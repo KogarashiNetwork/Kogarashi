@@ -1,0 +1,9 @@
+[package]
+authors = ['NoCtrlZ<shinsaku.ashizawa@artree.co.jp>']
+description = 'twisted edwards curve implementation'
+name = "zero-jubjub"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[dependencies]
