@@ -1,6 +1,8 @@
 #![no_std]
 #![feature(asm)]
 
+mod arithmetic;
+
 #[cfg(test)]
 mod tests {
     #[test]
