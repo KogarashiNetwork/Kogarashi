@@ -2,6 +2,7 @@
 #![feature(asm)]
 
 mod arithmetic;
+mod fr;
 
 #[cfg(test)]
 mod tests {
