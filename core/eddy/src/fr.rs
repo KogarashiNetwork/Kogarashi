@@ -1,4 +1,4 @@
-use crate::arithmetic::{add, sub, double};
+use crate::arithmetic::{add, double, sub};
 use parity_scale_codec::{Decode, Encode};
 
 pub const MODULUS: &[u64; 4] = &[
