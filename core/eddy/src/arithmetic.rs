@@ -1,11 +1,6 @@
-pub const MODULUS: &[u64; 4] = &[
-    0xd097_0e5e_d6f7_2cb7,
-    0xa668_2093_ccc8_1082,
-    0x0667_3b01_0134_3b00,
-    0x0e7d_b4ea_6533_afa9,
-];
+use crate::fr::MODULUS;
 
-pub fn add(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
+pub(crate) fn add(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     let mut r0: u64;
     let mut r1: u64;
     let mut r2: u64;
@@ -55,7 +50,7 @@ pub fn add(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     [r0, r1, r2, r3]
 }
 
-pub fn sub(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
+pub(crate) fn sub(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     let mut r0: u64;
     let mut r1: u64;
     let mut r2: u64;
@@ -105,7 +100,7 @@ pub fn sub(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     [r0, r1, r2, r3]
 }
 
-pub fn double(a: &[u64; 4]) -> [u64; 4] {
+pub(crate) fn double(a: &[u64; 4]) -> [u64; 4] {
     let mut r0: u64;
     let mut r1: u64;
     let mut r2: u64;
