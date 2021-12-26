@@ -12,3 +12,11 @@
 - Curve
     - Efficient
         - [`Efficient ECC in zkSNARKs using ZoKrates`](https://medium.com/zokrates/efficient-ecc-in-zksnarks-using-zokrates-bd9ae37b8186)
+
+## Plonk
+
+- zk SNARKs
+    - Groth16
+        - [`ZKP - Deep into Bellman Library`](https://starli.medium.com/zkp-deep-into-bellman-library-9b1bf52cb1a6)
+    - Optimization
+        - [`Loopring's zkSNARK Prover Optimizations`](https://medium.loopring.io/zksnark-prover-optimizations-3e9a3e5578c0)
