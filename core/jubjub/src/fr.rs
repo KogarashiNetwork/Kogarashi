@@ -1,6 +1,9 @@
 use crate::arithmetic::{add, double, mul, sub};
 use crate::error::Error;
-use core::cmp::Ordering;
+use core::{
+    cmp::Ordering,
+    fmt::{Display, Formatter, Result as FmtResult},
+};
 use parity_scale_codec::{Decode, Encode};
 
 pub(crate) const MODULUS: &[u64; 4] = &[
@@ -163,5 +166,16 @@ impl Ord for Fr {
             }
         }
         Ordering::Equal
+    }
+}
+
+impl Display for Fr {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        let tmp = self.to_bytes();
+        write!(f, "0x")?;
+        for &b in tmp.iter().rev() {
+            write!(f, "{:02x}", b)?;
+        }
+        Ok(())
     }
 }
