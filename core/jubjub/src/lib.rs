@@ -3,6 +3,7 @@
 #![allow(dead_code)]
 
 mod arithmetic;
+mod error;
 mod fr;
 
 #[cfg(test)]

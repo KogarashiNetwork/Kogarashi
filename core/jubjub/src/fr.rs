@@ -1,4 +1,5 @@
 use crate::arithmetic::{add, double, mul, sub};
+use crate::error::Error;
 use core::cmp::Ordering;
 use parity_scale_codec::{Decode, Encode};
 
@@ -33,6 +34,69 @@ impl Fr {
     #[inline(always)]
     pub fn mul_assign(&mut self, other: Self) {
         self.0 = mul(&self.0, &other.0)
+    }
+
+    fn from_hex(hex: &str) -> Result<Fr, Error> {
+        let max_len = 64;
+        let hex = hex.strip_prefix("0x").unwrap_or(hex);
+        let length = hex.len();
+        if length > max_len {
+            return Err(Error::HexStringTooLong);
+        }
+        let hex_bytes = hex.as_bytes();
+        Fr::from_bytes(hex_bytes)
+    }
+
+    fn to_bytes(&self) -> [u8; 64] {
+        let mut bytes: [u8; 64] = [0; 64];
+        let mut index = 0;
+        for i in 0..self.0.len() {
+            let mut number = self.0[i];
+            for n in 0..16 {
+                let quotient = number / 16_u64.pow(16 - n as u32);
+                bytes[index] = quotient as u8;
+                number = number % 16_u64.pow(16 - n as u32);
+                index += 1;
+            }
+        }
+        bytes
+    }
+
+    fn from_bytes(bytes: &[u8]) -> Result<Fr, Error> {
+        let max_len = 96;
+        let length = bytes.len();
+        if length > max_len {
+            return Err(Error::BytesTooLong);
+        }
+        let mut hex: [[u8; 16]; 6] = [[0; 16]; 6];
+        for i in 0..max_len {
+            hex[i / 16][i % 16] = if i >= length {
+                0
+            } else {
+                match bytes[length - i - 1] {
+                    48..=57 => bytes[length - i - 1] - 48,
+                    65..=70 => bytes[length - i - 1] - 55,
+                    97..=102 => bytes[length - i - 1] - 87,
+                    _ => return Err(Error::HexStringInvalid),
+                }
+            };
+        }
+        let mut limbs: [u64; 4] = [0; 4];
+        for i in 0..hex.len() {
+            limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
+        }
+        Ok(Fr(limbs))
+    }
+
+    fn bytes_to_u64(bytes: &[u8; 16]) -> Result<u64, Error> {
+        let mut res: u64 = 0;
+        for i in 0..bytes.len() {
+            res += match bytes[i] {
+                0..=15 => 16u64.pow(i as u32) * bytes[i] as u64,
+                _ => return Err(Error::BytesInvalid),
+            }
+        }
+        Ok(res)
     }
 }
 
