@@ -8,8 +8,10 @@ license = "Apache-2.0"
 
 [dependencies]
 zero-jubjub = { version = "0.1", default-features = false, path = "./core/jubjub" }
+zero-plonk = { version = "0.1", default-features = false, path = "./core/plonk" }
 
 [workspace]
 members = [
-    "core/jubjub"
+    "core/jubjub",
+    "core/plonk"
 ]
