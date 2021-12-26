@@ -12,6 +12,8 @@
 - Curve
     - Efficient
         - [`Efficient ECC in zkSNARKs using ZoKrates`](https://medium.com/zokrates/efficient-ecc-in-zksnarks-using-zokrates-bd9ae37b8186)
+        - [`Efficient Techniques for High-Speed Elliptic Curve Cryptography`](https://www.iacr.org/archive/ches2010/62250075/62250075.pdf)
+        - [`Efficient Arithmetic on Elliptic Curves over Fields of Characteristic Three`](https://eprint.iacr.org/2012/122.pdf)
 
 ## Plonk
 
