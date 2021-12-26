@@ -39,6 +39,10 @@ impl Fr {
         self.0 = mul(&self.0, &other.0)
     }
 
+    pub const fn zero() -> Fr {
+        Fr([0, 0, 0, 0])
+    }
+
     fn from_hex(hex: &str) -> Result<Fr, Error> {
         let max_len = 64;
         let hex = hex.strip_prefix("0x").unwrap_or(hex);
@@ -66,12 +70,12 @@ impl Fr {
     }
 
     fn from_bytes(bytes: &[u8]) -> Result<Fr, Error> {
-        let max_len = 96;
+        let max_len = 64;
         let length = bytes.len();
         if length > max_len {
             return Err(Error::BytesTooLong);
         }
-        let mut hex: [[u8; 16]; 6] = [[0; 16]; 6];
+        let mut hex: [[u8; 16]; 4] = [[0; 16]; 4];
         for i in 0..max_len {
             hex[i / 16][i % 16] = if i >= length {
                 0
@@ -100,6 +104,12 @@ impl Fr {
             }
         }
         Ok(res)
+    }
+}
+
+impl Default for Fr {
+    fn default() -> Self {
+        Fr::zero()
     }
 }
 
@@ -177,5 +187,26 @@ impl Display for Fr {
             write!(f, "{:02x}", b)?;
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod fr_tests {
+    use super::*;
+
+    #[test]
+    fn test_cmp() {
+        let a = Fr::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad82")
+            .unwrap();
+        let b = Fr::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad83")
+            .unwrap();
+
+        assert_eq!(a <= a, true);
+        assert_eq!(a >= a, true);
+        assert_eq!(a == a, true);
+        assert_eq!(a < b, true);
+        assert_eq!(a > b, false);
+        assert_eq!(a != b, true);
+        assert_eq!(a == b, false);
     }
 }
