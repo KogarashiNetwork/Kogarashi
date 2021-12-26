@@ -7,9 +7,9 @@ edition = "2021"
 license = "Apache-2.0"
 
 [dependencies]
-eddy = { version = "0.1", default-features = false, path = "./core/eddy" }
+zero-jubjub = { version = "0.1", default-features = false, path = "./core/jubjub" }
 
 [workspace]
 members = [
-    "core/eddy"
+    "core/jubjub"
 ]

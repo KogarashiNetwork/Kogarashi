@@ -1,6 +1,6 @@
 # Reference
 
-## Eddy
+## Jubjub
 
 - Field Arithmetic
     - Additive
