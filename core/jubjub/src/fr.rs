@@ -117,36 +117,36 @@ impl PartialOrd for Fr {
     }
 
     fn lt(&self, other: &Self) -> bool {
-        for i in 0..self.0.len() {
-            if self.0[3 - i] != other.0[3 - i] {
-                return self.0[3 - i] < other.0[3 - i];
+        for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+            if a != b {
+                return a < b;
             }
         }
         false
     }
 
     fn le(&self, other: &Self) -> bool {
-        for i in 0..self.0.len() {
-            if self.0[3 - i] != other.0[3 - i] {
-                return self.0[3 - i] < other.0[3 - i];
+        for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+            if a != b {
+                return a < b;
             }
         }
         true
     }
 
     fn gt(&self, other: &Self) -> bool {
-        for i in 0..self.0.len() {
-            if self.0[3 - i] != other.0[3 - i] {
-                return self.0[3 - i] > other.0[3 - i];
+        for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+            if a != b {
+                return a > b;
             }
         }
         false
     }
 
     fn ge(&self, other: &Self) -> bool {
-        for i in 0..self.0.len() {
-            if self.0[3 - i] != other.0[3 - i] {
-                return self.0[3 - i] > other.0[3 - i];
+        for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+            if a != b {
+                return a > b;
             }
         }
         true
@@ -155,13 +155,11 @@ impl PartialOrd for Fr {
 
 impl Ord for Fr {
     fn cmp(&self, other: &Self) -> Ordering {
-        for i in 0..self.0.len() {
-            if self.0[3 - i] != other.0[3 - i] {
-                return if self.0[3 - i] > other.0[3 - i] {
-                    Ordering::Greater
-                } else {
-                    Ordering::Less
-                };
+        for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+            if a < b {
+                return Ordering::Less;
+            } else if a > b {
+                return Ordering::Greater;
             }
         }
         Ordering::Equal
