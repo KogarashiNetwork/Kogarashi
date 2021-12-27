@@ -1,3 +1,9 @@
 # Zero Network
 [![CI Check](https://github.com/zero-network/zero/actions/workflows/ci.yml/badge.svg)](https://github.com/zero-network/zero/actions/workflows/ci.yml) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE)  
 Zero Network is a completely anonymous blockchain. This allows us the confidential transactions and private smart contracts. These features are realized without relying on `trusted party`, `sidechian technologies` and `TEE`, `optimistic assumption`.
+
+## Directory Structure
+- core  
+The cryptography libraries.
+- prototype  
+The anonymous blockchain implementation.
