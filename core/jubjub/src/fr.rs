@@ -268,7 +268,7 @@ mod fr_tests {
                 .unwrap()
         );
 
-        // a + modulus = a
+        // a - modulus = a
         let mut b =
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
                 .unwrap();
@@ -279,7 +279,7 @@ mod fr_tests {
                 .unwrap()
         );
 
-        // a + 1
+        // a - 1
         let mut c =
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
                 .unwrap();
@@ -289,6 +289,23 @@ mod fr_tests {
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6e")
                 .unwrap()
         )
+    }
+
+    #[test]
+    fn test_double() {
+        // a double = a + a
+        let mut a =
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap();
+        a.double_assign();
+        let mut b =
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap();
+        b.add_assign(
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap(),
+        );
+        assert_eq!(a, b);
     }
 
     #[test]
