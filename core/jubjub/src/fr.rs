@@ -1,4 +1,4 @@
-use crate::arithmetic::{add, double, mul, reduce, sub};
+use crate::arithmetic::{add, double, mul, sub};
 use crate::error::Error;
 use core::{
     cmp::Ordering,
@@ -6,6 +6,9 @@ use core::{
 };
 use parity_scale_codec::{Decode, Encode};
 use rand_core::RngCore;
+
+#[allow(unused_imports)]
+use libc_print::libc_println as println;
 
 pub(crate) const MODULUS: &[u64; 4] = &[
     0xd0970e5ed6f72cb7,
@@ -93,7 +96,7 @@ impl Fr {
         for i in 0..hex.len() {
             limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
         }
-        Ok(Fr(reduce(&limbs)))
+        Ok(Fr(limbs))
     }
 
     pub fn random(mut rand: impl RngCore) -> Result<Self, Error> {
@@ -200,6 +203,21 @@ impl Display for Fr {
 #[cfg(test)]
 mod fr_tests {
     use super::*;
+
+    #[test]
+    fn test_from_hex() {
+        let a = Fr::from_hex("0x64774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab")
+            .unwrap();
+        assert_eq!(
+            a,
+            Fr([
+                0xb9feffffffffaaab,
+                0x1eabfffeb153ffff,
+                0x6730d2a0f6b0f624,
+                0x64774b84f38512bf,
+            ])
+        )
+    }
 
     #[test]
     fn test_cmp() {
