@@ -220,6 +220,39 @@ mod fr_tests {
     }
 
     #[test]
+    fn test_add() {
+        let mut a =
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap();
+        a.add_asign(Fr::zero());
+        assert_eq!(
+            a,
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap()
+        );
+
+        let mut b =
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap();
+        b.add_asign(Fr(*MODULUS));
+        assert_eq!(
+            b,
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap()
+        );
+
+        let mut c =
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap();
+        c.add_asign(Fr([1, 0, 0, 0]));
+        assert_eq!(
+            c,
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e70")
+                .unwrap()
+        )
+    }
+
+    #[test]
     fn test_cmp() {
         let a = Fr::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad82")
             .unwrap();
