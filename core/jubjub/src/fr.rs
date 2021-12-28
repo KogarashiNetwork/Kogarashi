@@ -24,7 +24,7 @@ pub(crate) struct Fr(pub(crate) [u64; 4]);
 
 impl Fr {
     #[inline(always)]
-    pub fn add_asign(&mut self, other: Self) {
+    pub fn add_assign(&mut self, other: Self) {
         self.0 = add(&self.0, &other.0);
     }
 
@@ -221,33 +221,72 @@ mod fr_tests {
 
     #[test]
     fn test_add() {
+        // a + 0 = a
         let mut a =
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
                 .unwrap();
-        a.add_asign(Fr::zero());
+        a.add_assign(Fr::zero());
         assert_eq!(
             a,
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
                 .unwrap()
         );
 
+        // a + modulus = a
         let mut b =
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
                 .unwrap();
-        b.add_asign(Fr(*MODULUS));
+        b.add_assign(Fr(*MODULUS));
         assert_eq!(
             b,
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
                 .unwrap()
         );
 
+        // a + 1
         let mut c =
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
                 .unwrap();
-        c.add_asign(Fr([1, 0, 0, 0]));
+        c.add_assign(Fr([1, 0, 0, 0]));
         assert_eq!(
             c,
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e70")
+                .unwrap()
+        )
+    }
+
+    #[test]
+    fn test_sub() {
+        // a - 0 = a
+        let mut a =
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap();
+        a.sub_assign(Fr::zero());
+        assert_eq!(
+            a,
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap()
+        );
+
+        // a + modulus = a
+        let mut b =
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap();
+        b.sub_assign(Fr(*MODULUS));
+        assert_eq!(
+            b,
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap()
+        );
+
+        // a + 1
+        let mut c =
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
+                .unwrap();
+        c.sub_assign(Fr([1, 0, 0, 0]));
+        assert_eq!(
+            c,
+            Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6e")
                 .unwrap()
         )
     }

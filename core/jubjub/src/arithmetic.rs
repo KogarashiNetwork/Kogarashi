@@ -61,6 +61,12 @@ pub(crate) fn sub(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     let mut r3: u64;
     unsafe {
         asm!(
+            // init modulus area
+            "xor r12, r12",
+            "xor r13, r13",
+            "xor r14, r14",
+            "xor r15, r15",
+
             // load a array to former registers
             "mov r8, qword ptr [{a_ptr} + 0]",
             "mov r9, qword ptr [{a_ptr} + 8]",
@@ -73,23 +79,17 @@ pub(crate) fn sub(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             "sbb r10, qword ptr [{b_ptr} + 16]",
             "sbb r11, qword ptr [{b_ptr} + 24]",
 
-            // copy result array to latter registers
-            "mov r12, r8",
-            "mov r13, r9",
-            "mov r14, r10",
-            "mov r15, r11",
+            // if carry copy modulus
+            "cmovc r12, qword ptr [{m_ptr} + 0]",
+            "cmovc r13, qword ptr [{m_ptr} + 8]",
+            "cmovc r14, qword ptr [{m_ptr} + 16]",
+            "cmovc r15, qword ptr [{m_ptr} + 24]",
 
             // mod addition
-            "add r12, qword ptr [{m_ptr} + 0]",
-            "adc r13, qword ptr [{m_ptr} + 8]",
-            "adc r14, qword ptr [{m_ptr} + 16]",
-            "adc r15, qword ptr [{m_ptr} + 24]",
-
-            // if not carry copy former registers to out areas
-            "cmovnc r12, r8",
-            "cmovnc r13, r9",
-            "cmovnc r14, r10",
-            "cmovnc r15, r11",
+            "add  r12, r8",
+            "adc  r13, r9",
+            "adc  r14, r10",
+            "adc  r15, r11",
 
             m_ptr = in(reg) MODULUS.as_ptr(),
             a_ptr = in(reg) a.as_ptr(),
@@ -147,6 +147,10 @@ pub(crate) fn double(a: &[u64; 4]) -> [u64; 4] {
 
             m_ptr = in(reg) MODULUS.as_ptr(),
             a_ptr = in(reg) a.as_ptr(),
+            out("r8") _,
+            out("r9") _,
+            out("r10") _,
+            out("r11") _,
             out("r12") r0,
             out("r13") r1,
             out("r14") r2,
@@ -472,6 +476,10 @@ pub(crate) fn reduce(a: &[u64; 4]) -> [u64; 4] {
 
             m_ptr = in(reg) MODULUS.as_ptr(),
             a_ptr = in(reg) a.as_ptr(),
+            out("r8") _,
+            out("r9") _,
+            out("r10") _,
+            out("r11") _,
             out("r12") r0,
             out("r13") r1,
             out("r14") r2,
