@@ -1,0 +1,21 @@
+[tasks.test]
+description = "cargo test all dependencies"
+command = "cargo"
+args = ["test", "--verbose", "--release", "--all", "--all-features"]
+
+[tasks.build]
+description = "cargo build all dependencies"
+command = "cargo"
+args = ["build", "--all-features"]
+
+[tasks.ci]
+description = "github actions check"
+command = "cargo"
+args = ["fmt", "--all", "--", "--check"]
+dependencies = [
+    "build",
+    "test",
+]
+
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = "true"
