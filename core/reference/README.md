@@ -22,3 +22,6 @@
         - [`ZKP - Deep into Bellman Library`](https://starli.medium.com/zkp-deep-into-bellman-library-9b1bf52cb1a6)
     - Optimization
         - [`Loopring's zkSNARK Prover Optimizations`](https://medium.loopring.io/zksnark-prover-optimizations-3e9a3e5578c0)
+    - Plonk
+        - Setup
+            - [`Constant-Size Commitments to Polynomials and Their Applications?`](https://www.iacr.org/archive/asiacrypt2010/6477178/6477178.pdf)
