@@ -1,4 +1,4 @@
-use crate::arithmetic::{add, double, mul, sub};
+use crate::arithmetic::{add, double, mul, reduce, sub};
 use crate::error::Error;
 use core::{
     cmp::Ordering,
@@ -93,7 +93,7 @@ impl Fr {
         for i in 0..hex.len() {
             limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
         }
-        Ok(Fr(limbs))
+        Ok(Fr(reduce(&limbs)))
     }
 
     pub fn random(mut rand: impl RngCore) -> Result<Self, Error> {
