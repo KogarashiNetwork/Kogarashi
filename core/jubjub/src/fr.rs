@@ -5,6 +5,7 @@ use core::{
     fmt::{Display, Formatter, Result as FmtResult},
 };
 use parity_scale_codec::{Decode, Encode};
+use rand_core::RngCore;
 
 pub(crate) const MODULUS: &[u64; 4] = &[
     0xd0970e5ed6f72cb7,
@@ -93,6 +94,12 @@ impl Fr {
             limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
         }
         Ok(Fr(limbs))
+    }
+
+    pub fn random(mut rand: impl RngCore) -> Result<Self, Error> {
+        let mut random_bytes = [0; 64];
+        rand.fill_bytes(&mut random_bytes[..]);
+        Fr::from_bytes(&random_bytes)
     }
 
     fn bytes_to_u64(bytes: &[u8; 16]) -> Result<u64, Error> {
