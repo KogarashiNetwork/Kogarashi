@@ -5,7 +5,7 @@ use core::{
     fmt::{Display, Formatter, Result as FmtResult},
 };
 use parity_scale_codec::{Decode, Encode};
-use rand_core::RngCore;
+// use rand_core::RngCore;
 
 #[allow(unused_imports)]
 use libc_print::libc_println as println;
@@ -195,23 +195,23 @@ impl Display for Fr {
 #[cfg(test)]
 mod fr_tests {
     use super::*;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
+    // use rand::SeedableRng;
+    // use rand_xorshift::XorShiftRng;
 
-    #[test]
-    fn test_random() {
-        for i in 0..10000 {
-            let mut initial_seeds = [
-                0x43, 0x62, 0xbe, 0x7d, 0x23, 0xad, 0x56, 0xcd, 0x33, 0x0a, 0x22, 0x23, 0x46, 0x36,
-                0xac, 0xef,
-            ];
-            let seed = i as u8 % u8::MAX;
-            let index = (seed % 16) as usize;
-            initial_seeds[index] = seed;
-            let rng = XorShiftRng::from_seed(initial_seeds);
-            // Fr::random(rng).unwrap();
-        }
-    }
+    // #[test]
+    // fn test_random() {
+    //     for i in 0..10000 {
+    //         let mut initial_seeds = [
+    //             0x43, 0x62, 0xbe, 0x7d, 0x23, 0xad, 0x56, 0xcd, 0x33, 0x0a, 0x22, 0x23, 0x46, 0x36,
+    //             0xac, 0xef,
+    //         ];
+    //         let seed = i as u8 % u8::MAX;
+    //         let index = (seed % 16) as usize;
+    //         initial_seeds[index] = seed;
+    //         let rng = XorShiftRng::from_seed(initial_seeds);
+    //         // Fr::random(rng).unwrap();
+    //     }
+    // }
 
     #[test]
     fn test_from_hex() {
@@ -315,6 +315,31 @@ mod fr_tests {
                 .unwrap(),
         );
         assert_eq!(a, b);
+    }
+
+    #[test]
+    fn test_mul() {
+        let mut a = Fr([
+            0xb433b01287f71744,
+            0x4eafb86728c4d108,
+            0xfdd52c14b9dfbe65,
+            0x2ff1f3434821118,
+        ]);
+        a.mul_assign(Fr([
+            0xdae00fc63c9fa90f,
+            0x5a5ed89b96ce21ce,
+            0x913cd26101bd6f58,
+            0x3f0822831697fe9,
+        ]));
+        assert_eq!(
+            a,
+            Fr([
+                0xb68ecb61d54d2992,
+                0x5ff95874defce6a6,
+                0x3590eb053894657d,
+                0x53823a118515933
+            ])
+        );
     }
 
     #[test]

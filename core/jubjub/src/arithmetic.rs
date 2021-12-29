@@ -1,4 +1,4 @@
-use crate::fr::{INV, MODULUS};
+use crate::fr::MODULUS;
 
 pub(crate) fn add(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     let mut r0: u64;
@@ -296,7 +296,7 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             // r8 ~ r15
 
             // `r8` -> 0
-            "mov rdx, qword ptr [{i_ptr}]",
+            "mov rdx, 0x1ba3a358ef788ef9",
             "mulx rax, rdx, r8",
 
             // r8' * m0
@@ -311,20 +311,20 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             "adcx r10, rcx",
             "adc r11, 0",
 
-            // r8' * m2
+            // // r8' * m2
             "mulx rcx, rax, qword ptr [{m_ptr} + 16]",
             "add r10, rax",
             "adcx r11, rcx",
             "adc r12, 0",
 
-            // r8' * m3
+            // // r8' * m3
             "mulx rcx, rax, qword ptr [{m_ptr} + 24]",
             "add r11, rax",
             "adcx r12, rcx",
             "adc r13, 0",
 
             // `r9` -> 0
-            "mov rdx, qword ptr [{i_ptr}]",
+            "mov rdx, 0x1ba3a358ef788ef9",
             "mulx rax, rdx, r9",
 
             // r9' * m0
@@ -352,7 +352,7 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             "adc r14, 0",
 
             // `r10` -> 0
-            "mov rdx, qword ptr [{i_ptr}]",
+            "mov rdx, 0x1ba3a358ef788ef9",
             "mulx rax, rdx, r10",
 
             // r10' * m0
@@ -380,7 +380,7 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             "adc r15, 0",
 
             // `r11` -> 0
-            "mov rdx, qword ptr [{i_ptr}]",
+            "mov rdx, 0x1ba3a358ef788ef9",
             "mulx rax, rdx, r11",
 
             // r11' * m0
@@ -424,7 +424,6 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
 
             a_ptr = in(reg) a.as_ptr(),
             b_ptr = in(reg) b.as_ptr(),
-            i_ptr = in(reg) &INV,
             m_ptr = in(reg) MODULUS.as_ptr(),
             out("rax") _,
             out("rcx") _,
