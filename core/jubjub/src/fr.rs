@@ -55,7 +55,25 @@ impl Fr {
             return Err(Error::HexStringTooLong);
         }
         let hex_bytes = hex.as_bytes();
-        Fr::from_bytes(hex_bytes)
+
+        let mut hex: [[u8; 16]; 4] = [[0; 16]; 4];
+        for i in 0..max_len {
+            hex[i / 16][i % 16] = if i >= length {
+                0
+            } else {
+                match hex_bytes[length - i - 1] {
+                    48..=57 => hex_bytes[length - i - 1] - 48,
+                    65..=70 => hex_bytes[length - i - 1] - 55,
+                    97..=102 => hex_bytes[length - i - 1] - 87,
+                    _ => return Err(Error::HexStringInvalid),
+                }
+            };
+        }
+        let mut limbs: [u64; 4] = [0; 4];
+        for i in 0..hex.len() {
+            limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
+        }
+        Ok(Fr(limbs))
     }
 
     fn to_bytes(&self) -> [u8; 64] {
@@ -73,37 +91,11 @@ impl Fr {
         bytes
     }
 
-    fn from_bytes(bytes: &[u8]) -> Result<Fr, Error> {
-        let max_len = 64;
-        let length = bytes.len();
-        if length > max_len {
-            return Err(Error::BytesTooLong);
-        }
-        let mut hex: [[u8; 16]; 4] = [[0; 16]; 4];
-        for i in 0..max_len {
-            hex[i / 16][i % 16] = if i >= length {
-                0
-            } else {
-                match bytes[length - i - 1] {
-                    48..=57 => bytes[length - i - 1] - 48,
-                    65..=70 => bytes[length - i - 1] - 55,
-                    97..=102 => bytes[length - i - 1] - 87,
-                    _ => return Err(Error::HexStringInvalid),
-                }
-            };
-        }
-        let mut limbs: [u64; 4] = [0; 4];
-        for i in 0..hex.len() {
-            limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
-        }
-        Ok(Fr(limbs))
-    }
-
-    pub fn random(mut rand: impl RngCore) -> Result<Self, Error> {
-        let mut random_bytes = [0; 64];
-        rand.fill_bytes(&mut random_bytes[..]);
-        Fr::from_bytes(&random_bytes)
-    }
+    // pub fn random(mut rand: impl RngCore) -> Result<Self, Error> {
+    //     let mut random_bytes = [0; 64];
+    //     rand.fill_bytes(&mut random_bytes[..]);
+    //     Fr::from_bytes(&random_bytes)
+    // }
 
     fn bytes_to_u64(bytes: &[u8; 16]) -> Result<u64, Error> {
         let mut res: u64 = 0;
@@ -217,7 +209,7 @@ mod fr_tests {
             let index = (seed % 16) as usize;
             initial_seeds[index] = seed;
             let rng = XorShiftRng::from_seed(initial_seeds);
-            Fr::random(rng).unwrap();
+            // Fr::random(rng).unwrap();
         }
     }
 
