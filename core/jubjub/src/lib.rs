@@ -5,3 +5,5 @@
 mod arithmetic;
 mod error;
 mod fr;
+
+pub use fr::Fr;

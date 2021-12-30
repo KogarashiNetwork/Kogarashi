@@ -44,7 +44,7 @@ const R3: Fr = Fr([
 pub(crate) const INV: u64 = 0x1ba3a358ef788ef9;
 
 #[derive(Debug, Clone, Decode, Encode)]
-pub(crate) struct Fr(pub(crate) [u64; 4]);
+pub struct Fr(pub(crate) [u64; 4]);
 
 impl Fr {
     #[inline(always)]
