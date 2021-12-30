@@ -1,4 +1,4 @@
-use crate::arithmetic::{add, double, mul, sub};
+use crate::arithmetic::{add, double, mul, square, sub};
 use crate::error::Error;
 use core::{
     cmp::Ordering,
@@ -65,6 +65,11 @@ impl Fr {
     #[inline(always)]
     pub fn mul_assign(&mut self, other: Self) {
         self.0 = mul(&self.0, &other.0)
+    }
+
+    #[inline(always)]
+    pub fn square_assign(&mut self) {
+        self.0 = square(&self.0, &self.0)
     }
 
     pub const fn zero() -> Fr {
@@ -379,6 +384,21 @@ mod fr_tests {
                 0x53823a118515933
             ])
         );
+    }
+
+    #[test]
+    fn test_sqare() {
+        let mut a = Fr([
+            0xffffffffffffffff,
+            0xffffffffffffffff,
+            0xffffffffffffffff,
+            0xe7db4ea6533afa8,
+        ]);
+        let mut b = a.clone();
+        let c = a.clone();
+        a.square_assign();
+        b.mul_assign(c);
+        assert_eq!(a, b);
     }
 
     #[test]
