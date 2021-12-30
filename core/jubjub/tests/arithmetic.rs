@@ -8,7 +8,7 @@ mod arithmetic_tests {
 
     #[test]
     fn add_test() {
-        for i in 0..100000 {
+        for i in 0..1000000 {
             let mut initial_seeds = [
                 0x43, 0x62, 0xbe, 0x7d, 0x23, 0xad, 0x56, 0xcd, 0x33, 0x0a, 0x22, 0x23, 0x46, 0x36,
                 0xac, 0xef,
@@ -21,15 +21,18 @@ mod arithmetic_tests {
             let mut a = Fr::random(rng);
             let b = a.clone();
             let mut c = a.clone();
+
+            // a + a = a * 2
             a.add_assign(b);
             c.double_assign();
+
             assert_eq!(a, c);
         }
     }
 
     #[test]
     fn sub_test() {
-        for i in 0..100000 {
+        for i in 0..1000000 {
             let mut initial_seeds = [
                 0x43, 0x62, 0xbe, 0x7d, 0x23, 0xad, 0x56, 0xcd, 0x33, 0x0a, 0x22, 0x23, 0x46, 0x36,
                 0xac, 0xef,
@@ -43,17 +46,21 @@ mod arithmetic_tests {
             let b = a.clone();
             let mut c = a.clone();
             let mut d = a.clone();
+
+            // a - a = a * 2 - a * 2
             a.sub_assign(b);
             c.double_assign();
+
             d.double_assign();
             c.sub_assign(d);
+
             assert_eq!(a, c);
         }
     }
 
     #[test]
     fn mul_test() {
-        for i in 0..100000 {
+        for i in 0..1000000 {
             let mut initial_seeds = [
                 0x43, 0x62, 0xbe, 0x7d, 0x23, 0xad, 0x56, 0xcd, 0x33, 0x0a, 0x22, 0x23, 0x46, 0x36,
                 0xac, 0xef,
