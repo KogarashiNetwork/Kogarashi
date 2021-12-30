@@ -266,7 +266,7 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             // a2 * b3
             "mulx rcx, rax, qword ptr [{b_ptr} + 24]",
             "adcx r13, rax",
-            "adc r14, rcx",
+            "adcx r14, rcx",
             "adc r15, 0",
 
             // `a3`
@@ -276,16 +276,19 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             "mulx rcx, rax, qword ptr [{b_ptr} + 0]",
             "add r11, rax",
             "adcx r12, rcx",
+            "adc r13, 0",
 
             // a3 * b1
             "mulx rcx, rax, qword ptr [{b_ptr} + 8]",
             "adcx r12, rax",
             "adcx r13, rcx",
+            "adc r14, 0",
 
             // a3 * b2
             "mulx rcx, rax, qword ptr [{b_ptr} + 16]",
             "adcx r13, rax",
             "adcx r14, rcx",
+            "adc r15, 0",
 
             // a3 * b3
             "mulx rcx, rax, qword ptr [{b_ptr} + 24]",
