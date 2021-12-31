@@ -1106,7 +1106,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
 
 [[package]]
-name = "pallet_confidential_transfer"
+name = "pallet-confidential-transfer"
 version = "0.1.0"
 dependencies = [
  "plonk-pallet",
@@ -2360,6 +2360,7 @@ version = "0.1.0"
 dependencies = [
  "ed25519",
  "ed25519-dalek",
+ "pallet-confidential-transfer",
  "rand_core 0.5.1",
  "zero-jubjub",
  "zero-plonk",
