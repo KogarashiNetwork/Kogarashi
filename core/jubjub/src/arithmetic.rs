@@ -445,7 +445,7 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     [r0, r1, r2, r3]
 }
 
-pub(crate) fn square(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
+pub(crate) fn square(a: &[u64; 4]) -> [u64; 4] {
     let mut r0: u64;
     let mut r1: u64;
     let mut r2: u64;
@@ -476,79 +476,83 @@ pub(crate) fn square(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             //    r15  | 33  |     |     |
 
             // init registers
-            "xor r13, r13",
-            "xor r14, r14",
-            "xor r15, r15",
+            "mov r12, qword ptr [{a_ptr} + 0]",
+            "mov r13, qword ptr [{a_ptr} + 8]",
+            "mov r14, qword ptr [{a_ptr} + 16]",
+            "mov r15, qword ptr [{a_ptr} + 24]",
 
             // `a0`
-            "mov rdx, qword ptr [{a_ptr} + 0]",
+            "mov rdx, r12",
 
             // a0 * b0
-            "mulx r9, r8, qword ptr [{b_ptr} + 0]",
+            "mulx r9, r8, r12",
 
             // a0 * b1
-            "mulx r10, rax, qword ptr [{b_ptr} + 8]",
+            "mulx r10, rax, r13",
             "add r9, rax",
 
             // a0 * b2
-            "mulx r11, rax, qword ptr [{b_ptr} + 16]",
+            "mulx r11, rax, r14",
             "adcx r10, rax",
 
             // a0 * b3
-            "mulx r12, rax, qword ptr [{b_ptr} + 24]",
+            "mulx r12, rax, r15",
             "adcx r11, rax",
             "adc r12, 0",
 
             // `a1`
-            "mov rdx, [{a_ptr} + 8]",
+            "mov rdx, r13",
 
             // a1 * b0
-            "mulx rcx, rax, qword ptr [{b_ptr} + 0]",
+            "mulx rcx, rax, qword ptr [{a_ptr} + 0]",
             "add r9, rax",
             "adcx r10, rcx",
             "adc r11, 0",
 
             // a1 * b1
-            "mulx rcx, rax, qword ptr [{b_ptr} + 8]",
+            "mulx rcx, rax, r13",
             "add r10, rax",
             "adcx r11, rcx",
             "adc r12, 0",
+            "xor r13, r13",
 
             // a1 * b2
-            "mulx rcx, rax, qword ptr [{b_ptr} + 16]",
+            "mulx rcx, rax, r14",
             "add r11, rax",
             "adcx r12, rcx",
             "adc r13, 0",
+            "xor r14, r14",
 
             // a1 * b3
-            "mulx rcx, rax, qword ptr [{b_ptr} + 24]",
+            "mulx rcx, rax, r15",
             "add r12, rax",
             "adcx r13, rcx",
             "adc r14, 0",
+            "xor r15, r15",
 
             // `a2`
             "mov rdx, [{a_ptr} + 16]",
 
             // a2 * b0
-            "mulx rcx, rax, qword ptr [{b_ptr} + 0]",
+            "mulx rcx, rax, qword ptr [{a_ptr} + 0]",
             "add r10, rax",
             "adcx r11, rcx",
             "adc r12, 0",
 
             // a2 * b1
-            "mulx rcx, rax, qword ptr [{b_ptr} + 8]",
+            "mulx rcx, rax, qword ptr [{a_ptr} + 8]",
             "add r11, rax",
             "adcx r12, rcx",
             "adc r13, 0",
 
             // a2 * b2
-            "mulx rcx, rax, qword ptr [{b_ptr} + 16]",
+            "mulx rcx, rax, qword ptr [{a_ptr} + 16]",
             "add r12, rax",
             "adcx r13, rcx",
             "adc r14, 0",
 
             // a2 * b3
-            "mulx rcx, rax, qword ptr [{b_ptr} + 24]",
+            "mulx rcx, rax, qword ptr [{a_ptr} + 24]",
             "adcx r13, rax",
             "adcx r14, rcx",
             "adc r15, 0",
@@ -557,25 +561,25 @@ pub(crate) fn square(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             "mov rdx, [{a_ptr} + 24]",
 
             // a3 * b0
-            "mulx rcx, rax, qword ptr [{b_ptr} + 0]",
+            "mulx rcx, rax, qword ptr [{a_ptr} + 0]",
             "add r11, rax",
             "adcx r12, rcx",
             "adc r13, 0",
 
             // a3 * b1
-            "mulx rcx, rax, qword ptr [{b_ptr} + 8]",
+            "mulx rcx, rax, qword ptr [{a_ptr} + 8]",
             "adcx r12, rax",
             "adcx r13, rcx",
             "adc r14, 0",
 
             // a3 * b2
-            "mulx rcx, rax, qword ptr [{b_ptr} + 16]",
+            "mulx rcx, rax, qword ptr [{a_ptr} + 16]",
             "adcx r13, rax",
             "adcx r14, rcx",
             "adc r15, 0",
 
             // a3 * b3
-            "mulx rcx, rax, qword ptr [{b_ptr} + 24]",
+            "mulx rcx, rax, qword ptr [{a_ptr} + 24]",
             "adcx r14, rax",
             "adc r15, rcx",
 
@@ -710,7 +714,6 @@ pub(crate) fn square(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             "cmovc r11, r15",
 
             a_ptr = in(reg) a.as_ptr(),
-            b_ptr = in(reg) b.as_ptr(),
             m_ptr = in(reg) MODULUS.as_ptr(),
             out("rax") _,
             out("rcx") _,

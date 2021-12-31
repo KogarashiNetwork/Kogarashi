@@ -69,7 +69,7 @@ impl Fr {
 
     #[inline(always)]
     pub fn square_assign(&mut self) {
-        self.0 = square(&self.0, &self.0)
+        self.0 = square(&self.0)
     }
 
     pub const fn zero() -> Fr {
@@ -387,7 +387,7 @@ mod fr_tests {
     }
 
     #[test]
-    fn test_sqare() {
+    fn test_square() {
         let mut a = Fr([
             0xffffffffffffffff,
             0xffffffffffffffff,

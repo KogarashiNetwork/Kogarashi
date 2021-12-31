@@ -109,4 +109,46 @@ mod arithmetic_tests {
             assert_eq!(a, a3);
         }
     }
+
+    #[test]
+    fn square_test() {
+        for i in 0..1000000 {
+            let mut a_seeds = [
+                0x43, 0x62, 0xbe, 0x7d, 0x23, 0xad, 0x56, 0xcd, 0x33, 0x0a, 0x22, 0x23, 0x46, 0x36,
+                0xac, 0xef,
+            ];
+            let mut b_seeds = [
+                0xef, 0xac, 0x36, 0x7d, 0x23, 0x23, 0x22, 0x0a, 0x33, 0xcd, 0x56, 0xad, 0x46, 0xbe,
+                0x62, 0x43,
+            ];
+            let seed = i as u8 % u8::MAX;
+            let index = (seed % 16) as usize;
+            a_seeds[index] = seed;
+            b_seeds[index] = seed;
+            if i % 2 != 0 {
+                a_seeds.reverse();
+            } else {
+                b_seeds.reverse();
+            }
+            let a_rng = XorShiftRng::from_seed(a_seeds);
+            let b_rng = XorShiftRng::from_seed(b_seeds);
+
+            let mut a = Fr::random(a_rng);
+            let mut b = Fr::random(b_rng);
+            let mut a2 = a.clone();
+            let mut b2 = b.clone();
+
+            // (a * a) * (b * b)
+            a.mul_assign(a.clone());
+            b.mul_assign(b.clone());
+            a.mul_assign(b);
+
+            // a^2 * b^2
+            a2.square_assign();
+            b2.square_assign();
+            a2.mul_assign(b2);
+
+            assert_eq!(a, a2);
+        }
+    }
 }
