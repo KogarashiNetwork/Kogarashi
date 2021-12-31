@@ -3,10 +3,12 @@
 Zero Network is a completely anonymous blockchain. This allows us the confidential transactions and private smart contracts. These features are realized without relying on `trusted party`, `sidechian technologies` and `TEE`, `optimistic assumption`.
 
 ## Directory Structure
-- core  
-The cryptography libraries.
 - node  
 The anonymous blockchain implementation.
+- pallets  
+The `pallet` implementations which are used in blockchain.
+- snarks  
+The optimized `plonk` research and development.
 
 ## Test
 ```

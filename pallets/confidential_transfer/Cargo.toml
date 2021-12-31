@@ -1,0 +1,18 @@
+[package]
+name = "pallet_confidential_transfer"
+description = 'confidential transfer pallet'
+version = "0.1.0"
+authors = ['NoCtrlZ<shinsaku.ashizawa@artree.co.jp>']
+edition = "2021"
+license = "Apache-2.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+plonk-pallet = { git = "https://github.com/AstarNetwork/plonk", branch = 'master', default-features =  false }
+
+[features]
+default = ['std']
+std = [
+    'plonk-pallet/std'
+]

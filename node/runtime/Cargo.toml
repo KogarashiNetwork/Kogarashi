@@ -45,8 +45,8 @@ sp-std = { default-features = false, version = '3.0.0' }
 sp-transaction-pool = { default-features = false, version = '3.0.0' }
 sp-version = { default-features = false, version = '3.0.0' }
 
-# local dependencies
-plonk-pallet = { default-features = false, version = '0.2.1' }
+# Zero Network dependencies
+pallet_confidential_transfer = { path = "../../pallets/confidential_transfer", default-features =  false }
 
 [features]
 default = ['std']
@@ -71,7 +71,6 @@ std = [
     'pallet-grandpa/std',
     'pallet-randomness-collective-flip/std',
     'pallet-sudo/std',
-    'plonk-pallet/std',
     'pallet-timestamp/std',
     'pallet-transaction-payment-rpc-runtime-api/std',
     'pallet-transaction-payment/std',
