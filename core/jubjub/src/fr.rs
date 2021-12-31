@@ -19,26 +19,26 @@ pub(crate) const MODULUS: &[u64; 4] = &[
 
 /// R = 2^256 mod r
 const R: Fr = Fr([
-    0x25f8_0bb3_b996_07d9,
-    0xf315_d62f_66b6_e750,
-    0x9325_14ee_eb88_14f4,
-    0x09a6_fc6f_4791_55c6,
+    0x25f80bb3b99607d9,
+    0xf315d62f66b6e750,
+    0x932514eeeb8814f4,
+    0x09a6fc6f479155c6,
 ]);
 
 /// R^2 = 2^512 mod r
 const R2: Fr = Fr([
-    0x6771_9aa4_95e5_7731,
-    0x51b0_cef0_9ce3_fc26,
-    0x69da_b7fa_c026_e9a5,
-    0x04f6_547b_8d12_7688,
+    0x67719aa495e57731,
+    0x51b0cef09ce3fc26,
+    0x69dab7fac026e9a5,
+    0x04f6547b8d127688,
 ]);
 
 /// R^3 = 2^768 mod r
 const R3: Fr = Fr([
-    0xe0d6_c656_3d83_0544,
-    0x323e_3883_598d_0f85,
-    0xf0fe_a300_4c2e_2ba8,
-    0x0587_4f84_9467_37ec,
+    0xe0d6c6563d830544,
+    0x323e3883598d0f85,
+    0xf0fea3004c2e2ba8,
+    0x05874f84946737ec,
 ]);
 
 pub(crate) const INV: u64 = 0x1ba3a358ef788ef9;
@@ -76,7 +76,7 @@ impl Fr {
         Fr([0, 0, 0, 0])
     }
 
-    fn from_hex(hex: &str) -> Result<Fr, Error> {
+    pub fn from_hex(hex: &str) -> Result<Fr, Error> {
         let max_len = 64;
         let hex = hex.strip_prefix("0x").unwrap_or(hex);
         let length = hex.len();
