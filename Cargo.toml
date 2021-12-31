@@ -21,6 +21,7 @@ members = [
     "snarks/jubjub",
     "snarks/plonk",
     "pallets/confidential_transfer",
+    "draft"
 ]
 
 [features]

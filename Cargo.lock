@@ -261,6 +261,50 @@ dependencies = [
 ]
 
 [[package]]
+name = "crossbeam-channel"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06ed27e177f16d65f0f0c22a213e17c696ace5dd64b14258b52f9417ccb52db4"
+dependencies = [
+ "cfg-if",
+ "crossbeam-utils",
+]
+
+[[package]]
+name = "crossbeam-deque"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6455c0ca19f0d2fbf751b908d5c55c1f5cbc65e03c4225427254b46890bdde1e"
+dependencies = [
+ "cfg-if",
+ "crossbeam-epoch",
+ "crossbeam-utils",
+]
+
+[[package]]
+name = "crossbeam-epoch"
+version = "0.9.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4ec02e091aa634e2c3ada4a392989e7c3116673ef0ac5b72232439094d73b7fd"
+dependencies = [
+ "cfg-if",
+ "crossbeam-utils",
+ "lazy_static",
+ "memoffset",
+ "scopeguard",
+]
+
+[[package]]
+name = "crossbeam-utils"
+version = "0.8.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d82cfc11ce7f2c3faef78d8a684447b40d503d9681acebed6cb728d45940c4db"
+dependencies = [
+ "cfg-if",
+ "lazy_static",
+]
+
+[[package]]
 name = "crunchy"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -365,6 +409,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "draft"
+version = "0.1.0"
+dependencies = [
+ "dusk-jubjub 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "dusk-plonk 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand_core 0.6.3",
+]
+
+[[package]]
+name = "dusk-bls12_381"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e22aa3d0bb1f8a54723a33b056022b2f71eca929a86e2e03653f18b9dff0b1b8"
+dependencies = [
+ "byteorder",
+ "dusk-bytes",
+ "rand_core 0.6.3",
+ "rayon",
+ "subtle 2.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "dusk-bls12_381"
 version = "0.8.0"
 source = "git+https://github.com/AstarNetwork/bls12_381?branch=master#8e78639dd40d3f6c50da19901504517268cb592d"
@@ -390,9 +456,21 @@ dependencies = [
 [[package]]
 name = "dusk-jubjub"
 version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f842f5a6811741a236f46d4b7cd9da8a21e435e3395b4c3878681e0bb8e38d6f"
+dependencies = [
+ "dusk-bls12_381 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "dusk-bytes",
+ "rand_core 0.6.3",
+ "subtle 2.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "dusk-jubjub"
+version = "0.10.1"
 source = "git+https://github.com/AstarNetwork/jubjub?branch=master#b6819c22588f2c6797f4a001618069214230d8a5"
 dependencies = [
- "dusk-bls12_381",
+ "dusk-bls12_381 0.8.0 (git+https://github.com/AstarNetwork/bls12_381?branch=master)",
  "dusk-bytes",
  "rand_core 0.6.3",
  "subtle 2.4.1 (git+https://github.com/AstarNetwork/subtle?branch=main)",
@@ -401,11 +479,28 @@ dependencies = [
 [[package]]
 name = "dusk-plonk"
 version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1f56f95e1721c7cc035fdfa6976caf7c038dc068ce25e86ed02d94a2c4a2587e"
+dependencies = [
+ "cfg-if",
+ "dusk-bls12_381 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "dusk-bytes",
+ "dusk-jubjub 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "hashbrown 0.9.1",
+ "itertools",
+ "merlin 3.0.0",
+ "rand_core 0.6.3",
+ "rayon",
+]
+
+[[package]]
+name = "dusk-plonk"
+version = "0.9.0"
 source = "git+https://github.com/AstarNetwork/dusk-plonk?branch=master#180012e586dd6d81f4c9f7b395217fcf96f5eda1"
 dependencies = [
- "dusk-bls12_381",
+ "dusk-bls12_381 0.8.0 (git+https://github.com/AstarNetwork/bls12_381?branch=master)",
  "dusk-bytes",
- "dusk-jubjub",
+ "dusk-jubjub 0.10.1 (git+https://github.com/AstarNetwork/jubjub?branch=master)",
  "hashbrown 0.9.1",
  "itertools",
  "merlin 3.0.0",
@@ -970,6 +1065,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "308cc39be01b73d0d18f82a0e7b2a3df85245f84af96fdddc5d202d27e47b86a"
 
 [[package]]
+name = "memoffset"
+version = "0.6.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5aa361d4faea93603064a027415f07bd8e1d5c88c9fbf68bf56a285428fd79ce"
+dependencies = [
+ "autocfg",
+]
+
+[[package]]
 name = "memory-db"
 version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1236,8 +1340,8 @@ name = "plonk-pallet"
 version = "0.2.2"
 source = "git+https://github.com/AstarNetwork/plonk?branch=master#4fbd03cbc2f7617c04105f7c50f9d01a89c4abad"
 dependencies = [
- "dusk-jubjub",
- "dusk-plonk",
+ "dusk-jubjub 0.10.1 (git+https://github.com/AstarNetwork/jubjub?branch=master)",
+ "dusk-plonk 0.9.0 (git+https://github.com/AstarNetwork/dusk-plonk?branch=master)",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -1407,6 +1511,31 @@ dependencies = [
  "parity-scale-codec",
  "rand_core 0.6.3",
  "sp-std",
+]
+
+[[package]]
+name = "rayon"
+version = "1.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c06aca804d41dbc8ba42dfd964f0d01334eceb64314b9ecf7c5fad5188a06d90"
+dependencies = [
+ "autocfg",
+ "crossbeam-deque",
+ "either",
+ "rayon-core",
+]
+
+[[package]]
+name = "rayon-core"
+version = "1.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d78120e2c850279833f1dd3582f730c4ab53ed95aeaaaa862a2a5c71b1656d8e"
+dependencies = [
+ "crossbeam-channel",
+ "crossbeam-deque",
+ "crossbeam-utils",
+ "lazy_static",
+ "num_cpus",
 ]
 
 [[package]]
