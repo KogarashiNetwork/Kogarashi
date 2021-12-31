@@ -5,7 +5,7 @@ Zero Network is a completely anonymous blockchain. This allows us the confidenti
 ## Directory Structure
 - core  
 The cryptography libraries.
-- prototype  
+- node  
 The anonymous blockchain implementation.
 
 ## Test
