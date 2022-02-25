@@ -1,8 +1,10 @@
-use crate::arithmetic::{add, double, mul, square, sub};
+use crate::arithmetic::{add, double, mul, square, sub, neg};
 use crate::error::Error;
+use crate::operation::field_operation;
 use core::{
     cmp::Ordering,
     fmt::{Display, Formatter, Result as FmtResult},
+    ops::{Add, Mul, Neg, Sub},
 };
 use parity_scale_codec::{Decode, Encode};
 use rand_core::RngCore;
@@ -45,6 +47,8 @@ pub(crate) const INV: u64 = 0x1ba3a358ef788ef9;
 
 #[derive(Debug, Clone, Decode, Encode)]
 pub struct Fr(pub(crate) [u64; 4]);
+
+field_operation!(Fr);
 
 impl Fr {
     #[inline(always)]
