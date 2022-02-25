@@ -20,6 +20,7 @@ rand_core = { version = "0.5", features = ["std"] }
 members = [
     "snarks/jubjub",
     "snarks/plonk",
+    "snarks/poly",
     "pallets/confidential_transfer",
     "draft"
 ]
