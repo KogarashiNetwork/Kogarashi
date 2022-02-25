@@ -1,3 +1,5 @@
+mod fft;
+
 #[cfg(test)]
 mod tests {
     #[test]

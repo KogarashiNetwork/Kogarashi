@@ -9,7 +9,7 @@ license = "Apache-2.0"
 [dependencies]
 serde = { version = "1", default-features = false, features = ["derive"] }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
-rand_core = {version="0.6", default-features = false}
+rand_core = { version="0.6", default-features = false }
 libc-print = "0.1.16"
 
 [dev-dependencies]
