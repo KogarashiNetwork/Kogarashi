@@ -1,4 +1,4 @@
-use crate::arithmetic::{add, double, mul, square, sub, neg};
+use crate::arithmetic::{add, double, mul, neg, square, sub};
 use crate::error::Error;
 use crate::operation::field_operation;
 use core::{
@@ -45,7 +45,7 @@ const R3: &[u64; 4] = &[
 
 pub(crate) const INV: u64 = 0x1ba3a358ef788ef9;
 
-#[derive(Debug, Clone, Decode, Encode)]
+#[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct Fr(pub(crate) [u64; 4]);
 
 field_operation!(Fr);

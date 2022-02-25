@@ -8,7 +8,7 @@ mod fft_tests {
         let mut b_coeffs = vec![];
         let exponent_of_two = 6;
         let poly_degree = (1u64 << exponent_of_two) as usize;
-        let mut naive_result = Vec::<Fr>::with_capacity(poly_degree * 2);
+        let mut naive_result = vec![Fr::zero(); poly_degree * 2];
         for _ in 0..poly_degree {
             let rng = &mut rand::thread_rng();
             a_coeffs.push(Fr::random(rng));
@@ -22,5 +22,6 @@ mod fft_tests {
                 naive_result[a + b] = a_coeffs[a] * b_coeffs[b];
             }
         }
+        assert_eq!(naive_result.len(), poly_degree * 2)
     }
 }

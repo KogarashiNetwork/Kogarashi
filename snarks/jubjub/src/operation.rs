@@ -36,6 +36,15 @@ macro_rules! field_operation {
             }
         }
 
+        impl Mul for $field {
+            type Output = $field;
+
+            #[inline]
+            fn mul(self, rhs: $field) -> $field {
+                $field(mul(&self.0, &rhs.0))
+            }
+        }
+
         impl<'a, 'b> Mul<&'b $field> for &'a $field {
             type Output = $field;
 
