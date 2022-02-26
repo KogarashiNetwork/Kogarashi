@@ -1,6 +1,23 @@
+use sp_std::{vec, vec::Vec};
+use zero_jubjub::Fr;
+
+pub struct Fft {
+    k: usize,
+    n: u32,
+    twiddles: Vec<Vec<Fr>>,
+}
+
+impl Fft {
+    pub fn new(k: usize) -> Self {
+        let n = 1u32 << k;
+        let twiddles = vec![];
+        Fft { k, n, twiddles }
+    }
+}
+
 #[cfg(test)]
 mod fft_tests {
-    use zero_jubjub::Fr;
+    use super::*;
 
     #[test]
     fn fft_test() {

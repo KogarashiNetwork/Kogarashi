@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 zero-jubjub = { default-features = false, path = "../jubjub" }
+sp-std = { version = '3.0.0', default-features = false }
 
 [dev-dependencies]
 rand = "0.8"
