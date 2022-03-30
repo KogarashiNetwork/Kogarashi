@@ -3,15 +3,24 @@ use zero_jubjub::Fr;
 
 pub struct Fft {
     k: usize,
-    n: u32,
+    n: usize,
     twiddles: Vec<Vec<Fr>>,
+    reversed_indexes: Vec<usize>,
 }
 
 impl Fft {
     pub fn new(k: usize) -> Self {
-        let n = 1u32 << k;
-        let twiddles = vec![];
-        Fft { k, n, twiddles }
+        let n = 1 << k;
+        let twiddles = Vec::with_capacity(n / 2);
+        let mut reversed_indexes = vec![0; n];
+        if k % 2 == 1 {
+            
+        }
+        Fft { k, n, twiddles, reversed_indexes }
+    }
+
+    pub fn fft(&self, coeffs: &mut [Fr]) {
+
     }
 }
 
