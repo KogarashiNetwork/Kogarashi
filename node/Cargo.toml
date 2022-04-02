@@ -2,6 +2,7 @@
 members = [
     'node',
     'runtime',
+    'zkink'
 ]
 [profile.release]
 panic = 'unwind'
