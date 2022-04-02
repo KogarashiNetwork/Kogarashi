@@ -80,6 +80,10 @@ impl Fr {
         Fr([0, 0, 0, 0])
     }
 
+    pub const fn one() -> Fr {
+        Fr([1, 0, 0, 0])
+    }
+
     pub fn from_hex(hex: &str) -> Result<Fr, Error> {
         let max_len = 64;
         let hex = hex.strip_prefix("0x").unwrap_or(hex);

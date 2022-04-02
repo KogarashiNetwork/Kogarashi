@@ -9,11 +9,17 @@ pub struct Fft {
 }
 
 impl Fft {
-    pub fn new(k: usize) -> Self {
+    pub fn new(k: usize, omega: Fr) -> Self {
         let n = 1 << k;
         let mut counter = 2;
         let twiddles = Vec::with_capacity(n / 2);
         let mut reversed_indexes = vec![0; n];
+
+        let mut twiddle = Fr::one();
+        for i in 0..n / 2 {
+            twiddles.push(twiddle);
+            twiddle *= omega;
+        }
 
         if k % 2 != 0 {
             reversed_indexes[0] = 0;
