@@ -13,15 +13,16 @@ impl Fft {
         let n = 1 << k;
         let twiddles = Vec::with_capacity(n / 2);
         let mut reversed_indexes = vec![0; n];
-        if k % 2 == 1 {
-            
+        if k % 2 == 1 {}
+        Fft {
+            k,
+            n,
+            twiddles,
+            reversed_indexes,
         }
-        Fft { k, n, twiddles, reversed_indexes }
     }
 
-    pub fn fft(&self, coeffs: &mut [Fr]) {
-
-    }
+    pub fn fft(&self, coeffs: &mut [Fr]) {}
 }
 
 #[cfg(test)]
