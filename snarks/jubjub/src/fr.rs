@@ -5,6 +5,7 @@ use core::{
     cmp::Ordering,
     fmt::{Display, Formatter, Result as FmtResult},
     ops::{Add, Mul, Neg, Sub},
+    ops::{AddAssign, MulAssign, SubAssign},
 };
 use parity_scale_codec::{Decode, Encode};
 use rand_core::RngCore;

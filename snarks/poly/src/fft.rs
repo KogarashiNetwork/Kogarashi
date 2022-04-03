@@ -4,7 +4,7 @@ use zero_jubjub::Fr;
 pub struct Fft {
     k: usize,
     n: usize,
-    twiddles: Vec<Vec<Fr>>,
+    twiddles: Vec<Fr>,
     reversed_indexes: Vec<usize>,
 }
 
@@ -12,11 +12,11 @@ impl Fft {
     pub fn new(k: usize, omega: Fr) -> Self {
         let n = 1 << k;
         let mut counter = 2;
-        let twiddles = Vec::with_capacity(n / 2);
+        let mut twiddles = Vec::with_capacity(n / 2);
         let mut reversed_indexes = vec![0; n];
 
         let mut twiddle = Fr::one();
-        for i in 0..n / 2 {
+        for _ in 0..n / 2 {
             twiddles.push(twiddle);
             twiddle *= omega;
         }
