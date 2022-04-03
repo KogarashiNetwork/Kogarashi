@@ -3,11 +3,11 @@
 Zero Network is a completely anonymous blockchain. This allows us the confidential transactions and private smart contracts. These features are realized without relying on `trusted party`, `sidechian technologies` and `TEE`, `optimistic assumption`.
 
 ## Abstract
-Zero Network is the `substrate-based` blockchain and that transactions are totally concealed with cryptography. This is going to be deployed as [`Polkadot`](https://polkadot.network/) parachain. We are also implementing `zk-SNARKs` which has compatible with `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec) and, is optimized by assembly and algorithm. In particular, we are going to support following functionality.
+Zero Network is the `substrate-based` blockchain and that transactions are totally concealed with cryptography. This is going to be deployed as [`Polkadot`](https://polkadot.network/) parachain. We are also implementing `plonk` which has compatible with `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec) and, is optimized by assembly and algorithm. In particular, we are going to support following functionality.
 
 - Confidential Transfers
 - Private Smart Contracts
-- Client Wallet with `Rust` and `Javascript`
+- Client Wallet
 - Rollup Transactions
 
 ## Directory Structure

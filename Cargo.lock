@@ -409,15 +409,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "draft"
-version = "0.1.0"
-dependencies = [
- "dusk-jubjub 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "dusk-plonk 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "rand_core 0.6.3",
-]
-
-[[package]]
 name = "dusk-bls12_381"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2497,10 +2488,12 @@ dependencies = [
 name = "zero-network"
 version = "0.1.0"
 dependencies = [
+ "dusk-jubjub 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "dusk-plonk 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "ed25519",
  "ed25519-dalek",
  "pallet-confidential-transfer",
- "rand_core 0.5.1",
+ "rand_core 0.6.3",
  "zero-jubjub",
  "zero-plonk",
 ]
