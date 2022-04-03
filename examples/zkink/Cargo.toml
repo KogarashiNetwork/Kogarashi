@@ -1,7 +1,12 @@
 [package]
-name = "zkink"
-version = "0.1.0"
-authors = ["[your_name] <[your_email]>"]
+authors = ['NoCtrlZ<shinsaku.ashizawa@artree.co.jp>']
+description = 'zk ink! pallet'
+homepage = 'https://github.com/zero-network/zero'
+license = "Apache-2.0"
+name = 'zkink'
+readme = 'README.md'
+repository = 'https://github.com/zero-network/zero'
+version = '0.0.1'
 edition = "2021"
 rust-version = "1.56.1"
 
