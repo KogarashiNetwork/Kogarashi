@@ -24,8 +24,7 @@ members = [
     "snarks/jubjub",
     "snarks/plonk",
     "snarks/poly",
-    "pallets/confidential_transfer",
-    "examples/zkink"
+    "pallets/confidential_transfer"
 ]
 
 [features]
