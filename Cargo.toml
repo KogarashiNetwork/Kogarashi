@@ -7,7 +7,7 @@ edition = "2021"
 license = "Apache-2.0"
 
 [dependencies]
-zero-jubjub = { version = "0.1", default-features = false, path = "./snarks/jubjub" }
+zero-jubjub = { version = "0.1", default-features = false, path = "./primitive/jubjub" }
 zero-plonk = { version = "0.1", default-features = false, path = "./snarks/plonk" }
 pallet-confidential-transfer = { version = "0.1", default-features = false, path = "./pallets/confidential_transfer" }
 rand_core = { version = "0.5", features = ["std"] }
@@ -21,7 +21,7 @@ rand_core = "0.6"
 
 [workspace]
 members = [
-    "snarks/jubjub",
+    "primitive/jubjub",
     "snarks/plonk",
     "snarks/poly",
     "pallets/confidential_transfer"

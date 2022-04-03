@@ -6,3 +6,4 @@ This is the eDSL for confidential contract executions and forked originally by [
 - Encrypted Smart Contract Storage
 - Proof Verification eDSL
 - Zero Knowledge Friendly Compiler
+- Contract Constraint Metadata

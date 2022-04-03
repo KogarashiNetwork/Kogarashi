@@ -22,6 +22,8 @@ The primitive components implementation.
 The `pallet` implementations which are used in blockchain.
 - snarks  
 The [`Polkadot`](https://polkadot.network/) friendly and high performance `plonk` research and development.
+- zkink
+The [`Substrate`](https://substrate.io/) privacy preserving smart contract `eDSL` and compiler forked from [`ink!`](https://github.com/paritytech/ink/tree/v3.0.0).
 
 ## Test
 ```

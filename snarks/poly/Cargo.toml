@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zero-jubjub = { default-features = false, path = "../jubjub" }
+zero-jubjub = { default-features = false, path = "../../primitive/jubjub" }
 sp-std = { version = '3.0.0', default-features = false }
 
 [dev-dependencies]
