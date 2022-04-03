@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::backend::{
-    EnvBackend,
-    TypedEnvBackend,
-};
+use crate::backend::{EnvBackend, TypedEnvBackend};
 use cfg_if::cfg_if;
 
 pub trait OnInstance: EnvBackend + TypedEnvBackend {

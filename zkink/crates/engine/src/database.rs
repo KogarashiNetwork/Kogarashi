@@ -64,11 +64,7 @@ impl Database {
     }
 
     /// Returns a reference to the value corresponding to the key.
-    pub fn get_from_contract_storage(
-        &self,
-        account_id: &[u8],
-        key: &[u8],
-    ) -> Option<&Vec<u8>> {
+    pub fn get_from_contract_storage(&self, account_id: &[u8], key: &[u8]) -> Option<&Vec<u8>> {
         let hashed_key = storage_of_contract_key(account_id, key);
         self.hmap.get(&hashed_key.to_vec())
     }
@@ -85,11 +81,7 @@ impl Database {
     }
 
     /// Removes the value at the contract storage of `account_id` at storage key `key`.
-    pub fn remove_contract_storage(
-        &mut self,
-        account_id: &[u8],
-        key: &[u8],
-    ) -> Option<Vec<u8>> {
+    pub fn remove_contract_storage(&mut self, account_id: &[u8], key: &[u8]) -> Option<Vec<u8>> {
         let hashed_key = storage_of_contract_key(account_id, key);
         self.hmap.remove(&hashed_key.to_vec())
     }

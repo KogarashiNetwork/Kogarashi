@@ -14,10 +14,7 @@
 
 use super::HashMap as StorageHashMap;
 use crate::{
-    traits::{
-        KeyPtr,
-        SpreadLayout,
-    },
+    traits::{KeyPtr, SpreadLayout},
     Lazy,
 };
 use ink_primitives::Key;
@@ -315,9 +312,7 @@ fn spread_layout_clear_works() {
         // loading another instance from this storage will panic since the
         // hmap's length property cannot read a value:
         SpreadLayout::clear_spread(&hmap1, &mut KeyPtr::from(root_key));
-        let _ = <StorageHashMap<u8, i32> as SpreadLayout>::pull_spread(
-            &mut KeyPtr::from(root_key),
-        );
+        let _ = <StorageHashMap<u8, i32> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
         Ok(())
     })
     .unwrap()
@@ -339,10 +334,9 @@ fn storage_is_cleared_completely_after_pull_lazy() {
 
         // then
         let contract_id = ink_env::test::callee::<ink_env::DefaultEnvironment>();
-        let used_cells = ink_env::test::count_used_storage_cells::<
-            ink_env::DefaultEnvironment,
-        >(&contract_id)
-        .expect("used cells must be returned");
+        let used_cells =
+            ink_env::test::count_used_storage_cells::<ink_env::DefaultEnvironment>(&contract_id)
+                .expect("used cells must be returned");
         assert_eq!(used_cells, 0);
 
         Ok(())
@@ -360,23 +354,19 @@ fn drop_works() {
         let setup_result = std::panic::catch_unwind(|| {
             let hmap = filled_hmap();
             SpreadLayout::push_spread(&hmap, &mut KeyPtr::from(root_key));
-            let _ = <StorageHashMap<u8, i32> as SpreadLayout>::pull_spread(
-                &mut KeyPtr::from(root_key),
-            );
+            let _ =
+                <StorageHashMap<u8, i32> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
             // hmap is dropped which should clear the cells
         });
         assert!(setup_result.is_ok(), "setup should not panic");
 
         let contract_id = ink_env::test::callee::<ink_env::DefaultEnvironment>();
-        let used_cells = ink_env::test::count_used_storage_cells::<
-            ink_env::DefaultEnvironment,
-        >(&contract_id)
-        .expect("used cells must be returned");
+        let used_cells =
+            ink_env::test::count_used_storage_cells::<ink_env::DefaultEnvironment>(&contract_id)
+                .expect("used cells must be returned");
         assert_eq!(used_cells, 0);
 
-        let _ = <StorageHashMap<u8, i32> as SpreadLayout>::pull_spread(
-            &mut KeyPtr::from(root_key),
-        );
+        let _ = <StorageHashMap<u8, i32> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
         Ok(())
     })
     .unwrap()

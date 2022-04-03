@@ -17,30 +17,16 @@ mod tests;
 
 use crate::{
     serde_hex,
-    utils::{
-        deserialize_from_byte_str,
-        serialize_as_byte_str,
-    },
+    utils::{deserialize_from_byte_str, serialize_as_byte_str},
 };
 use derive_more::From;
 use ink_prelude::collections::btree_map::BTreeMap;
 use ink_primitives::Key;
 use scale_info::{
-    form::{
-        Form,
-        MetaForm,
-        PortableForm,
-    },
-    meta_type,
-    IntoPortable,
-    Registry,
-    TypeInfo,
+    form::{Form, MetaForm, PortableForm},
+    meta_type, IntoPortable, Registry, TypeInfo,
 };
-use serde::{
-    de::DeserializeOwned,
-    Deserialize,
-    Serialize,
-};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 /// Represents the static storage layout of an ink! smart contract.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, From, Serialize, Deserialize)]
@@ -158,21 +144,11 @@ impl IntoPortable for Layout {
 
     fn into_portable(self, registry: &mut Registry) -> Self::Output {
         match self {
-            Layout::Cell(encoded_cell) => {
-                Layout::Cell(encoded_cell.into_portable(registry))
-            }
-            Layout::Hash(hash_layout) => {
-                Layout::Hash(hash_layout.into_portable(registry))
-            }
-            Layout::Array(array_layout) => {
-                Layout::Array(array_layout.into_portable(registry))
-            }
-            Layout::Struct(struct_layout) => {
-                Layout::Struct(struct_layout.into_portable(registry))
-            }
-            Layout::Enum(enum_layout) => {
-                Layout::Enum(enum_layout.into_portable(registry))
-            }
+            Layout::Cell(encoded_cell) => Layout::Cell(encoded_cell.into_portable(registry)),
+            Layout::Hash(hash_layout) => Layout::Hash(hash_layout.into_portable(registry)),
+            Layout::Array(array_layout) => Layout::Array(array_layout.into_portable(registry)),
+            Layout::Struct(struct_layout) => Layout::Struct(struct_layout.into_portable(registry)),
+            Layout::Enum(enum_layout) => Layout::Enum(enum_layout.into_portable(registry)),
         }
     }
 }
@@ -572,9 +548,7 @@ impl IntoPortable for EnumLayout {
             variants: self
                 .variants
                 .into_iter()
-                .map(|(discriminant, layout)| {
-                    (discriminant, layout.into_portable(registry))
-                })
+                .map(|(discriminant, layout)| (discriminant, layout.into_portable(registry)))
                 .collect(),
         }
     }

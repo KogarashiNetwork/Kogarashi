@@ -14,14 +14,8 @@
 
 use crate::GenerateCode;
 use derive_more::From;
-use proc_macro2::{
-    Span,
-    TokenStream as TokenStream2,
-};
-use quote::{
-    quote,
-    quote_spanned,
-};
+use proc_macro2::{Span, TokenStream as TokenStream2};
+use quote::{quote, quote_spanned};
 use syn::spanned::Spanned as _;
 
 /// Generates code for the ink! event structs of the contract.
@@ -35,7 +29,7 @@ impl GenerateCode for Events<'_> {
     fn generate_code(&self) -> TokenStream2 {
         if self.contract.module().events().next().is_none() {
             // Generate no code in case there are no event definitions.
-            return TokenStream2::new()
+            return TokenStream2::new();
         }
         let emit_event_trait_impl = self.generate_emit_event_trait_impl();
         let event_base = self.generate_event_base();
@@ -90,8 +84,7 @@ impl<'a> Events<'a> {
             .events()
             .map(|event| event.ident())
             .collect::<Vec<_>>();
-        let base_event_ident =
-            proc_macro2::Ident::new("__ink_EventBase", Span::call_site());
+        let base_event_ident = proc_macro2::Ident::new("__ink_EventBase", Span::call_site());
         quote! {
             #[allow(non_camel_case_types)]
             #[derive(::scale::Encode, ::scale::Decode)]

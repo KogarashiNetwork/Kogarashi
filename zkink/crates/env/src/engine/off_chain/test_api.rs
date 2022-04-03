@@ -14,14 +14,8 @@
 
 //! Operations on the off-chain testing environment.
 
-use super::{
-    EnvInstance,
-    OnInstance,
-};
-use crate::{
-    Environment,
-    Result,
-};
+use super::{EnvInstance, OnInstance};
+use crate::{Environment, Result};
 use core::fmt::Debug;
 use ink_engine::test_api::RecordedDebugMessages;
 use std::panic::UnwindSafe;
@@ -124,9 +118,7 @@ pub fn recorded_debug_messages() -> RecordedDebugMessages {
 /// Useful for benchmarks because it ensures the initialized storage is maintained across runs,
 /// because lazy storage structures automatically clear their associated cells when they are dropped.
 pub fn set_clear_storage_disabled(_disable: bool) {
-    unimplemented!(
-        "off-chain environment does not yet support `set_clear_storage_disabled`"
-    );
+    unimplemented!("off-chain environment does not yet support `set_clear_storage_disabled`");
 }
 
 /// Advances the chain by a single block.
@@ -342,16 +334,15 @@ pub fn assert_contract_termination<T, F>(
     <T as Environment>::AccountId: Debug,
     <T as Environment>::Balance: Debug,
 {
-    let value_any = ::std::panic::catch_unwind(should_terminate)
-        .expect_err("contract did not terminate");
+    let value_any =
+        ::std::panic::catch_unwind(should_terminate).expect_err("contract did not terminate");
     let encoded_input = value_any
         .downcast_ref::<Vec<u8>>()
         .expect("panic object can not be cast");
     let (value_transferred, encoded_beneficiary): (T::Balance, Vec<u8>) =
         scale::Decode::decode(&mut &encoded_input[..]).expect("input can not be decoded");
-    let beneficiary =
-        <T::AccountId as scale::Decode>::decode(&mut &encoded_beneficiary[..])
-            .expect("input can not be decoded");
+    let beneficiary = <T::AccountId as scale::Decode>::decode(&mut &encoded_beneficiary[..])
+        .expect("input can not be decoded");
     assert_eq!(value_transferred, expected_value_transferred_to_beneficiary);
     assert_eq!(beneficiary, expected_beneficiary);
 }

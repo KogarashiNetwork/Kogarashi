@@ -194,15 +194,11 @@ fn mixed_enum_layout(key_ptr: &mut KeyPtr) -> Layout {
                     StructLayout::new(vec![
                         FieldLayout::new(
                             None,
-                            CellLayout::new::<i32>(LayoutKey::from(
-                                variant_key_ptr.advance_by(1),
-                            )),
+                            CellLayout::new::<i32>(LayoutKey::from(variant_key_ptr.advance_by(1))),
                         ),
                         FieldLayout::new(
                             None,
-                            CellLayout::new::<i64>(LayoutKey::from(
-                                variant_key_ptr.advance_by(1),
-                            )),
+                            CellLayout::new::<i64>(LayoutKey::from(variant_key_ptr.advance_by(1))),
                         ),
                     ]),
                 )
@@ -214,15 +210,11 @@ fn mixed_enum_layout(key_ptr: &mut KeyPtr) -> Layout {
                     StructLayout::new(vec![
                         FieldLayout::new(
                             "a",
-                            CellLayout::new::<i32>(LayoutKey::from(
-                                variant_key_ptr.advance_by(1),
-                            )),
+                            CellLayout::new::<i32>(LayoutKey::from(variant_key_ptr.advance_by(1))),
                         ),
                         FieldLayout::new(
                             "b",
-                            CellLayout::new::<i64>(LayoutKey::from(
-                                variant_key_ptr.advance_by(1),
-                            )),
+                            CellLayout::new::<i64>(LayoutKey::from(variant_key_ptr.advance_by(1))),
                         ),
                     ]),
                 )

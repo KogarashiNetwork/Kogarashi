@@ -21,20 +21,10 @@ use crate::{
     chain_extension::ChainExtensionHandler,
     database::Database,
     exec_context::ExecContext,
-    test_api::{
-        DebugInfo,
-        EmittedEvent,
-    },
-    types::{
-        AccountId,
-        Balance,
-        BlockTimestamp,
-    },
+    test_api::{DebugInfo, EmittedEvent},
+    types::{AccountId, Balance, BlockTimestamp},
 };
-use rand::{
-    Rng,
-    SeedableRng,
-};
+use rand::{Rng, SeedableRng};
 use scale::Encode;
 use std::panic::panic_any;
 
@@ -181,8 +171,8 @@ impl Engine {
     /// Transfers value from the contract to the destination account.
     pub fn transfer(&mut self, account_id: &[u8], mut value: &[u8]) -> Result {
         // Note that a transfer of `0` is allowed here
-        let increment = <u128 as scale::Decode>::decode(&mut value)
-            .map_err(|_| Error::TransferFailed)?;
+        let increment =
+            <u128 as scale::Decode>::decode(&mut value).map_err(|_| Error::TransferFailed)?;
 
         let dest = account_id.to_vec();
         // Note that the destination account does not have to exist
@@ -203,8 +193,8 @@ impl Engine {
     /// Deposits an event identified by the supplied topics and data.
     pub fn deposit_event(&mut self, topics: &[u8], data: &[u8]) {
         // The first byte contains the number of topics in the slice
-        let topics_count: scale::Compact<u32> = scale::Decode::decode(&mut &topics[0..1])
-            .expect("decoding number of topics failed");
+        let topics_count: scale::Compact<u32> =
+            scale::Decode::decode(&mut &topics[0..1]).expect("decoding number of topics failed");
         let topics_count = topics_count.0 as usize;
 
         let topics_vec = if topics_count > 0 {
@@ -237,11 +227,9 @@ impl Engine {
             .record_cell_for_account(account_id, key.to_vec());
 
         // We ignore if storage is already set for this key
-        let _ = self.database.insert_into_contract_storage(
-            &callee,
-            key,
-            encoded_value.to_vec(),
-        );
+        let _ = self
+            .database
+            .insert_into_contract_storage(&callee, key, encoded_value.to_vec());
     }
 
     /// Returns the decoded contract storage at the key if any.
@@ -363,15 +351,13 @@ impl Engine {
 
     /// Returns the current block number.
     pub fn block_number(&self, output: &mut &mut [u8]) {
-        let block_number: Vec<u8> =
-            scale::Encode::encode(&self.exec_context.block_number);
+        let block_number: Vec<u8> = scale::Encode::encode(&self.exec_context.block_number);
         set_output(output, &block_number[..])
     }
 
     /// Returns the timestamp of the current block.
     pub fn block_timestamp(&self, output: &mut &mut [u8]) {
-        let block_timestamp: Vec<u8> =
-            scale::Encode::encode(&self.exec_context.block_timestamp);
+        let block_timestamp: Vec<u8> = scale::Encode::encode(&self.exec_context.block_timestamp);
         set_output(output, &block_timestamp[..])
     }
 
@@ -382,8 +368,7 @@ impl Engine {
     /// Returns the minimum balance that is required for creating an account
     /// (i.e. the chain's existential deposit).
     pub fn minimum_balance(&self, output: &mut &mut [u8]) {
-        let minimum_balance: Vec<u8> =
-            scale::Encode::encode(&self.chain_spec.minimum_balance);
+        let minimum_balance: Vec<u8> = scale::Encode::encode(&self.chain_spec.minimum_balance);
         set_output(output, &minimum_balance[..])
     }
 
@@ -448,12 +433,7 @@ impl Engine {
     }
 
     /// Calls the chain extension method registered at `func_id` with `input`.
-    pub fn call_chain_extension(
-        &mut self,
-        func_id: u32,
-        input: &[u8],
-        output: &mut &mut [u8],
-    ) {
+    pub fn call_chain_extension(&mut self, func_id: u32, input: &[u8], output: &mut &mut [u8]) {
         let encoded_input = input.encode();
         let (status_code, out) = self
             .chain_extension_handler
@@ -478,12 +458,8 @@ impl Engine {
         output: &mut [u8; 33],
     ) -> Result {
         use secp256k1::{
-            ecdsa::{
-                RecoverableSignature,
-                RecoveryId,
-            },
-            Message,
-            SECP256K1,
+            ecdsa::{RecoverableSignature, RecoveryId},
+            Message, SECP256K1,
         };
 
         // In most implementations, the v is just 0 or 1 internally, but 27 was added
@@ -497,14 +473,10 @@ impl Engine {
         let recovery_id = RecoveryId::from_i32(recovery_byte as i32)
             .unwrap_or_else(|error| panic!("Unable to parse the recovery id: {}", error));
 
-        let message = Message::from_slice(message_hash).unwrap_or_else(|error| {
-            panic!("Unable to create the message from hash: {}", error)
-        });
-        let signature =
-            RecoverableSignature::from_compact(&signature[0..64], recovery_id)
-                .unwrap_or_else(|error| {
-                    panic!("Unable to parse the signature: {}", error)
-                });
+        let message = Message::from_slice(message_hash)
+            .unwrap_or_else(|error| panic!("Unable to create the message from hash: {}", error));
+        let signature = RecoverableSignature::from_compact(&signature[0..64], recovery_id)
+            .unwrap_or_else(|error| panic!("Unable to parse the signature: {}", error));
 
         let pub_key = SECP256K1.recover_ecdsa(&message, &signature);
         match pub_key {

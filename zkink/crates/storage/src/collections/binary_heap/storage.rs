@@ -14,25 +14,13 @@
 
 //! Implementation of ink! storage traits.
 
-use super::{
-    BinaryHeap,
-    ChildrenVec,
-};
-use crate::traits::{
-    KeyPtr,
-    PackedLayout,
-    SpreadAllocate,
-    SpreadLayout,
-};
+use super::{BinaryHeap, ChildrenVec};
+use crate::traits::{KeyPtr, PackedLayout, SpreadAllocate, SpreadLayout};
 
 #[cfg(feature = "std")]
 const _: () = {
     use crate::traits::StorageLayout;
-    use ink_metadata::layout::{
-        FieldLayout,
-        Layout,
-        StructLayout,
-    };
+    use ink_metadata::layout::{FieldLayout, Layout, StructLayout};
     use scale_info::TypeInfo;
 
     impl<T> StorageLayout for BinaryHeap<T>
@@ -51,16 +39,8 @@ const _: () = {
 #[cfg(feature = "std")]
 const _: () = {
     use super::children::Children;
-    use crate::{
-        collections::binary_heap::StorageVec,
-        lazy::Lazy,
-        traits::StorageLayout,
-    };
-    use ink_metadata::layout::{
-        FieldLayout,
-        Layout,
-        StructLayout,
-    };
+    use crate::{collections::binary_heap::StorageVec, lazy::Lazy, traits::StorageLayout};
+    use ink_metadata::layout::{FieldLayout, Layout, StructLayout};
     use scale_info::TypeInfo;
 
     impl<T> StorageLayout for ChildrenVec<T>

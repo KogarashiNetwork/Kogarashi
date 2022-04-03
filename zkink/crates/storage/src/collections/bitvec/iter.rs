@@ -13,18 +13,10 @@
 // limitations under the License.
 
 use super::{
-    super::extend_lifetime,
-    BitRefMut,
-    Bits256,
-    Bits256BitsIter,
-    Bits256BitsIterMut,
-    Bitvec as StorageBitvec,
-    ChunkRef,
+    super::extend_lifetime, BitRefMut, Bits256, Bits256BitsIter, Bits256BitsIterMut,
+    Bitvec as StorageBitvec, ChunkRef,
 };
-use crate::collections::vec::{
-    Iter as StorageVecIter,
-    IterMut as StorageVecIterMut,
-};
+use crate::collections::vec::{Iter as StorageVecIter, IterMut as StorageVecIterMut};
 use core::cmp::min;
 
 /// Iterator over the bits of a storage bit vector.
@@ -58,16 +50,16 @@ impl<'a> Iterator for BitsIter<'a> {
             if let Some(ref mut front_iter) = self.front_iter {
                 if let front @ Some(_) = front_iter.next() {
                     self.remaining -= 1;
-                    return front
+                    return front;
                 }
             }
             match self.bits256_iter.next() {
                 None => {
                     if let Some(back) = self.back_iter.as_mut()?.next() {
                         self.remaining -= 1;
-                        return Some(back)
+                        return Some(back);
                     }
-                    return None
+                    return None;
                 }
                 Some(ref mut front) => {
                     self.front_iter = Some(unsafe { extend_lifetime(front) }.iter());
@@ -92,16 +84,16 @@ impl<'a> DoubleEndedIterator for BitsIter<'a> {
             if let Some(ref mut back_iter) = self.back_iter {
                 if let back @ Some(_) = back_iter.next_back() {
                     self.remaining -= 1;
-                    return back
+                    return back;
                 }
             }
             match self.bits256_iter.next_back() {
                 None => {
                     if let Some(front) = self.front_iter.as_mut()?.next_back() {
                         self.remaining -= 1;
-                        return Some(front)
+                        return Some(front);
                     }
-                    return None
+                    return None;
                 }
                 Some(ref mut back) => {
                     self.back_iter = Some(unsafe { extend_lifetime(back) }.iter());
@@ -142,16 +134,16 @@ impl<'a> Iterator for BitsIterMut<'a> {
             if let Some(ref mut front_iter) = self.front_iter {
                 if let front @ Some(_) = front_iter.next() {
                     self.remaining -= 1;
-                    return front
+                    return front;
                 }
             }
             match self.bits256_iter.next() {
                 None => {
                     if let Some(back) = self.back_iter.as_mut()?.next() {
                         self.remaining -= 1;
-                        return Some(back)
+                        return Some(back);
                     }
-                    return None
+                    return None;
                 }
                 Some(ref mut front) => {
                     self.front_iter = Some(unsafe { extend_lifetime(front) }.iter_mut());
@@ -176,16 +168,16 @@ impl<'a> DoubleEndedIterator for BitsIterMut<'a> {
             if let Some(ref mut back_iter) = self.back_iter {
                 if let back @ Some(_) = back_iter.next_back() {
                     self.remaining -= 1;
-                    return back
+                    return back;
                 }
             }
             match self.bits256_iter.next_back() {
                 None => {
                     if let Some(front) = self.front_iter.as_mut()?.next_back() {
                         self.remaining -= 1;
-                        return Some(front)
+                        return Some(front);
                     }
-                    return None
+                    return None;
                 }
                 Some(ref mut back) => {
                     self.back_iter = Some(unsafe { extend_lifetime(back) }.iter_mut());
@@ -219,7 +211,7 @@ impl<'a> Iterator for Bits256Iter<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.remaining == 0 {
-            return None
+            return None;
         }
         let len = min(256, self.remaining);
         self.remaining = self.remaining.saturating_sub(256);
@@ -240,7 +232,7 @@ impl<'a> Iterator for Bits256Iter<'a> {
 impl<'a> DoubleEndedIterator for Bits256Iter<'a> {
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.remaining == 0 {
-            return None
+            return None;
         }
         let mut len = self.remaining % 256;
         if len == 0 {

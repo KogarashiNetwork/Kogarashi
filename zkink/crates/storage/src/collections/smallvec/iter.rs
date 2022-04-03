@@ -13,10 +13,7 @@
 // limitations under the License.
 
 use super::SmallVec;
-use crate::{
-    collections::extend_lifetime,
-    traits::PackedLayout,
-};
+use crate::{collections::extend_lifetime, traits::PackedLayout};
 
 /// An iterator over shared references to the elements of a small storage vector.
 #[derive(Debug, Clone, Copy)]
@@ -74,7 +71,7 @@ where
         debug_assert!(self.begin <= self.end);
         let n = n as u32;
         if self.begin + n >= self.end {
-            return None
+            return None;
         }
         let cur = self.begin + n;
         self.begin += 1 + n;
@@ -96,7 +93,7 @@ where
         debug_assert!(self.begin <= self.end);
         let n = n as u32;
         if self.begin >= self.end.saturating_sub(n) {
-            return None
+            return None;
         }
         self.end -= 1 + n;
         self.vec
@@ -181,7 +178,7 @@ where
         debug_assert!(self.begin <= self.end);
         let n = n as u32;
         if self.begin + n >= self.end {
-            return None
+            return None;
         }
         let cur = self.begin + n;
         self.begin += 1 + n;
@@ -203,7 +200,7 @@ where
         debug_assert!(self.begin <= self.end);
         let n = n as u32;
         if self.begin >= self.end.saturating_sub(n) {
-            return None
+            return None;
         }
         self.end -= 1 + n;
         self.get_mut(self.end)

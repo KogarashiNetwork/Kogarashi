@@ -29,7 +29,4 @@ mod key_ptr;
 #[cfg(test)]
 mod tests;
 
-pub use self::{
-    key::Key,
-    key_ptr::KeyPtr,
-};
+pub use self::{key::Key, key_ptr::KeyPtr};

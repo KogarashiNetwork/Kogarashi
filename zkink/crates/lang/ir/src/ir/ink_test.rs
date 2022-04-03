@@ -37,7 +37,7 @@ impl InkTest {
             return Err(format_err_spanned!(
                 attr,
                 "unexpected attribute input for ink! trait definition"
-            ))
+            ));
         }
         let item_fn = syn::parse2::<syn::ItemFn>(input)?;
         InkTest::try_from(item_fn)

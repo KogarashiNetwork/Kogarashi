@@ -14,21 +14,11 @@
 
 use cfg_if::cfg_if;
 use core::{
-    fmt::{
-        self,
-        Debug,
-        Display,
-        Formatter,
-    },
+    fmt::{self, Debug, Display, Formatter},
     ops::AddAssign,
 };
 #[cfg(feature = "std")]
-use scale_info::{
-    build::Fields,
-    Path,
-    Type,
-    TypeInfo,
-};
+use scale_info::{build::Fields, Path, Type, TypeInfo};
 
 /// A key into the smart contract storage.
 ///
@@ -196,9 +186,7 @@ impl TypeInfo for Key {
     fn type_info() -> Type {
         Type::builder()
             .path(Path::new("Key", "ink_primitives"))
-            .composite(
-                Fields::unnamed().field(|f| f.ty::<[u8; 32]>().type_name("[u8; 32]")),
-            )
+            .composite(Fields::unnamed().field(|f| f.ty::<[u8; 32]>().type_name("[u8; 32]")))
     }
 }
 
@@ -266,8 +254,7 @@ impl Key {
         let len_lhs = lhs_bytes.len();
         let mut carry = 0;
         for i in 0..len_rhs {
-            let (res, ovfl) =
-                lhs_bytes[i].overflowing_add(rhs_bytes[i].wrapping_add(carry));
+            let (res, ovfl) = lhs_bytes[i].overflowing_add(rhs_bytes[i].wrapping_add(carry));
             lhs_bytes[i] = res;
             carry = ovfl as u8;
         }
@@ -276,7 +263,7 @@ impl Key {
             lhs_bytes[i] = res;
             carry = ovfl as u8;
             if carry == 0 {
-                return
+                return;
             }
         }
     }
@@ -296,8 +283,7 @@ impl Key {
         let len_lhs = lhs_bytes.len();
         let mut carry = 0;
         for i in 0..len_rhs {
-            let (res, ovfl) =
-                lhs_bytes[i].overflowing_add(rhs_bytes[i].wrapping_add(carry));
+            let (res, ovfl) = lhs_bytes[i].overflowing_add(rhs_bytes[i].wrapping_add(carry));
             result_bytes[i] = res;
             carry = ovfl as u8;
         }

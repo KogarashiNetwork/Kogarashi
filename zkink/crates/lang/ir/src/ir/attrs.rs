@@ -15,18 +15,11 @@
 use crate::{
     error::ExtError as _,
     ir,
-    ir::{
-        ExtensionId,
-        Selector,
-    },
+    ir::{ExtensionId, Selector},
 };
 use core::result::Result;
 use proc_macro2::{
-    Group as Group2,
-    Ident,
-    Span,
-    TokenStream as TokenStream2,
-    TokenTree as TokenTree2,
+    Group as Group2, Ident, Span, TokenStream as TokenStream2, TokenTree as TokenTree2,
 };
 use std::collections::HashMap;
 use syn::spanned::Spanned;
@@ -47,14 +40,14 @@ impl IsDocAttribute for syn::Attribute {
 
     fn extract_docs(&self) -> Option<String> {
         if !self.is_doc_attribute() {
-            return None
+            return None;
         }
         if let Ok(syn::Meta::NameValue(syn::MetaNameValue {
             lit: syn::Lit::Str(lit_str),
             ..
         })) = self.parse_meta()
         {
-            return Some(lit_str.value())
+            return Some(lit_str.value());
         }
         None
     }
@@ -161,7 +154,7 @@ impl InkAttribute {
             return Err(format_err!(
                 self.span(),
                 "unexpected first ink! attribute argument",
-            ))
+            ));
         }
         Ok(())
     }
@@ -189,7 +182,7 @@ impl InkAttribute {
                 .into_combine(format_err!(
                     seen.span(),
                     "first equal ink! attribute argument here"
-                )))
+                )));
             }
             if let Some(seen) = seen2.get(&arg.kind().kind()) {
                 return Err(format_err!(
@@ -199,7 +192,7 @@ impl InkAttribute {
                 .into_combine(format_err!(
                     *seen,
                     "first equal ink! attribute argument with equal kind here"
-                )))
+                )));
             }
             seen.insert(arg);
             seen2.insert(arg.kind().kind(), arg.span());
@@ -231,7 +224,7 @@ impl InkAttribute {
             return Err(format_err!(
                 Span::call_site(),
                 "encountered unexpected empty expanded ink! attribute arguments",
-            ))
+            ));
         }
         Self::ensure_no_duplicate_args(&args)?;
         Ok(Self { args })
@@ -257,7 +250,7 @@ impl InkAttribute {
     pub fn namespace(&self) -> Option<ir::Namespace> {
         self.args().find_map(|arg| {
             if let ir::AttributeArg::Namespace(namespace) = arg.kind() {
-                return Some(namespace.clone())
+                return Some(namespace.clone());
             }
             None
         })
@@ -267,7 +260,7 @@ impl InkAttribute {
     pub fn selector(&self) -> Option<SelectorOrWildcard> {
         self.args().find_map(|arg| {
             if let ir::AttributeArg::Selector(selector) = arg.kind() {
-                return Some(*selector)
+                return Some(*selector);
             }
             None
         })
@@ -590,9 +583,7 @@ where
 /// # Errors
 ///
 /// Returns an error if the first ink! attribute is invalid.
-pub fn first_ink_attribute<'a, I>(
-    attrs: I,
-) -> Result<Option<ir::InkAttribute>, syn::Error>
+pub fn first_ink_attribute<'a, I>(attrs: I) -> Result<Option<ir::InkAttribute>, syn::Error>
 where
     I: IntoIterator<Item = &'a syn::Attribute>,
 {
@@ -621,11 +612,9 @@ where
         .map(<Attribute as TryFrom<_>>::try_from)
         .collect::<Result<Vec<Attribute>, syn::Error>>()?
         .into_iter()
-        .partition_map(|attr| {
-            match attr {
-                Attribute::Ink(ink_attr) => Either::Left(ink_attr),
-                Attribute::Other(other_attr) => Either::Right(other_attr),
-            }
+        .partition_map(|attr| match attr {
+            Attribute::Ink(ink_attr) => Either::Left(ink_attr),
+            Attribute::Other(other_attr) => Either::Right(other_attr),
         });
     Attribute::ensure_no_duplicate_attrs(&ink_attrs)?;
     Ok((ink_attrs, others))
@@ -663,9 +652,8 @@ where
     C: FnMut(&ir::AttributeFrag) -> Result<(), Option<syn::Error>>,
 {
     let (ink_attrs, other_attrs) = ir::partition_attributes(attrs)?;
-    let normalized = ir::InkAttribute::from_expanded(ink_attrs).map_err(|err| {
-        err.into_combine(format_err!(parent_span, "at this invocation",))
-    })?;
+    let normalized = ir::InkAttribute::from_expanded(ink_attrs)
+        .map_err(|err| err.into_combine(format_err!(parent_span, "at this invocation",)))?;
     normalized.ensure_first(is_valid_first).map_err(|err| {
         err.into_combine(format_err!(
             parent_span,
@@ -707,11 +695,10 @@ where
 {
     let (ink_attrs, rust_attrs) = ir::partition_attributes(attrs)?;
     if ink_attrs.is_empty() {
-        return Ok((None, rust_attrs))
+        return Ok((None, rust_attrs));
     }
-    let normalized = ir::InkAttribute::from_expanded(ink_attrs).map_err(|err| {
-        err.into_combine(format_err!(parent_span, "at this invocation",))
-    })?;
+    let normalized = ir::InkAttribute::from_expanded(ink_attrs)
+        .map_err(|err| err.into_combine(format_err!(parent_span, "at this invocation",)))?;
     normalized.ensure_no_conflicts(is_conflicting_attr)?;
     Ok((Some(normalized), rust_attrs))
 }
@@ -732,11 +719,10 @@ impl Attribute {
         for attr in attrs.into_iter() {
             if let Some(seen) = seen.get(attr) {
                 use crate::error::ExtError as _;
-                return Err(format_err!(
-                    attr.span(),
-                    "encountered duplicate ink! attribute"
-                )
-                .into_combine(format_err!(seen.span(), "first ink! attribute here")))
+                return Err(
+                    format_err!(attr.span(), "encountered duplicate ink! attribute")
+                        .into_combine(format_err!(seen.span(), "first ink! attribute here")),
+                );
             }
             seen.insert(attr);
         }
@@ -749,7 +735,7 @@ impl TryFrom<syn::Attribute> for Attribute {
 
     fn try_from(attr: syn::Attribute) -> Result<Self, Self::Error> {
         if attr.path.is_ident("ink") {
-            return <InkAttribute as TryFrom<_>>::try_from(attr).map(Into::into)
+            return <InkAttribute as TryFrom<_>>::try_from(attr).map(Into::into);
         }
         Ok(Attribute::Other(attr))
     }
@@ -774,28 +760,24 @@ fn transform_wildcard_selector_to_string(group: Group2) -> TokenTree2 {
     let new_group: TokenStream2 = group
         .stream()
         .into_iter()
-        .map(|tt| {
-            match tt {
-                TokenTree2::Group(grp) => transform_wildcard_selector_to_string(grp),
-                TokenTree2::Ident(ident)
-                    if found_selector && found_equal && ident == "_" =>
-                {
-                    let mut lit = proc_macro2::Literal::string("_");
-                    lit.set_span(ident.span());
-                    found_selector = false;
-                    found_equal = false;
-                    TokenTree2::Literal(lit)
-                }
-                TokenTree2::Ident(ident) if ident == "selector" => {
-                    found_selector = true;
-                    TokenTree2::Ident(ident)
-                }
-                TokenTree2::Punct(punct) if punct.as_char() == '=' => {
-                    found_equal = true;
-                    TokenTree2::Punct(punct)
-                }
-                _ => tt,
+        .map(|tt| match tt {
+            TokenTree2::Group(grp) => transform_wildcard_selector_to_string(grp),
+            TokenTree2::Ident(ident) if found_selector && found_equal && ident == "_" => {
+                let mut lit = proc_macro2::Literal::string("_");
+                lit.set_span(ident.span());
+                found_selector = false;
+                found_equal = false;
+                TokenTree2::Literal(lit)
             }
+            TokenTree2::Ident(ident) if ident == "selector" => {
+                found_selector = true;
+                TokenTree2::Ident(ident)
+            }
+            TokenTree2::Punct(punct) if punct.as_char() == '=' => {
+                found_equal = true;
+                TokenTree2::Punct(punct)
+            }
+            _ => tt,
         })
         .collect();
     TokenTree2::Group(Group2::new(group.delimiter(), new_group))
@@ -806,24 +788,23 @@ impl TryFrom<syn::Attribute> for InkAttribute {
 
     fn try_from(mut attr: syn::Attribute) -> Result<Self, Self::Error> {
         if !attr.path.is_ident("ink") {
-            return Err(format_err_spanned!(attr, "unexpected non-ink! attribute"))
+            return Err(format_err_spanned!(attr, "unexpected non-ink! attribute"));
         }
 
         let ts: TokenStream2 = attr
             .tokens
             .into_iter()
-            .map(|tt| {
-                match tt {
-                    TokenTree2::Group(grp) => transform_wildcard_selector_to_string(grp),
-                    _ => tt,
-                }
+            .map(|tt| match tt {
+                TokenTree2::Group(grp) => transform_wildcard_selector_to_string(grp),
+                _ => tt,
             })
             .collect();
         attr.tokens = ts;
 
-        match attr.parse_meta().map_err(|_| {
-            format_err_spanned!(attr, "unexpected ink! attribute structure")
-        })? {
+        match attr
+            .parse_meta()
+            .map_err(|_| format_err_spanned!(attr, "unexpected ink! attribute structure"))?
+        {
             syn::Meta::List(meta_list) => {
                 let args = meta_list
                     .nested
@@ -835,7 +816,7 @@ impl TryFrom<syn::Attribute> for InkAttribute {
                     return Err(format_err_spanned!(
                         attr,
                         "encountered unsupported empty ink! attribute"
-                    ))
+                    ));
                 }
                 Ok(InkAttribute { args })
             }
@@ -855,10 +836,7 @@ impl InkAttribute {
     /// The `is_conflicting_attr` closure returns `Ok` if the attribute does not conflict,
     /// returns `Err(None)` if the attribute conflicts but without providing further reasoning
     /// and `Err(Some(reason))` if the attribute conflicts given additional context information.
-    pub fn ensure_no_conflicts<'a, P>(
-        &'a self,
-        mut is_conflicting: P,
-    ) -> Result<(), syn::Error>
+    pub fn ensure_no_conflicts<'a, P>(&'a self, mut is_conflicting: P) -> Result<(), syn::Error>
     where
         P: FnMut(&'a ir::AttributeFrag) -> Result<(), Option<syn::Error>>,
     {
@@ -885,7 +863,7 @@ impl InkAttribute {
             }
         }
         if let Some(err) = err {
-            return Err(err)
+            return Err(err);
         }
         Ok(())
     }
@@ -1046,12 +1024,10 @@ impl TryFrom<syn::NestedMeta> for AttributeFrag {
                     }
                 }
             }
-            syn::NestedMeta::Lit(_) => {
-                Err(format_err_spanned!(
-                    nested_meta,
-                    "unknown ink! attribute argument (literal)"
-                ))
-            }
+            syn::NestedMeta::Lit(_) => Err(format_err_spanned!(
+                nested_meta,
+                "unknown ink! attribute argument (literal)"
+            )),
         }
     }
 }
@@ -1124,15 +1100,13 @@ mod tests {
         impl From<ir::Attribute> for Attribute {
             fn from(attr: ir::Attribute) -> Self {
                 match attr {
-                    ir::Attribute::Ink(ink_attr) => {
-                        Self::Ink(
-                            ink_attr
-                                .args
-                                .into_iter()
-                                .map(|arg| arg.arg)
-                                .collect::<Vec<_>>(),
-                        )
-                    }
+                    ir::Attribute::Ink(ink_attr) => Self::Ink(
+                        ink_attr
+                            .args
+                            .into_iter()
+                            .map(|arg| arg.arg)
+                            .collect::<Vec<_>>(),
+                    ),
                     ir::Attribute::Other(other_attr) => Self::Other(other_attr),
                 }
             }
@@ -1249,10 +1223,8 @@ mod tests {
             syn::parse_quote! {
                 #[ink(selector = 0xFFFF_FFFF_FFFF_FFFF)]
             },
-            Err(
-                "selector value out of range. \
-                selector must be a valid `u32` integer: number too large to fit in target type"
-            ),
+            Err("selector value out of range. \
+                selector must be a valid `u32` integer: number too large to fit in target type"),
         );
     }
 
@@ -1294,7 +1266,9 @@ mod tests {
             syn::parse_quote! {
                 #[ink(namespace = 42)]
             },
-            Err("expected string type for `namespace` argument, e.g. #[ink(namespace = \"hello\")]"),
+            Err(
+                "expected string type for `namespace` argument, e.g. #[ink(namespace = \"hello\")]",
+            ),
         );
     }
 
@@ -1463,9 +1437,7 @@ mod tests {
             },
             Ok(test::Attribute::Ink(vec![
                 AttributeArg::Message,
-                AttributeArg::Namespace(Namespace::from(
-                    "my_namespace".to_string().into_bytes(),
-                )),
+                AttributeArg::Namespace(Namespace::from("my_namespace".to_string().into_bytes())),
             ])),
         )
     }

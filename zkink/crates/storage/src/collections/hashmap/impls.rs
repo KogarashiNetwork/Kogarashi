@@ -12,28 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{
-    HashMap as StorageHashMap,
-    Iter,
-    IterMut,
-};
+use super::{HashMap as StorageHashMap, Iter, IterMut};
 use crate::traits::PackedLayout;
 use core::{
-    cmp::{
-        Eq,
-        Ord,
-        PartialEq,
-    },
+    cmp::{Eq, Ord, PartialEq},
     ops,
 };
-use ink_env::hash::{
-    CryptoHash,
-    HashOutput,
-};
-use ink_prelude::borrow::{
-    Borrow,
-    ToOwned,
-};
+use ink_env::hash::{CryptoHash, HashOutput};
+use ink_prelude::borrow::{Borrow, ToOwned};
 use ink_primitives::Key;
 
 impl<K, V, H> Drop for StorageHashMap<K, V, H>
@@ -161,7 +147,7 @@ where
 {
     fn eq(&self, other: &Self) -> bool {
         if self.len() != other.len() {
-            return false
+            return false;
         }
         self.iter()
             .map(|(key, value)| (value, other.get(key)))

@@ -13,31 +13,12 @@
 // limitations under the License.
 
 use super::StorageLayout;
-use crate::traits::{
-    ExtKeyPtr as _,
-    KeyPtr,
-    SpreadLayout,
-};
-use ink_env::{
-    AccountId,
-    Hash,
-};
+use crate::traits::{ExtKeyPtr as _, KeyPtr, SpreadLayout};
+use ink_env::{AccountId, Hash};
 use ink_metadata::layout::{
-    ArrayLayout,
-    CellLayout,
-    Discriminant,
-    EnumLayout,
-    FieldLayout,
-    Layout,
-    LayoutKey,
-    StructLayout,
+    ArrayLayout, CellLayout, Discriminant, EnumLayout, FieldLayout, Layout, LayoutKey, StructLayout,
 };
-use ink_prelude::{
-    boxed::Box,
-    collections::BTreeMap,
-    string::String,
-    vec::Vec,
-};
+use ink_prelude::{boxed::Box, collections::BTreeMap, string::String, vec::Vec};
 use ink_primitives::Key;
 use scale_info::TypeInfo;
 

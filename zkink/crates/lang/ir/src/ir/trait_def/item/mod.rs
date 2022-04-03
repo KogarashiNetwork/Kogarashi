@@ -18,30 +18,18 @@ mod trait_item;
 use self::iter::IterInkTraitItemsRaw;
 pub use self::{
     iter::IterInkTraitItems,
-    trait_item::{
-        InkTraitItem,
-        InkTraitMessage,
-    },
+    trait_item::{InkTraitItem, InkTraitMessage},
 };
 use super::TraitDefinitionConfig;
 use crate::{
     ir,
-    ir::{
-        attrs::SelectorOrWildcard,
-        idents_lint,
-    },
+    ir::{attrs::SelectorOrWildcard, idents_lint},
     Selector,
 };
 use ir::TraitPrefix;
-use proc_macro2::{
-    Ident,
-    Span,
-};
+use proc_macro2::{Ident, Span};
 use std::collections::HashMap;
-use syn::{
-    spanned::Spanned as _,
-    Result,
-};
+use syn::{spanned::Spanned as _, Result};
 
 /// A checked ink! trait definition without its configuration.
 #[derive(Debug, PartialEq, Eq)]
@@ -62,10 +50,7 @@ impl TryFrom<syn::ItemTrait> for InkItemTrait {
 
 impl InkItemTrait {
     /// Creates a new ink! item trait from the given configuration and trait definition.
-    pub fn new(
-        config: &TraitDefinitionConfig,
-        item_trait: syn::ItemTrait,
-    ) -> Result<Self> {
+    pub fn new(config: &TraitDefinitionConfig, item_trait: syn::ItemTrait) -> Result<Self> {
         idents_lint::ensure_no_ink_identifiers(&item_trait)?;
         Self::analyse_properties(&item_trait)?;
         Self::analyse_items(&item_trait)?;
@@ -75,7 +60,7 @@ impl InkItemTrait {
             return Err(format_err!(
                 item_trait.span(),
                 "encountered invalid empty ink! trait definition"
-            ))
+            ));
         }
         Ok(Self {
             item: item_trait,
@@ -118,31 +103,31 @@ impl InkItemTrait {
             return Err(format_err_spanned!(
                 unsafety,
                 "ink! trait definitions cannot be unsafe"
-            ))
+            ));
         }
         if let Some(auto) = &item_trait.auto_token {
             return Err(format_err_spanned!(
                 auto,
                 "ink! trait definitions cannot be automatically implemented traits"
-            ))
+            ));
         }
         if !item_trait.generics.params.is_empty() {
             return Err(format_err_spanned!(
                 item_trait.generics.params,
                 "ink! trait definitions must not be generic"
-            ))
+            ));
         }
         if !matches!(item_trait.vis, syn::Visibility::Public(_)) {
             return Err(format_err_spanned!(
                 item_trait.vis,
                 "ink! trait definitions must have public visibility"
-            ))
+            ));
         }
         if !item_trait.supertraits.is_empty() {
             return Err(format_err_spanned!(
                 item_trait.supertraits,
                 "ink! trait definitions with supertraits are not supported, yet"
-            ))
+            ));
         }
         Ok(())
     }
@@ -181,9 +166,9 @@ impl InkItemTrait {
                 }
                 syn::TraitItem::Type(type_trait_item) => {
                     return Err(format_err_spanned!(
-                    type_trait_item,
-                    "associated types in ink! trait definitions are not supported, yet"
-                ))
+                        type_trait_item,
+                        "associated types in ink! trait definitions are not supported, yet"
+                    ))
                 }
                 syn::TraitItem::Verbatim(verbatim) => {
                     return Err(format_err_spanned!(
@@ -219,61 +204,59 @@ impl InkItemTrait {
             return Err(format_err_spanned!(
                 default_impl,
                 "ink! trait methods with default implementations are not supported"
-            ))
+            ));
         }
         if let Some(constness) = &method.sig.constness {
             return Err(format_err_spanned!(
                 constness,
                 "const ink! trait methods are not supported"
-            ))
+            ));
         }
         if let Some(asyncness) = &method.sig.asyncness {
             return Err(format_err_spanned!(
                 asyncness,
                 "async ink! trait methods are not supported"
-            ))
+            ));
         }
         if let Some(unsafety) = &method.sig.unsafety {
             return Err(format_err_spanned!(
                 unsafety,
                 "unsafe ink! trait methods are not supported"
-            ))
+            ));
         }
         if let Some(abi) = &method.sig.abi {
             return Err(format_err_spanned!(
                 abi,
                 "ink! trait methods with non default ABI are not supported"
-            ))
+            ));
         }
         if let Some(variadic) = &method.sig.variadic {
             return Err(format_err_spanned!(
                 variadic,
                 "variadic ink! trait methods are not supported"
-            ))
+            ));
         }
         if !method.sig.generics.params.is_empty() {
             return Err(format_err_spanned!(
                 method.sig.generics.params,
                 "generic ink! trait methods are not supported"
-            ))
+            ));
         }
         match ir::first_ink_attribute(&method.attrs) {
-            Ok(Some(ink_attr)) => {
-                match ink_attr.first().kind() {
-                    ir::AttributeArg::Message => {
-                        Self::analyse_trait_message(method)?;
-                    }
-                    ir::AttributeArg::Constructor => {
-                        Self::analyse_trait_constructor(method)?;
-                    }
-                    _unsupported => {
-                        return Err(format_err_spanned!(
-                            method,
-                            "encountered unsupported ink! attribute for ink! trait method",
-                        ))
-                    }
+            Ok(Some(ink_attr)) => match ink_attr.first().kind() {
+                ir::AttributeArg::Message => {
+                    Self::analyse_trait_message(method)?;
                 }
-            }
+                ir::AttributeArg::Constructor => {
+                    Self::analyse_trait_constructor(method)?;
+                }
+                _unsupported => {
+                    return Err(format_err_spanned!(
+                        method,
+                        "encountered unsupported ink! attribute for ink! trait method",
+                    ))
+                }
+            },
             Ok(None) => {
                 return Err(format_err_spanned!(
                     method,
@@ -290,7 +273,7 @@ impl InkItemTrait {
         return Err(format_err!(
             constructor.span(),
             "ink! trait definitions must not have constructors",
-        ))
+        ));
     }
 
     /// Analyses the properties of an ink! message.
@@ -303,16 +286,16 @@ impl InkItemTrait {
         match message.sig.receiver() {
             None | Some(syn::FnArg::Typed(_)) => {
                 return Err(format_err_spanned!(
-                message.sig,
-                "missing or malformed `&self` or `&mut self` receiver for ink! message",
-            ))
+                    message.sig,
+                    "missing or malformed `&self` or `&mut self` receiver for ink! message",
+                ))
             }
             Some(syn::FnArg::Receiver(receiver)) => {
                 if receiver.reference.is_none() {
                     return Err(format_err_spanned!(
                         receiver,
                         "self receiver of ink! message must be `&self` or `&mut self`"
-                    ))
+                    ));
                 }
             }
         }
@@ -342,11 +325,9 @@ impl InkItemTrait {
         let (_ink_attrs, _) = ir::sanitize_optional_attributes(
             item_trait.span(),
             item_trait.attrs.iter().cloned(),
-            |arg| {
-                match arg.kind() {
-                    ir::AttributeArg::Namespace(_) => Ok(()),
-                    _ => Err(None),
-                }
+            |arg| match arg.kind() {
+                ir::AttributeArg::Namespace(_) => Ok(()),
+                _ => Err(None),
             },
         )
         .expect("encountered unexpected invalid attributes on ink! trait definition");
@@ -357,17 +338,13 @@ impl InkItemTrait {
             let ident = callable.ident();
             let ink_attrs = callable.ink_attrs();
             let selector = match ink_attrs.selector() {
-                Some(SelectorOrWildcard::UserProvided(manual_selector)) => {
-                    manual_selector
-                }
+                Some(SelectorOrWildcard::UserProvided(manual_selector)) => manual_selector,
                 _ => Selector::compose(trait_prefix, ident),
             };
             let (duplicate_selector, duplicate_ident) = match callable {
                 InkTraitItem::Message(_) => {
-                    let duplicate_selector =
-                        seen_message_selectors.insert(selector, ident.clone());
-                    let duplicate_ident =
-                        message_selectors.insert(ident.clone(), selector);
+                    let duplicate_selector = seen_message_selectors.insert(selector, ident.clone());
+                    let duplicate_ident = message_selectors.insert(ident.clone(), selector);
                     (duplicate_selector, duplicate_ident)
                 }
             };
@@ -377,10 +354,11 @@ impl InkItemTrait {
                     ident,
                     "encountered duplicate selector ({:x?}) in the same ink! trait definition",
                     selector.to_bytes(),
-                ).into_combine(format_err_spanned!(
+                )
+                .into_combine(format_err_spanned!(
                     duplicate_selector,
                     "first ink! trait constructor or message with same selector found here",
-                )))
+                )));
             }
             assert!(
                 duplicate_ident.is_none(),

@@ -12,26 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{
-    CacheCell,
-    EntryState,
-    StorageEntry,
-};
+use super::{CacheCell, EntryState, StorageEntry};
 use crate::traits::{
-    clear_packed_root,
-    pull_packed_root_opt,
-    ExtKeyPtr,
-    KeyPtr,
-    PackedLayout,
-    SpreadAllocate,
+    clear_packed_root, pull_packed_root_opt, ExtKeyPtr, KeyPtr, PackedLayout, SpreadAllocate,
     SpreadLayout,
 };
-use core::{
-    fmt,
-    fmt::Debug,
-    mem,
-    ptr::NonNull,
-};
+use core::{fmt, fmt::Debug, mem, ptr::NonNull};
 use ink_primitives::Key;
 
 /// The index type used in the lazy storage chunk.
@@ -68,12 +54,7 @@ pub struct LazyArray<T, const N: usize> {
 #[cfg(feature = "std")]
 const _: () = {
     use crate::traits::StorageLayout;
-    use ink_metadata::layout::{
-        ArrayLayout,
-        CellLayout,
-        Layout,
-        LayoutKey,
-    };
+    use ink_metadata::layout::{ArrayLayout, CellLayout, Layout, LayoutKey};
     use scale_info::TypeInfo;
 
     impl<T, const N: usize> StorageLayout for LazyArray<T, N>
@@ -86,9 +67,7 @@ const _: () = {
                 LayoutKey::from(key_ptr.advance_by(capacity as u64)),
                 capacity,
                 1,
-                Layout::Cell(CellLayout::new::<T>(LayoutKey::from(
-                    key_ptr.advance_by(0),
-                ))),
+                Layout::Cell(CellLayout::new::<T>(LayoutKey::from(key_ptr.advance_by(0)))),
             ))
         }
     }
@@ -262,7 +241,7 @@ impl<T, const N: usize> EntryArray<T, N> {
     /// Returns an exclusive reference to the entry at the given index if any.
     unsafe fn get_entry_mut(&self, at: Index) -> Option<&mut StorageEntry<T>> {
         if at >= Self::capacity() {
-            return None
+            return None;
         }
         (*CacheCell::get_ptr(&self.entries[at as usize]).as_ptr()).as_mut()
     }
@@ -414,7 +393,7 @@ impl<T, const N: usize> LazyArray<T, N> {
     /// Returns the offset key for the given index if not out of bounds.
     pub fn key_at(&self, at: Index) -> Option<Key> {
         if at >= self.capacity() {
-            return None
+            return None;
         }
         self.key.map(|mut key| {
             key += at as u64;
@@ -524,7 +503,7 @@ where
         assert!(b < self.capacity(), "b is out of bounds");
         if a == b {
             // Bail out early if both indices are the same.
-            return
+            return;
         }
         let (loaded_a, loaded_b) =
             // SAFETY: The loaded `x` and `y` entries are distinct from each
@@ -536,7 +515,7 @@ where
             ) };
         if loaded_a.value().is_none() && loaded_b.value().is_none() {
             // Bail out since nothing has to be swapped if both values are `None`.
-            return
+            return;
         }
         // At this point at least one of the values is `Some` so we have to
         // perform the swap and set both entry states to mutated.
@@ -549,17 +528,10 @@ where
 #[cfg(test)]
 mod tests {
     use super::{
-        super::{
-            EntryState,
-            StorageEntry,
-        },
-        Index,
-        LazyArray,
+        super::{EntryState, StorageEntry},
+        Index, LazyArray,
     };
-    use crate::traits::{
-        KeyPtr,
-        SpreadLayout,
-    };
+    use crate::traits::{KeyPtr, SpreadLayout};
     use ink_primitives::Key;
 
     /// Asserts that the cached entries of the given `imap` is equal to the `expected` slice.
@@ -572,9 +544,7 @@ mod tests {
             .cached_entries()
             .iter()
             .enumerate()
-            .filter_map(|(index, entry)| {
-                entry.as_ref().map(|entry| (index as u32, entry))
-            })
+            .filter_map(|(index, entry)| entry.as_ref().map(|entry| (index as u32, entry)))
             .zip(expected.iter().map(|(index, entry)| (*index, entry)))
         {
             assert_eq!(given, expected);
@@ -829,9 +799,8 @@ mod tests {
             // Then: Compare both instances to be equal.
             let root_key = Key::from([0x42; 32]);
             SpreadLayout::push_spread(&larray, &mut KeyPtr::from(root_key));
-            let larray2 = <LazyArray<u8, 4> as SpreadLayout>::pull_spread(
-                &mut KeyPtr::from(root_key),
-            );
+            let larray2 =
+                <LazyArray<u8, 4> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
             assert_cached_entries(&larray2, &[]);
             assert_eq!(larray2.get(0), Some(&b'A'));
             assert_eq!(larray2.get(1), Some(&b'B'));
@@ -858,9 +827,8 @@ mod tests {
             larray2.clear_packed_at(1);
             larray2.clear_packed_at(2); // Not really needed here.
             larray2.clear_packed_at(3); // Not really needed here.
-            let larray3 = <LazyArray<u8, 4> as SpreadLayout>::pull_spread(
-                &mut KeyPtr::from(root_key),
-            );
+            let larray3 =
+                <LazyArray<u8, 4> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
             assert_cached_entries(&larray3, &[]);
             assert_eq!(larray3.get(0), None);
             assert_eq!(larray3.get(1), None);

@@ -29,27 +29,12 @@ mod event;
 mod trait_def;
 
 pub use self::{
-    contract::{
-        ContractEnv,
-        ContractName,
-        ContractReference,
-    },
+    contract::{ContractEnv, ContractName, ContractReference},
     dispatch::{
-        ContractAmountDispatchables,
-        ContractConstructorDecoder,
-        ContractDispatchableConstructors,
-        ContractDispatchableMessages,
-        ContractMessageDecoder,
-        DecodeDispatch,
-        DispatchError,
-        DispatchableConstructorInfo,
-        DispatchableMessageInfo,
-        ExecuteDispatchable,
+        ContractAmountDispatchables, ContractConstructorDecoder, ContractDispatchableConstructors,
+        ContractDispatchableMessages, ContractMessageDecoder, DecodeDispatch, DispatchError,
+        DispatchableConstructorInfo, DispatchableMessageInfo, ExecuteDispatchable,
     },
     event::ContractEventBase,
-    trait_def::{
-        TraitDefinitionRegistry,
-        TraitInfo,
-        TraitMessageInfo,
-    },
+    trait_def::{TraitDefinitionRegistry, TraitInfo, TraitMessageInfo},
 };

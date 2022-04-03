@@ -14,12 +14,7 @@
 
 #![allow(clippy::len_without_is_empty)]
 
-use super::{
-    BitRefMut,
-    Bits256,
-    Bits256BitsIter,
-    Bits256BitsIterMut,
-};
+use super::{BitRefMut, Bits256, Bits256BitsIter, Bits256BitsIterMut};
 
 /// A reference to a sub-slice within a 256-bit chunk.
 ///
@@ -57,7 +52,7 @@ impl<'a> ChunkRef<&'a Bits256> {
     pub fn position_first_zero(&self) -> Option<u8> {
         let position = self.bits.position_first_zero()?;
         if position as u32 >= self.len() {
-            return None
+            return None;
         }
         Some(position)
     }
@@ -70,7 +65,7 @@ impl<'a> ChunkRef<&'a Bits256> {
     /// - If 1: returns `true`
     pub fn get(&self, index: u8) -> Option<bool> {
         if index as u32 >= self.len {
-            return None
+            return None;
         }
         self.bits.get(index).into()
     }
@@ -90,7 +85,7 @@ impl<'a> ChunkRef<&'a mut Bits256> {
     /// Returns mutable access to a single bit if the index is out of bounds.
     pub fn get_mut(&mut self, index: u8) -> Option<BitRefMut> {
         if index as u32 >= self.len {
-            return None
+            return None;
         }
         BitRefMut::new(self.bits, index).into()
     }
@@ -120,10 +115,7 @@ impl<'a> core::ops::Deref for ChunkRef<&'a mut Bits256> {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        Bits256,
-        ChunkRef,
-    };
+    use super::{Bits256, ChunkRef};
 
     fn is_populated_bit_set(index: u8) -> bool {
         (index % 5) == 0 || (index % 13) == 0

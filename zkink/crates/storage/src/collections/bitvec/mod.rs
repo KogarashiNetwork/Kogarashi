@@ -29,26 +29,13 @@ mod tests;
 pub use self::{
     bitref::BitRefMut,
     bitsref::ChunkRef,
-    iter::{
-        BitsIter,
-        BitsIterMut,
-    },
+    iter::{BitsIter, BitsIterMut},
 };
 use self::{
-    bits256::{
-        Bits256,
-        Iter as Bits256BitsIter,
-        IterMut as Bits256BitsIterMut,
-    },
-    iter::{
-        Bits256Iter,
-        Bits256IterMut,
-    },
+    bits256::{Bits256, Iter as Bits256BitsIter, IterMut as Bits256BitsIterMut},
+    iter::{Bits256Iter, Bits256IterMut},
 };
-use crate::{
-    Lazy,
-    Vec as StorageVec,
-};
+use crate::{Lazy, Vec as StorageVec};
 
 /// The index of a bit pack within the bit vector.
 type Index = u32;
@@ -130,7 +117,7 @@ impl Bitvec {
     /// Splits the given index into a 256-bit pack index and a position index of the bit.
     fn split_index(&self, at: Index) -> Option<(Index, Index256)> {
         if at >= self.len() {
-            return None
+            return None;
         }
         Some((at / 256, (at % 256) as u8))
     }
@@ -173,7 +160,7 @@ impl Bitvec {
     /// Returns a shared reference to the 256-bit chunk for the bit at the given index.
     pub fn get_chunk(&self, at: Index) -> Option<ChunkRef<&Bits256>> {
         if at >= self.len() {
-            return None
+            return None;
         }
         use core::cmp::min;
         let chunk_id = at / 256;
@@ -185,7 +172,7 @@ impl Bitvec {
     /// Returns an exclusive reference to the 256-bit chunk for the bit at the given index.
     pub fn get_chunk_mut(&mut self, at: Index) -> Option<ChunkRef<&mut Bits256>> {
         if at >= self.len() {
-            return None
+            return None;
         }
         use core::cmp::min;
         let chunk_id = at / 256;
@@ -201,7 +188,7 @@ impl Bitvec {
     /// Returns `None` if the bit vector is empty.
     pub fn first(&self) -> Option<bool> {
         if self.is_empty() {
-            return None
+            return None;
         }
         self.get(0)
     }
@@ -213,7 +200,7 @@ impl Bitvec {
     /// Returns `None` if the bit vector is empty.
     pub fn first_mut(&mut self) -> Option<BitRefMut> {
         if self.is_empty() {
-            return None
+            return None;
         }
         self.get_access_mut(0)
     }
@@ -225,7 +212,7 @@ impl Bitvec {
     /// Returns `None` if the bit vector is empty.
     pub fn last(&self) -> Option<bool> {
         if self.is_empty() {
-            return None
+            return None;
         }
         self.get(self.len() - 1)
     }
@@ -237,7 +224,7 @@ impl Bitvec {
     /// Returns `None` if the bit vector is empty.
     pub fn last_mut(&mut self) -> Option<BitRefMut> {
         if self.is_empty() {
-            return None
+            return None;
         }
         self.get_access_mut(self.len() - 1)
     }
@@ -272,7 +259,7 @@ impl Bitvec {
             };
             self.bits.push(bits256);
             *self.len += 1;
-            return
+            return;
         }
         // Case: The last 256-bit pack has unused bits:
         // - Set last bit of last 256-bit pack to the given value.
@@ -296,7 +283,7 @@ impl Bitvec {
     pub fn pop(&mut self) -> Option<bool> {
         if self.is_empty() {
             // Bail out early if the bit vector is emtpy.
-            return None
+            return None;
         }
         let mut access = self.last_mut().expect("must be some if non-empty");
         let popped = access.get();

@@ -12,24 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{
-    CacheCell,
-    EntryState,
-    StorageEntry,
-};
+use super::{CacheCell, EntryState, StorageEntry};
 use crate::traits::{
-    clear_spread_root_opt,
-    pull_spread_root_opt,
-    ExtKeyPtr,
-    KeyPtr,
-    SpreadAllocate,
-    SpreadLayout,
+    clear_spread_root_opt, pull_spread_root_opt, ExtKeyPtr, KeyPtr, SpreadAllocate, SpreadLayout,
 };
-use core::{
-    fmt,
-    fmt::Debug,
-    ptr::NonNull,
-};
+use core::{fmt, fmt::Debug, ptr::NonNull};
 use ink_primitives::Key;
 
 /// A lazy storage entity.
@@ -404,16 +391,9 @@ fn assert_footprint_threshold(footprint: u64) {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        EntryState,
-        LazyCell,
-        StorageEntry,
-    };
+    use super::{EntryState, LazyCell, StorageEntry};
     use crate::{
-        traits::{
-            KeyPtr,
-            SpreadLayout,
-        },
+        traits::{KeyPtr, SpreadLayout},
         Lazy,
     };
     use ink_env::test::run_test;
@@ -488,8 +468,7 @@ mod tests {
             // equal to `cell_a0`.
             let root_key = Key::from([0x42; 32]);
             SpreadLayout::push_spread(&cell_a0, &mut KeyPtr::from(root_key));
-            let cell_a1 =
-                <LazyCell<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
+            let cell_a1 = <LazyCell<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
             assert_eq!(cell_a1.get(), cell_a0.get());
             assert_eq!(cell_a1.get(), Some(&b'A'));
             assert_eq!(
@@ -547,8 +526,7 @@ mod tests {
             SpreadLayout::push_spread(&Lazy::new(val), &mut KeyPtr::from(k));
 
             // Pull another instance `v` from `k`, check that it is `None`
-            let mut v =
-                <Lazy<MaybeValue> as SpreadLayout>::pull_spread(&mut KeyPtr::from(k));
+            let mut v = <Lazy<MaybeValue> as SpreadLayout>::pull_spread(&mut KeyPtr::from(k));
             assert_eq!(*v, None);
 
             // Set `v` using `set` to an actual value
@@ -559,8 +537,7 @@ mod tests {
             SpreadLayout::push_spread(&v, &mut KeyPtr::from(k));
 
             // Load `v2` from `k`
-            let v2 =
-                <Lazy<MaybeValue> as SpreadLayout>::pull_spread(&mut KeyPtr::from(k));
+            let v2 = <Lazy<MaybeValue> as SpreadLayout>::pull_spread(&mut KeyPtr::from(k));
 
             // Check that V2 is the set value
             assert_eq!(*v2, Some(13));
@@ -726,23 +703,21 @@ mod tests {
             let root_key = Key::from([0x42; 32]);
             let nested_lazy: Lazy<Lazy<u32>> = Lazy::new(Lazy::new(13u32));
             SpreadLayout::push_spread(&nested_lazy, &mut KeyPtr::from(root_key));
-            let pulled_lazy = <Lazy<Lazy<u32>> as SpreadLayout>::pull_spread(
-                &mut KeyPtr::from(root_key),
-            );
+            let pulled_lazy =
+                <Lazy<Lazy<u32>> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
 
             // when
             SpreadLayout::clear_spread(&pulled_lazy, &mut KeyPtr::from(root_key));
 
             // then
             let contract_id = ink_env::test::callee::<ink_env::DefaultEnvironment>();
-            let used_cells = ink_env::test::count_used_storage_cells::<
-                ink_env::DefaultEnvironment,
-            >(&contract_id)
-            .expect("used cells must be returned");
+            let used_cells =
+                ink_env::test::count_used_storage_cells::<ink_env::DefaultEnvironment>(
+                    &contract_id,
+                )
+                .expect("used cells must be returned");
             assert_eq!(used_cells, 0);
-            let _ = *<Lazy<Lazy<u32>> as SpreadLayout>::pull_spread(&mut KeyPtr::from(
-                root_key,
-            ));
+            let _ = *<Lazy<Lazy<u32>> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
             Ok(())
         })
         .unwrap()
@@ -767,13 +742,13 @@ mod tests {
 
             // then
             let contract_id = ink_env::test::callee::<ink_env::DefaultEnvironment>();
-            let used_cells = ink_env::test::count_used_storage_cells::<
-                ink_env::DefaultEnvironment,
-            >(&contract_id)
-            .expect("used cells must be returned");
+            let used_cells =
+                ink_env::test::count_used_storage_cells::<ink_env::DefaultEnvironment>(
+                    &contract_id,
+                )
+                .expect("used cells must be returned");
             assert_eq!(used_cells, 0);
-            let _ =
-                *<Lazy<u32> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
+            let _ = *<Lazy<u32> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
             Ok(())
         })
         .unwrap()
@@ -790,22 +765,21 @@ mod tests {
             let setup_result = std::panic::catch_unwind(|| {
                 let lazy: Lazy<[u32; 5]> = Lazy::new([13, 14, 15, 16, 17]);
                 SpreadLayout::push_spread(&lazy, &mut KeyPtr::from(root_key));
-                let _pulled_lazy = <Lazy<[u32; 5]> as SpreadLayout>::pull_spread(
-                    &mut KeyPtr::from(root_key),
-                );
+                let _pulled_lazy =
+                    <Lazy<[u32; 5]> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
                 // lazy is dropped which should clear the cells
             });
             assert!(setup_result.is_ok(), "setup should not panic");
 
             // then
             let contract_id = ink_env::test::callee::<ink_env::DefaultEnvironment>();
-            let used_cells = ink_env::test::count_used_storage_cells::<
-                ink_env::DefaultEnvironment,
-            >(&contract_id)
-            .expect("used cells must be returned");
+            let used_cells =
+                ink_env::test::count_used_storage_cells::<ink_env::DefaultEnvironment>(
+                    &contract_id,
+                )
+                .expect("used cells must be returned");
             assert_eq!(used_cells, 0);
-            let _ =
-                *<Lazy<u32> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
+            let _ = *<Lazy<u32> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
             Ok(())
         })
         .unwrap()

@@ -12,49 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{
-    ext,
-    EnvInstance,
-    Error as ExtError,
-    ScopedBuffer,
-};
+use super::{ext, EnvInstance, Error as ExtError, ScopedBuffer};
 use crate::{
-    call::{
-        Call,
-        CallParams,
-        CreateParams,
-        DelegateCall,
-    },
-    hash::{
-        Blake2x128,
-        Blake2x256,
-        CryptoHash,
-        HashOutput,
-        Keccak256,
-        Sha2x256,
-    },
-    topics::{
-        Topics,
-        TopicsBuilderBackend,
-    },
-    Clear,
-    EnvBackend,
-    Environment,
-    Error,
-    FromLittleEndian,
-    Result,
-    ReturnFlags,
-    TypedEnvBackend,
+    call::{Call, CallParams, CreateParams, DelegateCall},
+    hash::{Blake2x128, Blake2x256, CryptoHash, HashOutput, Keccak256, Sha2x256},
+    topics::{Topics, TopicsBuilderBackend},
+    Clear, EnvBackend, Environment, Error, FromLittleEndian, Result, ReturnFlags, TypedEnvBackend,
 };
 use ink_primitives::Key;
 
 impl CryptoHash for Blake2x128 {
     fn hash(input: &[u8], output: &mut <Self as HashOutput>::Type) {
         type OutputType = [u8; 16];
-        static_assertions::assert_type_eq_all!(
-            <Blake2x128 as HashOutput>::Type,
-            OutputType
-        );
+        static_assertions::assert_type_eq_all!(<Blake2x128 as HashOutput>::Type, OutputType);
         let output: &mut OutputType = arrayref::array_mut_ref!(output, 0, 16);
         ext::hash_blake2_128(input, output);
     }
@@ -63,10 +33,7 @@ impl CryptoHash for Blake2x128 {
 impl CryptoHash for Blake2x256 {
     fn hash(input: &[u8], output: &mut <Self as HashOutput>::Type) {
         type OutputType = [u8; 32];
-        static_assertions::assert_type_eq_all!(
-            <Blake2x256 as HashOutput>::Type,
-            OutputType
-        );
+        static_assertions::assert_type_eq_all!(<Blake2x256 as HashOutput>::Type, OutputType);
         let output: &mut OutputType = arrayref::array_mut_ref!(output, 0, 32);
         ext::hash_blake2_256(input, output);
     }
@@ -75,10 +42,7 @@ impl CryptoHash for Blake2x256 {
 impl CryptoHash for Sha2x256 {
     fn hash(input: &[u8], output: &mut <Self as HashOutput>::Type) {
         type OutputType = [u8; 32];
-        static_assertions::assert_type_eq_all!(
-            <Sha2x256 as HashOutput>::Type,
-            OutputType
-        );
+        static_assertions::assert_type_eq_all!(<Sha2x256 as HashOutput>::Type, OutputType);
         let output: &mut OutputType = arrayref::array_mut_ref!(output, 0, 32);
         ext::hash_sha2_256(input, output);
     }
@@ -87,10 +51,7 @@ impl CryptoHash for Sha2x256 {
 impl CryptoHash for Keccak256 {
     fn hash(input: &[u8], output: &mut <Self as HashOutput>::Type) {
         type OutputType = [u8; 32];
-        static_assertions::assert_type_eq_all!(
-            <Keccak256 as HashOutput>::Type,
-            OutputType
-        );
+        static_assertions::assert_type_eq_all!(<Keccak256 as HashOutput>::Type, OutputType);
         let output: &mut OutputType = arrayref::array_mut_ref!(output, 0, 32);
         ext::hash_keccak_256(input, output);
     }
@@ -358,10 +319,7 @@ impl TypedEnvBackend for EnvInstance {
         ext::deposit_event(enc_topics, enc_data);
     }
 
-    fn invoke_contract<E, Args, R>(
-        &mut self,
-        params: &CallParams<E, Call<E>, Args, R>,
-    ) -> Result<R>
+    fn invoke_contract<E, Args, R>(&mut self, params: &CallParams<E, Call<E>, Args, R>) -> Result<R>
     where
         E: Environment,
         Args: scale::Encode,

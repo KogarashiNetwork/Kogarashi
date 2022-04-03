@@ -84,29 +84,14 @@ mod tests;
 #[doc(inline)]
 pub use self::engine::off_chain::test_api as test;
 
-use self::backend::{
-    EnvBackend,
-    TypedEnvBackend,
-};
+use self::backend::{EnvBackend, TypedEnvBackend};
 pub use self::{
     api::*,
-    backend::{
-        CallFlags,
-        ReturnFlags,
-    },
-    error::{
-        Error,
-        Result,
-    },
+    backend::{CallFlags, ReturnFlags},
+    error::{Error, Result},
     topics::Topics,
     types::{
-        AccountId,
-        Clear,
-        DefaultEnvironment,
-        Environment,
-        FromLittleEndian,
-        Hash,
-        NoChainExtension,
+        AccountId, Clear, DefaultEnvironment, Environment, FromLittleEndian, Hash, NoChainExtension,
     },
 };
 

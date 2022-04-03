@@ -18,18 +18,11 @@
 use super::Vec as StorageVec;
 use crate::{
     test_utils::FuzzCollection,
-    traits::{
-        KeyPtr,
-        PackedLayout,
-        SpreadLayout,
-    },
+    traits::{KeyPtr, PackedLayout, SpreadLayout},
     Pack,
 };
 use itertools::Itertools;
-use quickcheck::{
-    Arbitrary,
-    Gen,
-};
+use quickcheck::{Arbitrary, Gen};
 use std::vec::Vec;
 
 impl<T> Arbitrary for StorageVec<T>
@@ -88,7 +81,7 @@ crate::fuzz_storage!("vec_4", StorageVec<(i128, u32, bool, Option<(u32, i128)>)>
 fn fuzz_binary_search(mut std_vec: Vec<i32>) {
     // given
     if std_vec.is_empty() {
-        return
+        return;
     }
     let original_std_vec = std_vec.clone();
     std_vec.sort_unstable();
@@ -116,7 +109,7 @@ fn fuzz_binary_search(mut std_vec: Vec<i32>) {
 fn fuzz_binary_search_nonexistent(std_vec: Vec<i32>) {
     // given
     if std_vec.is_empty() {
-        return
+        return;
     }
     let mut unique_std_vec: Vec<i32> = std_vec.into_iter().unique().collect();
     let removed_el = unique_std_vec
@@ -145,7 +138,7 @@ fn fuzz_binary_search_nonexistent(std_vec: Vec<i32>) {
 fn fuzz_binary_search_by_key(mut std_vec: Vec<(i32, i32)>) {
     // given
     if std_vec.is_empty() {
-        return
+        return;
     }
     let original_std_vec = std_vec.clone();
     std_vec.sort_by_key(|&(_a, b)| b);
@@ -168,10 +161,9 @@ fn fuzz_binary_search_by_key(mut std_vec: Vec<(i32, i32)>) {
 fn fuzz_binary_search_by_key_nonexistent(std_vec: Vec<(i32, i32)>) {
     // given
     if std_vec.is_empty() {
-        return
+        return;
     }
-    let mut unique_std_vec: Vec<(i32, i32)> =
-        std_vec.into_iter().unique_by(|&(_a, b)| b).collect();
+    let mut unique_std_vec: Vec<(i32, i32)> = std_vec.into_iter().unique_by(|&(_a, b)| b).collect();
     let removed_el = unique_std_vec
         .pop()
         .expect("length is non-zero, first element must exist");

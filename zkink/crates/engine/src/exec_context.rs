@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::types::{
-    AccountId,
-    Balance,
-    BlockNumber,
-    BlockTimestamp,
-    Hash,
-};
+use super::types::{AccountId, Balance, BlockNumber, BlockTimestamp, Hash};
 use rand::Rng;
 
 /// The context of a contract execution.
@@ -86,10 +80,7 @@ impl ExecContext {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        AccountId,
-        ExecContext,
-    };
+    use super::{AccountId, ExecContext};
 
     #[test]
     fn basic_operations() {

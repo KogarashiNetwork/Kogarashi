@@ -97,17 +97,10 @@ mod tuples;
 mod fuzz_tests;
 
 use super::{
-    allocate_packed_root,
-    clear_packed_root,
-    pull_packed_root,
-    push_packed_root,
-    PackedAllocate,
+    allocate_packed_root, clear_packed_root, pull_packed_root, push_packed_root, PackedAllocate,
     PackedLayout,
 };
-use crate::traits::{
-    ExtKeyPtr as _,
-    KeyPtr,
-};
+use crate::traits::{ExtKeyPtr as _, KeyPtr};
 
 /// Returns the greater of both values.
 const fn max(a: u64, b: u64) -> u64 {

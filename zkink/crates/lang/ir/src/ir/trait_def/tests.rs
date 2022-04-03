@@ -423,16 +423,15 @@ fn trait_def_with_overlapping_selectors() {
 
 #[test]
 fn iter_messages_works() {
-    let ink_trait =
-        <InkItemTrait as TryFrom<syn::ItemTrait>>::try_from(syn::parse_quote! {
-            pub trait MyTrait {
-                #[ink(message)]
-                fn message_1(&self);
-                #[ink(message)]
-                fn message_2(&mut self);
-            }
-        })
-        .unwrap();
+    let ink_trait = <InkItemTrait as TryFrom<syn::ItemTrait>>::try_from(syn::parse_quote! {
+        pub trait MyTrait {
+            #[ink(message)]
+            fn message_1(&self);
+            #[ink(message)]
+            fn message_2(&mut self);
+        }
+    })
+    .unwrap();
     let actual = ink_trait
         .iter_items()
         .map(|(item, _)| item)

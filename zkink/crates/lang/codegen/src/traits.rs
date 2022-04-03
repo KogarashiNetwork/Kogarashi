@@ -36,8 +36,6 @@ where
     where
         G: GenerateCode + From<&'a ir::Contract>,
     {
-        <G as GenerateCode>::generate_code(&G::from(
-            <Self as AsRef<ir::Contract>>::as_ref(self),
-        ))
+        <G as GenerateCode>::generate_code(&G::from(<Self as AsRef<ir::Contract>>::as_ref(self)))
     }
 }

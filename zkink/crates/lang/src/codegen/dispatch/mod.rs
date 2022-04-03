@@ -18,15 +18,9 @@ mod type_check;
 
 pub use self::{
     execution::{
-        deny_payment,
-        execute_constructor,
-        initialize_contract,
-        ContractRootKey,
+        deny_payment, execute_constructor, initialize_contract, ContractRootKey,
         ExecuteConstructorConfig,
     },
     info::ContractCallBuilder,
-    type_check::{
-        DispatchInput,
-        DispatchOutput,
-    },
+    type_check::{DispatchInput, DispatchOutput},
 };

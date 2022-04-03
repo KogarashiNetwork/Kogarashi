@@ -17,10 +17,5 @@ mod topics;
 
 pub use self::{
     emit::EmitEvent,
-    topics::{
-        EventLenTopics,
-        EventRespectsTopicLimit,
-        EventTopics,
-        RespectTopicLimit,
-    },
+    topics::{EventLenTopics, EventRespectsTopicLimit, EventTopics, RespectTopicLimit},
 };

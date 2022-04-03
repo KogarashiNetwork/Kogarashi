@@ -14,42 +14,25 @@
 
 //! A lazy storage mapping that stores entries under their SCALE encoded key hashes.
 
-use super::{
-    CacheCell,
-    EntryState,
-    StorageEntry,
-};
+use super::{CacheCell, EntryState, StorageEntry};
 use crate::traits::{
-    clear_packed_root,
-    pull_packed_root_opt,
-    ExtKeyPtr,
-    KeyPtr,
-    PackedLayout,
-    SpreadAllocate,
+    clear_packed_root, pull_packed_root_opt, ExtKeyPtr, KeyPtr, PackedLayout, SpreadAllocate,
     SpreadLayout,
 };
 use core::{
     borrow::Borrow,
-    cmp::{
-        Eq,
-        Ord,
-    },
+    cmp::{Eq, Ord},
     fmt,
     fmt::Debug,
     marker::PhantomData,
     ptr::NonNull,
 };
-use ink_env::hash::{
-    CryptoHash,
-    HashOutput,
-};
+use ink_env::hash::{CryptoHash, HashOutput};
 use ink_prelude::{
     borrow::ToOwned,
     boxed::Box,
     collections::btree_map::{
-        BTreeMap,
-        Entry as BTreeMapEntry,
-        OccupiedEntry as BTreeMapOccupiedEntry,
+        BTreeMap, Entry as BTreeMapEntry, OccupiedEntry as BTreeMapOccupiedEntry,
     },
 };
 use ink_primitives::Key;
@@ -219,17 +202,8 @@ fn debug_impl_works() {
 
 #[cfg(feature = "std")]
 const _: () = {
-    use crate::traits::{
-        LayoutCryptoHasher,
-        StorageLayout,
-    };
-    use ink_metadata::layout::{
-        CellLayout,
-        HashLayout,
-        HashingStrategy,
-        Layout,
-        LayoutKey,
-    };
+    use crate::traits::{LayoutCryptoHasher, StorageLayout};
+    use ink_metadata::layout::{CellLayout, HashLayout, HashingStrategy, Layout, LayoutKey};
     use scale_info::TypeInfo;
 
     impl<K, V, H> StorageLayout for LazyHashMap<K, V, H>
@@ -247,9 +221,7 @@ const _: () = {
                     b"ink hashmap".to_vec(),
                     Vec::new(),
                 ),
-                Layout::Cell(CellLayout::new::<V>(LayoutKey::from(
-                    key_ptr.advance_by(0),
-                ))),
+                Layout::Cell(CellLayout::new::<V>(LayoutKey::from(key_ptr.advance_by(0)))),
             ))
         }
     }
@@ -454,12 +426,10 @@ where
         match cached_entries.entry(key.to_owned()) {
             BTreeMapEntry::Occupied(entry) => {
                 match entry.get().value() {
-                    Some(_) => {
-                        Entry::Occupied(OccupiedEntry {
-                            key,
-                            entry: EntryOrMutableValue::EntryElementWasInCache(entry),
-                        })
-                    }
+                    Some(_) => Entry::Occupied(OccupiedEntry {
+                        key,
+                        entry: EntryOrMutableValue::EntryElementWasInCache(entry),
+                    }),
                     None => {
                         // value is already marked as to be removed
                         Entry::Vacant(VacantEntry {
@@ -479,23 +449,17 @@ where
                         // The entry was not in the cache, but in the storage. This results in
                         // a problem: We only have `Vacant` here, but need to return `Occupied`,
                         // to reflect this.
-                        let v_mut = entry.insert(Box::new(StorageEntry::new(
-                            value,
-                            EntryState::Preserved,
-                        )));
+                        let v_mut =
+                            entry.insert(Box::new(StorageEntry::new(value, EntryState::Preserved)));
                         Entry::Occupied(OccupiedEntry {
                             key,
-                            entry: EntryOrMutableValue::MutableValueElementWasNotInCache(
-                                v_mut,
-                            ),
+                            entry: EntryOrMutableValue::MutableValueElementWasNotInCache(v_mut),
                         })
                     }
-                    false => {
-                        Entry::Vacant(VacantEntry {
-                            key,
-                            entry: BTreeMapEntry::Vacant(entry),
-                        })
-                    }
+                    false => Entry::Vacant(VacantEntry {
+                        key,
+                        entry: BTreeMapEntry::Vacant(entry),
+                    }),
                 }
             }
         }
@@ -589,19 +553,14 @@ where
         // the contraints on `K: Clone` once we have access to this API.
         // Read more about the issue here: https://github.com/rust-lang/rust/issues/56167
         match cached_entries.entry(key.to_owned()) {
-            BTreeMapEntry::Occupied(occupied) => {
-                NonNull::from(&mut **occupied.into_mut())
-            }
+            BTreeMapEntry::Occupied(occupied) => NonNull::from(&mut **occupied.into_mut()),
             BTreeMapEntry::Vacant(vacant) => {
                 let value = self
                     .key_at(key)
                     .map(|key| pull_packed_root_opt::<V>(&key))
                     .unwrap_or(None);
                 NonNull::from(
-                    &mut **vacant.insert(Box::new(StorageEntry::new(
-                        value,
-                        EntryState::Preserved,
-                    ))),
+                    &mut **vacant.insert(Box::new(StorageEntry::new(value, EntryState::Preserved))),
                 )
             }
         }
@@ -726,7 +685,7 @@ where
     {
         if x == y {
             // Bail out early if both indices are the same.
-            return
+            return;
         }
         let (loaded_x, loaded_y) =
             // SAFETY: The loaded `x` and `y` entries are distinct from each
@@ -740,7 +699,7 @@ where
             ) };
         if loaded_x.value().is_none() && loaded_y.value().is_none() {
             // Bail out since nothing has to be swapped if both values are `None`.
-            return
+            return;
         }
         // Set the `mutate` flag since at this point at least one of the loaded
         // values is guaranteed to be `Some`.
@@ -848,13 +807,11 @@ where
     pub fn insert(self, value: V) -> &'a mut V {
         let new = Box::new(StorageEntry::new(Some(value), EntryState::Mutated));
         match self.entry {
-            BTreeMapEntry::Vacant(vacant) => {
-                vacant
-                    .insert(new)
-                    .value_mut()
-                    .as_mut()
-                    .expect("insert was just executed; qed")
-            }
+            BTreeMapEntry::Vacant(vacant) => vacant
+                .insert(new)
+                .value_mut()
+                .as_mut()
+                .expect("insert was just executed; qed"),
             BTreeMapEntry::Occupied(mut occupied) => {
                 occupied.insert(new);
                 occupied
@@ -880,19 +837,15 @@ where
     /// Take the ownership of the key and value from the map.
     pub fn remove_entry(self) -> (K, V) {
         let old = match self.entry {
-            EntryOrMutableValue::EntryElementWasInCache(mut entry) => {
-                entry
-                    .get_mut()
-                    .value_mut()
-                    .take()
-                    .expect("entry behind `OccupiedEntry` must always exist")
-            }
-            EntryOrMutableValue::MutableValueElementWasNotInCache(v_mut) => {
-                v_mut
-                    .value_mut()
-                    .take()
-                    .expect("entry behind `MutableValue` must always exist")
-            }
+            EntryOrMutableValue::EntryElementWasInCache(mut entry) => entry
+                .get_mut()
+                .value_mut()
+                .take()
+                .expect("entry behind `OccupiedEntry` must always exist"),
+            EntryOrMutableValue::MutableValueElementWasNotInCache(v_mut) => v_mut
+                .value_mut()
+                .take()
+                .expect("entry behind `MutableValue` must always exist"),
         };
         (self.key, old)
     }
@@ -900,19 +853,15 @@ where
     /// Gets a reference to the value in the entry.
     pub fn get(&self) -> &V {
         match &self.entry {
-            EntryOrMutableValue::EntryElementWasInCache(entry) => {
-                entry
-                    .get()
-                    .value()
-                    .as_ref()
-                    .expect("entry behind `OccupiedEntry` must always exist")
-            }
-            EntryOrMutableValue::MutableValueElementWasNotInCache(v_mut) => {
-                v_mut
-                    .value()
-                    .as_ref()
-                    .expect("entry behind `MutableValue` must always exist")
-            }
+            EntryOrMutableValue::EntryElementWasInCache(entry) => entry
+                .get()
+                .value()
+                .as_ref()
+                .expect("entry behind `OccupiedEntry` must always exist"),
+            EntryOrMutableValue::MutableValueElementWasNotInCache(v_mut) => v_mut
+                .value()
+                .as_ref()
+                .expect("entry behind `MutableValue` must always exist"),
         }
     }
 
@@ -922,19 +871,15 @@ where
     /// `Entry` value, see `into_mut`.
     pub fn get_mut(&mut self) -> &mut V {
         match &mut self.entry {
-            EntryOrMutableValue::EntryElementWasInCache(entry) => {
-                entry
-                    .get_mut()
-                    .value_mut()
-                    .as_mut()
-                    .expect("entry behind `OccupiedEntry` must always exist")
-            }
-            EntryOrMutableValue::MutableValueElementWasNotInCache(v_mut) => {
-                v_mut
-                    .value_mut()
-                    .as_mut()
-                    .expect("entry behind `MutableValue` must always exist")
-            }
+            EntryOrMutableValue::EntryElementWasInCache(entry) => entry
+                .get_mut()
+                .value_mut()
+                .as_mut()
+                .expect("entry behind `OccupiedEntry` must always exist"),
+            EntryOrMutableValue::MutableValueElementWasNotInCache(v_mut) => v_mut
+                .value_mut()
+                .as_mut()
+                .expect("entry behind `MutableValue` must always exist"),
         }
     }
 
@@ -942,8 +887,7 @@ where
     pub fn insert(&mut self, new_value: V) -> V {
         match &mut self.entry {
             EntryOrMutableValue::EntryElementWasInCache(entry) => {
-                let new_value =
-                    Box::new(StorageEntry::new(Some(new_value), EntryState::Mutated));
+                let new_value = Box::new(StorageEntry::new(Some(new_value), EntryState::Mutated));
                 entry
                     .insert(new_value)
                     .into_value()
@@ -965,38 +909,24 @@ where
     /// with a lifetime bound to the map itself.
     pub fn into_mut(self) -> &'a mut V {
         match self.entry {
-            EntryOrMutableValue::EntryElementWasInCache(entry) => {
-                entry
-                    .into_mut()
-                    .value_mut()
-                    .as_mut()
-                    .expect("entry behind `OccupiedEntry` must always exist")
-            }
-            EntryOrMutableValue::MutableValueElementWasNotInCache(v_mut) => {
-                v_mut
-                    .value_mut()
-                    .as_mut()
-                    .expect("entry behind `MutableValue` must always exist")
-            }
+            EntryOrMutableValue::EntryElementWasInCache(entry) => entry
+                .into_mut()
+                .value_mut()
+                .as_mut()
+                .expect("entry behind `OccupiedEntry` must always exist"),
+            EntryOrMutableValue::MutableValueElementWasNotInCache(v_mut) => v_mut
+                .value_mut()
+                .as_mut()
+                .expect("entry behind `MutableValue` must always exist"),
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        EntryState,
-        LazyHashMap,
-        StorageEntry,
-    };
-    use crate::traits::{
-        KeyPtr,
-        SpreadLayout,
-    };
-    use ink_env::hash::{
-        Blake2x256,
-        Sha2x256,
-    };
+    use super::{EntryState, LazyHashMap, StorageEntry};
+    use crate::traits::{KeyPtr, SpreadLayout};
+    use ink_env::hash::{Blake2x256, Sha2x256};
     use ink_primitives::Key;
 
     /// Asserts that the cached entries of the given `imap` is equal to the `expected` slice.

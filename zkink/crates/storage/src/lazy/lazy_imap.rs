@@ -12,29 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{
-    CacheCell,
-    EntryState,
-    StorageEntry,
-};
+use super::{CacheCell, EntryState, StorageEntry};
 use crate::traits::{
-    clear_packed_root,
-    pull_packed_root_opt,
-    ExtKeyPtr,
-    KeyPtr,
-    PackedLayout,
-    SpreadAllocate,
+    clear_packed_root, pull_packed_root_opt, ExtKeyPtr, KeyPtr, PackedLayout, SpreadAllocate,
     SpreadLayout,
 };
-use core::{
-    fmt,
-    fmt::Debug,
-    ptr::NonNull,
-};
-use ink_prelude::{
-    boxed::Box,
-    collections::BTreeMap,
-};
+use core::{fmt, fmt::Debug, ptr::NonNull};
+use ink_prelude::{boxed::Box, collections::BTreeMap};
 use ink_primitives::Key;
 
 /// The index type used in the lazy storage chunk.
@@ -201,8 +185,7 @@ impl<V> LazyIndexMap<V> {
                 occupied.get_mut().put(new_value);
             }
             BTreeMapEntry::Vacant(vacant) => {
-                vacant
-                    .insert(Box::new(StorageEntry::new(new_value, EntryState::Mutated)));
+                vacant.insert(Box::new(StorageEntry::new(new_value, EntryState::Mutated)));
             }
         }
     }
@@ -211,12 +194,7 @@ impl<V> LazyIndexMap<V> {
 #[cfg(feature = "std")]
 const _: () = {
     use crate::traits::StorageLayout;
-    use ink_metadata::layout::{
-        ArrayLayout,
-        CellLayout,
-        Layout,
-        LayoutKey,
-    };
+    use ink_metadata::layout::{ArrayLayout, CellLayout, Layout, LayoutKey};
     use scale_info::TypeInfo;
 
     impl<T> StorageLayout for LazyIndexMap<T>
@@ -229,9 +207,7 @@ const _: () = {
                 LayoutKey::from(key_ptr.advance_by(capacity as u64)),
                 capacity,
                 1,
-                Layout::Cell(CellLayout::new::<T>(LayoutKey::from(
-                    key_ptr.advance_by(0),
-                ))),
+                Layout::Cell(CellLayout::new::<T>(LayoutKey::from(key_ptr.advance_by(0)))),
             ))
         }
     }
@@ -350,19 +326,14 @@ where
         let cached_entries = &mut *self.cached_entries.get_ptr().as_ptr();
         use ink_prelude::collections::btree_map::Entry as BTreeMapEntry;
         match cached_entries.entry(index) {
-            BTreeMapEntry::Occupied(occupied) => {
-                NonNull::from(&mut **occupied.into_mut())
-            }
+            BTreeMapEntry::Occupied(occupied) => NonNull::from(&mut **occupied.into_mut()),
             BTreeMapEntry::Vacant(vacant) => {
                 let value = self
                     .key_at(index)
                     .map(|key| pull_packed_root_opt::<V>(&key))
                     .unwrap_or(None);
                 NonNull::from(
-                    &mut **vacant.insert(Box::new(StorageEntry::new(
-                        value,
-                        EntryState::Preserved,
-                    ))),
+                    &mut **vacant.insert(Box::new(StorageEntry::new(value, EntryState::Preserved))),
                 )
             }
         }
@@ -436,7 +407,7 @@ where
     pub fn swap(&mut self, x: Index, y: Index) {
         if x == y {
             // Bail out early if both indices are the same.
-            return
+            return;
         }
         let (loaded_x, loaded_y) =
             // SAFETY: The loaded `x` and `y` entries are distinct from each
@@ -450,7 +421,7 @@ where
             ) };
         if loaded_x.value().is_none() && loaded_y.value().is_none() {
             // Bail out since nothing has to be swapped if both values are `None`.
-            return
+            return;
         }
         // Set the `mutate` flag since at this point at least one of the loaded
         // values is guaranteed to be `Some`.
@@ -463,24 +434,14 @@ where
 #[cfg(test)]
 mod tests {
     use super::{
-        super::{
-            EntryState,
-            StorageEntry,
-        },
-        Index,
-        LazyIndexMap,
+        super::{EntryState, StorageEntry},
+        Index, LazyIndexMap,
     };
-    use crate::traits::{
-        KeyPtr,
-        SpreadLayout,
-    };
+    use crate::traits::{KeyPtr, SpreadLayout};
     use ink_primitives::Key;
 
     /// Asserts that the cached entries of the given `imap` is equal to the `expected` slice.
-    fn assert_cached_entries(
-        imap: &LazyIndexMap<u8>,
-        expected: &[(Index, StorageEntry<u8>)],
-    ) {
+    fn assert_cached_entries(imap: &LazyIndexMap<u8>, expected: &[(Index, StorageEntry<u8>)]) {
         assert_eq!(imap.entries().len(), expected.len());
         for (given, expected) in imap
             .entries()
@@ -738,9 +699,8 @@ mod tests {
             // Then: Compare both instances to be equal.
             let root_key = Key::from([0x42; 32]);
             SpreadLayout::push_spread(&imap, &mut KeyPtr::from(root_key));
-            let imap2 = <LazyIndexMap<u8> as SpreadLayout>::pull_spread(
-                &mut KeyPtr::from(root_key),
-            );
+            let imap2 =
+                <LazyIndexMap<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
             assert_cached_entries(&imap2, &[]);
             assert_eq!(imap2.get(1), Some(&b'A'));
             assert_eq!(imap2.get(2), Some(&b'B'));
@@ -767,9 +727,8 @@ mod tests {
             imap2.clear_packed_at(2);
             imap2.clear_packed_at(3); // Not really needed here.
             imap2.clear_packed_at(4); // Not really needed here.
-            let imap3 = <LazyIndexMap<u8> as SpreadLayout>::pull_spread(
-                &mut KeyPtr::from(root_key),
-            );
+            let imap3 =
+                <LazyIndexMap<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
             assert_cached_entries(&imap3, &[]);
             assert_eq!(imap3.get(1), None);
             assert_eq!(imap3.get(2), None);

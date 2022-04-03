@@ -18,15 +18,8 @@ mod impls;
 mod tests;
 
 use crate::traits::KeyPtr;
-use ink_env::hash::{
-    Blake2x256,
-    Keccak256,
-    Sha2x256,
-};
-use ink_metadata::layout::{
-    CryptoHasher,
-    Layout,
-};
+use ink_env::hash::{Blake2x256, Keccak256, Sha2x256};
+use ink_metadata::layout::{CryptoHasher, Layout};
 
 /// Implemented by types that have a storage layout.
 pub trait StorageLayout {

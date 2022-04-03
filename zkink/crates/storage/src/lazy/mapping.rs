@@ -20,20 +20,12 @@
 //! Instead it is just a simple wrapper around the contract storage facilities.
 
 use crate::traits::{
-    pull_packed_root_opt,
-    push_packed_root,
-    ExtKeyPtr,
-    KeyPtr,
-    PackedLayout,
-    SpreadAllocate,
+    pull_packed_root_opt, push_packed_root, ExtKeyPtr, KeyPtr, PackedLayout, SpreadAllocate,
     SpreadLayout,
 };
 use core::marker::PhantomData;
 
-use ink_env::hash::{
-    Blake2x256,
-    HashOutput,
-};
+use ink_env::hash::{Blake2x256, HashOutput};
 use ink_primitives::Key;
 
 /// A mapping of key-value pairs directly into contract storage.
@@ -214,11 +206,7 @@ impl<K, V> SpreadAllocate for Mapping<K, V> {
 #[cfg(feature = "std")]
 const _: () = {
     use crate::traits::StorageLayout;
-    use ink_metadata::layout::{
-        CellLayout,
-        Layout,
-        LayoutKey,
-    };
+    use ink_metadata::layout::{CellLayout, Layout, LayoutKey};
 
     impl<K, V> StorageLayout for Mapping<K, V>
     where

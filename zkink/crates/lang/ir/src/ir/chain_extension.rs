@@ -12,18 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    error::ExtError,
-    ir,
-    ir::idents_lint,
-};
+use crate::{error::ExtError, ir, ir::idents_lint};
 use core::slice::Iter as SliceIter;
 use proc_macro2::TokenStream as TokenStream2;
 use std::collections::HashMap;
-use syn::{
-    spanned::Spanned as _,
-    Result,
-};
+use syn::{spanned::Spanned as _, Result};
 
 /// An ink! chain extension.
 #[derive(Debug, PartialEq, Eq)]
@@ -101,9 +94,7 @@ impl ChainExtensionMethod {
     /// Returns the Rust attributes of the ink! chain extension method.
     pub fn attrs(&self) -> Vec<syn::Attribute> {
         let (_, attrs) = ir::partition_attributes(self.item.attrs.iter().cloned())
-            .expect(
-            "encountered unexpected invalid attributes for ink! chain extension method",
-        );
+            .expect("encountered unexpected invalid attributes for ink! chain extension method");
         attrs
     }
 
@@ -160,7 +151,10 @@ impl<'a> Iterator for ChainExtensionMethodInputs<'a> {
         let item = self.iter.next()?;
         match item {
             syn::FnArg::Receiver(receiver) => {
-                panic!("encountered unexpected receiver in chain extension method input: {:?}", receiver)
+                panic!(
+                    "encountered unexpected receiver in chain extension method input: {:?}",
+                    receiver
+                )
             }
             syn::FnArg::Typed(pat_type) => Some(pat_type),
         }
@@ -213,7 +207,7 @@ impl ChainExtension {
             return Err(format_err_spanned!(
                 attr,
                 "unexpected attribute input for ink! chain extension"
-            ))
+            ));
         }
         let item_trait = syn::parse2::<syn::ItemTrait>(input)?;
         ChainExtension::try_from(item_trait)
@@ -233,31 +227,31 @@ impl ChainExtension {
             return Err(format_err_spanned!(
                 unsafety,
                 "ink! chain extensions cannot be unsafe"
-            ))
+            ));
         }
         if let Some(auto) = &item_trait.auto_token {
             return Err(format_err_spanned!(
                 auto,
                 "ink! chain extensions cannot be automatically implemented traits"
-            ))
+            ));
         }
         if !item_trait.generics.params.is_empty() {
             return Err(format_err_spanned!(
                 item_trait.generics.params,
                 "ink! chain extensions must not be generic"
-            ))
+            ));
         }
         if !matches!(item_trait.vis, syn::Visibility::Public(_)) {
             return Err(format_err_spanned!(
                 item_trait.vis,
                 "ink! chain extensions must have public visibility"
-            ))
+            ));
         }
         if !item_trait.supertraits.is_empty() {
             return Err(format_err_spanned!(
                 item_trait.supertraits,
                 "ink! chain extensions with super-traits are not supported, yet"
-            ))
+            ));
         }
         Ok(())
     }
@@ -278,35 +272,38 @@ impl ChainExtension {
                 item_type.ident,
                 "chain extensions expect an associated type with name `ErrorCode` but found {}",
                 item_type.ident,
-            ))
+            ));
         }
         if !item_type.generics.params.is_empty() {
             return Err(format_err_spanned!(
                 item_type.generics,
                 "generic chain extension `ErrorCode` types are not supported",
-            ))
+            ));
         }
         if !item_type.bounds.is_empty() {
             return Err(format_err_spanned!(
                 item_type.bounds,
                 "bounded chain extension `ErrorCode` types are not supported",
-            ))
+            ));
         }
         if item_type.default.is_none() {
             return Err(format_err_spanned!(
                 item_type,
                 "expected a default type for the ink! chain extension ErrorCode",
-            ))
+            ));
         }
         match previous {
             Some(previous_error_code) => {
                 return Err(format_err_spanned!(
                     item_type,
                     "encountered duplicate `ErrorCode` associated types for the chain extension",
-                )).map_err(|err| err.into_combine(format_err_spanned!(
-                    previous_error_code,
-                    "first `ErrorCode` associated type here",
-                )))
+                ))
+                .map_err(|err| {
+                    err.into_combine(format_err_spanned!(
+                        previous_error_code,
+                        "first `ErrorCode` associated type here",
+                    ))
+                })
             }
             None => {
                 *previous = Some(item_type.clone());
@@ -373,7 +370,7 @@ impl ChainExtension {
                         ).into_combine(format_err!(
                             *previous,
                             "previous duplicate extension identifier here",
-                        )))
+                        )));
                     }
                     seen_ids.insert(method_id, method.span());
                     methods.push(method);
@@ -412,43 +409,43 @@ impl ChainExtension {
             return Err(format_err_spanned!(
                 default_impl,
                 "ink! chain extension methods with default implementations are not supported"
-            ))
+            ));
         }
         if let Some(constness) = &method.sig.constness {
             return Err(format_err_spanned!(
                 constness,
                 "const ink! chain extension methods are not supported"
-            ))
+            ));
         }
         if let Some(asyncness) = &method.sig.asyncness {
             return Err(format_err_spanned!(
                 asyncness,
                 "async ink! chain extension methods are not supported"
-            ))
+            ));
         }
         if let Some(unsafety) = &method.sig.unsafety {
             return Err(format_err_spanned!(
                 unsafety,
                 "unsafe ink! chain extension methods are not supported"
-            ))
+            ));
         }
         if let Some(abi) = &method.sig.abi {
             return Err(format_err_spanned!(
                 abi,
                 "ink! chain extension methods with non default ABI are not supported"
-            ))
+            ));
         }
         if let Some(variadic) = &method.sig.variadic {
             return Err(format_err_spanned!(
                 variadic,
                 "variadic ink! chain extension methods are not supported"
-            ))
+            ));
         }
         if !method.sig.generics.params.is_empty() {
             return Err(format_err_spanned!(
                 method.sig.generics.params,
                 "generic ink! chain extension methods are not supported"
-            ))
+            ));
         }
         match ir::first_ink_attribute(&method.attrs)?
                 .map(|attr| attr.first().kind().clone()) {
@@ -483,20 +480,18 @@ impl ChainExtension {
             item_method.span(),
             item_method.attrs.clone(),
             &ir::AttributeArgKind::Extension,
-            |arg| {
-                match arg.kind() {
-                    ir::AttributeArg::Extension(_)
-                    | ir::AttributeArg::HandleStatus(_)
-                    | ir::AttributeArg::ReturnsResult(_) => Ok(()),
-                    _ => Err(None),
-                }
+            |arg| match arg.kind() {
+                ir::AttributeArg::Extension(_)
+                | ir::AttributeArg::HandleStatus(_)
+                | ir::AttributeArg::ReturnsResult(_) => Ok(()),
+                _ => Err(None),
             },
         )?;
         if let Some(receiver) = item_method.sig.receiver() {
             return Err(format_err_spanned!(
                 receiver,
                 "ink! chain extension method must not have a `self` receiver",
-            ))
+            ));
         }
         let result = ChainExtensionMethod {
             id: extension,
@@ -878,7 +873,8 @@ mod tests {
 
     #[test]
     fn chain_extension_is_ok() {
-        let chain_extension = <ChainExtension as TryFrom<syn::ItemTrait>>::try_from(syn::parse_quote! {
+        let chain_extension =
+            <ChainExtension as TryFrom<syn::ItemTrait>>::try_from(syn::parse_quote! {
                 pub trait MyChainExtension {
                     type ErrorCode = ();
 
@@ -893,7 +889,8 @@ mod tests {
                     #[ink(extension = 5)]
                     fn extension_5(in1: i8, in2: i16, in3: i32, in4: i64) -> (u8, u16, u32, u64);
                 }
-            }).unwrap();
+            })
+            .unwrap();
         assert_eq!(chain_extension.methods.len(), 5);
         for (actual, expected) in chain_extension
             .methods

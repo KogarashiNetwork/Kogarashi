@@ -14,12 +14,8 @@
 
 use crate::{
     ext::Engine,
-    types::{
-        AccountId,
-        Balance,
-    },
-    AccountError,
-    Error,
+    types::{AccountId, Balance},
+    AccountError, Error,
 };
 use std::collections::HashMap;
 
@@ -148,11 +144,7 @@ impl DebugInfo {
     /// Removes the cell under `key` for the supplied account.
     ///
     /// Returns the removed cell, if there was one.
-    pub fn remove_cell_for_account(
-        &mut self,
-        account_id: AccountId,
-        key: Vec<u8>,
-    ) -> Option<bool> {
+    pub fn remove_cell_for_account(&mut self, account_id: AccountId, key: Vec<u8>) -> Option<bool> {
         self.cells_per_account
             .get_mut(&account_id)
             .map(|hm| hm.remove(&key))
@@ -214,9 +206,7 @@ impl Engine {
             .debug_info
             .cells_per_account
             .get(&account_id.to_owned().into())
-            .ok_or_else(|| {
-                Error::Account(AccountError::NoAccountForId(account_id.to_vec()))
-            })?;
+            .ok_or_else(|| Error::Account(AccountError::NoAccountForId(account_id.to_vec())))?;
         Ok(cells.len())
     }
 

@@ -14,20 +14,11 @@
 
 use core::iter;
 
-use crate::{
-    generator,
-    GenerateCode,
-};
+use crate::{generator, GenerateCode};
 use derive_more::From;
-use ir::{
-    Callable,
-    HexLiteral as _,
-};
+use ir::{Callable, HexLiteral as _};
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{
-    quote,
-    quote_spanned,
-};
+use quote::{quote, quote_spanned};
 use syn::spanned::Spanned as _;
 
 /// Generates code for the message and constructor dispatcher.
@@ -54,20 +45,15 @@ impl GenerateCode for Dispatch<'_> {
         let mut constructor_spans = Vec::new();
         let mut message_spans = Vec::new();
 
-        let amount_dispatchables =
-            self.generate_contract_amount_dispatchables_trait_impl();
+        let amount_dispatchables = self.generate_contract_amount_dispatchables_trait_impl();
         let contract_dispatchable_messages =
             self.generate_contract_dispatchable_messages_trait_impl(&mut message_spans);
-        let contract_dispatchable_constructors = self
-            .generate_contract_dispatchable_constructors_trait_impl(
-                &mut constructor_spans,
-            );
+        let contract_dispatchable_constructors =
+            self.generate_contract_dispatchable_constructors_trait_impl(&mut constructor_spans);
         let contract_dispatchable_constructor_infos =
             self.generate_dispatchable_constructor_infos();
-        let contract_dispatchable_messages_infos =
-            self.generate_dispatchable_message_infos();
-        let constructor_decoder_type =
-            self.generate_constructor_decoder_type(&constructor_spans);
+        let contract_dispatchable_messages_infos = self.generate_dispatchable_message_infos();
+        let constructor_decoder_type = self.generate_constructor_decoder_type(&constructor_spans);
         let message_decoder_type = self.generate_message_decoder_type(&message_spans);
         let entry_points = self.generate_entry_points(&constructor_spans, &message_spans);
         quote! {
@@ -410,8 +396,7 @@ impl Dispatch<'_> {
         let storage_ident = self.contract.module().storage().ident();
         let any_constructor_accept_payment =
             self.any_constructor_accepts_payment_expr(constructor_spans);
-        let any_message_accept_payment =
-            self.any_message_accepts_payment_expr(message_spans);
+        let any_message_accept_payment = self.any_message_accepts_payment_expr(message_spans);
         quote_spanned!(span=>
             #[cfg(not(test))]
             #[no_mangle]
@@ -520,17 +505,12 @@ impl Dispatch<'_> {
                 }
             )
         });
-        let possibly_wildcard_selector_constructor = match self
-            .query_wildcard_constructor()
-        {
+        let possibly_wildcard_selector_constructor = match self.query_wildcard_constructor() {
             Some(wildcard_index) => {
                 let constructor_span = constructor_spans[wildcard_index];
                 let constructor_ident = constructor_variant_ident(wildcard_index);
-                let constructor_input = expand_constructor_input(
-                    constructor_span,
-                    storage_ident,
-                    wildcard_index,
-                );
+                let constructor_input =
+                    expand_constructor_input(constructor_span, storage_ident, wildcard_index);
                 quote! {
                     ::core::result::Result::Ok(Self::#constructor_ident(
                         <#constructor_input as ::scale::Decode>::decode(input)
@@ -627,10 +607,7 @@ impl Dispatch<'_> {
     ///
     /// This type can be used in order to decode the input bytes received by a call to `call`
     /// into one of the available dispatchable ink! messages and their arguments.
-    fn generate_message_decoder_type(
-        &self,
-        message_spans: &[proc_macro2::Span],
-    ) -> TokenStream2 {
+    fn generate_message_decoder_type(&self, message_spans: &[proc_macro2::Span]) -> TokenStream2 {
         assert_eq!(message_spans.len(), self.query_amount_messages());
 
         /// Expands into the token sequence to represent the

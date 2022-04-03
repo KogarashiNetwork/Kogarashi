@@ -13,19 +13,10 @@
 // limitations under the License.
 
 use super::TraitDefinition;
-use crate::{
-    generator,
-    traits::GenerateCode,
-};
+use crate::{generator, traits::GenerateCode};
 use derive_more::From;
-use proc_macro2::{
-    Span,
-    TokenStream as TokenStream2,
-};
-use quote::{
-    quote,
-    quote_spanned,
-};
+use proc_macro2::{Span, TokenStream as TokenStream2};
+use quote::{quote, quote_spanned};
 
 impl<'a> TraitDefinition<'a> {
     /// Generates code for the global trait call forwarder for an ink! trait.
@@ -365,25 +356,22 @@ impl CallForwarder<'_> {
 
     /// Generate the code for all ink! trait messages implemented by the trait call forwarder.
     fn generate_ink_trait_impl_messages(&self) -> TokenStream2 {
-        let messages =
-            self.trait_def
-                .trait_def
-                .item()
-                .iter_items()
-                .filter_map(|(item, _)| {
-                    item.filter_map_message()
-                        .map(|message| self.generate_ink_trait_impl_for_message(&message))
-                });
+        let messages = self
+            .trait_def
+            .trait_def
+            .item()
+            .iter_items()
+            .filter_map(|(item, _)| {
+                item.filter_map_message()
+                    .map(|message| self.generate_ink_trait_impl_for_message(&message))
+            });
         quote! {
             #( #messages )*
         }
     }
 
     /// Generate the code for a single ink! trait message implemented by the trait call forwarder.
-    fn generate_ink_trait_impl_for_message(
-        &self,
-        message: &ir::InkTraitMessage,
-    ) -> TokenStream2 {
+    fn generate_ink_trait_impl_for_message(&self, message: &ir::InkTraitMessage) -> TokenStream2 {
         let span = message.span();
         let trait_ident = self.trait_def.trait_def.item().ident();
         let forwarder_ident = self.ident();

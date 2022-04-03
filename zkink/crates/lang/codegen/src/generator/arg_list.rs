@@ -13,15 +13,8 @@
 // limitations under the License.
 
 use heck::ToLowerCamelCase as _;
-use proc_macro2::{
-    Span,
-    TokenStream as TokenStream2,
-};
-use quote::{
-    format_ident,
-    quote,
-    quote_spanned,
-};
+use proc_macro2::{Span, TokenStream as TokenStream2};
+use quote::{format_ident, quote, quote_spanned};
 
 /// Returns the associated output type for an ink! trait message.
 pub fn output_ident(message_name: &syn::Ident) -> syn::Ident {
@@ -83,7 +76,7 @@ where
             quote_spanned!(span=>
                 ::ink_env::call::utils::ArgumentList<::ink_env::call::utils::Argument<#arg>, #rest>
             )
-        }
+        },
     )
 }
 
@@ -93,10 +86,7 @@ where
 ///
 /// As with all Rust macros identifiers can shadow each other so the given identifier
 /// needs to be valid for the scope in which the returned code is generated.
-pub fn generate_reference_to_trait_info(
-    span: Span,
-    trait_path: &syn::Path,
-) -> TokenStream2 {
+pub fn generate_reference_to_trait_info(span: Span, trait_path: &syn::Path) -> TokenStream2 {
     quote_spanned!(span=>
         <<::ink_lang::reflect::TraitDefinitionRegistry<Environment>
             as #trait_path>::__ink_TraitInfo as ::ink_lang::reflect::TraitInfo>::ID

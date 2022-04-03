@@ -12,17 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use proc_macro2::{
-    Ident,
-    TokenStream as TokenStream2,
-};
+use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::ToTokens;
 use syn::{
     ext::IdentExt as _,
-    parse::{
-        Parse,
-        ParseStream,
-    },
+    parse::{Parse, ParseStream},
     punctuated::Punctuated,
     spanned::Spanned,
     Token,
@@ -112,15 +106,15 @@ impl MetaNameValue {
                     let ident = Ident::parse_any(input)?;
                     segments.push_value(syn::PathSegment::from(ident));
                     if !input.peek(syn::Token![::]) {
-                        break
+                        break;
                     }
                     let punct = input.parse()?;
                     segments.push_punct(punct);
                 }
                 if segments.is_empty() {
-                    return Err(input.error("expected path"))
+                    return Err(input.error("expected path"));
                 } else if segments.trailing_punct() {
-                    return Err(input.error("expected path segment"))
+                    return Err(input.error("expected path segment"));
                 }
                 segments
             },
@@ -148,10 +142,10 @@ impl MetaNameValue {
 impl Parse for PathOrLit {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         if input.fork().peek(syn::Lit) {
-            return input.parse::<syn::Lit>().map(PathOrLit::Lit)
+            return input.parse::<syn::Lit>().map(PathOrLit::Lit);
         }
         if input.fork().peek(Ident::peek_any) || input.fork().peek(Token![::]) {
-            return input.parse::<syn::Path>().map(PathOrLit::Path)
+            return input.parse::<syn::Path>().map(PathOrLit::Path);
         }
         Err(input.error("cannot parse into either literal or path"))
     }
@@ -233,14 +227,11 @@ mod tests {
     #[test]
     fn relative_path_value_works() {
         assert_eq!(
-            syn::parse2::<AttributeArgs>(quote! { name = this::is::my::relative::Path })
-                .unwrap(),
+            syn::parse2::<AttributeArgs>(quote! { name = this::is::my::relative::Path }).unwrap(),
             AttributeArgs::new(vec![MetaNameValue {
                 name: syn::parse_quote! { name },
                 eq_token: syn::parse_quote! { = },
-                value: PathOrLit::Path(
-                    syn::parse_quote! { this::is::my::relative::Path }
-                ),
+                value: PathOrLit::Path(syn::parse_quote! { this::is::my::relative::Path }),
             }])
         )
     }

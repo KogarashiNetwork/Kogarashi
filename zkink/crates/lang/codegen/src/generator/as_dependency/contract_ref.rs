@@ -12,20 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    generator,
-    GenerateCode,
-};
+use crate::{generator, GenerateCode};
 use derive_more::From;
-use ir::{
-    Callable,
-    IsDocAttribute as _,
-};
+use ir::{Callable, IsDocAttribute as _};
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{
-    quote,
-    quote_spanned,
-};
+use quote::{quote, quote_spanned};
 use syn::spanned::Spanned as _;
 
 /// Generates code for the contract reference of the ink! smart contract.
@@ -186,9 +177,9 @@ impl ContractRef<'_> {
             .impls()
             .filter_map(|impl_block| {
                 // We are only interested in ink! trait implementation block.
-                impl_block.trait_path().map(|trait_path| {
-                    self.generate_contract_trait_impl(trait_path, impl_block)
-                })
+                impl_block
+                    .trait_path()
+                    .map(|trait_path| self.generate_contract_trait_impl(trait_path, impl_block))
             })
             .collect()
     }
@@ -227,9 +218,7 @@ impl ContractRef<'_> {
     ) -> TokenStream2 {
         impl_block
             .iter_messages()
-            .map(|message| {
-                self.generate_contract_trait_impl_for_message(trait_path, message)
-            })
+            .map(|message| self.generate_contract_trait_impl_for_message(trait_path, message))
             .collect()
     }
 
@@ -308,9 +297,9 @@ impl ContractRef<'_> {
         let messages = impl_block
             .iter_messages()
             .map(|message| self.generate_contract_inherent_impl_for_message(message));
-        let constructors = impl_block.iter_constructors().map(|constructor| {
-            self.generate_contract_inherent_impl_for_constructor(constructor)
-        });
+        let constructors = impl_block
+            .iter_constructors()
+            .map(|constructor| self.generate_contract_inherent_impl_for_constructor(constructor));
         quote_spanned!(span=>
             #( #attrs )*
             impl #forwarder_ident {

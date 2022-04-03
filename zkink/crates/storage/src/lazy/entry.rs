@@ -13,24 +13,11 @@
 // limitations under the License.
 
 use crate::traits::{
-    clear_packed_root,
-    clear_spread_root_opt,
-    pull_packed_root_opt,
-    pull_spread_root_opt,
-    push_packed_root_opt,
-    push_spread_root_opt,
-    ExtKeyPtr,
-    KeyPtr,
-    PackedAllocate,
-    PackedLayout,
-    SpreadAllocate,
-    SpreadLayout,
+    clear_packed_root, clear_spread_root_opt, pull_packed_root_opt, pull_spread_root_opt,
+    push_packed_root_opt, push_spread_root_opt, ExtKeyPtr, KeyPtr, PackedAllocate, PackedLayout,
+    SpreadAllocate, SpreadLayout,
 };
-use core::{
-    cell::Cell,
-    fmt,
-    fmt::Debug,
-};
+use core::{cell::Cell, fmt, fmt::Debug};
 use ink_prelude::vec::Vec;
 use ink_primitives::Key;
 

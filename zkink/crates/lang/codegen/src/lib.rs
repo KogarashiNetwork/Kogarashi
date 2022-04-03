@@ -18,10 +18,7 @@ mod traits;
 
 use self::{
     enforced_error::EnforcedErrors,
-    traits::{
-        GenerateCode,
-        GenerateCodeUsing,
-    },
+    traits::{GenerateCode, GenerateCodeUsing},
 };
 use proc_macro2::TokenStream as TokenStream2;
 

@@ -15,11 +15,7 @@
 //! A `Children` object consists of two elements: a left and right child.
 
 use crate::traits::{
-    forward_clear_packed,
-    forward_pull_packed,
-    forward_push_packed,
-    KeyPtr,
-    PackedLayout,
+    forward_clear_packed, forward_pull_packed, forward_push_packed, KeyPtr, PackedLayout,
     SpreadLayout,
 };
 use ink_primitives::Key;
@@ -54,7 +50,7 @@ pub(super) const CHILDREN_PER_NODE: u32 = 2;
 /// the heap is stored.
 pub(super) fn get_children_storage_index(n: u32) -> u32 {
     if n == 0 {
-        return 0
+        return 0;
     }
     // The first `Children` object only ever contains the root element:
     // `[Some(root), None]`. So when calculating indices we need to account
@@ -121,11 +117,7 @@ where
 #[cfg(feature = "std")]
 const _: () = {
     use crate::traits::StorageLayout;
-    use ink_metadata::layout::{
-        CellLayout,
-        Layout,
-        LayoutKey,
-    };
+    use ink_metadata::layout::{CellLayout, Layout, LayoutKey};
 
     impl<T> StorageLayout for Children<T>
     where

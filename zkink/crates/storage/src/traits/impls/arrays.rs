@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::traits::{
-    KeyPtr,
-    PackedAllocate,
-    PackedLayout,
-    SpreadAllocate,
-    SpreadLayout,
-};
+use crate::traits::{KeyPtr, PackedAllocate, PackedLayout, SpreadAllocate, SpreadLayout};
 use array_init::array_init;
 use ink_primitives::Key;
 

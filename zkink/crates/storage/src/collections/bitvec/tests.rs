@@ -13,10 +13,7 @@
 // limitations under the License.
 
 use super::Bitvec as StorageBitvec;
-use crate::traits::{
-    KeyPtr,
-    SpreadLayout,
-};
+use crate::traits::{KeyPtr, SpreadLayout};
 use ink_primitives::Key;
 
 #[test]
@@ -184,8 +181,7 @@ fn spread_layout_push_pull_works() -> ink_env::Result<()> {
         SpreadLayout::push_spread(&bv1, &mut KeyPtr::from(root_key));
         // Load the pushed storage vector into another instance and check that
         // both instances are equal:
-        let bv2 =
-            <StorageBitvec as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
+        let bv2 = <StorageBitvec as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
         assert_eq!(bv1, bv2);
         Ok(())
     })

@@ -17,17 +17,9 @@ use core::iter;
 use crate::GenerateCode;
 use derive_more::From;
 use heck::ToLowerCamelCase as _;
-use ir::{
-    Callable as _,
-    HexLiteral,
-};
+use ir::{Callable as _, HexLiteral};
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{
-    format_ident,
-    quote,
-    quote_spanned,
-    ToTokens,
-};
+use quote::{format_ident, quote, quote_spanned, ToTokens};
 use syn::spanned::Spanned as _;
 
 /// Generates code for all ink! implementation blocks.
@@ -46,11 +38,10 @@ impl GenerateCode for ItemImpls<'_> {
             .map(|item_impl| self.generate_item_impl(item_impl));
         let inout_guards = self.generate_input_output_guards();
         let trait_message_property_guards = self.generate_trait_message_property_guards();
-        let use_emit_event =
-            self.contract.module().events().next().is_some().then(|| {
-                // Required to make `self.env().emit_event(...)` syntax available.
-                quote! { use ::ink_lang::codegen::EmitEvent as _; }
-            });
+        let use_emit_event = self.contract.module().events().next().is_some().then(|| {
+            // Required to make `self.env().emit_event(...)` syntax available.
+            quote! { use ::ink_lang::codegen::EmitEvent as _; }
+        });
         quote! {
             const _: () = {
                 // Required to make `self.env()` and `Self::env()` syntax available.
@@ -186,8 +177,7 @@ impl ItemImpls<'_> {
         let vis = message.visibility();
         let receiver = message.receiver();
         let ident = message.ident();
-        let output_ident =
-            format_ident!("{}Output", ident.to_string().to_lower_camel_case());
+        let output_ident = format_ident!("{}Output", ident.to_string().to_lower_camel_case());
         let inputs = message.inputs();
         let output = message
             .output()

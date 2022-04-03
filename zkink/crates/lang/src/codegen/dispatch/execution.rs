@@ -12,27 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::reflect::{
-    ContractEnv,
-    DispatchError,
-};
-use core::{
-    convert::Infallible,
-    mem::ManuallyDrop,
-};
-use ink_env::{
-    Environment,
-    ReturnFlags,
-};
-use ink_primitives::{
-    Key,
-    KeyPtr,
-};
-use ink_storage::traits::{
-    push_spread_root,
-    SpreadAllocate,
-    SpreadLayout,
-};
+use crate::reflect::{ContractEnv, DispatchError};
+use core::{convert::Infallible, mem::ManuallyDrop};
+use ink_env::{Environment, ReturnFlags};
+use ink_primitives::{Key, KeyPtr};
+use ink_storage::traits::{push_spread_root, SpreadAllocate, SpreadLayout};
 
 /// The root key of the ink! smart contract.
 ///
@@ -59,7 +43,7 @@ where
 {
     let transferred = ink_env::transferred_value::<E>();
     if transferred != <E as Environment>::Balance::from(0_u32) {
-        return Err(DispatchError::PaidUnpayableMessage)
+        return Err(DispatchError::PaidUnpayableMessage);
     }
     Ok(())
 }

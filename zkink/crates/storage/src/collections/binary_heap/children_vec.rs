@@ -17,18 +17,9 @@
 //! we don't just store each element in its own storage cell, but rather
 //! optimize storage access by putting children together in one storage cell.
 
-use super::{
-    children,
-    children::Children,
-    StorageVec,
-};
+use super::{children, children::Children, StorageVec};
 use crate::{
-    traits::{
-        KeyPtr,
-        PackedLayout,
-        SpreadAllocate,
-        SpreadLayout,
-    },
+    traits::{KeyPtr, PackedLayout, SpreadAllocate, SpreadLayout},
     Lazy,
 };
 
@@ -141,7 +132,7 @@ where
     /// If one or both indices are out of bounds.
     pub fn swap(&mut self, a: u32, b: u32) {
         if a == b {
-            return
+            return;
         }
         assert!(a < self.len(), "a is out of bounds");
         assert!(b < self.len(), "b is out of bounds");
@@ -162,7 +153,7 @@ where
     /// Returns `None` and does not mutate the heap if it is empty.
     pub fn swap_remove(&mut self, index: u32) -> Option<T> {
         if self.is_empty() {
-            return None
+            return None;
         }
         self.swap(index, self.len() - 1);
         self.pop()
@@ -182,7 +173,7 @@ where
     /// Returns a shared reference to the first element if any.
     pub fn first(&self) -> Option<&T> {
         if self.is_empty() {
-            return None
+            return None;
         }
         self.get(0)
     }
@@ -190,7 +181,7 @@ where
     /// Returns an exclusive reference to the first element if any.
     pub fn first_mut(&mut self) -> Option<&mut T> {
         if self.is_empty() {
-            return None
+            return None;
         }
         self.get_mut(0)
     }
@@ -204,7 +195,7 @@ where
     /// any of the elements (whereas `pop()` does).
     pub fn clear(&mut self) {
         if self.is_empty() {
-            return
+            return;
         }
         self.children.clear();
         self.len = Lazy::new(0);
@@ -250,7 +241,7 @@ where
         let info = self.get_child_mut(index);
         if let Some(info) = info {
             *info.child = value;
-            return
+            return;
         }
 
         self.children.push(Children::new(value, None));
@@ -268,7 +259,7 @@ where
     /// Returns `None` if the heap is empty.
     fn pop(&mut self) -> Option<T> {
         if self.is_empty() {
-            return None
+            return None;
         }
         let last_index = self.len() - 1;
         *self.len = last_index;
@@ -376,7 +367,7 @@ where
         debug_assert!(self.begin <= self.end);
         let n = n as u32;
         if self.begin + n >= self.end {
-            return None
+            return None;
         }
         let cur = self.begin + n;
         self.begin += 1 + n;

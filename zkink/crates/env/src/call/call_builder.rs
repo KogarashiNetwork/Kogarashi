@@ -15,18 +15,11 @@
 use crate::{
     backend::CallFlags,
     call::{
-        utils::{
-            EmptyArgumentList,
-            ReturnType,
-            Set,
-            Unset,
-        },
+        utils::{EmptyArgumentList, ReturnType, Set, Unset},
         ExecutionInput,
     },
     types::Gas,
-    Clear,
-    Environment,
-    Error,
+    Clear, Environment, Error,
 };
 use core::marker::PhantomData;
 use num_traits::Zero;
@@ -240,12 +233,8 @@ where
 ///     .unwrap();
 /// ```
 #[allow(clippy::type_complexity)]
-pub fn build_call<E>() -> CallBuilder<
-    E,
-    Unset<Call<E>>,
-    Unset<ExecutionInput<EmptyArgumentList>>,
-    Unset<ReturnType<()>>,
->
+pub fn build_call<E>(
+) -> CallBuilder<E, Unset<Call<E>>, Unset<ExecutionInput<EmptyArgumentList>>, Unset<ReturnType<()>>>
 where
     E: Environment,
 {
@@ -383,10 +372,7 @@ where
     /// The flags used to change the behavior of the contract call.
     #[inline]
     #[must_use]
-    pub fn call_flags(
-        self,
-        call_flags: CallFlags,
-    ) -> CallBuilder<E, CallType, Args, RetType> {
+    pub fn call_flags(self, call_flags: CallFlags) -> CallBuilder<E, CallType, Args, RetType> {
         CallBuilder {
             call_type: self.call_type,
             call_flags,
@@ -526,12 +512,7 @@ where
 }
 
 impl<E, Args, RetType>
-    CallBuilder<
-        E,
-        Set<DelegateCall<E>>,
-        Set<ExecutionInput<Args>>,
-        Set<ReturnType<RetType>>,
-    >
+    CallBuilder<E, Set<DelegateCall<E>>, Set<ExecutionInput<Args>>, Set<ReturnType<RetType>>>
 where
     E: Environment,
 {
@@ -565,12 +546,7 @@ where
 }
 
 impl<E, RetType>
-    CallBuilder<
-        E,
-        Set<DelegateCall<E>>,
-        Unset<ExecutionInput<EmptyArgumentList>>,
-        Unset<RetType>,
-    >
+    CallBuilder<E, Set<DelegateCall<E>>, Unset<ExecutionInput<EmptyArgumentList>>, Unset<RetType>>
 where
     E: Environment,
 {
@@ -587,12 +563,7 @@ where
 }
 
 impl<E>
-    CallBuilder<
-        E,
-        Set<Call<E>>,
-        Unset<ExecutionInput<EmptyArgumentList>>,
-        Unset<ReturnType<()>>,
-    >
+    CallBuilder<E, Set<Call<E>>, Unset<ExecutionInput<EmptyArgumentList>>, Unset<ReturnType<()>>>
 where
     E: Environment,
 {
@@ -618,8 +589,7 @@ where
     }
 }
 
-impl<E, Args, R>
-    CallBuilder<E, Set<Call<E>>, Set<ExecutionInput<Args>>, Set<ReturnType<R>>>
+impl<E, Args, R> CallBuilder<E, Set<Call<E>>, Set<ExecutionInput<Args>>, Set<ReturnType<R>>>
 where
     E: Environment,
     Args: scale::Encode,
@@ -631,8 +601,7 @@ where
     }
 }
 
-impl<E, Args, R>
-    CallBuilder<E, Set<DelegateCall<E>>, Set<ExecutionInput<Args>>, Set<ReturnType<R>>>
+impl<E, Args, R> CallBuilder<E, Set<DelegateCall<E>>, Set<ExecutionInput<Args>>, Set<ReturnType<R>>>
 where
     E: Environment,
     Args: scale::Encode,

@@ -18,19 +18,12 @@
 use super::HashMap as StorageHashMap;
 use crate::{
     test_utils::FuzzCollection,
-    traits::{
-        KeyPtr,
-        PackedLayout,
-        SpreadLayout,
-    },
+    traits::{KeyPtr, PackedLayout, SpreadLayout},
     Pack,
 };
 use ink_primitives::Key;
 use itertools::Itertools;
-use quickcheck::{
-    Arbitrary,
-    Gen,
-};
+use quickcheck::{Arbitrary, Gen};
 use std::collections::HashMap;
 
 /// Conducts repeated insert and remove operations into the map by iterating
@@ -110,9 +103,9 @@ fn fuzz_removes(xs: Vec<i32>, xth: usize) {
         // when
         // 1) insert all
         for x in 0..xs.len() {
-            let i = xs.get(x).expect(
-                "x is always in bounds since we iterate over the vec length; qed",
-            );
+            let i = xs
+                .get(x)
+                .expect("x is always in bounds since we iterate over the vec length; qed");
             assert_eq!(map.insert(*i, i.saturating_mul(10)), None);
             len += 1;
             assert_eq!(map.len(), len);
@@ -121,9 +114,9 @@ fn fuzz_removes(xs: Vec<i32>, xth: usize) {
         // 2) remove every `xth` element of `xs` from the map
         for x in 0..xs.len() {
             if x % xth == 0 {
-                let i = xs.get(x).expect(
-                    "x is always in bounds since we iterate over the vec length; qed",
-                );
+                let i = xs
+                    .get(x)
+                    .expect("x is always in bounds since we iterate over the vec length; qed");
                 assert_eq!(map.take(i), Some(i.saturating_mul(10)));
                 len -= 1;
             }
@@ -134,9 +127,9 @@ fn fuzz_removes(xs: Vec<i32>, xth: usize) {
         // everything else must still be get-able
         for x in 0..xs.len() {
             if x % xth != 0 {
-                let i = xs.get(x).expect(
-                    "x is always in bounds since we iterate over the vec length; qed",
-                );
+                let i = xs
+                    .get(x)
+                    .expect("x is always in bounds since we iterate over the vec length; qed");
                 assert_eq!(map.get(i), Some(&(i.saturating_mul(10))));
             }
         }
@@ -172,8 +165,7 @@ fn fuzz_defrag(xs: Vec<i32>, inserts_each: u8) {
         // Then we push the defragmented hash map to storage and pull it again
         let root_key = Key::from([0x00; 32]);
         SpreadLayout::push_spread(&map, &mut KeyPtr::from(root_key));
-        let map2: StorageHashMap<i32, i32> =
-            SpreadLayout::pull_spread(&mut KeyPtr::from(root_key));
+        let map2: StorageHashMap<i32, i32> = SpreadLayout::pull_spread(&mut KeyPtr::from(root_key));
 
         // Assert that everything that should be is still in the hash map
         assert_eq!(map2.len(), kv_pairs.len() as u32);

@@ -14,16 +14,9 @@
 
 //! Implementation of generic traits that are useful for the storage stash.
 
-use super::{
-    Iter,
-    IterMut,
-    Stash as StorageStash,
-};
+use super::{Iter, IterMut, Stash as StorageStash};
 use crate::traits::PackedLayout;
-use core::iter::{
-    Extend,
-    FromIterator,
-};
+use core::iter::{Extend, FromIterator};
 
 impl<T> Drop for StorageStash<T>
 where
@@ -145,7 +138,7 @@ where
 {
     fn eq(&self, other: &Self) -> bool {
         if self.len() != other.len() {
-            return false
+            return false;
         }
         self.iter().zip(other.iter()).all(|(lhs, rhs)| lhs == rhs)
     }

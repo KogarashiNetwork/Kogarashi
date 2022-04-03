@@ -13,24 +13,12 @@
 // limitations under the License.
 
 use super::SmallVec;
-use crate::traits::{
-    KeyPtr,
-    PackedLayout,
-    SpreadAllocate,
-    SpreadLayout,
-};
+use crate::traits::{KeyPtr, PackedLayout, SpreadAllocate, SpreadLayout};
 
 #[cfg(feature = "std")]
 const _: () = {
-    use crate::{
-        lazy::LazyArray,
-        traits::StorageLayout,
-    };
-    use ink_metadata::layout::{
-        FieldLayout,
-        Layout,
-        StructLayout,
-    };
+    use crate::{lazy::LazyArray, traits::StorageLayout};
+    use ink_metadata::layout::{FieldLayout, Layout, StructLayout};
     use scale_info::TypeInfo;
 
     impl<T, const N: usize> StorageLayout for SmallVec<T, N>
@@ -40,10 +28,7 @@ const _: () = {
         fn layout(key_ptr: &mut KeyPtr) -> Layout {
             Layout::Struct(StructLayout::new([
                 FieldLayout::new("len", <u32 as StorageLayout>::layout(key_ptr)),
-                FieldLayout::new(
-                    "elems",
-                    <LazyArray<T, N> as StorageLayout>::layout(key_ptr),
-                ),
+                FieldLayout::new("elems", <LazyArray<T, N> as StorageLayout>::layout(key_ptr)),
             ]))
         }
     }

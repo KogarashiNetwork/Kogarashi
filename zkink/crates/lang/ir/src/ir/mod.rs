@@ -30,78 +30,31 @@ pub mod utils;
 
 /// Marker types and definitions.
 pub mod marker {
-    pub use super::selector::{
-        SelectorBytes,
-        SelectorId,
-    };
+    pub use super::selector::{SelectorBytes, SelectorId};
 }
 
 #[cfg(test)]
 use self::attrs::Attribute;
 
 use self::attrs::{
-    contains_ink_attributes,
-    first_ink_attribute,
-    partition_attributes,
-    sanitize_attributes,
-    sanitize_optional_attributes,
-    AttributeArg,
-    AttributeArgKind,
-    AttributeFrag,
-    InkAttribute,
+    contains_ink_attributes, first_ink_attribute, partition_attributes, sanitize_attributes,
+    sanitize_optional_attributes, AttributeArg, AttributeArgKind, AttributeFrag, InkAttribute,
 };
 pub use self::{
-    attrs::{
-        IsDocAttribute,
-        Namespace,
-    },
-    blake2::{
-        blake2b_256,
-        Blake2x256Macro,
-    },
-    chain_extension::{
-        ChainExtension,
-        ChainExtensionMethod,
-        ExtensionId,
-    },
+    attrs::{IsDocAttribute, Namespace},
+    blake2::{blake2b_256, Blake2x256Macro},
+    chain_extension::{ChainExtension, ChainExtensionMethod, ExtensionId},
     config::Config,
     contract::Contract,
     ink_test::InkTest,
-    item::{
-        Event,
-        InkItem,
-        Item,
-        Storage,
-    },
+    item::{Event, InkItem, Item, Storage},
     item_impl::{
-        Callable,
-        CallableKind,
-        CallableWithSelector,
-        Constructor,
-        ImplItem,
-        InputsIter,
-        ItemImpl,
-        IterConstructors,
-        IterMessages,
-        Message,
-        Receiver,
-        Visibility,
+        Callable, CallableKind, CallableWithSelector, Constructor, ImplItem, InputsIter, ItemImpl,
+        IterConstructors, IterMessages, Message, Receiver, Visibility,
     },
-    item_mod::{
-        ItemMod,
-        IterEvents,
-        IterItemImpls,
-    },
-    selector::{
-        Selector,
-        SelectorMacro,
-        TraitPrefix,
-    },
+    item_mod::{ItemMod, IterEvents, IterItemImpls},
+    selector::{Selector, SelectorMacro, TraitPrefix},
     trait_def::{
-        InkItemTrait,
-        InkTraitDefinition,
-        InkTraitItem,
-        InkTraitMessage,
-        IterInkTraitItems,
+        InkItemTrait, InkTraitDefinition, InkTraitItem, InkTraitMessage, IterInkTraitItems,
     },
 };

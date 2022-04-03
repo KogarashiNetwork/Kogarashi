@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{
-    BitsIter,
-    Bitvec as StorageBitvec,
-};
+use super::{BitsIter, Bitvec as StorageBitvec};
 
 impl Default for StorageBitvec {
     fn default() -> Self {
@@ -26,7 +23,7 @@ impl Default for StorageBitvec {
 impl PartialEq for StorageBitvec {
     fn eq(&self, other: &Self) -> bool {
         if self.len() != other.len() {
-            return false
+            return false;
         }
         self.bits.eq(&other.bits)
     }

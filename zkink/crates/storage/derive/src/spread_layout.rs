@@ -207,9 +207,7 @@ pub fn spread_layout_derive(mut s: synstructure::Structure) -> TokenStream2 {
         syn::Data::Struct(_) => spread_layout_struct_derive(&s),
         syn::Data::Enum(_) => spread_layout_enum_derive(&s),
         _ => {
-            panic!(
-                "cannot derive `SpreadLayout` or `PackedLayout` for Rust `union` items"
-            )
+            panic!("cannot derive `SpreadLayout` or `PackedLayout` for Rust `union` items")
         }
     }
 }

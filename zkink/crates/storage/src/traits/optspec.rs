@@ -18,11 +18,7 @@
 //! The specializations make use of the storage entry state (occupied or vacant)
 //! in order to store the option's state thus using less storage in total.
 
-use super::{
-    KeyPtr,
-    PackedLayout,
-    SpreadLayout,
-};
+use super::{KeyPtr, PackedLayout, SpreadLayout};
 use ink_primitives::Key;
 
 pub fn pull_spread_root_opt<T>(root_key: &Key) -> Option<T>
@@ -88,7 +84,7 @@ where
         // for example in the case of `T` being a `storage::Box`.
         if let Some(value) = f() {
             super::clear_spread_root(value, root_key);
-            return
+            return;
         }
     }
     // Clean-up eagerly without potentially loading the entity from storage:

@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    engine::off_chain::impls::TopicsBuilder,
-    topics::TopicsBuilderBackend,
-    Result,
-};
+use crate::{engine::off_chain::impls::TopicsBuilder, topics::TopicsBuilderBackend, Result};
 
 #[test]
 fn topics_builder() -> Result<()> {

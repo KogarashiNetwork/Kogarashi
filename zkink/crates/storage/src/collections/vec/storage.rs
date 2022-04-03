@@ -17,25 +17,13 @@
 use super::Vec as StorageVec;
 use crate::{
     lazy::LazyIndexMap,
-    traits::{
-        KeyPtr,
-        PackedLayout,
-        SpreadAllocate,
-        SpreadLayout,
-    },
+    traits::{KeyPtr, PackedLayout, SpreadAllocate, SpreadLayout},
 };
 
 #[cfg(feature = "std")]
 const _: () = {
-    use crate::{
-        lazy::Lazy,
-        traits::StorageLayout,
-    };
-    use ink_metadata::layout::{
-        FieldLayout,
-        Layout,
-        StructLayout,
-    };
+    use crate::{lazy::Lazy, traits::StorageLayout};
+    use ink_metadata::layout::{FieldLayout, Layout, StructLayout};
     use scale_info::TypeInfo;
 
     impl<T> StorageLayout for StorageVec<T>
@@ -45,10 +33,7 @@ const _: () = {
         fn layout(key_ptr: &mut KeyPtr) -> Layout {
             Layout::Struct(StructLayout::new([
                 FieldLayout::new("len", <Lazy<u32> as StorageLayout>::layout(key_ptr)),
-                FieldLayout::new(
-                    "elems",
-                    <LazyIndexMap<T> as StorageLayout>::layout(key_ptr),
-                ),
+                FieldLayout::new("elems", <LazyIndexMap<T> as StorageLayout>::layout(key_ptr)),
             ]))
         }
     }

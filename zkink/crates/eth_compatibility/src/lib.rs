@@ -14,10 +14,7 @@
 
 #![no_std]
 
-use ink_env::{
-    DefaultEnvironment,
-    Environment,
-};
+use ink_env::{DefaultEnvironment, Environment};
 
 /// The ECDSA compressed public key.
 #[derive(Debug, Copy, Clone)]
@@ -137,9 +134,7 @@ impl ECDSAPublicKey {
     /// ];
     ///
     /// assert_eq!(pub_key.to_default_account_id(), EXPECTED_ACCOUNT_ID.into());
-    pub fn to_default_account_id(
-        &self,
-    ) -> <DefaultEnvironment as Environment>::AccountId {
+    pub fn to_default_account_id(&self) -> <DefaultEnvironment as Environment>::AccountId {
         use ink_env::hash;
 
         let mut output = <hash::Blake2x256 as hash::HashOutput>::Type::default();

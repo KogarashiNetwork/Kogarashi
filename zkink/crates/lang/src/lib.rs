@@ -35,19 +35,10 @@ mod contract_ref;
 mod env_access;
 
 pub use self::{
-    chain_extension::{
-        ChainExtensionInstance,
-        IsResultType,
-    },
+    chain_extension::{ChainExtensionInstance, IsResultType},
     contract_ref::ToAccountId,
     env_access::EnvAccess,
 };
 pub use ink_lang_macro::{
-    blake2x256,
-    chain_extension,
-    contract,
-    selector_bytes,
-    selector_id,
-    test,
-    trait_definition,
+    blake2x256, chain_extension, contract, selector_bytes, selector_id, test, trait_definition,
 };

@@ -75,8 +75,7 @@ mod my_contract {
 
             // then
             // all topics must be unique
-            let emitted_events =
-                ink_env::test::recorded_events().collect::<Vec<EmittedEvent>>();
+            let emitted_events = ink_env::test::recorded_events().collect::<Vec<EmittedEvent>>();
             let mut encoded_topics: std::vec::Vec<&[u8]> = emitted_events[0]
                 .topics
                 .iter()
@@ -93,11 +92,9 @@ mod my_contract {
             // Sort the vector
             items.sort_by(|a, b| Ord::cmp(a.as_ref(), b.as_ref()));
             // And then find any two consecutive equal elements.
-            items.windows(2).any(|w| {
-                match w {
-                    [ref a, ref b] => a == b,
-                    _ => false,
-                }
+            items.windows(2).any(|w| match w {
+                [ref a, ref b] => a == b,
+                _ => false,
             })
         }
     }

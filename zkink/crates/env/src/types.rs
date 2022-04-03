@@ -34,10 +34,7 @@
 use super::arithmetic::AtLeast32BitUnsigned;
 use core::array::TryFromSliceError;
 use derive_more::From;
-use scale::{
-    Decode,
-    Encode,
-};
+use scale::{Decode, Encode};
 #[cfg(feature = "std")]
 use scale_info::TypeInfo;
 
@@ -202,18 +199,7 @@ pub type BlockNumber = u32;
 /// This is a mirror of the `AccountId` type used in the default configuration
 /// of PALLET contracts.
 #[derive(
-    Debug,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    Ord,
-    PartialOrd,
-    Hash,
-    Encode,
-    Decode,
-    From,
-    Default,
+    Debug, Copy, Clone, PartialEq, Eq, Ord, PartialOrd, Hash, Encode, Decode, From, Default,
 )]
 #[cfg_attr(feature = "std", derive(TypeInfo))]
 pub struct AccountId([u8; 32]);
@@ -262,18 +248,7 @@ impl<'a> TryFrom<&'a [u8]> for AccountId {
 /// This is a mirror of the `Hash` type used in the default configuration
 /// of PALLET contracts.
 #[derive(
-    Debug,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    Ord,
-    PartialOrd,
-    Hash,
-    Encode,
-    Decode,
-    From,
-    Default,
+    Debug, Copy, Clone, PartialEq, Eq, Ord, PartialOrd, Hash, Encode, Decode, From, Default,
 )]
 #[cfg_attr(feature = "std", derive(TypeInfo))]
 pub struct Hash([u8; 32]);

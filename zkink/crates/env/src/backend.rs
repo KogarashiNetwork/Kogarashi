@@ -13,19 +13,10 @@
 // limitations under the License.
 
 use crate::{
-    call::{
-        Call,
-        CallParams,
-        CreateParams,
-        DelegateCall,
-    },
-    hash::{
-        CryptoHash,
-        HashOutput,
-    },
+    call::{Call, CallParams, CreateParams, DelegateCall},
+    hash::{CryptoHash, HashOutput},
     topics::Topics,
-    Environment,
-    Result,
+    Environment, Result,
 };
 use ink_primitives::Key;
 

@@ -28,11 +28,7 @@ pub mod vec;
 
 #[doc(inline)]
 pub use self::{
-    binary_heap::BinaryHeap,
-    bitstash::BitStash,
-    bitvec::Bitvec,
-    hashmap::HashMap,
-    stash::Stash,
+    binary_heap::BinaryHeap, bitstash::BitStash, bitvec::Bitvec, hashmap::HashMap, stash::Stash,
     vec::Vec,
 };
 

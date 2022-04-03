@@ -12,16 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{
-    BinaryHeap,
-    PeekMut,
-    Reverse,
-};
-use crate::traits::{
-    KeyPtr,
-    PackedLayout,
-    SpreadLayout,
-};
+use super::{BinaryHeap, PeekMut, Reverse};
+use crate::traits::{KeyPtr, PackedLayout, SpreadLayout};
 use ink_primitives::Key;
 
 fn heap_from_slice<T>(slice: &[T]) -> BinaryHeap<T>
@@ -208,8 +200,7 @@ fn spread_layout_push_pull_works() -> ink_env::Result<()> {
         SpreadLayout::push_spread(&heap1, &mut KeyPtr::from(root_key));
         // Load the pushed binary heap into another instance and check that
         // both instances are equal:
-        let heap2 =
-            <BinaryHeap<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
+        let heap2 = <BinaryHeap<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
         assert_eq!(heap1, heap2);
         Ok(())
     })
@@ -229,8 +220,7 @@ fn spread_layout_clear_works() {
         // loading another instance from this storage will panic since the
         // heap's length property cannot read a value:
         SpreadLayout::clear_spread(&heap1, &mut KeyPtr::from(root_key));
-        let _ =
-            <BinaryHeap<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
+        let _ = <BinaryHeap<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
         Ok(())
     })
     .unwrap()
@@ -285,9 +275,9 @@ where
         // write back to storage so we can see how many writes required
         SpreadLayout::push_spread(&lazy_heap, &mut KeyPtr::from(root_key));
 
-        let (reads, writes) = ink_env::test::get_contract_storage_rw::<
-            ink_env::DefaultEnvironment,
-        >(&contract_account);
+        let (reads, writes) = ink_env::test::get_contract_storage_rw::<ink_env::DefaultEnvironment>(
+            &contract_account,
+        );
 
         let net_reads = reads - base_reads;
         let net_writes = writes - base_writes;

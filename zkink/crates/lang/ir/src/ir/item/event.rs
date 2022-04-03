@@ -12,15 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    error::ExtError as _,
-    ir,
-    ir::utils,
-};
-use proc_macro2::{
-    Ident,
-    Span,
-};
+use crate::{error::ExtError as _, ir, ir::utils};
+use proc_macro2::{Ident, Span};
 use syn::spanned::Spanned as _;
 
 /// An ink! event struct definition.
@@ -60,11 +53,9 @@ impl Event {
     /// # Errors
     ///
     /// If the first found ink! attribute is malformed.
-    pub(super) fn is_ink_event(
-        item_struct: &syn::ItemStruct,
-    ) -> Result<bool, syn::Error> {
+    pub(super) fn is_ink_event(item_struct: &syn::ItemStruct) -> Result<bool, syn::Error> {
         if !ir::contains_ink_attributes(&item_struct.attrs) {
-            return Ok(false)
+            return Ok(false);
         }
         // At this point we know that there must be at least one ink!
         // attribute. This can be either the ink! storage struct,
@@ -84,42 +75,38 @@ impl TryFrom<syn::ItemStruct> for Event {
             struct_span,
             item_struct.attrs,
             &ir::AttributeArgKind::Event,
-            |arg| {
-                match arg.kind() {
-                    ir::AttributeArg::Event | ir::AttributeArg::Anonymous => Ok(()),
-                    _ => Err(None),
-                }
+            |arg| match arg.kind() {
+                ir::AttributeArg::Event | ir::AttributeArg::Anonymous => Ok(()),
+                _ => Err(None),
             },
         )?;
         if !item_struct.generics.params.is_empty() {
             return Err(format_err_spanned!(
                 item_struct.generics.params,
                 "generic ink! event structs are not supported",
-            ))
+            ));
         }
         utils::ensure_pub_visibility("event structs", struct_span, &item_struct.vis)?;
         'repeat: for field in item_struct.fields.iter() {
             let field_span = field.span();
             let (ink_attrs, _) = ir::partition_attributes(field.attrs.clone())?;
             if ink_attrs.is_empty() {
-                continue 'repeat
+                continue 'repeat;
             }
-            let normalized =
-                ir::InkAttribute::from_expanded(ink_attrs).map_err(|err| {
-                    err.into_combine(format_err!(field_span, "at this invocation",))
-                })?;
+            let normalized = ir::InkAttribute::from_expanded(ink_attrs)
+                .map_err(|err| err.into_combine(format_err!(field_span, "at this invocation",)))?;
             if !matches!(normalized.first().kind(), ir::AttributeArg::Topic) {
                 return Err(format_err!(
                     field_span,
                     "first optional ink! attribute of an event field must be #[ink(topic)]",
-                ))
+                ));
             }
             for arg in normalized.args() {
                 if !matches!(arg.kind(), ir::AttributeArg::Topic) {
                     return Err(format_err!(
                         arg.span(),
                         "encountered conflicting ink! attribute for event field",
-                    ))
+                    ));
                 }
             }
         }

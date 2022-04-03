@@ -14,10 +14,7 @@
 
 use super::Stash as StorageStash;
 use crate::{
-    traits::{
-        KeyPtr,
-        SpreadLayout,
-    },
+    traits::{KeyPtr, SpreadLayout},
     Lazy,
 };
 use ink_primitives::Key;
@@ -160,8 +157,7 @@ fn remove_works_with_spread_layout_push_pull() -> ink_env::Result<()> {
 
         // This time we check from the third instance using
         // get if the expected cells are still there or have been successfully removed.
-        let stash3 =
-            <StorageStash<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
+        let stash3 = <StorageStash<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
         assert_eq!(stash3.get(0), None);
         assert_eq!(stash3.get(1), Some(&b'B'));
         assert_eq!(stash3.get(2), Some(&b'C'));
@@ -725,8 +721,7 @@ fn spread_layout_push_pull_works() -> ink_env::Result<()> {
         SpreadLayout::push_spread(&stash1, &mut KeyPtr::from(root_key));
         // Load the pushed storage vector into another instance and check that
         // both instances are equal:
-        let stash2 =
-            <StorageStash<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
+        let stash2 = <StorageStash<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
         assert_eq!(stash1, stash2);
         Ok(())
     })
@@ -746,8 +741,7 @@ fn spread_layout_clear_works() {
         // loading another instance from this storage will panic since the
         // vector's length property cannot read a value:
         SpreadLayout::clear_spread(&stash1, &mut KeyPtr::from(root_key));
-        let _ =
-            <StorageStash<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
+        let _ = <StorageStash<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
         Ok(())
     })
     .unwrap()
@@ -760,19 +754,17 @@ fn storage_is_cleared_completely_after_pull_lazy() {
         let root_key = Key::from([0x42; 32]);
         let lazy_stash = Lazy::new(create_holey_stash());
         SpreadLayout::push_spread(&lazy_stash, &mut KeyPtr::from(root_key));
-        let pulled_stash = <Lazy<StorageStash<u8>> as SpreadLayout>::pull_spread(
-            &mut KeyPtr::from(root_key),
-        );
+        let pulled_stash =
+            <Lazy<StorageStash<u8>> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
 
         // when
         SpreadLayout::clear_spread(&pulled_stash, &mut KeyPtr::from(root_key));
 
         // then
         let contract_id = ink_env::test::callee::<ink_env::DefaultEnvironment>();
-        let storage_used = ink_env::test::count_used_storage_cells::<
-            ink_env::DefaultEnvironment,
-        >(&contract_id)
-        .expect("used cells must be returned");
+        let storage_used =
+            ink_env::test::count_used_storage_cells::<ink_env::DefaultEnvironment>(&contract_id)
+                .expect("used cells must be returned");
         assert_eq!(storage_used, 0);
 
         Ok(())
@@ -790,22 +782,18 @@ fn drop_works() {
         let setup_result = std::panic::catch_unwind(|| {
             let stash = create_holey_stash();
             SpreadLayout::push_spread(&stash, &mut KeyPtr::from(root_key));
-            let _ = <StorageStash<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(
-                root_key,
-            ));
+            let _ = <StorageStash<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
             // stash is dropped which should clear the cells
         });
         assert!(setup_result.is_ok(), "setup should not panic");
 
         let contract_id = ink_env::test::callee::<ink_env::DefaultEnvironment>();
-        let used_cells = ink_env::test::count_used_storage_cells::<
-            ink_env::DefaultEnvironment,
-        >(&contract_id)
-        .expect("used cells must be returned");
+        let used_cells =
+            ink_env::test::count_used_storage_cells::<ink_env::DefaultEnvironment>(&contract_id)
+                .expect("used cells must be returned");
         assert_eq!(used_cells, 0);
 
-        let _ =
-            <StorageStash<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
+        let _ = <StorageStash<u8> as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
         Ok(())
     })
     .unwrap()

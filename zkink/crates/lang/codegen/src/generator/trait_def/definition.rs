@@ -17,11 +17,7 @@
 use super::TraitDefinition;
 use heck::ToLowerCamelCase as _;
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{
-    format_ident,
-    quote,
-    quote_spanned,
-};
+use quote::{format_ident, quote, quote_spanned};
 
 impl<'a> TraitDefinition<'a> {
     fn generate_for_message(message: ir::InkTraitMessage<'a>) -> TokenStream2 {
@@ -34,8 +30,7 @@ impl<'a> TraitDefinition<'a> {
             syn::ReturnType::Default => quote! { () },
             syn::ReturnType::Type(_, ty) => quote! { #ty },
         };
-        let output_ident =
-            format_ident!("{}Output", ident.to_string().to_lower_camel_case());
+        let output_ident = format_ident!("{}Output", ident.to_string().to_lower_camel_case());
         quote_spanned!(span =>
             /// Output type of the respective trait message.
             type #output_ident: ::ink_lang::codegen::ImpliesReturn<#output>;

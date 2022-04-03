@@ -27,10 +27,7 @@ mod tests;
 mod fuzz_tests;
 
 use self::counts::CountFree;
-use crate::collections::{
-    Bitvec as StorageBitvec,
-    Vec as StorageVec,
-};
+use crate::collections::{Bitvec as StorageBitvec, Vec as StorageVec};
 
 /// The index type used in the storage bit stash.
 type Index = u32;
@@ -84,7 +81,7 @@ impl BitStash {
                 counts.inc(i as usize);
                 let n = n as u64;
                 let i = i as u64;
-                return Some(n * (32 * 256) + i * 256)
+                return Some(n * (32 * 256) + i * 256);
             }
         }
         None
@@ -94,7 +91,7 @@ impl BitStash {
     fn required_counts(&self) -> u32 {
         let capacity = self.free.capacity();
         if capacity == 0 {
-            return 0
+            return 0;
         }
         1 + ((capacity - 1) / (32 * 256)) as u32
     }
@@ -113,7 +110,7 @@ impl BitStash {
         if let Some(index) = self.position_first_zero() {
             if index == self.free.len() as u64 {
                 self.free.push(true);
-                return self.free.len() - 1
+                return self.free.len() - 1;
             }
             let mut bits256 = self
                 .free
@@ -165,11 +162,11 @@ impl BitStash {
     pub fn take(&mut self, index: Index) -> Option<bool> {
         if index >= self.free.len() {
             // Bail out early if index is out of bounds.
-            return None
+            return None;
         }
         let mut access = self.free.get_mut(index).expect("index is out of bounds");
         if !access.get() {
-            return Some(false)
+            return Some(false);
         }
         // At this point the bit was found to be set (`true`) and we have
         // update the underlying internals in order to reset it so the index

@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    ir,
-    ir::utils,
-};
+use crate::{ir, ir::utils};
 use proc_macro2::Ident;
 use syn::spanned::Spanned as _;
 
@@ -60,11 +57,9 @@ impl Storage {
     /// # Errors
     ///
     /// If the first found ink! attribute is malformed.
-    pub(super) fn is_ink_storage(
-        item_struct: &syn::ItemStruct,
-    ) -> Result<bool, syn::Error> {
+    pub(super) fn is_ink_storage(item_struct: &syn::ItemStruct) -> Result<bool, syn::Error> {
         if !ir::contains_ink_attributes(&item_struct.attrs) {
-            return Ok(false)
+            return Ok(false);
         }
         // At this point we know that there must be at least one ink!
         // attribute. This can be either the ink! storage struct,
@@ -84,18 +79,16 @@ impl TryFrom<syn::ItemStruct> for Storage {
             struct_span,
             item_struct.attrs,
             &ir::AttributeArgKind::Storage,
-            |arg| {
-                match arg.kind() {
-                    ir::AttributeArg::Storage => Ok(()),
-                    _ => Err(None),
-                }
+            |arg| match arg.kind() {
+                ir::AttributeArg::Storage => Ok(()),
+                _ => Err(None),
             },
         )?;
         if !item_struct.generics.params.is_empty() {
             return Err(format_err_spanned!(
                 item_struct.generics.params,
                 "generic ink! storage structs are not supported",
-            ))
+            ));
         }
         utils::ensure_pub_visibility("storage structs", struct_span, &item_struct.vis)?;
         Ok(Self {

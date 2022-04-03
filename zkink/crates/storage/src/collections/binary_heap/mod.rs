@@ -27,10 +27,7 @@ mod storage;
 mod tests;
 
 use self::children_vec::ChildrenVec;
-use crate::{
-    collections::vec::Vec as StorageVec,
-    traits::PackedLayout,
-};
+use crate::{collections::vec::Vec as StorageVec, traits::PackedLayout};
 
 pub use children_vec::Iter;
 pub use reverse::Reverse;
@@ -146,7 +143,7 @@ where
             }
             // if we are already in order, stop.
             if self.elements.get(pos) >= self.elements.get(child) {
-                break
+                break;
             }
             self.elements.swap(child, pos);
             pos = child;
@@ -186,7 +183,7 @@ where
         while pos > 0 {
             let parent = (pos - 1) / 2;
             if self.elements.get(pos) <= self.elements.get(parent) {
-                break
+                break;
             }
             self.elements.swap(parent, pos);
             pos = parent;

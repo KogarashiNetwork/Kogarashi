@@ -15,29 +15,13 @@
 //! The public raw interface towards the host Wasm engine.
 
 use crate::{
-    backend::{
-        EnvBackend,
-        ReturnFlags,
-        TypedEnvBackend,
-    },
-    call::{
-        Call,
-        CallParams,
-        CreateParams,
-        DelegateCall,
-    },
-    engine::{
-        EnvInstance,
-        OnInstance,
-    },
-    hash::{
-        CryptoHash,
-        HashOutput,
-    },
+    backend::{EnvBackend, ReturnFlags, TypedEnvBackend},
+    call::{Call, CallParams, CreateParams, DelegateCall},
+    engine::{EnvInstance, OnInstance},
+    hash::{CryptoHash, HashOutput},
     topics::Topics,
     types::Gas,
-    Environment,
-    Result,
+    Environment, Result,
 };
 use ink_primitives::Key;
 
@@ -50,9 +34,7 @@ pub fn caller<E>() -> E::AccountId
 where
     E: Environment,
 {
-    <EnvInstance as OnInstance>::on_instance(|instance| {
-        TypedEnvBackend::caller::<E>(instance)
-    })
+    <EnvInstance as OnInstance>::on_instance(|instance| TypedEnvBackend::caller::<E>(instance))
 }
 
 /// Returns the transferred value for the contract execution.
@@ -92,9 +74,7 @@ pub fn gas_left<E>() -> Gas
 where
     E: Environment,
 {
-    <EnvInstance as OnInstance>::on_instance(|instance| {
-        TypedEnvBackend::gas_left::<E>(instance)
-    })
+    <EnvInstance as OnInstance>::on_instance(|instance| TypedEnvBackend::gas_left::<E>(instance))
 }
 
 /// Returns the current block timestamp.
@@ -124,9 +104,7 @@ pub fn account_id<E>() -> E::AccountId
 where
     E: Environment,
 {
-    <EnvInstance as OnInstance>::on_instance(|instance| {
-        TypedEnvBackend::account_id::<E>(instance)
-    })
+    <EnvInstance as OnInstance>::on_instance(|instance| TypedEnvBackend::account_id::<E>(instance))
 }
 
 /// Returns the balance of the executed contract.
@@ -138,9 +116,7 @@ pub fn balance<E>() -> E::Balance
 where
     E: Environment,
 {
-    <EnvInstance as OnInstance>::on_instance(|instance| {
-        TypedEnvBackend::balance::<E>(instance)
-    })
+    <EnvInstance as OnInstance>::on_instance(|instance| TypedEnvBackend::balance::<E>(instance))
 }
 
 /// Returns the current block number.
@@ -366,9 +342,7 @@ pub fn decode_input<T>() -> Result<T>
 where
     T: scale::Decode,
 {
-    <EnvInstance as OnInstance>::on_instance(|instance| {
-        EnvBackend::decode_input::<T>(instance)
-    })
+    <EnvInstance as OnInstance>::on_instance(|instance| EnvBackend::decode_input::<T>(instance))
 }
 
 /// Returns the value back to the caller of the executed contract.
@@ -434,9 +408,7 @@ pub fn hash_bytes<H>(input: &[u8], output: &mut <H as HashOutput>::Type)
 where
     H: CryptoHash,
 {
-    <EnvInstance as OnInstance>::on_instance(|instance| {
-        instance.hash_bytes::<H>(input, output)
-    })
+    <EnvInstance as OnInstance>::on_instance(|instance| instance.hash_bytes::<H>(input, output))
 }
 
 /// Conducts the crypto hash of the given encoded input and stores the result in `output`.

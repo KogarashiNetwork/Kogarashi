@@ -195,11 +195,7 @@ impl ReturnCode {
 type Result = core::result::Result<(), Error>;
 
 mod sys {
-    use super::{
-        Ptr32,
-        Ptr32Mut,
-        ReturnCode,
-    };
+    use super::{Ptr32, Ptr32Mut, ReturnCode};
 
     #[link(wasm_import_module = "seal0")]
     extern "C" {
@@ -217,11 +213,7 @@ mod sys {
             data_len: u32,
         );
 
-        pub fn seal_set_storage(
-            key_ptr: Ptr32<[u8]>,
-            value_ptr: Ptr32<[u8]>,
-            value_len: u32,
-        );
+        pub fn seal_set_storage(key_ptr: Ptr32<[u8]>, value_ptr: Ptr32<[u8]>, value_len: u32);
         pub fn seal_get_storage(
             key_ptr: Ptr32<[u8]>,
             output_ptr: Ptr32Mut<[u8]>,
@@ -241,10 +233,7 @@ mod sys {
         pub fn seal_return(flags: u32, data_ptr: Ptr32<[u8]>, data_len: u32) -> !;
 
         pub fn seal_caller(output_ptr: Ptr32Mut<[u8]>, output_len_ptr: Ptr32Mut<u32>);
-        pub fn seal_block_number(
-            output_ptr: Ptr32Mut<[u8]>,
-            output_len_ptr: Ptr32Mut<u32>,
-        );
+        pub fn seal_block_number(output_ptr: Ptr32Mut<[u8]>, output_len_ptr: Ptr32Mut<u32>);
         pub fn seal_address(output_ptr: Ptr32Mut<[u8]>, output_len_ptr: Ptr32Mut<u32>);
         pub fn seal_balance(output_ptr: Ptr32Mut<[u8]>, output_len_ptr: Ptr32Mut<u32>);
         pub fn seal_weight_to_fee(
@@ -253,15 +242,9 @@ mod sys {
             output_len_ptr: Ptr32Mut<u32>,
         );
         pub fn seal_gas_left(output_ptr: Ptr32Mut<[u8]>, output_len_ptr: Ptr32Mut<u32>);
-        pub fn seal_value_transferred(
-            output_ptr: Ptr32Mut<[u8]>,
-            output_len_ptr: Ptr32Mut<u32>,
-        );
+        pub fn seal_value_transferred(output_ptr: Ptr32Mut<[u8]>, output_len_ptr: Ptr32Mut<u32>);
         pub fn seal_now(output_ptr: Ptr32Mut<[u8]>, output_len_ptr: Ptr32Mut<u32>);
-        pub fn seal_minimum_balance(
-            output_ptr: Ptr32Mut<[u8]>,
-            output_len_ptr: Ptr32Mut<u32>,
-        );
+        pub fn seal_minimum_balance(output_ptr: Ptr32Mut<[u8]>, output_len_ptr: Ptr32Mut<u32>);
 
         pub fn seal_hash_keccak_256(
             input_ptr: Ptr32<[u8]>,
@@ -416,12 +399,7 @@ pub fn call(
     ret_code.into()
 }
 
-pub fn delegate_call(
-    flags: u32,
-    code_hash: &[u8],
-    input: &[u8],
-    output: &mut &mut [u8],
-) -> Result {
+pub fn delegate_call(flags: u32, code_hash: &[u8], input: &[u8], output: &mut &mut [u8]) -> Result {
     let mut output_len = output.len() as u32;
     let ret_code = {
         unsafe {
@@ -616,9 +594,8 @@ pub fn debug_message(message: &str) {
     // of underestimate gas usage. Otherwise using this estimate could lead to a out of gas error.
     if unsafe { DEBUG_ENABLED || FIRST_RUN } {
         let bytes = message.as_bytes();
-        let ret_code = unsafe {
-            sys::seal_debug_message(Ptr32::from_slice(bytes), bytes.len() as u32)
-        };
+        let ret_code =
+            unsafe { sys::seal_debug_message(Ptr32::from_slice(bytes), bytes.len() as u32) };
         if !matches!(ret_code.into(), Err(Error::LoggingDisabled)) {
             // SAFETY: safe because executing in a single threaded context
             unsafe { DEBUG_ENABLED = true }

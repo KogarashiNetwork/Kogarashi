@@ -16,10 +16,7 @@ use crate::GenerateCode;
 use derive_more::From;
 use ir::ChainExtensionMethod;
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{
-    format_ident,
-    quote_spanned,
-};
+use quote::{format_ident, quote_spanned};
 use syn::spanned::Spanned;
 
 /// Generator to create an ink! chain extension.
@@ -118,7 +115,8 @@ impl ChainExtension<'_> {
 
         let where_output_impls_from_error_code = Some(quote_spanned!(span=>
             <#output_type as ::ink_lang::IsResultType>::Err: ::core::convert::From<#error_code>,
-        )).filter(|_| returns_result && handle_status);
+        ))
+        .filter(|_| returns_result && handle_status);
 
         quote_spanned!(span=>
             #( #attrs )*

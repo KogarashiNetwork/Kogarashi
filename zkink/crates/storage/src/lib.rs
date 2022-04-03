@@ -68,8 +68,4 @@ mod test_utils;
 pub use self::lazy::Mapping;
 
 #[doc(inline)]
-pub(crate) use self::{
-    collections::Vec,
-    lazy::Lazy,
-    pack::Pack,
-};
+pub(crate) use self::{collections::Vec, lazy::Lazy, pack::Pack};

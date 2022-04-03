@@ -12,18 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    generator,
-    GenerateCode,
-};
+use crate::{generator, GenerateCode};
 use derive_more::From;
 use ir::Callable;
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{
-    format_ident,
-    quote,
-    quote_spanned,
-};
+use quote::{format_ident, quote, quote_spanned};
 use syn::spanned::Spanned as _;
 
 /// Generates code for the call builder of the ink! smart contract.
@@ -150,9 +143,9 @@ impl CallBuilder<'_> {
             .impls()
             .filter_map(|impl_block| {
                 // We are only interested in ink! trait implementation block.
-                impl_block.trait_path().map(|trait_path| {
-                    self.generate_code_for_trait_impl(trait_path, impl_block)
-                })
+                impl_block
+                    .trait_path()
+                    .map(|trait_path| self.generate_code_for_trait_impl(trait_path, impl_block))
             })
             .collect()
     }
@@ -331,10 +324,7 @@ impl CallBuilder<'_> {
     /// Unlike as with ink! trait implementation blocks we do not have to generate
     /// associate `*Output` types, ink! trait validating implementation blocks or
     /// trait forwarder implementations. Instead we build the calls directly.
-    fn generate_call_builder_inherent_impl(
-        &self,
-        impl_block: &ir::ItemImpl,
-    ) -> TokenStream2 {
+    fn generate_call_builder_inherent_impl(&self, impl_block: &ir::ItemImpl) -> TokenStream2 {
         let span = impl_block.span();
         let cb_ident = Self::call_builder_ident();
         let messages = impl_block
@@ -372,8 +362,7 @@ impl CallBuilder<'_> {
         let arg_list = generator::generate_argument_list(input_types.iter().cloned());
         let mut_tok = callable.receiver().is_ref_mut().then(|| quote! { mut });
         let output = message.output();
-        let return_type =
-            output.map_or_else(|| quote! { () }, |output| quote! { #output });
+        let return_type = output.map_or_else(|| quote! { () }, |output| quote! { #output });
         let output_span = output.span();
         let output_type = quote_spanned!(output_span=>
             ::ink_env::call::CallBuilder<

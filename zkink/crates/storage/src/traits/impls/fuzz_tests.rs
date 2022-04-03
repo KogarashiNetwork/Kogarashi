@@ -44,7 +44,7 @@ fn fuzz_pull_push_pull_array(x: Vec<i32>) -> TestResult {
     // The guided fuzzing will notice that every Vec of greater/smaller
     // length is always discarded and aim to input vectors of length 32.
     if x.len() != 32 {
-        return TestResult::discard()
+        return TestResult::discard();
     }
 
     ink_env::test::run_test::<ink_env::DefaultEnvironment, _>(|_| {

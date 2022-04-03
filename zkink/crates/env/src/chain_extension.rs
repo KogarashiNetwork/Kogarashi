@@ -19,10 +19,7 @@
 
 use crate::{
     backend::EnvBackend,
-    engine::{
-        EnvInstance,
-        OnInstance,
-    },
+    engine::{EnvInstance, OnInstance},
 };
 use core::marker::PhantomData;
 
@@ -211,8 +208,7 @@ pub mod state {
     }
 }
 
-impl<I, T, E, ErrorCode>
-    ChainExtensionMethod<I, Result<T, E>, state::HandleErrorCode<ErrorCode>>
+impl<I, T, E, ErrorCode> ChainExtensionMethod<I, Result<T, E>, state::HandleErrorCode<ErrorCode>>
 where
     I: scale::Encode,
     T: scale::Decode,
@@ -329,8 +325,7 @@ where
     }
 }
 
-impl<I, O, ErrorCode>
-    ChainExtensionMethod<I, state::NoResult<O>, state::HandleErrorCode<ErrorCode>>
+impl<I, O, ErrorCode> ChainExtensionMethod<I, state::NoResult<O>, state::HandleErrorCode<ErrorCode>>
 where
     I: scale::Encode,
     O: scale::Decode,
@@ -381,8 +376,9 @@ where
                 input,
                 ErrorCode::from_status_code,
                 |mut output| {
-                    let decoded = <O as scale::Decode>::decode(&mut output)
-                        .expect("encountered error while decoding chain extension method call return value");
+                    let decoded = <O as scale::Decode>::decode(&mut output).expect(
+                        "encountered error while decoding chain extension method call return value",
+                    );
                     Ok(decoded)
                 },
             )
@@ -430,11 +426,13 @@ where
                 input,
                 |_status_code| Ok(()),
                 |mut output| {
-                    let decoded = <O as scale::Decode>::decode(&mut output)
-                        .expect("encountered error while decoding chain extension method call return value");
+                    let decoded = <O as scale::Decode>::decode(&mut output).expect(
+                        "encountered error while decoding chain extension method call return value",
+                    );
                     Ok(decoded)
                 },
-            ).expect("assume the chain extension method never fails")
+            )
+            .expect("assume the chain extension method never fails")
         })
     }
 }

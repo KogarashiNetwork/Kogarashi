@@ -23,37 +23,14 @@ mod selector;
 /// Utility types for the cross-contract calling API.
 pub mod utils {
     pub use super::{
-        common::{
-            ReturnType,
-            Set,
-            Unset,
-            Unwrap,
-        },
-        execution_input::{
-            ArgsList,
-            Argument,
-            ArgumentList,
-            ArgumentListEnd,
-            EmptyArgumentList,
-        },
+        common::{ReturnType, Set, Unset, Unwrap},
+        execution_input::{ArgsList, Argument, ArgumentList, ArgumentListEnd, EmptyArgumentList},
     };
 }
 
 pub use self::{
-    call_builder::{
-        build_call,
-        Call,
-        CallBuilder,
-        CallParams,
-        DelegateCall,
-    },
-    create_builder::{
-        build_create,
-        state,
-        CreateBuilder,
-        CreateParams,
-        FromAccountId,
-    },
+    call_builder::{build_call, Call, CallBuilder, CallParams, DelegateCall},
+    create_builder::{build_create, state, CreateBuilder, CreateParams, FromAccountId},
     execution_input::ExecutionInput,
     selector::Selector,
 };

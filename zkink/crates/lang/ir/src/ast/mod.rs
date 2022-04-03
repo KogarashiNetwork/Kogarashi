@@ -26,8 +26,4 @@
 
 mod attr_args;
 
-pub use self::attr_args::{
-    AttributeArgs,
-    MetaNameValue,
-    PathOrLit,
-};
+pub use self::attr_args::{AttributeArgs, MetaNameValue, PathOrLit};

@@ -15,19 +15,9 @@
 use crate::ChainExtensionInstance;
 use core::marker::PhantomData;
 use ink_env::{
-    call::{
-        Call,
-        CallParams,
-        CreateParams,
-        DelegateCall,
-    },
-    hash::{
-        CryptoHash,
-        HashOutput,
-    },
-    Environment,
-    Error,
-    Result,
+    call::{Call, CallParams, CreateParams, DelegateCall},
+    hash::{CryptoHash, HashOutput},
+    Environment, Error, Result,
 };
 use ink_eth_compatibility::ECDSAPublicKey;
 
@@ -545,10 +535,7 @@ where
     /// # Note
     ///
     /// For more details visit: [`ink_env::invoke_contract`]
-    pub fn invoke_contract<Args, R>(
-        self,
-        params: &CallParams<E, Call<E>, Args, R>,
-    ) -> Result<R>
+    pub fn invoke_contract<Args, R>(self, params: &CallParams<E, Call<E>, Args, R>) -> Result<R>
     where
         Args: scale::Encode,
         R: scale::Decode,

@@ -12,36 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{
-    Bits256,
-    Bitvec as StorageBitvec,
-};
+use super::{Bits256, Bitvec as StorageBitvec};
 use crate::{
     traits::{
-        forward_clear_packed,
-        forward_pull_packed,
-        forward_push_packed,
-        KeyPtr,
-        PackedLayout,
-        SpreadAllocate,
-        SpreadLayout,
+        forward_clear_packed, forward_pull_packed, forward_push_packed, KeyPtr, PackedLayout,
+        SpreadAllocate, SpreadLayout,
     },
-    Pack,
-    Vec as StorageVec,
+    Pack, Vec as StorageVec,
 };
 use ink_primitives::Key;
 
 #[cfg(feature = "std")]
 const _: () = {
-    use crate::{
-        lazy::Lazy,
-        traits::StorageLayout,
-    };
-    use ink_metadata::layout::{
-        FieldLayout,
-        Layout,
-        StructLayout,
-    };
+    use crate::{lazy::Lazy, traits::StorageLayout};
+    use ink_metadata::layout::{FieldLayout, Layout, StructLayout};
 
     impl StorageLayout for StorageBitvec {
         fn layout(key_ptr: &mut KeyPtr) -> Layout {

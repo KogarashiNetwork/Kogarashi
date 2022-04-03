@@ -14,10 +14,7 @@
 
 #![allow(clippy::len_without_is_empty)]
 
-use super::{
-    Bits256,
-    Index256,
-};
+use super::{Bits256, Index256};
 
 /// A mutable bit access for operating on a single bit within a 256-bit pack.
 #[derive(Debug)]

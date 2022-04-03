@@ -12,22 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{
-    ensure_callable_invariants,
-    Callable,
-    CallableKind,
-    InputsIter,
-    Visibility,
-};
-use crate::ir::{
-    self,
-    attrs::SelectorOrWildcard,
-    utils,
-};
-use proc_macro2::{
-    Ident,
-    Span,
-};
+use super::{ensure_callable_invariants, Callable, CallableKind, InputsIter, Visibility};
+use crate::ir::{self, attrs::SelectorOrWildcard, utils};
+use proc_macro2::{Ident, Span};
 use syn::spanned::Spanned as _;
 
 /// The receiver of an ink! message.
@@ -125,9 +112,7 @@ impl Message {
     ///
     /// - If the method inputs yields no elements.
     /// - If the first method input is not `&self` or `&mut self`.
-    fn ensure_receiver_is_self_ref(
-        method_item: &syn::ImplItemMethod,
-    ) -> Result<(), syn::Error> {
+    fn ensure_receiver_is_self_ref(method_item: &syn::ImplItemMethod) -> Result<(), syn::Error> {
         let mut fn_args = method_item.sig.inputs.iter();
         fn bail(span: Span) -> syn::Error {
             format_err!(
@@ -140,7 +125,7 @@ impl Message {
             Some(syn::FnArg::Typed(pat_typed)) => return Err(bail(pat_typed.span())),
             Some(syn::FnArg::Receiver(receiver)) => {
                 if receiver.reference.is_none() {
-                    return Err(bail(receiver.span()))
+                    return Err(bail(receiver.span()));
                 }
             }
         }
@@ -152,9 +137,7 @@ impl Message {
     /// # Errors
     ///
     /// If the given Rust method has a `Self` return type.
-    fn ensure_not_return_self(
-        method_item: &syn::ImplItemMethod,
-    ) -> Result<(), syn::Error> {
+    fn ensure_not_return_self(method_item: &syn::ImplItemMethod) -> Result<(), syn::Error> {
         match &method_item.sig.output {
             syn::ReturnType::Default => (),
             syn::ReturnType::Type(_arrow, ret_type) => {
@@ -163,7 +146,7 @@ impl Message {
                         return Err(format_err!(
                             ret_type,
                             "ink! messages must not return `Self`"
-                        ))
+                        ));
                     }
                 }
             }
@@ -181,13 +164,11 @@ impl Message {
             method_item.span(),
             method_item.attrs.clone(),
             &ir::AttributeArgKind::Message,
-            |arg| {
-                match arg.kind() {
-                    ir::AttributeArg::Message
-                    | ir::AttributeArg::Payable
-                    | ir::AttributeArg::Selector(_) => Ok(()),
-                    _ => Err(None),
-                }
+            |arg| match arg.kind() {
+                ir::AttributeArg::Message
+                | ir::AttributeArg::Payable
+                | ir::AttributeArg::Selector(_) => Ok(()),
+                _ => Err(None),
             },
         )
     }
@@ -225,14 +206,14 @@ impl Callable for Message {
 
     fn user_provided_selector(&self) -> Option<&ir::Selector> {
         if let Some(SelectorOrWildcard::UserProvided(selector)) = self.selector.as_ref() {
-            return Some(selector)
+            return Some(selector);
         }
         None
     }
 
     fn has_wildcard_selector(&self) -> bool {
         if let Some(SelectorOrWildcard::Wildcard) = self.selector {
-            return true
+            return true;
         }
         false
     }
@@ -562,8 +543,7 @@ mod tests {
 
     fn assert_try_from_fails(item_method: syn::ImplItemMethod, expected_err: &str) {
         assert_eq!(
-            <ir::Message as TryFrom<_>>::try_from(item_method)
-                .map_err(|err| err.to_string()),
+            <ir::Message as TryFrom<_>>::try_from(item_method).map_err(|err| err.to_string()),
             Err(expected_err.to_string()),
         );
     }

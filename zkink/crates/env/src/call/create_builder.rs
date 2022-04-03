@@ -14,17 +14,10 @@
 
 use crate::{
     call::{
-        utils::{
-            EmptyArgumentList,
-            ReturnType,
-            Set,
-            Unset,
-            Unwrap,
-        },
+        utils::{EmptyArgumentList, ReturnType, Set, Unset, Unwrap},
         ExecutionInput,
     },
-    Environment,
-    Error,
+    Environment, Error,
 };
 use core::marker::PhantomData;
 
@@ -299,8 +292,7 @@ where
     pub fn exec_input<Args>(
         self,
         exec_input: ExecutionInput<Args>,
-    ) -> CreateBuilder<E, CodeHash, GasLimit, Endowment, Set<ExecutionInput<Args>>, Salt, R>
-    {
+    ) -> CreateBuilder<E, CodeHash, GasLimit, Endowment, Set<ExecutionInput<Args>>, Salt, R> {
         CreateBuilder {
             code_hash: self.code_hash,
             gas_limit: self.gas_limit,

@@ -24,10 +24,7 @@ const TEST_BYTES: [u8; 32] = *b"\
 mod key {
     use super::*;
     use core::ops::AddAssign;
-    use scale::{
-        Decode,
-        Encode,
-    };
+    use scale::{Decode, Encode};
 
     #[test]
     fn default_works() {

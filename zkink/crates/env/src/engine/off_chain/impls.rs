@@ -14,36 +14,12 @@
 
 use super::EnvInstance;
 use crate::{
-    call::{
-        Call,
-        CallParams,
-        CreateParams,
-        DelegateCall,
-    },
-    hash::{
-        Blake2x128,
-        Blake2x256,
-        CryptoHash,
-        HashOutput,
-        Keccak256,
-        Sha2x256,
-    },
-    topics::{
-        Topics,
-        TopicsBuilderBackend,
-    },
-    Clear,
-    EnvBackend,
-    Environment,
-    Error,
-    Result,
-    ReturnFlags,
-    TypedEnvBackend,
+    call::{Call, CallParams, CreateParams, DelegateCall},
+    hash::{Blake2x128, Blake2x256, CryptoHash, HashOutput, Keccak256, Sha2x256},
+    topics::{Topics, TopicsBuilderBackend},
+    Clear, EnvBackend, Environment, Error, Result, ReturnFlags, TypedEnvBackend,
 };
-use ink_engine::{
-    ext,
-    ext::Engine,
-};
+use ink_engine::{ext, ext::Engine};
 use ink_primitives::Key;
 
 /// The capacity of the static buffer.
@@ -54,10 +30,7 @@ const BUFFER_SIZE: usize = 1 << 14; // 16 kB
 impl CryptoHash for Blake2x128 {
     fn hash(input: &[u8], output: &mut <Self as HashOutput>::Type) {
         type OutputType = [u8; 16];
-        static_assertions::assert_type_eq_all!(
-            <Blake2x128 as HashOutput>::Type,
-            OutputType
-        );
+        static_assertions::assert_type_eq_all!(<Blake2x128 as HashOutput>::Type, OutputType);
         let output: &mut OutputType = arrayref::array_mut_ref!(output, 0, 16);
         Engine::hash_blake2_128(input, output);
     }
@@ -66,10 +39,7 @@ impl CryptoHash for Blake2x128 {
 impl CryptoHash for Blake2x256 {
     fn hash(input: &[u8], output: &mut <Self as HashOutput>::Type) {
         type OutputType = [u8; 32];
-        static_assertions::assert_type_eq_all!(
-            <Blake2x256 as HashOutput>::Type,
-            OutputType
-        );
+        static_assertions::assert_type_eq_all!(<Blake2x256 as HashOutput>::Type, OutputType);
         let output: &mut OutputType = arrayref::array_mut_ref!(output, 0, 32);
         Engine::hash_blake2_256(input, output);
     }
@@ -78,10 +48,7 @@ impl CryptoHash for Blake2x256 {
 impl CryptoHash for Sha2x256 {
     fn hash(input: &[u8], output: &mut <Self as HashOutput>::Type) {
         type OutputType = [u8; 32];
-        static_assertions::assert_type_eq_all!(
-            <Sha2x256 as HashOutput>::Type,
-            OutputType
-        );
+        static_assertions::assert_type_eq_all!(<Sha2x256 as HashOutput>::Type, OutputType);
         let output: &mut OutputType = arrayref::array_mut_ref!(output, 0, 32);
         Engine::hash_sha2_256(input, output);
     }
@@ -90,10 +57,7 @@ impl CryptoHash for Sha2x256 {
 impl CryptoHash for Keccak256 {
     fn hash(input: &[u8], output: &mut <Self as HashOutput>::Type) {
         type OutputType = [u8; 32];
-        static_assertions::assert_type_eq_all!(
-            <Keccak256 as HashOutput>::Type,
-            OutputType
-        );
+        static_assertions::assert_type_eq_all!(<Keccak256 as HashOutput>::Type, OutputType);
         let output: &mut OutputType = arrayref::array_mut_ref!(output, 0, 32);
         Engine::hash_keccak_256(input, output);
     }
@@ -169,10 +133,7 @@ where
 
 impl EnvInstance {
     /// Returns the contract property value.
-    fn get_property<T>(
-        &mut self,
-        ext_fn: fn(engine: &Engine, output: &mut &mut [u8]),
-    ) -> Result<T>
+    fn get_property<T>(&mut self, ext_fn: fn(engine: &Engine, output: &mut &mut [u8])) -> Result<T>
     where
         T: scale::Decode,
     {
@@ -251,12 +212,8 @@ impl EnvBackend for EnvInstance {
         output: &mut [u8; 33],
     ) -> Result<()> {
         use secp256k1::{
-            ecdsa::{
-                RecoverableSignature,
-                RecoveryId,
-            },
-            Message,
-            SECP256K1,
+            ecdsa::{RecoverableSignature, RecoveryId},
+            Message, SECP256K1,
         };
 
         // In most implementations, the v is just 0 or 1 internally, but 27 was added
@@ -268,14 +225,10 @@ impl EnvBackend for EnvInstance {
         };
         let recovery_id = RecoveryId::from_i32(recovery_byte as i32)
             .unwrap_or_else(|error| panic!("Unable to parse the recovery id: {}", error));
-        let message = Message::from_slice(message_hash).unwrap_or_else(|error| {
-            panic!("Unable to create the message from hash: {}", error)
-        });
-        let signature =
-            RecoverableSignature::from_compact(&signature[0..64], recovery_id)
-                .unwrap_or_else(|error| {
-                    panic!("Unable to parse the signature: {}", error)
-                });
+        let message = Message::from_slice(message_hash)
+            .unwrap_or_else(|error| panic!("Unable to create the message from hash: {}", error));
+        let signature = RecoverableSignature::from_compact(&signature[0..64], recovery_id)
+            .unwrap_or_else(|error| panic!("Unable to parse the signature: {}", error));
 
         let pub_key = SECP256K1.recover_ecdsa(&message, &signature);
         match pub_key {
@@ -306,8 +259,8 @@ impl EnvBackend for EnvInstance {
 
         self.engine
             .call_chain_extension(func_id, enc_input, &mut &mut output[..]);
-        let (status, out): (u32, Vec<u8>) = scale::Decode::decode(&mut &output[..])
-            .unwrap_or_else(|error| {
+        let (status, out): (u32, Vec<u8>) =
+            scale::Decode::decode(&mut &output[..]).unwrap_or_else(|error| {
                 panic!(
                     "could not decode `call_chain_extension` output: {:?}",
                     error
@@ -323,9 +276,7 @@ impl EnvBackend for EnvInstance {
 impl TypedEnvBackend for EnvInstance {
     fn caller<E: Environment>(&mut self) -> E::AccountId {
         self.get_property::<E::AccountId>(Engine::caller)
-            .unwrap_or_else(|error| {
-                panic!("could not read `caller` property: {:?}", error)
-            })
+            .unwrap_or_else(|error| panic!("could not read `caller` property: {:?}", error))
     }
 
     fn transferred_value<E: Environment>(&mut self) -> E::Balance {
@@ -337,9 +288,7 @@ impl TypedEnvBackend for EnvInstance {
 
     fn gas_left<E: Environment>(&mut self) -> u64 {
         self.get_property::<u64>(Engine::gas_left)
-            .unwrap_or_else(|error| {
-                panic!("could not read `gas_left` property: {:?}", error)
-            })
+            .unwrap_or_else(|error| panic!("could not read `gas_left` property: {:?}", error))
     }
 
     fn block_timestamp<E: Environment>(&mut self) -> E::Timestamp {
@@ -351,23 +300,17 @@ impl TypedEnvBackend for EnvInstance {
 
     fn account_id<E: Environment>(&mut self) -> E::AccountId {
         self.get_property::<E::AccountId>(Engine::address)
-            .unwrap_or_else(|error| {
-                panic!("could not read `account_id` property: {:?}", error)
-            })
+            .unwrap_or_else(|error| panic!("could not read `account_id` property: {:?}", error))
     }
 
     fn balance<E: Environment>(&mut self) -> E::Balance {
         self.get_property::<E::Balance>(Engine::balance)
-            .unwrap_or_else(|error| {
-                panic!("could not read `balance` property: {:?}", error)
-            })
+            .unwrap_or_else(|error| panic!("could not read `balance` property: {:?}", error))
     }
 
     fn block_number<E: Environment>(&mut self) -> E::BlockNumber {
         self.get_property::<E::BlockNumber>(Engine::block_number)
-            .unwrap_or_else(|error| {
-                panic!("could not read `block_number` property: {:?}", error)
-            })
+            .unwrap_or_else(|error| panic!("could not read `block_number` property: {:?}", error))
     }
 
     fn minimum_balance<E: Environment>(&mut self) -> E::Balance {
@@ -388,10 +331,7 @@ impl TypedEnvBackend for EnvInstance {
         self.engine.deposit_event(&enc_topics[..], enc_data);
     }
 
-    fn invoke_contract<E, Args, R>(
-        &mut self,
-        params: &CallParams<E, Call<E>, Args, R>,
-    ) -> Result<R>
+    fn invoke_contract<E, Args, R>(&mut self, params: &CallParams<E, Call<E>, Args, R>) -> Result<R>
     where
         E: Environment,
         Args: scale::Encode,
@@ -415,9 +355,7 @@ impl TypedEnvBackend for EnvInstance {
         R: scale::Decode,
     {
         let _code_hash = params.code_hash();
-        unimplemented!(
-            "off-chain environment does not support delegated contract invocation"
-        )
+        unimplemented!("off-chain environment does not support delegated contract invocation")
     }
 
     fn instantiate_contract<E, Args, Salt, C>(
@@ -459,9 +397,8 @@ impl TypedEnvBackend for EnvInstance {
     fn weight_to_fee<E: Environment>(&mut self, gas: u64) -> E::Balance {
         let mut output: [u8; BUFFER_SIZE] = [0; BUFFER_SIZE];
         self.engine.weight_to_fee(gas, &mut &mut output[..]);
-        scale::Decode::decode(&mut &output[..]).unwrap_or_else(|error| {
-            panic!("could not read `weight_to_fee` property: {:?}", error)
-        })
+        scale::Decode::decode(&mut &output[..])
+            .unwrap_or_else(|error| panic!("could not read `weight_to_fee` property: {:?}", error))
     }
 
     fn random<E>(&mut self, subject: &[u8]) -> Result<(E::Hash, E::BlockNumber)>

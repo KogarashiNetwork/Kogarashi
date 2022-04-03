@@ -12,14 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{
-    Entry,
-    Stash,
-};
-use crate::{
-    collections::extend_lifetime,
-    traits::PackedLayout,
-};
+use super::{Entry, Stash};
+use crate::{collections::extend_lifetime, traits::PackedLayout};
 
 /// An iterator over shared references to the elements of a storage stash.
 #[derive(Debug, Clone, Copy)]
@@ -71,14 +65,14 @@ where
         loop {
             debug_assert!(self.begin <= self.end);
             if self.begin == self.end {
-                return None
+                return None;
             }
             let cur = self.begin;
             self.begin += 1;
             match self.stash.get(cur) {
                 Some(value) => {
                     self.yielded += 1;
-                    return Some(value)
+                    return Some(value);
                 }
                 None => continue,
             }
@@ -105,14 +99,14 @@ where
         loop {
             debug_assert!(self.begin <= self.end);
             if self.begin == self.end {
-                return None
+                return None;
             }
             debug_assert_ne!(self.end, 0);
             self.end -= 1;
             match self.stash.get(self.end) {
                 Some(value) => {
                     self.yielded += 1;
-                    return Some(value)
+                    return Some(value);
                 }
                 None => continue,
             }
@@ -189,14 +183,14 @@ where
         loop {
             debug_assert!(self.begin <= self.end);
             if self.begin == self.end {
-                return None
+                return None;
             }
             let cur = self.begin;
             self.begin += 1;
             match self.get_mut(cur) {
                 Some(value) => {
                     self.yielded += 1;
-                    return Some(value)
+                    return Some(value);
                 }
                 None => continue,
             }
@@ -223,14 +217,14 @@ where
         loop {
             debug_assert!(self.begin <= self.end);
             if self.begin == self.end {
-                return None
+                return None;
             }
             debug_assert_ne!(self.end, 0);
             self.end -= 1;
             match self.get_mut(self.end) {
                 Some(value) => {
                     self.yielded += 1;
-                    return Some(value)
+                    return Some(value);
                 }
                 None => continue,
             }
@@ -280,7 +274,7 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         debug_assert!(self.begin <= self.end);
         if self.begin == self.end {
-            return None
+            return None;
         }
         let cur = self.begin;
         self.begin += 1;
@@ -307,7 +301,7 @@ where
     fn next_back(&mut self) -> Option<Self::Item> {
         debug_assert!(self.begin <= self.end);
         if self.begin == self.end {
-            return None
+            return None;
         }
         debug_assert_ne!(self.end, 0);
         self.end -= 1;

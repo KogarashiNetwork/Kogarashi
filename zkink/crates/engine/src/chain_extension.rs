@@ -14,10 +14,7 @@
 
 use super::Error;
 use derive_more::From;
-use std::collections::{
-    hash_map::Entry,
-    HashMap,
-};
+use std::collections::{hash_map::Entry, HashMap};
 
 /// Chain extension registry.
 ///
@@ -30,9 +27,7 @@ pub struct ChainExtensionHandler {
 }
 
 /// The unique ID of the registered chain extension method.
-#[derive(
-    Debug, From, scale::Encode, scale::Decode, PartialEq, Eq, PartialOrd, Ord, Hash,
-)]
+#[derive(Debug, From, scale::Encode, scale::Decode, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ExtensionId(u32);
 
 /// Types implementing this trait can be used as chain extensions.

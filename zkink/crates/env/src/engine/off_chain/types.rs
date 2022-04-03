@@ -15,12 +15,7 @@
 //! Contains the necessary conversions from `ink_engine` types to types
 //! of this crate.
 
-use super::{
-    test_api::EmittedEvent,
-    AccountError,
-    Error,
-    OffChainError,
-};
+use super::{test_api::EmittedEvent, AccountError, Error, OffChainError};
 
 impl From<ink_engine::test_api::EmittedEvent> for EmittedEvent {
     fn from(evt: ink_engine::test_api::EmittedEvent) -> Self {
@@ -51,12 +46,8 @@ impl From<ink_engine::AccountError> for AccountError {
     fn from(err: ink_engine::AccountError) -> Self {
         match err {
             ink_engine::AccountError::Decoding(e) => AccountError::Decoding(e),
-            ink_engine::AccountError::UnexpectedUserAccount => {
-                AccountError::UnexpectedUserAccount
-            }
-            ink_engine::AccountError::NoAccountForId(acc) => {
-                AccountError::NoAccountForId(acc)
-            }
+            ink_engine::AccountError::UnexpectedUserAccount => AccountError::UnexpectedUserAccount,
+            ink_engine::AccountError::NoAccountForId(acc) => AccountError::NoAccountForId(acc),
         }
     }
 }

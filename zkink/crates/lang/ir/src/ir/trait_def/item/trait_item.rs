@@ -14,19 +14,11 @@
 
 use super::super::InkAttribute;
 use crate::{
-    ir::{
-        self,
-        attrs::SelectorOrWildcard,
-        utils,
-    },
-    InputsIter,
-    Receiver,
+    ir::{self, attrs::SelectorOrWildcard, utils},
+    InputsIter, Receiver,
 };
 use proc_macro2::Span;
-use syn::{
-    spanned::Spanned as _,
-    Result,
-};
+use syn::{spanned::Spanned as _, Result};
 
 /// An ink! item within an ink! trait definition.
 #[derive(Debug, Clone)]
@@ -170,23 +162,13 @@ impl<'a> InkTraitMessage<'a> {
     pub fn mutates(&self) -> bool {
         self.sig()
             .receiver()
-            .map(|fn_arg| {
-                match fn_arg {
-                    syn::FnArg::Receiver(receiver) if receiver.mutability.is_some() => {
-                        true
-                    }
-                    syn::FnArg::Typed(pat_type) => {
-                        match &*pat_type.ty {
-                            syn::Type::Reference(reference)
-                                if reference.mutability.is_some() =>
-                            {
-                                true
-                            }
-                            _ => false,
-                        }
-                    }
+            .map(|fn_arg| match fn_arg {
+                syn::FnArg::Receiver(receiver) if receiver.mutability.is_some() => true,
+                syn::FnArg::Typed(pat_type) => match &*pat_type.ty {
+                    syn::Type::Reference(reference) if reference.mutability.is_some() => true,
                     _ => false,
-                }
+                },
+                _ => false,
             })
             .expect("encountered missing receiver for ink! message")
     }

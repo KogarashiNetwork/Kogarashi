@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::traits::{
-    KeyPtr,
-    SpreadLayout,
-};
+use crate::traits::{KeyPtr, SpreadLayout};
 use ink_primitives::Key;
 
 #[cfg(test)]
@@ -419,10 +416,7 @@ mod lazyhmap_backend {
     use super::*;
     use crate::lazy::lazy_hmap::{
         Entry,
-        Entry::{
-            Occupied,
-            Vacant,
-        },
+        Entry::{Occupied, Vacant},
         LazyHashMap,
     };
     use ink_env::hash::Blake2x256;
@@ -434,10 +428,7 @@ mod hashmap_backend {
     use super::*;
     use crate::collections::hashmap::{
         Entry,
-        Entry::{
-            Occupied,
-            Vacant,
-        },
+        Entry::{Occupied, Vacant},
         HashMap as StorageHashMap,
     };
     use ink_env::hash::Blake2x256;

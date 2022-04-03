@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    ast,
-    ir,
-};
+use crate::{ast, ir};
 use proc_macro2::TokenStream as TokenStream2;
 
 /// An ink! contract definition consisting of the ink! configuration and module.
@@ -58,10 +55,7 @@ impl Contract {
     ///
     /// Returns an error if the provided token stream cannot be decoded properly
     /// into a valid ink! configuration or ink! module respectively.
-    pub fn new(
-        ink_config: TokenStream2,
-        ink_module: TokenStream2,
-    ) -> Result<Self, syn::Error> {
+    pub fn new(ink_config: TokenStream2, ink_module: TokenStream2) -> Result<Self, syn::Error> {
         let config = syn::parse2::<ast::AttributeArgs>(ink_config)?;
         let module = syn::parse2::<syn::ItemMod>(ink_module)?;
         let ink_config = ir::Config::try_from(config)?;

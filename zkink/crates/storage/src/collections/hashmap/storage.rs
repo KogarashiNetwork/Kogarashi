@@ -14,42 +14,24 @@
 
 //! Implementation of ink! storage traits.
 
-use super::{
-    HashMap as StorageHashMap,
-    ValueEntry,
-};
+use super::{HashMap as StorageHashMap, ValueEntry};
 use crate::{
     collections::Stash as StorageStash,
     traits::{
-        forward_clear_packed,
-        forward_pull_packed,
-        forward_push_packed,
-        KeyPtr,
-        PackedLayout,
-        SpreadAllocate,
-        SpreadLayout,
+        forward_clear_packed, forward_pull_packed, forward_push_packed, KeyPtr, PackedLayout,
+        SpreadAllocate, SpreadLayout,
     },
 };
-use ink_env::hash::{
-    CryptoHash,
-    HashOutput,
-};
+use ink_env::hash::{CryptoHash, HashOutput};
 use ink_primitives::Key;
 
 #[cfg(feature = "std")]
 const _: () = {
     use crate::{
         lazy::LazyHashMap,
-        traits::{
-            LayoutCryptoHasher,
-            StorageLayout,
-        },
+        traits::{LayoutCryptoHasher, StorageLayout},
     };
-    use ink_metadata::layout::{
-        FieldLayout,
-        Layout,
-        StructLayout,
-    };
+    use ink_metadata::layout::{FieldLayout, Layout, StructLayout};
     use scale_info::TypeInfo;
 
     impl<K, V, H> StorageLayout for StorageHashMap<K, V, H>
@@ -61,10 +43,7 @@ const _: () = {
     {
         fn layout(key_ptr: &mut KeyPtr) -> Layout {
             Layout::Struct(StructLayout::new([
-                FieldLayout::new(
-                    "keys",
-                    <StorageStash<K> as StorageLayout>::layout(key_ptr),
-                ),
+                FieldLayout::new("keys", <StorageStash<K> as StorageLayout>::layout(key_ptr)),
                 FieldLayout::new(
                     "values",
                     <LazyHashMap<K, ValueEntry<V>, H> as StorageLayout>::layout(key_ptr),

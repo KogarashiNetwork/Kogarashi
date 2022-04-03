@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    ast,
-    error::ExtError as _,
-    ir::config::WhitelistedAttributes,
-};
+use crate::{ast, error::ExtError as _, ir::config::WhitelistedAttributes};
 use syn::spanned::Spanned;
 
 /// The ink! configuration.
@@ -42,8 +38,7 @@ impl TraitDefinitionConfig {
     /// This is a test-only API.
     #[cfg(test)]
     pub fn with_namespace(mut self, namespace: &str) -> Self {
-        self.namespace =
-            Some(syn::LitStr::new(namespace, proc_macro2::Span::call_site()));
+        self.namespace = Some(syn::LitStr::new(namespace, proc_macro2::Span::call_site()));
         self
     }
 }
@@ -75,31 +70,31 @@ impl TryFrom<ast::AttributeArgs> for TraitDefinitionConfig {
         for arg in args.into_iter() {
             if arg.name.is_ident("namespace") {
                 if let Some((_, meta_name_value)) = namespace {
-                    return Err(duplicate_config_err(meta_name_value, arg, "namespace"))
+                    return Err(duplicate_config_err(meta_name_value, arg, "namespace"));
                 }
                 if let ast::PathOrLit::Lit(syn::Lit::Str(lit_str)) = &arg.value {
                     if syn::parse_str::<syn::Ident>(&lit_str.value()).is_err() {
                         return Err(format_err_spanned!(
                             lit_str,
                             "encountered invalid Rust identifier for the ink! namespace configuration parameter"
-                        ))
+                        ));
                     }
                     namespace = Some((lit_str.clone(), arg))
                 } else {
                     return Err(format_err_spanned!(
                         arg,
                         "expected a string literal for `namespace` ink! trait definition configuration argument",
-                    ))
+                    ));
                 }
             } else if arg.name.is_ident("keep_attr") {
                 if let Err(err) = whitelisted_attributes.parse_arg_value(&arg) {
-                    return Err(err)
+                    return Err(err);
                 }
             } else {
                 return Err(format_err_spanned!(
                     arg,
                     "encountered unknown or unsupported ink! trait definition configuration argument",
-                ))
+                ));
             }
         }
         Ok(TraitDefinitionConfig {

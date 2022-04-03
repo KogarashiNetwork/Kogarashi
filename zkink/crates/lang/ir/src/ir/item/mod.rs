@@ -18,16 +18,9 @@ mod storage;
 #[cfg(test)]
 mod tests;
 
-pub use self::{
-    event::Event,
-    storage::Storage,
-};
+pub use self::{event::Event, storage::Storage};
 
-use crate::{
-    error::ExtError as _,
-    ir,
-    ir::attrs::Attrs as _,
-};
+use crate::{error::ExtError as _, ir, ir::attrs::Attrs as _};
 use syn::spanned::Spanned as _;
 
 /// An item in the root of the ink! module ([`ir::ItemMod`](`crate::ir::ItemMod`)).
@@ -59,7 +52,7 @@ impl TryFrom<syn::Item> for Item {
         match item {
             syn::Item::Struct(item_struct) => {
                 if !ir::contains_ink_attributes(&item_struct.attrs) {
-                    return Ok(Self::Rust(item_struct.into()))
+                    return Ok(Self::Rust(item_struct.into()));
                 }
                 // At this point we know that there must be at least one ink!
                 // attribute. This can be either the ink! storage struct,
@@ -67,27 +60,21 @@ impl TryFrom<syn::Item> for Item {
                 let attr = ir::first_ink_attribute(&item_struct.attrs)?
                     .expect("missing expected ink! attribute for struct");
                 match attr.first().kind() {
-                    ir::AttributeArg::Storage => {
-                        <ir::Storage as TryFrom<_>>::try_from(item_struct)
-                            .map(Into::into)
-                            .map(Self::Ink)
-                    }
-                    ir::AttributeArg::Event => {
-                        <ir::Event as TryFrom<_>>::try_from(item_struct)
-                            .map(Into::into)
-                            .map(Self::Ink)
-                    }
-                    _invalid => {
-                        Err(format_err!(
-                            attr.span(),
-                            "encountered unsupported ink! attribute argument on struct",
-                        ))
-                    }
+                    ir::AttributeArg::Storage => <ir::Storage as TryFrom<_>>::try_from(item_struct)
+                        .map(Into::into)
+                        .map(Self::Ink),
+                    ir::AttributeArg::Event => <ir::Event as TryFrom<_>>::try_from(item_struct)
+                        .map(Into::into)
+                        .map(Self::Ink),
+                    _invalid => Err(format_err!(
+                        attr.span(),
+                        "encountered unsupported ink! attribute argument on struct",
+                    )),
                 }
             }
             syn::Item::Impl(item_impl) => {
                 if !ir::ItemImpl::is_ink_impl_block(&item_impl)? {
-                    return Ok(Self::Rust(item_impl.into()))
+                    return Ok(Self::Rust(item_impl.into()));
                 }
                 // At this point we know that there must be at least one ink!
                 // attribute on either the `impl` block itself or one of its items.
@@ -99,8 +86,7 @@ impl TryFrom<syn::Item> for Item {
                 // This is an error if the item contains any unexpected
                 // ink! attributes. Otherwise it is a normal Rust item.
                 if ir::contains_ink_attributes(item.attrs()) {
-                    let (ink_attrs, _) =
-                        ir::partition_attributes(item.attrs().iter().cloned())?;
+                    let (ink_attrs, _) = ir::partition_attributes(item.attrs().iter().cloned())?;
                     assert!(!ink_attrs.is_empty());
                     fn into_err(attr: &ir::InkAttribute) -> syn::Error {
                         format_err!(attr.span(), "encountered unexpected ink! attribute",)
@@ -108,7 +94,7 @@ impl TryFrom<syn::Item> for Item {
                     return Err(ink_attrs[1..]
                         .iter()
                         .map(into_err)
-                        .fold(into_err(&ink_attrs[0]), |fst, snd| fst.into_combine(snd)))
+                        .fold(into_err(&ink_attrs[0]), |fst, snd| fst.into_combine(snd)));
                 }
                 Ok(Self::Rust(item))
             }
@@ -183,12 +169,10 @@ impl InkItem {
                 if ir::Storage::is_ink_storage(item_struct)?
                     || ir::Event::is_ink_event(item_struct)?
                 {
-                    return Ok(true)
+                    return Ok(true);
                 }
             }
-            syn::Item::Impl(item_impl) => {
-                return ir::ItemImpl::is_ink_impl_block(item_impl)
-            }
+            syn::Item::Impl(item_impl) => return ir::ItemImpl::is_ink_impl_block(item_impl),
             _ => (),
         }
         Ok(false)

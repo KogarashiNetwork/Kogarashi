@@ -13,10 +13,7 @@
 // limitations under the License.
 
 use super::BitStash;
-use crate::traits::{
-    KeyPtr,
-    SpreadLayout,
-};
+use crate::traits::{KeyPtr, SpreadLayout};
 use ink_primitives::Key;
 
 cfg_if::cfg_if! {
@@ -151,8 +148,7 @@ fn spread_layout_clear_works() {
         let pulled = <BitStash as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
         assert_eq!(default, pulled);
         SpreadLayout::clear_spread(&pulled, &mut KeyPtr::from(root_key));
-        let invalid =
-            <BitStash as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
+        let invalid = <BitStash as SpreadLayout>::pull_spread(&mut KeyPtr::from(root_key));
         // We have to prevent calling its destructor since that would also panic but
         // in an uncontrollable way.
         let mut invalid = core::mem::ManuallyDrop::new(invalid);

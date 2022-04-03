@@ -14,10 +14,7 @@
 
 use ink_lang_codegen::generate_code;
 use ink_lang_ir::{
-    marker::{
-        SelectorBytes,
-        SelectorId,
-    },
+    marker::{SelectorBytes, SelectorId},
     SelectorMacro,
 };
 use proc_macro2::TokenStream as TokenStream2;

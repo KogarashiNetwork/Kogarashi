@@ -16,13 +16,6 @@ mod call_builder;
 mod trait_message;
 
 pub use self::{
-    call_builder::{
-        TraitCallBuilder,
-        TraitCallForwarder,
-        TraitCallForwarderFor,
-    },
-    trait_message::{
-        TraitMessagePayable,
-        TraitMessageSelector,
-    },
+    call_builder::{TraitCallBuilder, TraitCallForwarder, TraitCallForwarderFor},
+    trait_message::{TraitMessagePayable, TraitMessageSelector},
 };

@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::traits::{
-    KeyPtr,
-    PackedAllocate,
-    PackedLayout,
-    SpreadAllocate,
-    SpreadLayout,
-};
+use crate::traits::{KeyPtr, PackedAllocate, PackedLayout, SpreadAllocate, SpreadLayout};
 use ink_primitives::Key;
 
 macro_rules! impl_layout_for_tuple {

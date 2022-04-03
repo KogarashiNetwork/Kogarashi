@@ -20,11 +20,7 @@
 //! [`Reverse`] simply wraps [`core::cmp::Reverse`] and implements all the required traits for use
 //! as a storage struct.
 
-use crate::traits::{
-    KeyPtr,
-    PackedLayout,
-    SpreadLayout,
-};
+use crate::traits::{KeyPtr, PackedLayout, SpreadLayout};
 use ink_prelude::vec::Vec;
 use ink_primitives::Key;
 

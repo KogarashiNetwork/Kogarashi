@@ -13,21 +13,9 @@
 // limitations under the License.
 
 use super::max;
-use crate::traits::{
-    KeyPtr,
-    PackedAllocate,
-    PackedLayout,
-    SpreadAllocate,
-    SpreadLayout,
-};
-use ink_env::{
-    AccountId,
-    Hash,
-};
-use ink_prelude::{
-    boxed::Box,
-    string::String,
-};
+use crate::traits::{KeyPtr, PackedAllocate, PackedLayout, SpreadAllocate, SpreadLayout};
+use ink_env::{AccountId, Hash};
+use ink_prelude::{boxed::Box, string::String};
 use ink_primitives::Key;
 
 macro_rules! impl_layout_for_primitive {
@@ -161,8 +149,8 @@ where
         <T as SpreadLayout>::FOOTPRINT,
         <E as SpreadLayout>::FOOTPRINT,
     );
-    const REQUIRES_DEEP_CLEAN_UP: bool = <T as SpreadLayout>::REQUIRES_DEEP_CLEAN_UP
-        || <E as SpreadLayout>::REQUIRES_DEEP_CLEAN_UP;
+    const REQUIRES_DEEP_CLEAN_UP: bool =
+        <T as SpreadLayout>::REQUIRES_DEEP_CLEAN_UP || <E as SpreadLayout>::REQUIRES_DEEP_CLEAN_UP;
 
     fn pull_spread(ptr: &mut KeyPtr) -> Self {
         match <u8 as SpreadLayout>::pull_spread(ptr) {
@@ -295,10 +283,7 @@ mod tests {
     use ink_primitives::Key;
 
     push_pull_works_for_primitive!(bool, [false, true]);
-    push_pull_works_for_primitive!(
-        String,
-        [Default::default(), String::from("Hello, World!")]
-    );
+    push_pull_works_for_primitive!(String, [Default::default(), String::from("Hello, World!")]);
     push_pull_works_for_primitive!(
         Key,
         [
@@ -319,18 +304,12 @@ mod tests {
     push_pull_works_for_primitive!(i16, [0, Default::default(), 2, i16::MIN, i16::MAX]);
     push_pull_works_for_primitive!(i32, [0, Default::default(), 3, i32::MIN, i32::MAX]);
     push_pull_works_for_primitive!(i64, [0, Default::default(), 4, i64::MIN, i64::MAX]);
-    push_pull_works_for_primitive!(
-        i128,
-        [0, Default::default(), 5, i128::MIN, i128::MAX]
-    );
+    push_pull_works_for_primitive!(i128, [0, Default::default(), 5, i128::MIN, i128::MAX]);
     push_pull_works_for_primitive!(u8, [0, Default::default(), 10, u8::MIN, u8::MAX]);
     push_pull_works_for_primitive!(u16, [0, Default::default(), 20, u16::MIN, u16::MAX]);
     push_pull_works_for_primitive!(u32, [0, Default::default(), 30, u32::MIN, u32::MAX]);
     push_pull_works_for_primitive!(u64, [0, Default::default(), 40, u64::MIN, u64::MAX]);
-    push_pull_works_for_primitive!(
-        u128,
-        [0, Default::default(), 50, u128::MIN, u128::MAX]
-    );
+    push_pull_works_for_primitive!(u128, [0, Default::default(), 50, u128::MIN, u128::MAX]);
 
     type OptionU8 = Option<u8>;
     push_pull_works_for_primitive!(OptionU8, [Some(13u8), None]);

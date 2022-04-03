@@ -16,28 +16,13 @@
 
 use crate::serde_hex;
 #[cfg(not(feature = "std"))]
-use alloc::{
-    format,
-    vec,
-    vec::Vec,
-};
+use alloc::{format, vec, vec::Vec};
 use core::marker::PhantomData;
 use scale_info::{
-    form::{
-        Form,
-        MetaForm,
-        PortableForm,
-    },
-    meta_type,
-    IntoPortable,
-    Registry,
-    TypeInfo,
+    form::{Form, MetaForm, PortableForm},
+    meta_type, IntoPortable, Registry, TypeInfo,
 };
-use serde::{
-    de::DeserializeOwned,
-    Deserialize,
-    Serialize,
-};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 /// Describes a contract.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -318,10 +303,7 @@ impl ConstructorSpec {
 
 impl<P> ConstructorSpecBuilder<Missing<state::Selector>, P> {
     /// Sets the function selector of the message.
-    pub fn selector(
-        self,
-        selector: [u8; 4],
-    ) -> ConstructorSpecBuilder<state::Selector, P> {
+    pub fn selector(self, selector: [u8; 4]) -> ConstructorSpecBuilder<state::Selector, P> {
         ConstructorSpecBuilder {
             spec: ConstructorSpec {
                 selector: selector.into(),
@@ -334,10 +316,7 @@ impl<P> ConstructorSpecBuilder<Missing<state::Selector>, P> {
 
 impl<S> ConstructorSpecBuilder<S, Missing<state::IsPayable>> {
     /// Sets if the constructor is payable, thus accepting value for the caller.
-    pub fn payable(
-        self,
-        is_payable: bool,
-    ) -> ConstructorSpecBuilder<S, state::IsPayable> {
+    pub fn payable(self, is_payable: bool) -> ConstructorSpecBuilder<S, state::IsPayable> {
         ConstructorSpecBuilder {
             spec: ConstructorSpec {
                 payable: is_payable,
@@ -508,10 +487,7 @@ pub struct MessageSpecBuilder<Selector, Mutates, IsPayable, Returns> {
 
 impl<M, P, R> MessageSpecBuilder<Missing<state::Selector>, M, P, R> {
     /// Sets the function selector of the message.
-    pub fn selector(
-        self,
-        selector: [u8; 4],
-    ) -> MessageSpecBuilder<state::Selector, M, P, R> {
+    pub fn selector(self, selector: [u8; 4]) -> MessageSpecBuilder<state::Selector, M, P, R> {
         MessageSpecBuilder {
             spec: MessageSpec {
                 selector: selector.into(),
@@ -537,10 +513,7 @@ impl<S, P, R> MessageSpecBuilder<S, Missing<state::Mutates>, P, R> {
 
 impl<S, M, R> MessageSpecBuilder<S, M, Missing<state::IsPayable>, R> {
     /// Sets if the message is payable, thus accepting value for the caller.
-    pub fn payable(
-        self,
-        is_payable: bool,
-    ) -> MessageSpecBuilder<S, M, state::IsPayable, R> {
+    pub fn payable(self, is_payable: bool) -> MessageSpecBuilder<S, M, state::IsPayable, R> {
         MessageSpecBuilder {
             spec: MessageSpec {
                 payable: is_payable,
@@ -591,9 +564,7 @@ impl<S, M, P, R> MessageSpecBuilder<S, M, P, R> {
     }
 }
 
-impl
-    MessageSpecBuilder<state::Selector, state::Mutates, state::IsPayable, state::Returns>
-{
+impl MessageSpecBuilder<state::Selector, state::Mutates, state::IsPayable, state::Returns> {
     /// Finishes construction of the message.
     pub fn done(self) -> MessageSpec {
         self.spec
@@ -849,8 +820,7 @@ impl TypeSpec {
     {
         Self {
             ty: meta_type::<T>(),
-            display_name: DisplayName::from_segments(segments)
-                .expect("display name is invalid"),
+            display_name: DisplayName::from_segments(segments).expect("display name is invalid"),
         }
     }
 

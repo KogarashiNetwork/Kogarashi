@@ -13,10 +13,7 @@
 // limitations under the License.
 
 use crate::call::Selector;
-use ink_prelude::{
-    vec,
-    vec::Vec,
-};
+use ink_prelude::{vec, vec::Vec};
 
 /// The raw ABI respecting input data to a call.
 ///
@@ -80,9 +77,7 @@ impl scale::Encode for CallData {
 }
 
 impl scale::Decode for CallData {
-    fn decode<I: scale::Input>(
-        input: &mut I,
-    ) -> core::result::Result<Self, scale::Error> {
+    fn decode<I: scale::Input>(input: &mut I) -> core::result::Result<Self, scale::Error> {
         let remaining_len = input.remaining_len().unwrap_or(None).unwrap_or(0);
         let mut bytes = Vec::with_capacity(remaining_len);
         while let Ok(byte) = input.read_byte() {
@@ -91,7 +86,7 @@ impl scale::Decode for CallData {
         if bytes.len() < 4 {
             return Err(scale::Error::from(
                 "require at least 4 bytes for input data",
-            ))
+            ));
         }
         Ok(Self { bytes })
     }

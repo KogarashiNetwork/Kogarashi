@@ -21,10 +21,7 @@
 //! We will request new pages of memory as needed until we run out of memory, at which point we
 //! will crash with an `OOM` error instead of freeing any memory.
 
-use core::alloc::{
-    GlobalAlloc,
-    Layout,
-};
+use core::alloc::{GlobalAlloc, Layout};
 
 /// A page in Wasm is `64KiB`
 const PAGE_SIZE: usize = 64 * 1024;
@@ -160,8 +157,7 @@ mod tests {
         let layout = Layout::new::<()>();
         assert_eq!(inner.alloc(layout), Some(0));
 
-        let expected_limit =
-            PAGE_SIZE * required_pages(layout.pad_to_align().size()).unwrap();
+        let expected_limit = PAGE_SIZE * required_pages(layout.pad_to_align().size()).unwrap();
         assert_eq!(inner.upper_limit, expected_limit);
 
         let expected_alloc_start = size_of::<()>();
@@ -175,8 +171,7 @@ mod tests {
         let layout = Layout::new::<u8>();
         assert_eq!(inner.alloc(layout), Some(0));
 
-        let expected_limit =
-            PAGE_SIZE * required_pages(layout.pad_to_align().size()).unwrap();
+        let expected_limit = PAGE_SIZE * required_pages(layout.pad_to_align().size()).unwrap();
         assert_eq!(inner.upper_limit, expected_limit);
 
         let expected_alloc_start = size_of::<u8>();
@@ -221,8 +216,7 @@ mod tests {
         let layout = Layout::new::<Foo>();
         assert_eq!(inner.alloc(layout), Some(0));
 
-        let expected_limit =
-            PAGE_SIZE * required_pages(layout.pad_to_align().size()).unwrap();
+        let expected_limit = PAGE_SIZE * required_pages(layout.pad_to_align().size()).unwrap();
         assert_eq!(inner.upper_limit, expected_limit);
 
         let expected_alloc_start = size_of::<Foo>();
@@ -252,8 +246,7 @@ mod tests {
         let layout = Layout::new::<Foo>();
         assert_eq!(inner.alloc(layout), Some(0));
 
-        let expected_limit =
-            PAGE_SIZE * required_pages(layout.pad_to_align().size()).unwrap();
+        let expected_limit = PAGE_SIZE * required_pages(layout.pad_to_align().size()).unwrap();
         assert_eq!(inner.upper_limit, expected_limit);
 
         let expected_alloc_start = size_of::<Foo>();
@@ -275,10 +268,7 @@ mod tests {
 #[cfg(all(test, feature = "ink-fuzz-tests"))]
 mod fuzz_tests {
     use super::*;
-    use quickcheck::{
-        quickcheck,
-        TestResult,
-    };
+    use quickcheck::{quickcheck, TestResult};
     use std::mem::size_of;
 
     const FROM_SIZE_ALIGN_EXPECT: &str =
@@ -291,13 +281,12 @@ mod fuzz_tests {
         // If `n` is going to overflow we don't want to check it here (we'll check the overflow
         // case in another test)
         if n.checked_add(PAGE_SIZE - 1).is_none() {
-            return TestResult::discard()
+            return TestResult::discard();
         }
 
         let mut inner = InnerAlloc::new();
 
-        let layout =
-            Layout::from_size_align(n, size_of::<usize>()).expect(FROM_SIZE_ALIGN_EXPECT);
+        let layout = Layout::from_size_align(n, size_of::<usize>()).expect(FROM_SIZE_ALIGN_EXPECT);
 
         let size = layout.pad_to_align().size();
         assert_eq!(
@@ -325,7 +314,7 @@ mod fuzz_tests {
     fn should_not_allocate_arbitrary_bytes_if_they_overflow(n: usize) -> TestResult {
         // In the previous test we ignored the overflow case, now we ignore the valid cases
         if n.checked_add(PAGE_SIZE - 1).is_some() {
-            return TestResult::discard()
+            return TestResult::discard();
         }
 
         if let Ok(layout) = Layout::from_size_align(n, size_of::<usize>()) {
@@ -344,17 +333,14 @@ mod fuzz_tests {
     }
 
     #[quickcheck]
-    fn should_allocate_regardless_of_alignment_size(
-        n: usize,
-        align: usize,
-    ) -> TestResult {
+    fn should_allocate_regardless_of_alignment_size(n: usize, align: usize) -> TestResult {
         let aligns = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512];
         let align = aligns[align % aligns.len()];
 
         // If `n` is going to overflow we don't want to check it here (we'll check the overflow
         // case in another test)
         if n.checked_add(PAGE_SIZE - 1).is_none() {
-            return TestResult::discard()
+            return TestResult::discard();
         }
 
         let mut inner = InnerAlloc::new();
@@ -396,7 +382,7 @@ mod fuzz_tests {
         let mut inner = InnerAlloc::new();
 
         if sequence.is_empty() {
-            return TestResult::discard()
+            return TestResult::discard();
         }
 
         // We want to make sure no single allocation is going to overflow, we'll check this
@@ -405,7 +391,7 @@ mod fuzz_tests {
             .iter()
             .all(|n| n.checked_add(PAGE_SIZE - 1).is_some())
         {
-            return TestResult::discard()
+            return TestResult::discard();
         }
 
         // We can't just use `required_pages(Iterator::sum())` here because it ends up
@@ -418,7 +404,7 @@ mod fuzz_tests {
         // We know this is going to end up overflowing, we'll check this case in a different
         // test
         if pages_required > max_pages {
-            return TestResult::discard()
+            return TestResult::discard();
         }
 
         let mut expected_alloc_start = 0;
@@ -426,8 +412,8 @@ mod fuzz_tests {
         let mut total_bytes_fragmented = 0;
 
         for alloc in sequence {
-            let layout = Layout::from_size_align(alloc, size_of::<usize>())
-                .expect(FROM_SIZE_ALIGN_EXPECT);
+            let layout =
+                Layout::from_size_align(alloc, size_of::<usize>()).expect(FROM_SIZE_ALIGN_EXPECT);
             let size = layout.pad_to_align().size();
 
             let current_page_limit = PAGE_SIZE * required_pages(inner.next).unwrap();
@@ -478,7 +464,7 @@ mod fuzz_tests {
         let mut inner = InnerAlloc::new();
 
         if sequence.is_empty() {
-            return TestResult::discard()
+            return TestResult::discard();
         }
 
         // We want to make sure no single allocation is going to overflow, we'll check that
@@ -487,7 +473,7 @@ mod fuzz_tests {
             .iter()
             .all(|n| n.checked_add(PAGE_SIZE - 1).is_some())
         {
-            return TestResult::discard()
+            return TestResult::discard();
         }
 
         // We can't just use `required_pages(Iterator::sum())` here because it ends up
@@ -500,13 +486,13 @@ mod fuzz_tests {
         // We want to explicitly test for the case where a series of allocations eventually
         // runs out of pages of memory
         if !(pages_required > max_pages) {
-            return TestResult::discard()
+            return TestResult::discard();
         }
 
         let mut results = vec![];
         for alloc in sequence {
-            let layout = Layout::from_size_align(alloc, size_of::<usize>())
-                .expect(FROM_SIZE_ALIGN_EXPECT);
+            let layout =
+                Layout::from_size_align(alloc, size_of::<usize>()).expect(FROM_SIZE_ALIGN_EXPECT);
             results.push(inner.alloc(layout));
         }
 

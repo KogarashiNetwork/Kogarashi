@@ -43,13 +43,8 @@ mod trait_def;
 
 pub use self::{
     arg_list::{
-        generate_argument_list,
-        generate_reference_to_trait_info,
-        input_bindings,
-        input_bindings_tuple,
-        input_types,
-        input_types_tuple,
-        output_ident,
+        generate_argument_list, generate_reference_to_trait_info, input_bindings,
+        input_bindings_tuple, input_types, input_types_tuple, output_ident,
     },
     as_dependency::ContractReference,
     blake2b::Blake2x256,
@@ -61,10 +56,7 @@ pub use self::{
     ink_test::InkTest,
     item_impls::ItemImpls,
     metadata::Metadata,
-    selector::{
-        SelectorBytes,
-        SelectorId,
-    },
+    selector::{SelectorBytes, SelectorId},
     storage::Storage,
     trait_def::TraitDefinition,
 };

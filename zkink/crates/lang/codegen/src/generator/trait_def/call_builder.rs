@@ -13,19 +13,10 @@
 // limitations under the License.
 
 use super::TraitDefinition;
-use crate::{
-    generator,
-    traits::GenerateCode,
-};
+use crate::{generator, traits::GenerateCode};
 use derive_more::From;
-use proc_macro2::{
-    Span,
-    TokenStream as TokenStream2,
-};
-use quote::{
-    quote,
-    quote_spanned,
-};
+use proc_macro2::{Span, TokenStream as TokenStream2};
+use quote::{quote, quote_spanned};
 
 impl<'a> TraitDefinition<'a> {
     /// Generates code for the global trait call builder for an ink! trait.
@@ -337,13 +328,15 @@ impl CallBuilder<'_> {
 
     /// Generate the code for all ink! trait messages implemented by the trait call builder.
     fn generate_ink_trait_impl_messages(&self) -> TokenStream2 {
-        let messages = self.trait_def.trait_def.item().iter_items().filter_map(
-            |(item, selector)| {
-                item.filter_map_message().map(|message| {
-                    self.generate_ink_trait_impl_for_message(&message, selector)
-                })
-            },
-        );
+        let messages =
+            self.trait_def
+                .trait_def
+                .item()
+                .iter_items()
+                .filter_map(|(item, selector)| {
+                    item.filter_map_message()
+                        .map(|message| self.generate_ink_trait_impl_for_message(&message, selector))
+                });
         quote! {
             #( #messages )*
         }
@@ -365,8 +358,7 @@ impl CallBuilder<'_> {
             .filter_attr(message.attrs());
         let output_ident = generator::output_ident(message_ident);
         let output = message.output();
-        let output_type =
-            output.map_or_else(|| quote! { () }, |output| quote! { #output });
+        let output_type = output.map_or_else(|| quote! { () }, |output| quote! { #output });
         let selector_bytes = selector.hex_lits();
         let input_bindings = generator::input_bindings(message.inputs());
         let input_types = generator::input_types(message.inputs());

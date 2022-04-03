@@ -21,24 +21,14 @@
 
 use super::TraitDefinition;
 use crate::{
-    generator::{self,},
+    generator::{self},
     traits::GenerateCode,
     EnforcedErrors,
 };
 use derive_more::From;
-use proc_macro2::{
-    Span,
-    TokenStream as TokenStream2,
-};
-use quote::{
-    format_ident,
-    quote,
-    quote_spanned,
-};
-use syn::{
-    parse_quote,
-    spanned::Spanned,
-};
+use proc_macro2::{Span, TokenStream as TokenStream2};
+use quote::{format_ident, quote, quote_spanned};
+use syn::{parse_quote, spanned::Spanned};
 
 impl<'a> TraitDefinition<'a> {
     /// Generates the code for the global trait registry implementation.
@@ -120,12 +110,15 @@ impl TraitRegistry<'_> {
 
     /// Generate the code for all ink! trait messages implemented by the trait registry.
     fn generate_registry_messages(&self) -> TokenStream2 {
-        let messages = self.trait_def.trait_def.item().iter_items().filter_map(
-            |(item, selector)| {
-                item.filter_map_message()
-                    .map(|message| self.generate_registry_for_message(&message, selector))
-            },
-        );
+        let messages =
+            self.trait_def
+                .trait_def
+                .item()
+                .iter_items()
+                .filter_map(|(item, selector)| {
+                    item.filter_map_message()
+                        .map(|message| self.generate_registry_for_message(&message, selector))
+                });
         quote! {
             #( #messages )*
         }
@@ -174,8 +167,7 @@ impl TraitRegistry<'_> {
             .cloned()
             .unwrap_or_else(|| parse_quote! { () });
         let mut_token = message.receiver().is_ref_mut().then(|| quote! { mut });
-        let (input_bindings, input_types) =
-            Self::input_bindings_and_types(message.inputs());
+        let (input_bindings, input_types) = Self::input_bindings_and_types(message.inputs());
         let linker_error_ident = EnforcedErrors::cannot_call_trait_message(
             self.trait_ident(),
             message.ident(),
@@ -223,9 +215,7 @@ impl TraitRegistry<'_> {
     }
 
     /// Returns a pair of input bindings `__ink_bindings_N` and types.
-    fn input_bindings_and_types(
-        inputs: ir::InputsIter,
-    ) -> (Vec<syn::Ident>, Vec<&syn::Type>) {
+    fn input_bindings_and_types(inputs: ir::InputsIter) -> (Vec<syn::Ident>, Vec<&syn::Type>) {
         inputs
             .enumerate()
             .map(|(n, pat_type)| {
@@ -300,13 +290,16 @@ impl TraitRegistry<'_> {
     /// ink! messages defined by the ink! trait definition.
     fn generate_info_for_trait_messages(&self) -> TokenStream2 {
         let span = self.span();
-        let message_impls = self.trait_def.trait_def.item().iter_items().filter_map(
-            |(trait_item, selector)| {
-                trait_item.filter_map_message().map(|message| {
-                    self.generate_info_for_trait_for_message(&message, selector)
-                })
-            },
-        );
+        let message_impls =
+            self.trait_def
+                .trait_def
+                .item()
+                .iter_items()
+                .filter_map(|(trait_item, selector)| {
+                    trait_item
+                        .filter_map_message()
+                        .map(|message| self.generate_info_for_trait_for_message(&message, selector))
+                });
         quote_spanned!(span=>
             #( #message_impls )*
         )

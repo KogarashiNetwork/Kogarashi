@@ -206,9 +206,7 @@ macro_rules! fuzz_storage {
 pub fn assert_storage_clean() {
     let contract_id = ink_env::test::callee::<ink_env::DefaultEnvironment>();
     let used_cells =
-        ink_env::test::count_used_storage_cells::<ink_env::DefaultEnvironment>(
-            &contract_id,
-        )
-        .expect("used cells must be returned");
+        ink_env::test::count_used_storage_cells::<ink_env::DefaultEnvironment>(&contract_id)
+            .expect("used cells must be returned");
     assert_eq!(used_cells, 0);
 }

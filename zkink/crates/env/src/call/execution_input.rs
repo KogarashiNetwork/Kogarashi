@@ -35,10 +35,7 @@ impl ExecutionInput<EmptyArgumentList> {
 
     /// Pushes an argument to the execution input.
     #[inline]
-    pub fn push_arg<T>(
-        self,
-        arg: T,
-    ) -> ExecutionInput<ArgumentList<Argument<T>, EmptyArgumentList>>
+    pub fn push_arg<T>(self, arg: T) -> ExecutionInput<ArgumentList<Argument<T>, EmptyArgumentList>>
     where
         T: scale::Encode,
     {
@@ -242,8 +239,7 @@ mod tests {
             .push_arg(&[0x66u8; 4]);
         let encoded = scale::Encode::encode(&empty_list);
         assert!(!encoded.is_empty());
-        let decoded =
-            <(i32, bool, [u8; 4]) as scale::Decode>::decode(&mut &encoded[..]).unwrap();
+        let decoded = <(i32, bool, [u8; 4]) as scale::Decode>::decode(&mut &encoded[..]).unwrap();
         assert_eq!(decoded, (42i32, true, [0x66; 4]));
     }
 }

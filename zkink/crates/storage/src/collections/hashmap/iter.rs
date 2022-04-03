@@ -14,18 +14,11 @@
 
 use super::ValueEntry;
 use crate::{
-    collections::{
-        extend_lifetime,
-        stash::Iter as StashIter,
-        HashMap as StorageHashMap,
-    },
+    collections::{extend_lifetime, stash::Iter as StashIter, HashMap as StorageHashMap},
     lazy::LazyHashMap,
     traits::PackedLayout,
 };
-use ink_env::hash::{
-    CryptoHash,
-    HashOutput,
-};
+use ink_env::hash::{CryptoHash, HashOutput};
 use ink_primitives::Key;
 
 /// An iterator over shared references to the elements of a storage hash map.

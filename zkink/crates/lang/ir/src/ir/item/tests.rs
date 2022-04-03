@@ -73,8 +73,7 @@ fn simple_rust_item_works() {
     ];
     for rust_item in rust_items {
         assert_eq!(
-            <ir::Item as TryFrom<_>>::try_from(rust_item.clone())
-                .map_err(|err| err.to_string()),
+            <ir::Item as TryFrom<_>>::try_from(rust_item.clone()).map_err(|err| err.to_string()),
             Ok(ir::Item::Rust(rust_item))
         )
     }

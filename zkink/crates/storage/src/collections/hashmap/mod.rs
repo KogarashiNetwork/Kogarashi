@@ -24,32 +24,17 @@ mod tests;
 #[cfg(all(test, feature = "ink-fuzz-tests"))]
 mod fuzz_tests;
 
-pub use self::iter::{
-    Iter,
-    IterMut,
-    Keys,
-    Values,
-    ValuesMut,
-};
+pub use self::iter::{Iter, IterMut, Keys, Values, ValuesMut};
 use crate::{
     collections::Stash,
     lazy::lazy_hmap::{
-        Entry as LazyEntry,
-        LazyHashMap,
-        OccupiedEntry as LazyOccupiedEntry,
+        Entry as LazyEntry, LazyHashMap, OccupiedEntry as LazyOccupiedEntry,
         VacantEntry as LazyVacantEntry,
     },
     traits::PackedLayout,
 };
-use core::{
-    borrow::Borrow,
-    cmp::Eq,
-};
-use ink_env::hash::{
-    Blake2x256,
-    CryptoHash,
-    HashOutput,
-};
+use core::{borrow::Borrow, cmp::Eq};
+use ink_env::hash::{Blake2x256, CryptoHash, HashOutput};
 use ink_prelude::borrow::ToOwned;
 use ink_primitives::Key;
 
@@ -244,7 +229,7 @@ where
         if self.values.key().is_none() {
             // We won't clear any storage if we are in lazy state since there
             // probably has not been any state written to storage, yet.
-            return
+            return;
         }
         for key in self.keys() {
             // It might seem wasteful to clear all entries instead of just
@@ -280,7 +265,7 @@ where
         if let Some(occupied) = self.values.get_mut(&key) {
             // Update value, don't update key.
             let old_value = core::mem::replace(&mut occupied.value, new_value);
-            return Some(old_value)
+            return Some(old_value);
         }
         // At this point we know that `key` does not yet exist in the map.
         let key_index = self.keys.put(key.to_owned());
@@ -374,7 +359,7 @@ where
         if let Some(0) = max_iterations {
             // Bail out early if the iteration limit is set to 0 anyways to
             // completely avoid doing work in this case.
-            return 0
+            return 0;
         }
         let len_vacant = self.keys.capacity() - self.keys.len();
         let max_iterations = max_iterations.unwrap_or(len_vacant);
@@ -391,18 +376,14 @@ where
     pub fn entry(&mut self, key: K) -> Entry<K, V> {
         let entry = self.values.entry(key);
         match entry {
-            LazyEntry::Occupied(o) => {
-                Entry::Occupied(OccupiedEntry {
-                    keys: &mut self.keys,
-                    values_entry: o,
-                })
-            }
-            LazyEntry::Vacant(v) => {
-                Entry::Vacant(VacantEntry {
-                    keys: &mut self.keys,
-                    values_entry: v,
-                })
-            }
+            LazyEntry::Occupied(o) => Entry::Occupied(OccupiedEntry {
+                keys: &mut self.keys,
+                values_entry: o,
+            }),
+            LazyEntry::Vacant(v) => Entry::Vacant(VacantEntry {
+                keys: &mut self.keys,
+                values_entry: v,
+            }),
         }
     }
 }

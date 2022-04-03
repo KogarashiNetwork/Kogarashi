@@ -14,40 +14,20 @@
 
 //! Implementation of ink! storage traits.
 
-use super::{
-    Entry,
-    Header,
-    Stash as StorageStash,
-};
+use super::{Entry, Header, Stash as StorageStash};
 use crate::{
     lazy::LazyIndexMap,
     traits::{
-        forward_allocate_packed,
-        forward_clear_packed,
-        forward_pull_packed,
-        forward_push_packed,
-        KeyPtr,
-        PackedAllocate,
-        PackedLayout,
-        SpreadAllocate,
-        SpreadLayout,
+        forward_allocate_packed, forward_clear_packed, forward_pull_packed, forward_push_packed,
+        KeyPtr, PackedAllocate, PackedLayout, SpreadAllocate, SpreadLayout,
     },
 };
 use ink_primitives::Key;
 
 #[cfg(feature = "std")]
 const _: () = {
-    use crate::{
-        collections::Vec as StorageVec,
-        traits::StorageLayout,
-    };
-    use ink_metadata::layout::{
-        CellLayout,
-        FieldLayout,
-        Layout,
-        LayoutKey,
-        StructLayout,
-    };
+    use crate::{collections::Vec as StorageVec, traits::StorageLayout};
+    use ink_metadata::layout::{CellLayout, FieldLayout, Layout, LayoutKey, StructLayout};
     use scale_info::TypeInfo;
 
     impl StorageLayout for Header {
