@@ -64,6 +64,27 @@ impl Fft {
     }
 }
 
+pub fn bit_reverse_indexes(k: usize) -> Vec<(usize, usize)> {
+    let n = (1 << k) as usize;
+    let mut indexes = Vec::with_capacity(n / 2);
+    for i in 0..n {
+        let ri = bit_reverse(i, k);
+        if i < ri {
+            indexes.push((ri, i));
+        }
+    }
+    indexes
+}
+
+fn bit_reverse(mut i: usize, k: usize) -> usize {
+    let mut r = 0;
+    for _ in 0..k {
+        r = (r << 1) | (i & 1);
+        i >>= 1;
+    }
+    r
+}
+
 #[cfg(test)]
 mod fft_tests {
     use super::*;

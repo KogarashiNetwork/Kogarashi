@@ -14,15 +14,15 @@ The **Zero Network** is the `substrate-based` blockchain and that transaction in
 **We are in research and development phase and this is alpha quality software. Please use at your own risk**. We are supporting the confidential transactions for transfers and contracts executions. We are focusing on ensuring the `security assumption` and `privacy system` so after the research amd development phase, we are going to improve the performance by optimization of bytecode and libraries. We are also planning to support the `anonymous` transactions and `rollup` transactions.
 
 ## Directory Structure
-- node  
+- `node`  
 The blockchain implementation.
-- primitive  
+- `primitive`  
 The primitive components implementation.
-- pallets  
+- `pallets`  
 The `pallet` implementations which are used in blockchain.
-- snarks  
+- `snarks`  
 The [`Polkadot`](https://polkadot.network/) friendly and high performance `plonk` research and development.
-- zkink
+- `zkink`  
 The [`Substrate`](https://substrate.io/) privacy preserving smart contract `eDSL` and compiler forked from [`ink!`](https://github.com/paritytech/ink/tree/v3.0.0).
 
 ## Test
