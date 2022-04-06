@@ -4,28 +4,28 @@ use crate::fr::MODULUS;
 use super::utils::mac;
 const INV: u64 = 0x1ba3a358ef788ef9;
 
-pub(crate) fn add(a: &mut [u64; 4], b: &[u64; 4]) -> [u64; 4] {
-    let mut c = 0;
-    for (a, b) in a.iter_mut().zip(b.iter()) {
-        *a = adc(*a, *b, &mut c)
-    }
-    *a
+pub(crate) const fn add(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
+    let (l0, c) = adc(a[0], b[0], 0);
+    let (l1, c) = adc(a[1], b[1], c);
+    let (l2, c) = adc(a[2], b[2], c);
+    let (l3, _) = adc(a[3], b[3], c);
+    [l0, l1, l2, l3]
 }
 
-pub(crate) fn sub(a: &mut [u64; 4], b: &[u64; 4]) -> [u64; 4] {
-    let mut c = 0;
-    for (a, b) in a.iter_mut().zip(b.iter()) {
-        *a = sbb(*a, *b, &mut c)
-    }
-    *a
+pub(crate) const fn sub(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
+    let (l0, c) = sbb(a[0], b[0], 0);
+    let (l1, c) = sbb(a[1], b[1], c);
+    let (l2, c) = sbb(a[2], b[2], c);
+    let (l3, _) = sbb(a[3], b[3], c);
+    [l0, l1, l2, l3]
 }
 
-pub(crate) fn double(a: &mut [u64; 4]) -> [u64; 4] {
-    let mut c = 0;
-    for a in a.iter_mut() {
-        *a = adc(*a, *a, &mut c)
-    }
-    *a
+pub(crate) const fn double(a: &[u64; 4]) -> [u64; 4] {
+    let (l0, c) = adc(a[0], a[0], 0);
+    let (l1, c) = adc(a[1], a[1], c);
+    let (l2, c) = adc(a[2], a[2], c);
+    let (l3, _) = adc(a[3], a[3], c);
+    [l0, l1, l2, l3]
 }
 
 pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
@@ -34,24 +34,19 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     let r1 = mac(0, a[0], b[1], &mut d);
     let r2 = mac(0, a[0], b[2], &mut d);
     let r3 = mac(0, a[0], b[3], &mut d);
-    let r4 = mac(0, a[0], b[4], &mut d);
-    let r5 = mac(0, a[0], b[5], &mut d);
-    let r6 = d;
+    let r4 = d;
     let mut d = 0;
     let r1 = mac(r1, a[1], b[0], &mut d);
     let r2 = mac(r2, a[1], b[1], &mut d);
     let r3 = mac(r3, a[1], b[2], &mut d);
     let r4 = mac(r4, a[1], b[3], &mut d);
-    let r5 = mac(r5, a[1], b[4], &mut d);
-    let r6 = mac(r6, a[1], b[5], &mut d);
-    let r7 = d;
+    let r5 = d;
     let mut d = 0;
     let r2 = mac(r2, a[2], b[0], &mut d);
     let r3 = mac(r3, a[2], b[1], &mut d);
     let r4 = mac(r4, a[2], b[2], &mut d);
-    let r5 = mac(r5, a[2], b[3], &mut d);
-    let r6 = mac(r6, a[2], b[4], &mut d);
-    let r7 = mac(r7, a[2], b[5], &mut d);
+    let r6 = mac(r5, a[2], b[3], &mut d);
+    let r7 = d;
     mont(&mut [r0, r1, r2, r3, r4, r5, r6, r7])
 }
 
