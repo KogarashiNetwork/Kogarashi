@@ -8,7 +8,9 @@ license = "Apache-2.0"
 
 [dependencies]
 zero-jubjub = { version = "0.1", default-features = false, path = "./primitive/jubjub" }
+zero-elgamal = { version = "0.1", default-features = false, path = "./primitive/elgamal" }
 zero-plonk = { version = "0.1", default-features = false, path = "./snarks/plonk" }
+zero-poly = { version = "0.1", default-features = false, path = "./snarks/poly" }
 pallet-confidential-transfer = { version = "0.1", default-features = false, path = "./pallets/confidential_transfer" }
 rand_core = { version = "0.5", features = ["std"] }
 
@@ -20,6 +22,7 @@ rand_core = "0.6"
 [workspace]
 members = [
     "primitive/jubjub",
+    "primitive/elgamal",
     "snarks/plonk",
     "snarks/poly",
     "pallets/confidential_transfer"

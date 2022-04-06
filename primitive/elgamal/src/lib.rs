@@ -21,3 +21,34 @@
 //! This library is implemented based on [original paper](https://github.com/herumi/mcl/blob/master/misc/she/she.pdf).
 
 #![cfg_attr(not(feature = "std"), no_std)]
+
+use parity_scale_codec::{Decode, Encode};
+
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct Ciphertext {}
+
+impl Ciphertext {
+    pub fn new() -> Self {
+        Ciphertext {}
+    }
+
+    pub fn zero() -> Self {
+        Ciphertext {}
+    }
+
+    pub fn encrypt() -> Self {
+        Ciphertext {}
+    }
+
+    pub fn decrypt() -> Self {
+        Ciphertext {}
+    }
+
+    pub fn add(&self, other: &Self) -> Self {
+        Ciphertext {}
+    }
+
+    pub fn sub(&self, other: &Self) -> Self {
+        Ciphertext {}
+    }
+}
