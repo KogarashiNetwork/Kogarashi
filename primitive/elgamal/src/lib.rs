@@ -13,6 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! # Lifted-ElGamal Pallet
+//!
+//! ## Overview
+//!
+//! This is the additive homomorphic encryption which supports one-time multiplication.
+//! This library is implemented based on [original paper](https://github.com/herumi/mcl/blob/master/misc/she/she.pdf).
+
 #![cfg_attr(not(feature = "std"), no_std)]
-
-
