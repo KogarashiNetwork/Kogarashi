@@ -1,4 +1,5 @@
 use crate::fr::MODULUS;
+use core::arch::asm;
 
 pub(crate) fn add(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     let mut r0: u64;
