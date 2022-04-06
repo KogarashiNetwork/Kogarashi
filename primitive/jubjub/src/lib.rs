@@ -17,8 +17,10 @@
 #![allow(dead_code)]
 
 mod arithmetic;
+mod curve;
 mod error;
 mod fr;
 mod operation;
+mod pairing;
 
 pub use fr::Fr;
