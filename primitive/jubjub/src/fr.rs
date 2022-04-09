@@ -13,7 +13,7 @@ use rand_core::RngCore;
 #[allow(unused_imports)]
 use libc_print::libc_println as println;
 
-pub(crate) const MODULUS: &[u64; 4] = &[
+pub(crate) const MODULUS: [u64; 4] = [
     0xd0970e5ed6f72cb7,
     0xa6682093ccc81082,
     0x06673b0101343b00,
@@ -21,7 +21,7 @@ pub(crate) const MODULUS: &[u64; 4] = &[
 ];
 
 /// R = 2^256 mod r
-const R: &[u64; 4] = &[
+const R: [u64; 4] = [
     0x25f80bb3b99607d9,
     0xf315d62f66b6e750,
     0x932514eeeb8814f4,
@@ -45,6 +45,15 @@ const R3: &[u64; 4] = &[
 ];
 
 pub(crate) const INV: u64 = 0x1ba3a358ef788ef9;
+
+const S: u32 = 1;
+
+const ROOT_OF_UNITY: &[u64; 4] = &[
+    0xaa9f02ab1d6124de,
+    0xb3524a6466112932,
+    0x7342261215ac260b,
+    0x4d6b87b1da259e2,
+];
 
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct Fr(pub(crate) [u64; 4]);
@@ -179,7 +188,7 @@ mod fr_tests {
             initial_seeds[index] = seed;
             let rng = XorShiftRng::from_seed(initial_seeds);
             let randomness = Fr::random(rng);
-            assert!(randomness < Fr(*MODULUS))
+            assert!(randomness < Fr(MODULUS))
         }
     }
 
@@ -215,7 +224,7 @@ mod fr_tests {
         let mut b =
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
                 .unwrap();
-        b.add_assign(Fr(*MODULUS));
+        b.add_assign(Fr(MODULUS));
         assert_eq!(
             b,
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
@@ -251,7 +260,7 @@ mod fr_tests {
         let mut b =
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
                 .unwrap();
-        b.sub_assign(Fr(*MODULUS));
+        b.sub_assign(Fr(MODULUS));
         assert_eq!(
             b,
             Fr::from_hex("0x0a85fa9c9fef6326f04bc41062fd73229abac9e4157b61727e7140b5196b9e6f")
