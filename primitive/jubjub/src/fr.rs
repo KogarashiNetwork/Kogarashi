@@ -1,6 +1,7 @@
 use crate::arithmetic::{add, double, mul, neg, square, sub};
 use crate::error::Error;
 use crate::operation::field_operation;
+use crate::pairing::PrimeField;
 use core::{
     cmp::Ordering,
     fmt::{Display, Formatter, Result as FmtResult},
@@ -167,6 +168,16 @@ impl Fr {
             }
         }
         Ok(res)
+    }
+}
+
+impl PrimeField for Fr {
+    const BITS: u32 = 252;
+
+    const S: u32 = S;
+
+    fn root_of_unity() -> Self {
+        Self(*ROOT_OF_UNITY)
     }
 }
 
@@ -350,5 +361,12 @@ mod fr_tests {
         assert_eq!(a > b, false);
         assert_eq!(a != b, true);
         assert_eq!(a == b, false);
+    }
+
+    #[test]
+    fn test_root_of_unity() {
+        let mut root_of_unity = Fr::root_of_unity();
+        root_of_unity.square_assign();
+        assert_eq!(root_of_unity, Fr::one());
     }
 }
