@@ -1,17 +1,17 @@
-use super::field::PrimeField;
+use super::cordinate::CurveAffine;
+use super::field::{Field, PrimeField};
 
 /// `Fr` and `Curve` necessary for pairing
 pub trait Engine {
     type Fr: PrimeField;
-}
 
-/// Curve affine cordinate
-pub trait CurveAffine {
-    type Engine: Engine;
+    type G1Affine: CurveAffine;
 
-    fn zero() -> Self;
+    type G2Affine: CurveAffine;
 
-    fn one() -> Self;
+    type Fq: PrimeField;
 
-    fn is_zero(&self) -> bool;
+    type Fqk: Field;
+
+    fn pairing() -> Self::Fqk;
 }
