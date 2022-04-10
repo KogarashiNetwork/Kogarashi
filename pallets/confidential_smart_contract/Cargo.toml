@@ -1,25 +1,11 @@
-[workspace]
-resolver = "2"
-members = [
-    "crates/metadata",
-    "crates/allocator",
-    "crates/lang",
-    "crates/lang/macro",
-    "crates/lang/ir",
-    "crates/lang/codegen",
-    "crates/lang/macro",
-    "crates/prelude",
-    "crates/primitives",
-    "crates/engine",
-    "crates/env",
-    "crates/eth_compatibility",
-    "crates/storage",
-    "crates/storage/derive",
-]
-exclude = [
-    "examples/",
-]
+[package]
+name = "pallet-confidential-smart-contract"
+description = 'confidential smart contract'
+version = "0.1.0"
+authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
+edition = "2021"
+license = "Apache-2.0"
 
-[profile.release]
-panic = "abort"
-lto = true
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]

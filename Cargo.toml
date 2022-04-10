@@ -2,7 +2,7 @@
 name = "zero-network"
 description = 'Zero network blockchain'
 version = "0.1.0"
-authors = ['NoCtrlZ<shinsaku.ashizawa@artree.co.jp>']
+authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
 edition = "2021"
 license = "Apache-2.0"
 
@@ -25,6 +25,7 @@ members = [
     "primitive/elgamal",
     "primitive/snarks/plonk",
     "primitive/snarks/poly",
+    "pallets/confidential_smart_contract",
     "pallets/confidential_transfer"
 ]
 

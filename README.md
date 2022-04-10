@@ -22,10 +22,10 @@ The primitive components implementations which is compatible with [`Polkadot`](h
     The [`Polkadot`](https://polkadot.network/) friendly and high performance `plonk` research and development.
 - `pallets`  
 The `pallet` implementations which are used in runtime.
-    - `confidential_smart_contract`  
+    - `zkink`  
     The [`Substrate`](https://substrate.io/) privacy preserving smart contract `eDSL` and compiler forked from [`ink!`](https://github.com/paritytech/ink/tree/v3.0.0).
     - `confidential_transfer`  
-    The [`Substrate`](https://substrate.io/) privacy preserving smart contract `eDSL` and compiler forked from [`ink!`](https://github.com/paritytech/ink/tree/v3.0.0).
+    The balance encrypted by `lifted-ElGamal` enctyption.
 
 ## Test
 ```

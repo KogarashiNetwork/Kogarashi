@@ -2,7 +2,7 @@
 name = "pallet-confidential-transfer"
 description = 'confidential transfer pallet'
 version = "0.1.0"
-authors = ['NoCtrlZ<shinsaku.ashizawa@artree.co.jp>']
+authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
 edition = "2021"
 license = "Apache-2.0"
 
