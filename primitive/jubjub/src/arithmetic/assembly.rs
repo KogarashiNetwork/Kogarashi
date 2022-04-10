@@ -779,5 +779,5 @@ pub(crate) fn neg(a: &[u64; 4]) -> [u64; 4] {
             options(pure, readonly, nostack)
         )
     }
-    return [r0, r1, r2, r3];
+    [r0, r1, r2, r3]
 }

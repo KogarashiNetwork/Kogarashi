@@ -28,6 +28,14 @@ The `pallet` implementations which are used in runtime.
     The balance encrypted by `lifted-ElGamal` enctyption.
 
 ## Test
+The `cargo-make` we are using.
+
 ```
 makers test
 ```
+
+## License
+Copyright 2020-2022 The Artree LLC.
+
+This software is under the `Apache License`.
+You can check it more detail [here](./LICENSE).
