@@ -17,13 +17,15 @@ The **Zero Network** is the `substrate-based` blockchain and that transaction in
 - `node`  
 The substrate-based blockchain implementation.
 - `primitive`  
-The primitive components implementation.
+The primitive components implementations which is compatible with [`Polkadot`](https://polkadot.network/).
+    - `snarks`  
+    The [`Polkadot`](https://polkadot.network/) friendly and high performance `plonk` research and development.
 - `pallets`  
 The `pallet` implementations which are used in runtime.
-- `snarks`  
-The [`Polkadot`](https://polkadot.network/) friendly and high performance `plonk` research and development.
-- `zkink`  
-The [`Substrate`](https://substrate.io/) privacy preserving smart contract `eDSL` and compiler forked from [`ink!`](https://github.com/paritytech/ink/tree/v3.0.0).
+    - `confidential_smart_contract`  
+    The [`Substrate`](https://substrate.io/) privacy preserving smart contract `eDSL` and compiler forked from [`ink!`](https://github.com/paritytech/ink/tree/v3.0.0).
+    - `confidential_transfer`  
+    The [`Substrate`](https://substrate.io/) privacy preserving smart contract `eDSL` and compiler forked from [`ink!`](https://github.com/paritytech/ink/tree/v3.0.0).
 
 ## Test
 ```
