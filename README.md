@@ -1,5 +1,8 @@
 # Zero Network
 [![CI Check](https://github.com/zero-network/zero/actions/workflows/ci.yml/badge.svg)](https://github.com/zero-network/zero/actions/workflows/ci.yml) [![Repository](https://img.shields.io/badge/github-zero-blueviolet?logo=github)](https://github.com/zero-network/zero) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE)  
+
+<img width="500" alt="architecture" src="https://user-images.githubusercontent.com/39494661/163749008-3ad6fa47-9771-419b-98de-7a85cedaa2c7.jpg">
+
 Zero Network is a privacy specialized blockchain. This allows us the confidential transfers and confidential smart contracts. These functionalities are designed relying on only the **cryptographic hardness assumptions** instead `L2 technologies`, `TEE` and `centralized security assumption`.
 
 ## Abstract
@@ -52,4 +55,4 @@ The white paper is work in progress. You can find the light paper [here](https:/
 Copyright 2020-2022 The Artree LLC.
 
 This software is under the `Apache License`.
-You can check it more detail [here](./LICENSE).
+You can check more detail [here](./LICENSE).
