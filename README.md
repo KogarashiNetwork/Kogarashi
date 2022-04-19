@@ -1,14 +1,12 @@
 # Zero Network
 [![CI Check](https://github.com/zero-network/zero/actions/workflows/ci.yml/badge.svg)](https://github.com/zero-network/zero/actions/workflows/ci.yml) [![Repository](https://img.shields.io/badge/github-zero-blueviolet?logo=github)](https://github.com/zero-network/zero) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE)  
 
-<div style="text-align: center;">
-<img width="530" alt="architecture" src="https://user-images.githubusercontent.com/39494661/163749008-3ad6fa47-9771-419b-98de-7a85cedaa2c7.jpg">
-</div>
-
 Zero Network is a privacy specialized blockchain. This allows us the confidential transfers and confidential smart contracts. These functionalities are designed relying on only the **cryptographic hardness assumptions** instead `L2 technologies`, `TEE` and `centralized security assumption`.
 
 ## Abstract
 The **Zero Network** is the `substrate-based` blockchain and that transaction information are totally hided with cryptography. This is going to be deployed as [`Polkadot`](https://polkadot.network/) parachain. We are also implementing `plonk` which has compatible with `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec) and, is optimized by assembly and latest algorithm. We are going to support following functionalities.
+
+<center><img width="500" alt="architecture" src="https://user-images.githubusercontent.com/39494661/163749008-3ad6fa47-9771-419b-98de-7a85cedaa2c7.jpg"></center>
 
 - Confidential Transfers
 - Confidential Smart Contracts
