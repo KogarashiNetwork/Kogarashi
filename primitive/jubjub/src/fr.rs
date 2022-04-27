@@ -348,6 +348,13 @@ mod fr_tests {
     }
 
     #[test]
+    fn test_basic_arithmetic() {
+        let a = Fr::one();
+        let b = Fr::one();
+        let c = a + b;
+    }
+
+    #[test]
     fn test_cmp() {
         let a = Fr::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad82")
             .unwrap();

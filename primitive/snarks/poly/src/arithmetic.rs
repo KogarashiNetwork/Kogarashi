@@ -15,7 +15,10 @@ impl Polynomial {
     }
 
     fn evaluate(self, at: Fr) -> Fr {
-        Fr::zero()
+        self.coeffs
+            .iter()
+            .rev()
+            .fold(Fr::zero(), |sum, coeff| sum * at + *coeff)
     }
 }
 

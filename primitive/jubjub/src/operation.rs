@@ -1,6 +1,15 @@
 macro_rules! field_operation {
     ($field:ident) => {
         // three basic arithmetic
+        impl Add for $field {
+            type Output = $field;
+
+            #[inline]
+            fn add(self, rhs: $field) -> $field {
+                $field(add(&self.0, &rhs.0))
+            }
+        }
+
         impl<'a, 'b> Add<&'b $field> for &'a $field {
             type Output = $field;
 
