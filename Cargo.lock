@@ -3004,6 +3004,7 @@ name = "zero-poly"
 version = "0.1.0"
 dependencies = [
  "rand 0.8.5",
+ "rand_core 0.6.3",
  "sp-std 3.0.0",
  "zero-jubjub",
 ]
