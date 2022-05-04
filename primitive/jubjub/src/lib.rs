@@ -18,9 +18,9 @@
 
 mod arithmetic;
 mod curve;
+mod dress;
+mod entity;
 mod error;
-mod fr;
-mod operation;
-mod pairing;
+mod interface;
 
-pub use fr::Fr;
+pub use entity::Fr;

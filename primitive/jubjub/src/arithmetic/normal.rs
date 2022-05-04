@@ -1,5 +1,5 @@
 use crate::arithmetic::utils::{adc, sbb};
-use crate::fr::MODULUS;
+use crate::entity::MODULUS;
 
 use super::utils::mac;
 const INV: u64 = 0x1ba3a358ef788ef9;

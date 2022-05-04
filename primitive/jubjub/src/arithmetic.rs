@@ -9,7 +9,7 @@ pub(crate) use assembly::{add, double, mul, neg, square, sub};
 
 #[test]
 fn test_normal_and_asm() {
-    use super::fr::Fr;
+    use super::entity::Fr;
     use assembly::{
         add as asm_add, double as asm_double, mul as asm_mul, neg as asm_neg, square as asm_square,
         sub as asm_sub,

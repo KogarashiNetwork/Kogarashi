@@ -1,5 +1,5 @@
-use crate::fr::Fr;
-use crate::pairing::Engine;
+use crate::entity::Fr;
+use crate::interface::Engine;
 
 /// This is the pairing Engine
 pub trait JubjubEngine: Engine {}

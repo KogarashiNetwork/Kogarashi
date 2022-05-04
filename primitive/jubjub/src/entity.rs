@@ -1,7 +1,7 @@
 use crate::arithmetic::{add, double, mul, neg, square, sub};
+use crate::dress::field_operation;
 use crate::error::Error;
-use crate::operation::field_operation;
-use crate::pairing::PrimeField;
+use crate::interface::PrimeField;
 use core::{
     cmp::Ordering,
     fmt::{Display, Formatter, Result as FmtResult},
