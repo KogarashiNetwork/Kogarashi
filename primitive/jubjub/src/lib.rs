@@ -16,6 +16,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(dead_code)]
 
+mod algorithm;
 mod arithmetic;
 mod curve;
 mod dress;
