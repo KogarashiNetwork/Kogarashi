@@ -40,13 +40,8 @@ pub(crate) struct Affine {
     y: Fr,
 }
 
-impl Affine {
-    pub fn add(&self, other: Self) {}
-
-    pub fn double(&self) {}
-}
-
 /// The projective form of coordinate
+#[derive(Debug, Clone)]
 pub(crate) struct Projective {
     x: Fr,
     y: Fr,
@@ -135,5 +130,41 @@ impl Projective {
         self.x = k * c;
         self.y = l - g.double();
         self.z = e;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Fr, Projective};
+    use proptest::prelude::*;
+    use rand::SeedableRng;
+    use rand_xorshift::XorShiftRng;
+
+    prop_compose! {
+        fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fr {
+            Fr::random(XorShiftRng::from_seed(bytes))
+        }
+    }
+
+    prop_compose! {
+        fn arb_cdn()(x in arb_fr(), y in arb_fr(), z in arb_fr()) -> Projective {
+            Projective {
+                x,
+                y,
+                z,
+                is_infinity: false
+            }
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(100))]
+        #[test]
+        fn test_projective(mut a in arb_cdn()) {
+            let mut b = a.clone();
+            let c = a.clone();
+
+            assert_eq!(a.double(), b.add(c))
+        }
     }
 }
