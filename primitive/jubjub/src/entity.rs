@@ -11,9 +11,6 @@ use core::{
 use parity_scale_codec::{Decode, Encode};
 use rand_core::RngCore;
 
-#[allow(unused_imports)]
-use libc_print::libc_println as println;
-
 pub(crate) const MODULUS: [u64; 4] = [
     0xd0970e5ed6f72cb7,
     0xa6682093ccc81082,

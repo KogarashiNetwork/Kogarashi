@@ -133,6 +133,14 @@ impl Projective {
     }
 }
 
+impl PartialEq for Projective {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y && self.z == other.z
+    }
+}
+
+impl Eq for Projective {}
+
 #[cfg(test)]
 mod tests {
     use super::{Fr, Projective};
@@ -163,8 +171,27 @@ mod tests {
         fn test_projective(mut a in arb_cdn()) {
             let mut b = a.clone();
             let c = a.clone();
+            a.double();
+            b.add(c);
 
-            assert_eq!(a.double(), b.add(c))
+            assert_eq!(a, b)
         }
+    }
+
+    #[test]
+    fn test_coordinate_cmp() {
+        let a = Projective {
+            x: Fr::one(),
+            y: Fr::one(),
+            z: Fr::one(),
+            is_infinity: false,
+        };
+        let b = Projective {
+            x: Fr::one(),
+            y: Fr::zero(),
+            z: Fr::one(),
+            is_infinity: false,
+        };
+        assert_ne!(a, b)
     }
 }

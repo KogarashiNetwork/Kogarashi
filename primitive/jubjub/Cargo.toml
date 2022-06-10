@@ -10,10 +10,10 @@ license = "Apache-2.0"
 serde = { version = "1", default-features = false, features = ["derive"] }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 rand_core = { version="0.6", default-features = false }
-libc-print = "0.1.16"
 sp-std = { version = '3.0.0', default-features = false }
 
 [dev-dependencies]
 rand = { version = "0.8", default-features = false }
 rand_xorshift = { version = "0.3", default-features = false }
 proptest = "1"
+libc-print = "0.1.16"
