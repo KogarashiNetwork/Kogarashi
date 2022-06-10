@@ -9,6 +9,7 @@ pub(crate) use assembly::{add, double, mul, neg, square, sub};
 
 #[test]
 fn test_normal_and_asm() {
+    env_logger::init();
     use super::entity::Fr;
     use assembly::{
         add as asm_add, double as asm_double, mul as asm_mul, neg as asm_neg, square as asm_square,
@@ -42,7 +43,15 @@ fn test_normal_and_asm() {
         let a = Fr::random(a_rng);
         let b = Fr::random(b_rng);
 
+        log::debug!("i = {i}");
+        log::debug!("a = {:?}", a);
+        log::debug!("b = {:?}", b);
+
         assert_eq!(add(&a.0, &b.0), asm_add(&a.0, &b.0));
+        assert_eq!(sub(&a.0, &b.0), asm_sub(&a.0, &b.0));
         assert_eq!(double(&a.0), asm_double(&a.0));
+        assert_eq!(neg(&a.0), asm_neg(&a.0));
+        assert_eq!(square(&a.0), asm_square(&a.0));
+        assert_eq!(mul(&a.0, &b.0), asm_mul(&a.0, &b.0));
     }
 }

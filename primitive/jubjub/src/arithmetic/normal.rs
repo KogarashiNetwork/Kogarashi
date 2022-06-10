@@ -1,7 +1,7 @@
 use crate::arithmetic::utils::{adc, sbb};
 use crate::entity::MODULUS;
 
-use super::utils::mac;
+use super::utils::{mac, rdc};
 const INV: u64 = 0x1ba3a358ef788ef9;
 
 pub(crate) const fn add(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
@@ -9,15 +9,33 @@ pub(crate) const fn add(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     let (l1, c) = adc(a[1], b[1], c);
     let (l2, c) = adc(a[2], b[2], c);
     let (l3, _) = adc(a[3], b[3], c);
-    [l0, l1, l2, l3]
+    reduce(&[l0, l1, l2, l3], &MODULUS)
+}
+
+pub(crate) const fn reduce(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
+    let (l0, c) = rdc(a[0], b[0], 0);
+    let (l1, c) = rdc(a[1], b[1], c);
+    let (l2, c) = rdc(a[2], b[2], c);
+    let (l3, c) = rdc(a[3], b[3], c);
+
+    if c == 1 {
+        *a
+    } else {
+        [l0, l1, l2, l3]
+    }
 }
 
 pub(crate) const fn sub(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     let (l0, c) = sbb(a[0], b[0], 0);
     let (l1, c) = sbb(a[1], b[1], c);
     let (l2, c) = sbb(a[2], b[2], c);
-    let (l3, _) = sbb(a[3], b[3], c);
-    [l0, l1, l2, l3]
+    let (l3, c) = sbb(a[3], b[3], c);
+    let res = [l0, l1, l2, l3];
+    if c == 1 {
+        add(&res, &MODULUS)
+    } else {
+        res
+    }
 }
 
 pub(crate) const fn double(a: &[u64; 4]) -> [u64; 4] {
@@ -25,7 +43,7 @@ pub(crate) const fn double(a: &[u64; 4]) -> [u64; 4] {
     let (l1, c) = adc(a[1], a[1], c);
     let (l2, c) = adc(a[2], a[2], c);
     let (l3, _) = adc(a[3], a[3], c);
-    [l0, l1, l2, l3]
+    reduce(&[l0, l1, l2, l3], &MODULUS)
 }
 
 pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
