@@ -99,5 +99,41 @@ impl Projective {
         self.z = j * c;
     }
 
-    pub fn double(&mut self, other: Self) {}
+    /// The projective coordinate doubling
+    /// cost: 5M + 6S + 1*a + A + 3*2 + 1*3.
+    /// a = 0
+    pub fn double(&mut self) {
+        // XX
+        let a = self.x.square();
+
+        // w
+        let b = a.double() + a;
+        // s
+        let c = self.y.double() * self.z;
+        // ss
+        let d = c.square();
+        // sss
+        let e = d * c;
+
+        // R
+        let f = self.y * b;
+        // RR
+        let g = f.square();
+
+        // X1+R
+        let h = self.x + f;
+        // (X1+R)^2
+        let i = h.square();
+        // B
+        let j = i - a - g;
+        // h
+        let k = c.square() - j.double();
+
+        // w*(B-h)
+        let l = b * (j - k);
+
+        self.x = k * c;
+        self.y = l - g.double();
+        self.z = e;
+    }
 }
