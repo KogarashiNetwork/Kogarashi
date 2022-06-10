@@ -25,6 +25,15 @@ macro_rules! field_operation {
             }
         }
 
+        impl Sub for $field {
+            type Output = $field;
+
+            #[inline]
+            fn sub(self, rhs: $field) -> $field {
+                $field(sub(&self.0, &rhs.0))
+            }
+        }
+
         impl<'a, 'b> Sub<&'b $field> for &'a $field {
             type Output = $field;
 
@@ -61,6 +70,18 @@ macro_rules! field_operation {
         impl MulAssign for $field {
             fn mul_assign(&mut self, rhs: $field) {
                 self.0 = mul(&self.0, &rhs.0)
+            }
+        }
+
+        impl $field {
+            pub fn double(self) -> $field {
+                $field(double(&self.0))
+            }
+        }
+
+        impl $field {
+            pub fn square(self) -> $field {
+                $field(square(&self.0))
             }
         }
 
