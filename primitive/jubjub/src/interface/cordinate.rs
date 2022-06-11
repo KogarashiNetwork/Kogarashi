@@ -1,14 +1,10 @@
-use super::engine::Engine;
-use super::field::PrimeField;
-
 /// Elliptic curve affine point
-pub trait CurveAffine {
-    type Engine: Engine;
-    type Scalar: PrimeField;
-
+pub trait Coordinate {
     fn zero() -> Self;
 
     fn one() -> Self;
 
     fn is_zero(&self) -> Self;
+
+    fn is_on_curve(&self) -> bool;
 }

@@ -40,6 +40,12 @@ pub(crate) struct Affine {
     y: Fr,
 }
 
+impl Affine {
+    fn is_on_curve(&self) -> bool {
+        true
+    }
+}
+
 /// The projective form of coordinate
 #[derive(Debug, Clone)]
 pub(crate) struct Projective {
