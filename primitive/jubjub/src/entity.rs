@@ -2,5 +2,5 @@ mod coordinate;
 mod curve;
 mod fr;
 
-pub(crate) use coordinate::*;
-pub use fr::*;
+pub use coordinate::Affine;
+pub use fr::Fr;

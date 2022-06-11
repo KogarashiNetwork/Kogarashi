@@ -3071,6 +3071,7 @@ name = "zero-elgamal"
 version = "0.1.0"
 dependencies = [
  "parity-scale-codec 2.3.1",
+ "zero-jubjub",
 ]
 
 [[package]]

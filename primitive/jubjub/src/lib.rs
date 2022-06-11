@@ -24,4 +24,4 @@ mod entity;
 mod error;
 mod interface;
 
-pub use entity::Fr;
+pub use entity::{Affine, Fr};

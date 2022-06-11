@@ -23,32 +23,28 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use parity_scale_codec::{Decode, Encode};
+use zero_jubjub::{Affine, Fr};
 
 #[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct Ciphertext {}
+pub struct EncryptedNumber {
+    s: Affine,
+    t: Affine,
+}
 
-impl Ciphertext {
-    pub fn new() -> Self {
-        Ciphertext {}
-    }
-
-    pub fn zero() -> Self {
-        Ciphertext {}
-    }
-
-    pub fn encrypt() -> Self {
-        Ciphertext {}
+impl EncryptedNumber {
+    pub fn encrypt(private_key: Fr, value: Fr, random: Fr) -> Self {
+        EncryptedNumber {}
     }
 
     pub fn decrypt() -> Self {
-        Ciphertext {}
+        EncryptedNumber {}
     }
 
     pub fn add(&self, other: &Self) -> Self {
-        Ciphertext {}
+        EncryptedNumber {}
     }
 
     pub fn sub(&self, other: &Self) -> Self {
-        Ciphertext {}
+        EncryptedNumber {}
     }
 }

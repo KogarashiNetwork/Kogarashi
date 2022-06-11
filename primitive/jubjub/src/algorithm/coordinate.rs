@@ -33,19 +33,6 @@
 
 use crate::entity::Fr;
 
-/// The affine form of coordinate
-#[derive(Debug)]
-pub(crate) struct Affine {
-    x: Fr,
-    y: Fr,
-}
-
-impl Affine {
-    fn is_on_curve(&self) -> bool {
-        true
-    }
-}
-
 /// The projective form of coordinate
 #[derive(Debug, Clone)]
 pub(crate) struct Projective {
