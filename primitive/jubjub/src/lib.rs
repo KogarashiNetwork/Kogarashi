@@ -16,12 +16,9 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(dead_code)]
 
-mod algorithm;
 mod arithmetic;
-mod curve;
-mod dress;
-mod entity;
+pub mod coordinate;
+mod domain;
 mod error;
+pub mod fr;
 mod interface;
-
-pub use entity::{Affine, Fr};

@@ -1,7 +1,6 @@
-use crate::entity::MODULUS;
 use core::arch::asm;
 
-pub(crate) fn add(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
+pub(crate) fn add(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let mut r0: u64;
     let mut r1: u64;
     let mut r2: u64;
@@ -38,7 +37,7 @@ pub(crate) fn add(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             "cmovc r14, r10",
             "cmovc r15, r11",
 
-            m_ptr = in(reg) MODULUS.as_ptr(),
+            m_ptr = in(reg) p.as_ptr(),
             a_ptr = in(reg) a.as_ptr(),
             b_ptr = in(reg) b.as_ptr(),
             out("r8") _,
@@ -55,7 +54,7 @@ pub(crate) fn add(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     [r0, r1, r2, r3]
 }
 
-pub(crate) fn sub(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
+pub(crate) fn sub(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let mut r0: u64;
     let mut r1: u64;
     let mut r2: u64;
@@ -92,7 +91,7 @@ pub(crate) fn sub(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             "adc  r14, r10",
             "adc  r15, r11",
 
-            m_ptr = in(reg) MODULUS.as_ptr(),
+            m_ptr = in(reg) p.as_ptr(),
             a_ptr = in(reg) a.as_ptr(),
             b_ptr = in(reg) b.as_ptr(),
             out("r8") _,
@@ -109,7 +108,7 @@ pub(crate) fn sub(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     [r0, r1, r2, r3]
 }
 
-pub(crate) fn double(a: &[u64; 4]) -> [u64; 4] {
+pub(crate) fn double(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let mut r0: u64;
     let mut r1: u64;
     let mut r2: u64;
@@ -146,7 +145,7 @@ pub(crate) fn double(a: &[u64; 4]) -> [u64; 4] {
             "cmovc r14, r10",
             "cmovc r15, r11",
 
-            m_ptr = in(reg) MODULUS.as_ptr(),
+            m_ptr = in(reg) p.as_ptr(),
             a_ptr = in(reg) a.as_ptr(),
             out("r8") _,
             out("r9") _,
@@ -162,7 +161,7 @@ pub(crate) fn double(a: &[u64; 4]) -> [u64; 4] {
     [r0, r1, r2, r3]
 }
 
-pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
+pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let mut r0: u64;
     let mut r1: u64;
     let mut r2: u64;
@@ -445,9 +444,9 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
             "cmovc r14, r10",
             "cmovc r15, r11",
 
+            m_ptr = in(reg) p.as_ptr(),
             a_ptr = in(reg) a.as_ptr(),
             b_ptr = in(reg) b.as_ptr(),
-            m_ptr = in(reg) MODULUS.as_ptr(),
             out("rax") _,
             out("rcx") _,
             out("rdx") _,
@@ -465,7 +464,7 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4]) -> [u64; 4] {
     [r0, r1, r2, r3]
 }
 
-pub(crate) fn square(a: &[u64; 4]) -> [u64; 4] {
+pub(crate) fn square(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let mut r0: u64;
     let mut r1: u64;
     let mut r2: u64;
@@ -711,8 +710,8 @@ pub(crate) fn square(a: &[u64; 4]) -> [u64; 4] {
             "cmovc r10, r14",
             "cmovc r11, r15",
 
+            m_ptr = in(reg) p.as_ptr(),
             a_ptr = in(reg) a.as_ptr(),
-            m_ptr = in(reg) MODULUS.as_ptr(),
             out("rax") _,
             out("rcx") _,
             out("rdx") _,
@@ -730,7 +729,7 @@ pub(crate) fn square(a: &[u64; 4]) -> [u64; 4] {
     [r0, r1, r2, r3]
 }
 
-pub(crate) fn neg(a: &[u64; 4]) -> [u64; 4] {
+pub(crate) fn neg(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let mut r0: u64;
     let mut r1: u64;
     let mut r2: u64;
@@ -767,7 +766,7 @@ pub(crate) fn neg(a: &[u64; 4]) -> [u64; 4] {
             "and r11, r13",
 
             a_ptr = in(reg) a.as_ptr(),
-            m_ptr = in(reg) MODULUS.as_ptr(),
+            m_ptr = in(reg) p.as_ptr(),
             out("r8") r0,
             out("r9") r1,
             out("r10") r2,

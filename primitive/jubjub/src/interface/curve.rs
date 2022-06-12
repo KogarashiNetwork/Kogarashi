@@ -1,5 +1,5 @@
-use crate::entity::Affine;
-use crate::entity::Fr;
+use crate::coordinate::Affine;
+use crate::fr::Fr;
 
 /// This expresses the curve equation
 /// y^2 = x^3 + ax + b

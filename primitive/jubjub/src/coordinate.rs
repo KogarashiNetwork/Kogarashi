@@ -31,10 +31,19 @@
 //! We implement coordinate system to refer the following.
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
-use crate::entity::Fr;
+use crate::fr::Fr;
+use parity_scale_codec::{Decode, Encode};
 
 /// The projective form of coordinate
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Decode, Encode)]
+pub struct Affine {
+    x: Fr,
+    y: Fr,
+    is_infinity: bool,
+}
+
+/// The projective form of coordinate
+#[derive(Debug, Clone, Decode, Encode)]
 pub(crate) struct Projective {
     x: Fr,
     y: Fr,

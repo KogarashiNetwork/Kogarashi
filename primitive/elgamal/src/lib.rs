@@ -23,28 +23,20 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use parity_scale_codec::{Decode, Encode};
-use zero_jubjub::{Affine, Fr};
+use zero_jubjub::{coordinate::Affine, fr::Fr};
 
-#[derive(Debug, Clone, Copy, Decode, Encode)]
+#[derive(Debug, Clone, Decode, Encode)]
 pub struct EncryptedNumber {
     s: Affine,
     t: Affine,
 }
 
 impl EncryptedNumber {
-    pub fn encrypt(private_key: Fr, value: Fr, random: Fr) -> Self {
-        EncryptedNumber {}
-    }
+    pub fn encrypt(private_key: Fr, value: Fr, random: Fr) {}
 
-    pub fn decrypt() -> Self {
-        EncryptedNumber {}
-    }
+    pub fn decrypt() {}
 
-    pub fn add(&self, other: &Self) -> Self {
-        EncryptedNumber {}
-    }
+    pub fn add(&self, other: &Self) {}
 
-    pub fn sub(&self, other: &Self) -> Self {
-        EncryptedNumber {}
-    }
+    pub fn sub(&self, other: &Self) {}
 }

@@ -1,12 +1,46 @@
 macro_rules! field_operation {
-    ($field:ident) => {
+    ($field:ident, $p:ident) => {
         // three basic arithmetic
+        impl $field {
+            #[inline(always)]
+            pub fn add_assign(&mut self, other: $field) {
+                self.0 = add(&self.0, &other.0, $p);
+            }
+
+            #[inline(always)]
+            pub fn sub_assign(&mut self, other: $field) {
+                self.0 = sub(&self.0, &other.0, $p);
+            }
+
+            #[inline(always)]
+            pub fn double_assign(&mut self) {
+                self.0 = double(&self.0, $p)
+            }
+
+            #[inline(always)]
+            pub fn mul_assign(&mut self, other: $field) {
+                self.0 = mul(&self.0, &other.0, $p)
+            }
+
+            #[inline(always)]
+            pub fn square_assign(&mut self) {
+                self.0 = square(&self.0, $p)
+            }
+
+            pub const fn zero() -> $field {
+                $field([0, 0, 0, 0])
+            }
+
+            pub const fn one() -> $field {
+                $field([1, 0, 0, 0])
+            }
+        }
         impl Add for $field {
             type Output = $field;
 
             #[inline]
             fn add(self, rhs: $field) -> $field {
-                $field(add(&self.0, &rhs.0))
+                $field(add(&self.0, &rhs.0, $p))
             }
         }
 
@@ -15,13 +49,13 @@ macro_rules! field_operation {
 
             #[inline]
             fn add(self, rhs: &'b $field) -> $field {
-                $field(add(&self.0, &rhs.0))
+                $field(add(&self.0, &rhs.0, $p))
             }
         }
 
         impl AddAssign for $field {
             fn add_assign(&mut self, rhs: $field) {
-                self.0 = add(&self.0, &rhs.0)
+                self.0 = add(&self.0, &rhs.0, $p)
             }
         }
 
@@ -30,7 +64,7 @@ macro_rules! field_operation {
 
             #[inline]
             fn sub(self, rhs: $field) -> $field {
-                $field(sub(&self.0, &rhs.0))
+                $field(sub(&self.0, &rhs.0, $p))
             }
         }
 
@@ -39,13 +73,13 @@ macro_rules! field_operation {
 
             #[inline]
             fn sub(self, rhs: &'b $field) -> $field {
-                $field(sub(&self.0, &rhs.0))
+                $field(sub(&self.0, &rhs.0, $p))
             }
         }
 
         impl SubAssign for $field {
             fn sub_assign(&mut self, rhs: $field) {
-                self.0 = sub(&self.0, &rhs.0)
+                self.0 = sub(&self.0, &rhs.0, $p)
             }
         }
 
@@ -54,7 +88,7 @@ macro_rules! field_operation {
 
             #[inline]
             fn mul(self, rhs: $field) -> $field {
-                $field(mul(&self.0, &rhs.0))
+                $field(mul(&self.0, &rhs.0, $p))
             }
         }
 
@@ -63,25 +97,36 @@ macro_rules! field_operation {
 
             #[inline]
             fn mul(self, rhs: &'b $field) -> $field {
-                $field(mul(&self.0, &rhs.0))
+                $field(mul(&self.0, &rhs.0, $p))
             }
         }
 
         impl MulAssign for $field {
             fn mul_assign(&mut self, rhs: $field) {
-                self.0 = mul(&self.0, &rhs.0)
+                self.0 = mul(&self.0, &rhs.0, $p)
             }
         }
 
         impl $field {
             pub fn double(self) -> $field {
-                $field(double(&self.0))
+                $field(double(&self.0, $p))
             }
-        }
 
-        impl $field {
             pub fn square(self) -> $field {
-                $field(square(&self.0))
+                $field(square(&self.0, $p))
+            }
+
+            pub fn random(mut rand: impl RngCore) -> $field {
+                Fr::from_u512([
+                    rand.next_u64(),
+                    rand.next_u64(),
+                    rand.next_u64(),
+                    rand.next_u64(),
+                    rand.next_u64(),
+                    rand.next_u64(),
+                    rand.next_u64(),
+                    rand.next_u64(),
+                ])
             }
         }
 
@@ -99,7 +144,7 @@ macro_rules! field_operation {
 
             #[inline]
             fn neg(self) -> $field {
-                $field(neg(&self.0))
+                $field(neg(&self.0, $p))
             }
         }
 
