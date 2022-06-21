@@ -61,6 +61,11 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let r3 = mac(r3, a[2], b[1], &mut d);
     let r4 = mac(r4, a[2], b[2], &mut d);
     let r6 = mac(r5, a[2], b[3], &mut d);
+    let mut d = 0;
+    let r3 = mac(r3, a[3], b[0], &mut d);
+    let r4 = mac(r4, a[3], b[1], &mut d);
+    let r5 = mac(r5, a[3], b[2], &mut d);
+    let r6 = mac(r6, a[3], b[3], &mut d);
     let r7 = d;
     mont(&mut [r0, r1, r2, r3, r4, r5, r6, r7], p)
 }
@@ -70,16 +75,19 @@ pub(crate) fn square(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
 }
 
 pub(crate) fn neg(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
-    sub(p, a, p)
+    if a == &[0; 4] {
+        *a
+    } else {
+        sub(p, a, p)
+    }
 }
 
 pub(crate) fn mont(a: &mut [u64; 8], p: &[u64; 4]) -> [u64; 4] {
     let mut c = 0;
-    let mut c2 = 0;
 
     for i in 0..4 {
         let mut offset = i;
-        let b = a[i] * INV;
+        let b = (a[i] as u128 * INV as u128) as u64;
         a[offset] = mac(a[offset], b, p[0], &mut c);
         offset += 1;
         a[offset] = mac(a[offset], b, p[0], &mut c);
@@ -87,7 +95,6 @@ pub(crate) fn mont(a: &mut [u64; 8], p: &[u64; 4]) -> [u64; 4] {
         a[offset] = mac(a[offset], b, p[0], &mut c);
         offset += 1;
         a[offset] = mac(a[offset], b, p[0], &mut c);
-        c2 = c;
         c = 0;
     }
 

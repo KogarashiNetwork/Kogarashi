@@ -31,6 +31,7 @@ pub struct EncryptedNumber {
     t: Affine,
 }
 
+#[allow(unused_variables)]
 impl EncryptedNumber {
     pub fn encrypt(private_key: Fr, value: Fr, random: Fr) {}
 
