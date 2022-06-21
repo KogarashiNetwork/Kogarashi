@@ -3071,6 +3071,7 @@ name = "zero-elgamal"
 version = "0.1.0"
 dependencies = [
  "parity-scale-codec 2.3.1",
+ "zero-jubjub",
 ]
 
 [[package]]
@@ -3097,22 +3098,6 @@ dependencies = [
  "rand_core 0.5.1",
  "rand_core 0.6.3",
  "zero-elgamal",
- "zero-jubjub",
- "zero-plonk",
- "zero-poly",
-]
-
-[[package]]
-name = "zero-plonk"
-version = "0.1.0"
-
-[[package]]
-name = "zero-poly"
-version = "0.1.0"
-dependencies = [
- "rand 0.8.5",
- "rand_core 0.6.3",
- "sp-std 3.0.0",
  "zero-jubjub",
 ]
 

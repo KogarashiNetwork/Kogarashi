@@ -1,4 +1,4 @@
-use zero_jubjub::Fr;
+use zero_jubjub::fr::Fr;
 
 #[cfg(test)]
 mod arithmetic_tests {
