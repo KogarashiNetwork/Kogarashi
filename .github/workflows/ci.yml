@@ -46,15 +46,3 @@ jobs:
         with:
           command: fmt
           args: --all -- --check
-
-  node:
-    name: Build Node
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-      - name: Add Target
-        run: rustup target add wasm32-unknown-unknown
-      - name: Build
-        run: cd node && cargo build
