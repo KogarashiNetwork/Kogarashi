@@ -17,3 +17,6 @@ rand = { version = "0.8", default-features = false }
 rand_xorshift = { version = "0.3", default-features = false }
 proptest = "1"
 libc-print = "0.1.16"
+
+[features]
+asm = []
