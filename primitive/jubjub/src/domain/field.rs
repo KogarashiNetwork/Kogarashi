@@ -108,6 +108,10 @@ macro_rules! field_operation {
         }
 
         impl $field {
+            pub fn is_zero(&self) -> bool {
+                self.0.iter().all(|x| *x == 0)
+            }
+
             pub fn double(self) -> $field {
                 $field(double(&self.0, $p))
             }

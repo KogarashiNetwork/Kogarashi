@@ -121,6 +121,19 @@ impl Fr {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn is_zero() {
+        let fr = Fr([0, 0, 0, 0]);
+        assert!(fr.is_zero());
+        let fr = Fr([0, 0, 0, 1]);
+        assert!(!fr.is_zero());
+    }
+}
+
 // #[cfg(test)]
 // mod fr_tests {
 //     use super::*;
