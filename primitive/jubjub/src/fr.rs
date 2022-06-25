@@ -89,15 +89,15 @@ impl Fr {
 
     fn to_bytes(&self) -> [u8; 64] {
         let mut bytes: [u8; 64] = [0; 64];
-        let mut index = 0;
+        let mut index = 15;
         for i in 0..self.0.len() {
             let mut number = self.0[i];
             for n in 0..16 {
-                let quotient = number / 16_u64.pow(16 - n as u32);
-                bytes[index] = quotient as u8;
-                number = number % 16_u64.pow(16 - n as u32);
-                index += 1;
+                let quotient = number as u128 / 16_u128.pow(15 - n as u32);
+                bytes[index - n] = quotient as u8;
+                number = (number as u128 % 16_u128.pow(15 - n as u32)) as u64;
             }
+            index += 16;
         }
         bytes
     }

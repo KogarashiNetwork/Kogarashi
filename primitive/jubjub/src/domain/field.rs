@@ -230,8 +230,8 @@ macro_rules! field_operation {
             fn fmt(&self, f: &mut Formatter) -> FmtResult {
                 let tmp = self.to_bytes();
                 write!(f, "0x")?;
-                for &b in tmp.iter().rev() {
-                    write!(f, "{:02x}", b)?;
+                for b in tmp.iter().rev().skip_while(|&x| *x == 0) {
+                    write!(f, "{:0x}", b)?;
                 }
                 Ok(())
             }
