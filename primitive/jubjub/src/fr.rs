@@ -3,7 +3,7 @@ use crate::domain::field::field_operation;
 use crate::error::Error;
 use core::{
     cmp::Ordering,
-    fmt::{Display, Formatter, Result as FmtResult},
+    fmt::{Binary, Display, Formatter, Result as FmtResult},
     ops::{Add, Mul, Neg, Sub},
     ops::{AddAssign, MulAssign, SubAssign},
 };
@@ -99,7 +99,22 @@ impl Fr {
             }
             index += 16;
         }
+        bytes.reverse();
         bytes
+    }
+
+    fn to_bits(&self) -> [u8; 256] {
+        let mut index = 0;
+        let mut bits: [u8; 256] = [0; 256];
+        for mut x in self.0 {
+            for _ in 0..64 {
+                bits[index] = (x & 1) as u8;
+                x = x >> 1;
+                index += 1;
+            }
+        }
+        bits.reverse();
+        bits
     }
 
     fn from_u512(limbs: [u64; 8]) -> Self {
