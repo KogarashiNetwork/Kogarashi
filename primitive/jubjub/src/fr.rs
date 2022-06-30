@@ -99,7 +99,6 @@ impl Fr {
             }
             index += 16;
         }
-        bytes.reverse();
         bytes
     }
 
@@ -113,7 +112,6 @@ impl Fr {
                 index += 1;
             }
         }
-        bits.reverse();
         bits
     }
 
@@ -146,6 +144,18 @@ mod tests {
         assert!(fr.is_zero());
         let fr = Fr([0, 0, 0, 1]);
         assert!(!fr.is_zero());
+    }
+
+    #[test]
+    fn fmt_and_to_bin() {
+        let fr = Fr([
+            0xd0970e5ed6f72cb7,
+            0xa6682093ccc81082,
+            0x06673b0101343b00,
+            0x0e7db4ea6533afa9,
+        ]);
+        libc_print::libc_println!("{}", fr);
+        libc_print::libc_println!("{:b}", fr);
     }
 }
 
