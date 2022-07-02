@@ -43,34 +43,31 @@ pub(crate) const fn double(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     reduce(&[l0, l1, l2, l3], p)
 }
 
-pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
-    let mut d = 0;
-    let r0 = mac(0, a[0], b[0], &mut d);
-    let r1 = mac(0, a[0], b[1], &mut d);
-    let r2 = mac(0, a[0], b[2], &mut d);
-    let r3 = mac(0, a[0], b[3], &mut d);
-    let r4 = d;
-    let mut d = 0;
-    let r1 = mac(r1, a[1], b[0], &mut d);
-    let r2 = mac(r2, a[1], b[1], &mut d);
-    let r3 = mac(r3, a[1], b[2], &mut d);
-    let r4 = mac(r4, a[1], b[3], &mut d);
-    let r5 = d;
-    let mut d = 0;
-    let r2 = mac(r2, a[2], b[0], &mut d);
-    let r3 = mac(r3, a[2], b[1], &mut d);
-    let r4 = mac(r4, a[2], b[2], &mut d);
-    let r6 = mac(r5, a[2], b[3], &mut d);
-    let mut d = 0;
-    let r3 = mac(r3, a[3], b[0], &mut d);
-    let r4 = mac(r4, a[3], b[1], &mut d);
-    let r5 = mac(r5, a[3], b[2], &mut d);
-    let r6 = mac(r6, a[3], b[3], &mut d);
-    let r7 = d;
-    mont(&mut [r0, r1, r2, r3, r4, r5, r6, r7], p)
+pub(crate) const fn mul(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+    let (l0, d) = mac(0, a[0], b[0], 0);
+    let (l1, d) = mac(0, a[0], b[1], d);
+    let (l2, d) = mac(0, a[0], b[2], d);
+    let (l3, l4) = mac(0, a[0], b[3], d);
+
+    let (l1, d) = mac(l1, a[1], b[0], 0);
+    let (l2, d) = mac(l2, a[1], b[1], d);
+    let (l3, d) = mac(l3, a[1], b[2], d);
+    let (l4, l5) = mac(l4, a[1], b[3], d);
+
+    let (l2, d) = mac(l2, a[2], b[0], 0);
+    let (l3, d) = mac(l3, a[2], b[1], d);
+    let (l4, d) = mac(l4, a[2], b[2], d);
+    let (l5, l6) = mac(l5, a[2], b[3], d);
+
+    let (l3, d) = mac(l3, a[3], b[0], 0);
+    let (l4, d) = mac(l4, a[3], b[1], d);
+    let (l5, d) = mac(l5, a[3], b[2], d);
+    let (l6, l7) = mac(l6, a[3], b[3], d);
+
+    mont(&[l0, l1, l2, l3, l4, l5, l6, l7], p)
 }
 
-pub(crate) fn square(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+pub(crate) const fn square(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     mul(a, a, p)
 }
 
@@ -82,21 +79,34 @@ pub(crate) fn neg(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     }
 }
 
-pub(crate) fn mont(a: &mut [u64; 8], p: &[u64; 4]) -> [u64; 4] {
-    let mut c = 0;
+pub(crate) const fn mont(a: &[u64; 8], p: &[u64; 4]) -> [u64; 4] {
+    let rhs = a[0].wrapping_mul(INV);
+    let (_, d) = mac(a[0], rhs, p[0], 0);
+    let (l1, d) = mac(a[1], rhs, p[1], d);
+    let (l2, d) = mac(a[2], rhs, p[2], d);
+    let (l3, d) = mac(a[3], rhs, p[3], d);
+    let (l4, e) = adc(a[4], 0, d);
 
-    for i in 0..4 {
-        let mut offset = i;
-        let b = (a[i] as u128 * INV as u128) as u64;
-        a[offset] = mac(a[offset], b, p[0], &mut c);
-        offset += 1;
-        a[offset] = mac(a[offset], b, p[0], &mut c);
-        offset += 1;
-        a[offset] = mac(a[offset], b, p[0], &mut c);
-        offset += 1;
-        a[offset] = mac(a[offset], b, p[0], &mut c);
-        c = 0;
-    }
+    let rhs = l1.wrapping_mul(INV);
+    let (_, d) = mac(l1, rhs, p[0], 0);
+    let (l2, d) = mac(l2, rhs, p[1], d);
+    let (l3, d) = mac(l3, rhs, p[2], d);
+    let (l4, d) = mac(l4, rhs, p[3], d);
+    let (l5, e) = adc(a[5], e, d);
 
-    [a[0], a[1], a[2], a[3]]
+    let rhs = l2.wrapping_mul(INV);
+    let (_, d) = mac(l2, rhs, p[0], 0);
+    let (l3, d) = mac(l3, rhs, p[1], d);
+    let (l4, d) = mac(l4, rhs, p[2], d);
+    let (l5, d) = mac(l5, rhs, p[3], d);
+    let (l6, e) = adc(a[6], e, d);
+
+    let rhs = l3.wrapping_mul(INV);
+    let (_, d) = mac(l3, rhs, p[0], 0);
+    let (l4, d) = mac(l4, rhs, p[1], d);
+    let (l5, d) = mac(l5, rhs, p[2], d);
+    let (l6, d) = mac(l6, rhs, p[3], d);
+    let (l7, _) = adc(a[7], e, d);
+
+    sub(&[l4, l5, l6, l7], p, p)
 }
