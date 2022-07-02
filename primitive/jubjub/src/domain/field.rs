@@ -108,6 +108,17 @@ macro_rules! field_operation {
         }
 
         impl $field {
+            fn binary_method(&self, base: &Projective) -> Projective {
+                let mut res = Projective::zero();
+                for b in self.to_bits().into_iter().rev().skip_while(|x| *x == 0) {
+                    if b == 1 {
+                        res.add(base.clone());
+                    }
+                    res.double();
+                }
+                res
+            }
+
             pub fn is_zero(&self) -> bool {
                 self.0.iter().all(|x| *x == 0)
             }

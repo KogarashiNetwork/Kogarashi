@@ -31,7 +31,7 @@
 //! We implement coordinate system to refer the following.
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
-use crate::fr::Fr;
+use crate::{fr::Fr, interface::coordinate::Coordinate};
 use parity_scale_codec::{Decode, Encode};
 
 /// The projective form of coordinate
@@ -142,6 +142,34 @@ impl PartialEq for Projective {
 }
 
 impl Eq for Projective {}
+
+impl Coordinate for Projective {
+    fn zero() -> Self {
+        Projective {
+            x: Fr::zero(),
+            y: Fr::zero(),
+            z: Fr::zero(),
+            is_infinity: false,
+        }
+    }
+
+    fn one() -> Self {
+        Projective {
+            x: Fr::one(),
+            y: Fr::one(),
+            z: Fr::one(),
+            is_infinity: false,
+        }
+    }
+
+    fn is_zero(&self) -> bool {
+        self.x.is_zero() && self.y.is_zero() && self.z.is_zero()
+    }
+
+    fn is_on_curve(&self) -> bool {
+        todo!()
+    }
+}
 
 #[cfg(test)]
 mod tests {

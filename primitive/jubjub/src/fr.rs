@@ -1,6 +1,8 @@
 use crate::arithmetic::limbs::{add, double, mul, neg, square, sub};
+use crate::coordinate::Projective;
 use crate::domain::field::field_operation;
 use crate::error::Error;
+use crate::interface::coordinate::Coordinate;
 use core::{
     cmp::Ordering,
     fmt::{Binary, Display, Formatter, Result as FmtResult},
@@ -136,6 +138,8 @@ impl Fr {
 
 #[cfg(test)]
 mod tests {
+    use crate::interface::coordinate::Coordinate;
+
     use super::*;
 
     #[test]
@@ -156,6 +160,16 @@ mod tests {
         ]);
         libc_print::libc_println!("{}", fr);
         libc_print::libc_println!("{:b}", fr);
+    }
+
+    #[test]
+    fn binary_method() {
+        let fr = Fr([3, 3, 3, 3]);
+        libc_print::libc_println!("{}", fr);
+        let base = Projective::one();
+        libc_print::libc_println!("{:?}", base);
+        let res = fr.binary_method(&base);
+        libc_print::libc_println!("{:?}", res);
     }
 }
 
