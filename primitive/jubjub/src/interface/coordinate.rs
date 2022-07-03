@@ -4,7 +4,7 @@ pub trait Coordinate {
 
     fn one() -> Self;
 
-    fn is_zero(&self) -> Self;
+    fn is_zero(&self) -> bool;
 
     fn is_on_curve(&self) -> bool;
 }

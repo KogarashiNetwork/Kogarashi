@@ -108,6 +108,21 @@ macro_rules! field_operation {
         }
 
         impl $field {
+            fn binary_method(&self, base: &Projective) -> Projective {
+                let mut res = Projective::zero();
+                for b in self.to_bits().into_iter().rev().skip_while(|x| *x == 0) {
+                    if b == 1 {
+                        res.add(base.clone());
+                    }
+                    res.double();
+                }
+                res
+            }
+
+            pub fn is_zero(&self) -> bool {
+                self.0.iter().all(|x| *x == 0)
+            }
+
             pub fn double(self) -> $field {
                 $field(double(&self.0, $p))
             }
@@ -226,8 +241,18 @@ macro_rules! field_operation {
             fn fmt(&self, f: &mut Formatter) -> FmtResult {
                 let tmp = self.to_bytes();
                 write!(f, "0x")?;
-                for &b in tmp.iter().rev() {
-                    write!(f, "{:02x}", b)?;
+                for b in tmp.iter().rev().skip_while(|&x| *x == 0) {
+                    write!(f, "{:0x}", b)?;
+                }
+                Ok(())
+            }
+        }
+
+        impl Binary for $field {
+            fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                let tmp = self.to_bits();
+                for b in tmp.iter().rev().skip_while(|&x| *x == 0) {
+                    write!(f, "{}", b)?;
                 }
                 Ok(())
             }

@@ -1,4 +1,4 @@
-mod coordinate;
+pub(crate) mod coordinate;
 mod curve;
 mod engine;
 mod field;

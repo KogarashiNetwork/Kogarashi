@@ -1,9 +1,11 @@
 use crate::arithmetic::limbs::{add, double, mul, neg, square, sub};
+use crate::coordinate::Projective;
 use crate::domain::field::field_operation;
 use crate::error::Error;
+use crate::interface::coordinate::Coordinate;
 use core::{
     cmp::Ordering,
-    fmt::{Display, Formatter, Result as FmtResult},
+    fmt::{Binary, Display, Formatter, Result as FmtResult},
     ops::{Add, Mul, Neg, Sub},
     ops::{AddAssign, MulAssign, SubAssign},
 };
@@ -89,17 +91,30 @@ impl Fr {
 
     fn to_bytes(&self) -> [u8; 64] {
         let mut bytes: [u8; 64] = [0; 64];
-        let mut index = 0;
+        let mut index = 15;
         for i in 0..self.0.len() {
             let mut number = self.0[i];
             for n in 0..16 {
-                let quotient = number / 16_u64.pow(16 - n as u32);
-                bytes[index] = quotient as u8;
-                number = number % 16_u64.pow(16 - n as u32);
+                let quotient = number as u128 / 16_u128.pow(15 - n as u32);
+                bytes[index - n] = quotient as u8;
+                number = (number as u128 % 16_u128.pow(15 - n as u32)) as u64;
+            }
+            index += 16;
+        }
+        bytes
+    }
+
+    fn to_bits(&self) -> [u8; 256] {
+        let mut index = 0;
+        let mut bits: [u8; 256] = [0; 256];
+        for mut x in self.0 {
+            for _ in 0..64 {
+                bits[index] = (x & 1) as u8;
+                x = x >> 1;
                 index += 1;
             }
         }
-        bytes
+        bits
     }
 
     fn from_u512(limbs: [u64; 8]) -> Self {
@@ -122,25 +137,38 @@ impl Fr {
 }
 
 #[cfg(test)]
-mod fr_tests {
+mod tests {
     use super::*;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
+    use crate::interface::coordinate::Coordinate;
 
     #[test]
-    fn test_random() {
-        for i in 0..10000 {
-            let mut initial_seeds = [
-                0x43, 0x62, 0xbe, 0x7d, 0x23, 0xad, 0x56, 0xcd, 0x33, 0x0a, 0x22, 0x23, 0x46, 0x36,
-                0xac, 0xef,
-            ];
-            let seed = i as u8 % u8::MAX;
-            let index = (seed % 16) as usize;
-            initial_seeds[index] = seed;
-            let rng = XorShiftRng::from_seed(initial_seeds);
-            let randomness = Fr::random(rng);
-            assert!(randomness < Fr(*MODULUS))
-        }
+    fn test_is_zero() {
+        let fr = Fr([0, 0, 0, 0]);
+        assert!(fr.is_zero());
+        let fr = Fr([0, 0, 0, 1]);
+        assert!(!fr.is_zero());
+    }
+
+    #[test]
+    fn test_fmt_and_to_bin() {
+        let fr = Fr([
+            0xd0970e5ed6f72cb7,
+            0xa6682093ccc81082,
+            0x06673b0101343b00,
+            0x0e7db4ea6533afa9,
+        ]);
+        libc_print::libc_println!("{}", fr);
+        libc_print::libc_println!("{:b}", fr);
+    }
+
+    #[test]
+    fn test_binary_method() {
+        let fr = Fr([3, 3, 3, 3]);
+        libc_print::libc_println!("{}", fr);
+        let base = Projective::one();
+        libc_print::libc_println!("{:?}", base);
+        let res = fr.binary_method(&base);
+        libc_print::libc_println!("{:?}", res);
     }
 
     #[test]
