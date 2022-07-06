@@ -56,44 +56,42 @@ impl Projective {
     /// cost: 12M + 2S + 6A + 1*2
     pub fn add(&mut self, other: Self) {
         // Y1Z2
-        let a = self.y * other.z;
+        let y1_z2 = self.y * other.z;
         // X1Z2
-        let b = self.x * other.z;
+        let x1_z2 = self.x * other.z;
         // Z1Z2
-        let c = self.z * other.z;
+        let z1_z2 = self.z * other.z;
 
         // Y2*Z1
-        let d = other.y * self.z;
+        let y2_z1 = other.y * self.z;
         // u
-        let e = d - b;
+        let u = y2_z1 - y1_z2;
         // uu
-        let f = e.square();
+        let uu = u.square();
 
         // X2*Z1
-        let g = other.x * self.z;
+        let x2_z1 = other.x * self.z;
         // v
-        let h = g - a;
+        let v = x2_z1 - x1_z2;
         // vv
-        let i = h.square();
+        let vv = v.square();
         // vvv
-        let j = i * h;
+        let vvv = vv * v;
 
-        // R
-        let k = i * a;
+        // vv * X1 * Z2
+        let r = vv * x1_z2;
         // uu*Z1Z2
-        let l = f * c;
-        // 2*R
-        let m = k.double();
+        let l = uu * z1_z2;
         // A
-        let n = l - j - m;
+        let a = l - vvv - r.double();
         // vvv*Y1Z2
-        let o = j * b;
-        // u*(R-A)
-        let p = e * (k - n);
+        let o = vvv * y1_z2;
+        // u*(r-A)
+        let p = u * (r - a);
 
-        self.x = h * n;
+        self.x = v * a;
         self.y = p - o;
-        self.z = j * c;
+        self.z = vvv * z1_z2;
     }
 
     /// The projective coordinate doubling
@@ -101,37 +99,26 @@ impl Projective {
     /// a = 0
     pub fn double(&mut self) {
         // XX
-        let a = self.x.square();
+        let xx = self.x.square();
 
         // w
-        let b = a.double() + a;
-        // s
-        let c = self.y.double() * self.z;
-        // ss
-        let d = c.square();
-        // sss
-        let e = d * c;
+        let w = xx.double() + xx + self.z.square();
+        // y1 * z1
+        let s = self.y * self.z;
+        // 4ss
+        let ss_4 = s.double().square();
 
-        // R
-        let f = self.y * b;
-        // RR
-        let g = f.square();
-
-        // X1+R
-        let h = self.x + f;
-        // (X1+R)^2
-        let i = h.square();
-        // B
-        let j = i - a - g;
         // h
-        let k = c.square() - j.double();
+        let h = w.square();
 
-        // w*(B-h)
-        let l = b * (j - k);
+        // w*(4B-h)
+        let l = -w * h;
+        // 4 * yy * ss
+        let r = (self.y * s).double().square();
 
-        self.x = k * c;
-        self.y = l - g.double();
-        self.z = e;
+        self.x = h.double() * s;
+        self.y = l - r.double();
+        self.z = ss_4.double() * s;
     }
 }
 
