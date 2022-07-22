@@ -107,14 +107,24 @@ macro_rules! field_operation {
             }
         }
 
+        // a * 1 = a, 1 == INF
+        // a + 0 = a,
         impl $field {
-            fn binary_method(&self, base: &Projective) -> Projective {
+            pub fn binary_method(&self, base: &Projective) -> Projective {
                 let mut res = Projective::zero();
+                // libc_print::libc_println!("Zero, res = {:?}", res);
+                // libc_print::libc_println!("Base, base = {:?}", base);
                 for b in self.to_bits().into_iter().rev().skip_while(|x| *x == 0) {
                     if b == 1 {
-                        res.add(base.clone());
+                        if res.is_zero() {
+                            res = base.clone();
+                        } else {
+                            res.add(base.clone());
+                        }
+                        // libc_print::libc_println!("Add, res = {:?}", res);
                     }
                     res.double();
+                    // libc_print::libc_println!("Double, res = {:?}", res);
                 }
                 res
             }

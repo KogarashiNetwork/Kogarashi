@@ -139,7 +139,7 @@ impl Fr {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::interface::coordinate::Coordinate;
+    use crate::coordinate::Affine;
 
     #[test]
     fn test_is_zero() {
@@ -164,11 +164,9 @@ mod tests {
     #[test]
     fn test_binary_method() {
         let fr = Fr([3, 3, 3, 3]);
-        libc_print::libc_println!("{}", fr);
-        let base = Projective::one();
+        let base = Projective::from(Affine::generator());
         libc_print::libc_println!("{:?}", base);
-        let res = fr.binary_method(&base);
-        libc_print::libc_println!("{:?}", res);
+        libc_print::libc_println!("{:?}", fr.binary_method(&base));
     }
 
     #[test]
