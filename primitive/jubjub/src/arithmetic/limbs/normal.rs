@@ -1,7 +1,8 @@
 use super::utils::{adc, mac, sbb};
 const INV: u64 = 0x1ba3_a358_ef78_8ef9;
 
-pub(crate) fn add(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+#[inline]
+pub(crate) const fn add(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let (l0, c) = adc(a[0], b[0], 0);
     let (l1, c) = adc(a[1], b[1], c);
     let (l2, c) = adc(a[2], b[2], c);
@@ -11,7 +12,7 @@ pub(crate) fn add(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
 }
 
 #[inline]
-pub(crate) fn sub(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+pub(crate) const fn sub(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let (l0, brw) = sbb(a[0], b[0], 0);
     let (l1, brw) = sbb(a[1], b[1], brw);
     let (l2, brw) = sbb(a[2], b[2], brw);
@@ -25,12 +26,13 @@ pub(crate) fn sub(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     [l0, l1, l2, l3]
 }
 
-pub(crate) fn double(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+#[inline]
+pub(crate) const fn double(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     add(a, a, p)
 }
 
 #[inline]
-pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+pub(crate) const fn mul(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let (l0, c) = mac(0, a[0], b[0], 0);
     let (l1, c) = mac(0, a[0], b[1], c);
     let (l2, c) = mac(0, a[0], b[2], c);
@@ -54,10 +56,12 @@ pub(crate) fn mul(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     mont(&[l0, l1, l2, l3, l4, l5, l6, l7], p)
 }
 
-pub(crate) fn square(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+#[inline]
+pub(crate) const fn square(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     mul(a, a, p)
 }
 
+#[inline]
 pub(crate) fn neg(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     if a == &[0; 4] {
         *a
@@ -66,7 +70,8 @@ pub(crate) fn neg(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     }
 }
 
-pub(crate) fn mont(a: &[u64; 8], p: &[u64; 4]) -> [u64; 4] {
+#[inline]
+pub(crate) const fn mont(a: &[u64; 8], p: &[u64; 4]) -> [u64; 4] {
     let rhs = a[0].wrapping_mul(INV);
 
     let (_, d) = mac(a[0], rhs, p[0], 0); // a + (b * c) + d = 4 + INV * MOD[0] + 0;
@@ -98,17 +103,4 @@ pub(crate) fn mont(a: &[u64; 8], p: &[u64; 4]) -> [u64; 4] {
     let (l7, _) = adc(a[7], e, d);
 
     sub(&[l4, l5, l6, l7], p, p)
-}
-
-#[cfg(test)]
-mod test {
-    use crate::fr::Fr;
-
-    #[test]
-    fn two_square() {
-        let x = Fr::from_raw([2, 0, 0, 0]);
-        let y = Fr::from_raw([4, 0, 0, 0]);
-
-        assert_eq!(x.square(), y);
-    }
 }
