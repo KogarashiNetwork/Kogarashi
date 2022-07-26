@@ -112,8 +112,6 @@ macro_rules! field_operation {
         impl $field {
             pub fn binary_method(&self, base: &Projective) -> Projective {
                 let mut res = Projective::zero();
-                // libc_print::libc_println!("Zero, res = {:?}", res);
-                // libc_print::libc_println!("Base, base = {:?}", base);
                 for b in self.to_bits().into_iter().rev().skip_while(|x| *x == 0) {
                     if b == 1 {
                         if res.is_zero() {
@@ -121,10 +119,8 @@ macro_rules! field_operation {
                         } else {
                             res.add(base.clone());
                         }
-                        // libc_print::libc_println!("Add, res = {:?}", res);
                     }
                     res.double();
-                    // libc_print::libc_println!("Double, res = {:?}", res);
                 }
                 res
             }

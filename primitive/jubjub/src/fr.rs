@@ -60,6 +60,10 @@ pub struct Fr(pub(crate) [u64; 4]);
 field_operation!(Fr, MODULUS);
 
 impl Fr {
+    pub fn from_raw(val: [u64; 4]) -> Self {
+        Fr(mul(&val, R2, MODULUS))
+    }
+
     pub fn from_hex(hex: &str) -> Result<Fr, Error> {
         let max_len = 64;
         let hex = hex.strip_prefix("0x").unwrap_or(hex);
@@ -86,7 +90,7 @@ impl Fr {
         for i in 0..hex.len() {
             limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
         }
-        Ok(Fr(limbs))
+        Ok(Fr(mul(&limbs, R2, MODULUS)))
     }
 
     fn to_bytes(&self) -> [u8; 64] {
@@ -165,8 +169,8 @@ mod tests {
     fn test_binary_method() {
         let fr = Fr([3, 3, 3, 3]);
         let base = Projective::from(Affine::generator());
-        libc_print::libc_println!("{:?}", base);
-        libc_print::libc_println!("{:?}", fr.binary_method(&base));
+        libc_print::libc_println!("Base = {:?}", base);
+        libc_print::libc_println!("Multiplied = {:?}", fr.binary_method(&base));
     }
 
     #[test]
@@ -176,10 +180,10 @@ mod tests {
         assert_eq!(
             a,
             Fr([
-                0xb9feffffffffaaab,
-                0x1eabfffeb153ffff,
-                0x6730d2a0f6b0f624,
-                0x64774b84f38512bf,
+                0x4ddc8f91e171cd75,
+                0x9b925835a7d203fb,
+                0x0cdb538ead47e463,
+                0x01a19f85f00d79b8,
             ])
         )
     }

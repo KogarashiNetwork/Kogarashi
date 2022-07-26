@@ -34,7 +34,6 @@
 use core::ops::{Add, Mul};
 
 use crate::{fr::Fr, interface::coordinate::Coordinate};
-use libc_print::libc_println;
 use parity_scale_codec::{Decode, Encode};
 
 /// The projective form of coordinate
@@ -80,7 +79,6 @@ impl Projective {
     /// The projective coordinate addition
     /// cost: 12M + 2S + 6A + 1*2
     pub fn add(&mut self, other: Self) {
-        // libc_println!("{self:?}\n{other:?}");
         // Y1Z2
         let y1_z2 = self.y * other.z;
         // X1Z2
@@ -88,15 +86,12 @@ impl Projective {
         // Z1Z2
         let z1_z2 = self.z * other.z;
 
-        // libc_println!("y1z2 = {y1_z2}\nx1z2 = {x1_z2}\nz1_z2 = {z1_z2}");
-
         // Y2*Z1
         let y2_z1 = other.y * self.z;
         // u
         let u = y2_z1 - y1_z2;
         // uu
         let uu = u.square();
-        // libc_println!("y2z1 = {y2_z1}\nu = {u}\nuu = {uu}");
 
         // X2*Z1
         let x2_z1 = other.x * self.z;
@@ -106,7 +101,6 @@ impl Projective {
         let vv = v.square();
         // vvv
         let vvv = vv * v;
-        // libc_println!("x2z1 = {x2_z1}\nv = {v}\nv = {vv}\nvvv = {vvv}");
 
         // vv * X1 * Z2
         let r = vv * x1_z2;
@@ -119,12 +113,9 @@ impl Projective {
         // u*(r-A)
         let p = u * (r - a);
 
-        // libc_println!("r = {r}\nl = {l}\nA = {a}\np = {p}\no = {o}");
-
         self.x = v * a;
         self.y = p - o;
         self.z = vvv * z1_z2;
-        // libc_println!("x = {}\ny = {}\nz = {}", self.x, self.y, self.z);
     }
 
     /// The projective coordinate doubling
@@ -152,7 +143,6 @@ impl Projective {
         self.x = h.double() * s;
         self.y = l - r.double();
         self.z = ss_4.double() * s;
-        // libc_println!("x = {}\ny = {}\nz = {}", self.x, self.y, self.z);
     }
 }
 
@@ -189,17 +179,6 @@ impl Coordinate for Projective {
     }
 
     fn is_on_curve(&self) -> bool {
-        // TODO
-        // libc_println!("y = {:?}", self.y);
-        // libc_println!("y2 = {:?}", self.y.square());
-        // libc_println!("x = {:?}", self.x);
-        // libc_println!(
-        //     "x3 + 4 = {:?}",
-        //     self.x
-        //         .square()
-        //         .mul(self.x)
-        //         .add(Fr::from_hex("0x4").unwrap())
-        // );
         self.y.square()
             == self
                 .x
@@ -214,7 +193,6 @@ mod tests {
     use crate::interface::coordinate::Coordinate;
 
     use super::{Affine, Fr, Projective};
-    use libc_print::libc_println;
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
@@ -238,42 +216,20 @@ mod tests {
 
     // proptest! {
     //     #![proptest_config(ProptestConfig::with_cases(1))]
-    #[test]
-    // fn test_projective(mut a in arb_cdn(), mut b in arb_cdn()) {
-    fn test_projective() {
-        let mut a = Projective {
-            x: Fr([0, 0, 0, 0]),
-            y: Fr([2, 0, 0, 0]),
-            z: Fr::one(),
-            is_infinity: false,
-        };
-        let mut b = Fr([2, 0, 0, 0]).binary_method(&a);
-        libc_println!("{a:?}");
-        libc_println!("{b:?}");
+    //     #[test]
+    //     fn test_projective(mut a in arb_cdn(), mut b in arb_cdn()) {
+    //         let mut c = a.clone();
+    //         let d = b.clone();
 
-        let mut c = a.clone();
-        let d = b.clone();
-        // a.double();
-        // b.add(c);
+    //         a.add(d);
+    //         a.double();
 
-        // (a + b) * 2
-        libc_println!("A + B");
-        a.add(d);
-        libc_println!("(A + B) * 2");
-        a.double();
+    //         c.double();
+    //         b.double();
+    //         b.add(c);
 
-        // b * 2 + a * 2
-        libc_println!("A * 2");
-        c.double();
-        libc_println!("B * 2");
-        b.double();
-        libc_println!("A * 2 + B * 2");
-        b.add(c);
-
-        libc_println!("{a:#?}");
-        libc_println!("{b:#?}");
-        // assert_eq!(a, b);
-    }
+    //         assert_eq!(a, b);
+    //     }
     // }
 
     #[test]
@@ -295,9 +251,9 @@ mod tests {
 
     #[test]
     fn test_on_curve() {
-        // let a = Projective::zero();
+        let a = Projective::zero();
         let b = Projective::from(Affine::generator());
-        // assert!(!a.is_on_curve());
+        assert!(!a.is_on_curve());
         assert!(b.is_on_curve());
     }
 }
