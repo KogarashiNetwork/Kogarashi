@@ -111,10 +111,10 @@ macro_rules! field_operation {
         // a + 0 = a,
         impl $field {
             pub fn binary_method(&self, base: &Projective) -> Projective {
-                let mut res = Projective::zero();
+                let mut res = Projective::identity();
                 for b in self.to_bits().into_iter().rev().skip_while(|x| *x == 0) {
                     if b == 1 {
-                        if res.is_zero() {
+                        if res.is_identity() {
                             res = base.clone();
                         } else {
                             res.add(base.clone());
