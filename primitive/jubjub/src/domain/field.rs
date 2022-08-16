@@ -31,8 +31,8 @@ macro_rules! field_operation {
                 $field([0, 0, 0, 0])
             }
 
-            pub const fn one() -> $field {
-                $field([1, 0, 0, 0])
+            pub fn one() -> $field {
+                $field::from_raw([1, 0, 0, 0])
             }
         }
         impl Add for $field {
@@ -111,14 +111,10 @@ macro_rules! field_operation {
         // a + 0 = a,
         impl $field {
             pub fn binary_method(&self, base: &Projective) -> Projective {
-                let mut res = Projective::zero();
-                for b in self.to_bits().into_iter().rev().skip_while(|x| *x == 0) {
+                let mut res = Projective::identity();
+                for b in self.to_bits().into_iter().rev() {
                     if b == 1 {
-                        if res.is_zero() {
-                            res = base.clone();
-                        } else {
-                            res.add(base.clone());
-                        }
+                        res.add(base.clone());
                     }
                     res.double();
                 }

@@ -167,7 +167,7 @@ mod tests {
 
     #[test]
     fn test_binary_method() {
-        let fr = Fr([3, 3, 3, 3]);
+        let fr = Fr::one();
         let base = Projective::from(Affine::generator());
         libc_print::libc_println!("Base = {:?}", base);
         libc_print::libc_println!("Multiplied = {:?}", fr.binary_method(&base));
