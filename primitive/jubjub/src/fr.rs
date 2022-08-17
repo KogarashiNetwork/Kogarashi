@@ -93,7 +93,7 @@ impl Fr {
         Ok(Fr(mul(&limbs, R2, MODULUS)))
     }
 
-    fn to_bytes(&self) -> [u8; 64] {
+    fn as_bytes(&self) -> [u8; 64] {
         let mut bytes: [u8; 64] = [0; 64];
         let mut index = 15;
         for i in 0..self.0.len() {
@@ -108,13 +108,13 @@ impl Fr {
         bytes
     }
 
-    fn to_bits(&self) -> [u8; 256] {
+    fn as_bits(&self) -> [u8; 256] {
         let mut index = 0;
         let mut bits: [u8; 256] = [0; 256];
         for mut x in self.0 {
             for _ in 0..64 {
                 bits[index] = (x & 1) as u8;
-                x = x >> 1;
+                x >>= 1;
                 index += 1;
             }
         }
@@ -122,17 +122,17 @@ impl Fr {
     }
 
     fn from_u512(limbs: [u64; 8]) -> Self {
-        let a = mul(&[limbs[0], limbs[1], limbs[2], limbs[3]], R2, &MODULUS);
-        let b = mul(&[limbs[4], limbs[5], limbs[6], limbs[7]], R3, &MODULUS);
-        let c = add(&a, &b, &MODULUS);
+        let a = mul(&[limbs[0], limbs[1], limbs[2], limbs[3]], R2, MODULUS);
+        let b = mul(&[limbs[4], limbs[5], limbs[6], limbs[7]], R3, MODULUS);
+        let c = add(&a, &b, MODULUS);
         Fr(c)
     }
 
     fn bytes_to_u64(bytes: &[u8; 16]) -> Result<u64, Error> {
         let mut res: u64 = 0;
-        for i in 0..bytes.len() {
-            res += match bytes[i] {
-                0..=15 => 16u64.pow(i as u32) * bytes[i] as u64,
+        for (i, byte) in bytes.iter().enumerate() {
+            res += match byte {
+                0..=15 => 16u64.pow(i as u32) * (*byte as u64),
                 _ => return Err(Error::BytesInvalid),
             }
         }
@@ -143,7 +143,6 @@ impl Fr {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::coordinate::Affine;
 
     #[test]
     fn test_is_zero() {
@@ -167,8 +166,8 @@ mod tests {
 
     #[test]
     fn test_binary_method() {
-        let fr = Fr::one();
-        let base = Projective::from(Affine::generator());
+        let fr = Fr::from_raw([3, 3, 3, 3]);
+        let base = Projective::generator();
         libc_print::libc_println!("Base = {:?}", base);
         libc_print::libc_println!("Multiplied = {:?}", fr.binary_method(&base));
     }

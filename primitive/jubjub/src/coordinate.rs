@@ -101,9 +101,7 @@ impl Projective {
     pub fn add(&mut self, other: Self) {
         if self.is_identity() {
             *self = other;
-        } else if other.is_identity() {
-            return;
-        } else {
+        } else if !other.is_identity() {
             let z1z1 = self.z.square();
             let z2z2 = other.z.square();
             let u1 = self.x * z2z2; // 0
@@ -197,7 +195,7 @@ impl Coordinate for Projective {
 mod tests {
     use crate::interface::coordinate::Coordinate;
 
-    use super::{Affine, Fr, Projective};
+    use super::{Fr, Projective};
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
@@ -219,9 +217,9 @@ mod tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(1))]
+        #![proptest_config(ProptestConfig::with_cases(1000))]
         #[test]
-         fn test_projective(mut a in arb_cdn(), d in arb_cdn()) {
+         fn test_projective(mut a in arb_cdn()) {
             let mut b = a.clone();
             let c = a.clone();
             a.double();
@@ -248,7 +246,7 @@ mod tests {
     #[test]
     fn test_on_curve() {
         let a = Projective::identity();
-        let b = Projective::from(Affine::generator());
+        let b = Projective::generator();
         assert!(!a.is_on_curve());
         assert!(b.is_on_curve());
     }
