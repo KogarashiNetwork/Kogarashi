@@ -41,28 +41,31 @@ use parity_scale_codec::{Decode, Encode};
 pub struct Affine {
     x: Fr,
     y: Fr,
-    is_infinity: bool,
 }
 
 impl Affine {
-    pub fn generator() -> Self {
+    pub(crate) fn generator() -> Self {
         Self {
-            x: Fr::zero(),
-            y: Fr::from_hex("0x2").expect("Failed to parse hex"),
-            is_infinity: false,
+            x: Fr::from_raw([
+                0x7c24d812779a3316,
+                0x72e38f4ebd4070f3,
+                0x03b3fe93f505a6f2,
+                0xc4c71e5a4102960,
+            ]),
+            y: Fr::from_raw([
+                0xd2047ef3463de4af,
+                0x01ca03640d236cbf,
+                0xd3033593ae386e92,
+                0xaa87a50921b80ec,
+            ]),
         }
     }
 }
 
 impl From<Affine> for Projective {
     fn from(a: Affine) -> Self {
-        let Affine { x, y, is_infinity } = a;
-        Self {
-            x,
-            y,
-            z: Fr::one(),
-            is_infinity,
-        }
+        let Affine { x, y } = a;
+        Self { x, y, z: Fr::one() }
     }
 }
 
@@ -72,10 +75,27 @@ pub struct Projective {
     x: Fr,
     y: Fr,
     z: Fr,
-    is_infinity: bool,
 }
 
 impl Projective {
+    pub(crate) fn generator() -> Self {
+        Self {
+            x: Fr::from_raw([
+                0x7c24d812779a3316,
+                0x72e38f4ebd4070f3,
+                0x03b3fe93f505a6f2,
+                0xc4c71e5a4102960,
+            ]),
+            y: Fr::from_raw([
+                0xd2047ef3463de4af,
+                0x01ca03640d236cbf,
+                0xd3033593ae386e92,
+                0xaa87a50921b80ec,
+            ]),
+            z: Fr::one(),
+        }
+    }
+
     /// The projective coordinate addition
     /// cost: 12M + 2S + 6A + 1*2
     pub fn add(&mut self, other: Self) {
@@ -158,31 +178,18 @@ impl Coordinate for Projective {
             x: Fr::zero(),
             y: Fr::zero(),
             z: Fr::zero(),
-            is_infinity: false,
         }
     }
 
-    fn one() -> Self {
-        // TODO
-        Projective {
-            x: Fr::zero(),
-            y: Fr::zero(),
-            z: Fr::zero(),
-            is_infinity: true,
-        }
+    fn constant_b() -> Fr {
+        Fr::from_raw([4, 0, 0, 0])
     }
-
     fn is_identity(&self) -> bool {
-        self.z.is_zero()
+        self.x.is_zero() && self.y.is_zero() && self.z.is_zero()
     }
 
     fn is_on_curve(&self) -> bool {
-        self.y.square()
-            == self
-                .x
-                .square()
-                .mul(self.x)
-                .add(Fr::from_hex("0x4").unwrap())
+        self.y.square() == self.x.square().mul(self.x).add(Self::constant_b())
     }
 }
 
@@ -207,7 +214,6 @@ mod tests {
                 x,
                 y,
                 z,
-                is_infinity: false
             }
         }
     }
@@ -230,13 +236,11 @@ mod tests {
             x: Fr::one(),
             y: Fr::one(),
             z: Fr::one(),
-            is_infinity: false,
         };
         let b = Projective {
             x: Fr::one(),
             y: Fr::zero(),
             z: Fr::one(),
-            is_infinity: false,
         };
         assert_ne!(a, b)
     }
