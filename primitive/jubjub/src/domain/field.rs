@@ -31,8 +31,8 @@ macro_rules! field_operation {
                 $field([0, 0, 0, 0])
             }
 
-            pub const fn one() -> $field {
-                $field([1, 0, 0, 0])
+            pub fn one() -> $field {
+                $field::from_raw([1, 0, 0, 0])
             }
         }
         impl Add for $field {
