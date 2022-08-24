@@ -31,6 +31,8 @@
 //! We implement coordinate system to refer the following.
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
+use core::ops::{Add, Mul};
+
 use crate::{fr::Fr, interface::coordinate::Coordinate};
 use parity_scale_codec::{Decode, Encode};
 
@@ -39,99 +41,124 @@ use parity_scale_codec::{Decode, Encode};
 pub struct Affine {
     x: Fr,
     y: Fr,
-    is_infinity: bool,
+}
+
+impl Affine {
+    pub(crate) fn generator() -> Self {
+        Self {
+            x: Fr::from_raw([
+                0x7c24d812779a3316,
+                0x72e38f4ebd4070f3,
+                0x03b3fe93f505a6f2,
+                0xc4c71e5a4102960,
+            ]),
+            y: Fr::from_raw([
+                0xd2047ef3463de4af,
+                0x01ca03640d236cbf,
+                0xd3033593ae386e92,
+                0xaa87a50921b80ec,
+            ]),
+        }
+    }
+}
+
+impl From<Affine> for Projective {
+    fn from(a: Affine) -> Self {
+        let Affine { x, y } = a;
+        Self { x, y, z: Fr::one() }
+    }
 }
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Decode, Encode)]
-pub(crate) struct Projective {
+pub struct Projective {
     x: Fr,
     y: Fr,
     z: Fr,
-    is_infinity: bool,
 }
 
 impl Projective {
+    pub(crate) fn generator() -> Self {
+        Self {
+            x: Fr::from_raw([
+                0x7c24d812779a3316,
+                0x72e38f4ebd4070f3,
+                0x03b3fe93f505a6f2,
+                0xc4c71e5a4102960,
+            ]),
+            y: Fr::from_raw([
+                0xd2047ef3463de4af,
+                0x01ca03640d236cbf,
+                0xd3033593ae386e92,
+                0xaa87a50921b80ec,
+            ]),
+            z: Fr::one(),
+        }
+    }
+
     /// The projective coordinate addition
     /// cost: 12M + 2S + 6A + 1*2
     pub fn add(&mut self, other: Self) {
-        // Y1Z2
-        let a = self.y * other.z;
-        // X1Z2
-        let b = self.x * other.z;
-        // Z1Z2
-        let c = self.z * other.z;
+        if self.is_identity() {
+            *self = other;
+        } else if !other.is_identity() {
+            let z1z1 = self.z.square();
+            let z2z2 = other.z.square();
+            let u1 = self.x * z2z2; // 0
+            let u2 = other.x * z1z1; // 0
+            let s1 = self.y * z2z2 * other.z; // !0
+            let s2 = other.y * z1z1 * self.z; // !0
 
-        // Y2*Z1
-        let d = other.y * self.z;
-        // u
-        let e = d - b;
-        // uu
-        let f = e.square();
-
-        // X2*Z1
-        let g = other.x * self.z;
-        // v
-        let h = g - a;
-        // vv
-        let i = h.square();
-        // vvv
-        let j = i * h;
-
-        // R
-        let k = i * a;
-        // uu*Z1Z2
-        let l = f * c;
-        // 2*R
-        let m = k.double();
-        // A
-        let n = l - j - m;
-        // vvv*Y1Z2
-        let o = j * b;
-        // u*(R-A)
-        let p = e * (k - n);
-
-        self.x = h * n;
-        self.y = p - o;
-        self.z = j * c;
+            if u1 == u2 {
+                if s1 == s2 {
+                    self.double()
+                } else {
+                    *self = Projective::identity()
+                }
+            } else {
+                let h = u2 - u1;
+                let i = h.double().square();
+                let j = h * i;
+                let r = (s2 - s1).double();
+                let v = u1 * i;
+                let x3 = r.square() - j - v.double();
+                let s1 = (s1 * j).double();
+                let y3 = r * (v - x3) - s1;
+                let z3 = ((self.z + other.z).square() - z1z1 - z2z2) * h;
+                self.x = x3;
+                self.y = y3;
+                self.z = z3;
+            }
+        }
     }
 
     /// The projective coordinate doubling
-    /// cost: 5M + 6S + 1*a + A + 3*2 + 1*3.
+    /// cost: 1M + 8S + 1*a + 10ADD + 2*2 + 1*3 + 1*8.
     /// a = 0
     pub fn double(&mut self) {
-        // XX
-        let a = self.x.square();
+        let xx = self.x.square();
+        let yy = self.y.square();
+        let yyyy = yy.square();
+        let zz = self.z.square();
 
-        // w
-        let b = a.double() + a;
-        // s
-        let c = self.y.double() * self.z;
-        // ss
-        let d = c.square();
-        // sss
-        let e = d * c;
+        let a = self.x + yy;
+        let b = a.square() - xx - yyyy;
+        let s = b.double();
 
-        // R
-        let f = self.y * b;
-        // RR
-        let g = f.square();
+        let c = xx.double() + xx;
+        let d = Fr::zero(); // a = 0
+        let m = c + d;
+        let e = s.double();
+        let t = m.square() - e;
 
-        // X1+R
-        let h = self.x + f;
-        // (X1+R)^2
-        let i = h.square();
-        // B
-        let j = i - a - g;
-        // h
-        let k = c.square() - j.double();
+        let f = s - t;
+        let l = yyyy.double().double().double();
 
-        // w*(B-h)
-        let l = b * (j - k);
+        let n = self.y * self.z;
 
-        self.x = k * c;
-        self.y = l - g.double();
-        self.z = e;
+        self.x = t;
+        self.y = m * f - l;
+        self.z = n.square() - yy - zz;
     }
 }
 
@@ -144,35 +171,30 @@ impl PartialEq for Projective {
 impl Eq for Projective {}
 
 impl Coordinate for Projective {
-    fn zero() -> Self {
+    fn identity() -> Self {
         Projective {
             x: Fr::zero(),
             y: Fr::zero(),
             z: Fr::zero(),
-            is_infinity: false,
         }
     }
 
-    fn one() -> Self {
-        Projective {
-            x: Fr::one(),
-            y: Fr::one(),
-            z: Fr::one(),
-            is_infinity: false,
-        }
+    fn constant_b() -> Fr {
+        Fr::from_raw([4, 0, 0, 0])
     }
-
-    fn is_zero(&self) -> bool {
+    fn is_identity(&self) -> bool {
         self.x.is_zero() && self.y.is_zero() && self.z.is_zero()
     }
 
     fn is_on_curve(&self) -> bool {
-        todo!()
+        self.y.square() == self.x.square().mul(self.x).add(Self::constant_b())
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::interface::coordinate::Coordinate;
+
     use super::{Fr, Projective};
     use proptest::prelude::*;
     use rand::SeedableRng;
@@ -190,21 +212,19 @@ mod tests {
                 x,
                 y,
                 z,
-                is_infinity: false
             }
         }
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100))]
+        #![proptest_config(ProptestConfig::with_cases(1000))]
         #[test]
-        fn test_projective(mut a in arb_cdn()) {
+         fn test_projective(mut a in arb_cdn()) {
             let mut b = a.clone();
             let c = a.clone();
             a.double();
             b.add(c);
-
-            assert_eq!(a, b)
+            assert_eq!(a, b);
         }
     }
 
@@ -214,14 +234,20 @@ mod tests {
             x: Fr::one(),
             y: Fr::one(),
             z: Fr::one(),
-            is_infinity: false,
         };
         let b = Projective {
             x: Fr::one(),
             y: Fr::zero(),
             z: Fr::one(),
-            is_infinity: false,
         };
         assert_ne!(a, b)
+    }
+
+    #[test]
+    fn test_on_curve() {
+        let a = Projective::identity();
+        let b = Projective::generator();
+        assert!(!a.is_on_curve());
+        assert!(b.is_on_curve());
     }
 }

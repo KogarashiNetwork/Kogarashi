@@ -1,10 +1,12 @@
+use crate::fr::Fr;
+
 /// Elliptic curve affine point
 pub trait Coordinate {
-    fn zero() -> Self;
+    fn identity() -> Self;
 
-    fn one() -> Self;
+    fn is_identity(&self) -> bool;
 
-    fn is_zero(&self) -> bool;
+    fn constant_b() -> Fr;
 
     fn is_on_curve(&self) -> bool;
 }
