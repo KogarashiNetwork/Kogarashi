@@ -21,7 +21,6 @@ rand_core = "0.6"
 members = [
     "primitive/jubjub",
     "primitive/elgamal",
-    "pallets/confidential_smart_contract",
     "pallets/confidential_transfer"
 ]
 
