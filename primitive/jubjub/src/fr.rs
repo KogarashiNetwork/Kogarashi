@@ -169,7 +169,8 @@ mod tests {
         let fr = Fr::from_raw([3, 3, 3, 3]);
         let base = Projective::generator();
         libc_print::libc_println!("Base = {:?}", base);
-        libc_print::libc_println!("Multiplied = {:?}", fr.binary_method(&base));
+        libc_print::libc_println!("Multiplied = {:?}", fr * base.clone());
+        libc_print::libc_println!("Multiplied, commutative = {:?}", base * fr);
     }
 
     #[test]
@@ -194,12 +195,11 @@ mod tests {
         let b = Fr::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad83")
             .unwrap();
 
-        assert_eq!(a <= a, true);
-        assert_eq!(a >= a, true);
-        assert_eq!(a == a, true);
-        assert_eq!(a < b, true);
-        assert_eq!(a > b, false);
-        assert_eq!(a != b, true);
-        assert_eq!(a == b, false);
+        assert!(a <= a);
+        assert!(a >= a);
+        assert!(a == a);
+        assert!(a < b);
+        assert!(a <= b);
+        assert!(a != b);
     }
 }

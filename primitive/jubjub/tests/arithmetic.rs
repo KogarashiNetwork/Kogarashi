@@ -17,10 +17,10 @@ mod arithmetic_tests {
         #![proptest_config(ProptestConfig::with_cases(1000000))]
         #[test]
         fn add_test(mut a in arb_fr()) {
-            let b = a.clone();
-            let mut c = a.clone();
+            let b = a;
+            let mut c = a;
             // a + a = a * 2
-            a.add_assign(b);
+            a += b;
             c.double_assign();
             assert_eq!(a, c);
         }
@@ -31,16 +31,16 @@ mod arithmetic_tests {
         #![proptest_config(ProptestConfig::with_cases(1000000))]
         #[test]
         fn sub_test(mut a in arb_fr()) {
-            let b = a.clone();
-            let mut c = a.clone();
-            let mut d = a.clone();
+            let b = a;
+            let mut c = a;
+            let mut d = a;
 
             // a - a = a * 2 - a * 2
-            a.sub_assign(b);
+            a -= b;
             c.double_assign();
 
             d.double_assign();
-            c.sub_assign(d);
+            c -= d;
 
             assert_eq!(a, c);
         }
@@ -50,19 +50,19 @@ mod arithmetic_tests {
         #![proptest_config(ProptestConfig::with_cases(1000000))]
         #[test]
         fn mul_test(mut a in arb_fr(), b in arb_fr(), c in arb_fr()) {
-            let mut a2 = a.clone();
-            let mut b2 = b.clone();
-            let c2 = c.clone();
-            let mut a3 = a.clone();
+            let mut a2 = a;
+            let mut b2 = b;
+            let c2 = c;
+            let mut a3 = a;
 
             // a * b + a * c
-            a.mul_assign(b);
-            a2.mul_assign(c);
-            a.add_assign(a2);
+            a *= b;
+            a2 *= c;
+            a += a2;
 
             // a * (b + c)
-            b2.add_assign(c2);
-            a3.mul_assign(b2);
+            b2 += c2;
+            a3 *= b2;
 
             assert_eq!(a, a3);
         }
@@ -72,18 +72,18 @@ mod arithmetic_tests {
         #![proptest_config(ProptestConfig::with_cases(1000000))]
         #[test]
         fn square_test(mut a in arb_fr(), mut b in arb_fr()) {
-            let mut a2 = a.clone();
-            let mut b2 = b.clone();
+            let mut a2 = a;
+            let mut b2 = b;
 
             // (a * a) * (b * b)
-            a.mul_assign(a.clone());
-            b.mul_assign(b.clone());
-            a.mul_assign(b);
+            a *= a;
+            b *= b;
+            a *= b;
 
             // a^2 * b^2
             a2.square_assign();
             b2.square_assign();
-            a2.mul_assign(b2);
+            a2 *= b2;
 
             assert_eq!(a, a2);
         }

@@ -78,7 +78,7 @@ pub struct Projective {
 }
 
 impl Projective {
-    pub(crate) fn generator() -> Self {
+    pub fn generator() -> Self {
         Self {
             x: Fr::from_raw([
                 0x7c24d812779a3316,
