@@ -1,0 +1,15 @@
+{
+  "name": "circuits",
+  "version": "1.0.0",
+  "description": "This describes the circuit used in pallet.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "snarkjs": "^0.4.27"
+  }
+}

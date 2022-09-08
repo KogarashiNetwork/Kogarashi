@@ -1,0 +1,13 @@
+node_modules
+
+*.cpp
+*.hpp
+*.asm
+*.dat
+Makefile
+
+*.wasm
+*.js
+
+*.r1cs
+*.sym
