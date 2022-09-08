@@ -1,25 +1,10 @@
 macro_rules! field_operation {
     ($field:ident, $p:ident) => {
-        // three basic arithmetic
+        // basic arithmetic
         impl $field {
-            #[inline(always)]
-            pub fn add_assign(&mut self, other: $field) {
-                self.0 = add(&self.0, &other.0, $p);
-            }
-
-            #[inline(always)]
-            pub fn sub_assign(&mut self, other: $field) {
-                self.0 = sub(&self.0, &other.0, $p);
-            }
-
             #[inline(always)]
             pub fn double_assign(&mut self) {
                 self.0 = double(&self.0, $p)
-            }
-
-            #[inline(always)]
-            pub fn mul_assign(&mut self, other: $field) {
-                self.0 = mul(&self.0, &other.0, $p)
             }
 
             #[inline(always)]
@@ -107,20 +92,35 @@ macro_rules! field_operation {
             }
         }
 
-        // a * 1 = a, 1 == INF
-        // a + 0 = a,
-        impl $field {
-            pub fn binary_method(&self, base: &Projective) -> Projective {
+        impl Mul<Projective> for $field {
+            type Output = Projective;
+            fn mul(self, rhs: Projective) -> Self::Output {
                 let mut res = Projective::identity();
                 for b in self.as_bits().into_iter().rev() {
                     if b == 1 {
-                        res.add(base.clone());
+                        res.add(rhs.clone());
                     }
                     res.double();
                 }
                 res
             }
+        }
 
+        impl Mul<$field> for Projective {
+            type Output = Projective;
+            fn mul(self, rhs: $field) -> Self::Output {
+                let mut res = Projective::identity();
+                for b in rhs.as_bits().into_iter().rev() {
+                    if b == 1 {
+                        res.add(self.clone());
+                    }
+                    res.double();
+                }
+                res
+            }
+        }
+
+        impl $field {
             pub fn is_zero(&self) -> bool {
                 self.0.iter().all(|x| *x == 0)
             }
@@ -131,6 +131,10 @@ macro_rules! field_operation {
 
             pub fn square(self) -> $field {
                 $field(square(&self.0, $p))
+            }
+
+            pub fn invert(self) -> Option<$field> {
+                invert(&self).map(|x| $field(x))
             }
 
             pub fn random(mut rand: impl RngCore) -> $field {
