@@ -41,6 +41,7 @@ use parity_scale_codec::{Decode, Encode};
 pub struct Affine {
     x: Fr,
     y: Fr,
+    is_infinity: bool,
 }
 
 impl Affine {
@@ -58,23 +59,28 @@ impl Affine {
                 0xd3033593ae386e92,
                 0xaa87a50921b80ec,
             ]),
+            is_infinity: false,
         }
     }
 }
 
 impl From<Affine> for Projective {
     fn from(a: Affine) -> Self {
-        let Affine { x, y } = a;
-        Self { x, y, z: Fr::one() }
+        let Affine { x, y, is_infinity } = a;
+        Self {
+            x,
+            y,
+            z: if is_infinity { Fr::zero() } else { Fr::one() },
+        }
     }
 }
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Decode, Encode)]
 pub struct Projective {
-    x: Fr,
-    y: Fr,
-    z: Fr,
+    pub(crate) x: Fr,
+    pub(crate) y: Fr,
+    pub(crate) z: Fr,
 }
 
 impl Projective {
@@ -159,6 +165,21 @@ impl Projective {
         self.x = t;
         self.y = m * f - l;
         self.z = n.square() - yy - zz;
+    }
+
+    pub fn to_affine(&self) -> Affine {
+        match self.z.invert() {
+            Some(inv) => Affine {
+                x: self.x * inv,
+                y: self.y * inv,
+                is_infinity: false,
+            },
+            None => Affine {
+                x: self.x,
+                y: self.y,
+                is_infinity: true,
+            },
+        }
     }
 }
 

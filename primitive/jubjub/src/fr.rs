@@ -1,4 +1,4 @@
-use crate::arithmetic::limbs::{add, double, mul, neg, square, sub};
+use crate::arithmetic::limbs::{add, double, invert, mul, neg, square, sub};
 use crate::coordinate::Projective;
 use crate::domain::field::field_operation;
 use crate::error::Error;

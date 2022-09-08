@@ -133,6 +133,10 @@ macro_rules! field_operation {
                 $field(square(&self.0, $p))
             }
 
+            pub fn invert(self) -> Option<$field> {
+                invert(&self).map(|x| $field(x))
+            }
+
             pub fn random(mut rand: impl RngCore) -> $field {
                 Fr::from_u512([
                     rand.next_u64(),
