@@ -83,7 +83,6 @@ mod tests {
             libc_print::libc_println!("Encrypted = {:?}", encrypted_balance);
             let decrypted_message = encrypted_balance.decrypt(private_key, r);
             libc_print::libc_println!("Decrypted = {:?}", decrypted_message);
-
         }
     }
 }

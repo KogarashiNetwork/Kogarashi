@@ -20,6 +20,8 @@ sp-runtime = { version = "3.0.0", default-features = false }
 frame-benchmarking = { version = "3.0.0", default-features = false, optional = true }
 frame-support = { version = "3.0.0", default-features = false }
 frame-system = { version = "3.0.0", default-features = false }
+zero-elgamal = { version = "0.1.0", default-features = false, path = "../../primitive/elgamal" }
+plonk = { git = "https://github.com/ZK-Garage/plonk", branch = "master", default-features = false }
 
 [dev-dependencies]
 sp-io = { version = "3.0.0" }

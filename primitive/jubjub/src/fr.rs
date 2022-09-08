@@ -160,17 +160,12 @@ mod tests {
             0x06673b0101343b00,
             0x0e7db4ea6533afa9,
         ]);
-        libc_print::libc_println!("{}", fr);
-        libc_print::libc_println!("{:b}", fr);
     }
 
     #[test]
     fn test_binary_method() {
         let fr = Fr::from_raw([3, 3, 3, 3]);
         let base = Projective::generator();
-        libc_print::libc_println!("Base = {:?}", base);
-        libc_print::libc_println!("Multiplied = {:?}", fr * base.clone());
-        libc_print::libc_println!("Multiplied, commutative = {:?}", base * fr);
     }
 
     #[test]
