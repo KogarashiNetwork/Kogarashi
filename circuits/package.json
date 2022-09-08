@@ -4,7 +4,17 @@
   "description": "This describes the circuit used in pallet.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "circom confidential_transfer.circom --r1cs --wasm --sym --c",
+    "witness": "node confidential_transfer_js/generate_witness.js confidential_transfer_js/confidential_transfer.wasm input.json witness.wtns",
+    "pot:1": "snarkjs powersoftau new bn128 12 pot12_0000.ptau -v",
+    "pot:2": "snarkjs powersoftau contribute pot12_0000.ptau pot12_0001.ptau --name='First contribution' -v",
+    "pot:3": "snarkjs powersoftau prepare phase2 pot12_0001.ptau pot12_final.ptau -v",
+    "pot:4": "snarkjs groth16 setup confidential_transfer.r1cs pot12_final.ptau confidential_transfer_0000.zkey",
+    "pot:5": "snarkjs zkey contribute confidential_transfer_0000.zkey confidential_transfer_0001.zkey --name='1st Contributor Name' -v",
+    "pot:6": "snarkjs zkey export verificationkey confidential_transfer_0001.zkey verification_key.json",
+    "prove": "snarkjs groth16 prove confidential_transfer_0001.zkey witness.wtns proof.json public.json",
+    "verify": "snarkjs groth16 verify verification_key.json public.json proof.json",
+    "test": "yarn compile && yarn witness"
   },
   "keywords": [],
   "author": "",

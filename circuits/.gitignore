@@ -11,3 +11,11 @@ Makefile
 
 *.r1cs
 *.sym
+
+*.wtns
+*.ptau
+*.zkey
+
+proof.json
+public.json
+verification_key.json
