@@ -4,8 +4,8 @@
   "description": "This describes the circuit used in pallet.",
   "main": "index.js",
   "scripts": {
-    "compile": "circom transfer.circom --r1cs --wasm --sym --c",
-    "witness": "node transfer_js/generate_witness.js transfer_js/transfer.wasm transfer_input.json witness.wtns",
+    "compile": "circom src/transfer.circom --r1cs --wasm --sym --c",
+    "witness": "node src/transfer_js/generate_witness.js src/transfer_js/transfer.wasm src/transfer_input.json witness.wtns",
     "pot:1": "snarkjs powersoftau new bn128 12 pot12_0000.ptau -v",
     "pot:2": "snarkjs powersoftau contribute pot12_0000.ptau pot12_0001.ptau --name='First contribution' -v",
     "pot:3": "snarkjs powersoftau prepare phase2 pot12_0001.ptau pot12_final.ptau -v",
@@ -14,7 +14,9 @@
     "pot:6": "snarkjs zkey export verificationkey transfer_0001.zkey verification_key.json",
     "prove": "snarkjs groth16 prove transfer_0001.zkey witness.wtns proof.json public.json",
     "verify": "snarkjs groth16 verify verification_key.json public.json proof.json",
-    "test": "yarn compile && yarn witness && yarn pot:1 && yarn pot:2 && yarn pot:3 && yarn pot:4 && yarn pot:5 && yarn pot:6 && yarn prove && yarn verify"
+    "transfer": "yarn compile && yarn witness && yarn pot:1 && yarn pot:2 && yarn pot:3 && yarn pot:4 && yarn pot:5 && yarn pot:6 && yarn prove && yarn verify",
+    "test": "jest --forceExit",
+    "format": "prettier --write src/**/*.js"
   },
   "keywords": [],
   "author": "",

@@ -1,0 +1,9 @@
+version: '3'
+services:
+  elgamal:
+    build: .
+    container_name: elgamal
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/app

@@ -16,6 +16,8 @@ Makefile
 *.ptau
 *.zkey
 
+*.py
+
 proof.json
 public.json
 verification_key.json
