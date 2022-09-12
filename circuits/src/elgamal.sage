@@ -28,7 +28,7 @@ class ElGamal:
         return encrypted_message / shared_secret
 
     def encrypt(self, message, randomness, public_key):
-        return (self.g^randomness, (self.g^message) * (public_key^randomness))
+        return ((self.g^message) * (public_key^randomness), self.g^randomness)
 
     @staticmethod
     def add(encrypted_a, encrypted_b):
@@ -75,18 +75,18 @@ def confidential_transfer():
     assert(alice_after_encrypted_balance == alice_encrypted_after_balance)
     assert(bob_after_encrypted_balance == bob_encrypted_after_balance)
 
-    (alice_left_encypted_balance, alice_right_encrypted_balance) = alice_encrypted_before_balance
-    (alice_left_encypted_transfer_amount, alice_right_encypted_transfer_amount) = alice_encrypted_transfer_amount
-    (bob_left_encypted_transfer_amount, bob_right_encypted_transfer_amount) = bob_encrypted_transfer_amount
+    (alice_left_encrypted_balance, alice_right_encrypted_balance) = alice_encrypted_before_balance
+    (alice_left_encrypted_transfer_amount, alice_right_encrypted_transfer_amount) = alice_encrypted_transfer_amount
+    (bob_left_encrypted_transfer_amount, bob_right_encrypted_transfer_amount) = bob_encrypted_transfer_amount
     contents = {
         "alice_public_key": alice_pk,
         "bob_public_key": bob_pk,
-        "alice_left_encypted_balance": alice_left_encypted_balance,
+        "alice_left_encrypted_balance": alice_left_encrypted_balance,
         "alice_right_encrypted_balance": alice_right_encrypted_balance,
-        "alice_left_encypted_transfer_amount": alice_left_encypted_transfer_amount,
-        "alice_right_encypted_transfer_amount": alice_right_encypted_transfer_amount,
-        "bob_left_encypted_transfer_amount": bob_left_encypted_transfer_amount,
-        "bob_right_encypted_transfer_amount": bob_right_encypted_transfer_amount,
+        "alice_left_encrypted_transfer_amount": alice_left_encrypted_transfer_amount,
+        "alice_right_encrypted_transfer_amount": alice_right_encrypted_transfer_amount,
+        "bob_left_encrypted_transfer_amount": bob_left_encrypted_transfer_amount,
+        "bob_right_encrypted_transfer_amount": bob_right_encrypted_transfer_amount,
         "generator": elgamal.g,
         "alice_private_key": alice_sk,
         "transfer_amount_b": transfer_amount,
