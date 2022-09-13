@@ -80,9 +80,7 @@ mod tests {
         #[test]
         fn test_elgamal(private_key in arb_fr(), m in arb_fr(), r in arb_fr()) {
             let encrypted_balance = EncryptedNumber::encrypt(private_key, m, r);
-            libc_print::libc_println!("Encrypted = {:?}", encrypted_balance);
             let decrypted_message = encrypted_balance.decrypt(private_key, r);
-            libc_print::libc_println!("Decrypted = {:?}", decrypted_message);
         }
     }
 }
