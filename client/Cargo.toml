@@ -9,6 +9,7 @@ edition = "2021"
 subxt = "0.22.0"
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive", "full", "bit-vec"] }
 tokio = { version = "1.8", features = ["rt-multi-thread", "macros", "time"] }
+sp-keyring = "6.0.0"
 
 [workspace]
 members = []
