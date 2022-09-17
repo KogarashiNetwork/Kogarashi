@@ -46,7 +46,7 @@ sp-transaction-pool = { default-features = false, version = '3.0.0' }
 sp-version = { default-features = false, version = '3.0.0' }
 
 # local dependencies
-pallet-confidential-transfer = { default-features = false, path = '../../pallets/confidential_transfer', version = '0.1.0' }
+# pallet-confidential-transfer = { default-features = false, path = '../../pallets/confidential_transfer', version = '0.1.0' }
 
 [features]
 default = ['std']
@@ -57,7 +57,7 @@ runtime-benchmarks = [
     'frame-system/runtime-benchmarks',
     'hex-literal',
     'pallet-balances/runtime-benchmarks',
-    'pallet-confidential-transfer/runtime-benchmarks',
+    # 'pallet-confidential-transfer/runtime-benchmarks',
     'pallet-timestamp/runtime-benchmarks',
     'sp-runtime/runtime-benchmarks',
 ]
@@ -72,7 +72,7 @@ std = [
     'pallet-grandpa/std',
     'pallet-randomness-collective-flip/std',
     'pallet-sudo/std',
-    'pallet-confidential-transfer/std',
+    # 'pallet-confidential-transfer/std',
     'pallet-timestamp/std',
     'pallet-transaction-payment-rpc-runtime-api/std',
     'pallet-transaction-payment/std',

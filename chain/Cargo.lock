@@ -3572,7 +3572,6 @@ dependencies = [
  "hex-literal",
  "pallet-aura",
  "pallet-balances",
- "pallet-confidential-transfer",
  "pallet-grandpa",
  "pallet-randomness-collective-flip",
  "pallet-sudo",
@@ -3780,20 +3779,6 @@ dependencies = [
  "serde",
  "sp-runtime",
  "sp-std",
-]
-
-[[package]]
-name = "pallet-confidential-transfer"
-version = "0.1.0"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "serde",
- "sp-runtime",
- "sp-std",
- "zero-elgamal",
 ]
 
 [[package]]
@@ -8476,24 +8461,6 @@ dependencies = [
  "parking_lot 0.11.1",
  "rand 0.7.3",
  "static_assertions",
-]
-
-[[package]]
-name = "zero-elgamal"
-version = "0.1.0"
-dependencies = [
- "parity-scale-codec",
- "zero-jubjub",
-]
-
-[[package]]
-name = "zero-jubjub"
-version = "0.1.0"
-dependencies = [
- "parity-scale-codec",
- "rand_core 0.6.2",
- "serde",
- "sp-std",
 ]
 
 [[package]]

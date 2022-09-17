@@ -21,11 +21,12 @@ frame-benchmarking = { version = "3.0.0", default-features = false, optional = t
 frame-support = { version = "3.0.0", default-features = false }
 frame-system = { version = "3.0.0", default-features = false }
 zero-elgamal = { version = "0.1.0", default-features = false, path = "../../primitive/elgamal" }
+plonk = { git = "https://github.com/zero-network/plonk", rev = "c9d8864c5411fbf332e4b23fa80938fd099d8b05", default-features = false }
 
 [dev-dependencies]
-sp-io = { version = "3.0.0" }
-sp-core = { version = "3.0.0" }
-pallet-transaction-payment = { version = "3.0.0" }
+sp-io = { version = "3.0.0", default-features = false }
+sp-core = { version = "3.0.0", default-features = false }
+pallet-transaction-payment = { version = "3.0.0", default-features = false }
 
 [features]
 default = ["std"]
