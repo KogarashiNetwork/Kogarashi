@@ -81,14 +81,16 @@ template ConfidentialTransfer() {
    alice_key_constraint.out === 1;
 }
 
-component main {public [
-               alice_public_key,
-               bob_public_key,
-               alice_left_encrypted_balance,
-               alice_right_encrypted_balance,
-               alice_left_encrypted_transfer_amount,
-               alice_right_encrypted_transfer_amount,
-               bob_left_encrypted_transfer_amount,
-               bob_right_encrypted_transfer_amount,
-               generator
-               ]} = ConfidentialTransfer();
+component main {
+   public [
+      alice_public_key,
+      bob_public_key,
+      alice_left_encrypted_balance,
+      alice_right_encrypted_balance,
+      alice_left_encrypted_transfer_amount,
+      alice_right_encrypted_transfer_amount,
+      bob_left_encrypted_transfer_amount,
+      bob_right_encrypted_transfer_amount,
+      generator
+   ]
+} = ConfidentialTransfer();

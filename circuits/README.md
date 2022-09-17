@@ -1,6 +1,21 @@
 # Circuits Spec
 This describes the circuit used in pallet.
 
+## Command
+
+### Generate Circuit Input
+
+```
+$ docker-compose up
+$ docker-compose exec elgamal sage src/elgamal.sage
+```
+
+### Prove and Verify
+
+```
+$ yarn confidential_transfer
+```
+
 ## Confidential Transfer
 This circuit is implemented according to [`Zether`](https://crypto.stanford.edu/~buenz/papers/zether.pdf) p14 **Transfer transaction**.
 
