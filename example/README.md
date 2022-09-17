@@ -1,5 +1,5 @@
 # Circuits Spec
-This describes the circuit used in pallet.
+This describes the circuit used in confidential transfer pallet.
 
 ## Command
 

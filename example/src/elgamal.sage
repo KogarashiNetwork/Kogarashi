@@ -95,7 +95,7 @@ def confidential_transfer():
         "alice_after_balance": str(alice_after_balance),
         "randomness": str(alice_transfer_randomness)
     }
-    open(f"src/confidential_transfer_input.json", "w", encoding='utf-8').write(str(contents).replace("'", '"') + '\n')
+    open(f"inputs/confidential_transfer_input.json", "w", encoding='utf-8').write(str(contents).replace("'", '"') + '\n')
 
 confidential_transfer()
 
