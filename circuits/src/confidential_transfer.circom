@@ -37,30 +37,30 @@ template ConfidentialTransfer() {
    signal right_encrypted_after_balance;
    signal culculated_pk;
 
-   component alice_left_encrypted_balance_constraint = IsEqual();
+   component alice_left_transfer_amount_constraint = IsEqual();
 
    g_powered_by_balance <-- generator ** transfer_amount_b;
    alice_pk_powered_by_randomness <-- alice_public_key ** randomness;
 
-   alice_left_encrypted_balance_constraint.in[0] <== g_powered_by_balance * alice_pk_powered_by_randomness;
-   alice_left_encrypted_balance_constraint.in[1] <== alice_left_encrypted_balance;
-   alice_left_encrypted_balance_constraint.out === 1;
+   alice_left_transfer_amount_constraint.in[0] <== g_powered_by_balance * alice_pk_powered_by_randomness;
+   alice_left_transfer_amount_constraint.in[1] <== alice_left_encrypted_transfer_amount;
+   alice_left_transfer_amount_constraint.out === 1;
 
-   component bob_left_encrypted_balance_constraint = IsEqual();
+   component bob_left_transfer_amount_constraint = IsEqual();
 
    bob_pk_powered_by_randomness <-- bob_public_key ** randomness;
 
-   bob_left_encrypted_balance_constraint.in[0] <== g_powered_by_balance * bob_pk_powered_by_randomness;
-   bob_left_encrypted_balance_constraint.in[1] <== bob_left_encrypted_transfer_amount;
-   bob_left_encrypted_balance_constraint.out === 1;
+   bob_left_transfer_amount_constraint.in[0] <== g_powered_by_balance * bob_pk_powered_by_randomness;
+   bob_left_transfer_amount_constraint.in[1] <== bob_left_encrypted_transfer_amount;
+   bob_left_transfer_amount_constraint.out === 1;
 
-   component alice_right_encrypted_balance_constraint = IsEqual();
+   component alice_right_transfer_amount_constraint = IsEqual();
 
    g_powered_by_randomness <-- generator ** randomness;
 
-   alice_right_encrypted_balance_constraint.in[0] <== g_powered_by_randomness;
-   alice_right_encrypted_balance_constraint.in[1] <== alice_right_encrypted_balance;
-   alice_right_encrypted_balance_constraint.out === 1;
+   alice_right_transfer_amount_constraint.in[0] <== g_powered_by_randomness;
+   alice_right_transfer_amount_constraint.in[1] <== alice_right_encrypted_transfer_amount;
+   alice_right_transfer_amount_constraint.out === 1;
 
    component alice_after_balance_constraint = IsEqual();
 

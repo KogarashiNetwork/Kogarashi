@@ -1,8 +1,9 @@
+# same prime number with circom finite field
+p = 21888242871839275222246405745257275088548364400416034343698204186575808495617
+F = GF(p)
+
 class ElGamal:
     def __init__(self):
-        # same prime number with circom finite field
-        p = 21888242871839275222246405745257275088548364400416034343698204186575808495617
-        F = GF(p)
         self.F = F
         self.g = F.multiplicative_generator()
 
@@ -78,20 +79,21 @@ def confidential_transfer():
     (alice_left_encrypted_balance, alice_right_encrypted_balance) = alice_encrypted_before_balance
     (alice_left_encrypted_transfer_amount, alice_right_encrypted_transfer_amount) = alice_encrypted_transfer_amount
     (bob_left_encrypted_transfer_amount, bob_right_encrypted_transfer_amount) = bob_encrypted_transfer_amount
+
     contents = {
-        "alice_public_key": alice_pk,
-        "bob_public_key": bob_pk,
-        "alice_left_encrypted_balance": alice_left_encrypted_balance,
-        "alice_right_encrypted_balance": alice_right_encrypted_balance,
-        "alice_left_encrypted_transfer_amount": alice_left_encrypted_transfer_amount,
-        "alice_right_encrypted_transfer_amount": alice_right_encrypted_transfer_amount,
-        "bob_left_encrypted_transfer_amount": bob_left_encrypted_transfer_amount,
-        "bob_right_encrypted_transfer_amount": bob_right_encrypted_transfer_amount,
-        "generator": elgamal.g,
-        "alice_private_key": alice_sk,
-        "transfer_amount_b": transfer_amount,
-        "alice_after_balance": alice_after_balance,
-        "randomness": alice_transfer_randomness
+        "alice_public_key": str(alice_pk),
+        "bob_public_key": str(bob_pk),
+        "alice_left_encrypted_balance": str(alice_left_encrypted_balance),
+        "alice_right_encrypted_balance": str(alice_right_encrypted_balance),
+        "alice_left_encrypted_transfer_amount": str(alice_left_encrypted_transfer_amount),
+        "alice_right_encrypted_transfer_amount": str(alice_right_encrypted_transfer_amount),
+        "bob_left_encrypted_transfer_amount": str(bob_left_encrypted_transfer_amount),
+        "bob_right_encrypted_transfer_amount": str(bob_right_encrypted_transfer_amount),
+        "generator": str(elgamal.g),
+        "alice_private_key": str(alice_sk),
+        "transfer_amount_b": str(transfer_amount),
+        "alice_after_balance": str(alice_after_balance),
+        "randomness": str(alice_transfer_randomness)
     }
     open(f"src/confidential_transfer_input.json", "w", encoding='utf-8').write(str(contents).replace("'", '"') + '\n')
 
