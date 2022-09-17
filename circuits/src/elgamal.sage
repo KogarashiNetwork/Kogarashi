@@ -90,6 +90,7 @@ def confidential_transfer():
         "generator": elgamal.g,
         "alice_private_key": alice_sk,
         "transfer_amount_b": transfer_amount,
+        "alice_after_balance": alice_after_balance,
         "randomness": alice_transfer_randomness
     }
     open(f"src/confidential_transfer_input.json", "w", encoding='utf-8').write(str(contents).replace("'", '"') + '\n')
