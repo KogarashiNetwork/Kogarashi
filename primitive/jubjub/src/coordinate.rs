@@ -239,6 +239,7 @@ impl Coordinate for Projective {
     fn constant_b() -> Fr {
         Fr::from_raw([4, 0, 0, 0])
     }
+
     fn is_identity(&self) -> bool {
         self.x.is_zero() && self.y.is_zero() && self.z.is_zero()
     }

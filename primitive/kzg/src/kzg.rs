@@ -1,10 +1,14 @@
+use core::ops::Mul;
 use parity_scale_codec::alloc::vec::Vec;
 use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
-use zero_jubjub::{coordinate::Projective, fr::Fr};
+use zero_jubjub::{
+    arithmetic::poly::Polynomial, coordinate::Projective, fr::Fr, interface::Coordinate,
+};
 
 pub struct Kzg {
     k: u32,
+    n: u64,
     g1_projective: Vec<Projective>,
     g2_projective: Vec<Projective>,
 }
@@ -27,9 +31,25 @@ impl Kzg {
 
         Kzg {
             k,
+            n,
             g1_projective,
             g2_projective,
         }
+    }
+
+    pub fn g1_commit(self, poly: Polynomial) -> Projective {
+        assert_eq!(self.n, poly.len() as u64);
+
+        let mut acc = Projective::identity();
+
+        poly.iter()
+            .rev()
+            .zip(self.g1_projective.iter())
+            .for_each(|(coeff, at)| {
+                acc.add(at.clone().mul(*coeff));
+            });
+
+        acc
     }
 }
 
