@@ -31,13 +31,13 @@
 //! We implement coordinate system to refer the following.
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
-use core::ops::{Add, Mul};
+use core::ops::{Add, Mul, Neg};
 
 use crate::{fr::Fr, interface::coordinate::Coordinate};
 use parity_scale_codec::{Decode, Encode};
 
 /// The projective form of coordinate
-#[derive(Debug, Clone, Decode, Encode)]
+#[derive(Debug, Clone, Decode, Encode, PartialEq, Eq)]
 pub struct Affine {
     x: Fr,
     y: Fr,
@@ -165,6 +165,14 @@ impl Projective {
         self.x = t;
         self.y = m * f - l;
         self.z = n.square() - yy - zz;
+    }
+
+    pub fn neg(&self) -> Self {
+        Self {
+            x: self.x.neg(),
+            y: self.y.neg(),
+            z: self.z,
+        }
     }
 
     pub fn to_affine(&self) -> Affine {
