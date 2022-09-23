@@ -102,6 +102,42 @@ impl Projective {
         }
     }
 
+    pub fn g1() -> Self {
+        Self {
+            x: Fr::from_raw([
+                0x85d3790e014051f1,
+                0xaa7f260471bc1570,
+                0xeb4ce2141ce5983f,
+                0x7a848c10e9359ab,
+            ]),
+            y: Fr::from_raw([
+                0xfab31faba44ff18a,
+                0x29c8d2a5308d04ce,
+                0xabe251109b820e98,
+                0xdb95d587051a4b7,
+            ]),
+            z: Fr::one(),
+        }
+    }
+
+    pub fn g2() -> Self {
+        Self {
+            x: Fr::from_raw([
+                0x08f9ee6a9cf52e55,
+                0xcd3756a2f35a4943,
+                0xaf18ef6d41736986,
+                0x54dd209a091bc11,
+            ]),
+            y: Fr::from_raw([
+                0x5642a3b127c5986d,
+                0xc9cbd197bdf08e1b,
+                0x4e1b56ffdb7f65f9,
+                0x110cb52133f089b,
+            ]),
+            z: Fr::one(),
+        }
+    }
+
     /// The projective coordinate addition
     /// cost: 12M + 2S + 6A + 1*2
     pub fn add(&mut self, other: Self) {
@@ -211,12 +247,17 @@ impl Coordinate for Projective {
     fn constant_b() -> Fr {
         Fr::from_raw([4, 0, 0, 0])
     }
+
     fn is_identity(&self) -> bool {
         self.x.is_zero() && self.y.is_zero() && self.z.is_zero()
     }
 
     fn is_on_curve(&self) -> bool {
-        self.y.square() == self.x.square().mul(self.x).add(Self::constant_b())
+        if self.is_identity() {
+            true
+        } else {
+            self.y.square() == self.x.square().mul(self.x).add(Self::constant_b())
+        }
     }
 }
 
@@ -276,7 +317,11 @@ mod tests {
     fn test_on_curve() {
         let a = Projective::identity();
         let b = Projective::generator();
-        assert!(!a.is_on_curve());
+        let c = Projective::g1();
+        let d = Projective::g2();
+        assert!(a.is_on_curve());
         assert!(b.is_on_curve());
+        assert!(c.is_on_curve());
+        assert!(d.is_on_curve());
     }
 }

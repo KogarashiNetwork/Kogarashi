@@ -127,7 +127,6 @@ mod tests {
             libc_print::libc_println!("Enc_Alice: {exp_alice_balance_enc:?}\nEnc_Bob: {exp_bob_balance_enc:?}");
             // assert_eq!(exp_alice_balance_enc, alice_after_balance_enc);
             // assert_eq!(exp_bob_balance_enc, bob_after_balance_enc);
-
         }
     }
 }

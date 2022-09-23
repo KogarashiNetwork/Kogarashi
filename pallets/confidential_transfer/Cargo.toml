@@ -1,27 +1,32 @@
 [package]
 name = "pallet-confidential-transfer"
-description = 'confidential transfer pallet'
 version = "0.1.0"
-authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
-edition = "2021"
+authors = ["Parity Technologies <admin@parity.io>"]
+edition = "2018"
 license = "Apache-2.0"
+homepage = "https://substrate.dev"
+repository = "https://github.com/paritytech/substrate/"
+description = "FRAME pallet to manage balances"
+readme = "README.md"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 serde = { version = "1.0.101", optional = true }
-codec = { package = "parity-scale-codec", version = "1.3.4", default-features = false, features = ["derive"] }
-sp-std = { version = "2.0.0", default-features = false }
-sp-runtime = { version = "2.0.0", default-features = false }
-frame-benchmarking = { version = "2.0.0", default-features = false, optional = true }
-frame-support = { version = "2.0.0", default-features = false }
-frame-system = { version = "2.0.0", default-features = false }
+codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive"] }
+sp-std = { version = "3.0.0", default-features = false }
+sp-runtime = { version = "3.0.0", default-features = false }
+frame-benchmarking = { version = "3.0.0", default-features = false, optional = true }
+frame-support = { version = "3.0.0", default-features = false }
+frame-system = { version = "3.0.0", default-features = false }
+zero-elgamal = { version = "0.1.0", default-features = false, path = "../../primitive/elgamal" }
+plonk = { git = "https://github.com/zero-network/plonk", rev = "c9d8864c5411fbf332e4b23fa80938fd099d8b05", default-features = false }
 
 [dev-dependencies]
-sp-io = { version = "2.0.0" }
-sp-core = { version = "2.0.0" }
-pallet-transaction-payment = { version = "2.0.0" }
+sp-io = { version = "3.0.0", default-features = false }
+sp-core = { version = "3.0.0", default-features = false }
+pallet-transaction-payment = { version = "3.0.0", default-features = false }
 
 [features]
 default = ["std"]
