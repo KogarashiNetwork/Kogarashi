@@ -2,7 +2,7 @@
 
 mod kzg;
 
-use kzg::Kzg;
+pub use kzg::Kzg;
 
 #[cfg(test)]
 mod tests {
