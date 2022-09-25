@@ -6,7 +6,7 @@ use parity_scale_codec::alloc::vec::Vec;
 pub struct Polynomial(pub Vec<Fr>);
 
 impl Polynomial {
-    pub(crate) fn evaluate(self, at: Fr) -> Projective {
+    pub fn evaluate(self, at: Fr) -> Projective {
         self.0
             .iter()
             .rev()
