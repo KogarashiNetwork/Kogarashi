@@ -1,10 +1,10 @@
+use crate::poly::Polynomial;
+
 use core::ops::Mul;
 use parity_scale_codec::alloc::vec::Vec;
 use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
-use zero_jubjub::{
-    arithmetic::poly::Polynomial, coordinate::Projective, fr::Fr, interface::Coordinate,
-};
+use zero_jubjub::{coordinate::Projective, fr::Fr, interface::Coordinate};
 
 pub struct Kzg {
     k: u32,

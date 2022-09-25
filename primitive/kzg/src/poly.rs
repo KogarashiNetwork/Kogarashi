@@ -1,12 +1,12 @@
-use crate::coordinate::Projective;
-use crate::fr::Fr;
-use crate::interface::Coordinate;
 use parity_scale_codec::alloc::vec::Vec;
+use zero_jubjub::coordinate::Projective;
+use zero_jubjub::fr::Fr;
+use zero_jubjub::interface::Coordinate;
 
-pub struct Polynomial(pub Vec<Fr>);
+pub(crate) struct Polynomial(pub Vec<Fr>);
 
 impl Polynomial {
-    pub fn evaluate(self, at: Fr) -> Projective {
+    pub(crate) fn evaluate(self, at: Fr) -> Projective {
         self.0
             .iter()
             .rev()
