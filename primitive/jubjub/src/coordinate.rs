@@ -31,9 +31,12 @@
 //! We implement coordinate system to refer the following.
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
-use core::ops::{Add, Mul};
+use core::ops::{Add, AddAssign, Mul};
 
-use crate::{fr::Fr, interface::coordinate::Coordinate};
+use crate::arithmetic::coordinate::add;
+use crate::domain::curve::curve_operation;
+use crate::fr::Fr;
+use crate::interface::coordinate::Coordinate;
 use parity_scale_codec::{Decode, Encode};
 
 /// The projective form of coordinate
@@ -82,6 +85,8 @@ pub struct Projective {
     pub(crate) y: Fr,
     pub(crate) z: Fr,
 }
+
+curve_operation!(Projective);
 
 impl Projective {
     pub fn generator() -> Self {

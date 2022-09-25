@@ -20,6 +20,7 @@ macro_rules! field_operation {
                 $field::from_raw([1, 0, 0, 0])
             }
         }
+
         impl Add for $field {
             type Output = $field;
 
@@ -98,7 +99,7 @@ macro_rules! field_operation {
                 let mut res = Projective::identity();
                 for b in self.as_bits().into_iter().rev() {
                     if b == 1 {
-                        res.add(rhs.clone());
+                        res += rhs.clone();
                     }
                     res.double();
                 }
@@ -112,7 +113,7 @@ macro_rules! field_operation {
                 let mut res = Projective::identity();
                 for b in rhs.as_bits().into_iter().rev() {
                     if b == 1 {
-                        res.add(self.clone());
+                        res += self.clone();
                     }
                     res.double();
                 }
