@@ -6,10 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-subxt = "0.10.0"
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive", "full", "bit-vec"] }
+codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive", "full", "bit-vec", "fuzz"] }
 tokio = { version = "1.8", features = ["rt-multi-thread", "macros", "time"] }
-sp-keyring = "6.0.0"
+sp-keyring = "3.0.0"
+sp-runtime = "3.0.0"
+substrate-api-client = "0.6.0"
 
 [workspace]
 members = []

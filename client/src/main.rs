@@ -1,29 +1,47 @@
-use sp_keyring::AccountKeyring;
-use subxt::{ClientBuilder, DefaultConfig, PairSigner, PolkadotExtrinsicParams};
+use codec::Compact;
+use sp_keyring::{sr25519::sr25519::Pair, AccountKeyring};
+use sp_runtime::{AccountId32, MultiAddress};
+use substrate_api_client::{compose_extrinsic, Api, XtStatus};
 
-#[subxt::subxt(runtime_metadata_path = "./artifacts/polkadot_metadata.scale")]
-pub mod polkadot {}
+fn main() {
+    let url = "ws://127.0.0.1:9944";
+    let from = AccountKeyring::Alice.pair();
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let signer = PairSigner::new(AccountKeyring::Alice.pair());
+    let api = Api::<Pair>::new(url.to_string())
+        .map(|api| api.set_signer(from.clone()).unwrap())
+        .unwrap();
 
-    let api = ClientBuilder::new()
-        .build()
-        .await?
-        .to_runtime_api::<polkadot::RuntimeApi<DefaultConfig, PolkadotExtrinsicParams<DefaultConfig>>>();
+    let to = AccountKeyring::Bob.to_account_id();
+    match api.get_account_data(&to).unwrap() {
+        Some(bob) => println!("[+] Bob's Free Balance is is {}\n", bob.free),
+        None => println!("[+] Bob's Free Balance is is 0\n"),
+    }
 
-    // Submit the `transfer` extrinsic from Alice's account to Bob's.
-    let dest = AccountKeyring::Bob.to_account_id().into();
+    let xt = compose_extrinsic(
+        &api,
+        "Balances",
+        "transfer",
+        (
+            MultiAddress::<AccountId32, ()>::Id(to.clone()),
+            Compact(1000),
+        ),
+    );
 
-    // Obtain an extrinsic, calling the "transfer" function in
-    // the "balances" pallet.
-    let extrinsic = api.tx().balances().transfer(dest, 123_456_789_012_345)?;
+    println!(
+        "Sending an extrinsic from Alice (Key = {:?}),\n\nto Bob (Key = {})\n",
+        from.as_ref().public,
+        to
+    );
 
-    // Sign and submit the extrinsic, returning its hash.
-    let tx_hash = extrinsic.sign_and_submit_default(&signer).await?;
+    println!("[+] Composed extrinsic: {:?}\n", xt);
 
-    println!("Balance transfer extrinsic submitted: {}", tx_hash);
+    // send and watch extrinsic until finalized
+    let tx_hash = api
+        .send_extrinsic(xt.hex_encode(), XtStatus::InBlock)
+        .unwrap();
+    println!("[+] Transaction got included. Hash: {:?}\n", tx_hash);
 
-    Ok(())
+    // verify that Bob's free Balance increased
+    let bob = api.get_account_data(&to).unwrap().unwrap();
+    println!("[+] Bob's Free Balance is now {}\n", bob.free);
 }
