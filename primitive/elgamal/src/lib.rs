@@ -107,7 +107,6 @@ mod tests {
             let alice_randomness = Fr::from_hex("0x315").unwrap();
             let bob_randomness = Fr::from_hex("0x1c8").unwrap();
             let alice_transfer_randomness = Fr::from_hex("0x7b").unwrap();
-            libc_print::libc_println!("Alice: {alice_balance}, Bob: {bob_balance}");
             let alice_balance_enc = EncryptedNumber::encrypt(alice_pk, alice_balance, alice_randomness);
             let bob_balance_enc = EncryptedNumber::encrypt(bob_pk, bob_balance, bob_randomness);
 
@@ -120,13 +119,10 @@ mod tests {
             let bob_randomness_sum = bob_randomness + alice_transfer_randomness;
             let explicit_alice = alice_balance - transfer_amount;
             let explicit_bob = bob_balance + transfer_amount;
-            libc_print::libc_println!("Alice: {explicit_alice}, Bob: {explicit_bob}");
             let exp_alice_balance_enc = EncryptedNumber::encrypt(alice_pk, explicit_alice, alice_randomness_sum);
             let exp_bob_balance_enc = EncryptedNumber::encrypt(bob_pk, explicit_bob, bob_randomness_sum);
-            libc_print::libc_println!("Enc_Alice: {alice_after_balance_enc:?}\nEnc_Bob: {bob_after_balance_enc:?}\n");
-            libc_print::libc_println!("Enc_Alice: {exp_alice_balance_enc:?}\nEnc_Bob: {exp_bob_balance_enc:?}");
-            // assert_eq!(exp_alice_balance_enc, alice_after_balance_enc);
-            // assert_eq!(exp_bob_balance_enc, bob_after_balance_enc);
+            assert_eq!(exp_alice_balance_enc, alice_after_balance_enc);
+            assert_eq!(exp_bob_balance_enc, bob_after_balance_enc);
         }
     }
 }

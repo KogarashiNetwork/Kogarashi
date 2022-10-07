@@ -6,10 +6,16 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-subxt = "0.10.0"
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive", "full", "bit-vec"] }
-tokio = { version = "1.8", features = ["rt-multi-thread", "macros", "time"] }
-sp-keyring = "6.0.0"
+anyhow = "1.0"
+tokio = { version = "1.10.0", features = ["full"] }
+hex = "0.4.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sp-keyring = "3.0.0"
+sp-runtime = "3.0.0"
+sp-version = "3.0.0"
+sp-core = "3.0.0"
+reqwest = { version = "0.11.12", features = ["json"] }
 
 [workspace]
 members = []
