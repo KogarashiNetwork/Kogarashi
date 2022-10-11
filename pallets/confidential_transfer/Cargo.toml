@@ -21,8 +21,7 @@ frame-benchmarking = { version = "3.0.0", default-features = false, optional = t
 frame-support = { version = "3.0.0", default-features = false }
 frame-system = { version = "3.0.0", default-features = false }
 zero-elgamal = { version = "0.1.0", default-features = false, path = "../../primitive/elgamal" }
-plonk = { git = "https://github.com/zero-network/plonk", rev = "c9d8864c5411fbf332e4b23fa80938fd099d8b05", default-features = false }
-# plonk = { default-features = false, path = '../../../plonk', version = "0.8.2" }
+plonk = { git = "https://github.com/zero-network/plonk", branch = "no_std_support", default-features = false }
 
 [dev-dependencies]
 sp-io = { version = "3.0.0", default-features = false }
@@ -39,5 +38,6 @@ std = [
 	"frame-benchmarking/std",
 	"frame-support/std",
 	"frame-system/std",
+	"plonk/std"
 ]
 runtime-benchmarks = ["frame-benchmarking"]
