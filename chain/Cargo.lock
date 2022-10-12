@@ -162,7 +162,6 @@ dependencies = [
  "ark-std",
  "derivative",
  "num-traits",
- "rayon",
  "zeroize",
 ]
 
@@ -180,7 +179,6 @@ dependencies = [
  "num-bigint 0.4.3",
  "num-traits",
  "paste 1.0.5",
- "rayon",
  "rustc_version 0.3.3",
  "zeroize",
 ]
@@ -208,24 +206,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ark-nonnative-field"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "440ad4569974910adbeb84422b7e622b79e08d27142afd113785b7fcfb446186"
-dependencies = [
- "ark-ec",
- "ark-ff",
- "ark-r1cs-std",
- "ark-relations",
- "ark-std",
- "derivative",
- "num-bigint 0.4.3",
- "num-integer",
- "num-traits",
- "tracing",
-]
-
-[[package]]
 name = "ark-poly"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -236,7 +216,6 @@ dependencies = [
  "ark-std",
  "derivative",
  "hashbrown 0.11.2",
- "rayon",
 ]
 
 [[package]]
@@ -247,43 +226,12 @@ checksum = "a71ddfa72bad1446cab7bbecb6018dbbdc9abcbc3a0065483ae5186ad2a64dcd"
 dependencies = [
  "ark-ec",
  "ark-ff",
- "ark-nonnative-field",
  "ark-poly",
- "ark-relations",
  "ark-serialize",
  "ark-std",
  "derivative",
  "digest 0.9.0",
- "rayon",
  "tracing",
-]
-
-[[package]]
-name = "ark-r1cs-std"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22e8fdacb1931f238a0d866ced1e916a49d36de832fd8b83dc916b718ae72893"
-dependencies = [
- "ark-ec",
- "ark-ff",
- "ark-relations",
- "ark-std",
- "derivative",
- "num-bigint 0.4.3",
- "num-traits",
- "tracing",
-]
-
-[[package]]
-name = "ark-relations"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4cba4c1c99792a6834bd97f7fd76578ec2cd58d2afc5139a17e1d1bec65b38f6"
-dependencies = [
- "ark-ff",
- "ark-std",
- "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]
@@ -316,7 +264,6 @@ checksum = "1df2c09229cbc5a028b1d70e00fdb2acee28b1055dfb5ca73eea49c5a25c4e7c"
 dependencies = [
  "num-traits",
  "rand 0.8.3",
- "rayon",
 ]
 
 [[package]]
@@ -4594,7 +4541,7 @@ checksum = "989d43012e2ca1c4a02507c67282691a0a3207f9dc67cec596b43fe925b3d325"
 [[package]]
 name = "plonk"
 version = "0.8.2"
-source = "git+https://github.com/zero-network/plonk?branch=no_std_support#aef7fdb01903483ac4cbb58a3f2eb87aff9c70f3"
+source = "git+https://github.com/zero-network/plonk?branch=no_std_support#363a0c3d2a2443726b17df7b695cb2a7664c8ee5"
 dependencies = [
  "plonk-core",
  "plonk-hashing",
@@ -4603,7 +4550,7 @@ dependencies = [
 [[package]]
 name = "plonk-core"
 version = "0.1.0"
-source = "git+https://github.com/zero-network/plonk?branch=no_std_support#aef7fdb01903483ac4cbb58a3f2eb87aff9c70f3"
+source = "git+https://github.com/zero-network/plonk?branch=no_std_support#363a0c3d2a2443726b17df7b695cb2a7664c8ee5"
 dependencies = [
  "ark-bls12-381",
  "ark-ec",
@@ -4625,7 +4572,7 @@ dependencies = [
 [[package]]
 name = "plonk-hashing"
 version = "0.8.2"
-source = "git+https://github.com/zero-network/plonk?branch=no_std_support#aef7fdb01903483ac4cbb58a3f2eb87aff9c70f3"
+source = "git+https://github.com/zero-network/plonk?branch=no_std_support#363a0c3d2a2443726b17df7b695cb2a7664c8ee5"
 dependencies = [
  "plonk-core",
 ]
