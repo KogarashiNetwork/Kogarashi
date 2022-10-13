@@ -31,102 +31,76 @@
 //! We implement coordinate system to refer the following.
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
+use crate::coordinate::Projective;
 use crate::fr::Fr;
-use parity_scale_codec::{Decode, Encode};
-
-/// The projective form of coordinate
-#[derive(Debug, Clone, Decode, Encode)]
-pub(crate) struct Projective {
-    x: Fr,
-    y: Fr,
-    z: Fr,
-    is_infinity: bool,
-}
+use crate::interface::coordinate::Coordinate;
 
 /// The projective coordinate addition
 /// cost: 12M + 2S + 6A + 1*2
 pub(crate) fn add(rhs: Projective, other: Projective) -> Projective {
-    // Y1Z2
-    let a = rhs.y * other.z;
-    // X1Z2
-    let b = rhs.x * other.z;
-    // Z1Z2
-    let c = rhs.z * other.z;
+    if rhs.is_identity() {
+        return other;
+    } else if !other.is_identity() {
+        let z1z1 = rhs.z.square();
+        let z2z2 = other.z.square();
+        let u1 = rhs.x * z2z2; // 0
+        let u2 = other.x * z1z1; // 0
+        let s1 = rhs.y * z2z2 * other.z; // !0
+        let s2 = other.y * z1z1 * rhs.z; // !0
 
-    // Y2*Z1
-    let d = other.y * rhs.z;
-    // u
-    let e = d - b;
-    // uu
-    let f = e.square();
+        if u1 == u2 {
+            if s1 == s2 {
+                return double(rhs);
+            } else {
+                return Projective::identity();
+            }
+        } else {
+            let h = u2 - u1;
+            let i = h.double().square();
+            let j = h * i;
+            let r = (s2 - s1).double();
+            let v = u1 * i;
+            let x3 = r.square() - j - v.double();
+            let s1 = (s1 * j).double();
 
-    // X2*Z1
-    let g = other.x * rhs.z;
-    // v
-    let h = g - a;
-    // vv
-    let i = h.square();
-    // vvv
-    let j = i * h;
-
-    // R
-    let k = i * a;
-    // uu*Z1Z2
-    let l = f * c;
-    // 2*R
-    let m = k.double();
-    // A
-    let n = l - j - m;
-    // vvv*Y1Z2
-    let o = j * b;
-    // u*(R-A)
-    let p = e * (k - n);
-
-    Projective {
-        x: h * n,
-        y: p - o,
-        z: j * c,
-        is_infinity: false,
+            return Projective {
+                x: x3,
+                y: r * (v - x3) - s1,
+                z: ((rhs.z + other.z).square() - z1z1 - z2z2) * h,
+            };
+        }
     }
+
+    rhs
 }
 
 /// The projective coordinate doubling
 /// cost: 5M + 6S + 1*a + A + 3*2 + 1*3.
 /// a = 0
 pub(crate) fn double(rhs: Projective) -> Projective {
-    // XX
-    let a = rhs.x.square();
+    let xx = rhs.x.square();
+    let yy = rhs.y.square();
+    let yyyy = yy.square();
+    let zz = rhs.z.square();
 
-    // w
-    let b = a.double() + a;
-    // s
-    let c = rhs.y.double() * rhs.z;
-    // ss
-    let d = c.square();
-    // sss
-    let e = d * c;
+    let a = rhs.x + yy;
+    let b = a.square() - xx - yyyy;
+    let s = b.double();
 
-    // R
-    let f = rhs.y * b;
-    // RR
-    let g = f.square();
+    let c = xx.double() + xx;
+    let d = Fr::zero(); // a = 0
+    let m = c + d;
+    let e = s.double();
+    let t = m.square() - e;
 
-    // X1+R
-    let h = rhs.x + f;
-    // (X1+R)^2
-    let i = h.square();
-    // B
-    let j = i - a - g;
-    // h
-    let k = c.square() - j.double();
+    let f = s - t;
+    let l = yyyy.double().double().double();
 
-    // w*(B-h)
-    let l = b * (j - k);
+    let n = rhs.y * rhs.z;
 
     Projective {
-        x: k * c,
-        y: l - g.double(),
-        z: e,
-        is_infinity: false,
+        x: t,
+        y: m * f - l,
+        z: n.square() - yy - zz,
     }
 }
