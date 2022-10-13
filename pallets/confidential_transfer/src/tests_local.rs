@@ -25,7 +25,6 @@ use frame_support::traits::StorageMapShim;
 use frame_support::weights::{DispatchInfo, IdentityFee, Weight};
 use pallet_transaction_payment::CurrencyAdapter;
 use sp_core::H256;
-use sp_io;
 use sp_runtime::{testing::Header, traits::IdentityLookup};
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
