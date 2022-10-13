@@ -13,7 +13,7 @@ readme = "README.md"
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-serde = { version = "1.0.101", optional = true }
+serde = { version = "1.0.101", default-features = false, optional = true }
 codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive"] }
 sp-std = { version = "3.0.0", default-features = false }
 sp-runtime = { version = "3.0.0", default-features = false }
@@ -21,7 +21,7 @@ frame-benchmarking = { version = "3.0.0", default-features = false, optional = t
 frame-support = { version = "3.0.0", default-features = false }
 frame-system = { version = "3.0.0", default-features = false }
 zero-elgamal = { version = "0.1.0", default-features = false, path = "../../primitive/elgamal" }
-plonk = { git = "https://github.com/zero-network/plonk", rev = "c9d8864c5411fbf332e4b23fa80938fd099d8b05", default-features = false }
+plonk = { git = "https://github.com/zero-network/plonk", rev = "4f7ae664709a7814ae166acfc9e2ce17c6ef45be", default-features = false }
 
 [dev-dependencies]
 sp-io = { version = "3.0.0", default-features = false }
@@ -38,5 +38,6 @@ std = [
 	"frame-benchmarking/std",
 	"frame-support/std",
 	"frame-system/std",
+	"plonk/std"
 ]
 runtime-benchmarks = ["frame-benchmarking"]
