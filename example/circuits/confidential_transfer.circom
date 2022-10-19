@@ -35,7 +35,19 @@ template ConfidentialTransfer() {
    signal bob_pk_powered_by_randomness;
    signal left_encrypted_after_balance;
    signal right_encrypted_after_balance;
-   signal culculated_pk;
+   signal calculated_pk;
+
+   component transfer_amount_comp = LessThan(252);
+
+   transfer_amount_comp.in[0] <== 0;
+   transfer_amount_comp.in[1] <== transfer_amount_b;
+   transfer_amount_comp.out === 1;
+
+   component alice_after_balance_comp = LessThan(252);
+
+   alice_after_balance_comp.in[0] <== 0;
+   alice_after_balance_comp.in[1] <== alice_after_balance;
+   alice_after_balance_comp.out === 1;
 
    component alice_left_transfer_amount_constraint = IsEqual();
 
@@ -74,9 +86,9 @@ template ConfidentialTransfer() {
 
    component alice_key_constraint = IsEqual();
 
-   culculated_pk <-- generator ** alice_private_key;
+   calculated_pk <-- generator ** alice_private_key;
 
-   alice_key_constraint.in[0] <== culculated_pk;
+   alice_key_constraint.in[0] <== calculated_pk;
    alice_key_constraint.in[1] <== alice_public_key;
    alice_key_constraint.out === 1;
 }
