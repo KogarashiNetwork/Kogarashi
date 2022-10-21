@@ -1,4 +1,4 @@
-use crate::arithmetic::limbs::{add, double, invert, mul, neg, square, sub};
+use crate::arithmetic::limbs::{add, double, mul, neg, square, sub};
 use crate::coordinate::Projective;
 use crate::domain::field::field_operation;
 use crate::error::Error;
@@ -143,6 +143,9 @@ impl Fr {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use proptest::prelude::*;
+    use rand::SeedableRng;
+    use rand_xorshift::XorShiftRng;
 
     #[test]
     fn test_is_zero() {
@@ -154,7 +157,7 @@ mod tests {
 
     #[test]
     fn test_fmt_and_to_bin() {
-        let fr = Fr([
+        let _fr = Fr([
             0xd0970e5ed6f72cb7,
             0xa6682093ccc81082,
             0x06673b0101343b00,
@@ -164,8 +167,8 @@ mod tests {
 
     #[test]
     fn test_binary_method() {
-        let fr = Fr::from_raw([3, 3, 3, 3]);
-        let base = Projective::generator();
+        let _fr = Fr::from_raw([3, 3, 3, 3]);
+        let _base = Projective::generator();
     }
 
     #[test]
@@ -196,5 +199,26 @@ mod tests {
         assert!(a < b);
         assert!(a <= b);
         assert!(a != b);
+    }
+
+    prop_compose! {
+        fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fr {
+            Fr::random(XorShiftRng::from_seed(bytes))
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(100000))]
+        #[test]
+        fn test_invert(x in arb_fr()) {
+            match Fr::_invert(&x) {
+                Some(y) => {
+                    let z = mul(&x.0, &y, MODULUS);
+                    assert_eq!(Fr(z), Fr::one());
+                },
+                None => assert_eq!(x, Fr::zero())
+            }
+
+        }
     }
 }
