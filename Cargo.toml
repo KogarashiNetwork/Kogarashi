@@ -19,8 +19,9 @@ rand_core = "0.6"
 
 [workspace]
 members = [
-    "primitive/jubjub",
     "primitive/elgamal",
+    "primitive/hash",
+    "primitive/jubjub",
     "primitive/kzg",
     "pallets/confidential_transfer"
 ]
