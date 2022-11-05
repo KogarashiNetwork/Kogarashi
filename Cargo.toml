@@ -23,7 +23,8 @@ members = [
     "primitive/hash",
     "primitive/jubjub",
     "primitive/kzg",
-    "pallets/confidential_transfer"
+    "pallets/confidential_transfer",
+    "pallets/plonk"
 ]
 
 [features]
