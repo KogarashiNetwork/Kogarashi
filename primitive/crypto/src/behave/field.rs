@@ -1,6 +1,6 @@
 // This trait resresents prime field
 
-use super::{algebra::Field, basic::Basic, parity::ParityCmp};
+use super::{algebra::Field, basic::Basic, comp::ParityCmp};
 
 /// This is prime field trait
 pub trait PrimeField: ParityCmp + Field + Basic {

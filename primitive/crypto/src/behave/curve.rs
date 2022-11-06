@@ -1,6 +1,6 @@
 // This trait resresents elliptic curve and its scalar field
 
-use super::{algebra::Ring, basic::Basic, field::PrimeField, parity::ParityCmp};
+use super::{algebra::Ring, basic::Basic, comp::ParityCmp, field::PrimeField};
 
 /// This is curve trait
 /// This has add and mul operation
