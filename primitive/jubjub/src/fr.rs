@@ -11,6 +11,7 @@ use core::{
 };
 use parity_scale_codec::{Decode, Encode};
 use rand_core::RngCore;
+use sp_std::vec::Vec;
 
 pub(crate) const MODULUS: &[u64; 4] = &[
     0xd0970e5ed6f72cb7,
@@ -64,6 +65,10 @@ impl Fr {
         Fr(mul(&val, R2, MODULUS))
     }
 
+    pub fn from_u64(val: u64) -> Self {
+        Fr([val, 0, 0, 0])
+    }
+
     pub fn from_hex(hex: &str) -> Result<Fr, Error> {
         let max_len = 64;
         let hex = hex.strip_prefix("0x").unwrap_or(hex);
@@ -109,13 +114,13 @@ impl Fr {
     }
 
     fn as_bits(&self) -> [u8; 256] {
-        let mut index = 0;
+        let mut index = 256;
         let mut bits: [u8; 256] = [0; 256];
         for mut x in self.0 {
             for _ in 0..64 {
+                index -= 1;
                 bits[index] = (x & 1) as u8;
                 x >>= 1;
-                index += 1;
             }
         }
         bits
@@ -165,10 +170,23 @@ mod tests {
         ]);
     }
 
-    #[test]
-    fn test_binary_method() {
-        let _fr = Fr::from_raw([3, 3, 3, 3]);
-        let _base = Projective::generator();
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(50))]
+        #[test]
+        fn test_binary_method(x in any::<u16>()) {
+            let fr = Fr::from_u64(x as u64);
+            let g = Projective::generator();
+            let mul = fr * g.clone();
+            let rev_mul = g.clone() * fr;
+            assert_eq!(mul, rev_mul);
+
+            let mut acc = Projective::identity();
+            for _ in 0..x {
+                acc += g.clone();
+            }
+
+            assert_eq!(acc, mul);
+        }
     }
 
     #[test]

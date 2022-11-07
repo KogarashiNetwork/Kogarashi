@@ -97,11 +97,14 @@ macro_rules! field_operation {
             type Output = Projective;
             fn mul(self, rhs: Projective) -> Self::Output {
                 let mut res = Projective::identity();
-                for b in self.as_bits().into_iter().rev() {
+                let mut acc = rhs.clone();
+                // TODO
+                let bits: Vec<u8> = self.as_bits().into_iter().skip_while(|x| *x == 0).collect();
+                for &b in bits.iter().rev() {
                     if b == 1 {
-                        res += rhs.clone();
+                        res += acc.clone();
                     }
-                    res.double();
+                    acc.double();
                 }
                 res
             }
@@ -111,11 +114,14 @@ macro_rules! field_operation {
             type Output = Projective;
             fn mul(self, rhs: $field) -> Self::Output {
                 let mut res = Projective::identity();
-                for b in rhs.as_bits().into_iter().rev() {
+                let mut acc = self.clone();
+                // TODO
+                let bits: Vec<u8> = rhs.as_bits().into_iter().skip_while(|x| *x == 0).collect();
+                for &b in bits.iter().rev() {
                     if b == 1 {
-                        res += self.clone();
+                        res += acc.clone();
                     }
-                    res.double();
+                    acc.double();
                 }
                 res
             }
@@ -353,10 +359,9 @@ macro_rules! field_operation {
 
         impl Display for $field {
             fn fmt(&self, f: &mut Formatter) -> FmtResult {
-                let tmp = self.as_bytes();
                 write!(f, "0x")?;
-                for b in tmp.iter().rev().skip_while(|&x| *x == 0) {
-                    write!(f, "{:0x}", b)?;
+                for i in self.0.iter().rev() {
+                    write!(f, "{:016x}", *i)?;
                 }
                 Ok(())
             }
@@ -364,8 +369,7 @@ macro_rules! field_operation {
 
         impl Binary for $field {
             fn fmt(&self, f: &mut Formatter) -> FmtResult {
-                let tmp = self.as_bits();
-                for b in tmp.iter().rev().skip_while(|&x| *x == 0) {
+                for b in self.as_bits().into_iter().skip_while(|x| *x == 0) {
                     write!(f, "{}", b)?;
                 }
                 Ok(())

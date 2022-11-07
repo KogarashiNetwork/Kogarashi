@@ -31,7 +31,7 @@
 //! We implement coordinate system to refer the following.
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
-use core::ops::{Add, AddAssign, Mul, Neg};
+use core::ops::{Add, AddAssign, Neg};
 
 use crate::arithmetic::coordinate::add;
 use crate::domain::curve::curve_operation;
@@ -149,68 +149,52 @@ impl Projective {
         if self.is_identity() {
             *self = other;
         } else if !other.is_identity() {
-            let z1z1 = self.z.square();
-            let z2z2 = other.z.square();
-            let u1 = self.x * z2z2; // 0
-            let u2 = other.x * z1z1; // 0
-            let s1 = self.y * z2z2 * other.z; // !0
-            let s2 = other.y * z1z1 * self.z; // !0
+            let s1 = self.y * other.z;
+            let s2 = other.y * self.z;
+            let u1 = self.x * other.z;
+            let u2 = other.x * self.z;
 
             if u1 == u2 {
                 if s1 == s2 {
-                    self.double()
+                    self.double();
                 } else {
                     *self = Projective::identity()
                 }
             } else {
-                let h = u2 - u1;
-                let i = h.double().square();
-                let j = h * i;
-                let r = (s2 - s1).double();
-                let v = u1 * i;
-                let x3 = r.square() - j - v.double();
-                let s1 = (s1 * j).double();
-                let y3 = r * (v - x3) - s1;
-                let z3 = ((self.z + other.z).square() - z1z1 - z2z2) * h;
-                self.x = x3;
-                self.y = y3;
-                self.z = z3;
+                let s = s1 - s2;
+                let u = u1 - u2;
+                let uu = u.square();
+                let v = self.z * other.z;
+                let w = s.square() * v - uu * (u1 + u2);
+                let uuu = uu * u;
+                self.x = u * w;
+                self.y = s * (u1 * uu - w) - s1 * uuu;
+                self.z = uuu * v;
             }
         }
     }
 
     /// The projective coordinate doubling
     /// cost: 1M + 8S + 1*a + 10ADD + 2*2 + 1*3 + 1*8.
-    /// a = 0
+    /// a = 0, b = 4
     pub fn double(&mut self) {
-        let xx = self.x.square();
-        let yy = self.y.square();
-        let yyyy = yy.square();
-        let zz = self.z.square();
-
-        let a = self.x + yy;
-        let b = a.square() - xx - yyyy;
-        let s = b.double();
-
-        let c = xx.double() + xx;
-        let d = Fr::zero(); // a = 0
-        let m = c + d;
-        let e = s.double();
-        let t = m.square() - e;
-
-        let f = s - t;
-        let l = yyyy.double().double().double();
-
-        let n = self.y * self.z;
-
-        self.x = t;
-        self.y = m * f - l;
-        self.z = n.square() - yy - zz;
+        if self.is_identity() || self.y.is_zero() {
+            *self = Projective::identity();
+        } else {
+            let xx = self.x.square();
+            let t = xx.double() + xx;
+            let u = (self.y * self.z).double();
+            let v = (u * self.x * self.y).double();
+            let w = t.square() - v.double();
+            self.x = u * w;
+            self.y = t * (v - w) - (u.square() * self.y.square()).double();
+            self.z = u.square() * u;
+        }
     }
 
     pub fn neg(&self) -> Self {
         Self {
-            x: self.x.neg(),
+            x: self.x,
             y: self.y.neg(),
             z: self.z,
         }
@@ -234,7 +218,11 @@ impl Projective {
 
 impl PartialEq for Projective {
     fn eq(&self, other: &Self) -> bool {
-        self.x == other.x && self.y == other.y && self.z == other.z
+        if self.is_identity() || other.is_identity() {
+            self.is_identity() && other.is_identity()
+        } else {
+            self.x * other.z == other.x * self.z && self.y * other.z == other.y * self.z
+        }
     }
 }
 
@@ -261,7 +249,8 @@ impl Coordinate for Projective {
         if self.is_identity() {
             true
         } else {
-            self.y.square() == self.x.square().mul(self.x).add(Self::constant_b())
+            self.y.square() * self.z
+                == self.x.square() * self.x + Self::constant_b() * self.z.square() * self.z
         }
     }
 }
@@ -282,25 +271,45 @@ mod tests {
     }
 
     prop_compose! {
-        fn arb_cdn()(x in arb_fr(), y in arb_fr(), z in arb_fr()) -> Projective {
-            Projective {
-                x,
-                y,
-                z,
-            }
+        fn arb_cdn()(k in arb_fr()) -> Projective {
+            Projective::generator() * k
         }
     }
 
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(1000))]
         #[test]
-         fn test_projective(mut a in arb_cdn()) {
-            let mut b = a.clone();
-            let c = a.clone();
+         fn test_projective(mut a in arb_cdn(), mut b in arb_cdn(), mut c in arb_cdn()) {
+            let mut base_for_neg = a.clone();
+            let _b = b.clone();
+            let mut a1 = a.clone();
+            assert!(a.is_on_curve());
+            assert!(b.is_on_curve());
+            assert!(c.is_on_curve());
+            a1.add(b.clone());
+            a1.add(c.clone());
+            c.add(a.clone());
+            c.add(b.clone());
+            assert_eq!(a1, c); // A + B + C == C + A + B
+            let mut x = a.clone();
+            let y = a.clone();
             a.double();
-            b.add(c);
-            assert_eq!(a, b);
+            x.add(y);
+            assert_eq!(a, x); // A * A = A + A
+            base_for_neg.add(base_for_neg.neg());
+            assert_eq!(base_for_neg, Projective::identity()); // A + (-A) = e
+
+            b.add(Projective::identity());
+            assert_eq!(b, _b); // X + e == X
         }
+    }
+
+    #[test]
+    fn test_identity() {
+        let mut iden = Projective::identity();
+        assert!(iden.is_on_curve());
+        iden.double();
+        assert_eq!(iden, Projective::identity()); // e * e = e
     }
 
     #[test]
@@ -320,13 +329,17 @@ mod tests {
 
     #[test]
     fn test_on_curve() {
-        let a = Projective::identity();
-        let b = Projective::generator();
-        let c = Projective::g1();
-        let d = Projective::g2();
-        assert!(a.is_on_curve());
-        assert!(b.is_on_curve());
-        assert!(c.is_on_curve());
-        assert!(d.is_on_curve());
+        let gen = Projective::generator();
+        let mut g1 = Projective::g1();
+        let mut g2 = Projective::g2();
+
+        assert!(gen.is_on_curve());
+        assert!(g1.is_on_curve());
+        assert!(g2.is_on_curve());
+
+        g1.double();
+        g2.add(Projective::g1());
+        assert!(g1.is_on_curve());
+        assert!(g2.is_on_curve());
     }
 }

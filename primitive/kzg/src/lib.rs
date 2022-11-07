@@ -3,7 +3,7 @@
 mod kzg;
 mod poly;
 
-pub use kzg::Kzg;
+pub use crate::kzg::Kzg;
 
 #[cfg(test)]
 mod tests {
