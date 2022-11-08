@@ -4,6 +4,35 @@ macro_rules! field_operation {
         group_operation!($field, $p, $g, $e);
 
         ring_operation!($field, $p);
+
+        impl Field for $field {}
+
+        impl Div for $field {
+            type Output = $field;
+
+            #[inline]
+            fn div(self, rhs: $field) -> $field {
+                let inv = $field(invert(&rhs.0, &$p.0).unwrap());
+                self * inv
+            }
+        }
+
+        impl<'a, 'b> Div<&'b $field> for &'a $field {
+            type Output = $field;
+
+            #[inline]
+            fn div(self, rhs: &'b $field) -> $field {
+                let inv = $field(invert(&rhs.0, &$p.0).unwrap());
+                self * &inv
+            }
+        }
+
+        impl DivAssign for $field {
+            fn div_assign(&mut self, rhs: $field) {
+                let inv = $field(invert(&rhs.0, &$p.0).unwrap());
+                *self *= inv
+            }
+        }
     };
 }
 
@@ -15,7 +44,7 @@ macro_rules! prime_field_operation {
         built_in_operation!($field);
 
         impl PrimeField for $field {
-            const INV: Self = $i;
+            const INV: u64 = $i;
         }
     };
 }
@@ -28,6 +57,8 @@ macro_rules! fft_field_operation {
         impl FftField for $field {
             const ROOT_OF_UNITY: Self = $r;
         }
+
+        impl ParallelCmp for $field {}
     };
 }
 

@@ -9,12 +9,12 @@ pub use group::*;
 pub use ring::*;
 
 use crate::arithmetic::{add, double, invert, mul, neg, square, sub};
-use crate::behave::{Basic, FftField, Field, Group, ParityCmp, PrimeField, Ring};
+use crate::behave::{Basic, FftField, Field, Group, ParallelCmp, ParityCmp, PrimeField, Ring};
 use core::{
     cmp::Ordering,
     fmt::{Display, Formatter, Result as FmtResult},
-    ops::{Add, Mul, Neg, Sub},
-    ops::{AddAssign, MulAssign, SubAssign},
+    ops::{Add, Div, Mul, Neg, Sub},
+    ops::{AddAssign, DivAssign, MulAssign, SubAssign},
 };
 use parity_scale_codec::{Decode, Encode};
 
