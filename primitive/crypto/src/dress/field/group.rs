@@ -1,13 +1,13 @@
 #[macro_export]
 macro_rules! group_operation {
-    ($field:ident, $g:ident, $e:ident) => {
+    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident) => {
         impl Group for $field {
             const GENERATOR: Self = $g;
 
             const IDENTITY: Self = $e;
 
             fn invert(self) -> Self {
-                Self(invert(&self.0, &$p.0).unwrap())
+                Self(invert(&self.0, $p.0, $inv).unwrap())
             }
         }
 

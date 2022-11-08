@@ -1,6 +1,9 @@
 #[macro_export]
 macro_rules! built_in_operation {
     ($element:ident) => {
+        use zero_crypto::behave::*;
+        use zero_crypto::common::*;
+
         impl ParityCmp for $element {}
 
         impl Basic for $element {}

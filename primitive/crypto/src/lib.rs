@@ -4,4 +4,3 @@ pub mod arithmetic;
 pub mod behave;
 pub mod common;
 pub mod dress;
-pub mod entity;

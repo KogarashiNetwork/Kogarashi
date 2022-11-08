@@ -6,10 +6,8 @@ pub use ring::*;
 
 #[macro_export]
 macro_rules! field_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident) => {
-        group_operation!($field, $g, $e);
-
-        ring_operation!($field, $p);
+    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident) => {
+        ring_operation!($field, $p, $g, $e, $inv);
 
         impl Field for $field {}
 
@@ -18,7 +16,7 @@ macro_rules! field_operation {
 
             #[inline]
             fn div(self, rhs: $field) -> $field {
-                let inv = $field(invert(&rhs.0, &$p.0).unwrap());
+                let inv = $field(invert(rhs.0, $p.0, $inv).unwrap());
                 self * inv
             }
         }
@@ -28,14 +26,14 @@ macro_rules! field_operation {
 
             #[inline]
             fn div(self, rhs: &'b $field) -> $field {
-                let inv = $field(invert(&rhs.0, &$p.0).unwrap());
+                let inv = $field(invert(rhs.0, $p.0, $inv).unwrap());
                 self * &inv
             }
         }
 
         impl DivAssign for $field {
             fn div_assign(&mut self, rhs: $field) {
-                let inv = $field(invert(&rhs.0, &$p.0).unwrap());
+                let inv = $field(invert(rhs.0, $p.0, $inv).unwrap());
                 *self *= inv
             }
         }
@@ -44,30 +42,28 @@ macro_rules! field_operation {
 
 #[macro_export]
 macro_rules! prime_field_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident) => {
-        field_operation!($field, $p, $g, $e);
+    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident) => {
+        field_operation!($field, $p, $g, $e, $inv);
 
         built_in_operation!($field);
 
         impl PrimeField for $field {
-            const MODULUS: Self = $p;
-
-            const INV: u64 = $i;
+            const INV: u64 = $inv;
 
             fn double(self) -> Self {
-                Self(double(&self.0, &$p.0))
+                Self(double(self.0, $p.0))
             }
 
             fn square(self) -> Self {
-                Self(square(&self.0, &$p.0))
+                Self(square(self.0, $p.0))
             }
 
             fn double_assign(&mut self) {
-                self.0 = double(&self.0, &$p.0)
+                self.0 = double(self.0, $p.0)
             }
 
             fn square_assign(&mut self) {
-                self.0 = square(&self.0, &$p.0)
+                self.0 = square(self.0, $p.0)
             }
         }
     };
@@ -76,6 +72,8 @@ macro_rules! prime_field_operation {
 #[macro_export]
 macro_rules! fft_field_operation {
     ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident, $r:ident) => {
+        use zero_crypto::arithmetic::limbs::bits_256::*;
+
         prime_field_operation!($field, $p, $g, $e, $i);
 
         impl FftField for $field {
