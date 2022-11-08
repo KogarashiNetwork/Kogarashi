@@ -7,9 +7,9 @@ mod assembly;
 mod normal;
 
 #[cfg(all(feature = "asm", target_arch = "x86_64"))]
-pub(crate) use assembly::{add, double, mul, neg, square, sub};
+pub use assembly::{add, double, mul, neg, square, sub};
 
 #[cfg(any(not(feature = "asm"), not(target_arch = "x86_64")))]
-pub(crate) use normal::{add, double, mul, neg, square, sub};
+pub use normal::{add, double, mul, neg, square, sub};
 
-pub(crate) use normal::invert;
+pub use normal::invert;

@@ -2,7 +2,7 @@ use super::utils::{adc, mac, sbb};
 const INV: u64 = 0x1ba3_a358_ef78_8ef9;
 
 #[inline]
-pub(crate) const fn add(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+pub const fn add(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let (l0, c) = adc(a[0], b[0], 0);
     let (l1, c) = adc(a[1], b[1], c);
     let (l2, c) = adc(a[2], b[2], c);
@@ -12,7 +12,7 @@ pub(crate) const fn add(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
 }
 
 #[inline]
-pub(crate) const fn sub(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+pub const fn sub(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let (l0, brw) = sbb(a[0], b[0], 0);
     let (l1, brw) = sbb(a[1], b[1], brw);
     let (l2, brw) = sbb(a[2], b[2], brw);
@@ -27,12 +27,12 @@ pub(crate) const fn sub(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
 }
 
 #[inline]
-pub(crate) const fn double(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+pub const fn double(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     add(a, a, p)
 }
 
 #[inline]
-pub(crate) const fn mul(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+pub const fn mul(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     let (l0, c) = mac(0, a[0], b[0], 0);
     let (l1, c) = mac(0, a[0], b[1], c);
     let (l2, c) = mac(0, a[0], b[2], c);
@@ -57,12 +57,12 @@ pub(crate) const fn mul(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
 }
 
 #[inline]
-pub(crate) const fn square(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+pub const fn square(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     mul(a, a, p)
 }
 
 #[inline]
-pub(crate) fn neg(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
+pub fn neg(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
     if a == &[0; 4] {
         *a
     } else {
@@ -71,7 +71,7 @@ pub(crate) fn neg(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
 }
 
 #[inline]
-pub(crate) const fn mont(a: &[u64; 8], p: &[u64; 4]) -> [u64; 4] {
+pub const fn mont(a: &[u64; 8], p: &[u64; 4]) -> [u64; 4] {
     let rhs = a[0].wrapping_mul(INV);
 
     let (_, d) = mac(a[0], rhs, p[0], 0); // a + (b * c) + d = 4 + INV * MOD[0] + 0;
@@ -106,7 +106,7 @@ pub(crate) const fn mont(a: &[u64; 8], p: &[u64; 4]) -> [u64; 4] {
 }
 
 #[inline]
-pub(crate) fn invert(a: &[u64; 4], p: &[u64; 4]) -> Option<[u64; 4]> {
+pub fn invert(a: &[u64; 4], p: &[u64; 4]) -> Option<[u64; 4]> {
     let zero: &[u64; 4] = &[0, 0, 0, 0];
     if a == zero {
         return None;
