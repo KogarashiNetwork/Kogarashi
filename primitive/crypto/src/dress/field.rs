@@ -68,6 +68,61 @@ macro_rules! prime_field_operation {
                 self.0 = square(self.0, $p.0, $inv)
             }
         }
+
+        impl PartialOrd for $field {
+            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+                Some(self.cmp(other))
+            }
+
+            fn lt(&self, other: &Self) -> bool {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a != b {
+                        return a < b;
+                    }
+                }
+                false
+            }
+
+            fn le(&self, other: &Self) -> bool {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a != b {
+                        return a < b;
+                    }
+                }
+                true
+            }
+
+            fn gt(&self, other: &Self) -> bool {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a != b {
+                        return a > b;
+                    }
+                }
+                false
+            }
+
+            fn ge(&self, other: &Self) -> bool {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a != b {
+                        return a > b;
+                    }
+                }
+                true
+            }
+        }
+
+        impl Ord for $field {
+            fn cmp(&self, other: &Self) -> Ordering {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a < b {
+                        return Ordering::Less;
+                    } else if a > b {
+                        return Ordering::Greater;
+                    }
+                }
+                Ordering::Equal
+            }
+        }
     };
 }
 

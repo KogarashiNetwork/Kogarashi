@@ -3,7 +3,7 @@
 use super::{algebra::Field, basic::Basic, comp::ParityCmp};
 
 /// This is prime field trait
-pub trait PrimeField: Field + Basic + ParityCmp {
+pub trait PrimeField: Field + Basic + ParityCmp + PartialOrd + Ord {
     const MODULUS: Self;
 
     // mongomery reduction inverse

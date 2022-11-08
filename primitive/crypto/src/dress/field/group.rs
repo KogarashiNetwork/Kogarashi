@@ -23,63 +23,7 @@ macro_rules! group_operation {
             }
         }
 
-        // comparison operation
-        impl Eq for Fr {}
-
-        impl PartialOrd for $field {
-            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-                Some(self.cmp(other))
-            }
-
-            fn lt(&self, other: &Self) -> bool {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a != b {
-                        return a < b;
-                    }
-                }
-                false
-            }
-
-            fn le(&self, other: &Self) -> bool {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a != b {
-                        return a < b;
-                    }
-                }
-                true
-            }
-
-            fn gt(&self, other: &Self) -> bool {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a != b {
-                        return a > b;
-                    }
-                }
-                false
-            }
-
-            fn ge(&self, other: &Self) -> bool {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a != b {
-                        return a > b;
-                    }
-                }
-                true
-            }
-        }
-
-        impl Ord for Fr {
-            fn cmp(&self, other: &Self) -> Ordering {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a < b {
-                        return Ordering::Less;
-                    } else if a > b {
-                        return Ordering::Greater;
-                    }
-                }
-                Ordering::Equal
-            }
-        }
+        impl Eq for $field {}
     };
 }
 

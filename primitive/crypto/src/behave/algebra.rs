@@ -4,7 +4,7 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAss
 
 /// This is group trait
 /// This has generator, identity and inverse
-pub trait Group: PartialEq + Eq + PartialOrd + Ord {
+pub trait Group: PartialEq + Eq {
     const GENERATOR: Self;
 
     const IDENTITY: Self;

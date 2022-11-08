@@ -58,7 +58,7 @@ macro_rules! ring_operation {
 
             #[inline]
             fn neg(self) -> Self {
-                -self
+                $field(neg(self.0, $p.0))
             }
         }
 
