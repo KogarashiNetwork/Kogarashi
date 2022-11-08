@@ -1,4 +1,4 @@
-use crate::arithmetic::limbs::{add, double, invert, mul, neg, square, sub};
+use crate::arithmetic::limbs::{add, double, mul, neg, square, sub};
 use crate::coordinate::Projective;
 use crate::domain::field::field_operation;
 use crate::error::Error;
@@ -11,6 +11,7 @@ use core::{
 };
 use parity_scale_codec::{Decode, Encode};
 use rand_core::RngCore;
+use sp_std::vec::Vec;
 
 pub(crate) const MODULUS: &[u64; 4] = &[
     0xd0970e5ed6f72cb7,
@@ -64,6 +65,10 @@ impl Fr {
         Fr(mul(&val, R2, MODULUS))
     }
 
+    pub fn from_u64(val: u64) -> Self {
+        Fr([val, 0, 0, 0])
+    }
+
     pub fn from_hex(hex: &str) -> Result<Fr, Error> {
         let max_len = 64;
         let hex = hex.strip_prefix("0x").unwrap_or(hex);
@@ -109,13 +114,13 @@ impl Fr {
     }
 
     fn as_bits(&self) -> [u8; 256] {
-        let mut index = 0;
+        let mut index = 256;
         let mut bits: [u8; 256] = [0; 256];
         for mut x in self.0 {
             for _ in 0..64 {
+                index -= 1;
                 bits[index] = (x & 1) as u8;
                 x >>= 1;
-                index += 1;
             }
         }
         bits
@@ -143,6 +148,9 @@ impl Fr {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use proptest::prelude::*;
+    use rand::SeedableRng;
+    use rand_xorshift::XorShiftRng;
 
     #[test]
     fn test_is_zero() {
@@ -154,7 +162,7 @@ mod tests {
 
     #[test]
     fn test_fmt_and_to_bin() {
-        let fr = Fr([
+        let _fr = Fr([
             0xd0970e5ed6f72cb7,
             0xa6682093ccc81082,
             0x06673b0101343b00,
@@ -162,10 +170,23 @@ mod tests {
         ]);
     }
 
-    #[test]
-    fn test_binary_method() {
-        let fr = Fr::from_raw([3, 3, 3, 3]);
-        let base = Projective::generator();
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(50))]
+        #[test]
+        fn test_binary_method(x in any::<u16>()) {
+            let fr = Fr::from_u64(x as u64);
+            let g = Projective::generator();
+            let mul = fr * g.clone();
+            let rev_mul = g.clone() * fr;
+            assert_eq!(mul, rev_mul);
+
+            let mut acc = Projective::identity();
+            for _ in 0..x {
+                acc += g.clone();
+            }
+
+            assert_eq!(acc, mul);
+        }
     }
 
     #[test]
@@ -196,5 +217,26 @@ mod tests {
         assert!(a < b);
         assert!(a <= b);
         assert!(a != b);
+    }
+
+    prop_compose! {
+        fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fr {
+            Fr::random(XorShiftRng::from_seed(bytes))
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(100000))]
+        #[test]
+        fn test_invert(x in arb_fr()) {
+            match Fr::_invert(&x) {
+                Some(y) => {
+                    let z = mul(&x.0, &y, MODULUS);
+                    assert_eq!(Fr(z), Fr::one());
+                },
+                None => assert_eq!(x, Fr::zero())
+            }
+
+        }
     }
 }

@@ -32,75 +32,58 @@
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
 use crate::coordinate::Projective;
-use crate::fr::Fr;
 use crate::interface::coordinate::Coordinate;
 
 /// The projective coordinate addition
 /// cost: 12M + 2S + 6A + 1*2
-pub(crate) fn add(rhs: Projective, other: Projective) -> Projective {
-    if rhs.is_identity() {
-        return other;
-    } else if !other.is_identity() {
-        let z1z1 = rhs.z.square();
-        let z2z2 = other.z.square();
-        let u1 = rhs.x * z2z2; // 0
-        let u2 = other.x * z1z1; // 0
-        let s1 = rhs.y * z2z2 * other.z; // !0
-        let s2 = other.y * z1z1 * rhs.z; // !0
+pub(crate) fn add(lhs: Projective, rhs: Projective) -> Projective {
+    if lhs.is_identity() {
+        return rhs;
+    } else if !rhs.is_identity() {
+        let s1 = lhs.y * rhs.z;
+        let s2 = rhs.y * lhs.z;
+        let u1 = lhs.x * rhs.z;
+        let u2 = rhs.x * lhs.z;
 
         if u1 == u2 {
             if s1 == s2 {
-                return double(rhs);
+                return double(lhs);
             } else {
                 return Projective::identity();
             }
         } else {
-            let h = u2 - u1;
-            let i = h.double().square();
-            let j = h * i;
-            let r = (s2 - s1).double();
-            let v = u1 * i;
-            let x3 = r.square() - j - v.double();
-            let s1 = (s1 * j).double();
-
+            let s = s1 - s2;
+            let u = u1 - u2;
+            let uu = u.square();
+            let v = lhs.z * rhs.z;
+            let w = s.square() * v - uu * (u1 + u2);
+            let uuu = uu * u;
             return Projective {
-                x: x3,
-                y: r * (v - x3) - s1,
-                z: ((rhs.z + other.z).square() - z1z1 - z2z2) * h,
+                x: u * w,
+                y: s * (u1 * uu - w) - s1 * uuu,
+                z: uuu * v,
             };
         }
     }
-
-    rhs
+    lhs
 }
 
 /// The projective coordinate doubling
 /// cost: 5M + 6S + 1*a + A + 3*2 + 1*3.
-/// a = 0
-pub(crate) fn double(rhs: Projective) -> Projective {
-    let xx = rhs.x.square();
-    let yy = rhs.y.square();
-    let yyyy = yy.square();
-    let zz = rhs.z.square();
-
-    let a = rhs.x + yy;
-    let b = a.square() - xx - yyyy;
-    let s = b.double();
-
-    let c = xx.double() + xx;
-    let d = Fr::zero(); // a = 0
-    let m = c + d;
-    let e = s.double();
-    let t = m.square() - e;
-
-    let f = s - t;
-    let l = yyyy.double().double().double();
-
-    let n = rhs.y * rhs.z;
-
-    Projective {
-        x: t,
-        y: m * f - l,
-        z: n.square() - yy - zz,
+/// a = 0, b = 4
+pub(crate) fn double(point: Projective) -> Projective {
+    if point.is_identity() || point.y.is_zero() {
+        Projective::identity()
+    } else {
+        let xx = point.x.square();
+        let t = xx.double() + xx;
+        let u = (point.y * point.z).double();
+        let v = (u * point.x * point.y).double();
+        let w = t.square() - v.double();
+        Projective {
+            x: u * w,
+            y: t * (v - w) - (u.square() * point.y.square()).double(),
+            z: u.square() * u,
+        }
     }
 }
