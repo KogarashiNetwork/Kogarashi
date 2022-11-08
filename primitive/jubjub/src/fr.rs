@@ -1,24 +1,21 @@
-use crate::arithmetic::limbs::{add, double, mul, neg, square, sub};
 use crate::coordinate::Projective;
-use crate::domain::field::field_operation;
 use crate::error::Error;
-use crate::interface::coordinate::Coordinate;
-use core::{
-    cmp::Ordering,
-    fmt::{Binary, Display, Formatter, Result as FmtResult},
-    ops::{Add, Mul, Neg, Sub},
-    ops::{AddAssign, MulAssign, SubAssign},
-};
-use parity_scale_codec::{Decode, Encode};
 use rand_core::RngCore;
-use sp_std::vec::Vec;
+use zero_crypto::dress::{basic::*, field::*};
 
-pub(crate) const MODULUS: &[u64; 4] = &[
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct Fr(pub(crate) [u64; 4]);
+
+const MODULUS: Fr = Fr([
     0xd0970e5ed6f72cb7,
     0xa6682093ccc81082,
     0x06673b0101343b00,
     0x0e7db4ea6533afa9,
-];
+]);
+
+const GENERATOR: Fr = Fr([2, 0, 0, 0]);
+
+const IDENTITY: Fr = Fr([1, 0, 0, 0]);
 
 /// R = 2^256 mod r
 const R: [u64; 4] = [
@@ -48,21 +45,26 @@ pub(crate) const INV: u64 = 0x1ba3a358ef788ef9;
 
 const S: u32 = 1;
 
-const ROOT_OF_UNITY: &[u64; 4] = &[
+const ROOT_OF_UNITY: Fr = Fr([
     0xaa9f02ab1d6124de,
     0xb3524a6466112932,
     0x7342261215ac260b,
     0x4d6b87b1da259e2,
-];
+]);
 
-#[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct Fr(pub(crate) [u64; 4]);
-
-field_operation!(Fr, MODULUS);
+fft_field_operation!(Fr, MODULUS, GENERATOR, IDENTITY, INV, ROOT_OF_UNITY);
 
 impl Fr {
+    pub const fn zero() -> Fr {
+        Fr([0, 0, 0, 0])
+    }
+
+    pub fn one() -> Fr {
+        Fr::from_raw([1, 0, 0, 0])
+    }
+
     pub fn from_raw(val: [u64; 4]) -> Self {
-        Fr(mul(&val, R2, MODULUS))
+        Fr(mul(&val, R2, &Self::MODULUS.0))
     }
 
     pub fn from_u64(val: u64) -> Self {
@@ -95,7 +97,7 @@ impl Fr {
         for i in 0..hex.len() {
             limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
         }
-        Ok(Fr(mul(&limbs, R2, MODULUS)))
+        Ok(Fr(mul(&limbs, R2, &Self::MODULUS.0)))
     }
 
     fn as_bytes(&self) -> [u8; 64] {
@@ -127,9 +129,17 @@ impl Fr {
     }
 
     fn from_u512(limbs: [u64; 8]) -> Self {
-        let a = mul(&[limbs[0], limbs[1], limbs[2], limbs[3]], R2, MODULUS);
-        let b = mul(&[limbs[4], limbs[5], limbs[6], limbs[7]], R3, MODULUS);
-        let c = add(&a, &b, MODULUS);
+        let a = mul(
+            &[limbs[0], limbs[1], limbs[2], limbs[3]],
+            R2,
+            &Self::MODULUS.0,
+        );
+        let b = mul(
+            &[limbs[4], limbs[5], limbs[6], limbs[7]],
+            R3,
+            &Self::MODULUS.0,
+        );
+        let c = add(&a, &b, &Self::MODULUS.0);
         Fr(c)
     }
 
@@ -142,6 +152,23 @@ impl Fr {
             }
         }
         Ok(res)
+    }
+
+    pub fn is_zero(&self) -> bool {
+        self.0.iter().all(|x| *x == 0)
+    }
+
+    pub fn random(mut rand: impl RngCore) -> Fr {
+        Fr::from_u512([
+            rand.next_u64(),
+            rand.next_u64(),
+            rand.next_u64(),
+            rand.next_u64(),
+            rand.next_u64(),
+            rand.next_u64(),
+            rand.next_u64(),
+            rand.next_u64(),
+        ])
     }
 }
 
@@ -229,14 +256,9 @@ mod tests {
         #![proptest_config(ProptestConfig::with_cases(100000))]
         #[test]
         fn test_invert(x in arb_fr()) {
-            match Fr::_invert(&x) {
-                Some(y) => {
-                    let z = mul(&x.0, &y, MODULUS);
-                    assert_eq!(Fr(z), Fr::one());
-                },
-                None => assert_eq!(x, Fr::zero())
-            }
-
+            let inv = Fr::invert(x);
+            let one = x * inv;
+            assert_eq!(one, Fr::one());
         }
     }
 }

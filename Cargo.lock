@@ -3414,6 +3414,7 @@ dependencies = [
  "rand_xorshift",
  "serde",
  "sp-std",
+ "zero-crypto",
 ]
 
 [[package]]

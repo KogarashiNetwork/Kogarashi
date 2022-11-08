@@ -33,6 +33,7 @@
 
 use crate::coordinate::Projective;
 use crate::interface::coordinate::Coordinate;
+use zero_crypto::dress::field::Group;
 
 /// The projective coordinate addition
 /// cost: 12M + 2S + 6A + 1*2

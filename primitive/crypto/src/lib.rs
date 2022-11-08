@@ -2,4 +2,4 @@
 
 mod arithmetic;
 mod behave;
-mod dress;
+pub mod dress;
