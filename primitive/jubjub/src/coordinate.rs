@@ -35,7 +35,8 @@ use crate::arithmetic::coordinate::add;
 use crate::domain::curve::curve_operation;
 use crate::fr::Fr;
 use crate::interface::coordinate::Coordinate;
-use zero_crypto::dress::field::*;
+use zero_crypto::behave::*;
+use zero_crypto::common::*;
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Decode, Encode, PartialEq, Eq)]

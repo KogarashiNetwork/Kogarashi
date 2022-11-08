@@ -26,7 +26,7 @@ const R: [u64; 4] = [
 ];
 
 /// R^2 = 2^512 mod r
-const R2: &[u64; 4] = &[
+const R2: [u64; 4] = [
     0x67719aa495e57731,
     0x51b0cef09ce3fc26,
     0x69dab7fac026e9a5,
@@ -34,7 +34,7 @@ const R2: &[u64; 4] = &[
 ];
 
 /// R^3 = 2^768 mod r
-const R3: &[u64; 4] = &[
+const R3: [u64; 4] = [
     0xe0d6c6563d830544,
     0x323e3883598d0f85,
     0xf0fea3004c2e2ba8,
@@ -64,7 +64,7 @@ impl Fr {
     }
 
     pub fn from_raw(val: [u64; 4]) -> Self {
-        Fr(mul(&val, R2, &Self::MODULUS.0))
+        Fr(mul(val, R2, Self::MODULUS.0, INV))
     }
 
     pub fn from_u64(val: u64) -> Self {
@@ -97,7 +97,7 @@ impl Fr {
         for i in 0..hex.len() {
             limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
         }
-        Ok(Fr(mul(&limbs, R2, &Self::MODULUS.0)))
+        Ok(Fr(mul(limbs, R2, Self::MODULUS.0, INV)))
     }
 
     fn as_bytes(&self) -> [u8; 64] {
@@ -130,16 +130,18 @@ impl Fr {
 
     fn from_u512(limbs: [u64; 8]) -> Self {
         let a = mul(
-            &[limbs[0], limbs[1], limbs[2], limbs[3]],
+            [limbs[0], limbs[1], limbs[2], limbs[3]],
             R2,
-            &Self::MODULUS.0,
+            Self::MODULUS.0,
+            INV,
         );
         let b = mul(
-            &[limbs[4], limbs[5], limbs[6], limbs[7]],
+            [limbs[4], limbs[5], limbs[6], limbs[7]],
             R3,
-            &Self::MODULUS.0,
+            Self::MODULUS.0,
+            INV,
         );
-        let c = add(&a, &b, &Self::MODULUS.0);
+        let c = add(a, b, Self::MODULUS.0);
         Fr(c)
     }
 
@@ -256,7 +258,7 @@ mod tests {
         #![proptest_config(ProptestConfig::with_cases(100000))]
         #[test]
         fn test_invert(x in arb_fr()) {
-            let inv = Fr::invert(x);
+            let inv = Fr::invert(x).unwrap();
             let one = x * inv;
             assert_eq!(one, Fr::one());
         }

@@ -6,8 +6,11 @@ macro_rules! group_operation {
 
             const IDENTITY: Self = $e;
 
-            fn invert(self) -> Self {
-                Self(invert(&self.0, $p.0, $inv).unwrap())
+            fn invert(self) -> Option<Self> {
+                match invert(self.0, $p.0, $inv) {
+                    Some(x) => Some(Self(x)),
+                    None => None,
+                }
             }
         }
 

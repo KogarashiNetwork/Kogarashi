@@ -14,11 +14,11 @@ macro_rules! ring_operation {
             }
         }
 
-        impl<'a, 'b> Add<&'b $field> for &'a Self {
-            type Output = Self;
+        impl<'a, 'b> Add<&'b $field> for &'a $field {
+            type Output = $field;
 
             #[inline]
-            fn add(self, rhs: &'b $field) -> Self {
+            fn add(self, rhs: &'b $field) -> $field {
                 $field(add(self.0, rhs.0, $p.0))
             }
         }
@@ -38,18 +38,18 @@ macro_rules! ring_operation {
             }
         }
 
-        impl<'a, 'b> Mul<&'b $field> for &'a Self {
-            type Output = Self;
+        impl<'a, 'b> Mul<&'b $field> for &'a $field {
+            type Output = $field;
 
             #[inline]
-            fn mul(self, rhs: &'b $field) -> Self {
-                $field(mul(self.0, rhs.0, $p.0))
+            fn mul(self, rhs: &'b $field) -> $field {
+                $field(mul(self.0, rhs.0, $p.0, $inv))
             }
         }
 
         impl MulAssign for $field {
             fn mul_assign(&mut self, rhs: $field) {
-                self.0 = mul(&self.0, rhs.0, $p.0)
+                self.0 = mul(self.0, rhs.0, $p.0, $inv)
             }
         }
 
@@ -58,15 +58,15 @@ macro_rules! ring_operation {
 
             #[inline]
             fn neg(self) -> Self {
-                -&self
+                -self
             }
         }
 
         impl<'a> Neg for &'a $field {
-            type Output = Self;
+            type Output = $field;
 
             #[inline]
-            fn neg(self) -> Self {
+            fn neg(self) -> $field {
                 $field(neg(self.0, $p.0))
             }
         }
@@ -81,10 +81,10 @@ macro_rules! ring_operation {
         }
 
         impl<'a, 'b> Sub<&'b $field> for &'a $field {
-            type Output = Self;
+            type Output = $field;
 
             #[inline]
-            fn sub(self, rhs: &'b $field) -> Self {
+            fn sub(self, rhs: &'b $field) -> $field {
                 $field(sub(self.0, rhs.0, $p.0))
             }
         }

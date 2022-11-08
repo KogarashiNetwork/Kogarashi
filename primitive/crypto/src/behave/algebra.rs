@@ -5,14 +5,14 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAss
 /// This is group trait
 /// This has generator, identity and inverse
 pub trait Group: PartialEq + Eq + PartialOrd + Ord {
-    const MODULUS: Self;
-
     const GENERATOR: Self;
 
     const IDENTITY: Self;
 
     #[must_use]
-    fn invert(self) -> Self;
+    fn invert(self) -> Option<Self>
+    where
+        Self: Sized;
 }
 
 /// This is ring trait

@@ -48,6 +48,8 @@ macro_rules! prime_field_operation {
         built_in_operation!($field);
 
         impl PrimeField for $field {
+            const MODULUS: Self = $p;
+
             const INV: u64 = $inv;
 
             fn double(self) -> Self {
@@ -55,7 +57,7 @@ macro_rules! prime_field_operation {
             }
 
             fn square(self) -> Self {
-                Self(square(self.0, $p.0))
+                Self(square(self.0, $p.0, $inv))
             }
 
             fn double_assign(&mut self) {
@@ -63,7 +65,7 @@ macro_rules! prime_field_operation {
             }
 
             fn square_assign(&mut self) {
-                self.0 = square(self.0, $p.0)
+                self.0 = square(self.0, $p.0, $inv)
             }
         }
     };
