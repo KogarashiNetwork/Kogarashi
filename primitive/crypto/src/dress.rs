@@ -1,20 +1,30 @@
 mod field;
+mod group;
+mod ring;
 
-use crate::arithmetic::{add, double, mul, neg, square, sub};
+pub use field::field_operation;
+pub use group::group_operation;
+pub use ring::ring_operation;
+
+use crate::arithmetic::{add, double, invert, mul, neg, square, sub};
+use crate::behave::{Field, Group, Ring};
 use core::{
     cmp::Ordering,
     fmt::{Display, Formatter, Result as FmtResult},
     ops::{Add, Mul, Neg, Sub},
     ops::{AddAssign, MulAssign, SubAssign},
 };
-pub use field::field_operation;
 
-pub(crate) const MODULUS: &[u64; 4] = &[
+pub(crate) const MODULUS: Fr = Fr([
     0xd0970e5ed6f72cb7,
     0xa6682093ccc81082,
     0x06673b0101343b00,
     0x0e7db4ea6533afa9,
-];
+]);
+
+pub(crate) const GENERATOR: Fr = Fr([2, 0, 0, 0]);
+
+pub(crate) const IDENTITY: Fr = Fr([1, 0, 0, 0]);
 
 /// R = 2^256 mod r
 const R: [u64; 4] = [
@@ -53,4 +63,4 @@ const ROOT_OF_UNITY: &[u64; 4] = &[
 
 pub struct Fr(pub(crate) [u64; 4]);
 
-field_operation!(Fr, MODULUS);
+field_operation!(Fr, MODULUS, GENERATOR, IDENTITY);

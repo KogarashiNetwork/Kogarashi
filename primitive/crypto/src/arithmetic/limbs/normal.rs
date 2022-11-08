@@ -104,3 +104,114 @@ pub(crate) const fn mont(a: &[u64; 8], p: &[u64; 4]) -> [u64; 4] {
 
     sub(&[l4, l5, l6, l7], p, p)
 }
+
+#[inline]
+pub(crate) fn invert(a: &[u64; 4], p: &[u64; 4]) -> Option<[u64; 4]> {
+    let zero: &[u64; 4] = &[0, 0, 0, 0];
+    if a == zero {
+        return None;
+    }
+
+    let mut t1 = square(a, p);
+    let mut t0 = square(&t1, p);
+    let mut t3 = mul(&t0, &&t1, p);
+    let t6 = mul(&t3, a, p);
+    let t7 = mul(&t6, &t1, p);
+    let t12 = mul(&t7, &t3, p);
+    let t13 = mul(&t12, &t0, p);
+    let t16 = mul(&t12, &t3, p);
+    let t2 = mul(&t13, &t3, p);
+    let t15 = mul(&t16, &t3, p);
+    let t19 = mul(&t2, &t0, p);
+    let t9 = mul(&t15, &t3, p);
+    let t18 = mul(&t9, &t3, p);
+    let t14 = mul(&t18, &t1, p);
+    let t4 = mul(&t18, &t0, p);
+    let t8 = mul(&t18, &t3, p);
+    let t17 = mul(&t14, &t3, p);
+    let t11 = mul(&t8, &t3, p);
+    t1 = mul(&t17, &t3, p);
+    let t5 = mul(&t11, &t3, p);
+    t3 = mul(&t5, &t0, p);
+    t0 = square(&t5, p);
+    let t0 = multi_square(&t0, p, 5);
+    let t0 = mul(&t0, &t3, p);
+    let t0 = multi_square(&t0, p, 6);
+    let t0 = mul(&t0, &t8, p);
+    let t0 = multi_square(&t0, p, 7);
+    let t0 = mul(&t0, &t19, p);
+    let t0 = multi_square(&t0, p, 6);
+    let t0 = mul(&t0, &t13, p);
+    let t0 = multi_square(&t0, p, 8);
+    let t0 = mul(&t0, &t14, p);
+    let t0 = multi_square(&t0, p, 6);
+    let t0 = mul(&t0, &t18, p);
+    let t0 = multi_square(&t0, p, 7);
+    let t0 = mul(&t0, &t17, p);
+    let t0 = multi_square(&t0, p, 5);
+    let t0 = mul(&t0, &t16, p);
+    let t0 = multi_square(&t0, p, 3);
+    let t0 = mul(&t0, a, p);
+    let t0 = multi_square(&t0, p, 11);
+    let t0 = mul(&t0, &t11, p);
+    let t0 = multi_square(&t0, p, 8);
+    let t0 = mul(&t0, &t5, p);
+    let t0 = multi_square(&t0, p, 5);
+    let t0 = mul(&t0, &t15, p);
+    let t0 = multi_square(&t0, p, 8);
+    let t0 = mul(&t0, a, p);
+    let t0 = multi_square(&t0, p, 12);
+    let t0 = mul(&t0, &t13, p);
+    let t0 = multi_square(&t0, p, 7);
+    let t0 = mul(&t0, &t9, p);
+    let t0 = multi_square(&t0, p, 5);
+    let t0 = mul(&t0, &t15, p);
+    let t0 = multi_square(&t0, p, 14);
+    let t0 = mul(&t0, &t14, p);
+    let t0 = multi_square(&t0, p, 5);
+    let t0 = mul(&t0, &t13, p);
+    let t0 = multi_square(&t0, p, 2);
+    let t0 = mul(&t0, a, p);
+    let t0 = multi_square(&t0, p, 6);
+    let t0 = mul(&t0, a, p);
+    let t0 = multi_square(&t0, p, 9);
+    let t0 = mul(&t0, &t7, p);
+    let t0 = multi_square(&t0, p, 6);
+    let t0 = mul(&t0, &t12, p);
+    let t0 = multi_square(&t0, p, 8);
+    let t0 = mul(&t0, &t11, p);
+    let t0 = multi_square(&t0, p, 3);
+    let t0 = mul(&t0, a, p);
+    let t0 = multi_square(&t0, p, 12);
+    let t0 = mul(&t0, &t9, p);
+    let t0 = multi_square(&t0, p, 11);
+    let t0 = mul(&t0, &t8, p);
+    let t0 = multi_square(&t0, p, 8);
+    let t0 = mul(&t0, &t7, p);
+    let t0 = multi_square(&t0, p, 4);
+    let t0 = mul(&t0, &t6, p);
+    let t0 = multi_square(&t0, p, 10);
+    let t0 = mul(&t0, &t5, p);
+    let t0 = multi_square(&t0, p, 7);
+    let t0 = mul(&t0, &t3, p);
+    let t0 = multi_square(&t0, p, 6);
+    let t0 = mul(&t0, &t4, p);
+    let t0 = multi_square(&t0, p, 7);
+    let t0 = mul(&t0, &t3, p);
+    let t0 = multi_square(&t0, p, 5);
+    let t0 = mul(&t0, &t2, p);
+    let t0 = multi_square(&t0, p, 6);
+    let t0 = mul(&t0, &t2, p);
+    let t0 = multi_square(&t0, p, 7);
+    let t0 = mul(&t0, &t1, p);
+
+    Some(t0)
+}
+
+fn multi_square(a: &[u64; 4], p: &[u64; 4], num_times: usize) -> [u64; 4] {
+    let mut sqrt = a.clone();
+    for _ in 0..num_times {
+        sqrt = square(&sqrt, p);
+    }
+    sqrt
+}

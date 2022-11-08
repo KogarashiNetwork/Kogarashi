@@ -4,16 +4,27 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAss
 
 /// This is group trait
 /// This has generator, identity and inverse
-pub trait Group: PartialEq + PartialOrd + Ord {
+pub trait Group: PartialEq + Eq + PartialOrd + Ord {
+    const MODULUS: Self;
+
     const GENERATOR: Self;
 
     const IDENTITY: Self;
 
+    #[must_use]
     fn invert(self) -> Self;
 
+    #[must_use]
     fn double(self) -> Self;
 
+    #[must_use]
     fn square(self) -> Self;
+
+    #[must_use]
+    fn double_assign(&mut self);
+
+    #[must_use]
+    fn square_assign(&mut self);
 }
 
 /// This is ring trait
