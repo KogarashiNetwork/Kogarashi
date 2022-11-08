@@ -1,4 +1,4 @@
-use crate::behave::Curve;
+use crate::behave::{Curve, Group};
 use crate::entity::ProjectiveCoordinate;
 
 /// The projective coordinate addition

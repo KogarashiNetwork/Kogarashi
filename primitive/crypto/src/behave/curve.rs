@@ -6,6 +6,12 @@ pub trait Curve {
     // scalar field of curve
     type ScalarField: PrimeField;
 
+    // affine coordinate representation
+    type Affine: Affine;
+
+    // projective coordinate representation
+    type Projective: Projective;
+
     // a param
     const PARAM_A: Self::ScalarField;
 

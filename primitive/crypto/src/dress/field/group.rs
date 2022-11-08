@@ -1,31 +1,13 @@
 #[macro_export]
 macro_rules! group_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident) => {
+    ($field:ident, $g:ident, $e:ident) => {
         impl Group for $field {
-            const MODULUS: Self = $p;
-
             const GENERATOR: Self = $g;
 
             const IDENTITY: Self = $e;
 
             fn invert(self) -> Self {
                 Self(invert(&self.0, &$p.0).unwrap())
-            }
-
-            fn double(self) -> Self {
-                Self(double(&self.0, &$p.0))
-            }
-
-            fn square(self) -> Self {
-                Self(square(&self.0, &$p.0))
-            }
-
-            fn double_assign(&mut self) {
-                self.0 = double(&self.0, &$p.0)
-            }
-
-            fn square_assign(&mut self) {
-                self.0 = square(&self.0, &$p.0)
             }
         }
 

@@ -13,18 +13,6 @@ pub trait Group: PartialEq + Eq + PartialOrd + Ord {
 
     #[must_use]
     fn invert(self) -> Self;
-
-    #[must_use]
-    fn double(self) -> Self;
-
-    #[must_use]
-    fn square(self) -> Self;
-
-    #[must_use]
-    fn double_assign(&mut self);
-
-    #[must_use]
-    fn square_assign(&mut self);
 }
 
 /// This is ring trait
