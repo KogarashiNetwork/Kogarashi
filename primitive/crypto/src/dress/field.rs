@@ -4,24 +4,35 @@ macro_rules! field_operation {
         group_operation!($field, $p, $g, $e);
 
         ring_operation!($field, $p);
+    };
+}
 
-        // basic trait
-        impl Default for $field {
-            fn default() -> Self {
-                Self::IDENTITY
-            }
+#[macro_export]
+macro_rules! prime_field_operation {
+    ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident) => {
+        field_operation!($field, $p, $g, $e);
+
+        built_in_operation!($field);
+
+        impl PrimeField for $field {
+            const INV: Self = $i;
         }
+    };
+}
 
-        impl Display for $field {
-            fn fmt(&self, f: &mut Formatter) -> FmtResult {
-                write!(f, "0x")?;
-                for i in self.0.iter().rev() {
-                    write!(f, "{:016x}", *i)?;
-                }
-                Ok(())
-            }
+#[macro_export]
+macro_rules! fft_field_operation {
+    ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident, $r:ident) => {
+        prime_field_operation!($field, $p, $g, $e, $i);
+
+        impl FftField for $field {
+            const ROOT_OF_UNITY: Self = $r;
         }
     };
 }
 
 pub use field_operation;
+
+pub use prime_field_operation;
+
+pub use fft_field_operation;

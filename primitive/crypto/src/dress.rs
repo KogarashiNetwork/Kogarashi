@@ -1,19 +1,22 @@
+mod basic;
 mod field;
 mod group;
 mod ring;
 
-pub use field::field_operation;
-pub use group::group_operation;
-pub use ring::ring_operation;
+pub use basic::*;
+pub use field::*;
+pub use group::*;
+pub use ring::*;
 
 use crate::arithmetic::{add, double, invert, mul, neg, square, sub};
-use crate::behave::{Field, Group, Ring};
+use crate::behave::{Basic, FftField, Field, Group, ParityCmp, PrimeField, Ring};
 use core::{
     cmp::Ordering,
     fmt::{Display, Formatter, Result as FmtResult},
     ops::{Add, Mul, Neg, Sub},
     ops::{AddAssign, MulAssign, SubAssign},
 };
+use parity_scale_codec::{Decode, Encode};
 
 pub(crate) const MODULUS: Fr = Fr([
     0xd0970e5ed6f72cb7,
@@ -54,13 +57,14 @@ pub(crate) const INV: u64 = 0x1ba3a358ef788ef9;
 
 const S: u32 = 1;
 
-const ROOT_OF_UNITY: &[u64; 4] = &[
+const ROOT_OF_UNITY: Fr = Fr([
     0xaa9f02ab1d6124de,
     0xb3524a6466112932,
     0x7342261215ac260b,
     0x4d6b87b1da259e2,
-];
+]);
 
+#[derive(Clone, Copy, Debug, Decode, Encode)]
 pub struct Fr(pub(crate) [u64; 4]);
 
-field_operation!(Fr, MODULUS, GENERATOR, IDENTITY);
+fft_field_operation!(Fr, MODULUS, GENERATOR, IDENTITY, INV, ROOT_OF_UNITY);
