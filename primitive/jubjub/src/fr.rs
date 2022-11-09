@@ -5,16 +5,16 @@ use zero_crypto::dress::{basic::field::*, field::*};
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct Fr(pub(crate) [u64; 4]);
 
-const MODULUS: Fr = Fr([
+const MODULUS: [u64; 4] = [
     0xd0970e5ed6f72cb7,
     0xa6682093ccc81082,
     0x06673b0101343b00,
     0x0e7db4ea6533afa9,
-]);
+];
 
-const GENERATOR: Fr = Fr([2, 0, 0, 0]);
+const GENERATOR: [u64; 4] = [2, 0, 0, 0];
 
-const IDENTITY: Fr = Fr([1, 0, 0, 0]);
+const IDENTITY: [u64; 4] = [1, 0, 0, 0];
 
 /// R = 2^256 mod r
 const R: [u64; 4] = [

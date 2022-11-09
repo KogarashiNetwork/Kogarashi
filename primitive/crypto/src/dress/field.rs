@@ -11,12 +11,36 @@ macro_rules! field_operation {
 
         impl Field for $field {}
 
+        impl Mul for $field {
+            type Output = Self;
+
+            #[inline]
+            fn mul(self, rhs: $field) -> Self {
+                $field(mul(self.0, rhs.0, $p, $inv))
+            }
+        }
+
+        impl<'a, 'b> Mul<&'b $field> for &'a $field {
+            type Output = $field;
+
+            #[inline]
+            fn mul(self, rhs: &'b $field) -> $field {
+                $field(mul(self.0, rhs.0, $p, $inv))
+            }
+        }
+
+        impl MulAssign for $field {
+            fn mul_assign(&mut self, rhs: $field) {
+                self.0 = mul(self.0, rhs.0, $p, $inv)
+            }
+        }
+
         impl Div for $field {
             type Output = $field;
 
             #[inline]
             fn div(self, rhs: $field) -> $field {
-                let inv = $field(invert(rhs.0, $p.0, $inv).unwrap());
+                let inv = $field(invert(rhs.0, $p, $inv).unwrap());
                 self * inv
             }
         }
@@ -26,14 +50,14 @@ macro_rules! field_operation {
 
             #[inline]
             fn div(self, rhs: &'b $field) -> $field {
-                let inv = $field(invert(rhs.0, $p.0, $inv).unwrap());
+                let inv = $field(invert(rhs.0, $p, $inv).unwrap());
                 self * &inv
             }
         }
 
         impl DivAssign for $field {
             fn div_assign(&mut self, rhs: $field) {
-                let inv = $field(invert(rhs.0, $p.0, $inv).unwrap());
+                let inv = $field(invert(rhs.0, $p, $inv).unwrap());
                 *self *= inv
             }
         }
@@ -48,24 +72,24 @@ macro_rules! prime_field_operation {
         field_built_in!($field);
 
         impl PrimeField for $field {
-            const MODULUS: Self = $p;
+            const MODULUS: Self = $field($p);
 
             const INV: u64 = $inv;
 
             fn double(self) -> Self {
-                Self(double(self.0, $p.0))
+                Self(double(self.0, $p))
             }
 
             fn square(self) -> Self {
-                Self(square(self.0, $p.0, $inv))
+                Self(square(self.0, $p, $inv))
             }
 
             fn double_assign(&mut self) {
-                self.0 = double(self.0, $p.0)
+                self.0 = double(self.0, $p)
             }
 
             fn square_assign(&mut self) {
-                self.0 = square(self.0, $p.0, $inv)
+                self.0 = square(self.0, $p, $inv)
             }
         }
 

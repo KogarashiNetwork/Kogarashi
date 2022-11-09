@@ -52,9 +52,6 @@ pub trait Projective: ParityCmp + Basic + Ring {
     // b param
     const PARAM_B: Self::ScalarField;
 
-    // identity
-    const IDENTITY: Self;
-
     // convert projective to affine representation
     fn to_affine(self) -> Self::Affine;
 

@@ -2,12 +2,12 @@
 macro_rules! group_operation {
     ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident) => {
         impl Group for $field {
-            const GENERATOR: Self = $g;
+            const GENERATOR: Self = $field($g);
 
-            const IDENTITY: Self = $e;
+            const IDENTITY: Self = $field($e);
 
             fn invert(self) -> Option<Self> {
-                match invert(self.0, $p.0, $inv) {
+                match invert(self.0, $p, $inv) {
                     Some(x) => Some(Self(x)),
                     None => None,
                 }

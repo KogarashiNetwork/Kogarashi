@@ -10,7 +10,7 @@ macro_rules! ring_operation {
 
             #[inline]
             fn add(self, rhs: $field) -> Self {
-                $field(add(self.0, rhs.0, $p.0))
+                $field(add(self.0, rhs.0, $p))
             }
         }
 
@@ -19,37 +19,13 @@ macro_rules! ring_operation {
 
             #[inline]
             fn add(self, rhs: &'b $field) -> $field {
-                $field(add(self.0, rhs.0, $p.0))
+                $field(add(self.0, rhs.0, $p))
             }
         }
 
         impl AddAssign for $field {
             fn add_assign(&mut self, rhs: $field) {
-                self.0 = add(self.0, rhs.0, $p.0)
-            }
-        }
-
-        impl Mul for $field {
-            type Output = Self;
-
-            #[inline]
-            fn mul(self, rhs: $field) -> Self {
-                $field(mul(self.0, rhs.0, $p.0, $inv))
-            }
-        }
-
-        impl<'a, 'b> Mul<&'b $field> for &'a $field {
-            type Output = $field;
-
-            #[inline]
-            fn mul(self, rhs: &'b $field) -> $field {
-                $field(mul(self.0, rhs.0, $p.0, $inv))
-            }
-        }
-
-        impl MulAssign for $field {
-            fn mul_assign(&mut self, rhs: $field) {
-                self.0 = mul(self.0, rhs.0, $p.0, $inv)
+                self.0 = add(self.0, rhs.0, $p)
             }
         }
 
@@ -58,7 +34,7 @@ macro_rules! ring_operation {
 
             #[inline]
             fn neg(self) -> Self {
-                $field(neg(self.0, $p.0))
+                $field(neg(self.0, $p))
             }
         }
 
@@ -67,7 +43,7 @@ macro_rules! ring_operation {
 
             #[inline]
             fn neg(self) -> $field {
-                $field(neg(self.0, $p.0))
+                $field(neg(self.0, $p))
             }
         }
 
@@ -76,7 +52,7 @@ macro_rules! ring_operation {
 
             #[inline]
             fn sub(self, rhs: $field) -> Self {
-                $field(sub(self.0, rhs.0, $p.0))
+                $field(sub(self.0, rhs.0, $p))
             }
         }
 
@@ -85,13 +61,13 @@ macro_rules! ring_operation {
 
             #[inline]
             fn sub(self, rhs: &'b $field) -> $field {
-                $field(sub(self.0, rhs.0, $p.0))
+                $field(sub(self.0, rhs.0, $p))
             }
         }
 
         impl SubAssign for $field {
             fn sub_assign(&mut self, rhs: $field) {
-                self.0 = sub(self.0, rhs.0, $p.0)
+                self.0 = sub(self.0, rhs.0, $p)
             }
         }
     };
