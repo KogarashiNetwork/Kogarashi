@@ -1,8 +1,8 @@
-mod utils;
+mod jubjub;
 
 #[cfg(test)]
-mod jubjub_tests {
-    use crate::utils::jubjub_field::*;
+mod jubjub_limbs_tests {
+    use crate::jubjub::field::*;
 
     use proptest::prelude::*;
     use rand::SeedableRng;

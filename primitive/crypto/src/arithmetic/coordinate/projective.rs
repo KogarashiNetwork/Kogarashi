@@ -1,6 +1,6 @@
 use crate::arithmetic::limbs::bits_256::*;
 
-type ProjectiveCoordinate = ([u64; 4], [u64; 4], [u64; 4]);
+pub type ProjectiveCoordinate = ([u64; 4], [u64; 4], [u64; 4]);
 
 /// The projective coordinate addition
 /// cost: 12M + 2S + 6A + 1*2
@@ -10,9 +10,9 @@ pub fn add_point(
     p: [u64; 4],
     inv: u64,
 ) -> ProjectiveCoordinate {
+    let zero: [u64; 4] = [0; 4];
     let (x, y, z) = lhs;
     let (a, b, c) = rhs;
-    let zero: [u64; 4] = [0; 4];
 
     if z == zero {
         return rhs;
@@ -26,32 +26,30 @@ pub fn add_point(
     let u2 = mul(a, z, p, inv);
 
     if u1 == u2 {
-        let identity = (zero, zero, zero);
         if s1 == s2 {
-            double_point(lhs, p, inv)
+            return double_point(lhs, p, inv);
         } else {
-            identity
+            return ([0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]);
         }
     } else {
         let s = sub(s1, s2, p);
         let u = sub(u1, u2, p);
         let uu = square(u, p, inv);
         let v = mul(z, c, p, inv);
-        let ss = square(s, p, inv);
-        let ssv = mul(ss, v, p, inv);
-        let u1u2 = add(u1, u2, p);
-        let uuu1u2 = mul(uu, u1u2, p, inv);
-        let w = sub(ssv, uuu1u2, p);
+        let w = sub(
+            mul(square(s, p, inv), v, p, inv),
+            mul(uu, add(u1, u2, p), p, inv),
+            p,
+        );
         let uuu = mul(uu, u, p, inv);
-
-        let u1uu = mul(u1, uu, p, inv);
-        let wu1uu = sub(u1uu, w, p);
-        let swu1uu = mul(s, wu1uu, p, inv);
-        let s1uuu = mul(s1, uuu, p, inv);
 
         (
             mul(u, w, p, inv),
-            mul(swu1uu, s1uuu, p, inv),
+            sub(
+                mul(s, sub(mul(u1, uu, p, inv), w, p), p, inv),
+                mul(s1, uuu, p, inv),
+                p,
+            ),
             mul(uuu, v, p, inv),
         )
     }

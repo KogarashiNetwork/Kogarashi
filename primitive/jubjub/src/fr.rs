@@ -178,8 +178,6 @@ mod tests {
     use super::*;
     use crate::coordinate::JubjubProjective;
     use proptest::prelude::*;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
 
     #[test]
     fn test_is_zero() {
@@ -246,21 +244,5 @@ mod tests {
         assert!(a < b);
         assert!(a <= b);
         assert!(a != b);
-    }
-
-    prop_compose! {
-        fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fr {
-            Fr::random(XorShiftRng::from_seed(bytes))
-        }
-    }
-
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100000))]
-        #[test]
-        fn test_invert(x in arb_fr()) {
-            let inv = Fr::invert(x).unwrap();
-            let one = x * inv;
-            assert_eq!(one, Fr::one());
-        }
     }
 }
