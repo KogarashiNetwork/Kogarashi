@@ -81,3 +81,20 @@ pub fn double_point(rhs: ProjectiveCoordinate, p: [u64; 4], inv: u64) -> Project
         )
     }
 }
+
+pub fn scalar_point(
+    mut base: ProjectiveCoordinate,
+    scalar: [u64; 4],
+    mut identity: ProjectiveCoordinate,
+    p: [u64; 4],
+    inv: u64,
+) -> ProjectiveCoordinate {
+    let bits = to_bits(scalar);
+    for &bit in bits.iter().rev() {
+        if bit == 1 {
+            identity = add_point(identity, base, p, inv);
+        }
+        base = double_point(base, p, inv);
+    }
+    identity
+}
