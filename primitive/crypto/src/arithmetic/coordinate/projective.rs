@@ -31,28 +31,28 @@ pub fn add_point(
         } else {
             return ([0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]);
         }
-    } else {
-        let s = sub(s1, s2, p);
-        let u = sub(u1, u2, p);
-        let uu = square(u, p, inv);
-        let v = mul(z, c, p, inv);
-        let w = sub(
-            mul(square(s, p, inv), v, p, inv),
-            mul(uu, add(u1, u2, p), p, inv),
-            p,
-        );
-        let uuu = mul(uu, u, p, inv);
-
-        (
-            mul(u, w, p, inv),
-            sub(
-                mul(s, sub(mul(u1, uu, p, inv), w, p), p, inv),
-                mul(s1, uuu, p, inv),
-                p,
-            ),
-            mul(uuu, v, p, inv),
-        )
     }
+
+    let s = sub(s1, s2, p);
+    let u = sub(u1, u2, p);
+    let uu = square(u, p, inv);
+    let v = mul(z, c, p, inv);
+    let w = sub(
+        mul(square(s, p, inv), v, p, inv),
+        mul(uu, add(u1, u2, p), p, inv),
+        p,
+    );
+    let uuu = mul(uu, u, p, inv);
+
+    (
+        mul(u, w, p, inv),
+        sub(
+            mul(s, sub(mul(u1, uu, p, inv), w, p), p, inv),
+            mul(s1, uuu, p, inv),
+            p,
+        ),
+        mul(uuu, v, p, inv),
+    )
 }
 
 /// The projective coordinate doubling
