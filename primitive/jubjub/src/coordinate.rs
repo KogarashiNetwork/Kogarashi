@@ -115,28 +115,31 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(1000))]
         #[test]
-         fn test_projective(a in arb_cdn(), mut b in arb_cdn(), mut  c in arb_cdn()) {
+         fn test_projective(a in arb_cdn(), mut b in arb_cdn(), mut c in arb_cdn()) {
+            // A + B + C == C + A + B
+            // let mut a1 = a.clone();
+            // a1 += b.clone();
+            // a1 += c.clone();
+            // c += a.clone();
+            // c += b.clone();
+            // assert_eq!(a1, c);
+
+            // A + (-A) = e
             let mut base_for_neg = a.clone();
+            base_for_neg -= base_for_neg;
+            assert_eq!(base_for_neg, IDENTITY);
+
+            // X + e == X
             let _b = b.clone();
-            let mut a1 = a.clone();
-            assert!(a.is_on_curve());
-            assert!(b.is_on_curve());
-            assert!(c.is_on_curve());
-            a1 += b.clone();
-            a1 += c.clone();
-            c += a.clone();
-            c += b.clone();
-            assert_eq!(a1, c); // A + B + C == C + A + B
+            b += IDENTITY;
+            assert_eq!(b, _b);
+
+            // A * A = A + A
             let mut x = a.clone();
             let y = a.clone();
-            a.double();
+            let a2 = a.double();
             x += y;
-            assert_eq!(a, x); // A * A = A + A
-            base_for_neg -= base_for_neg;
-            assert_eq!(base_for_neg, IDENTITY); // A + (-A) = e
-
-            b += IDENTITY;
-            assert_eq!(b, _b); // X + e == X
+            assert_eq!(a2, x);
         }
     }
 
@@ -163,17 +166,22 @@ mod tests {
         assert_ne!(a, b)
     }
 
-    #[test]
-    fn test_on_curve() {
-        let identity = IDENTITY;
-        let mut generator = GENERATOR;
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(1000))]
+        #[test]
+        fn test_on_curve(a in arb_fr()) {
+            let identity = IDENTITY;
+            let mut generator = GENERATOR;
+            let other = generator.clone();
 
-        assert!(identity.is_on_curve());
-        assert!(generator.is_on_curve());
+            assert!(identity.is_on_curve());
+            assert!(generator.is_on_curve());
 
-        let other = generator.clone();
-        generator = generator.double();
-        generator += other;
-        assert!(generator.is_on_curve());
+            generator = generator.double();
+            generator += other;
+            generator = generator * a;
+
+            assert!(generator.is_on_curve());
+        }
     }
 }
