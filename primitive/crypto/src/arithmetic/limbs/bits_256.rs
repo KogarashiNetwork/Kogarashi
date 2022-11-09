@@ -1,5 +1,3 @@
-mod utils;
-
 use rand_core::RngCore;
 
 #[cfg(all(feature = "asm", target_arch = "x86_64"))]
