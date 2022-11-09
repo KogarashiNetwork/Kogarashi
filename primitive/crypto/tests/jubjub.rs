@@ -1,5 +1,6 @@
+use rand_core::RngCore;
 pub mod field {
-    use rand_core::RngCore;
+    use super::*;
     use zero_crypto::arithmetic::limbs::bits_256::*;
 
     pub const MODULUS: [u64; 4] = [
@@ -36,11 +37,15 @@ pub mod field {
 
 pub mod curve {
     use super::field::*;
-    use zero_crypto::arithmetic::coordinate::projective::ProjectiveCoordinate;
+    use super::*;
+    use zero_crypto::arithmetic::{
+        coordinate::projective::{scalar_point, ProjectiveCoordinate},
+        limbs::bits_256::*,
+    };
 
-    const IDENTITY: ProjectiveCoordinate = ([0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]);
+    pub const IDENTITY: ProjectiveCoordinate = ([0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]);
 
-    const GENERATOR: ProjectiveCoordinate = (
+    pub const GENERATOR: ProjectiveCoordinate = (
         from_raw([
             0x7c24d812779a3316,
             0x72e38f4ebd4070f3,
@@ -59,4 +64,30 @@ pub mod curve {
     const PARAM_A: [u64; 4] = [0, 0, 0, 0];
 
     const PARAM_B: [u64; 4] = from_raw([4, 0, 0, 0]);
+
+    pub fn is_on_curve(point: ProjectiveCoordinate) -> bool {
+        let identity = [0, 0, 0, 0];
+        let (x, y, z) = point;
+
+        if z == identity {
+            true
+        } else {
+            let yy = square(y, MODULUS, INV);
+            let right = mul(yy, z, MODULUS, INV);
+
+            let xx = square(x, MODULUS, INV);
+            let xxx = mul(xx, x, MODULUS, INV);
+            let zz = square(z, MODULUS, INV);
+            let zzz = mul(zz, z, MODULUS, INV);
+            let c = mul(PARAM_B, zzz, MODULUS, INV);
+            let left = add(xxx, c, MODULUS);
+
+            right == left
+        }
+    }
+
+    pub fn random_point(rand: impl RngCore) -> ProjectiveCoordinate {
+        let random_scalar = random(rand);
+        scalar_point(GENERATOR, random_scalar, IDENTITY, MODULUS, INV)
+    }
 }
