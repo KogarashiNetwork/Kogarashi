@@ -4,20 +4,20 @@ macro_rules! field_operation {
         impl $field {
             #[inline(always)]
             pub fn double_assign(&mut self) {
-                self.0 = double(&self.0, $p)
+                self.0 .0 = double(&self.0 .0, &$p.0)
             }
 
             #[inline(always)]
             pub fn square_assign(&mut self) {
-                self.0 = square(&self.0, $p)
+                self.0 .0 = square(&self.0 .0, &$p.0)
             }
 
             pub const fn zero() -> $field {
-                $field([0, 0, 0, 0])
+                $field(FrRaw([0, 0, 0, 0]))
             }
 
             pub fn one() -> $field {
-                $field::from_raw([1, 0, 0, 0])
+                $field::from_raw(FrRaw([1, 0, 0, 0])).unwrap()
             }
         }
 
@@ -26,7 +26,7 @@ macro_rules! field_operation {
 
             #[inline]
             fn add(self, rhs: $field) -> $field {
-                $field(add(&self.0, &rhs.0, $p))
+                $field(FrRaw(add(&self.0 .0, &rhs.0 .0, &$p.0)))
             }
         }
 
@@ -35,13 +35,13 @@ macro_rules! field_operation {
 
             #[inline]
             fn add(self, rhs: &'b $field) -> $field {
-                $field(add(&self.0, &rhs.0, $p))
+                $field(FrRaw(add(&self.0 .0, &rhs.0 .0, &$p.0)))
             }
         }
 
         impl AddAssign for $field {
             fn add_assign(&mut self, rhs: $field) {
-                self.0 = add(&self.0, &rhs.0, $p)
+                self.0 .0 = add(&self.0 .0, &rhs.0 .0, &$p.0)
             }
         }
 
@@ -50,7 +50,7 @@ macro_rules! field_operation {
 
             #[inline]
             fn sub(self, rhs: $field) -> $field {
-                $field(sub(&self.0, &rhs.0, $p))
+                $field(FrRaw(sub(&self.0 .0, &rhs.0 .0, &$p.0)))
             }
         }
 
@@ -59,13 +59,13 @@ macro_rules! field_operation {
 
             #[inline]
             fn sub(self, rhs: &'b $field) -> $field {
-                $field(sub(&self.0, &rhs.0, $p))
+                $field(FrRaw(sub(&self.0 .0, &rhs.0 .0, &$p.0)))
             }
         }
 
         impl SubAssign for $field {
             fn sub_assign(&mut self, rhs: $field) {
-                self.0 = sub(&self.0, &rhs.0, $p)
+                self.0 .0 = sub(&self.0 .0, &rhs.0 .0, &$p.0)
             }
         }
 
@@ -74,7 +74,7 @@ macro_rules! field_operation {
 
             #[inline]
             fn mul(self, rhs: $field) -> $field {
-                $field(mul(&self.0, &rhs.0, $p))
+                $field(FrRaw(mul(&self.0 .0, &rhs.0 .0, &$p.0)))
             }
         }
 
@@ -83,13 +83,13 @@ macro_rules! field_operation {
 
             #[inline]
             fn mul(self, rhs: &'b $field) -> $field {
-                $field(mul(&self.0, &rhs.0, $p))
+                $field(FrRaw(mul(&self.0 .0, &rhs.0 .0, &$p.0)))
             }
         }
 
         impl MulAssign for $field {
             fn mul_assign(&mut self, rhs: $field) {
-                self.0 = mul(&self.0, &rhs.0, $p)
+                self.0 .0 = mul(&self.0 .0, &rhs.0 .0, &$p.0)
             }
         }
 
@@ -129,19 +129,19 @@ macro_rules! field_operation {
 
         impl $field {
             pub fn is_zero(&self) -> bool {
-                self.0.iter().all(|x| *x == 0)
+                self.0.is_zero()
             }
 
             pub fn double(self) -> $field {
-                $field(double(&self.0, $p))
+                $field(FrRaw(double(&self.0 .0, &$p.0)))
             }
 
             pub fn square(self) -> $field {
-                $field(square(&self.0, $p))
+                $field(FrRaw(square(&self.0 .0, &$p.0)))
             }
 
             pub fn invert(self) -> Option<$field> {
-                Self::_invert(&self).map(|x| $field(x))
+                Self::_invert(&self).map(|x| $field(FrRaw(x)))
             }
 
             pub fn random(mut rand: impl RngCore) -> $field {
@@ -260,7 +260,7 @@ macro_rules! field_operation {
 
                 match x.is_zero() {
                     true => None,
-                    false => Some(t0.0),
+                    false => Some(t0.0 .0),
                 }
             }
         }
@@ -279,74 +279,7 @@ macro_rules! field_operation {
 
             #[inline]
             fn neg(self) -> $field {
-                $field(neg(&self.0, $p))
-            }
-        }
-
-        // comparison operation
-        impl Eq for Fr {}
-
-        impl PartialEq for Fr {
-            fn eq(&self, other: &Self) -> bool {
-                self.0[0] == other.0[0]
-                    && self.0[1] == other.0[1]
-                    && self.0[2] == other.0[2]
-                    && self.0[3] == other.0[3]
-            }
-        }
-
-        impl PartialOrd for $field {
-            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-                Some(self.cmp(other))
-            }
-
-            fn lt(&self, other: &Self) -> bool {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a != b {
-                        return a < b;
-                    }
-                }
-                false
-            }
-
-            fn le(&self, other: &Self) -> bool {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a != b {
-                        return a < b;
-                    }
-                }
-                true
-            }
-
-            fn gt(&self, other: &Self) -> bool {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a != b {
-                        return a > b;
-                    }
-                }
-                false
-            }
-
-            fn ge(&self, other: &Self) -> bool {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a != b {
-                        return a > b;
-                    }
-                }
-                true
-            }
-        }
-
-        impl Ord for Fr {
-            fn cmp(&self, other: &Self) -> Ordering {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a < b {
-                        return Ordering::Less;
-                    } else if a > b {
-                        return Ordering::Greater;
-                    }
-                }
-                Ordering::Equal
+                $field(FrRaw(neg(&self.0 .0, &$p.0)))
             }
         }
 
@@ -359,11 +292,7 @@ macro_rules! field_operation {
 
         impl Display for $field {
             fn fmt(&self, f: &mut Formatter) -> FmtResult {
-                write!(f, "0x")?;
-                for i in self.0.iter().rev() {
-                    write!(f, "{:016x}", *i)?;
-                }
-                Ok(())
+                write!(f, "Fs({})", self.into_raw())
             }
         }
 

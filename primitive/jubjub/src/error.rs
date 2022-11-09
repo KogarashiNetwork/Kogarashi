@@ -8,4 +8,6 @@ pub enum Error {
     BytesTooLong,
     /// Invalid byte
     BytesInvalid,
+    /// Out of field
+    OutOfField,
 }

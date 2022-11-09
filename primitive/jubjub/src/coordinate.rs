@@ -33,10 +33,10 @@
 
 use core::ops::{Add, AddAssign, Neg};
 
-use crate::arithmetic::coordinate::add;
 use crate::domain::curve::curve_operation;
 use crate::fr::Fr;
 use crate::interface::coordinate::Coordinate;
+use crate::{arithmetic::coordinate::add, fr::FrRaw};
 use parity_scale_codec::{Decode, Encode};
 
 /// The projective form of coordinate
@@ -50,18 +50,20 @@ pub struct Affine {
 impl Affine {
     pub(crate) fn generator() -> Self {
         Self {
-            x: Fr::from_raw([
+            x: Fr::from_raw(FrRaw::from([
                 0x7c24d812779a3316,
                 0x72e38f4ebd4070f3,
                 0x03b3fe93f505a6f2,
                 0xc4c71e5a4102960,
-            ]),
-            y: Fr::from_raw([
+            ]))
+            .unwrap(),
+            y: Fr::from_raw(FrRaw::from([
                 0xd2047ef3463de4af,
                 0x01ca03640d236cbf,
                 0xd3033593ae386e92,
                 0xaa87a50921b80ec,
-            ]),
+            ]))
+            .unwrap(),
             is_infinity: false,
         }
     }
@@ -91,54 +93,60 @@ curve_operation!(Projective);
 impl Projective {
     pub fn generator() -> Self {
         Self {
-            x: Fr::from_raw([
+            x: Fr::from_raw(FrRaw::from([
                 0x7c24d812779a3316,
                 0x72e38f4ebd4070f3,
                 0x03b3fe93f505a6f2,
                 0xc4c71e5a4102960,
-            ]),
-            y: Fr::from_raw([
+            ]))
+            .unwrap(),
+            y: Fr::from_raw(FrRaw::from([
                 0xd2047ef3463de4af,
                 0x01ca03640d236cbf,
                 0xd3033593ae386e92,
                 0xaa87a50921b80ec,
-            ]),
+            ]))
+            .unwrap(),
             z: Fr::one(),
         }
     }
 
     pub fn g1() -> Self {
         Self {
-            x: Fr::from_raw([
+            x: Fr::from_raw(FrRaw::from([
                 0x85d3790e014051f1,
                 0xaa7f260471bc1570,
                 0xeb4ce2141ce5983f,
                 0x7a848c10e9359ab,
-            ]),
-            y: Fr::from_raw([
+            ]))
+            .unwrap(),
+            y: Fr::from_raw(FrRaw::from([
                 0xfab31faba44ff18a,
                 0x29c8d2a5308d04ce,
                 0xabe251109b820e98,
                 0xdb95d587051a4b7,
-            ]),
+            ]))
+            .unwrap(),
             z: Fr::one(),
         }
     }
 
     pub fn g2() -> Self {
         Self {
-            x: Fr::from_raw([
+            x: Fr::from_raw(FrRaw::from([
                 0x08f9ee6a9cf52e55,
                 0xcd3756a2f35a4943,
                 0xaf18ef6d41736986,
                 0x54dd209a091bc11,
-            ]),
-            y: Fr::from_raw([
+            ]))
+            .unwrap(),
+            y: Fr::from_raw(FrRaw::from([
                 0x5642a3b127c5986d,
                 0xc9cbd197bdf08e1b,
                 0x4e1b56ffdb7f65f9,
                 0x110cb52133f089b,
-            ]),
+            ]))
+            .unwrap(),
             z: Fr::one(),
         }
     }
@@ -238,7 +246,7 @@ impl Coordinate for Projective {
     }
 
     fn constant_b() -> Fr {
-        Fr::from_raw([4, 0, 0, 0])
+        Fr::from_raw(FrRaw::from(4_u64)).unwrap()
     }
 
     fn is_identity(&self) -> bool {

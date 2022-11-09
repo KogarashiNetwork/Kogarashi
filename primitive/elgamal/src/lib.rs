@@ -25,7 +25,7 @@
 use parity_scale_codec::{Decode, Encode};
 use zero_jubjub::{
     coordinate::{Affine, Projective},
-    fr::Fr,
+    fr::{Fr, FrRaw},
     interface::Coordinate,
 };
 
@@ -40,7 +40,7 @@ impl EncryptedNumber {
     pub fn encrypt(private_key: Fr, value: u32, random: Fr) -> Self {
         let g = Projective::generator();
         let public_key = private_key * g.clone();
-        let mut left = Fr::from_u64(value as u64) * g.clone();
+        let mut left = Fr(FrRaw::from(value)) * g.clone();
         left.add(random * public_key);
         EncryptedNumber {
             s: left.to_affine(),
@@ -94,7 +94,7 @@ mod tests {
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
-    use zero_jubjub::fr::Fr;
+    use zero_jubjub::fr::{Fr, FrRaw};
 
     use crate::EncryptedNumber;
 
@@ -104,7 +104,7 @@ mod tests {
         }
     }
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(50))]
+        #![proptest_config(ProptestConfig::with_cases(25))]
         #[test]
         fn test_encrypt_decrypt(priv_k in arb_fr(), random in arb_fr(), balance in any::<u16>()) {
             let enc_balance = EncryptedNumber::encrypt(priv_k, balance as u32, random);
@@ -115,7 +115,7 @@ mod tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(50))]
+        #![proptest_config(ProptestConfig::with_cases(25))]
         #[test]
         fn test_homomorphic(
             priv_k in arb_fr(), random1 in arb_fr(), random2 in arb_fr(),
@@ -161,9 +161,9 @@ mod tests {
             } else {
                 (alice_transfer_randomness, alice_randomness)
             };
-            let alice_randomness = Fr::from_u64(alice_randomness);
-            let bob_randomness = Fr::from_u64(bob_randomness);
-            let alice_transfer_randomness = Fr::from_u64(alice_transfer_randomness);
+            let alice_randomness = Fr(FrRaw::from(alice_randomness));
+            let bob_randomness = Fr(FrRaw::from(bob_randomness));
+            let alice_transfer_randomness = Fr(FrRaw::from(alice_transfer_randomness));
 
             let alice_balance_enc = EncryptedNumber::encrypt(alice_pk, alice_balance, alice_randomness);
             let bob_balance_enc = EncryptedNumber::encrypt(bob_pk, bob_balance, bob_randomness);
@@ -186,7 +186,7 @@ mod tests {
             let exp_bob_balance_enc =
                 EncryptedNumber::encrypt(bob_pk, explicit_bob, bob_randomness_sum);
 
-            assert_eq!(exp_alice_balance_enc.t, alice_after_balance_enc.t);
+            assert_eq!(exp_alice_balance_enc, alice_after_balance_enc);
             assert_eq!(exp_bob_balance_enc, bob_after_balance_enc);
         }
     }

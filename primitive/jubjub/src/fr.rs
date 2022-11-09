@@ -1,4 +1,4 @@
-use crate::arithmetic::limbs::{add, double, mul, neg, square, sub};
+use crate::arithmetic::limbs::{add, double, mont, mul, neg, square, sub};
 use crate::coordinate::Projective;
 use crate::domain::field::field_operation;
 use crate::error::Error;
@@ -13,60 +13,145 @@ use parity_scale_codec::{Decode, Encode};
 use rand_core::RngCore;
 use sp_std::vec::Vec;
 
-pub(crate) const MODULUS: &[u64; 4] = &[
+pub(crate) const MODULUS: FrRaw = FrRaw([
     0xd0970e5ed6f72cb7,
     0xa6682093ccc81082,
     0x06673b0101343b00,
     0x0e7db4ea6533afa9,
-];
+]);
 
 /// R = 2^256 mod r
-const R: [u64; 4] = [
+const R: FrRaw = FrRaw([
     0x25f80bb3b99607d9,
     0xf315d62f66b6e750,
     0x932514eeeb8814f4,
     0x09a6fc6f479155c6,
-];
+]);
 
 /// R^2 = 2^512 mod r
-const R2: &[u64; 4] = &[
+const R2: FrRaw = FrRaw([
     0x67719aa495e57731,
     0x51b0cef09ce3fc26,
     0x69dab7fac026e9a5,
     0x04f6547b8d127688,
-];
+]);
 
 /// R^3 = 2^768 mod r
-const R3: &[u64; 4] = &[
+const R3: FrRaw = FrRaw([
     0xe0d6c6563d830544,
     0x323e3883598d0f85,
     0xf0fea3004c2e2ba8,
     0x05874f84946737ec,
-];
+]);
 
 pub(crate) const INV: u64 = 0x1ba3a358ef788ef9;
 
 const S: u32 = 1;
 
-const ROOT_OF_UNITY: &[u64; 4] = &[
+const ROOT_OF_UNITY: FrRaw = FrRaw([
     0xaa9f02ab1d6124de,
     0xb3524a6466112932,
     0x7342261215ac260b,
     0x4d6b87b1da259e2,
-];
+]);
 
-#[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct Fr(pub(crate) [u64; 4]);
+#[derive(Copy, Clone, PartialEq, Eq, Default, Debug, Decode, Encode)]
+pub struct FrRaw([u64; 4]);
+
+impl Ord for FrRaw {
+    #[inline(always)]
+    fn cmp(&self, other: &FrRaw) -> Ordering {
+        for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+            match a.cmp(b) {
+                Ordering::Greater => return Ordering::Greater,
+                Ordering::Less => return Ordering::Less,
+                _ => continue,
+            }
+        }
+        Ordering::Equal
+    }
+}
+
+impl PartialOrd for FrRaw {
+    #[inline(always)]
+    fn partial_cmp(&self, other: &FrRaw) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl From<u32> for FrRaw {
+    fn from(x: u32) -> Self {
+        let mut raw = Self::default();
+        raw.0[0] = x as u64;
+        raw
+    }
+}
+
+impl From<u64> for FrRaw {
+    fn from(x: u64) -> Self {
+        let mut raw = Self::default();
+        raw.0[0] = x;
+        raw
+    }
+}
+
+impl From<[u64; 4]> for FrRaw {
+    fn from(x: [u64; 4]) -> Self {
+        Self(x)
+    }
+}
+
+impl From<Fr> for FrRaw {
+    fn from(fr: Fr) -> Self {
+        fr.into_raw()
+    }
+}
+
+impl Display for FrRaw {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        write!(f, "0x")?;
+        for i in self.0.iter().rev() {
+            write!(f, "{:016x}", *i)?;
+        }
+        Ok(())
+    }
+}
+
+impl FrRaw {
+    #[inline(always)]
+    fn is_zero(&self) -> bool {
+        self.0.iter().all(|&e| e == 0)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Decode, Encode)]
+pub struct Fr(pub FrRaw);
 
 field_operation!(Fr, MODULUS);
 
 impl Fr {
-    pub fn from_raw(val: [u64; 4]) -> Self {
-        Fr(mul(&val, R2, MODULUS))
+    pub fn from_raw(raw: FrRaw) -> Result<Self, Error> {
+        if raw < MODULUS {
+            Ok(Fr(FrRaw(mul(&raw.0, &R2.0, &MODULUS.0))))
+        } else {
+            Err(Error::OutOfField)
+        }
     }
 
-    pub fn from_u64(val: u64) -> Self {
-        Fr([val, 0, 0, 0])
+    pub fn into_raw(&self) -> FrRaw {
+        FrRaw(mont(
+            &[
+                self.0 .0[0],
+                self.0 .0[1],
+                self.0 .0[2],
+                self.0 .0[3],
+                0,
+                0,
+                0,
+                0,
+            ],
+            &MODULUS.0,
+        ))
     }
 
     pub fn from_hex(hex: &str) -> Result<Fr, Error> {
@@ -95,14 +180,14 @@ impl Fr {
         for i in 0..hex.len() {
             limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
         }
-        Ok(Fr(mul(&limbs, R2, MODULUS)))
+        Ok(Fr(FrRaw(mul(&limbs, &R2.0, &MODULUS.0))))
     }
 
     fn as_bytes(&self) -> [u8; 64] {
         let mut bytes: [u8; 64] = [0; 64];
         let mut index = 15;
-        for i in 0..self.0.len() {
-            let mut number = self.0[i];
+        for i in 0..self.0 .0.len() {
+            let mut number = self.0 .0[i];
             for n in 0..16 {
                 let quotient = number as u128 / 16_u128.pow(15 - n as u32);
                 bytes[index - n] = quotient as u8;
@@ -116,7 +201,7 @@ impl Fr {
     fn as_bits(&self) -> [u8; 256] {
         let mut index = 256;
         let mut bits: [u8; 256] = [0; 256];
-        for mut x in self.0 {
+        for mut x in self.0 .0 {
             for _ in 0..64 {
                 index -= 1;
                 bits[index] = (x & 1) as u8;
@@ -127,10 +212,10 @@ impl Fr {
     }
 
     fn from_u512(limbs: [u64; 8]) -> Self {
-        let a = mul(&[limbs[0], limbs[1], limbs[2], limbs[3]], R2, MODULUS);
-        let b = mul(&[limbs[4], limbs[5], limbs[6], limbs[7]], R3, MODULUS);
-        let c = add(&a, &b, MODULUS);
-        Fr(c)
+        let a = mul(&[limbs[0], limbs[1], limbs[2], limbs[3]], &R2.0, &MODULUS.0);
+        let b = mul(&[limbs[4], limbs[5], limbs[6], limbs[7]], &R3.0, &MODULUS.0);
+        let c = add(&a, &b, &MODULUS.0);
+        Fr(FrRaw(c))
     }
 
     fn bytes_to_u64(bytes: &[u8; 16]) -> Result<u64, Error> {
@@ -154,27 +239,27 @@ mod tests {
 
     #[test]
     fn test_is_zero() {
-        let fr = Fr([0, 0, 0, 0]);
+        let fr = Fr(FrRaw([0, 0, 0, 0]));
         assert!(fr.is_zero());
-        let fr = Fr([0, 0, 0, 1]);
+        let fr = Fr(FrRaw([0, 0, 0, 1]));
         assert!(!fr.is_zero());
     }
 
     #[test]
     fn test_fmt_and_to_bin() {
-        let _fr = Fr([
+        let _fr = Fr(FrRaw([
             0xd0970e5ed6f72cb7,
             0xa6682093ccc81082,
             0x06673b0101343b00,
             0x0e7db4ea6533afa9,
-        ]);
+        ]));
     }
 
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(50))]
         #[test]
         fn test_binary_method(x in any::<u16>()) {
-            let fr = Fr::from_u64(x as u64);
+            let fr = Fr(FrRaw::from(x as u64));
             let g = Projective::generator();
             let mul = fr * g.clone();
             let rev_mul = g.clone() * fr;
@@ -189,18 +274,32 @@ mod tests {
         }
     }
 
+    // TODO
+    #[test]
+    fn negative_binary_method() {
+        let a = Fr(FrRaw::from(10_u64));
+        let b = Fr(FrRaw::from(20_u64));
+        // A - B
+        // Raw: 0x08d2ac6947db3e87379d9f244f3d452dc40c70802e393ae15121322dc385917b
+        // Mont: 0x0e7db4ea6533afa906673b0101343b00a6682093ccc81082d0970e5ed6f72cad
+        let _x = (a - b) * Projective::generator();
+        let _y = a * Projective::generator() + (b * Projective::generator()).neg();
+        // println!("{} {} {}", y.x, y.y, y.z);
+        // assert_eq!(x, y);
+    }
+
     #[test]
     fn test_from_hex() {
         let a = Fr::from_hex("0x64774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab")
             .unwrap();
         assert_eq!(
             a,
-            Fr([
+            Fr(FrRaw([
                 0x4ddc8f91e171cd75,
                 0x9b925835a7d203fb,
                 0x0cdb538ead47e463,
                 0x01a19f85f00d79b8,
-            ])
+            ]))
         )
     }
 
@@ -231,12 +330,52 @@ mod tests {
         fn test_invert(x in arb_fr()) {
             match Fr::_invert(&x) {
                 Some(y) => {
-                    let z = mul(&x.0, &y, MODULUS);
-                    assert_eq!(Fr(z), Fr::one());
+                    let z = mul(&x.0.0, &y, &MODULUS.0);
+                    assert_eq!(Fr(FrRaw(z)), Fr::one());
                 },
                 None => assert_eq!(x, Fr::zero())
             }
 
+        }
+    }
+
+    #[test]
+    fn test_montgomery_form() {
+        assert!(Fr::from_raw(MODULUS).is_err());
+        let a = FrRaw([
+            0x302ac6aa9b26189e,
+            0x4ac882606b48941c,
+            0xa43a060ccb89ddd7,
+            0x03fb5f814d8da217,
+        ]);
+        let a_fr = Fr::from_raw(a).unwrap();
+        let b = FrRaw([
+            0xb3b4ffd8ef558c79,
+            0xb66914dbf986df8f,
+            0x0397e6ddcd846f14,
+            0x023ae83ad1c563a5,
+        ]);
+        let b_fr = Fr::from_raw(b).unwrap();
+        let c = FrRaw([
+            0x37ca877d339e33c0,
+            0xb495f8d0546afd2d,
+            0x76a419ae0060413b,
+            0x017cefddee6b2200,
+        ]);
+        assert_eq!((a_fr * b_fr).into_raw(), c);
+
+        assert!(Fr::from_raw(FrRaw::from(0_u64)).unwrap().is_zero());
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(10000))]
+        #[test]
+        fn test_from_mont_and_back(a in arb_fr()) {
+            let a_raw = a.into_raw();
+            let a1_raw = FrRaw::from(a);
+            assert_eq!(a_raw, a1_raw);
+            let a_again = Fr::from_raw(a_raw).unwrap();
+            assert_eq!(a, a_again);
         }
     }
 }
