@@ -63,7 +63,7 @@ impl Fr {
     }
 
     pub const fn from_raw(val: [u64; 4]) -> Self {
-        Fr(mul(val, R2, Self::MODULUS.0, INV))
+        Fr(mul(val, R2, MODULUS, INV))
     }
 
     pub fn from_u64(val: u64) -> Self {

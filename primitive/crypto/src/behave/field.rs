@@ -15,9 +15,7 @@ pub trait PrimeField: Field + Basic + ParityCmp + PartialOrd + Ord {
     #[must_use]
     fn square(self) -> Self;
 
-    #[must_use]
     fn double_assign(&mut self);
 
-    #[must_use]
     fn square_assign(&mut self);
 }
