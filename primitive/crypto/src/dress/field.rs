@@ -45,7 +45,7 @@ macro_rules! prime_field_operation {
     ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident) => {
         field_operation!($field, $p, $g, $e, $inv);
 
-        built_in_operation!($field);
+        field_built_in!($field);
 
         impl PrimeField for $field {
             const MODULUS: Self = $p;

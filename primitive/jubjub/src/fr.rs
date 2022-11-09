@@ -1,7 +1,6 @@
-use crate::coordinate::Projective;
 use crate::error::Error;
 use rand_core::RngCore;
-use zero_crypto::dress::{basic::*, field::*};
+use zero_crypto::dress::{basic::field::*, field::*};
 
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct Fr(pub(crate) [u64; 4]);
@@ -177,6 +176,7 @@ impl Fr {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::coordinate::JubjubProjective;
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
@@ -204,12 +204,12 @@ mod tests {
         #[test]
         fn test_binary_method(x in any::<u16>()) {
             let fr = Fr::from_u64(x as u64);
-            let g = Projective::generator();
-            let mul = fr * g.clone();
+            let g = JubjubProjective::GENERATOR;
+            let mul = g.clone() * fr;
             let rev_mul = g.clone() * fr;
             assert_eq!(mul, rev_mul);
 
-            let mut acc = Projective::identity();
+            let mut acc = JubjubProjective::IDENTITY;
             for _ in 0..x {
                 acc += g.clone();
             }

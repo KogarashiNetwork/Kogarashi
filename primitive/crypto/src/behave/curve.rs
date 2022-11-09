@@ -36,7 +36,7 @@ pub trait Affine: ParityCmp + Basic {
     fn to_projective(self) -> Self::Projective;
 
     // check that point is on curve
-    fn is_on_curve(self, point: Self) -> bool;
+    fn is_on_curve(self) -> bool;
 }
 
 pub trait Projective: ParityCmp + Basic + Ring {
@@ -51,6 +51,9 @@ pub trait Projective: ParityCmp + Basic + Ring {
 
     // b param
     const PARAM_B: Self::ScalarField;
+
+    // identity
+    const IDENTITY: Self;
 
     // convert projective to affine representation
     fn to_affine(self) -> Self::Affine;

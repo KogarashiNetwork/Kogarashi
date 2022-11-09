@@ -73,8 +73,8 @@ pub fn neg(a: [u64; 4], p: [u64; 4]) -> [u64; 4] {
 pub const fn mont(a: [u64; 8], p: [u64; 4], inv: u64) -> [u64; 4] {
     let rhs = a[0].wrapping_mul(inv);
 
-    let (_, d) = mac(a[0], rhs, p[0], 0); // a + (b * c) + d = 4 + INV * MOD[0] + 0;
-    let (l1, d) = mac(a[1], rhs, p[1], d); //
+    let (_, d) = mac(a[0], rhs, p[0], 0);
+    let (l1, d) = mac(a[1], rhs, p[1], d);
     let (l2, d) = mac(a[2], rhs, p[2], d);
     let (l3, d) = mac(a[3], rhs, p[3], d);
     let (l4, e) = adc(a[4], 0, d);

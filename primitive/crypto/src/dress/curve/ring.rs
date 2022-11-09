@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! projective_ring_operation {
-    ($projective:ident, $g:ident, $e:ident) => {
+    ($projective:ident, $field:ident, $g:ident, $e:ident) => {
         projective_group_operation!($projective, $g, $e);
 
         impl Ring for $projective {}
@@ -36,8 +36,21 @@ macro_rules! projective_ring_operation {
             type Output = Self;
 
             #[inline]
-            fn mul(self, rhs: $projective) -> Self {
-                $projective(mul(self.0, rhs.0, $p.0, $inv))
+            fn mul(self, scalar: $field) -> Self {
+                let mut res = Projective::IDENTITY;
+                let mut acc = self.clone();
+                let bits: Vec<u8> = scalar
+                    .as_bits()
+                    .into_iter()
+                    .skip_while(|x| *x == 0)
+                    .collect();
+                for &b in bits.iter().rev() {
+                    if b == 1 {
+                        res += acc.clone();
+                    }
+                    acc.double();
+                }
+                res
             }
         }
 
@@ -45,14 +58,40 @@ macro_rules! projective_ring_operation {
             type Output = $projective;
 
             #[inline]
-            fn mul(self, rhs: &'b $projective) -> $projective {
-                $projective(mul(self.0, rhs.0, $p.0, $inv))
+            fn mul(self, scalar: &'b $field) -> $projective {
+                let mut res = Projective::IDENTITY;
+                let mut acc = self.clone();
+                let bits: Vec<u8> = scalar
+                    .as_bits()
+                    .into_iter()
+                    .skip_while(|x| *x == 0)
+                    .collect();
+                for &b in bits.iter().rev() {
+                    if b == 1 {
+                        res += acc.clone();
+                    }
+                    acc.double();
+                }
+                res
             }
         }
 
         impl MulAssign for $projective {
-            fn mul_assign(&mut self, rhs: $projective) {
-                self.0 = mul(self.0, rhs.0, $p.0, $inv)
+            fn mul_assign(&mut self, scalar: $field) {
+                let mut res = Projective::IDENTITY;
+                let mut acc = self.clone();
+                let bits: Vec<u8> = scalar
+                    .as_bits()
+                    .into_iter()
+                    .skip_while(|x| *x == 0)
+                    .collect();
+                for &b in bits.iter().rev() {
+                    if b == 1 {
+                        res += acc.clone();
+                    }
+                    acc.double();
+                }
+                self = res
             }
         }
 
@@ -87,7 +126,8 @@ macro_rules! projective_ring_operation {
 
             #[inline]
             fn sub(self, rhs: $projective) -> Self {
-                $projective(sub(self.0, rhs.0, $p.0))
+                let (x, y, z) = add_point((self.x, self.y, self.z), (rhs.x, -rhs.y, rhs.z));
+                Self { x, y, z }
             }
         }
 
@@ -96,13 +136,15 @@ macro_rules! projective_ring_operation {
 
             #[inline]
             fn sub(self, rhs: &'b $projective) -> $projective {
-                $projective(sub(self.0, rhs.0, $p.0))
+                let (x, y, z) = add_point((self.x, self.y, self.z), (rhs.x, -rhs.y, rhs.z));
+                Self { x, y, z }
             }
         }
 
         impl SubAssign for $projective {
             fn sub_assign(&mut self, rhs: $projective) {
-                self.0 = sub(self.0, rhs.0, $p.0)
+                let (x, y, z) = add_point((self.x, self.y, self.z), (rhs.x, -rhs.y, rhs.z));
+                self.0 = Self { x, y, z }
             }
         }
     };

@@ -6,18 +6,24 @@ macro_rules! projective_group_operation {
 
             const IDENTITY: Self = $e;
 
-            fn invert(self) -> Self {
-                Self {
-                    x: self.x,
-                    y: -self.y,
-                    z: self.z,
+            fn invert(self) -> Option<Self> {
+                match self.z.is_zero() {
+                    true => None,
+                    false => Some(
+                        Self {
+                            x: self.x,
+                            y: -self.y,
+                            z: self.z,
+                })
                 }
             }
         }
 
         impl PartialEq for $projective {
             fn eq(&self, other: &Self) -> bool {
-                self.x == other.x && self.y == other.y && self.z == other.z
+                (self.z == Self::ScalarField::zero() && other.z == Self::ScalarField::zero())
+                ||
+                (self.x == other.x && self.y == other.y && self.z == other.z)
             }
         }
 

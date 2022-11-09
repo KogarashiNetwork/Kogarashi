@@ -1,2 +1,2 @@
-mod coordinate;
+pub mod coordinate;
 pub mod limbs;

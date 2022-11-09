@@ -16,9 +16,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(dead_code)]
 
-pub mod arithmetic;
 pub mod coordinate;
-mod domain;
 mod error;
 pub mod fr;
-pub mod interface;
