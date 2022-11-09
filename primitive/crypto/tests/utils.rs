@@ -27,28 +27,42 @@ pub mod jubjub_field {
         0x05874f84946737ec,
     ];
 
-    pub fn random(mut rand: impl RngCore) -> [u64; 4] {
-        from_u512(
-            [
-                rand.next_u64(),
-                rand.next_u64(),
-                rand.next_u64(),
-                rand.next_u64(),
-                rand.next_u64(),
-                rand.next_u64(),
-                rand.next_u64(),
-                rand.next_u64(),
-            ],
-            R2,
-            R3,
-            MODULUS,
-            INV,
-        )
+    pub fn random(rand: impl RngCore) -> [u64; 4] {
+        random_logic(rand, R2, R3, MODULUS, INV)
     }
 
     pub fn from_raw(val: [u64; 4]) -> [u64; 4] {
-        mul(val, R2, MODULUS, INV)
+        from_raw_logic(val, R2, MODULUS, INV)
     }
+}
+
+fn random_logic(
+    mut rand: impl RngCore,
+    r2: [u64; 4],
+    r3: [u64; 4],
+    p: [u64; 4],
+    inv: u64,
+) -> [u64; 4] {
+    from_u512(
+        [
+            rand.next_u64(),
+            rand.next_u64(),
+            rand.next_u64(),
+            rand.next_u64(),
+            rand.next_u64(),
+            rand.next_u64(),
+            rand.next_u64(),
+            rand.next_u64(),
+        ],
+        r2,
+        r3,
+        p,
+        inv,
+    )
+}
+
+fn from_raw_logic(val: [u64; 4], r2: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
+    mul(val, r2, p, inv)
 }
 
 fn from_u512(limbs: [u64; 8], r2: [u64; 4], r3: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {

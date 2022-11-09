@@ -1,7 +1,7 @@
 mod utils;
 
 #[cfg(test)]
-mod tests {
+mod jubjub_tests {
     use crate::utils::jubjub_field::*;
 
     use proptest::prelude::*;
