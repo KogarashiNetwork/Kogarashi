@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    if: ! github.event.pull_request.draft
     name: Build Crate
     runs-on: ubuntu-latest
 

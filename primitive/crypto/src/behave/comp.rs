@@ -6,4 +6,5 @@ use parity_scale_codec::{Decode, Encode};
 pub trait ParityCmp: Decode + Encode {}
 
 /// This is parallelize compatible pallet
+#[cfg(feature = "std")]
 pub trait ParallelCmp: Send + Sync {}

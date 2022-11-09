@@ -3389,6 +3389,8 @@ name = "zero-crypto"
 version = "0.1.0"
 dependencies = [
  "parity-scale-codec",
+ "rand_core 0.6.3",
+ "sp-std",
 ]
 
 [[package]]
@@ -3413,6 +3415,7 @@ dependencies = [
  "rand_xorshift",
  "serde",
  "sp-std",
+ "zero-crypto",
 ]
 
 [[package]]
