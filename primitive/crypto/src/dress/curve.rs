@@ -72,6 +72,25 @@ macro_rules! curve_operation {
             fn is_identity(self) -> bool {
                 self.z == Self::ScalarField::zero()
             }
+
+            fn double(self) -> Self {
+                let (x,y,z) = double_point((self.x.0, self.y.0, self.z.0), $field::MODULUS.0,
+                $field::INV,);
+                Self {
+                    x: $field(x),
+                    y: $field(y),
+                    z: $field(z),
+                }
+            }
+
+            fn is_on_curve(self) -> bool {
+                if self.is_identity() {
+                    true
+                } else {
+                    self.y.square() * self.z
+                        == self.x.square() * self.x + Self::PARAM_B * self.z.square() * self.z
+                }
+            }
         }
     };
 }

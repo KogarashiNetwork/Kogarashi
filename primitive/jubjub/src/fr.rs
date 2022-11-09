@@ -58,11 +58,11 @@ impl Fr {
         Fr([0, 0, 0, 0])
     }
 
-    pub fn one() -> Fr {
+    pub const fn one() -> Fr {
         Fr::from_raw([1, 0, 0, 0])
     }
 
-    pub fn from_raw(val: [u64; 4]) -> Self {
+    pub const fn from_raw(val: [u64; 4]) -> Self {
         Fr(mul(val, R2, Self::MODULUS.0, INV))
     }
 
@@ -114,7 +114,7 @@ impl Fr {
         bytes
     }
 
-    fn as_bits(&self) -> [u8; 256] {
+    pub(crate) fn as_bits(&self) -> [u8; 256] {
         let mut index = 256;
         let mut bits: [u8; 256] = [0; 256];
         for mut x in self.0 {

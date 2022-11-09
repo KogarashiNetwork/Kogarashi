@@ -94,7 +94,7 @@ curve_operation!(
 
 #[cfg(test)]
 mod tests {
-    use super::{Fr, JubjubProjective};
+    use super::{Fr, JubjubProjective, GENERATOR, IDENTITY};
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
@@ -108,44 +108,44 @@ mod tests {
 
     prop_compose! {
         fn arb_cdn()(k in arb_fr()) -> JubjubProjective {
-            JubjubProjective::GENERATOR * k
+            GENERATOR * k
         }
     }
 
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(1000))]
         #[test]
-         fn test_projective(mut a in arb_cdn(), mut b in arb_cdn(), mut c in arb_cdn()) {
+         fn test_projective(a in arb_cdn(), mut b in arb_cdn(), mut  c in arb_cdn()) {
             let mut base_for_neg = a.clone();
             let _b = b.clone();
             let mut a1 = a.clone();
             assert!(a.is_on_curve());
             assert!(b.is_on_curve());
             assert!(c.is_on_curve());
-            a1.add(b.clone());
-            a1.add(c.clone());
-            c.add(a.clone());
-            c.add(b.clone());
+            a1 += b.clone();
+            a1 += c.clone();
+            c += a.clone();
+            c += b.clone();
             assert_eq!(a1, c); // A + B + C == C + A + B
             let mut x = a.clone();
             let y = a.clone();
             a.double();
-            x.add(y);
+            x += y;
             assert_eq!(a, x); // A * A = A + A
-            base_for_neg.add(base_for_neg.neg());
-            assert_eq!(base_for_neg, JubjubProjective::IDENTITY); // A + (-A) = e
+            base_for_neg -= base_for_neg;
+            assert_eq!(base_for_neg, IDENTITY); // A + (-A) = e
 
-            b.add(JubjubProjective::IDENTITY);
+            b += IDENTITY;
             assert_eq!(b, _b); // X + e == X
         }
     }
 
     #[test]
     fn test_identity() {
-        let mut iden = JubjubProjective::IDENTITY;
+        let mut iden = IDENTITY;
         assert!(iden.is_on_curve());
-        iden.double();
-        assert_eq!(iden, JubjubProjective::IDENTITY); // e * e = e
+        iden = iden.double();
+        assert_eq!(iden, IDENTITY); // e * e = e
     }
 
     #[test]
@@ -165,17 +165,15 @@ mod tests {
 
     #[test]
     fn test_on_curve() {
-        let gen = Projective::generator();
-        let mut g1 = Projective::g1();
-        let mut g2 = Projective::g2();
+        let identity = IDENTITY;
+        let mut generator = GENERATOR;
 
-        assert!(gen.is_on_curve());
-        assert!(g1.is_on_curve());
-        assert!(g2.is_on_curve());
+        assert!(identity.is_on_curve());
+        assert!(generator.is_on_curve());
 
-        g1.double();
-        g2.add(Projective::g1());
-        assert!(g1.is_on_curve());
-        assert!(g2.is_on_curve());
+        let other = generator.clone();
+        generator = generator.double();
+        generator += other;
+        assert!(generator.is_on_curve());
     }
 }

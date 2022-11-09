@@ -56,7 +56,7 @@ macro_rules! projective_ring_operation {
                     y: $field(y),
                     z: $field(z),
                 };
-                self = &mut res
+                *self = res
             }
         }
 
@@ -119,7 +119,7 @@ macro_rules! projective_ring_operation {
                     }
                     acc.double();
                 }
-                self = res
+                *self = res
             }
         }
 
@@ -200,7 +200,7 @@ macro_rules! projective_ring_operation {
                     y: $field(y),
                     z: $field(z),
                 };
-                self = &mut res
+                *self = res
             }
         }
     };

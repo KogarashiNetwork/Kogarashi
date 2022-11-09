@@ -1,11 +1,10 @@
-use zero_jubjub::fr::Fr;
-
 #[cfg(test)]
 mod arithmetic_tests {
-    use super::*;
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
+    use zero_crypto::behave::*;
+    use zero_jubjub::fr::Fr;
 
     prop_compose! {
         fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fr {

@@ -57,4 +57,10 @@ pub trait Projective: ParityCmp + Basic + Ring {
 
     // check that point is on curve
     fn is_identity(self) -> bool;
+
+    // doubling this point
+    fn double(self) -> Self;
+
+    // check that point is on curve
+    fn is_on_curve(self) -> bool;
 }
