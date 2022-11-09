@@ -51,23 +51,19 @@ const ROOT_OF_UNITY: Fr = Fr([
     0x4d6b87b1da259e2,
 ]);
 
-fft_field_operation!(Fr, MODULUS, GENERATOR, IDENTITY, INV, ROOT_OF_UNITY);
+fft_field_operation!(Fr, MODULUS, GENERATOR, IDENTITY, INV, ROOT_OF_UNITY, R2, R3);
 
 impl Fr {
-    pub const fn zero() -> Fr {
-        Fr([0, 0, 0, 0])
+    pub(crate) const fn zero() -> Self {
+        Self(zero())
     }
 
-    pub const fn one() -> Fr {
-        Fr::from_raw([1, 0, 0, 0])
+    pub(crate) const fn one() -> Self {
+        Self(one(R2, MODULUS, INV))
     }
 
-    pub const fn from_raw(val: [u64; 4]) -> Self {
-        Fr(mul(val, R2, MODULUS, INV))
-    }
-
-    pub fn from_u64(val: u64) -> Self {
-        Fr([val, 0, 0, 0])
+    pub(crate) const fn to_mont_form(val: [u64; 4]) -> Self {
+        Self(to_mont_form(val, R2, MODULUS, INV))
     }
 
     pub fn from_hex(hex: &str) -> Result<Fr, Error> {
@@ -114,36 +110,6 @@ impl Fr {
         bytes
     }
 
-    pub(crate) fn as_bits(&self) -> [u8; 256] {
-        let mut index = 256;
-        let mut bits: [u8; 256] = [0; 256];
-        for mut x in self.0 {
-            for _ in 0..64 {
-                index -= 1;
-                bits[index] = (x & 1) as u8;
-                x >>= 1;
-            }
-        }
-        bits
-    }
-
-    fn from_u512(limbs: [u64; 8]) -> Self {
-        let a = mul(
-            [limbs[0], limbs[1], limbs[2], limbs[3]],
-            R2,
-            Self::MODULUS.0,
-            INV,
-        );
-        let b = mul(
-            [limbs[4], limbs[5], limbs[6], limbs[7]],
-            R3,
-            Self::MODULUS.0,
-            INV,
-        );
-        let c = add(a, b, Self::MODULUS.0);
-        Fr(c)
-    }
-
     fn bytes_to_u64(bytes: &[u8; 16]) -> Result<u64, Error> {
         let mut res: u64 = 0;
         for (i, byte) in bytes.iter().enumerate() {
@@ -153,23 +119,6 @@ impl Fr {
             }
         }
         Ok(res)
-    }
-
-    pub fn is_zero(&self) -> bool {
-        self.0.iter().all(|x| *x == 0)
-    }
-
-    pub fn random(mut rand: impl RngCore) -> Fr {
-        Fr::from_u512([
-            rand.next_u64(),
-            rand.next_u64(),
-            rand.next_u64(),
-            rand.next_u64(),
-            rand.next_u64(),
-            rand.next_u64(),
-            rand.next_u64(),
-            rand.next_u64(),
-        ])
     }
 }
 

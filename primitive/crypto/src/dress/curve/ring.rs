@@ -68,7 +68,7 @@ macro_rules! projective_ring_operation {
                 let mut res = Self::Output::IDENTITY;
                 let mut acc = self.clone();
                 let bits: Vec<u8> = scalar
-                    .as_bits()
+                    .to_bits()
                     .into_iter()
                     .skip_while(|x| *x == 0)
                     .collect();
@@ -90,7 +90,7 @@ macro_rules! projective_ring_operation {
                 let mut res = Self::Output::IDENTITY;
                 let mut acc = self.clone();
                 let bits: Vec<u8> = scalar
-                    .as_bits()
+                    .to_bits()
                     .into_iter()
                     .skip_while(|x| *x == 0)
                     .collect();
@@ -109,7 +109,7 @@ macro_rules! projective_ring_operation {
                 let mut res = Self::IDENTITY;
                 let mut acc = self.clone();
                 let bits: Vec<u8> = scalar
-                    .as_bits()
+                    .to_bits()
                     .into_iter()
                     .skip_while(|x| *x == 0)
                     .collect();

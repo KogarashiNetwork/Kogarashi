@@ -66,7 +66,7 @@ macro_rules! field_operation {
 
 #[macro_export]
 macro_rules! prime_field_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident) => {
+    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident, $r2:ident, $r3:ident) => {
         field_operation!($field, $p, $g, $e, $inv);
 
         field_built_in!($field);
@@ -75,6 +75,26 @@ macro_rules! prime_field_operation {
             const MODULUS: Self = $field($p);
 
             const INV: u64 = $inv;
+
+            fn from_u64(val: u64) -> Self {
+                Self([val,0,0,0])
+            }
+
+            fn from_u512(val: [u64; 8]) -> Self {
+                Self(from_u512(val, $r2, $r3, $p, $inv))
+            }
+
+            fn to_bits(self) -> [u8; 256] {
+                to_bits(self.0)
+            }
+
+            fn is_zero(self) -> bool {
+                self.0.iter().all(|x| *x == 0)
+            }
+
+            fn random(rand: impl RngCore) -> Self {
+                Self(random_limbs(rand, $r2, $r3, $p, $inv))
+            }
 
             fn double(self) -> Self {
                 Self(double(self.0, $p))
@@ -152,10 +172,10 @@ macro_rules! prime_field_operation {
 
 #[macro_export]
 macro_rules! fft_field_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident, $r:ident) => {
+    ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident, $r:ident, $r2:ident, $r3:ident) => {
         use zero_crypto::arithmetic::limbs::bits_256::*;
 
-        prime_field_operation!($field, $p, $g, $e, $i);
+        prime_field_operation!($field, $p, $g, $e, $i, $r2, $r3);
 
         impl FftField for $field {
             const ROOT_OF_UNITY: Self = $r;

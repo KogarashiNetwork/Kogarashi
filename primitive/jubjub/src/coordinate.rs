@@ -32,6 +32,7 @@
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
 use crate::fr::Fr;
+use zero_crypto::arithmetic::limbs::bits_256::*;
 use zero_crypto::behave::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::basic::curve::*;
@@ -44,13 +45,13 @@ const IDENTITY: JubjubProjective = JubjubProjective {
 };
 
 const GENERATOR: JubjubProjective = JubjubProjective {
-    x: Fr::from_raw([
+    x: Fr::to_mont_form([
         0x7c24d812779a3316,
         0x72e38f4ebd4070f3,
         0x03b3fe93f505a6f2,
         0xc4c71e5a4102960,
     ]),
-    y: Fr::from_raw([
+    y: Fr::to_mont_form([
         0xd2047ef3463de4af,
         0x01ca03640d236cbf,
         0xd3033593ae386e92,
@@ -61,7 +62,7 @@ const GENERATOR: JubjubProjective = JubjubProjective {
 
 const PARAM_A: Fr = Fr::zero();
 
-const PARAM_B: Fr = Fr::from_raw([4, 0, 0, 0]);
+const PARAM_B: Fr = Fr::to_mont_form([4, 0, 0, 0]);
 
 pub struct JubJubCurve {}
 
@@ -94,7 +95,7 @@ curve_operation!(
 
 #[cfg(test)]
 mod tests {
-    use super::{Fr, JubjubProjective, GENERATOR, IDENTITY};
+    use super::{Fr, JubjubProjective, PrimeField, GENERATOR, IDENTITY};
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
