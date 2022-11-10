@@ -1,5 +1,8 @@
 use crate::error::Error;
 use rand_core::RngCore;
+use zero_crypto::arithmetic::limbs::bits_256::*;
+use zero_crypto::behave::*;
+use zero_crypto::common::*;
 use zero_crypto::dress::{basic::field::*, field::*};
 
 #[derive(Debug, Clone, Copy, Decode, Encode)]
@@ -51,7 +54,22 @@ const ROOT_OF_UNITY: Fr = Fr([
     0x4d6b87b1da259e2,
 ]);
 
-fft_field_operation!(Fr, MODULUS, GENERATOR, IDENTITY, INV, ROOT_OF_UNITY, R2, R3);
+type Mont = [u64; 8];
+
+type Bits = [u8; 256];
+
+fft_field_operation!(
+    Fr,
+    MODULUS,
+    GENERATOR,
+    IDENTITY,
+    INV,
+    ROOT_OF_UNITY,
+    R2,
+    R3,
+    Mont,
+    Bits
+);
 
 impl Fr {
     pub(crate) const fn zero() -> Self {
@@ -92,7 +110,7 @@ impl Fr {
         for i in 0..hex.len() {
             limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
         }
-        Ok(Fr(mul(limbs, R2, Self::MODULUS.0, INV)))
+        Ok(Fr(mul(limbs, R2, MODULUS, INV)))
     }
 
     fn as_bytes(&self) -> [u8; 64] {

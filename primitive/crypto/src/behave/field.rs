@@ -5,7 +5,7 @@ use super::{algebra::Field, basic::Basic, comp::ParityCmp};
 use rand_core::RngCore;
 
 /// This is prime field trait
-pub trait PrimeField: Field + Basic + ParityCmp + PartialOrd + Ord {
+pub trait PrimeField<M, B>: Field + Basic + ParityCmp + PartialOrd + Ord {
     const MODULUS: Self;
 
     // mongomery reduction inverse
@@ -13,9 +13,9 @@ pub trait PrimeField: Field + Basic + ParityCmp + PartialOrd + Ord {
 
     fn from_u64(val: u64) -> Self;
 
-    fn from_u512(val: [u64; 8]) -> Self;
+    fn from_u512(val: M) -> Self;
 
-    fn to_bits(self) -> [u8; 256];
+    fn to_bits(self) -> B;
 
     fn is_zero(self) -> bool;
 
