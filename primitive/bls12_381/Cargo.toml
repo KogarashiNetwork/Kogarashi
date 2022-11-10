@@ -10,3 +10,5 @@ license = "Apache-2.0"
 
 [dependencies]
 zero-crypto = { version = '0.1.0', path = '../crypto' }
+rand_core = { version="0.6", default-features = false }
+parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
