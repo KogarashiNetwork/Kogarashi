@@ -1,3 +1,4 @@
+mod bls12_381;
 mod jubjub;
 
 #[cfg(test)]
@@ -10,7 +11,7 @@ mod jubjub_limbs_tests {
     use zero_crypto::arithmetic::limbs::bits_256::*;
 
     prop_compose! {
-        fn arb_jubjub_fr()(bytes in [any::<u8>(); 16]) -> [u64;4] {
+        fn arb_jubjub_fr()(bytes in [any::<u8>(); 16]) -> [u64; 4] {
             random(XorShiftRng::from_seed(bytes))
         }
     }
@@ -97,6 +98,90 @@ mod jubjub_limbs_tests {
                 }
                 None => {}
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod bls12_381_limbs_tests {
+    use crate::bls12_381::field::*;
+
+    use proptest::prelude::*;
+    use rand::SeedableRng;
+    use rand_xorshift::XorShiftRng;
+    use zero_crypto::arithmetic::limbs::bits_384::*;
+
+    prop_compose! {
+        fn arb_jubjub_fp()(bytes in [any::<u8>(); 16]) -> [u64; 6] {
+            random(XorShiftRng::from_seed(bytes))
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(1000000))]
+        #[test]
+        fn jubjub_field_add_test(a in arb_jubjub_fp()) {
+            let b = a;
+            let c = a;
+
+            // a + a = a * 2
+            let d = add(a, b, MODULUS);
+            let e = double(c, MODULUS);
+            assert_eq!(d, e);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(1000000))]
+        #[test]
+        fn jubjub_field_sub_test(a in arb_jubjub_fp()) {
+            let b = a;
+            let c = a;
+            let d = a;
+
+            // a - a = a * 2 - a * 2
+            let e = sub(a, b, MODULUS);
+
+            let cc = double(c, MODULUS);
+            let dd = double(d, MODULUS);
+            let f = sub(cc, dd, MODULUS);
+
+            assert_eq!(e, f);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(100000))]
+        #[test]
+        fn jubjub_field_mul_test(a in arb_jubjub_fp(), b in arb_jubjub_fp(), c in arb_jubjub_fp()) {
+            // a * b + a * c
+            let ab = mul(a, b, MODULUS, INV);
+            let ac = mul(a, c, MODULUS, INV);
+            let d = add(ab, ac, MODULUS);
+
+            // a * (b + c)
+            let bc = add(b, c, MODULUS);
+            let e = mul(a, bc, MODULUS, INV);
+
+            assert_eq!(d, e);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(100000))]
+        #[test]
+        fn jubjub_field_square_test(a in arb_jubjub_fp(), b in arb_jubjub_fp()) {
+            // (a * a) * (b * b)
+            let aa = mul(a, a, MODULUS, INV);
+            let bb = mul(b, b, MODULUS, INV);
+            let c = mul(aa, bb, MODULUS, INV);
+
+            // a^2 * b^2
+            let aa = square(a, MODULUS, INV);
+            let bb = square(b, MODULUS, INV);
+            let d = mul(aa, bb, MODULUS, INV);
+
+            assert_eq!(c, d);
         }
     }
 }
