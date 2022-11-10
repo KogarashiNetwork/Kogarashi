@@ -55,3 +55,17 @@ type Mont = [u64; 12];
 type Bits = [u8; 384];
 
 prime_field_operation!(Fp, MODULUS, GENERATOR, IDENTITY, INV, R2, R3, Mont, Bits);
+
+impl Fp {
+    pub(crate) const fn zero() -> Self {
+        Self(zero())
+    }
+
+    pub(crate) const fn one() -> Self {
+        Self(R)
+    }
+
+    pub(crate) const fn to_mont_form(val: [u64; 6]) -> Self {
+        Self(to_mont_form(val, R2, MODULUS, INV))
+    }
+}

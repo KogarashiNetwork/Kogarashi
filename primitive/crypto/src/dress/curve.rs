@@ -7,8 +7,6 @@ pub use ring::*;
 #[macro_export]
 macro_rules! curve_operation {
     ($curve:ident, $field:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $g:ident, $e:ident, $mont:ident, $bits:ident) => {
-        use zero_crypto::arithmetic::coordinate::projective::*;
-
         curve_built_in!($affine, $projective);
 
         projective_ring_operation!($projective, $field, $g, $e);

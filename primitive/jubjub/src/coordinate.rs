@@ -32,10 +32,19 @@
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
 use crate::fr::Fr;
+use zero_crypto::arithmetic::coordinate::projective::*;
 use zero_crypto::behave::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::basic::curve::*;
 use zero_crypto::dress::curve::*;
+
+/// The projective form of coordinate
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct JubjubProjective {
+    pub(crate) x: Fr,
+    pub(crate) y: Fr,
+    pub(crate) z: Fr,
+}
 
 const IDENTITY: JubjubProjective = JubjubProjective {
     x: Fr::zero(),
@@ -71,14 +80,6 @@ pub struct JubjubAffine {
     x: Fr,
     y: Fr,
     is_infinity: bool,
-}
-
-/// The projective form of coordinate
-#[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct JubjubProjective {
-    pub(crate) x: Fr,
-    pub(crate) y: Fr,
-    pub(crate) z: Fr,
 }
 
 type Mont = [u64; 8];

@@ -1,9 +1,9 @@
 use crate::error::Error;
 use rand_core::RngCore;
-use zero_crypto::common::*;
-use zero_crypto::dress::{basic::field::*, field::*};
 use zero_crypto::arithmetic::limbs::bits_256::*;
 use zero_crypto::behave::*;
+use zero_crypto::common::*;
+use zero_crypto::dress::{basic::field::*, field::*};
 
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct Fr(pub(crate) [u64; 4]);
@@ -58,7 +58,18 @@ type Mont = [u64; 8];
 
 type Bits = [u8; 256];
 
-fft_field_operation!(Fr, MODULUS, GENERATOR, IDENTITY, INV, ROOT_OF_UNITY, R2, R3, Mont, Bits);
+fft_field_operation!(
+    Fr,
+    MODULUS,
+    GENERATOR,
+    IDENTITY,
+    INV,
+    ROOT_OF_UNITY,
+    R2,
+    R3,
+    Mont,
+    Bits
+);
 
 impl Fr {
     pub(crate) const fn zero() -> Self {
