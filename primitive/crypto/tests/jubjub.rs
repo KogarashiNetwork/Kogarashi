@@ -2,7 +2,7 @@ use rand_core::RngCore;
 
 pub mod field {
     use super::*;
-    use zero_crypto::arithmetic::limbs::bits_256::*;
+    use zero_crypto::arithmetic::bits_256::*;
 
     pub const MODULUS: [u64; 4] = [
         0xd0970e5ed6f72cb7,
@@ -39,9 +39,8 @@ pub mod field {
 pub mod curve {
     use super::field::*;
     use super::*;
-    use zero_crypto::arithmetic::{
-        coordinate::projective::scalar_point, coordinate::utils::*, limbs::bits_256::*,
-    };
+    use zero_crypto::arithmetic::bits_256::*;
+    use zero_crypto::arithmetic::utils::ProjectiveCoordinate;
 
     pub const IDENTITY: ProjectiveCoordinate<[u64; 4]> = ([0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]);
 

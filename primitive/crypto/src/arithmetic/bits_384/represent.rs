@@ -1,6 +1,5 @@
-mod normal;
-
-pub use normal::{add, double, invert, mul, neg, square, sub};
+use crate::arithmetic::bits_384::limbs::*;
+use crate::arithmetic::utils::Bits;
 use rand_core::RngCore;
 
 pub const fn zero() -> [u64; 6] {
@@ -41,7 +40,7 @@ pub const fn to_mont_form(val: [u64; 6], r2: [u64; 6], p: [u64; 6], inv: u64) ->
     mul(val, r2, p, inv)
 }
 
-pub fn to_bits(val: [u64; 6]) -> [u8; 384] {
+pub fn to_bits(val: [u64; 6]) -> Bits {
     let mut index = 384;
     let mut bits: [u8; 384] = [0; 384];
     for mut x in val {
@@ -51,7 +50,7 @@ pub fn to_bits(val: [u64; 6]) -> [u8; 384] {
             x >>= 1;
         }
     }
-    bits
+    bits.to_vec()
 }
 
 pub fn random_limbs(

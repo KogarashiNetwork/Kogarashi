@@ -32,10 +32,8 @@
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
 use crate::fp::Fp;
-use zero_crypto::arithmetic::coordinate::bits_384::projective::*;
-use zero_crypto::behave::*;
+use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::common::*;
-use zero_crypto::dress::basic::curve::*;
 use zero_crypto::dress::curve::*;
 
 /// The projective form of coordinate
@@ -93,10 +91,6 @@ pub struct Bls381Affine {
     is_infinity: bool,
 }
 
-type Mont = [u64; 12];
-
-type Bits = [u8; 384];
-
 curve_operation!(
     Bls381Curve,
     Fp,
@@ -105,7 +99,5 @@ curve_operation!(
     Bls381Affine,
     Bls381Projective,
     GENERATOR,
-    IDENTITY,
-    Mont,
-    Bits
+    IDENTITY
 );

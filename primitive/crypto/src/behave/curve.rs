@@ -2,12 +2,12 @@
 /// y^2 = x^3 + ax + b
 use super::{algebra::Ring, basic::Basic, comp::ParityCmp, field::PrimeField};
 
-pub trait Affine<M, B>: ParityCmp + Basic {
+pub trait Affine: ParityCmp + Basic {
     // scalar field of curve
-    type ScalarField: PrimeField<M, B>;
+    type ScalarField: PrimeField;
 
     // projective coordinate representation
-    type Projective: Projective<M, B>;
+    type Projective: Projective;
 
     // a param
     const PARAM_A: Self::ScalarField;
@@ -22,12 +22,12 @@ pub trait Affine<M, B>: ParityCmp + Basic {
     fn is_on_curve(self) -> bool;
 }
 
-pub trait Projective<M, B>: ParityCmp + Basic + Ring {
+pub trait Projective: ParityCmp + Basic + Ring {
     // scalar field of curve
-    type ScalarField: PrimeField<M, B>;
+    type ScalarField: PrimeField;
 
     // affine coordinate representation
-    type Affine: Affine<M, B>;
+    type Affine: Affine;
 
     // a param
     const PARAM_A: Self::ScalarField;

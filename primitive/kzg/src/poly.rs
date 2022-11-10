@@ -1,9 +1,7 @@
 use parity_scale_codec::alloc::vec::Vec;
-use zero_jubjub::coordinate::Projective;
-use zero_jubjub::fr::Fr;
-use zero_jubjub::interface::Coordinate;
+use zero_crypto::behave::*;
 
-pub(crate) struct Polynomial(pub Vec<Fr>);
+pub(crate) struct Polynomial(pub Vec<FftField>);
 
 impl Polynomial {
     pub(crate) fn evaluate(self, at: Fr) -> Projective {

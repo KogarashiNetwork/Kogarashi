@@ -1,6 +1,6 @@
 use rand_core::RngCore;
-use zero_crypto::arithmetic::limbs::bits_384::*;
-use zero_crypto::dress::{basic::field::*, field::*};
+use zero_crypto::arithmetic::bits_384::*;
+use zero_crypto::dress::field::*;
 
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct Fp(pub(crate) [u64; 6]);
@@ -50,11 +50,7 @@ const R3: [u64; 6] = [
 
 const INV: u64 = 0x89f3fffcfffcfffd;
 
-type Mont = [u64; 12];
-
-type Bits = [u8; 384];
-
-prime_field_operation!(Fp, MODULUS, GENERATOR, IDENTITY, INV, R2, R3, Mont, Bits);
+prime_field_operation!(Fp, MODULUS, GENERATOR, IDENTITY, INV, R2, R3);
 
 impl Fp {
     pub(crate) const fn zero() -> Self {

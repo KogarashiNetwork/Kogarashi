@@ -32,10 +32,8 @@
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
 use crate::fr::Fr;
-use zero_crypto::arithmetic::coordinate::projective::*;
-use zero_crypto::behave::*;
+use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;
-use zero_crypto::dress::basic::curve::*;
 use zero_crypto::dress::curve::*;
 
 /// The projective form of coordinate
@@ -82,10 +80,6 @@ pub struct JubjubAffine {
     is_infinity: bool,
 }
 
-type Mont = [u64; 8];
-
-type Bits = [u8; 256];
-
 curve_operation!(
     JubJubCurve,
     Fr,
@@ -94,9 +88,7 @@ curve_operation!(
     JubjubAffine,
     JubjubProjective,
     GENERATOR,
-    IDENTITY,
-    Mont,
-    Bits
+    IDENTITY
 );
 
 #[cfg(test)]

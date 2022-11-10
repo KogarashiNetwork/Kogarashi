@@ -1,18 +1,6 @@
+use crate::arithmetic::bits_256::limbs::*;
+use crate::arithmetic::utils::Bits;
 use rand_core::RngCore;
-
-#[cfg(all(feature = "asm", target_arch = "x86_64"))]
-mod assembly;
-
-#[cfg(any(not(feature = "asm"), not(target_arch = "x86_64")))]
-mod normal;
-
-#[cfg(all(feature = "asm", target_arch = "x86_64"))]
-pub use assembly::{add, double, mul, neg, square, sub};
-
-#[cfg(any(not(feature = "asm"), not(target_arch = "x86_64")))]
-pub use normal::{add, double, mul, neg, square, sub};
-
-pub use normal::invert;
 
 pub const fn zero() -> [u64; 4] {
     [0, 0, 0, 0]
@@ -42,7 +30,7 @@ pub const fn to_mont_form(val: [u64; 4], r2: [u64; 4], p: [u64; 4], inv: u64) ->
     mul(val, r2, p, inv)
 }
 
-pub fn to_bits(val: [u64; 4]) -> [u8; 256] {
+pub fn to_bits(val: [u64; 4]) -> Bits {
     let mut index = 256;
     let mut bits: [u8; 256] = [0; 256];
     for mut x in val {
@@ -52,7 +40,7 @@ pub fn to_bits(val: [u64; 4]) -> [u8; 256] {
             x >>= 1;
         }
     }
-    bits
+    bits.to_vec()
 }
 
 pub fn random_limbs(

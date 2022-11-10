@@ -1,17 +1,17 @@
 mod bls12_381;
 mod jubjub;
 
+use proptest::prelude::*;
+use rand::SeedableRng;
+use rand_xorshift::XorShiftRng;
+use zero_crypto::arithmetic::utils::ProjectiveCoordinate;
+
 #[cfg(test)]
 mod jubjub_curve_tests {
+    use super::*;
     use crate::jubjub::curve::*;
     use crate::jubjub::field::*;
-
-    use proptest::prelude::*;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
-    use zero_crypto::arithmetic::{
-        coordinate::projective::*, coordinate::utils::*, limbs::bits_256::*,
-    };
+    use zero_crypto::arithmetic::bits_256::*;
 
     prop_compose! {
         fn arb_jubjub_point()(bytes in [any::<u8>(); 16]) -> ProjectiveCoordinate<[u64; 4]> {
@@ -86,15 +86,10 @@ mod jubjub_curve_tests {
 
 #[cfg(test)]
 mod bls12_381_curve_tests {
+    use super::*;
     use crate::bls12_381::curve::*;
     use crate::bls12_381::field::*;
-
-    use proptest::prelude::*;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
-    use zero_crypto::arithmetic::{
-        coordinate::bits_384::projective::*, coordinate::utils::*, limbs::bits_384::*,
-    };
+    use zero_crypto::arithmetic::bits_384::*;
 
     prop_compose! {
         fn arb_bls12_381_point()(bytes in [any::<u8>(); 16]) -> ProjectiveCoordinate<[u64; 6]> {

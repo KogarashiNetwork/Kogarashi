@@ -15,3 +15,7 @@ pub(crate) const fn mac(a: u64, b: u64, c: u64, d: u64) -> (u64, u64) {
     let t = (a as u128) + ((b as u128) * (c as u128)) + (d as u128);
     (t as u64, (t >> 64) as u64)
 }
+
+pub type ProjectiveCoordinate<L> = (L, L, L);
+
+pub type Bits = Vec<u8>;

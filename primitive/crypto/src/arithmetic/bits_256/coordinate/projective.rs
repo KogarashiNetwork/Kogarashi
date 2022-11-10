@@ -1,5 +1,6 @@
-use crate::arithmetic::coordinate::utils::*;
-use crate::arithmetic::limbs::bits_256::*;
+use crate::arithmetic::bits_256::limbs::*;
+use crate::arithmetic::bits_256::represent::*;
+use crate::arithmetic::utils::ProjectiveCoordinate;
 
 /// The projective coordinate addition
 /// cost: 12M + 2S + 6A + 1*2
