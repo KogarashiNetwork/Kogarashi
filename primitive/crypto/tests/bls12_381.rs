@@ -15,6 +15,15 @@ pub mod field {
 
     pub const INV: u64 = 0x89f3_fffc_fffc_fffd;
 
+    pub const R: [u64; 6] = [
+        0x7609_0000_0002_fffd,
+        0xebf4_000b_c40c_0002,
+        0x5f48_9857_53c7_58ba,
+        0x77ce_5853_7052_5745,
+        0x5c07_1a97_a256_ec6d,
+        0x15f6_5ec3_fa80_e493,
+    ];
+
     const R2: [u64; 6] = [
         0xf4df_1f34_1c34_1746,
         0x0a76_e6a6_09d1_04f1,
@@ -53,28 +62,35 @@ pub mod curve {
         ([0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]);
 
     pub const GENERATOR: ProjectiveCoordinate<[u64; 6]> = (
-        from_raw([
+        [
             0x5cb3_8790_fd53_0c16,
             0x7817_fc67_9976_fff5,
             0x154f_95c7_143b_a1c1,
             0xf0ae_6acd_f3d0_e747,
             0xedce_6ecc_21db_f440,
             0x1201_7741_9e0b_fb75,
-        ]),
-        from_raw([
-            0x5cb3_8790_fd53_0c16,
-            0x7817_fc67_9976_fff5,
-            0x154f_95c7_143b_a1c1,
-            0xf0ae_6acd_f3d0_e747,
-            0xedce_6ecc_21db_f440,
-            0x1201_7741_9e0b_fb75,
-        ]),
-        from_raw([1, 0, 0, 0, 0, 0]),
+        ],
+        [
+            0xbaac_93d5_0ce7_2271,
+            0x8c22_631a_7918_fd8e,
+            0xdd59_5f13_5707_25ce,
+            0x51ac_5829_5040_5194,
+            0x0e1c_8c3f_ad00_59c0,
+            0x0bbc_3efc_5008_a26a,
+        ],
+        R,
     );
 
     const PARAM_A: [u64; 6] = [0, 0, 0, 0, 0, 0];
 
-    const PARAM_B: [u64; 6] = from_raw([4, 0, 0, 0, 0, 0]);
+    const PARAM_B: [u64; 6] = [
+        0xaa27_0000_000c_fff3,
+        0x53cc_0032_fc34_000a,
+        0x478f_e97a_6b0a_807f,
+        0xb1d3_7ebe_e6ba_24d7,
+        0x8ec9_733b_bf78_ab2f,
+        0x09d6_4551_3d83_de7e,
+    ];
 
     pub fn is_on_curve(point: ProjectiveCoordinate<[u64; 6]>) -> bool {
         let identity = [0, 0, 0, 0, 0, 0];
