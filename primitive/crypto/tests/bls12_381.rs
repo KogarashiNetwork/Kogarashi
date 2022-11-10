@@ -41,3 +41,64 @@ pub mod field {
         to_mont_form(val, R2, MODULUS, INV)
     }
 }
+
+pub mod curve {
+    use super::field::*;
+    use super::*;
+    use zero_crypto::arithmetic::{
+        coordinate::bits_384::projective::*, coordinate::utils::*, limbs::bits_384::*,
+    };
+
+    pub const IDENTITY: ProjectiveCoordinate<[u64; 6]> =
+        ([0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]);
+
+    pub const GENERATOR: ProjectiveCoordinate<[u64; 6]> = (
+        from_raw([
+            0x5cb3_8790_fd53_0c16,
+            0x7817_fc67_9976_fff5,
+            0x154f_95c7_143b_a1c1,
+            0xf0ae_6acd_f3d0_e747,
+            0xedce_6ecc_21db_f440,
+            0x1201_7741_9e0b_fb75,
+        ]),
+        from_raw([
+            0x5cb3_8790_fd53_0c16,
+            0x7817_fc67_9976_fff5,
+            0x154f_95c7_143b_a1c1,
+            0xf0ae_6acd_f3d0_e747,
+            0xedce_6ecc_21db_f440,
+            0x1201_7741_9e0b_fb75,
+        ]),
+        from_raw([1, 0, 0, 0, 0, 0]),
+    );
+
+    const PARAM_A: [u64; 6] = [0, 0, 0, 0, 0, 0];
+
+    const PARAM_B: [u64; 6] = from_raw([4, 0, 0, 0, 0, 0]);
+
+    pub fn is_on_curve(point: ProjectiveCoordinate<[u64; 6]>) -> bool {
+        let identity = [0, 0, 0, 0, 0, 0];
+        let (x, y, z) = point;
+
+        if z == identity {
+            true
+        } else {
+            let yy = square(y, MODULUS, INV);
+            let right = mul(yy, z, MODULUS, INV);
+
+            let xx = square(x, MODULUS, INV);
+            let xxx = mul(xx, x, MODULUS, INV);
+            let zz = square(z, MODULUS, INV);
+            let zzz = mul(zz, z, MODULUS, INV);
+            let c = mul(PARAM_B, zzz, MODULUS, INV);
+            let left = add(xxx, c, MODULUS);
+
+            right == left
+        }
+    }
+
+    pub fn random_point(rand: impl RngCore) -> ProjectiveCoordinate<[u64; 6]> {
+        let random_scalar = random(rand);
+        scalar_point(GENERATOR, random_scalar, IDENTITY, MODULUS, INV)
+    }
+}

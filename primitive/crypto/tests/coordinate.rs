@@ -8,10 +8,12 @@ mod jubjub_curve_tests {
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
-    use zero_crypto::arithmetic::{coordinate::projective::*, limbs::bits_256::*};
+    use zero_crypto::arithmetic::{
+        coordinate::projective::*, coordinate::utils::*, limbs::bits_256::*,
+    };
 
     prop_compose! {
-        fn arb_jubjub_point()(bytes in [any::<u8>(); 16]) -> ProjectiveCoordinate {
+        fn arb_jubjub_point()(bytes in [any::<u8>(); 16]) -> ProjectiveCoordinate<[u64; 4]> {
             random_point(XorShiftRng::from_seed(bytes))
         }
     }

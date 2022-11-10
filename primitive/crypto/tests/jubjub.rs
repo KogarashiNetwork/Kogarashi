@@ -40,13 +40,12 @@ pub mod curve {
     use super::field::*;
     use super::*;
     use zero_crypto::arithmetic::{
-        coordinate::projective::{scalar_point, ProjectiveCoordinate},
-        limbs::bits_256::*,
+        coordinate::projective::scalar_point, coordinate::utils::*, limbs::bits_256::*,
     };
 
-    pub const IDENTITY: ProjectiveCoordinate = ([0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]);
+    pub const IDENTITY: ProjectiveCoordinate<[u64; 4]> = ([0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]);
 
-    pub const GENERATOR: ProjectiveCoordinate = (
+    pub const GENERATOR: ProjectiveCoordinate<[u64; 4]> = (
         from_raw([
             0x7c24d812779a3316,
             0x72e38f4ebd4070f3,
@@ -66,7 +65,7 @@ pub mod curve {
 
     const PARAM_B: [u64; 4] = from_raw([4, 0, 0, 0]);
 
-    pub fn is_on_curve(point: ProjectiveCoordinate) -> bool {
+    pub fn is_on_curve(point: ProjectiveCoordinate<[u64; 4]>) -> bool {
         let identity = [0, 0, 0, 0];
         let (x, y, z) = point;
 
@@ -87,7 +86,7 @@ pub mod curve {
         }
     }
 
-    pub fn random_point(rand: impl RngCore) -> ProjectiveCoordinate {
+    pub fn random_point(rand: impl RngCore) -> ProjectiveCoordinate<[u64; 4]> {
         let random_scalar = random(rand);
         scalar_point(GENERATOR, random_scalar, IDENTITY, MODULUS, INV)
     }
