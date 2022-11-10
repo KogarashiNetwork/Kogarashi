@@ -1,3 +1,4 @@
+pub use crate::arithmetic::represent::utils::Bits;
 pub use core::{
     cmp::Ordering,
     fmt::{Display, Formatter, Result as FmtResult},

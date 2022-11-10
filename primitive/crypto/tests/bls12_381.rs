@@ -2,7 +2,7 @@ use rand_core::RngCore;
 
 pub mod field {
     use super::*;
-    use zero_crypto::arithmetic::limbs::bits_384::*;
+    use zero_crypto::arithmetic::represent::bits_384::*;
 
     pub const MODULUS: [u64; 6] = [
         0xb9fe_ffff_ffff_aaab,

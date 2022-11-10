@@ -6,12 +6,12 @@ pub use ring::*;
 
 #[macro_export]
 macro_rules! curve_operation {
-    ($curve:ident, $field:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $g:ident, $e:ident, $mont:ident, $bits:ident) => {
+    ($curve:ident, $field:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $g:ident, $e:ident) => {
         curve_built_in!($affine, $projective);
 
         projective_ring_operation!($projective, $field, $g, $e);
 
-        impl Affine<$mont, $bits> for $affine {
+        impl Affine for $affine {
             type ScalarField = $field;
 
             type Projective = $projective;
@@ -37,7 +37,7 @@ macro_rules! curve_operation {
             }
         }
 
-        impl Projective<$mont, $bits> for $projective {
+        impl Projective for $projective {
             type ScalarField = $field;
 
             type Affine = $affine;

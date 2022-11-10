@@ -66,12 +66,12 @@ macro_rules! field_operation {
 
 #[macro_export]
 macro_rules! prime_field_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident, $r2:ident, $r3:ident, $mont:ident, $bits:ident) => {
+    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident, $r2:ident, $r3:ident) => {
         field_operation!($field, $p, $g, $e, $inv);
 
         field_built_in!($field);
 
-        impl PrimeField<$mont, $bits> for $field {
+        impl PrimeField for $field {
             const MODULUS: Self = $field($p);
 
             const INV: u64 = $inv;
@@ -80,11 +80,7 @@ macro_rules! prime_field_operation {
                 Self(from_u64(val))
             }
 
-            fn from_u512(val: $mont) -> Self {
-                Self(from_u512(val, $r2, $r3, $p, $inv))
-            }
-
-            fn to_bits(self) -> $bits {
+            fn to_bits(self) -> Bits {
                 to_bits(self.0)
             }
 
@@ -172,10 +168,10 @@ macro_rules! prime_field_operation {
 
 #[macro_export]
 macro_rules! fft_field_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident, $r:ident, $r2:ident, $r3:ident, $mont:ident, $bits:ident) => {
-        prime_field_operation!($field, $p, $g, $e, $i, $r2, $r3, $mont, $bits);
+    ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident, $r:ident, $r2:ident, $r3:ident) => {
+        prime_field_operation!($field, $p, $g, $e, $i, $r2, $r3);
 
-        impl FftField<$mont, $bits> for $field {
+        impl FftField for $field {
             const ROOT_OF_UNITY: Self = $r;
         }
 

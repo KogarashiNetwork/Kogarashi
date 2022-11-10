@@ -1391,7 +1391,7 @@ dependencies = [
  "parity-scale-codec",
  "rand 0.8.5",
  "rand_xorshift",
- "zero-jubjub",
+ "zero-crypto",
 ]
 
 [[package]]

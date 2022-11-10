@@ -7,21 +7,21 @@ use super::{algebra::Ring, comp::ParallelCmp};
 
 /// This is pairing field
 /// This is used for pairing
-pub trait PairingField<M, B>: PrimeField<M, B> + ParityCmp {}
+pub trait PairingField: PrimeField + ParityCmp {}
 
 /// This is fft field
 /// This is used for fft and has roots of unity
 #[cfg(feature = "std")]
-pub trait FftField<M, B>: PrimeField<M, B> + ParallelCmp {
+pub trait FftField: PrimeField + ParallelCmp {
     const ROOT_OF_UNITY: Self;
 }
 
 /// This is polynomial
 /// This has fft functionality and represents polynomial ring
 #[cfg(feature = "std")]
-pub trait Polynomial<M, B>: Ring + ParallelCmp {
+pub trait Polynomial: Ring + ParallelCmp {
     // domain of polynomial
-    type Domain: FftField<M, B>;
+    type Domain: FftField;
 
     fn evaluate(self, at: Self::Domain) -> Self::Domain;
 }

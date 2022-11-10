@@ -82,10 +82,6 @@ pub struct JubjubAffine {
     is_infinity: bool,
 }
 
-type Mont = [u64; 8];
-
-type Bits = [u8; 256];
-
 curve_operation!(
     JubJubCurve,
     Fr,
@@ -94,9 +90,7 @@ curve_operation!(
     JubjubAffine,
     JubjubProjective,
     GENERATOR,
-    IDENTITY,
-    Mont,
-    Bits
+    IDENTITY
 );
 
 #[cfg(test)]

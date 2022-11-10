@@ -1,6 +1,7 @@
 use crate::error::Error;
 use rand_core::RngCore;
 use zero_crypto::arithmetic::limbs::bits_256::*;
+use zero_crypto::arithmetic::represent::bits_256::*;
 use zero_crypto::behave::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::{basic::field::*, field::*};
@@ -54,22 +55,7 @@ const ROOT_OF_UNITY: Fr = Fr([
     0x4d6b87b1da259e2,
 ]);
 
-type Mont = [u64; 8];
-
-type Bits = [u8; 256];
-
-fft_field_operation!(
-    Fr,
-    MODULUS,
-    GENERATOR,
-    IDENTITY,
-    INV,
-    ROOT_OF_UNITY,
-    R2,
-    R3,
-    Mont,
-    Bits
-);
+fft_field_operation!(Fr, MODULUS, GENERATOR, IDENTITY, INV, ROOT_OF_UNITY, R2, R3);
 
 impl Fr {
     pub(crate) const fn zero() -> Self {

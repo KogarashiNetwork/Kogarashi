@@ -93,10 +93,6 @@ pub struct Bls381Affine {
     is_infinity: bool,
 }
 
-type Mont = [u64; 12];
-
-type Bits = [u8; 384];
-
 curve_operation!(
     Bls381Curve,
     Fp,
@@ -105,7 +101,5 @@ curve_operation!(
     Bls381Affine,
     Bls381Projective,
     GENERATOR,
-    IDENTITY,
-    Mont,
-    Bits
+    IDENTITY
 );
