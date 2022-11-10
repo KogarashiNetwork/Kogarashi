@@ -1,15 +1,14 @@
+use crate::arithmetic::coordinate::utils::*;
 use crate::arithmetic::limbs::bits_256::*;
-
-pub type ProjectiveCoordinate = ([u64; 4], [u64; 4], [u64; 4]);
 
 /// The projective coordinate addition
 /// cost: 12M + 2S + 6A + 1*2
 pub fn add_point(
-    lhs: ProjectiveCoordinate,
-    rhs: ProjectiveCoordinate,
+    lhs: ProjectiveCoordinate<[u64; 4]>,
+    rhs: ProjectiveCoordinate<[u64; 4]>,
     p: [u64; 4],
     inv: u64,
-) -> ProjectiveCoordinate {
+) -> ProjectiveCoordinate<[u64; 4]> {
     let zero: [u64; 4] = [0; 4];
     let (x, y, z) = lhs;
     let (a, b, c) = rhs;
@@ -29,7 +28,7 @@ pub fn add_point(
         if s1 == s2 {
             return double_point(lhs, p, inv);
         } else {
-            return ([0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]);
+            return (zero, zero, zero);
         }
     }
 
@@ -58,13 +57,16 @@ pub fn add_point(
 /// The projective coordinate doubling
 /// cost: 5M + 6S + 1*a + A + 3*2 + 1*3.
 /// a = 0, b = 4
-pub fn double_point(rhs: ProjectiveCoordinate, p: [u64; 4], inv: u64) -> ProjectiveCoordinate {
-    let (x, y, z) = rhs;
+pub fn double_point(
+    rhs: ProjectiveCoordinate<[u64; 4]>,
+    p: [u64; 4],
+    inv: u64,
+) -> ProjectiveCoordinate<[u64; 4]> {
     let zero: [u64; 4] = [0; 4];
-    let identity = (zero, zero, zero);
+    let (x, y, z) = rhs;
 
     if z == zero || y == zero {
-        identity
+        (zero, zero, zero)
     } else {
         let xx = square(x, p, inv);
         let t = add(double(xx, p), xx, p);
@@ -83,12 +85,12 @@ pub fn double_point(rhs: ProjectiveCoordinate, p: [u64; 4], inv: u64) -> Project
 }
 
 pub fn scalar_point(
-    mut base: ProjectiveCoordinate,
+    mut base: ProjectiveCoordinate<[u64; 4]>,
     scalar: [u64; 4],
-    mut identity: ProjectiveCoordinate,
+    mut identity: ProjectiveCoordinate<[u64; 4]>,
     p: [u64; 4],
     inv: u64,
-) -> ProjectiveCoordinate {
+) -> ProjectiveCoordinate<[u64; 4]> {
     let bits = to_bits(scalar);
     for &bit in bits.iter().rev() {
         if bit == 1 {

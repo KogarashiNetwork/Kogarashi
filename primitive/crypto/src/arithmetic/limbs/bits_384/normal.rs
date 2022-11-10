@@ -73,12 +73,12 @@ pub const fn mul(a: [u64; 6], b: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
     let (l8, c) = mac(l8, a[4], b[4], c);
     let (l9, l10) = mac(l9, a[4], b[5], c);
 
-    let (l5, c) = mac(l5, a[4], b[0], 0);
-    let (l6, c) = mac(l6, a[4], b[1], c);
-    let (l7, c) = mac(l7, a[4], b[2], c);
-    let (l8, c) = mac(l8, a[4], b[3], c);
-    let (l9, c) = mac(l9, a[4], b[4], c);
-    let (l10, l11) = mac(l10, a[4], b[5], c);
+    let (l5, c) = mac(l5, a[5], b[0], 0);
+    let (l6, c) = mac(l6, a[5], b[1], c);
+    let (l7, c) = mac(l7, a[5], b[2], c);
+    let (l8, c) = mac(l8, a[5], b[3], c);
+    let (l9, c) = mac(l9, a[5], b[4], c);
+    let (l10, l11) = mac(l10, a[5], b[5], c);
 
     mont([l0, l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11], p, inv)
 }
@@ -135,7 +135,7 @@ pub const fn mont(a: [u64; 12], p: [u64; 6], inv: u64) -> [u64; 6] {
     let (l6, d) = mac(l6, rhs, p[3], d);
     let (l7, d) = mac(l7, rhs, p[4], d);
     let (l8, d) = mac(l8, rhs, p[5], d);
-    let (l9, _) = adc(a[9], e, d);
+    let (l9, e) = adc(a[9], e, d);
 
     let rhs = l4.wrapping_mul(inv);
     let (_, d) = mac(l4, rhs, p[0], 0);
@@ -144,7 +144,7 @@ pub const fn mont(a: [u64; 12], p: [u64; 6], inv: u64) -> [u64; 6] {
     let (l7, d) = mac(l7, rhs, p[3], d);
     let (l8, d) = mac(l8, rhs, p[4], d);
     let (l9, d) = mac(l9, rhs, p[5], d);
-    let (l10, _) = adc(a[10], e, d);
+    let (l10, e) = adc(a[10], e, d);
 
     let rhs = l5.wrapping_mul(inv);
     let (_, d) = mac(l5, rhs, p[0], 0);

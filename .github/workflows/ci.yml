@@ -23,6 +23,7 @@ jobs:
           args: --all-features
 
   test:
+    if: github.event.pull_request.draft == false
     name: Unit Test
     runs-on: ubuntu-latest
 
@@ -36,6 +37,7 @@ jobs:
           args: --verbose --release --all --all-features
 
   format:
+    if: github.event.pull_request.draft == false
     name: Code Format Check
     runs-on: ubuntu-latest
 
