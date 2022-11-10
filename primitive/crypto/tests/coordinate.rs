@@ -52,9 +52,18 @@ mod jubjub_curve_tests {
             let ca = add_point(c, a, MODULUS, INV);
             let cab = add_point(ca,b, MODULUS, INV);
 
+            // 2 * (a + b) = 2 * a + 2 * b
+            let double_ab = double_point(ab, MODULUS, INV);
+            let aa = double_point(a, MODULUS, INV);
+            let bb = double_point(b, MODULUS, INV);
+            let aabb = add_point(aa, bb, MODULUS, INV);
+
             assert!(is_on_curve(abc));
             assert!(is_on_curve(cab));
+            assert!(is_on_curve(double_ab));
+            assert!(is_on_curve(aabb));
             assert_eq!(abc, cab);
+            assert_eq!(double_ab, aabb);
         }
     }
 
@@ -126,9 +135,18 @@ mod bls12_381_curve_tests {
             let ca = add_point(c, a, MODULUS, INV);
             let cab = add_point(ca,b, MODULUS, INV);
 
+            // 2 * (a + b) = 2 * a + 2 * b
+            let double_ab = double_point(ab, MODULUS, INV);
+            let aa = double_point(a, MODULUS, INV);
+            let bb = double_point(b, MODULUS, INV);
+            let aabb = add_point(aa, bb, MODULUS, INV);
+
             assert!(is_on_curve(abc));
             assert!(is_on_curve(cab));
+            assert!(is_on_curve(double_ab));
+            assert!(is_on_curve(aabb));
             assert_eq!(abc, cab);
+            assert_eq!(double_ab, aabb);
         }
     }
 

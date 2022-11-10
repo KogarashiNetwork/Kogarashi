@@ -17,7 +17,7 @@ mod jubjub_limbs_tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(1000000))]
+        #![proptest_config(ProptestConfig::with_cases(100000))]
         #[test]
         fn jubjub_field_add_test(a in arb_jubjub_fr()) {
             let b = a;
@@ -31,7 +31,7 @@ mod jubjub_limbs_tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(1000000))]
+        #![proptest_config(ProptestConfig::with_cases(100000))]
         #[test]
         fn jubjub_field_sub_test(a in arb_jubjub_fr()) {
             let b = a;
@@ -50,7 +50,7 @@ mod jubjub_limbs_tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100000))]
+        #![proptest_config(ProptestConfig::with_cases(10000))]
         #[test]
         fn jubjub_field_mul_test(a in arb_jubjub_fr(), b in arb_jubjub_fr(), c in arb_jubjub_fr()) {
             // a * b + a * c
@@ -67,7 +67,7 @@ mod jubjub_limbs_tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100000))]
+        #![proptest_config(ProptestConfig::with_cases(10000))]
         #[test]
         fn jubjub_field_square_test(a in arb_jubjub_fr(), b in arb_jubjub_fr()) {
             // (a * a) * (b * b)
@@ -112,15 +112,15 @@ mod bls12_381_limbs_tests {
     use zero_crypto::arithmetic::limbs::bits_384::*;
 
     prop_compose! {
-        fn arb_jubjub_fp()(bytes in [any::<u8>(); 16]) -> [u64; 6] {
+        fn arb_bls12_381_fp()(bytes in [any::<u8>(); 16]) -> [u64; 6] {
             random(XorShiftRng::from_seed(bytes))
         }
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(1000000))]
+        #![proptest_config(ProptestConfig::with_cases(100000))]
         #[test]
-        fn jubjub_field_add_test(a in arb_jubjub_fp()) {
+        fn bls12_381_field_add_test(a in arb_bls12_381_fp()) {
             let b = a;
             let c = a;
 
@@ -132,9 +132,9 @@ mod bls12_381_limbs_tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(1000000))]
+        #![proptest_config(ProptestConfig::with_cases(100000))]
         #[test]
-        fn jubjub_field_sub_test(a in arb_jubjub_fp()) {
+        fn bls12_381_field_sub_test(a in arb_bls12_381_fp()) {
             let b = a;
             let c = a;
             let d = a;
@@ -151,9 +151,9 @@ mod bls12_381_limbs_tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100000))]
+        #![proptest_config(ProptestConfig::with_cases(10000))]
         #[test]
-        fn jubjub_field_mul_test(a in arb_jubjub_fp(), b in arb_jubjub_fp(), c in arb_jubjub_fp()) {
+        fn bls12_381_field_mul_test(a in arb_bls12_381_fp(), b in arb_bls12_381_fp(), c in arb_bls12_381_fp()) {
             // a * b + a * c
             let ab = mul(a, b, MODULUS, INV);
             let ac = mul(a, c, MODULUS, INV);
@@ -168,9 +168,9 @@ mod bls12_381_limbs_tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100000))]
+        #![proptest_config(ProptestConfig::with_cases(10000))]
         #[test]
-        fn jubjub_field_square_test(a in arb_jubjub_fp(), b in arb_jubjub_fp()) {
+        fn bls12_381_field_square_test(a in arb_bls12_381_fp(), b in arb_bls12_381_fp()) {
             // (a * a) * (b * b)
             let aa = mul(a, a, MODULUS, INV);
             let bb = mul(b, b, MODULUS, INV);
