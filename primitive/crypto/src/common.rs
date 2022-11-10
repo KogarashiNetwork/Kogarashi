@@ -1,4 +1,5 @@
-pub use crate::arithmetic::represent::utils::Bits;
+pub use super::behave::*;
+pub use crate::arithmetic::utils::*;
 pub use core::{
     cmp::Ordering,
     fmt::{Display, Formatter, Result as FmtResult},

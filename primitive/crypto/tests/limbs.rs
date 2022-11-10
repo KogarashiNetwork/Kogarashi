@@ -1,14 +1,15 @@
 mod bls12_381;
 mod jubjub;
 
+use proptest::prelude::*;
+use rand::SeedableRng;
+use rand_xorshift::XorShiftRng;
+
 #[cfg(test)]
 mod jubjub_limbs_tests {
+    use super::*;
     use crate::jubjub::field::*;
-
-    use proptest::prelude::*;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
-    use zero_crypto::arithmetic::limbs::bits_256::*;
+    use zero_crypto::arithmetic::bits_256::*;
 
     prop_compose! {
         fn arb_jubjub_fr()(bytes in [any::<u8>(); 16]) -> [u64; 4] {
@@ -104,12 +105,9 @@ mod jubjub_limbs_tests {
 
 #[cfg(test)]
 mod bls12_381_limbs_tests {
+    use super::*;
     use crate::bls12_381::field::*;
-
-    use proptest::prelude::*;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
-    use zero_crypto::arithmetic::limbs::bits_384::*;
+    use zero_crypto::arithmetic::bits_384::*;
 
     prop_compose! {
         fn arb_bls12_381_fp()(bytes in [any::<u8>(); 16]) -> [u64; 6] {

@@ -1,5 +1,5 @@
-use crate::arithmetic::limbs::bits_384::*;
-use crate::arithmetic::represent::utils::Bits;
+use crate::arithmetic::bits_384::limbs::*;
+use crate::arithmetic::utils::Bits;
 use rand_core::RngCore;
 
 pub const fn zero() -> [u64; 6] {

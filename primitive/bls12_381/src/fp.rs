@@ -1,7 +1,6 @@
 use rand_core::RngCore;
-use zero_crypto::arithmetic::limbs::bits_384::*;
-use zero_crypto::arithmetic::represent::bits_384::*;
-use zero_crypto::dress::{basic::field::*, field::*};
+use zero_crypto::arithmetic::bits_384::*;
+use zero_crypto::dress::field::*;
 
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct Fp(pub(crate) [u64; 6]);
