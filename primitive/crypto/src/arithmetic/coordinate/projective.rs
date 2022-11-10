@@ -28,7 +28,7 @@ pub fn add_point(
         if s1 == s2 {
             return double_point(lhs, p, inv);
         } else {
-            return ([0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]);
+            return (zero, zero, zero);
         }
     }
 
@@ -62,12 +62,11 @@ pub fn double_point(
     p: [u64; 4],
     inv: u64,
 ) -> ProjectiveCoordinate<[u64; 4]> {
-    let (x, y, z) = rhs;
     let zero: [u64; 4] = [0; 4];
-    let identity = (zero, zero, zero);
+    let (x, y, z) = rhs;
 
     if z == zero || y == zero {
-        identity
+        (zero, zero, zero)
     } else {
         let xx = square(x, p, inv);
         let t = add(double(xx, p), xx, p);
