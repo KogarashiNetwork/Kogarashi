@@ -13,12 +13,6 @@ pub fn add_point(
     let (x, y, z) = lhs;
     let (a, b, c) = rhs;
 
-    if z == zero {
-        return rhs;
-    } else if c == zero {
-        return lhs;
-    }
-
     let s1 = mul(y, c, p, inv);
     let s2 = mul(b, z, p, inv);
     let u1 = mul(x, c, p, inv);

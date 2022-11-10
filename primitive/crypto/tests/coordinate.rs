@@ -45,17 +45,16 @@ mod jubjub_curve_tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(1000))]
         #[test]
-        fn jubjub_curve_add_test(a in arb_jubjub_point(), b in arb_jubjub_point()) {
-            // 2 * (a + b) = 2 * a + 2 * b
+        fn jubjub_curve_add_test(a in arb_jubjub_point(), b in arb_jubjub_point(), c in arb_jubjub_point()) {
+            // a + b + c = c + a + b
             let ab = add_point(a, b, MODULUS, INV);
-            let abd = double_point(ab, MODULUS, INV);
-            let aa = double_point(a, MODULUS, INV);
-            let bb = double_point(b, MODULUS, INV);
-            let aabb = add_point(aa, bb, MODULUS, INV);
+            let abc = add_point(ab, c, MODULUS, INV);
+            let ca = add_point(c, a, MODULUS, INV);
+            let cab = add_point(ca,b, MODULUS, INV);
 
-            assert!(is_on_curve(abd));
-            assert!(is_on_curve(aabb));
-            assert_eq!(abd, aabb);
+            assert!(is_on_curve(abc));
+            assert!(is_on_curve(cab));
+            assert_eq!(abc, cab);
         }
     }
 
@@ -120,19 +119,16 @@ mod bls12_381_curve_tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(1000))]
         #[test]
-        fn bls12_381_curve_add_test(a in arb_bls12_381_point(), b in arb_bls12_381_point()) {
-            // 2 * (a + b) = 2 * a + 2 * b
+        fn bls12_381_curve_add_test(a in arb_bls12_381_point(), b in arb_bls12_381_point(), c in arb_bls12_381_point()) {
+            // a + b + c = c + a + b
             let ab = add_point(a, b, MODULUS, INV);
-            let abd = double_point(ab, MODULUS, INV);
-            let aa = double_point(a, MODULUS, INV);
-            let bb = double_point(b, MODULUS, INV);
-            let aabb = add_point(aa, bb, MODULUS, INV);
+            let abc = add_point(ab, c, MODULUS, INV);
+            let ca = add_point(c, a, MODULUS, INV);
+            let cab = add_point(ca,b, MODULUS, INV);
 
-            let double = double_point(GENERATOR, MODULUS, INV);
-
-            assert!(is_on_curve(double));
-            assert!(is_on_curve(aabb));
-            assert_eq!(abd, aabb);
+            assert!(is_on_curve(abc));
+            assert!(is_on_curve(cab));
+            assert_eq!(abc, cab);
         }
     }
 

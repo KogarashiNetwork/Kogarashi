@@ -14,16 +14,10 @@ pub fn add_point(
     let (x, y, z) = lhs;
     let (a, b, c) = rhs;
 
-    if z == zero {
-        return rhs;
-    } else if c == zero {
-        return lhs;
-    }
-
-    let u1 = mul(x, c, p, inv);
-    let u2 = mul(a, z, p, inv);
     let s1 = mul(y, c, p, inv);
     let s2 = mul(b, z, p, inv);
+    let u1 = mul(x, c, p, inv);
+    let u2 = mul(a, z, p, inv);
 
     if u1 == u2 {
         if s1 == s2 {
@@ -31,24 +25,28 @@ pub fn add_point(
         } else {
             return (zero, zero, zero);
         }
+    } else {
+        let s = sub(s1, s2, p);
+        let u = sub(u1, u2, p);
+        let uu = square(u, p, inv);
+        let v = mul(z, c, p, inv);
+        let w = sub(
+            mul(square(s, p, inv), v, p, inv),
+            mul(uu, add(u1, u2, p), p, inv),
+            p,
+        );
+        let uuu = mul(uu, u, p, inv);
+
+        return (
+            mul(u, w, p, inv),
+            sub(
+                mul(s, sub(mul(u1, uu, p, inv), s1, p), p, inv),
+                mul(s1, uuu, p, inv),
+                p,
+            ),
+            mul(uuu, v, p, inv),
+        );
     }
-
-    let zz = mul(z, c, p, inv);
-    let t = add(u1, u2, p);
-    let tt = square(t, p, inv);
-    let m = add(s1, s2, p);
-    let r = sub(tt, mul(u1, u2, p, inv), p);
-    let f = mul(zz, m, p, inv);
-    let l = mul(m, f, p, inv);
-    let ll = square(l, p, inv);
-    let g = sub(sub(square(add(t, l, p), p, inv), tt, p), ll, p);
-    let w = sub(double(square(r, p, inv), p), g, p);
-
-    (
-        double(mul(f, w, p, inv), p),
-        sub(mul(r, sub(g, double(w, p), p), p, inv), double(ll, p), p),
-        double(double(mul(f, square(f, p, inv), p, inv), p), p),
-    )
 }
 
 /// The projective coordinate doubling
