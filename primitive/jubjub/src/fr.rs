@@ -44,7 +44,7 @@ const R3: [u64; 4] = [
 
 pub(crate) const INV: u64 = 0x1ba3a358ef788ef9;
 
-const S: u32 = 1;
+const S: usize = 1;
 
 const ROOT_OF_UNITY: Fr = Fr([
     0xaa9f02ab1d6124de,
@@ -53,7 +53,17 @@ const ROOT_OF_UNITY: Fr = Fr([
     0x4d6b87b1da259e2,
 ]);
 
-fft_field_operation!(Fr, MODULUS, GENERATOR, IDENTITY, INV, ROOT_OF_UNITY, R2, R3);
+fft_field_operation!(
+    Fr,
+    MODULUS,
+    GENERATOR,
+    IDENTITY,
+    INV,
+    ROOT_OF_UNITY,
+    R2,
+    R3,
+    S
+);
 
 impl Fr {
     pub(crate) const fn zero() -> Self {

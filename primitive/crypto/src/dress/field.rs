@@ -168,11 +168,17 @@ macro_rules! prime_field_operation {
 
 #[macro_export]
 macro_rules! fft_field_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident, $r:ident, $r2:ident, $r3:ident) => {
+    ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident, $r:ident, $r2:ident, $r3:ident, $s:ident) => {
         prime_field_operation!($field, $p, $g, $e, $i, $r2, $r3);
 
         impl FftField for $field {
+            const S: usize = $s;
+
             const ROOT_OF_UNITY: Self = $r;
+
+            fn one() -> Self {
+                $field(one($r2, $p, $i))
+            }
         }
 
         impl ParallelCmp for $field {}

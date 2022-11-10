@@ -13,7 +13,11 @@ pub trait PairingField: PrimeField + ParityCmp {}
 /// This is used for fft and has roots of unity
 #[cfg(feature = "std")]
 pub trait FftField: PrimeField + ParallelCmp {
+    const S: usize;
+
     const ROOT_OF_UNITY: Self;
+
+    fn one() -> Self;
 }
 
 /// This is polynomial
