@@ -43,6 +43,25 @@ fn h2b(bytes: &HexBytes, n: usize) -> Bits {
     trunc(n, output)
 }
 
+fn multirate_padding(mut bytes: Vec<u8>, r: u32) -> Vec<u8> {
+    let m = bytes.len();
+    let p = r / 8;
+    let q = p - m as u32 % p;
+
+    if q == 1 {
+        bytes.push(0x86);
+    } else if q == 2 {
+        bytes.append(&mut Vec::from([0x06, 0x80]));
+    } else {
+        let offset = q - 2;
+        bytes.push(0x06);
+        bytes.append(&mut (0..offset).map(|_| 0).collect::<Vec<u8>>());
+        bytes.push(0x80);
+    }
+
+    bytes
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
