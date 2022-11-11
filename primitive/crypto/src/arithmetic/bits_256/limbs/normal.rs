@@ -207,10 +207,7 @@ pub fn invert(a: [u64; 4], p: [u64; 4], inv: u64) -> Option<[u64; 4]> {
     Some(t0)
 }
 
-fn multi_square(a: [u64; 4], p: [u64; 4], inv: u64, num_times: usize) -> [u64; 4] {
-    let mut sqrt = a.clone();
-    for _ in 0..num_times {
-        sqrt = square(sqrt, p, inv);
-    }
-    sqrt
+fn multi_square(mut a: [u64; 4], p: [u64; 4], inv: u64, num_times: usize) -> [u64; 4] {
+    (0..num_times).for_each(|_| a = square(a, p, inv));
+    a
 }

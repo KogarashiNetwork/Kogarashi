@@ -182,4 +182,21 @@ mod bls12_381_limbs_tests {
             assert_eq!(c, d);
         }
     }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(10000))]
+        #[test]
+        fn bls12_381_field_invert_test(a in arb_bls12_381_fp()) {
+            let one = from_raw([1,0,0,0,0,0]);
+            let inv = invert(a, MODULUS, INV);
+
+            match inv {
+                Some(x) => {
+                    let b = mul(a, x, MODULUS, INV);
+                    assert_eq!(b, one)
+                }
+                None => {}
+            }
+        }
+    }
 }

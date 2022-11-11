@@ -86,8 +86,6 @@ impl Fr {
 fn test_root_of_unity() {
     let s = Fr::S;
     let mut root_of_unity = Fr::ROOT_OF_UNITY;
-    for _ in 0..s {
-        root_of_unity.square_assign();
-    }
+    (0..s).for_each(|_| root_of_unity.square_assign());
     assert_eq!(root_of_unity, Fr::one())
 }
