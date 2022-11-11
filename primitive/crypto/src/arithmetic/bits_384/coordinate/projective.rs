@@ -89,7 +89,7 @@ pub fn scalar_point(
     inv: u64,
 ) -> ProjectiveCoordinate<[u64; 6]> {
     let bits = to_bits(scalar);
-    for &bit in bits.iter().rev() {
+    for &bit in bits.iter() {
         if bit == 1 {
             identity = add_point(identity, base, p, inv);
         }

@@ -40,7 +40,7 @@ macro_rules! field_operation {
 
             #[inline]
             fn div(self, rhs: $field) -> $field {
-                let inv = $field(invert(rhs.0, $p, $inv).unwrap());
+                let inv = self.invert().unwrap();
                 self * inv
             }
         }
@@ -50,14 +50,14 @@ macro_rules! field_operation {
 
             #[inline]
             fn div(self, rhs: &'b $field) -> $field {
-                let inv = $field(invert(rhs.0, $p, $inv).unwrap());
+                let inv = self.invert().unwrap();
                 self * &inv
             }
         }
 
         impl DivAssign for $field {
             fn div_assign(&mut self, rhs: $field) {
-                let inv = $field(invert(rhs.0, $p, $inv).unwrap());
+                let inv = self.invert().unwrap();
                 *self *= inv
             }
         }

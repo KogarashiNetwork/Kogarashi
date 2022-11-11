@@ -7,7 +7,7 @@ macro_rules! group_operation {
             const IDENTITY: Self = $field($e);
 
             fn invert(self) -> Option<Self> {
-                match invert(self.0, $p, $inv) {
+                match invert(self.0, little_fermat($p), $e, $p, $inv) {
                     Some(x) => Some(Self(x)),
                     None => None,
                 }
