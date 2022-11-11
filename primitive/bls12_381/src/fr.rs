@@ -45,15 +45,15 @@ const R3: [u64; 4] = [
     0x6e2a5bb9c8db33e9,
 ];
 
-pub(crate) const INV: u64 = 0xfffffffeffffffff;
+pub const INV: u64 = 0xfffffffeffffffff;
 
 const S: usize = 32;
 
 const ROOT_OF_UNITY: Fr = Fr([
-    0xaa9f02ab1d6124de,
-    0xb3524a6466112932,
-    0x7342261215ac260b,
-    0x4d6b87b1da259e2,
+    0xb9b58d8c5f0e466a,
+    0x5b1b4c801819d7ec,
+    0x0af53ae352a31e64,
+    0x5bf3adda19e9b27b,
 ]);
 
 fft_field_operation!(
@@ -69,15 +69,25 @@ fft_field_operation!(
 );
 
 impl Fr {
-    pub(crate) const fn zero() -> Self {
+    pub const fn zero() -> Self {
         Self(zero())
     }
 
-    pub(crate) const fn one() -> Self {
+    pub const fn one() -> Self {
         Self(R)
     }
 
     pub(crate) const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
+}
+
+#[test]
+fn test_root_of_unity() {
+    let s = Fr::S;
+    let mut root_of_unity = Fr::ROOT_OF_UNITY;
+    for _ in 0..s {
+        root_of_unity.square_assign();
+    }
+    assert_eq!(root_of_unity, Fr::one())
 }

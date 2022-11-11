@@ -20,6 +20,8 @@ mod coordinate;
 mod fp;
 mod fr;
 
+pub use fr::Fr;
+
 #[cfg(test)]
 mod tests {
     #[test]

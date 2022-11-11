@@ -197,7 +197,7 @@ macro_rules! field_built_in {
 
         impl Default for $element {
             fn default() -> Self {
-                Self::IDENTITY
+                Self(zero())
             }
         }
 

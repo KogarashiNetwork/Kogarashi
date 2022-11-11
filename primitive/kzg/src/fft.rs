@@ -17,35 +17,35 @@ pub struct Fft<F: FftField> {
 impl<F: FftField> Fft<F> {
     pub fn new(k: u32) -> Self {
         let n = 1 << k;
-        let half_n = n / 2;
+        let half_n = n as usize / 2;
         let mut g = F::ROOT_OF_UNITY;
+        let r = F::S - k as usize;
         let inv = F::from_u64(n).invert().unwrap();
-        let s = F::S;
 
-        // adjust cofactor
-        for _ in 0..s - k as usize {
+        // adjust factor size
+        for _ in 0..r {
             g = g.square()
         }
 
         let g_inv = g.invert().unwrap();
 
         // compute twiddle factors
-        let twiddle_factors = (0..half_n as usize)
+        let twiddle_factors = (0..half_n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= g;
                 Some(tw)
             })
-            .collect::<Vec<_>>();
+            .collect::<Vec<F>>();
 
         // compute inverse twiddle factors
-        let inv_twiddle_factors = (0..half_n as usize)
+        let inv_twiddle_factors = (0..half_n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= g_inv;
                 Some(tw)
             })
-            .collect::<Vec<_>>();
+            .collect::<Vec<F>>();
 
         Fft {
             k,
@@ -142,9 +142,9 @@ mod tests {
     use proptest::std_facade::vec;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
+    use zero_bls12_381::Fr;
     use zero_crypto::behave::PrimeField;
     use zero_crypto::common::Vec;
-    use zero_jubjub::fr::Fr;
 
     prop_compose! {
         fn arb_poly(k: u32)(bytes in vec![[any::<u8>(); 16]; 1 << k as usize]) -> Vec<Fr> {
@@ -152,17 +152,44 @@ mod tests {
         }
     }
 
+    fn naive_multiply<F: PrimeField>(a: Vec<F>, b: Vec<F>) -> Vec<F> {
+        assert_eq!(a.len(), b.len());
+        let mut c = vec![F::default(); a.len() + b.len()];
+        a.iter().enumerate().for_each(|(i_a, coeff_a)| {
+            b.iter().enumerate().for_each(|(i_b, coeff_b)| {
+                c[i_a + i_b] += *coeff_a * *coeff_b;
+            })
+        });
+        c
+    }
+
+    fn point_mutiply<F: PrimeField>(a: Vec<F>, b: Vec<F>) -> Vec<F> {
+        assert_eq!(a.len(), b.len());
+        a.iter()
+            .zip(b.iter())
+            .map(|(coeff_a, coeff_b)| *coeff_a * *coeff_b)
+            .collect::<Vec<F>>()
+    }
+
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
-        fn classic_fft_test(mut poly_a in arb_poly(4)) {
-            let poly_b = poly_a.clone();
-            let classic_fft = Fft::new(4);
+        fn fft_test(mut poly_a in arb_poly(4), mut poly_b in arb_poly(4)) {
+            let fft = Fft::new(5);
+            let poly_c = poly_a.clone();
+            let poly_d = poly_b.clone();
+            poly_a.resize(1<<4, Fr::zero());
+            poly_b.resize(1<<4, Fr::zero());
 
-            classic_fft.dft(&mut poly_a);
-            classic_fft.idft(&mut poly_a);
+            let poly_e = naive_multiply(poly_c, poly_d);
 
-            assert_eq!(poly_a, poly_b)
+            fft.dft(&mut poly_a);
+            fft.dft(&mut poly_b);
+            let mut poly_f = point_mutiply(poly_a, poly_b);
+            fft.dft(&mut poly_f);
+
+            assert_eq!(poly_e.len(), poly_f.len());
+            assert_eq!(poly_e, poly_f)
         }
     }
 }

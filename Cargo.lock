@@ -1393,8 +1393,8 @@ dependencies = [
  "rand 0.8.5",
  "rand_xorshift",
  "rayon",
+ "zero-bls12-381",
  "zero-crypto",
- "zero-jubjub",
 ]
 
 [[package]]
