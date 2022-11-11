@@ -50,7 +50,7 @@ const R3: [u64; 6] = [
 
 const INV: u64 = 0x89f3fffcfffcfffd;
 
-prime_field_operation!(Fp, MODULUS, GENERATOR, IDENTITY, INV, R2, R3);
+pairing_field_operation!(Fp, MODULUS, GENERATOR, IDENTITY, INV, R2, R3);
 
 impl Fp {
     pub(crate) const fn zero() -> Self {

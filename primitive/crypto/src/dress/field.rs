@@ -186,6 +186,15 @@ macro_rules! fft_field_operation {
 }
 
 #[macro_export]
+macro_rules! pairing_field_operation {
+    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident, $r2:ident, $r3:ident) => {
+        prime_field_operation!($field, $p, $g, $e, $inv, $r2, $r3);
+
+        impl PairingField for $field {}
+    };
+}
+
+#[macro_export]
 macro_rules! field_built_in {
     ($element:ident) => {
         use zero_crypto::behave::*;
@@ -213,10 +222,7 @@ macro_rules! field_built_in {
     };
 }
 
-pub use field_operation;
-
-pub use prime_field_operation;
-
-pub use fft_field_operation;
-
-pub use field_built_in;
+pub use {
+    fft_field_operation, field_built_in, field_operation, pairing_field_operation,
+    prime_field_operation,
+};

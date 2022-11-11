@@ -89,8 +89,8 @@ pub const fn square(a: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
 }
 
 #[inline]
-pub fn neg(a: [u64; 6], p: [u64; 6]) -> [u64; 6] {
-    if a == [0; 6] {
+pub const fn neg(a: [u64; 6], p: [u64; 6]) -> [u64; 6] {
+    if (a[0] | a[1] | a[2] | a[3] | a[4] | a[5]) == 0 {
         a
     } else {
         sub(p, a, p)
@@ -165,9 +165,9 @@ pub fn invert(a: [u64; 6], p: [u64; 6], inv: u64) -> Option<[u64; 6]> {
         return None;
     }
 
-    let mut t1 = square(a, p, inv);
-    let mut t0 = square(t1, p, inv);
-    let mut t3 = mul(t0, t1, p, inv);
+    let t1 = square(a, p, inv);
+    let t0 = square(t1, p, inv);
+    let t3 = mul(t0, t1, p, inv);
     let t6 = mul(t3, a, p, inv);
     let t7 = mul(t6, t1, p, inv);
     let t12 = mul(t7, t3, p, inv);
@@ -183,10 +183,10 @@ pub fn invert(a: [u64; 6], p: [u64; 6], inv: u64) -> Option<[u64; 6]> {
     let t8 = mul(t18, t3, p, inv);
     let t17 = mul(t14, t3, p, inv);
     let t11 = mul(t8, t3, p, inv);
-    t1 = mul(t17, t3, p, inv);
+    let t1 = mul(t17, t3, p, inv);
     let t5 = mul(t11, t3, p, inv);
-    t3 = mul(t5, t0, p, inv);
-    t0 = square(t5, p, inv);
+    let t3 = mul(t5, t0, p, inv);
+    let t0 = square(t5, p, inv);
     let t0 = multi_square(t0, p, inv, 5);
     let t0 = mul(t0, t3, p, inv);
     let t0 = multi_square(t0, p, inv, 6);
@@ -261,10 +261,7 @@ pub fn invert(a: [u64; 6], p: [u64; 6], inv: u64) -> Option<[u64; 6]> {
     Some(t0)
 }
 
-fn multi_square(a: [u64; 6], p: [u64; 6], inv: u64, num_times: usize) -> [u64; 6] {
-    let mut sqrt = a.clone();
-    for _ in 0..num_times {
-        sqrt = square(sqrt, p, inv);
-    }
-    sqrt
+fn multi_square(mut a: [u64; 6], p: [u64; 6], inv: u64, num_times: usize) -> [u64; 6] {
+    (0..num_times).for_each(|_| a = square(a, p, inv));
+    a
 }

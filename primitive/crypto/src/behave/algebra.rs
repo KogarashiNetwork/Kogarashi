@@ -17,7 +17,7 @@ pub trait Group: PartialEq + Eq {
 /// This is ring trait
 /// This has add, mul and sub operation
 pub trait Ring:
-    Group + Add<Output = Self> + AddAssign + Neg + Sub<Output = Self> + SubAssign + Sized
+    Group + Add<Output = Self> + AddAssign + Neg<Output = Self> + Sub<Output = Self> + SubAssign + Sized
 {
 }
 
