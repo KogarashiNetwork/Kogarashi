@@ -2,7 +2,7 @@
 /// y^2 = x^3 + ax + b
 use super::{algebra::Ring, basic::Basic, comp::ParityCmp, field::PrimeField};
 
-pub trait Affine: ParityCmp + Basic {
+pub trait Affine: ParityCmp + Basic + PartialEq + Eq {
     // scalar field of curve
     type ScalarField: PrimeField;
 
@@ -17,6 +17,9 @@ pub trait Affine: ParityCmp + Basic {
 
     // convert affine to projective representation
     fn to_projective(self) -> Self::Projective;
+
+    // check that point is on curve
+    fn is_identity(self) -> bool;
 
     // check that point is on curve
     fn is_on_curve(self) -> bool;

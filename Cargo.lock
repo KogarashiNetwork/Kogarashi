@@ -3416,6 +3416,7 @@ dependencies = [
  "proptest",
  "rand 0.8.5",
  "rand_xorshift",
+ "zero-crypto",
  "zero-jubjub",
 ]
 

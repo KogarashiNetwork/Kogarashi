@@ -28,6 +28,10 @@ macro_rules! curve_operation {
                 }
             }
 
+            fn is_identity(self) -> bool {
+                self.is_infinity
+            }
+
             fn is_on_curve(self) -> bool {
                 if self.is_infinity {
                     true
@@ -36,6 +40,16 @@ macro_rules! curve_operation {
                 }
             }
         }
+
+        impl PartialEq for $affine {
+            fn eq(&self, other: &Self) -> bool {
+                (self.is_identity() && other.is_identity())
+                ||
+                (self.x == other.x && self.y == other.y)
+            }
+        }
+
+        impl Eq for $affine {}
 
         impl Projective for $projective {
             type ScalarField = $field;
