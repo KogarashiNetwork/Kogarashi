@@ -18,6 +18,7 @@
 
 mod coordinate;
 mod fp;
+mod fr;
 
 #[cfg(test)]
 mod tests {

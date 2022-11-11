@@ -7,4 +7,5 @@ pub use core::{
     ops::{AddAssign, DivAssign, MulAssign, SubAssign},
 };
 pub use parity_scale_codec::{Decode, Encode};
+pub use rand_core::RngCore;
 pub use sp_std::vec::Vec;

@@ -1,5 +1,4 @@
 use crate::error::Error;
-use rand_core::RngCore;
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
