@@ -31,7 +31,7 @@
 //! We implement coordinate system to refer the following.
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
-use crate::fp::Fp;
+use crate::fq::Fq;
 use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::curve::*;
@@ -39,61 +39,58 @@ use zero_crypto::dress::curve::*;
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct Bls381Projective {
-    pub(crate) x: Fp,
-    pub(crate) y: Fp,
-    pub(crate) z: Fp,
+    pub(crate) x: Fq,
+    pub(crate) y: Fq,
+    pub(crate) z: Fq,
 }
 
 const IDENTITY: Bls381Projective = Bls381Projective {
-    x: Fp::zero(),
-    y: Fp::zero(),
-    z: Fp::zero(),
+    x: Fq::zero(),
+    y: Fq::zero(),
+    z: Fq::zero(),
 };
 
 const GENERATOR: Bls381Projective = Bls381Projective {
-    x: Fp([
-        0x5cb3_8790_fd53_0c16,
-        0x7817_fc67_9976_fff5,
-        0x154f_95c7_143b_a1c1,
-        0xf0ae_6acd_f3d0_e747,
-        0xedce_6ecc_21db_f440,
-        0x1201_7741_9e0b_fb75,
+    x: Fq([
+        0x5cb38790fd530c16,
+        0x7817fc679976fff5,
+        0x154f95c7143ba1c1,
+        0xf0ae6acdf3d0e747,
+        0xedce6ecc21dbf440,
+        0x120177419e0bfb75,
     ]),
-    y: Fp([
-        0xbaac_93d5_0ce7_2271,
-        0x8c22_631a_7918_fd8e,
-        0xdd59_5f13_5707_25ce,
-        0x51ac_5829_5040_5194,
-        0x0e1c_8c3f_ad00_59c0,
-        0x0bbc_3efc_5008_a26a,
+    y: Fq([
+        0xbaac93d50ce72271,
+        0x8c22631a7918fd8e,
+        0xdd595f13570725ce,
+        0x51ac582950405194,
+        0x0e1c8c3fad0059c0,
+        0x0bbc3efc5008a26a,
     ]),
-    z: Fp::one(),
+    z: Fq::one(),
 };
 
-const PARAM_A: Fp = Fp([0, 0, 0, 0, 0, 0]);
+const PARAM_A: Fq = Fq([0, 0, 0, 0, 0, 0]);
 
-const PARAM_B: Fp = Fp([
-    0xaa27_0000_000c_fff3,
-    0x53cc_0032_fc34_000a,
-    0x478f_e97a_6b0a_807f,
-    0xb1d3_7ebe_e6ba_24d7,
-    0x8ec9_733b_bf78_ab2f,
-    0x09d6_4551_3d83_de7e,
+const PARAM_B: Fq = Fq([
+    0xaa270000000cfff3,
+    0x53cc0032fc34000a,
+    0x478fe97a6b0a807f,
+    0xb1d37ebee6ba24d7,
+    0x8ec9733bbf78ab2f,
+    0x09d645513d83de7e,
 ]);
-
-pub struct Bls381Curve {}
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct Bls381Affine {
-    x: Fp,
-    y: Fp,
+    x: Fq,
+    y: Fq,
     is_infinity: bool,
 }
 
 curve_operation!(
-    Bls381Curve,
-    Fp,
+    Fq,
     PARAM_A,
     PARAM_B,
     Bls381Affine,

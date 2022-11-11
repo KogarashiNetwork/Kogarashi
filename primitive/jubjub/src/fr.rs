@@ -139,24 +139,6 @@ mod tests {
     use crate::coordinate::JubjubProjective;
     use proptest::prelude::*;
 
-    #[test]
-    fn test_is_zero() {
-        let fr = Fr([0, 0, 0, 0]);
-        assert!(fr.is_zero());
-        let fr = Fr([0, 0, 0, 1]);
-        assert!(!fr.is_zero());
-    }
-
-    #[test]
-    fn test_fmt_and_to_bin() {
-        let _fr = Fr([
-            0xd0970e5ed6f72cb7,
-            0xa6682093ccc81082,
-            0x06673b0101343b00,
-            0x0e7db4ea6533afa9,
-        ]);
-    }
-
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(50))]
         #[test]
