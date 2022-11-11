@@ -197,8 +197,8 @@ mod bls12_381_limbs_tests {
         #![proptest_config(ProptestConfig::with_cases(10000))]
         #[test]
         fn bls12_381_field_invert_test(a in arb_bls12_381_fp()) {
-            let one = from_raw([1,0,0,0,0,0]);
-            let little_fermat = sub(MODULUS, [2,0,0,0,0,0], MODULUS);
+            let one = from_raw([1, 0, 0, 0, 0, 0]);
+            let little_fermat = sub(MODULUS, [2, 0, 0, 0, 0, 0], MODULUS);
             let inv = invert(a, little_fermat, one, MODULUS, INV);
 
             match inv {

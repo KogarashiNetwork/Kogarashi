@@ -83,5 +83,5 @@ pub fn random_limbs(
 }
 
 pub const fn little_fermat(p: [u64; 6]) -> [u64; 6] {
-    sub(p, [2, 0, 0, 0, 0, 0], p)
+    sub(zero(), [2, 0, 0, 0, 0, 0], p)
 }
