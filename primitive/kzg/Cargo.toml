@@ -10,3 +10,10 @@ zero-crypto = { version = '0.1.0', path = '../crypto' }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 rand = { version = "0.8", default-features = false }
 rand_xorshift = { version = "0.3", default-features = false }
+rayon = "1.5.1"
+
+[dev-dependencies]
+zero-jubjub = { version = '0.1.0', path = '../jubjub' }
+rand = { version = "0.8", default-features = false }
+rand_xorshift = { version = "0.3", default-features = false }
+proptest = "1"
