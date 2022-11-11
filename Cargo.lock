@@ -1389,8 +1389,11 @@ name = "kzg"
 version = "0.1.0"
 dependencies = [
  "parity-scale-codec",
+ "proptest",
  "rand 0.8.5",
  "rand_xorshift",
+ "rayon",
+ "zero-bls12-381",
  "zero-crypto",
 ]
 

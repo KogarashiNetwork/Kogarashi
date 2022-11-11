@@ -7,6 +7,7 @@ use rand_core::RngCore;
 
 /// This is prime field trait
 pub trait PrimeField: Field + Basic + ParityCmp + PartialOrd + Ord {
+    // prime order of this field
     const MODULUS: Self;
 
     // mongomery reduction inverse

@@ -1,4 +1,4 @@
-use crate::arithmetic::utils::*;
+use crate::arithmetic::{bits_256::to_bits, utils::*};
 
 #[inline]
 pub const fn add(a: [u64; 4], b: [u64; 4], p: [u64; 4]) -> [u64; 4] {
@@ -61,8 +61,8 @@ pub const fn square(a: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
 }
 
 #[inline]
-pub fn neg(a: [u64; 4], p: [u64; 4]) -> [u64; 4] {
-    if a == [0; 4] {
+pub const fn neg(a: [u64; 4], p: [u64; 4]) -> [u64; 4] {
+    if (a[0] | a[1] | a[2] | a[3]) == 0 {
         a
     } else {
         sub(p, a, p)
@@ -104,113 +104,30 @@ pub const fn mont(a: [u64; 8], p: [u64; 4], inv: u64) -> [u64; 4] {
     sub([l4, l5, l6, l7], p, p)
 }
 
+// 54M + 248S
 #[inline]
-pub fn invert(a: [u64; 4], p: [u64; 4], inv: u64) -> Option<[u64; 4]> {
+pub fn invert(
+    a: [u64; 4],
+    little_fermat: [u64; 4],
+    identity: [u64; 4],
+    p: [u64; 4],
+    inv: u64,
+) -> Option<[u64; 4]> {
     let zero: [u64; 4] = [0, 0, 0, 0];
     if a == zero {
-        return None;
+        None
+    } else {
+        Some(pow(a, little_fermat, identity, p, inv))
     }
-
-    let mut t1 = square(a, p, inv);
-    let mut t0 = square(t1, p, inv);
-    let mut t3 = mul(t0, t1, p, inv);
-    let t6 = mul(t3, a, p, inv);
-    let t7 = mul(t6, t1, p, inv);
-    let t12 = mul(t7, t3, p, inv);
-    let t13 = mul(t12, t0, p, inv);
-    let t16 = mul(t12, t3, p, inv);
-    let t2 = mul(t13, t3, p, inv);
-    let t15 = mul(t16, t3, p, inv);
-    let t19 = mul(t2, t0, p, inv);
-    let t9 = mul(t15, t3, p, inv);
-    let t18 = mul(t9, t3, p, inv);
-    let t14 = mul(t18, t1, p, inv);
-    let t4 = mul(t18, t0, p, inv);
-    let t8 = mul(t18, t3, p, inv);
-    let t17 = mul(t14, t3, p, inv);
-    let t11 = mul(t8, t3, p, inv);
-    t1 = mul(t17, t3, p, inv);
-    let t5 = mul(t11, t3, p, inv);
-    t3 = mul(t5, t0, p, inv);
-    t0 = square(t5, p, inv);
-    let t0 = multi_square(t0, p, inv, 5);
-    let t0 = mul(t0, t3, p, inv);
-    let t0 = multi_square(t0, p, inv, 6);
-    let t0 = mul(t0, t8, p, inv);
-    let t0 = multi_square(t0, p, inv, 7);
-    let t0 = mul(t0, t19, p, inv);
-    let t0 = multi_square(t0, p, inv, 6);
-    let t0 = mul(t0, t13, p, inv);
-    let t0 = multi_square(t0, p, inv, 8);
-    let t0 = mul(t0, t14, p, inv);
-    let t0 = multi_square(t0, p, inv, 6);
-    let t0 = mul(t0, t18, p, inv);
-    let t0 = multi_square(t0, p, inv, 7);
-    let t0 = mul(t0, t17, p, inv);
-    let t0 = multi_square(t0, p, inv, 5);
-    let t0 = mul(t0, t16, p, inv);
-    let t0 = multi_square(t0, p, inv, 3);
-    let t0 = mul(t0, a, p, inv);
-    let t0 = multi_square(t0, p, inv, 11);
-    let t0 = mul(t0, t11, p, inv);
-    let t0 = multi_square(t0, p, inv, 8);
-    let t0 = mul(t0, t5, p, inv);
-    let t0 = multi_square(t0, p, inv, 5);
-    let t0 = mul(t0, t15, p, inv);
-    let t0 = multi_square(t0, p, inv, 8);
-    let t0 = mul(t0, a, p, inv);
-    let t0 = multi_square(t0, p, inv, 12);
-    let t0 = mul(t0, t13, p, inv);
-    let t0 = multi_square(t0, p, inv, 7);
-    let t0 = mul(t0, t9, p, inv);
-    let t0 = multi_square(t0, p, inv, 5);
-    let t0 = mul(t0, t15, p, inv);
-    let t0 = multi_square(t0, p, inv, 14);
-    let t0 = mul(t0, t14, p, inv);
-    let t0 = multi_square(t0, p, inv, 5);
-    let t0 = mul(t0, t13, p, inv);
-    let t0 = multi_square(t0, p, inv, 2);
-    let t0 = mul(t0, a, p, inv);
-    let t0 = multi_square(t0, p, inv, 6);
-    let t0 = mul(t0, a, p, inv);
-    let t0 = multi_square(t0, p, inv, 9);
-    let t0 = mul(t0, t7, p, inv);
-    let t0 = multi_square(t0, p, inv, 6);
-    let t0 = mul(t0, t12, p, inv);
-    let t0 = multi_square(t0, p, inv, 8);
-    let t0 = mul(t0, t11, p, inv);
-    let t0 = multi_square(t0, p, inv, 3);
-    let t0 = mul(t0, a, p, inv);
-    let t0 = multi_square(t0, p, inv, 12);
-    let t0 = mul(t0, t9, p, inv);
-    let t0 = multi_square(t0, p, inv, 11);
-    let t0 = mul(t0, t8, p, inv);
-    let t0 = multi_square(t0, p, inv, 8);
-    let t0 = mul(t0, t7, p, inv);
-    let t0 = multi_square(t0, p, inv, 4);
-    let t0 = mul(t0, t6, p, inv);
-    let t0 = multi_square(t0, p, inv, 10);
-    let t0 = mul(t0, t5, p, inv);
-    let t0 = multi_square(t0, p, inv, 7);
-    let t0 = mul(t0, t3, p, inv);
-    let t0 = multi_square(t0, p, inv, 6);
-    let t0 = mul(t0, t4, p, inv);
-    let t0 = multi_square(t0, p, inv, 7);
-    let t0 = mul(t0, t3, p, inv);
-    let t0 = multi_square(t0, p, inv, 5);
-    let t0 = mul(t0, t2, p, inv);
-    let t0 = multi_square(t0, p, inv, 6);
-    let t0 = mul(t0, t2, p, inv);
-    let t0 = multi_square(t0, p, inv, 7);
-    let t0 = mul(t0, t1, p, inv);
-
-    Some(t0)
 }
 
-fn multi_square(a: [u64; 4], p: [u64; 4], inv: u64, num_times: usize) -> [u64; 4] {
-    let mut sqrt = a.clone();
-    for _ in 0..num_times {
-        sqrt = square(sqrt, p, inv);
+pub fn pow(a: [u64; 4], b: [u64; 4], mut identity: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
+    let bits = to_bits(b);
+    for &bit in bits.iter() {
+        identity = square(identity, p, inv);
+        if bit == 1 {
+            identity = mul(identity, a, p, inv);
+        }
     }
-    sqrt
+    identity
 }

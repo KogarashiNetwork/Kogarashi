@@ -140,6 +140,4 @@ macro_rules! curve_built_in {
     };
 }
 
-pub use curve_operation;
-
-pub use curve_built_in;
+pub use {curve_built_in, curve_operation};

@@ -40,7 +40,7 @@ macro_rules! field_operation {
 
             #[inline]
             fn div(self, rhs: $field) -> $field {
-                let inv = $field(invert(rhs.0, $p, $inv).unwrap());
+                let inv = self.invert().unwrap();
                 self * inv
             }
         }
@@ -50,14 +50,14 @@ macro_rules! field_operation {
 
             #[inline]
             fn div(self, rhs: &'b $field) -> $field {
-                let inv = $field(invert(rhs.0, $p, $inv).unwrap());
+                let inv = self.invert().unwrap();
                 self * &inv
             }
         }
 
         impl DivAssign for $field {
             fn div_assign(&mut self, rhs: $field) {
-                let inv = $field(invert(rhs.0, $p, $inv).unwrap());
+                let inv = self.invert().unwrap();
                 *self *= inv
             }
         }
@@ -168,14 +168,29 @@ macro_rules! prime_field_operation {
 
 #[macro_export]
 macro_rules! fft_field_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident, $r:ident, $r2:ident, $r3:ident) => {
+    ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident, $r:ident, $r2:ident, $r3:ident, $s:ident) => {
         prime_field_operation!($field, $p, $g, $e, $i, $r2, $r3);
 
         impl FftField for $field {
+            const S: usize = $s;
+
             const ROOT_OF_UNITY: Self = $r;
+
+            fn one() -> Self {
+                $field(one($r2, $p, $i))
+            }
         }
 
         impl ParallelCmp for $field {}
+    };
+}
+
+#[macro_export]
+macro_rules! pairing_field_operation {
+    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident, $r2:ident, $r3:ident) => {
+        prime_field_operation!($field, $p, $g, $e, $inv, $r2, $r3);
+
+        impl PairingField for $field {}
     };
 }
 
@@ -191,7 +206,7 @@ macro_rules! field_built_in {
 
         impl Default for $element {
             fn default() -> Self {
-                Self::IDENTITY
+                Self(zero())
             }
         }
 
@@ -207,10 +222,7 @@ macro_rules! field_built_in {
     };
 }
 
-pub use field_operation;
-
-pub use prime_field_operation;
-
-pub use fft_field_operation;
-
-pub use field_built_in;
+pub use {
+    fft_field_operation, field_built_in, field_operation, pairing_field_operation,
+    prime_field_operation,
+};

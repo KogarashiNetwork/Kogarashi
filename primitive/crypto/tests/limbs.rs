@@ -89,8 +89,8 @@ mod jubjub_limbs_tests {
         #![proptest_config(ProptestConfig::with_cases(10000))]
         #[test]
         fn jubjub_field_invert_test(a in arb_jubjub_fr()) {
-            let one = from_raw([1,0,0,0]);
-            let inv = invert(a, MODULUS, INV);
+            let one = from_raw([1, 0, 0, 0]);
+            let inv = invert(a, sub(zero(), [2, 0, 0, 0], MODULUS), one, MODULUS, INV);
 
             match inv {
                 Some(x) => {
@@ -99,6 +99,16 @@ mod jubjub_limbs_tests {
                 }
                 None => {}
             }
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(10000))]
+        #[test]
+        fn jubjub_field_power_test(a in arb_jubjub_fr()) {
+            let one = from_raw([1, 0, 0, 0]);
+            let identity = pow(a, sub(zero(), [1, 0, 0, 0], MODULUS), one, MODULUS, INV);
+            assert_eq!(one, identity)
         }
     }
 }
@@ -180,6 +190,34 @@ mod bls12_381_limbs_tests {
             let d = mul(aa, bb, MODULUS, INV);
 
             assert_eq!(c, d);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(10000))]
+        #[test]
+        fn bls12_381_field_invert_test(a in arb_bls12_381_fp()) {
+            let one = from_raw([1, 0, 0, 0, 0, 0]);
+            let little_fermat = sub(MODULUS, [2, 0, 0, 0, 0, 0], MODULUS);
+            let inv = invert(a, little_fermat, one, MODULUS, INV);
+
+            match inv {
+                Some(x) => {
+                    let b = mul(a, x, MODULUS, INV);
+                    assert_eq!(b, one)
+                }
+                None => {}
+            }
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(10000))]
+        #[test]
+        fn jubjub_field_power_test(a in arb_bls12_381_fp()) {
+            let one = from_raw([1, 0, 0, 0, 0, 0]);
+            let identity = pow(a, sub(zero(), [1, 0, 0, 0, 0, 0], MODULUS), one, MODULUS, INV);
+            assert_eq!(one, identity)
         }
     }
 }

@@ -9,7 +9,6 @@ pub trait Group: PartialEq + Eq {
 
     const IDENTITY: Self;
 
-    #[must_use]
     fn invert(self) -> Option<Self>
     where
         Self: Sized;
@@ -17,8 +16,11 @@ pub trait Group: PartialEq + Eq {
 
 /// This is ring trait
 /// This has add, mul and sub operation
-pub trait Ring: Group + Add + AddAssign + Neg + Sub + SubAssign + Sized {}
+pub trait Ring:
+    Group + Add<Output = Self> + AddAssign + Neg<Output = Self> + Sub<Output = Self> + SubAssign + Sized
+{
+}
 
 /// This is field trait
 /// This has inverse for all element and operation
-pub trait Field: Ring + Mul + MulAssign + Div + DivAssign {}
+pub trait Field: Ring + Mul<Output = Self> + MulAssign + Div<Output = Self> + DivAssign {}
