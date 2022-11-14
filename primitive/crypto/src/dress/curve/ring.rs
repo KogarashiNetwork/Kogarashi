@@ -76,7 +76,7 @@ macro_rules! projective_ring_operation {
                     if b == 1 {
                         res += acc.clone();
                     }
-                    acc.double();
+                    acc = acc.double();
                 }
                 res
             }

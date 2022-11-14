@@ -92,12 +92,9 @@ mod jubjub_limbs_tests {
             let one = from_raw([1, 0, 0, 0]);
             let inv = invert(a, sub(zero(), [2, 0, 0, 0], MODULUS), one, MODULUS, INV);
 
-            match inv {
-                Some(x) => {
-                    let b = mul(a, x, MODULUS, INV);
-                    assert_eq!(b, one)
-                }
-                None => {}
+            if let Some(x) = inv {
+                let b = mul(a, x, MODULUS, INV);
+                assert_eq!(b, one)
             }
         }
     }
@@ -201,12 +198,9 @@ mod bls12_381_limbs_tests {
             let little_fermat = sub(MODULUS, [2, 0, 0, 0, 0, 0], MODULUS);
             let inv = invert(a, little_fermat, one, MODULUS, INV);
 
-            match inv {
-                Some(x) => {
-                    let b = mul(a, x, MODULUS, INV);
-                    assert_eq!(b, one)
-                }
-                None => {}
+            if let Some(x) = inv {
+                let b = mul(a, x, MODULUS, INV);
+                assert_eq!(b, one)
             }
         }
     }

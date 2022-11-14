@@ -15,7 +15,12 @@ const MODULUS: [u64; 4] = [
 
 const GENERATOR: [u64; 4] = [2, 0, 0, 0];
 
-const IDENTITY: [u64; 4] = [1, 0, 0, 0];
+const IDENTITY: [u64; 4] = [
+    2735949640168245209,
+    17516141824802482000,
+    10602903914100036852,
+    695520747347596742,
+];
 
 /// R = 2^256 mod r
 const R: [u64; 4] = [
@@ -141,7 +146,7 @@ mod tests {
 
     #[test]
     fn test_is_zero() {
-        let fr = Fr([0, 0, 0, 0]);
+        let fr = Fr([0; 4]);
         assert!(fr.is_zero());
         let fr = Fr([0, 0, 0, 1]);
         assert!(!fr.is_zero());
@@ -163,13 +168,13 @@ mod tests {
         fn test_binary_method(x in any::<u16>()) {
             let fr = Fr::from_u64(x as u64);
             let g = JubjubProjective::GENERATOR;
-            let mul = g.clone() * fr;
-            let rev_mul = g.clone() * fr;
+            let mul = g * fr;
+            let rev_mul = g * fr;
             assert_eq!(mul, rev_mul);
 
             let mut acc = JubjubProjective::IDENTITY;
             for _ in 0..x {
-                acc += g.clone();
+                acc += g;
             }
 
             assert_eq!(acc, mul);

@@ -62,8 +62,8 @@ mod jubjub_curve_tests {
             assert!(is_on_curve(cab));
             assert!(is_on_curve(double_ab));
             assert!(is_on_curve(aabb));
-            assert_eq!(abc, cab);
-            assert_eq!(double_ab, aabb);
+            assert!(are_points_equal(abc, cab));
+            assert!(are_points_equal(double_ab, aabb));
         }
     }
 
@@ -80,6 +80,7 @@ mod jubjub_curve_tests {
             assert!(is_on_curve(scalared_a));
             assert!(is_on_curve(aaaa));
             assert_eq!(scalared_a, aaaa);
+            assert!(are_points_equal(scalared_a, aaaa));
         }
     }
 }
@@ -148,7 +149,7 @@ mod bls12_381_curve_tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(1000))]
         #[test]
-        fn jubjub_curve_double_test(a in arb_bls12_381_point()) {
+        fn bls12_381_curve_double_test(a in arb_bls12_381_point()) {
             // a + a = a * 8
             let scalared_a = scalar_point(a, [8,0,0,0,0,0], IDENTITY, MODULUS, INV);
             let aa = double_point(a, MODULUS, INV);

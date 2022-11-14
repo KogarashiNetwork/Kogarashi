@@ -3,7 +3,7 @@ use crate::arithmetic::utils::Bits;
 use rand_core::RngCore;
 
 pub const fn zero() -> [u64; 4] {
-    [0, 0, 0, 0]
+    [0; 4]
 }
 
 pub const fn one(r2: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {

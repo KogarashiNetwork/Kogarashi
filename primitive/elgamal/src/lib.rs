@@ -39,9 +39,8 @@ pub struct EncryptedNumber {
 impl EncryptedNumber {
     pub fn encrypt(private_key: Fr, value: u32, random: Fr) -> Self {
         let g = JubjubProjective::GENERATOR;
-        let public_key = g.clone() * private_key;
-        let mut left = g.clone() * Fr::from_u64(value as u64);
-        left += public_key * random;
+        let public_key = g * private_key;
+        let left = g * Fr::from_u64(value as u64) + public_key * random;
         EncryptedNumber {
             s: left.to_affine(),
             t: (g * random).to_affine(),
@@ -50,41 +49,29 @@ impl EncryptedNumber {
 
     pub fn decrypt(&self, private_key: Fr) -> Option<u32> {
         let g = JubjubProjective::GENERATOR;
-        let mut decrypted_message = self.s.clone().to_projective();
-        let neg = -(self.t.clone().to_projective() * private_key);
-        decrypted_message += neg;
+        let decrypted_message = self.s.to_projective() - (self.t.to_projective() * private_key);
 
         let mut acc = JubjubProjective::IDENTITY;
         for i in 0..150000 {
             if acc == decrypted_message {
                 return Some(i);
             }
-            acc += g.clone();
+            acc += g;
         }
         None
     }
 
     pub fn add(&self, other: &Self) -> Self {
-        let mut s = self.s.clone().to_projective();
-        let mut t = self.t.clone().to_projective();
-        s += other.s.clone().to_projective();
-        t += other.t.clone().to_projective();
-
         Self {
-            s: s.to_affine(),
-            t: t.to_affine(),
+            s: (self.s.to_projective() + other.s.to_projective()).to_affine(),
+            t: (self.t.to_projective() + other.t.to_projective()).to_affine(),
         }
     }
 
     pub fn sub(&self, other: &Self) -> Self {
-        let mut s = self.s.clone().to_projective();
-        let mut t = self.t.clone().to_projective();
-        s -= other.s.clone().to_projective();
-        t -= other.t.clone().to_projective();
-
         Self {
-            s: s.to_affine(),
-            t: t.to_affine(),
+            s: (self.s.to_projective() - other.s.to_projective()).to_affine(),
+            t: (self.t.to_projective() - other.t.to_projective()).to_affine(),
         }
     }
 }
@@ -104,7 +91,7 @@ mod tests {
         }
     }
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(50))]
+        #![proptest_config(ProptestConfig::with_cases(25))]
         #[test]
         fn test_encrypt_decrypt(priv_k in arb_fr(), random in arb_fr(), balance in any::<u16>()) {
             let enc_balance = EncryptedNumber::encrypt(priv_k, balance as u32, random);
@@ -115,7 +102,7 @@ mod tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(50))]
+        #![proptest_config(ProptestConfig::with_cases(25))]
         #[test]
         fn test_homomorphic(
             priv_k in arb_fr(), random1 in arb_fr(), random2 in arb_fr(),

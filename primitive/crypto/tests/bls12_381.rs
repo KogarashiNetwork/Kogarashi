@@ -1,5 +1,6 @@
 use rand_core::RngCore;
 
+#[allow(dead_code)]
 pub mod field {
     use super::*;
     use zero_crypto::arithmetic::bits_384::*;
@@ -51,6 +52,7 @@ pub mod field {
     }
 }
 
+#[allow(dead_code)]
 pub mod curve {
     use super::field::*;
     use super::*;
