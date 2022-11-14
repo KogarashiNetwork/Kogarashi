@@ -6,7 +6,7 @@ pub use ring::*;
 
 #[macro_export]
 macro_rules! curve_operation {
-    ($curve:ident, $field:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $g:ident, $e:ident) => {
+    ($field:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $g:ident, $e:ident) => {
         curve_built_in!($affine, $projective);
 
         projective_ring_operation!($projective, $field, $g, $e);

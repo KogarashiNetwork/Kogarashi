@@ -3,7 +3,7 @@ use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::dress::field::*;
 
 #[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct Fp(pub(crate) [u64; 6]);
+pub struct Fq(pub(crate) [u64; 6]);
 
 const MODULUS: [u64; 6] = [
     0xb9feffffffffaaab,
@@ -50,9 +50,9 @@ const R3: [u64; 6] = [
 
 const INV: u64 = 0x89f3fffcfffcfffd;
 
-pairing_field_operation!(Fp, MODULUS, GENERATOR, IDENTITY, INV, R2, R3);
+pairing_field_operation!(Fq, MODULUS, GENERATOR, IDENTITY, INV, R2, R3);
 
-impl Fp {
+impl Fq {
     pub(crate) const fn zero() -> Self {
         Self(zero())
     }

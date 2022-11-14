@@ -70,8 +70,6 @@ const PARAM_A: Fr = Fr::zero();
 
 const PARAM_B: Fr = Fr::to_mont_form([4, 0, 0, 0]);
 
-pub struct JubJubCurve {}
-
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct JubjubAffine {
@@ -81,7 +79,6 @@ pub struct JubjubAffine {
 }
 
 curve_operation!(
-    JubJubCurve,
     Fr,
     PARAM_A,
     PARAM_B,
