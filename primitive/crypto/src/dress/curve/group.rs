@@ -21,9 +21,11 @@ macro_rules! projective_group_operation {
 
         impl PartialEq for $projective {
             fn eq(&self, other: &Self) -> bool {
-                (self.is_identity() && other.is_identity())
-                ||
-                (self.x == other.x && self.y == other.y && self.z == other.z)
+                if self.is_identity() || other.is_identity() {
+                    self.is_identity() && other.is_identity()
+                } else {
+                    self.x * other.z == other.x * self.z && self.y * other.z == other.y * self.z
+                }
             }
         }
 

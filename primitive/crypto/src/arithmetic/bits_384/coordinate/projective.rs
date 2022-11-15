@@ -21,9 +21,9 @@ pub fn add_point(
 
     if u1 == u2 {
         if s1 == s2 {
-            return double_point(lhs, p, inv);
+            double_point(lhs, p, inv)
         } else {
-            return (zero, zero, zero);
+            (zero, zero, zero)
         }
     } else {
         let s = sub(s1, s2, p);
@@ -37,7 +37,7 @@ pub fn add_point(
         );
         let uuu = mul(uu, u, p, inv);
 
-        return (
+        (
             mul(u, w, p, inv),
             sub(
                 mul(s, sub(mul(u1, uu, p, inv), s1, p), p, inv),
@@ -45,7 +45,7 @@ pub fn add_point(
                 p,
             ),
             mul(uuu, v, p, inv),
-        );
+        )
     }
 }
 

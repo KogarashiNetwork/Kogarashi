@@ -35,29 +35,32 @@ macro_rules! field_operation {
             }
         }
 
+        #[allow(clippy::suspicious_arithmetic_impl)]
         impl Div for $field {
             type Output = $field;
 
             #[inline]
             fn div(self, rhs: $field) -> $field {
-                let inv = self.invert().unwrap();
+                let inv = rhs.invert().unwrap();
                 self * inv
             }
         }
 
+        #[allow(clippy::suspicious_arithmetic_impl)]
         impl<'a, 'b> Div<&'b $field> for &'a $field {
             type Output = $field;
 
             #[inline]
             fn div(self, rhs: &'b $field) -> $field {
-                let inv = self.invert().unwrap();
+                let inv = rhs.invert().unwrap();
                 self * &inv
             }
         }
 
+        #[allow(clippy::suspicious_op_assign_impl)]
         impl DivAssign for $field {
             fn div_assign(&mut self, rhs: $field) {
-                let inv = self.invert().unwrap();
+                let inv = rhs.invert().unwrap();
                 *self *= inv
             }
         }

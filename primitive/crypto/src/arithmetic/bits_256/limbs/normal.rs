@@ -113,7 +113,7 @@ pub fn invert(
     p: [u64; 4],
     inv: u64,
 ) -> Option<[u64; 4]> {
-    let zero: [u64; 4] = [0, 0, 0, 0];
+    let zero: [u64; 4] = [0; 4];
     if a == zero {
         None
     } else {

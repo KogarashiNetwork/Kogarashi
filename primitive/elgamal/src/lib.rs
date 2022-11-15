@@ -23,78 +23,65 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use parity_scale_codec::{Decode, Encode};
+use zero_crypto::behave::*;
 use zero_jubjub::{
-    coordinate::{Affine, Projective},
+    coordinate::{JubjubAffine, JubjubProjective},
     fr::Fr,
-    interface::Coordinate,
 };
 
 #[derive(Debug, Clone, Decode, Encode, PartialEq, Eq)]
 pub struct EncryptedNumber {
-    s: Affine,
-    t: Affine,
+    s: JubjubAffine,
+    t: JubjubAffine,
 }
 
 #[allow(unused_variables)]
 impl EncryptedNumber {
     pub fn encrypt(private_key: Fr, value: u32, random: Fr) -> Self {
-        let g = Projective::generator();
-        let public_key = private_key * g.clone();
-        let mut left = Fr::from_u64(value as u64) * g.clone();
-        left.add(random * public_key);
+        let g = JubjubProjective::GENERATOR;
+        let public_key = g * private_key;
+        let left = g * Fr::from_u64(value as u64) + public_key * random;
         EncryptedNumber {
             s: left.to_affine(),
-            t: (random * g).to_affine(),
+            t: (g * random).to_affine(),
         }
     }
 
     pub fn decrypt(&self, private_key: Fr) -> Option<u32> {
-        let g = Projective::generator();
-        let mut decrypted_message = Projective::from(self.s.clone());
-        let neg = (private_key * Projective::from(self.t.clone())).neg();
-        decrypted_message.add(neg);
+        let g = JubjubProjective::GENERATOR;
+        let decrypted_message = self.s.to_projective() - (self.t.to_projective() * private_key);
 
-        let mut acc = Projective::identity();
+        let mut acc = JubjubProjective::IDENTITY;
         for i in 0..150000 {
             if acc == decrypted_message {
                 return Some(i);
             }
-            acc.add(g.clone());
+            acc += g;
         }
         None
     }
 
     pub fn add(&self, other: &Self) -> Self {
-        let mut s = Projective::from(self.s.clone());
-        let mut t = Projective::from(self.t.clone());
-        s.add(Projective::from(other.s.clone()));
-        t.add(Projective::from(other.t.clone()));
-
         Self {
-            s: s.to_affine(),
-            t: t.to_affine(),
+            s: (self.s.to_projective() + other.s.to_projective()).to_affine(),
+            t: (self.t.to_projective() + other.t.to_projective()).to_affine(),
         }
     }
 
     pub fn sub(&self, other: &Self) -> Self {
-        let mut s = Projective::from(self.s.clone());
-        let mut t = Projective::from(self.t.clone());
-        s.add(Projective::from(other.s.clone()).neg());
-        t.add(Projective::from(other.t.clone()).neg());
-
         Self {
-            s: s.to_affine(),
-            t: t.to_affine(),
+            s: (self.s.to_projective() - other.s.to_projective()).to_affine(),
+            t: (self.t.to_projective() - other.t.to_projective()).to_affine(),
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
-    use zero_jubjub::fr::Fr;
 
     use crate::EncryptedNumber;
 
@@ -104,7 +91,7 @@ mod tests {
         }
     }
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(50))]
+        #![proptest_config(ProptestConfig::with_cases(25))]
         #[test]
         fn test_encrypt_decrypt(priv_k in arb_fr(), random in arb_fr(), balance in any::<u16>()) {
             let enc_balance = EncryptedNumber::encrypt(priv_k, balance as u32, random);
@@ -115,7 +102,7 @@ mod tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(50))]
+        #![proptest_config(ProptestConfig::with_cases(25))]
         #[test]
         fn test_homomorphic(
             priv_k in arb_fr(), random1 in arb_fr(), random2 in arb_fr(),

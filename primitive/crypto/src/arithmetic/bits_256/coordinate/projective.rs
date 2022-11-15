@@ -1,6 +1,7 @@
 use crate::arithmetic::bits_256::limbs::*;
 use crate::arithmetic::bits_256::represent::*;
 use crate::arithmetic::utils::ProjectiveCoordinate;
+use crate::common::Bits;
 
 /// The projective coordinate addition
 /// cost: 12M + 2S + 6A + 1*2
@@ -11,6 +12,12 @@ pub fn add_point(
     inv: u64,
 ) -> ProjectiveCoordinate<[u64; 4]> {
     let zero: [u64; 4] = [0; 4];
+    if lhs == (zero, zero, zero) {
+        return rhs;
+    } else if rhs == (zero, zero, zero) {
+        return lhs;
+    }
+
     let (x, y, z) = lhs;
     let (a, b, c) = rhs;
 
@@ -74,7 +81,7 @@ pub fn double_point(
         (
             mul(u, w, p, inv),
             sub(tvw, double(mul(uu, yy, p, inv), p), p),
-            mul(square(u, p, inv), u, p, inv),
+            mul(uu, u, p, inv),
         )
     }
 }
@@ -86,8 +93,11 @@ pub fn scalar_point(
     p: [u64; 4],
     inv: u64,
 ) -> ProjectiveCoordinate<[u64; 4]> {
-    let bits = to_bits(scalar);
-    for &bit in bits.iter() {
+    let bits = to_bits(scalar)
+        .into_iter()
+        .skip_while(|&x| x == 0)
+        .collect::<Bits>();
+    for &bit in bits.iter().rev() {
         if bit == 1 {
             identity = add_point(identity, base, p, inv);
         }
