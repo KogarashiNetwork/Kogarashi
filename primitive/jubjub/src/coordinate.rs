@@ -75,7 +75,7 @@ const PARAM_B: Fr = Fr::to_mont_form([4, 0, 0, 0]);
 pub struct JubjubAffine {
     x: Fr,
     y: Fr,
-    is_infinity: bool,
+    is_identity: bool,
 }
 
 curve_operation!(
