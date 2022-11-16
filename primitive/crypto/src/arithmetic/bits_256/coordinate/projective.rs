@@ -5,7 +5,6 @@ use crate::common::PrimeField;
 use crate::common::Projective;
 
 /// The projective coordinate addition
-/// cost: 12M + 2S + 6A + 1*2
 pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
     if lhs.is_identity() {
         return rhs;
@@ -41,8 +40,6 @@ pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
 }
 
 /// The projective coordinate doubling
-/// cost: 5M + 6S + 1*a + A + 3*2 + 1*3.
-/// a = 0, b = 4
 pub fn double_point<P: Projective>(point: P) -> P {
     if point.is_identity() || point.get_y().is_zero() {
         <P as Group>::IDENTITY

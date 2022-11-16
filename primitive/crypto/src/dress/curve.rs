@@ -100,17 +100,14 @@ macro_rules! curve_operation {
                 self.z
             }
 
-            // set x coordinate
             fn set_x(&mut self, value: Self::ScalarField) {
                 self.x = value;
             }
 
-            // set y coordinate
             fn set_y(&mut self, value: Self::ScalarField) {
                self.y = value;
             }
 
-            // set z coordinate
             fn set_z(&mut self, value: Self::ScalarField) {
                 self.z = value;
             }
