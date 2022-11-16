@@ -49,4 +49,22 @@ pub trait Projective: ParityCmp + Basic + Ring {
 
     // check that point is on curve
     fn is_on_curve(self) -> bool;
+
+    // get x coordinate
+    fn get_x(&self) -> Self::ScalarField;
+
+    // get y coordinate
+    fn get_y(&self) -> Self::ScalarField;
+
+    // get z coordinate
+    fn get_z(&self) -> Self::ScalarField;
+
+    // set x coordinate
+    fn set_x(&mut self, value: Self::ScalarField);
+
+    // set y coordinate
+    fn set_y(&mut self, value: Self::ScalarField);
+
+    // set z coordinate
+    fn set_z(&mut self, value: Self::ScalarField);
 }

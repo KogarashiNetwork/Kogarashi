@@ -1,99 +1,74 @@
 use crate::arithmetic::bits_384::*;
-use crate::arithmetic::utils::*;
+use crate::common::Bits;
+use crate::common::Group;
+use crate::common::PrimeField;
+use crate::common::Projective;
 
 /// The projective coordinate addition
-/// cost: 11M + 6S + 1*a + 10add + 4*2 + 1*4.
-/// a = 0
-pub fn add_point(
-    lhs: ProjectiveCoordinate<[u64; 6]>,
-    rhs: ProjectiveCoordinate<[u64; 6]>,
-    p: [u64; 6],
-    inv: u64,
-) -> ProjectiveCoordinate<[u64; 6]> {
-    let zero: [u64; 6] = [0; 6];
-    let (x, y, z) = lhs;
-    let (a, b, c) = rhs;
+pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
+    if lhs.is_identity() {
+        return rhs;
+    } else if rhs.is_identity() {
+        return lhs;
+    }
 
-    let s1 = mul(y, c, p, inv);
-    let s2 = mul(b, z, p, inv);
-    let u1 = mul(x, c, p, inv);
-    let u2 = mul(a, z, p, inv);
+    let s1 = lhs.get_y() * rhs.get_z();
+    let s2 = rhs.get_y() * lhs.get_z();
+    let u1 = lhs.get_x() * rhs.get_z();
+    let u2 = rhs.get_x() * lhs.get_z();
 
     if u1 == u2 {
         if s1 == s2 {
-            double_point(lhs, p, inv)
+            return double_point(lhs);
         } else {
-            (zero, zero, zero)
+            return <P as Group>::IDENTITY;
         }
-    } else {
-        let s = sub(s1, s2, p);
-        let u = sub(u1, u2, p);
-        let uu = square(u, p, inv);
-        let v = mul(z, c, p, inv);
-        let w = sub(
-            mul(square(s, p, inv), v, p, inv),
-            mul(uu, add(u1, u2, p), p, inv),
-            p,
-        );
-        let uuu = mul(uu, u, p, inv);
-
-        (
-            mul(u, w, p, inv),
-            sub(
-                mul(s, sub(mul(u1, uu, p, inv), s1, p), p, inv),
-                mul(s1, uuu, p, inv),
-                p,
-            ),
-            mul(uuu, v, p, inv),
-        )
     }
+
+    let s = s1 - s2;
+    let u = u1 - u2;
+    let uu = u.square();
+    let v = lhs.get_z() * rhs.get_z();
+    let w = s.square() * v - uu * (u1 + u2);
+    let uuu = uu * u;
+
+    let mut res = <P as Default>::default();
+    res.set_x(u * w);
+    res.set_y(s * (u1 * uu - w) - s1 * uuu);
+    res.set_z(uuu * v);
+    res
 }
 
 /// The projective coordinate doubling
-/// cost: 5M + 6S + 1*a + 7add + 3*2 + 1*3.
-/// a = 0
-pub fn double_point(
-    rhs: ProjectiveCoordinate<[u64; 6]>,
-    p: [u64; 6],
-    inv: u64,
-) -> ProjectiveCoordinate<[u64; 6]> {
-    let zero: [u64; 6] = [0; 6];
-    let (x, y, z) = rhs;
 
-    if z == zero || y == zero {
-        (zero, zero, zero)
+pub fn double_point<P: Projective>(point: P) -> P {
+    if point.is_identity() || point.get_y().is_zero() {
+        <P as Group>::IDENTITY
     } else {
-        let xx = square(x, p, inv);
-        let w = add(xx, double(xx, p), p);
-        let s = double(mul(y, z, p, inv), p);
-        let ss = square(s, p, inv);
-        let sss = mul(s, ss, p, inv);
-        let r = mul(y, s, p, inv);
-        let rr = square(r, p, inv);
-        let b = sub(sub(square(add(x, r, p), p, inv), xx, p), rr, p);
-        let h = sub(square(w, p, inv), double(b, p), p);
-
-        (
-            mul(h, s, p, inv),
-            sub(mul(w, sub(b, h, p), p, inv), double(rr, p), p),
-            sss,
-        )
+        let xx = point.get_x().square();
+        let t = xx.double() + xx;
+        let u = (point.get_y() * point.get_z()).double();
+        let v = (u * point.get_x() * point.get_y()).double();
+        let w = t.square() - v.double();
+        let uu = u.square();
+        let mut res = <P as Default>::default();
+        res.set_x(u * w);
+        res.set_y(t * (v - w) - (uu * point.get_y().square()).double());
+        res.set_z(uu * u);
+        res
     }
 }
 
-pub fn scalar_point(
-    mut base: ProjectiveCoordinate<[u64; 6]>,
-    scalar: [u64; 6],
-    mut identity: ProjectiveCoordinate<[u64; 6]>,
-    p: [u64; 6],
-    inv: u64,
-) -> ProjectiveCoordinate<[u64; 6]> {
-    let bits = to_bits(scalar);
-    for &bit in bits.iter() {
+pub fn scalar_point<P: Projective>(mut base: P, scalar: [u64; 6], mut identity: P) -> P {
+    let bits = to_bits(scalar)
+        .into_iter()
+        .skip_while(|&x| x == 0)
+        .collect::<Bits>();
+    for &bit in bits.iter().rev() {
         if bit == 1 {
-            identity = add_point(identity, base, p, inv);
+            identity += base;
         }
-        base = double_point(base, p, inv);
+        base = double_point(base);
     }
     identity
 }

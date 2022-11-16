@@ -63,9 +63,10 @@ macro_rules! curve_operation {
             const PARAM_B: $field = $b;
 
             fn to_affine(self) -> Self::Affine {
+                let inv_z = self.z.invert().unwrap();
                 Self::Affine {
-                    x: self.x / self.z,
-                    y: self.y / self.z,
+                    x: self.x * inv_z,
+                    y: self.y * inv_z,
                     is_infinity: self.z == Self::ScalarField::zero()
                 }
             }
@@ -75,13 +76,7 @@ macro_rules! curve_operation {
             }
 
             fn double(self) -> Self {
-                let (x,y,z) = double_point((self.x.0, self.y.0, self.z.0), $field::MODULUS.0,
-                $field::INV,);
-                Self {
-                    x: $field(x),
-                    y: $field(y),
-                    z: $field(z),
-                }
+                double_point(self)
             }
 
             fn is_on_curve(self) -> bool {
@@ -91,6 +86,33 @@ macro_rules! curve_operation {
                     self.y.square() * self.z
                         == self.x.square() * self.x + Self::PARAM_B * self.z.square() * self.z
                 }
+            }
+
+            fn get_x(&self) -> Self::ScalarField {
+                self.x
+            }
+
+            fn get_y(&self) -> Self::ScalarField {
+                self.y
+            }
+
+            fn get_z(&self) -> Self::ScalarField {
+                self.z
+            }
+
+            // set x coordinate
+            fn set_x(&mut self, value: Self::ScalarField) {
+                self.x = value;
+            }
+
+            // set y coordinate
+            fn set_y(&mut self, value: Self::ScalarField) {
+               self.y = value;
+            }
+
+            // set z coordinate
+            fn set_z(&mut self, value: Self::ScalarField) {
+                self.z = value;
             }
         }
     };
