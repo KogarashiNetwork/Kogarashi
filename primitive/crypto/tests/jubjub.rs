@@ -1,6 +1,5 @@
 use rand_core::RngCore;
 
-#[allow(dead_code)]
 pub mod field {
     use super::*;
     use zero_crypto::arithmetic::bits_256::*;
@@ -34,73 +33,5 @@ pub mod field {
 
     pub const fn from_raw(val: [u64; 4]) -> [u64; 4] {
         to_mont_form(val, R2, MODULUS, INV)
-    }
-}
-
-#[allow(dead_code)]
-pub mod curve {
-    use super::field::*;
-    use super::*;
-    use zero_crypto::arithmetic::bits_256::*;
-    use zero_crypto::arithmetic::utils::ProjectiveCoordinate;
-
-    pub const IDENTITY: ProjectiveCoordinate<[u64; 4]> = ([0; 4], [0; 4], [0; 4]);
-
-    pub const GENERATOR: ProjectiveCoordinate<[u64; 4]> = (
-        from_raw([
-            0x7c24d812779a3316,
-            0x72e38f4ebd4070f3,
-            0x03b3fe93f505a6f2,
-            0xc4c71e5a4102960,
-        ]),
-        from_raw([
-            0xd2047ef3463de4af,
-            0x01ca03640d236cbf,
-            0xd3033593ae386e92,
-            0xaa87a50921b80ec,
-        ]),
-        from_raw([1, 0, 0, 0]),
-    );
-
-    const PARAM_A: [u64; 4] = [0; 4];
-
-    const PARAM_B: [u64; 4] = from_raw([4, 0, 0, 0]);
-
-    pub fn is_on_curve(point: ProjectiveCoordinate<[u64; 4]>) -> bool {
-        let identity = [0; 4];
-        let (x, y, z) = point;
-
-        if z == identity {
-            true
-        } else {
-            let yy = square(y, MODULUS, INV);
-            let right = mul(yy, z, MODULUS, INV);
-
-            let xx = square(x, MODULUS, INV);
-            let xxx = mul(xx, x, MODULUS, INV);
-            let zz = square(z, MODULUS, INV);
-            let zzz = mul(zz, z, MODULUS, INV);
-            let c = mul(PARAM_B, zzz, MODULUS, INV);
-            let left = add(xxx, c, MODULUS);
-
-            right == left
-        }
-    }
-
-    pub fn are_points_equal(
-        p1: ProjectiveCoordinate<[u64; 4]>,
-        p2: ProjectiveCoordinate<[u64; 4]>,
-    ) -> bool {
-        if p1.2 == zero() || p2.2 == zero() {
-            p1.2 == zero() && p2.2 == zero()
-        } else {
-            mul(p1.0, p2.2, MODULUS, INV) == mul(p2.0, p1.2, MODULUS, INV)
-                && mul(p1.1, p2.2, MODULUS, INV) == mul(p2.1, p1.2, MODULUS, INV)
-        }
-    }
-
-    pub fn random_point(rand: impl RngCore) -> ProjectiveCoordinate<[u64; 4]> {
-        let random_scalar = random(rand);
-        scalar_point(GENERATOR, random_scalar, IDENTITY, MODULUS, INV)
     }
 }

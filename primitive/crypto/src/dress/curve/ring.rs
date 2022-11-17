@@ -10,17 +10,7 @@ macro_rules! projective_ring_operation {
 
             #[inline]
             fn add(self, rhs: $projective) -> Self {
-                let (x, y, z) = add_point(
-                    (self.x.0, self.y.0, self.z.0),
-                    (rhs.x.0, rhs.y.0, rhs.z.0),
-                    $field::MODULUS.0,
-                    $field::INV,
-                );
-                Self {
-                    x: $field(x),
-                    y: $field(y),
-                    z: $field(z),
-                }
+                add_point(self, rhs)
             }
         }
 
@@ -29,34 +19,13 @@ macro_rules! projective_ring_operation {
 
             #[inline]
             fn add(self, rhs: &'b $projective) -> $projective {
-                let (x, y, z) = add_point(
-                    (self.x.0, self.y.0, self.z.0),
-                    (rhs.x.0, rhs.y.0, rhs.z.0),
-                    $field::MODULUS.0,
-                    $field::INV,
-                );
-                $projective {
-                    x: $field(x),
-                    y: $field(y),
-                    z: $field(z),
-                }
+                add_point(self.clone(), rhs.clone())
             }
         }
 
         impl AddAssign for $projective {
             fn add_assign(&mut self, rhs: $projective) {
-                let (x, y, z) = add_point(
-                    (self.x.0, self.y.0, self.z.0),
-                    (rhs.x.0, rhs.y.0, rhs.z.0),
-                    $field::MODULUS.0,
-                    $field::INV,
-                );
-                let mut res = $projective {
-                    x: $field(x),
-                    y: $field(y),
-                    z: $field(z),
-                };
-                *self = res
+                *self = self.add(rhs);
             }
         }
 
@@ -154,17 +123,7 @@ macro_rules! projective_ring_operation {
 
             #[inline]
             fn sub(self, rhs: $projective) -> Self {
-                let (x, y, z) = add_point(
-                    (self.x.0, self.y.0, self.z.0),
-                    (rhs.x.0, (-rhs.y).0, rhs.z.0),
-                    $field::MODULUS.0,
-                    $field::INV,
-                );
-                Self {
-                    x: $field(x),
-                    y: $field(y),
-                    z: $field(z),
-                }
+                add_point(self, rhs.neg())
             }
         }
 
@@ -173,34 +132,13 @@ macro_rules! projective_ring_operation {
 
             #[inline]
             fn sub(self, rhs: &'b $projective) -> $projective {
-                let (x, y, z) = add_point(
-                    (self.x.0, self.y.0, self.z.0),
-                    (rhs.x.0, (-rhs.y).0, rhs.z.0),
-                    $field::MODULUS.0,
-                    $field::INV,
-                );
-                $projective {
-                    x: $field(x),
-                    y: $field(y),
-                    z: $field(z),
-                }
+                add_point(self.clone(), rhs.neg())
             }
         }
 
         impl SubAssign for $projective {
             fn sub_assign(&mut self, rhs: $projective) {
-                let (x, y, z) = add_point(
-                    (self.x.0, self.y.0, self.z.0),
-                    (rhs.x.0, (-rhs.y).0, rhs.z.0),
-                    $field::MODULUS.0,
-                    $field::INV,
-                );
-                let mut res = $projective {
-                    x: $field(x),
-                    y: $field(y),
-                    z: $field(z),
-                };
-                *self = res
+                *self = self.add(rhs.neg());
             }
         }
     };
