@@ -29,11 +29,11 @@ macro_rules! curve_operation {
             }
 
             fn is_identity(self) -> bool {
-                self.is_identity
+                self.is_infinity
             }
 
             fn is_on_curve(self) -> bool {
-                if self.is_identity {
+                if self.is_infinity {
                     true
                 } else {
                     self.y.square() == self.x.square() * self.x + Self::PARAM_B
@@ -67,7 +67,7 @@ macro_rules! curve_operation {
                 Self::Affine {
                     x: self.x * inv_z,
                     y: self.y * inv_z,
-                    is_identity: self.z == Self::ScalarField::zero()
+                    is_infinity: self.z == Self::ScalarField::zero()
                 }
             }
 

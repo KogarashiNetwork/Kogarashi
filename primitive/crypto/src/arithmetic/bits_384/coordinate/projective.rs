@@ -1,8 +1,5 @@
 use crate::arithmetic::bits_384::*;
-use crate::common::Bits;
-use crate::common::Group;
-use crate::common::PrimeField;
-use crate::common::Projective;
+use crate::common::{Bits, Group, PrimeField, Projective};
 
 /// The projective coordinate addition
 pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {

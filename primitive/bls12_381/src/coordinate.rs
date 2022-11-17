@@ -86,7 +86,7 @@ const PARAM_B: Fq = Fq([
 pub struct Bls381Affine {
     x: Fq,
     y: Fq,
-    is_identity: bool,
+    is_infinity: bool,
 }
 
 curve_operation!(
