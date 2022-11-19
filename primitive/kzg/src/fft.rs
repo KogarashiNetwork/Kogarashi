@@ -13,12 +13,15 @@ pub struct Fft<F: FftField> {
     inv_twiddle_factors: Vec<F>,
     // n inverse for inverse discrete fourier transform
     n_inv: F,
+    // bit reverse index
+    bit_reverse: Vec<usize>,
 }
 
 impl<F: FftField> Fft<F> {
     pub fn new(k: usize) -> Self {
         let n = 1 << k;
         let half_n = n / 2;
+        let offset = 64 - k;
 
         // precompute twiddle factors
         let g = (0..F::S - k).fold(F::ROOT_OF_UNITY, |acc, _| acc.square());
@@ -45,6 +48,9 @@ impl<F: FftField> Fft<F> {
             twiddle_factors,
             inv_twiddle_factors,
             n_inv: F::from(n).invert().unwrap(),
+            bit_reverse: (0..n as usize)
+                .map(|i| i.reverse_bits() >> offset)
+                .collect::<Vec<_>>(),
         }
     }
 
@@ -53,7 +59,7 @@ impl<F: FftField> Fft<F> {
         let n = 1 << self.k;
         assert_eq!(coeffs.len(), n);
 
-        swap_bit_reverse(coeffs, n, self.k);
+        self.reverse_index(coeffs);
         classic_fft_arithmetic(coeffs, n, 1, &self.twiddle_factors)
     }
 
@@ -62,9 +68,18 @@ impl<F: FftField> Fft<F> {
         let n = 1 << self.k;
         assert_eq!(coeffs.len(), n);
 
-        swap_bit_reverse(coeffs, n, self.k);
+        self.reverse_index(coeffs);
         classic_fft_arithmetic(coeffs, n, 1, &self.inv_twiddle_factors);
         coeffs.par_iter_mut().for_each(|coeff| *coeff *= self.n_inv)
+    }
+
+    // polynomial coefficients bit reverse permutation
+    fn reverse_index(&self, coeffs: &mut Polynomial<F>) {
+        for (i, ri) in self.bit_reverse.iter().enumerate() {
+            if i < *ri {
+                coeffs.swap(*ri, i);
+            }
+        }
     }
 }
 
@@ -87,17 +102,6 @@ fn classic_fft_arithmetic<F: FftField>(
             || classic_fft_arithmetic(right, n / 2, twiddle_chunk * 2, twiddles),
         );
         butterfly_arithmetic(left, right, twiddle_chunk, twiddles)
-    }
-}
-
-pub(crate) fn swap_bit_reverse<F: FftField>(a: &mut Polynomial<F>, n: usize, k: usize) {
-    assert!(k <= 64);
-    let diff = 64 - k;
-    for i in 0..n as u64 {
-        let ri = i.reverse_bits() >> diff;
-        if i < ri {
-            a.swap(ri as usize, i as usize);
-        }
     }
 }
 
@@ -165,9 +169,9 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(1))]
         #[test]
-        fn fft_transformation_test(mut poly_a in arb_poly(2)) {
+        fn fft_transformation_test(mut poly_a in arb_poly(10)) {
             let poly_b = poly_a.clone();
-            let classic_fft = Fft::new(2);
+            let classic_fft = Fft::new(10);
 
             classic_fft.dft(&mut poly_a);
             classic_fft.idft(&mut poly_a);
