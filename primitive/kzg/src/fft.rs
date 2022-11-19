@@ -2,6 +2,7 @@ use crate::poly::Polynomial;
 use rayon::{join, prelude::*};
 use zero_crypto::common::*;
 
+// fft structure
 #[derive(Clone, Debug)]
 pub struct Fft<F: FftField> {
     // polynomial degree 2^k
@@ -11,16 +12,16 @@ pub struct Fft<F: FftField> {
     // multiplicative group generator inverse
     inv_twiddle_factors: Vec<F>,
     // n inverse for inverse discrete fourier transform
-    inv: F,
+    n_inv: F,
 }
 
 impl<F: FftField> Fft<F> {
     pub fn new(k: u32) -> Self {
         let n = 1 << k;
-        let half_n = n as usize / 2;
+        let half_n = n / 2;
         let mut g = F::ROOT_OF_UNITY;
         let r = F::S - k as usize;
-        let inv = F::from_u64(n).invert().unwrap();
+        let n_inv = F::from(n).invert().unwrap();
 
         // adjust factor size
         for _ in 0..r {
@@ -29,34 +30,34 @@ impl<F: FftField> Fft<F> {
 
         let g_inv = g.invert().unwrap();
 
-        // compute twiddle factors
-        let twiddle_factors = (0..half_n)
+        // precompute twiddle factors
+        let twiddle_factors = (0..half_n as usize)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= g;
                 Some(tw)
             })
-            .collect::<Vec<F>>();
+            .collect::<Vec<_>>();
 
-        // compute inverse twiddle factors
-        let inv_twiddle_factors = (0..half_n)
+        // precompute inverse twiddle factors
+        let inv_twiddle_factors = (0..half_n as usize)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= g_inv;
                 Some(tw)
             })
-            .collect::<Vec<F>>();
+            .collect::<Vec<_>>();
 
         Fft {
             k,
             twiddle_factors,
             inv_twiddle_factors,
-            inv,
+            n_inv,
         }
     }
 
     // perform classic discrete fourier transform
-    pub fn dft(&self, coeffs: &mut Polynomial<F>) {
+    pub fn dft(&self, coeffs: &mut [F]) {
         let n = 1 << self.k;
         assert_eq!(coeffs.len(), n);
 
@@ -66,20 +67,20 @@ impl<F: FftField> Fft<F> {
     }
 
     // perform classic inverse discrete fourier transform
-    pub fn idft(&self, coeffs: &mut Polynomial<F>) {
+    pub fn idft(&self, coeffs: &mut [F]) {
         let n = 1 << self.k;
         assert_eq!(coeffs.len(), n);
 
         swap_bit_reverse(coeffs, n, self.k);
 
         classic_fft_arithmetic(coeffs, n, 1, &self.inv_twiddle_factors);
-        coeffs.par_iter_mut().for_each(|coeff| *coeff *= self.inv)
+        coeffs.par_iter_mut().for_each(|coeff| *coeff *= self.n_inv)
     }
 }
 
 // classic fft using divide and conquer algorithm
 fn classic_fft_arithmetic<F: FftField>(
-    coeffs: &mut Polynomial<F>,
+    coeffs: &mut [F],
     n: usize,
     twiddle_chunk: usize,
     twiddles: &[F],
@@ -137,8 +138,6 @@ pub(crate) fn butterfly_arithmetic<F: FftField>(
 
 #[cfg(test)]
 mod tests {
-    use crate::poly;
-
     use super::Fft;
     use proptest::prelude::*;
     use proptest::std_facade::vec;
@@ -174,16 +173,16 @@ mod tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100))]
+        #![proptest_config(ProptestConfig::with_cases(1))]
         #[test]
-        fn fft_transformation_test(mut poly_a in arb_poly(5)) {
-            // let fft = Fft::new(5);
-            // let poly_b = poly_a.clone();
+        fn fft_transformation_test(mut poly_a in arb_poly(2)) {
+            let poly_b = poly_a.clone();
+            let classic_fft = Fft::new(2);
 
-            // fft.dft(&mut poly_a);
-            // fft.idft(&mut poly_a);
+            classic_fft.dft(&mut poly_a);
+            classic_fft.idft(&mut poly_a);
 
-            // assert_eq!(poly_a, poly_b);
+            assert_eq!(poly_a, poly_b)
         }
     }
 
@@ -200,12 +199,12 @@ mod tests {
             let poly_e = naive_multiply(poly_c, poly_d);
 
             fft.dft(&mut poly_a);
-            // fft.dft(&mut poly_b);
-            // let mut poly_f = point_mutiply(poly_a, poly_b);
-            // fft.idft(&mut poly_f);
+            fft.dft(&mut poly_b);
+            let mut poly_f = point_mutiply(poly_a, poly_b);
+            fft.idft(&mut poly_f);
 
-            // assert_eq!(poly_e.len(), poly_f.len());
-            // assert_eq!(poly_e, poly_f)
+            assert_eq!(poly_e.len(), poly_f.len());
+            assert_eq!(poly_e, poly_f)
         }
     }
 }

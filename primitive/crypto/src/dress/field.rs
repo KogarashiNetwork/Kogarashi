@@ -184,6 +184,12 @@ macro_rules! fft_field_operation {
             }
         }
 
+        impl From<u64> for $field {
+            fn from(val: u64) -> $field {
+                $field(mul(from_u64(val), $r2, $p, $i))
+            }
+        }
+
         impl ParallelCmp for $field {}
     };
 }

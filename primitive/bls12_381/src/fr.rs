@@ -19,7 +19,12 @@ const GENERATOR: [u64; 4] = [
     0x351332208fc5a8c4,
 ];
 
-const IDENTITY: [u64; 4] = [1, 0, 0, 0];
+const IDENTITY: [u64; 4] = [
+    0x00000001fffffffe,
+    0x5884b7fa00034802,
+    0x998c4fefecbc4ff5,
+    0x1824b159acc5056f,
+];
 
 /// R = 2^256 mod r
 const R: [u64; 4] = [

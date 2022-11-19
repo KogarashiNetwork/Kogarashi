@@ -12,7 +12,7 @@ pub trait PairingField: PrimeField + ParityCmp {}
 /// This is fft field
 /// This is used for fft and has roots of unity
 #[cfg(feature = "std")]
-pub trait FftField: PrimeField + ParallelCmp {
+pub trait FftField: PrimeField + ParallelCmp + From<u64> {
     // factor power of two
     const S: usize;
 
