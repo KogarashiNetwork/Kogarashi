@@ -6,7 +6,7 @@ use zero_crypto::common::*;
 #[derive(Clone, Debug)]
 pub struct Fft<F: FftField> {
     // polynomial degree 2^k
-    k: u32,
+    k: usize,
     // generator of order 2^{k - 1} multiplicative group used as twiddle factors
     twiddle_factors: Vec<F>,
     // multiplicative group generator inverse
@@ -16,21 +16,12 @@ pub struct Fft<F: FftField> {
 }
 
 impl<F: FftField> Fft<F> {
-    pub fn new(k: u32) -> Self {
+    pub fn new(k: usize) -> Self {
         let n = 1 << k;
         let half_n = n / 2;
-        let mut g = F::ROOT_OF_UNITY;
-        let r = F::S - k as usize;
-        let n_inv = F::from(n).invert().unwrap();
-
-        // adjust factor size
-        for _ in 0..r {
-            g = g.square()
-        }
-
-        let g_inv = g.invert().unwrap();
 
         // precompute twiddle factors
+        let g = (0..F::S - k).fold(F::ROOT_OF_UNITY, |acc, _| acc.square());
         let twiddle_factors = (0..half_n as usize)
             .scan(F::one(), |w, _| {
                 let tw = *w;
@@ -40,6 +31,7 @@ impl<F: FftField> Fft<F> {
             .collect::<Vec<_>>();
 
         // precompute inverse twiddle factors
+        let g_inv = g.invert().unwrap();
         let inv_twiddle_factors = (0..half_n as usize)
             .scan(F::one(), |w, _| {
                 let tw = *w;
@@ -52,27 +44,25 @@ impl<F: FftField> Fft<F> {
             k,
             twiddle_factors,
             inv_twiddle_factors,
-            n_inv,
+            n_inv: F::from(n).invert().unwrap(),
         }
     }
 
     // perform classic discrete fourier transform
-    pub fn dft(&self, coeffs: &mut [F]) {
+    pub fn dft(&self, coeffs: &mut Polynomial<F>) {
         let n = 1 << self.k;
         assert_eq!(coeffs.len(), n);
 
         swap_bit_reverse(coeffs, n, self.k);
-
         classic_fft_arithmetic(coeffs, n, 1, &self.twiddle_factors)
     }
 
     // perform classic inverse discrete fourier transform
-    pub fn idft(&self, coeffs: &mut [F]) {
+    pub fn idft(&self, coeffs: &mut Polynomial<F>) {
         let n = 1 << self.k;
         assert_eq!(coeffs.len(), n);
 
         swap_bit_reverse(coeffs, n, self.k);
-
         classic_fft_arithmetic(coeffs, n, 1, &self.inv_twiddle_factors);
         coeffs.par_iter_mut().for_each(|coeff| *coeff *= self.n_inv)
     }
@@ -80,10 +70,10 @@ impl<F: FftField> Fft<F> {
 
 // classic fft using divide and conquer algorithm
 fn classic_fft_arithmetic<F: FftField>(
-    coeffs: &mut [F],
+    coeffs: &mut Polynomial<F>,
     n: usize,
     twiddle_chunk: usize,
-    twiddles: &[F],
+    twiddles: &Polynomial<F>,
 ) {
     if n == 2 {
         let t = coeffs[1];
@@ -100,7 +90,7 @@ fn classic_fft_arithmetic<F: FftField>(
     }
 }
 
-pub(crate) fn swap_bit_reverse<F: FftField>(a: &mut [F], n: usize, k: u32) {
+pub(crate) fn swap_bit_reverse<F: FftField>(a: &mut Polynomial<F>, n: usize, k: usize) {
     assert!(k <= 64);
     let diff = 64 - k;
     for i in 0..n as u64 {
@@ -112,10 +102,10 @@ pub(crate) fn swap_bit_reverse<F: FftField>(a: &mut [F], n: usize, k: u32) {
 }
 
 pub(crate) fn butterfly_arithmetic<F: FftField>(
-    left: &mut [F],
-    right: &mut [F],
+    left: &mut Polynomial<F>,
+    right: &mut Polynomial<F>,
     twiddle_chunk: usize,
-    twiddles: &[F],
+    twiddles: &Polynomial<F>,
 ) {
     // case when twiddle factor is one
     let t = right[0];
