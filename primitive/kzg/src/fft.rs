@@ -105,6 +105,7 @@ fn classic_fft_arithmetic<F: FftField>(
     }
 }
 
+// butterfly arithmetic polynomial evaluation
 pub(crate) fn butterfly_arithmetic<F: FftField>(
     left: &mut Polynomial<F>,
     right: &mut Polynomial<F>,

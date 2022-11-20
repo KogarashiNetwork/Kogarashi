@@ -15,8 +15,8 @@
 
 //! # Elliptic Curve Coordinate System
 //!
-//! - [`Bls381Affine`]
-//! - [`Bls381Projective`]
+//! - [`G1Affine`]
+//! - [`G1Projective`]
 //!
 //! ## Overview
 //!
@@ -38,19 +38,19 @@ use zero_crypto::dress::curve::*;
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct Bls381Projective {
+pub struct G1Projective {
     pub(crate) x: Fq,
     pub(crate) y: Fq,
     pub(crate) z: Fq,
 }
 
-const IDENTITY: Bls381Projective = Bls381Projective {
+const IDENTITY: G1Projective = G1Projective {
     x: Fq::zero(),
     y: Fq::zero(),
     z: Fq::zero(),
 };
 
-const GENERATOR: Bls381Projective = Bls381Projective {
+const GENERATOR: G1Projective = G1Projective {
     x: Fq([
         0x5cb38790fd530c16,
         0x7817fc679976fff5,
@@ -94,7 +94,7 @@ curve_operation!(
     PARAM_A,
     PARAM_B,
     Bls381Affine,
-    Bls381Projective,
+    G1Projective,
     GENERATOR,
     IDENTITY
 );

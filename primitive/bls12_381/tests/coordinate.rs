@@ -1,7 +1,7 @@
 use proptest::prelude::*;
 use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
-use zero_bls12_381::{coordinate::Bls381Projective, Fq};
+use zero_bls12_381::{g1::G1Projective, Fq};
 use zero_crypto::common::{Group, PrimeField, Projective};
 
 prop_compose! {
@@ -11,15 +11,15 @@ prop_compose! {
 }
 
 prop_compose! {
-    fn arb_point()(k in arb_fq()) -> Bls381Projective {
-        Bls381Projective::GENERATOR * k
+    fn arb_point()(k in arb_fq()) -> G1Projective {
+        G1Projective::GENERATOR * k
     }
 }
 
 #[test]
 fn bls12_381_is_on_curve() {
-    assert!(Bls381Projective::GENERATOR.is_on_curve());
-    assert!(Bls381Projective::IDENTITY.is_on_curve());
+    assert!(G1Projective::GENERATOR.is_on_curve());
+    assert!(G1Projective::IDENTITY.is_on_curve());
 }
 
 proptest! {
@@ -30,9 +30,9 @@ proptest! {
         let identity = a - a;
 
         // a + e = a
-        let a_prime = a + Bls381Projective::IDENTITY;
+        let a_prime = a + G1Projective::IDENTITY;
 
-        assert_eq!(identity, Bls381Projective::IDENTITY);
+        assert_eq!(identity, G1Projective::IDENTITY);
         assert_eq!(a_prime, a);
     }
 }

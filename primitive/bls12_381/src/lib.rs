@@ -16,9 +16,9 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(dead_code)]
 
-pub mod coordinate;
 mod fq;
 mod fr;
+pub mod g1;
 
 pub use fq::Fq;
 pub use fr::Fr;

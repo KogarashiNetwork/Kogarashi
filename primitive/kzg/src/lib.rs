@@ -1,6 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 mod fft;
+mod keypair;
 mod poly;
 
 #[cfg(test)]
