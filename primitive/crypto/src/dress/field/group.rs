@@ -1,13 +1,13 @@
 #[macro_export]
 macro_rules! group_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident) => {
+    ($field:ident, $p:ident, $g:ident, $r:ident, $inv:ident) => {
         impl Group for $field {
             const GENERATOR: Self = $field($g);
 
-            const IDENTITY: Self = $field($e);
+            const IDENTITY: Self = $field($r);
 
             fn invert(self) -> Option<Self> {
-                match invert(self.0, little_fermat($p), $e, $p, $inv) {
+                match invert(self.0, little_fermat($p), $r, $p, $inv) {
                     Some(x) => Some(Self(x)),
                     None => None,
                 }

@@ -15,13 +15,6 @@ const MODULUS: [u64; 4] = [
 
 const GENERATOR: [u64; 4] = [2, 0, 0, 0];
 
-const IDENTITY: [u64; 4] = [
-    0x25f80bb3b99607d9,
-    0xf315d62f66b6e750,
-    0x932514eeeb8814f4,
-    0x09a6fc6f479155c6,
-];
-
 /// R = 2^256 mod r
 const R: [u64; 4] = [
     0x25f80bb3b99607d9,
@@ -57,17 +50,7 @@ const ROOT_OF_UNITY: Fp = Fp([
     0x4d6b87b1da259e2,
 ]);
 
-fft_field_operation!(
-    Fp,
-    MODULUS,
-    GENERATOR,
-    IDENTITY,
-    INV,
-    ROOT_OF_UNITY,
-    R2,
-    R3,
-    S
-);
+fft_field_operation!(Fp, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 
 impl Fp {
     pub(crate) const fn zero() -> Self {
