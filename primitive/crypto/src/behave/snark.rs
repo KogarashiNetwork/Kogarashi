@@ -44,7 +44,9 @@ pub trait Commitment {
     type G1Affine: Affine + From<Self::G1Projective>;
 
     // g1 group projective point
-    type G1Projective: Projective + Mul<Self::ScalarField, Output = Self::G1Projective>;
+    type G1Projective: Projective
+        + From<Self::G1Affine>
+        + Mul<Self::ScalarField, Output = Self::G1Projective>;
 
     // g2 group affine point
     type G2Affine: Affine;

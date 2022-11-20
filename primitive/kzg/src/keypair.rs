@@ -1,5 +1,6 @@
+use crate::poly::Polynomial;
 use rand_core::RngCore;
-use zero_crypto::{behave::*, common::Affine};
+use zero_crypto::behave::*;
 
 // key pair structure
 #[derive(Clone, Debug)]
@@ -24,5 +25,14 @@ impl<C: Commitment> KeyPair<C> {
             .collect::<Vec<_>>();
 
         Self { k, g1 }
+    }
+
+    pub fn commit(&self, poly: &Polynomial<C::ScalarField>) -> C::G1Projective {
+        let mut acc = C::G1Projective::IDENTITY;
+
+        poly.iter().zip(self.g1.iter()).for_each(|(scalar, base)| {
+            acc += C::G1Projective::from(*base) * *scalar;
+        });
+        acc
     }
 }
