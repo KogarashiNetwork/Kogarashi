@@ -116,6 +116,28 @@ macro_rules! curve_operation {
                 self.z = value;
             }
         }
+
+        impl Mul<$scalar> for $projective {
+            type Output = Self;
+
+            #[inline]
+            fn mul(self, scalar: $scalar) -> Self {
+                let mut res = Self::Output::IDENTITY;
+                let mut acc = self.clone();
+                let bits: Vec<u8> = scalar
+                    .to_bits()
+                    .into_iter()
+                    .skip_while(|x| *x == 0)
+                    .collect();
+                for &b in bits.iter().rev() {
+                    if b == 1 {
+                        res += acc.clone();
+                    }
+                    acc = acc.double();
+                }
+                res
+            }
+        }
     };
 }
 

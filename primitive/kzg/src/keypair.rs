@@ -14,8 +14,14 @@ impl<C: Commitment> KeyPair<C> {
         let g = C::G1Projective::GENERATOR;
         let r = C::ScalarField::random(rng);
 
-        let mut acc = C::ScalarField::one();
-        let g1 = (0..n).map(|i| acc * g).collect::<Vec<_>>();
+        let mut acc = C::ScalarField::IDENTITY;
+        let g1 = (0..n)
+            .map(|_| {
+                let res = C::G1Affine::from(g * acc);
+                acc *= r;
+                res
+            })
+            .collect::<Vec<_>>();
 
         Self { k, g1 }
     }

@@ -1,6 +1,7 @@
 // This trait resresents elliptic curve and its scalar field
-/// y^2 = x^3 + ax + b
 use super::{algebra::Ring, basic::Basic, comp::ParityCmp, field::PrimeField};
+/// y^2 = x^3 + ax + b
+use core::ops::Mul;
 
 pub trait Affine: ParityCmp + Basic + PartialEq + Eq {
     // scalar field of curve
@@ -28,7 +29,7 @@ pub trait Affine: ParityCmp + Basic + PartialEq + Eq {
     fn is_on_curve(self) -> bool;
 }
 
-pub trait Projective: ParityCmp + Basic + Ring {
+pub trait Projective: ParityCmp + Basic + Ring + Mul<Self::ScalarField, Output = Self> {
     // scalar field of curve
     type ScalarField: PrimeField;
 

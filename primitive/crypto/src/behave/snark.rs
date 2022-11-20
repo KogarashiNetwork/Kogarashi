@@ -1,5 +1,7 @@
 // This trait resresents zkSNARKs trait
 
+use core::ops::Mul;
+
 use super::{
     comp::ParityCmp,
     curve::{Affine, Projective},
@@ -39,10 +41,10 @@ pub trait Polynomial: Ring + ParallelCmp {
 /// This is commitment
 pub trait Commitment {
     // g1 group affine point
-    type G1Affine: Affine;
+    type G1Affine: Affine + From<Self::G1Projective>;
 
     // g1 group projective point
-    type G1Projective: Projective;
+    type G1Projective: Projective + Mul<Self::ScalarField, Output = Self::G1Projective>;
 
     // g2 group affine point
     type G2Affine: Affine;
@@ -51,7 +53,5 @@ pub trait Commitment {
     type G2Projective: Projective;
 
     // scalar field of point
-    type ScalarField: FftField;
-
-    type PrimeField: PrimeField;
+    type ScalarField: PrimeField;
 }
