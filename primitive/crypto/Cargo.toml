@@ -2,7 +2,7 @@
 authors = ['NoCtrlZ<shinsaku.ashizawa@artree.co.jp>']
 description = 'zkSNARK plonk pallet'
 name = "zero-crypto"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 homepage = 'https://github.com/zero-network/zero/'
 readme = 'README.md'
