@@ -6,25 +6,27 @@ pub use ring::*;
 
 #[macro_export]
 macro_rules! curve_operation {
-    ($field:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $g:ident, $e:ident) => {
+    ($scalar:ident, $range:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $g:ident, $e:ident) => {
         curve_built_in!($affine, $projective);
 
-        projective_ring_operation!($projective, $field, $g, $e);
+        projective_ring_operation!($projective, $scalar, $g, $e);
 
         impl Affine for $affine {
-            type ScalarField = $field;
+            type ScalarField = $scalar;
+
+            type RangeField = $range;
 
             type Projective = $projective;
 
-            const PARAM_A: $field = $a;
+            const PARAM_A: $range = $a;
 
-            const PARAM_B: $field = $b;
+            const PARAM_B: $range = $b;
 
             fn to_projective(self) -> Self::Projective {
                 Self::Projective {
                     x: self.x,
                     y: self.y,
-                    z: Self::ScalarField::one(),
+                    z: Self::RangeField::one(),
                 }
             }
 
@@ -54,25 +56,27 @@ macro_rules! curve_operation {
         impl Eq for $affine {}
 
         impl Projective for $projective {
-            type ScalarField = $field;
+            type ScalarField = $scalar;
+
+            type RangeField = $range;
 
             type Affine = $affine;
 
-            const PARAM_A: $field = $a;
+            const PARAM_A: $range = $a;
 
-            const PARAM_B: $field = $b;
+            const PARAM_B: $range = $b;
 
             fn to_affine(self) -> Self::Affine {
                 let inv_z = self.z.invert().unwrap();
                 Self::Affine {
                     x: self.x * inv_z,
                     y: self.y * inv_z,
-                    is_infinity: self.z == Self::ScalarField::zero()
+                    is_infinity: self.z == Self::RangeField::zero()
                 }
             }
 
             fn is_identity(self) -> bool {
-                self.z == Self::ScalarField::zero()
+                self.z == Self::RangeField::zero()
             }
 
             fn double(self) -> Self {
@@ -88,27 +92,27 @@ macro_rules! curve_operation {
                 }
             }
 
-            fn get_x(&self) -> Self::ScalarField {
+            fn get_x(&self) -> Self::RangeField {
                 self.x
             }
 
-            fn get_y(&self) -> Self::ScalarField {
+            fn get_y(&self) -> Self::RangeField {
                 self.y
             }
 
-            fn get_z(&self) -> Self::ScalarField {
+            fn get_z(&self) -> Self::RangeField {
                 self.z
             }
 
-            fn set_x(&mut self, value: Self::ScalarField) {
+            fn set_x(&mut self, value: Self::RangeField) {
                 self.x = value;
             }
 
-            fn set_y(&mut self, value: Self::ScalarField) {
+            fn set_y(&mut self, value: Self::RangeField) {
                self.y = value;
             }
 
-            fn set_z(&mut self, value: Self::ScalarField) {
+            fn set_z(&mut self, value: Self::RangeField) {
                 self.z = value;
             }
         }

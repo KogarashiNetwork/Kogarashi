@@ -6,14 +6,17 @@ pub trait Affine: ParityCmp + Basic + PartialEq + Eq {
     // scalar field of curve
     type ScalarField: PrimeField;
 
+    // range field of curve
+    type RangeField: PrimeField;
+
     // projective coordinate representation
     type Projective: Projective;
 
     // a param
-    const PARAM_A: Self::ScalarField;
+    const PARAM_A: Self::RangeField;
 
     // b param
-    const PARAM_B: Self::ScalarField;
+    const PARAM_B: Self::RangeField;
 
     // convert affine to projective representation
     fn to_projective(self) -> Self::Projective;
@@ -29,14 +32,17 @@ pub trait Projective: ParityCmp + Basic + Ring {
     // scalar field of curve
     type ScalarField: PrimeField;
 
+    // range field of curve
+    type RangeField: PrimeField;
+
     // affine coordinate representation
     type Affine: Affine;
 
     // a param
-    const PARAM_A: Self::ScalarField;
+    const PARAM_A: Self::RangeField;
 
     // b param
-    const PARAM_B: Self::ScalarField;
+    const PARAM_B: Self::RangeField;
 
     // convert projective to affine representation
     fn to_affine(self) -> Self::Affine;
@@ -51,20 +57,20 @@ pub trait Projective: ParityCmp + Basic + Ring {
     fn is_on_curve(self) -> bool;
 
     // get x coordinate
-    fn get_x(&self) -> Self::ScalarField;
+    fn get_x(&self) -> Self::RangeField;
 
     // get y coordinate
-    fn get_y(&self) -> Self::ScalarField;
+    fn get_y(&self) -> Self::RangeField;
 
     // get z coordinate
-    fn get_z(&self) -> Self::ScalarField;
+    fn get_z(&self) -> Self::RangeField;
 
     // set x coordinate
-    fn set_x(&mut self, value: Self::ScalarField);
+    fn set_x(&mut self, value: Self::RangeField);
 
     // set y coordinate
-    fn set_y(&mut self, value: Self::ScalarField);
+    fn set_y(&mut self, value: Self::RangeField);
 
     // set z coordinate
-    fn set_z(&mut self, value: Self::ScalarField);
+    fn set_z(&mut self, value: Self::RangeField);
 }

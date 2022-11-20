@@ -80,6 +80,7 @@ pub struct JubjubAffine {
 
 curve_operation!(
     Fr,
+    Fr,
     PARAM_A,
     PARAM_B,
     JubjubAffine,

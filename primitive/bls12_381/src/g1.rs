@@ -32,6 +32,7 @@
 //! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
 use crate::fq::Fq;
+use crate::fr::Fr;
 use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::curve::*;
@@ -90,6 +91,7 @@ pub struct Bls381Affine {
 }
 
 curve_operation!(
+    Fr,
     Fq,
     PARAM_A,
     PARAM_B,
