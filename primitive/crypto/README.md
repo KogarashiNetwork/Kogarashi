@@ -1,9 +1,11 @@
 # Crypto
+[![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE) [![crates.io badge](https://img.shields.io/crates/v/zero-crypto.svg)](https://crates.io/crates/zero-crypto)
+
 This is the primitive of `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec) cryptography libraries.
 
 ## Usage
 ### Field
-The following `Fr` support four basic operation.
+The following `Fp` support four basic operation.
 
 ```rust
 use zero_crypto::arithmetic::bits_256::*;
@@ -11,7 +13,7 @@ use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
 #[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct Fr(pub(crate) [u64; 4]);
+pub struct Fp(pub(crate) [u64; 4]);
 
 const MODULUS: [u64; 4] = [
     0xd0970e5ed6f72cb7,
@@ -21,8 +23,6 @@ const MODULUS: [u64; 4] = [
 ];
 
 const GENERATOR: [u64; 4] = [2, 0, 0, 0];
-
-const IDENTITY: [u64; 4] = [1, 0, 0, 0];
 
 /// R = 2^256 mod r
 const R: [u64; 4] = [
@@ -52,30 +52,20 @@ pub const INV: u64 = 0x1ba3a358ef788ef9;
 
 const S: usize = 1;
 
-const ROOT_OF_UNITY: Fr = Fr([
+const ROOT_OF_UNITY: Fp = Fp([
     0xaa9f02ab1d6124de,
     0xb3524a6466112932,
     0x7342261215ac260b,
     0x4d6b87b1da259e2,
 ]);
 
-fft_field_operation!(
-    Fr,
-    MODULUS,
-    GENERATOR,
-    IDENTITY,
-    INV,
-    ROOT_OF_UNITY,
-    R2,
-    R3,
-    S
-);
+fft_field_operation!(Fp, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 ```
 
 ### Curve
 The following `JubjubProjective` supports point arithmetic.
 ```rust
-use crate::fr::Fr;
+use crate::fp::Fp;
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::curve::*;
@@ -83,47 +73,48 @@ use zero_crypto::dress::curve::*;
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct JubjubProjective {
-    pub(crate) x: Fr,
-    pub(crate) y: Fr,
-    pub(crate) z: Fr,
+    pub(crate) x: Fp,
+    pub(crate) y: Fp,
+    pub(crate) z: Fp,
 }
 
 const IDENTITY: JubjubProjective = JubjubProjective {
-    x: Fr::zero(),
-    y: Fr::zero(),
-    z: Fr::zero(),
+    x: Fp::zero(),
+    y: Fp::zero(),
+    z: Fp::zero(),
 };
 
 const GENERATOR: JubjubProjective = JubjubProjective {
-    x: Fr::to_mont_form([
+    x: Fp::to_mont_form([
         0x7c24d812779a3316,
         0x72e38f4ebd4070f3,
         0x03b3fe93f505a6f2,
         0xc4c71e5a4102960,
     ]),
-    y: Fr::to_mont_form([
+    y: Fp::to_mont_form([
         0xd2047ef3463de4af,
         0x01ca03640d236cbf,
         0xd3033593ae386e92,
         0xaa87a50921b80ec,
     ]),
-    z: Fr::one(),
+    z: Fp::one(),
 };
 
-const PARAM_A: Fr = Fr::zero();
+const PARAM_A: Fp = Fp::zero();
 
-const PARAM_B: Fr = Fr::to_mont_form([4, 0, 0, 0]);
+const PARAM_B: Fp = Fp::to_mont_form([4, 0, 0, 0]);
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct JubjubAffine {
-    x: Fr,
-    y: Fr,
+    x: Fp,
+    y: Fp,
     is_infinity: bool,
 }
 
 curve_operation!(
-    Fr,
+    Fp,
+    Fp,
     PARAM_A,
     PARAM_B,
     JubjubAffine,

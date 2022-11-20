@@ -29,28 +29,6 @@ macro_rules! projective_ring_operation {
             }
         }
 
-        impl Mul<$field> for $projective {
-            type Output = Self;
-
-            #[inline]
-            fn mul(self, scalar: $field) -> Self {
-                let mut res = Self::Output::IDENTITY;
-                let mut acc = self.clone();
-                let bits: Vec<u8> = scalar
-                    .to_bits()
-                    .into_iter()
-                    .skip_while(|x| *x == 0)
-                    .collect();
-                for &b in bits.iter().rev() {
-                    if b == 1 {
-                        res += acc.clone();
-                    }
-                    acc = acc.double();
-                }
-                res
-            }
-        }
-
         impl<'a, 'b> Mul<&'b $field> for &'a $projective {
             type Output = $projective;
 

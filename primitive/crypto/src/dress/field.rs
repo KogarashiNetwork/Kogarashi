@@ -69,8 +69,8 @@ macro_rules! field_operation {
 
 #[macro_export]
 macro_rules! prime_field_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident, $r2:ident, $r3:ident) => {
-        field_operation!($field, $p, $g, $e, $inv);
+    ($field:ident, $p:ident, $g:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
+        field_operation!($field, $p, $g, $r, $inv);
 
         field_built_in!($field);
 
@@ -171,13 +171,13 @@ macro_rules! prime_field_operation {
 
 #[macro_export]
 macro_rules! fft_field_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $i:ident, $r:ident, $r2:ident, $r3:ident, $s:ident) => {
-        prime_field_operation!($field, $p, $g, $e, $i, $r2, $r3);
+    ($field:ident, $p:ident, $g:ident, $i:ident, $u:ident, $r:ident, $r2:ident, $r3:ident, $s:ident) => {
+        prime_field_operation!($field, $p, $g, $i, $r, $r2, $r3);
 
         impl FftField for $field {
             const S: usize = $s;
 
-            const ROOT_OF_UNITY: Self = $r;
+            const ROOT_OF_UNITY: Self = $u;
 
             fn one() -> Self {
                 $field(one($r2, $p, $i))
@@ -196,8 +196,8 @@ macro_rules! fft_field_operation {
 
 #[macro_export]
 macro_rules! pairing_field_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident, $r2:ident, $r3:ident) => {
-        prime_field_operation!($field, $p, $g, $e, $inv, $r2, $r3);
+    ($field:ident, $p:ident, $g:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
+        prime_field_operation!($field, $p, $g, $inv, $r, $r2, $r3);
 
         impl PairingField for $field {}
     };
