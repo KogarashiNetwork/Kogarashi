@@ -1,6 +1,6 @@
 use crate::poly::Polynomial;
 use rayon::{join, prelude::*};
-use zero_crypto::common::*;
+use zero_crypto::common::FftField;
 
 // fft structure
 #[derive(Clone, Debug)]
@@ -57,27 +57,30 @@ impl<F: FftField> Fft<F> {
     // perform classic discrete fourier transform
     pub fn dft(&self, coeffs: &mut Polynomial<F>) {
         let n = 1 << self.k;
-        assert_eq!(coeffs.len(), n);
+        assert_eq!(coeffs.0.len(), n);
 
         self.reverse_index(coeffs);
-        classic_fft_arithmetic(coeffs, n, 1, &self.twiddle_factors)
+        classic_fft_arithmetic(&mut coeffs.0, n, 1, &self.twiddle_factors)
     }
 
     // perform classic inverse discrete fourier transform
     pub fn idft(&self, coeffs: &mut Polynomial<F>) {
         let n = 1 << self.k;
-        assert_eq!(coeffs.len(), n);
+        assert_eq!(coeffs.0.len(), n);
 
         self.reverse_index(coeffs);
-        classic_fft_arithmetic(coeffs, n, 1, &self.inv_twiddle_factors);
-        coeffs.par_iter_mut().for_each(|coeff| *coeff *= self.n_inv)
+        classic_fft_arithmetic(&mut coeffs.0, n, 1, &self.inv_twiddle_factors);
+        coeffs
+            .0
+            .par_iter_mut()
+            .for_each(|coeff| *coeff *= self.n_inv)
     }
 
     // polynomial coefficients bit reverse permutation
     fn reverse_index(&self, coeffs: &mut Polynomial<F>) {
         for (i, ri) in self.bit_reverse.iter().enumerate() {
             if i < *ri {
-                coeffs.swap(*ri, i);
+                coeffs.0.swap(*ri, i);
             }
         }
     }
@@ -85,10 +88,10 @@ impl<F: FftField> Fft<F> {
 
 // classic fft using divide and conquer algorithm
 fn classic_fft_arithmetic<F: FftField>(
-    coeffs: &mut Polynomial<F>,
+    coeffs: &mut [F],
     n: usize,
     twiddle_chunk: usize,
-    twiddles: &Polynomial<F>,
+    twiddles: &Vec<F>,
 ) {
     if n == 2 {
         let t = coeffs[1];
@@ -107,10 +110,10 @@ fn classic_fft_arithmetic<F: FftField>(
 
 // butterfly arithmetic polynomial evaluation
 pub(crate) fn butterfly_arithmetic<F: FftField>(
-    left: &mut Polynomial<F>,
-    right: &mut Polynomial<F>,
+    left: &mut [F],
+    right: &mut [F],
     twiddle_chunk: usize,
-    twiddles: &Polynomial<F>,
+    twiddles: &Vec<F>,
 ) {
     // case when twiddle factor is one
     let t = right[0];
@@ -133,6 +136,8 @@ pub(crate) fn butterfly_arithmetic<F: FftField>(
 
 #[cfg(test)]
 mod tests {
+    use crate::poly::Polynomial;
+
     use super::Fft;
     use proptest::prelude::*;
     use proptest::std_facade::vec;
@@ -159,18 +164,21 @@ mod tests {
         c
     }
 
-    fn point_mutiply<F: PrimeField>(a: Vec<F>, b: Vec<F>) -> Vec<F> {
-        assert_eq!(a.len(), b.len());
-        a.iter()
-            .zip(b.iter())
-            .map(|(coeff_a, coeff_b)| *coeff_a * *coeff_b)
-            .collect::<Vec<F>>()
+    fn point_mutiply<F: PrimeField>(a: Polynomial<F>, b: Polynomial<F>) -> Polynomial<F> {
+        assert_eq!(a.0.len(), b.0.len());
+        Polynomial(
+            a.0.iter()
+                .zip(b.0.iter())
+                .map(|(coeff_a, coeff_b)| *coeff_a * *coeff_b)
+                .collect::<Vec<F>>(),
+        )
     }
 
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(1))]
         #[test]
-        fn fft_transformation_test(mut poly_a in arb_poly(10)) {
+        fn fft_transformation_test(coeffs in arb_poly(10)) {
+            let mut poly_a = Polynomial(coeffs);
             let poly_b = poly_a.clone();
             let classic_fft = Fft::new(10);
 
@@ -184,21 +192,23 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
-        fn fft_multiplication_test(mut poly_a in arb_poly(4), mut poly_b in arb_poly(4)) {
+        fn fft_multiplication_test(mut coeffs_a in arb_poly(4), mut coeffs_b in arb_poly(4)) {
             let fft = Fft::new(5);
-            let poly_c = poly_a.clone();
-            let poly_d = poly_b.clone();
-            poly_a.resize(1<<5, Fr::zero());
-            poly_b.resize(1<<5, Fr::zero());
+            let poly_c = coeffs_a.clone();
+            let poly_d = coeffs_b.clone();
+            coeffs_a.resize(1<<5, Fr::zero());
+            coeffs_b.resize(1<<5, Fr::zero());
+            let mut poly_a = Polynomial(coeffs_a);
+            let mut poly_b = Polynomial(coeffs_b);
 
-            let poly_e = naive_multiply(poly_c, poly_d);
+            let poly_e = Polynomial(naive_multiply(poly_c, poly_d));
 
             fft.dft(&mut poly_a);
             fft.dft(&mut poly_b);
             let mut poly_f = point_mutiply(poly_a, poly_b);
             fft.idft(&mut poly_f);
 
-            assert_eq!(poly_e.len(), poly_f.len());
+            assert_eq!(poly_e.0.len(), poly_f.0.len());
             assert_eq!(poly_e, poly_f)
         }
     }

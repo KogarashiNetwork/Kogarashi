@@ -10,7 +10,7 @@ pub struct KeyPair<C: Commitment> {
 }
 
 impl<C: Commitment> KeyPair<C> {
-    pub fn new<R: RngCore>(k: u64, rng: R) -> Self {
+    pub fn setup<R: RngCore>(k: u64, rng: R) -> Self {
         let n = 1 << k;
         let g = C::G1Projective::GENERATOR;
         let r = C::ScalarField::random(rng);
@@ -30,9 +30,12 @@ impl<C: Commitment> KeyPair<C> {
     pub fn commit(&self, poly: &Polynomial<C::ScalarField>) -> C::G1Projective {
         let mut acc = C::G1Projective::IDENTITY;
 
-        poly.iter().zip(self.g1.iter()).for_each(|(scalar, base)| {
-            acc += C::G1Projective::from(*base) * *scalar;
-        });
+        poly.0
+            .iter()
+            .zip(self.g1.iter())
+            .for_each(|(scalar, base)| {
+                acc += C::G1Projective::from(*base) * *scalar;
+            });
         acc
     }
 }
