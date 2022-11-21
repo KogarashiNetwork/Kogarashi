@@ -175,7 +175,7 @@ mod tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(1))]
+        #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
         fn fft_transformation_test(coeffs in arb_poly(10)) {
             let mut poly_a = Polynomial(coeffs);

@@ -25,6 +25,8 @@ pub trait FftField: PrimeField + ParallelCmp + From<u64> {
     // 2^s th root of unity
     const ROOT_OF_UNITY: Self;
 
+    fn zero() -> Self;
+
     fn one() -> Self;
 }
 
