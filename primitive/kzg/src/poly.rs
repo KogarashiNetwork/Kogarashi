@@ -1,9 +1,28 @@
+/// the terminology bellow is aligned with the following paper
+/// https://www.iacr.org/archive/asiacrypt2010/6477178/6477178.pdf
+use rand_core::RngCore;
 use zero_crypto::behave::FftField;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Polynomial<F>(pub(crate) Vec<F>);
 
 impl<F: FftField> Polynomial<F> {
+    // polynomial evaluation domain
+    // r^0, r^1, r^2, ..., r^n
+    pub fn setup(k: usize, rng: impl RngCore) -> (F, Vec<F>) {
+        let randomness = F::random(rng);
+        (
+            randomness,
+            (0..(1 << k))
+                .scan(F::one(), |w, _| {
+                    let tw = *w;
+                    *w *= randomness;
+                    Some(tw)
+                })
+                .collect::<Vec<_>>(),
+        )
+    }
+
     // commit polynomial to domain
     pub fn commit(&self, domain: Vec<F>) -> F {
         assert_eq!(self.0.len(), domain.len());
@@ -95,16 +114,11 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
-        fn polynomial_commit_and_evaluation_test(randomness in arb_fr(), poly in arb_poly(10)) {
+        fn polynomial_commit_and_evaluation_test(bytes in [any::<u8>(); 16], poly in arb_poly(10)) {
             let k = 10;
 
             // polynomial evaluation domain
-            // r^0, r^1, r^2, ..., r^n
-            let domain = (0..(1 << k)).scan(Fr::one(), |w, _| {
-                let tw = *w;
-                *w *= randomness;
-                Some(tw)
-            }).collect::<Vec<_>>();
+            let (randomness, domain) = Polynomial::setup(k, XorShiftRng::from_seed(bytes));
 
             // polynomial commitment with domain
             let commitment = poly.commit(domain);
@@ -139,25 +153,16 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
-        fn polynomial_arithmetic_test(randomness in arb_fr(), at in arb_fr(), polynomial in arb_poly(10)) {
+        fn kzg_scheme_test(bytes in [any::<u8>(); 16], at in arb_fr(), poly_part in arb_poly(10)) {
             let k = 10;
+            let n = 1 << k;
 
-            // trusted setup
-            let domain = (0..(1 << k)).scan(Fr::one(), |w, _| {
-                let tw = *w;
-                *w *= randomness;
-                Some(tw)
-            }).collect::<Vec<_>>();
+            // evaluation domain
+            let (randomness, domain) = Polynomial::<Fr>::setup(k, XorShiftRng::from_seed(bytes));
 
-            // commit polynomial
-            let mut commitment = Fr::one();
-            polynomial.commit(domain);
-
-            // evaluate polynomial at a
-            let evaluation = polynomial.evaluate(at);
-
-            // quotient polynomial
-            let quotient = polynomial;
+            // polynomial to be verified
+            let factor_poly = vec![Fr::one(), at];
+            let poly = Polynomial(naive_multiply(poly_part.0, factor_poly.clone()));
         }
     }
 }
