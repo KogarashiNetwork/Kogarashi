@@ -6,6 +6,13 @@ use zero_crypto::behave::FftField;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Polynomial<F>(pub(crate) Vec<F>);
 
+pub struct Witness<F> {
+    s_eval: F,
+    a_eval: F,
+    q_eval: F,
+    denominator: F,
+}
+
 impl<F: FftField> Polynomial<F> {
     // polynomial evaluation domain
     // r^0, r^1, r^2, ..., r^n
@@ -24,8 +31,8 @@ impl<F: FftField> Polynomial<F> {
     }
 
     // commit polynomial to domain
-    pub fn commit(&self, domain: Vec<F>) -> F {
-        assert_eq!(self.0.len(), domain.len());
+    pub fn commit(&self, domain: &Vec<F>) -> F {
+        assert!(self.0.len() <= domain.len());
 
         domain
             .iter()
@@ -57,6 +64,27 @@ impl<F: FftField> Polynomial<F> {
                 })
                 .collect::<Vec<_>>(),
         )
+    }
+
+    pub fn create_witness(self, at: F, s: F, domain: Vec<F>) -> Witness<F> {
+        let quotient = self.divide(at);
+        let s_eval = self.commit(&domain);
+        let a_eval = self.evaluate(at);
+        let q_eval = quotient.commit(&domain);
+        let denominator = s - at;
+        Witness {
+            s_eval,
+            a_eval,
+            q_eval,
+            denominator,
+        }
+    }
+}
+
+impl<F: FftField> Witness<F> {
+    // verify witness
+    pub fn verify_eval(self) -> bool {
+        self.q_eval * self.denominator == self.s_eval * self.a_eval
     }
 }
 
@@ -121,7 +149,7 @@ mod tests {
             let (randomness, domain) = Polynomial::setup(k, XorShiftRng::from_seed(bytes));
 
             // polynomial commitment with domain
-            let commitment = poly.commit(domain);
+            let commitment = poly.commit(&domain);
 
             // evaluate polynomial with at
             let evaluation = poly.evaluate(randomness);
@@ -153,16 +181,21 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
-        fn kzg_scheme_test(bytes in [any::<u8>(); 16], at in arb_fr(), poly_part in arb_poly(10)) {
+        fn kzg_scheme_test(bytes in [any::<u8>(); 16], at in arb_fr(), mut poly_part in arb_poly(10)) {
             let k = 10;
-            let n = 1 << k;
+            poly_part.0.remove(poly_part.0.len() - 1);
 
             // evaluation domain
-            let (randomness, domain) = Polynomial::<Fr>::setup(k, XorShiftRng::from_seed(bytes));
+            let (s, domain) = Polynomial::<Fr>::setup(k, XorShiftRng::from_seed(bytes));
 
             // polynomial to be verified
-            let factor_poly = vec![Fr::one(), at];
+            let factor_poly = vec![Fr::one(), -at];
             let poly = Polynomial(naive_multiply(poly_part.0, factor_poly.clone()));
+
+            // create witness
+            let witness = poly.create_witness(at, s, domain);
+
+            assert!(witness.verify_eval())
         }
     }
 }
