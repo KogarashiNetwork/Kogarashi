@@ -4,7 +4,7 @@ use zero_crypto::behave::FftField;
 pub struct Polynomial<F>(pub(crate) Vec<F>);
 
 impl<F: FftField> Polynomial<F> {
-    pub fn commit(self, domain: Vec<F>) -> F {
+    pub fn commit(&self, domain: Vec<F>) -> F {
         let mut commitment = F::one();
         domain
             .iter()
@@ -13,7 +13,7 @@ impl<F: FftField> Polynomial<F> {
         commitment
     }
 
-    pub fn evaluate(self, at: F) -> F {
+    pub fn evaluate(&self, at: F) -> F {
         self.0
             .iter()
             .rev()
@@ -22,9 +22,18 @@ impl<F: FftField> Polynomial<F> {
 
     // divide polynomial with at
     // f(x) - f(at) / x - at
-    // pub fn divide(self, at: F) -> F {
-    //     let divisor = self.evaluate(at);
-    // }
+    pub fn divide(&self, at: F) -> Self {
+        let a = -at;
+        let mut prev_c = self.0[0];
+        let mut quotient = Vec::new();
+
+        self.0.iter().skip(1).for_each(|coeff| {
+            quotient.push(prev_c);
+            prev_c = *coeff - a * prev_c;
+        });
+
+        Self(quotient)
+    }
 }
 
 #[cfg(test)]
@@ -48,9 +57,36 @@ mod tests {
         }
     }
 
+    fn naive_multiply<F: PrimeField>(a: Vec<F>, b: Vec<F>) -> Vec<F> {
+        let mut c = vec![F::default(); a.len() + b.len() - 1];
+        a.iter().enumerate().for_each(|(i_a, coeff_a)| {
+            b.iter().enumerate().for_each(|(i_b, coeff_b)| {
+                c[i_a + i_b] += *coeff_a * *coeff_b;
+            })
+        });
+        c
+    }
+
     proptest! {
-            #![proptest_config(ProptestConfig::with_cases(100))]
-            #[test]
+        #![proptest_config(ProptestConfig::with_cases(1))]
+        #[test]
+        fn polynomial_division_test(at in arb_fr(), divisor in arb_poly(2)) {
+            // (x + 2) * (x + 2) = x^2 + 4x + 4
+            let poly_a = Polynomial(naive_multiply(vec![Fr::one(), Fr::one() + Fr::one()], vec![Fr::one(), Fr::one() + Fr::one()]));
+
+            // (x^2 + 4x + 4) / (x + 2) = (x + 2)
+            let quotient = poly_a.divide(-(Fr::one() + Fr::one()));
+
+            // (x + 2) * (x + 2) = x^2 + 4x + 4
+            let original = Polynomial(naive_multiply(quotient.0, vec![Fr::one(), Fr::one() + Fr::one()]));
+
+            assert_eq!(poly_a.0, original.0);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(100))]
+        #[test]
         fn polynomial_arithmetic_test(randomness in arb_fr(), at in arb_fr(), polynomial in arb_poly(10)) {
             let k = 10;
 
