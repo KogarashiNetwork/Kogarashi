@@ -23,16 +23,18 @@ impl<F: FftField> Polynomial<F> {
     // no remainder polynomial division with at
     // f(x) - f(at) / x - at
     pub fn divide(&self, at: F) -> Self {
-        let a = -at;
-        let mut prev_c = self.0[0];
-        let mut quotient = Vec::new();
-
-        self.0.iter().skip(1).for_each(|coeff| {
-            quotient.push(prev_c);
-            prev_c = *coeff - a * prev_c;
-        });
-
-        Self(quotient)
+        Self(
+            self.0
+                .iter()
+                .skip(1)
+                .scan(self.0[0], |w, coeff| {
+                    let tmp = *w;
+                    *w *= at;
+                    *w += *coeff;
+                    Some(tmp)
+                })
+                .collect::<Vec<_>>(),
+        )
     }
 }
 
