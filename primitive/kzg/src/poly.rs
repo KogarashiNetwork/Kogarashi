@@ -4,16 +4,18 @@ use zero_crypto::behave::FftField;
 pub struct Polynomial<F>(pub(crate) Vec<F>);
 
 impl<F: FftField> Polynomial<F> {
+    // commit polynomial to domain
     pub fn commit(&self, domain: Vec<F>) -> F {
         assert_eq!(self.0.len(), domain.len());
 
         domain
             .iter()
             .rev()
-            .zip(self.0.iter())
+            .zip(self.0.iter().rev())
             .fold(F::zero(), |acc, (a, b)| acc + *a * *b)
     }
 
+    // evaluate polynomial at
     pub fn evaluate(&self, at: F) -> F {
         self.0
             .iter()
@@ -110,7 +112,7 @@ mod tests {
             // evaluate polynomial with at
             let evaluation = poly.evaluate(randomness);
 
-            // assert_eq!(commitment, evaluation);
+            assert_eq!(commitment, evaluation);
         }
     }
 
