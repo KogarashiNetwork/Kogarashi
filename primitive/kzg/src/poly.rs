@@ -5,12 +5,13 @@ pub struct Polynomial<F>(pub(crate) Vec<F>);
 
 impl<F: FftField> Polynomial<F> {
     pub fn commit(&self, domain: Vec<F>) -> F {
-        let mut commitment = F::one();
+        assert_eq!(self.0.len(), domain.len());
+
         domain
             .iter()
+            .rev()
             .zip(self.0.iter())
-            .for_each(|(a, b)| commitment += *a * *b);
-        commitment
+            .fold(F::zero(), |acc, (a, b)| acc + *a * *b)
     }
 
     pub fn evaluate(&self, at: F) -> F {
@@ -67,6 +68,50 @@ mod tests {
             })
         });
         c
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(1))]
+        #[test]
+        fn polynomial_evaluation_test(at in arb_fr(), poly in arb_poly(10)) {
+            let mut naive_eval = Fr::zero();
+            let mut exp = Fr::one();
+
+            // naive polynomial evaluation
+            poly.0.iter().for_each(|coeff| {
+                naive_eval += coeff * &exp;
+                exp *= at;
+            });
+
+            // polynomial evaluation
+            let eval = poly.evaluate(at);
+
+            assert_eq!(naive_eval, eval);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(100))]
+        #[test]
+        fn polynomial_commit_and_evaluation_test(randomness in arb_fr(), poly in arb_poly(10)) {
+            let k = 10;
+
+            // polynomial evaluation domain
+            // r^0, r^1, r^2, ..., r^n
+            let domain = (0..(1 << k)).scan(Fr::one(), |w, _| {
+                let tw = *w;
+                *w *= randomness;
+                Some(tw)
+            }).collect::<Vec<_>>();
+
+            // polynomial commitment with domain
+            let commitment = poly.commit(domain);
+
+            // evaluate polynomial with at
+            let evaluation = poly.evaluate(randomness);
+
+            // assert_eq!(commitment, evaluation);
+        }
     }
 
     proptest! {
