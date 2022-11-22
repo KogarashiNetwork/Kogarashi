@@ -3,6 +3,7 @@
 use rand_core::RngCore;
 use zero_crypto::behave::FftField;
 
+// f(x) = a_n-1 , a_n-2, ... , a_0
 #[derive(Debug, Clone, PartialEq)]
 pub struct Polynomial<F>(pub(crate) Vec<F>);
 
@@ -33,11 +34,12 @@ impl<F: FftField> Polynomial<F> {
     // commit polynomial to domain
     pub fn commit(&self, domain: &Vec<F>) -> F {
         assert!(self.0.len() <= domain.len());
+        let diff = domain.len() - self.0.len();
 
-        domain
+        self.0
             .iter()
             .rev()
-            .zip(self.0.iter().rev())
+            .zip(domain.iter().rev().skip(diff))
             .fold(F::zero(), |acc, (a, b)| acc + *a * *b)
     }
 
@@ -66,12 +68,19 @@ impl<F: FftField> Polynomial<F> {
         )
     }
 
+    // create witness for f(a)
     pub fn create_witness(self, at: F, s: F, domain: Vec<F>) -> Witness<F> {
+        // p(x) - f(at) / x - at
         let quotient = self.divide(at);
-        let s_eval = self.commit(&domain);
+        // p(s)
+        let s_eval = self.evaluate(s);
+        // p(at)
         let a_eval = self.evaluate(at);
-        let q_eval = quotient.commit(&domain);
+        // p(s) - f(at) / s - at
+        let q_eval = quotient.evaluate(s);
+        // s - at
         let denominator = s - at;
+
         Witness {
             s_eval,
             a_eval,
@@ -84,7 +93,9 @@ impl<F: FftField> Polynomial<F> {
 impl<F: FftField> Witness<F> {
     // verify witness
     pub fn verify_eval(self) -> bool {
-        self.q_eval * self.denominator == self.s_eval * self.a_eval
+        // left: {(p(s) - f(at)) / (s - at)} * (s - at) = p(s) - f(at)
+        // right: p(s) - f(at)
+        self.q_eval * self.denominator == self.s_eval - self.a_eval
     }
 }
 
@@ -142,19 +153,22 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
-        fn polynomial_commit_and_evaluation_test(bytes in [any::<u8>(); 16], poly in arb_poly(10)) {
+        fn polynomial_commit_test(bytes in [any::<u8>(); 16], poly_a in arb_poly(8), poly_b in arb_poly(10)) {
             let k = 10;
 
             // polynomial evaluation domain
             let (randomness, domain) = Polynomial::setup(k, XorShiftRng::from_seed(bytes));
 
             // polynomial commitment with domain
-            let commitment = poly.commit(&domain);
+            let commitment_a = poly_a.commit(&domain);
+            let commitment_b = poly_b.commit(&domain);
 
             // evaluate polynomial with at
-            let evaluation = poly.evaluate(randomness);
+            let evaluation_a = poly_a.evaluate(randomness);
+            let evaluation_b = poly_b.evaluate(randomness);
 
-            assert_eq!(commitment, evaluation);
+            assert_eq!(commitment_a, evaluation_a);
+            assert_eq!(commitment_b, evaluation_b);
         }
     }
 
@@ -179,23 +193,30 @@ mod tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100))]
+        #![proptest_config(ProptestConfig::with_cases(5))]
         #[test]
         fn kzg_scheme_test(bytes in [any::<u8>(); 16], at in arb_fr(), mut poly_part in arb_poly(10)) {
             let k = 10;
             poly_part.0.remove(poly_part.0.len() - 1);
 
-            // evaluation domain
+            // evaluation domain and s
             let (s, domain) = Polynomial::<Fr>::setup(k, XorShiftRng::from_seed(bytes));
 
             // polynomial to be verified
             let factor_poly = vec![Fr::one(), -at];
-            let poly = Polynomial(naive_multiply(poly_part.0, factor_poly.clone()));
+            let poly = Polynomial(naive_multiply(poly_part.0.clone(), factor_poly.clone()));
 
             // create witness
-            let witness = poly.create_witness(at, s, domain);
+            let witness = poly.clone().create_witness(at, s, domain);
 
-            assert!(witness.verify_eval())
+            let left = poly_part.evaluate(s);
+            let right = (poly.clone().evaluate(s) - poly.clone().evaluate(at)) / (s - at);
+            println!("{:?} {:?}", left, right);
+            assert_eq!(left, right);
+
+            // {(p(s) - f(at)) / (s - at)} * (s - at) = p(s) - p(at)
+            assert!((poly.clone().evaluate(s) - poly.clone().evaluate(at)) / (s - at) * (s - at) == poly.clone().evaluate(s) - poly.evaluate(at));
+            // assert!(witness.verify_eval())
         }
     }
 }
