@@ -20,7 +20,7 @@ impl<F: FftField> Polynomial<F> {
             .fold(F::zero(), |acc, coeff| acc * at + *coeff)
     }
 
-    // divide polynomial with at
+    // no remainder polynomial division with at
     // f(x) - f(at) / x - at
     pub fn divide(&self, at: F) -> Self {
         let a = -at;
@@ -68,17 +68,20 @@ mod tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(1))]
+        #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
-        fn polynomial_division_test(at in arb_fr(), divisor in arb_poly(2)) {
-            // (x + 2) * (x + 2) = x^2 + 4x + 4
-            let poly_a = Polynomial(naive_multiply(vec![Fr::one(), Fr::one() + Fr::one()], vec![Fr::one(), Fr::one() + Fr::one()]));
+        fn polynomial_division_test(at in arb_fr(), divisor in arb_poly(10)) {
+            // dividend = divisor * quotient
+            let factor_poly = vec![Fr::one(), -at];
 
-            // (x^2 + 4x + 4) / (x + 2) = (x + 2)
-            let quotient = poly_a.divide(-(Fr::one() + Fr::one()));
+            // divisor * (x - at) = dividend
+            let poly_a = Polynomial(naive_multiply(divisor.0, factor_poly.clone()));
 
-            // (x + 2) * (x + 2) = x^2 + 4x + 4
-            let original = Polynomial(naive_multiply(quotient.0, vec![Fr::one(), Fr::one() + Fr::one()]));
+            // dividend / (x - at) = quotient
+            let quotient = poly_a.divide(at);
+
+            // quotient * (x - at) = divident
+            let original = Polynomial(naive_multiply(quotient.0, factor_poly));
 
             assert_eq!(poly_a.0, original.0);
         }
