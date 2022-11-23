@@ -11,7 +11,7 @@ macro_rules! extention_field_group_operation {
             }
         }
 
-        impl PartialEq for $field {
+        impl PartialEq for $extention_field {
             fn eq(&self, other: &Self) -> bool {
                 self.0[0].0[0] == other.0[0].0[0]
                     && self.0[0].0[1] == other.0[0].0[1]
@@ -24,7 +24,7 @@ macro_rules! extention_field_group_operation {
             }
         }
 
-        impl Eq for $field {}
+        impl Eq for $extention_field {}
     };
 }
 

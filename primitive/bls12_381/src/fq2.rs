@@ -5,4 +5,6 @@ use zero_crypto::dress::extention_field::*;
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct Fq2(pub(crate) [Fq; 2]);
 
-extention_field_operation!(Fq2, Fq);
+const ZERO: Fq2 = Fq2([Fq([0, 0, 0, 0, 0, 0]), Fq([0, 0, 0, 0, 0, 0])]);
+
+extention_field_operation!(Fq2, Fq, ZERO);

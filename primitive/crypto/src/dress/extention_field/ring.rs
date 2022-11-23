@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! extention_field_ring_operation {
-    ($extention_field:ident) => {
-        group_operation!($extention_field, $g);
+    ($extention_field:ident, $g:ident) => {
+        extention_field_group_operation!($extention_field, $g);
 
         impl Ring for $extention_field {}
 
@@ -10,7 +10,7 @@ macro_rules! extention_field_ring_operation {
 
             #[inline]
             fn add(self, rhs: $extention_field) -> Self {
-                $extention_field([self.0[0] + rhs.0[1]])
+                $extention_field([self.0[0] + rhs.0[0], self.0[1] + rhs.0[1]])
             }
         }
 
@@ -19,13 +19,13 @@ macro_rules! extention_field_ring_operation {
 
             #[inline]
             fn add(self, rhs: &'b $extention_field) -> $extention_field {
-                $extention_field(add(self.0, rhs.0, $p))
+                $extention_field([self.0[0] + rhs.0[0], self.0[1] + rhs.0[1]])
             }
         }
 
         impl AddAssign for $extention_field {
             fn add_assign(&mut self, rhs: $extention_field) {
-                self.0 = add(self.0, rhs.0, $p)
+                self.0 = [self.0[0] + rhs.0[0], self.0[1] + rhs.0[1]]
             }
         }
 
@@ -34,7 +34,7 @@ macro_rules! extention_field_ring_operation {
 
             #[inline]
             fn neg(self) -> Self {
-                $extention_field(neg(self.0, $p))
+                $extention_field([-self.0[0], -self.0[1]])
             }
         }
 
@@ -43,7 +43,7 @@ macro_rules! extention_field_ring_operation {
 
             #[inline]
             fn neg(self) -> $extention_field {
-                $extention_field(neg(self.0, $p))
+                $extention_field([-self.0[0], -self.0[1]])
             }
         }
 
@@ -52,7 +52,7 @@ macro_rules! extention_field_ring_operation {
 
             #[inline]
             fn sub(self, rhs: $extention_field) -> Self {
-                $extention_field(sub(self.0, rhs.0, $p))
+                $extention_field([self.0[0] - rhs.0[0], self.0[1] - rhs.0[1]])
             }
         }
 
@@ -61,13 +61,13 @@ macro_rules! extention_field_ring_operation {
 
             #[inline]
             fn sub(self, rhs: &'b $extention_field) -> $extention_field {
-                $extention_field(sub(self.0, rhs.0, $p))
+                $extention_field([self.0[0] - rhs.0[0], self.0[1] - rhs.0[1]])
             }
         }
 
         impl SubAssign for $extention_field {
             fn sub_assign(&mut self, rhs: $extention_field) {
-                self.0 = sub(self.0, rhs.0, $p)
+                self.0 = [self.0[0] - rhs.0[0], self.0[1] - rhs.0[1]]
             }
         }
     };

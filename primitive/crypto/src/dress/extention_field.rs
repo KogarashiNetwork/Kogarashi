@@ -6,7 +6,9 @@ pub use ring::*;
 
 #[macro_export]
 macro_rules! extention_field_operation {
-    ($extention_field:ident, $sub_field:ident) => {
+    ($extention_field:ident, $sub_field:ident, $g:ident) => {
+        extention_field_ring_operation!($extention_field, $g);
+
         extention_field_built_in!($extention_field);
 
         impl ExtentionField for $extention_field {}
