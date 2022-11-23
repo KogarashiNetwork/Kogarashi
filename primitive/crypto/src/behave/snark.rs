@@ -9,7 +9,7 @@ use super::{
 };
 
 #[cfg(feature = "std")]
-use super::{algebra::Ring, comp::ParallelCmp};
+use super::{algebra::Field, comp::ParallelCmp};
 
 /// This is pairing field
 /// This is used for pairing
@@ -25,13 +25,15 @@ pub trait FftField: PrimeField + ParallelCmp + From<u64> {
     // 2^s th root of unity
     const ROOT_OF_UNITY: Self;
 
+    fn zero() -> Self;
+
     fn one() -> Self;
 }
 
 /// This is polynomial
 /// This has fft functionality and represents polynomial ring
 #[cfg(feature = "std")]
-pub trait Polynomial: Ring + ParallelCmp {
+pub trait Polynomial: Field + ParallelCmp {
     // domain of polynomial
     type Domain: FftField;
 
