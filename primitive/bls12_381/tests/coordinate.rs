@@ -1,7 +1,7 @@
 use proptest::prelude::*;
 use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
-use zero_bls12_381::{g1::G1Projective, Fr};
+use zero_bls12_381::{Fr, G1Projective};
 use zero_crypto::common::{Group, PrimeField, Projective};
 
 prop_compose! {

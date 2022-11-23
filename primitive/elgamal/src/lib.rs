@@ -1,4 +1,4 @@
-// Copyright (C) 2021-2022 Artree (JP) LLC.
+// Copyright (C) 2021-2022 Invers (JP) INC.
 // SPDX-License-Identifier: Apache-2.0
 
 // Licensed under the Apache License, Version 2.0 (the "License");

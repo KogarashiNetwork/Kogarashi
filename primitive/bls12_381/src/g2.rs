@@ -6,19 +6,19 @@ use zero_crypto::dress::curve::*;
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct G1Projective {
+pub struct G2Projective {
     pub(crate) x: Fq,
     pub(crate) y: Fq,
     pub(crate) z: Fq,
 }
 
-const IDENTITY: G1Projective = G1Projective {
+const IDENTITY: G2Projective = G2Projective {
     x: Fq::zero(),
     y: Fq::zero(),
     z: Fq::zero(),
 };
 
-const GENERATOR: G1Projective = G1Projective {
+const GENERATOR: G2Projective = G2Projective {
     x: Fq([
         0x5cb38790fd530c16,
         0x7817fc679976fff5,
@@ -51,7 +51,7 @@ const PARAM_B: Fq = Fq([
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct G1Affine {
+pub struct G2Affine {
     x: Fq,
     y: Fq,
     is_infinity: bool,
@@ -62,8 +62,8 @@ curve_operation!(
     Fq,
     PARAM_A,
     PARAM_B,
-    G1Affine,
-    G1Projective,
+    G2Affine,
+    G2Projective,
     GENERATOR,
     IDENTITY
 );

@@ -54,7 +54,7 @@ The white paper is work in progress. You can find the light paper [here](https:/
 - [Zexe](https://eprint.iacr.org/2018/962.pdf)
 
 ## License
-Copyright 2020-2022 The Artree LLC.
+Copyright 2020-2022 The Invers INC.
 
 This software is under the `Apache License`.
 You can check more detail [here](./LICENSE).
