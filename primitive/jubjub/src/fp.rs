@@ -39,7 +39,7 @@ const R3: [u64; 4] = [
     0x05874f84946737ec,
 ];
 
-pub const INV: u64 = 0x1ba3a358ef788ef9;
+const INV: u64 = 0x1ba3a358ef788ef9;
 
 const S: usize = 1;
 

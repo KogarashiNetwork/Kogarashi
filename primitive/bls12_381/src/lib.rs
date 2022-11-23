@@ -15,6 +15,8 @@
 
 //! # Bls12 381 Curve Implementation
 //!
+//! - [`Fq`]
+//! - [`Fr`]
 //! - [`G1Projective`]
 //! - [`G2Projective`]
 //!
@@ -25,7 +27,7 @@
 //! - Point addition
 //! - Point doubling
 //! - Point scalar
-//! - G1 and G2 group p[eratopm]
+//! - G1 and G2 group operation
 //!
 //! ### Reference
 //!

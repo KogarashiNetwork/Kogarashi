@@ -24,10 +24,7 @@
 
 use parity_scale_codec::{Decode, Encode};
 use zero_crypto::behave::*;
-use zero_jubjub::{
-    coordinate::{JubjubAffine, JubjubProjective},
-    fp::Fp,
-};
+use zero_jubjub::{Fp, JubjubAffine, JubjubProjective};
 
 #[derive(Debug, Clone, Decode, Encode, PartialEq, Eq)]
 pub struct EncryptedNumber {

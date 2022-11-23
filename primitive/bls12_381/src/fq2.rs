@@ -2,6 +2,7 @@ use crate::fq::Fq;
 use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::dress::extention_field::*;
 
+// quadratic finite field struct
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct Fq2(pub(crate) [Fq; 2]);
 
