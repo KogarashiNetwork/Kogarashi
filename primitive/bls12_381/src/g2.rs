@@ -15,7 +15,7 @@ pub struct G2Projective {
 
 const IDENTITY: G2Projective = G2Projective {
     x: Fq2::zero(),
-    y: Fq2::zero(),
+    y: Fq2::one(),
     z: Fq2::zero(),
 };
 

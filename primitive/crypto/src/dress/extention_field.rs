@@ -1,9 +1,55 @@
+mod group;
+mod ring;
+
+pub use group::*;
+pub use ring::*;
+
 #[macro_export]
 macro_rules! extention_field_operation {
     ($extention_field:ident, $sub_field:ident) => {
         extention_field_built_in!($extention_field);
 
         impl ExtentionField for $extention_field {}
+
+        impl Field for $extention_field {}
+
+        impl PrimeField for $extention_field {
+            const MODULUS: $sub_field = $sub_field::MODULUS;
+
+            const INV: u64 = $sub_field::INV;
+
+            fn from_u64(val: u64) -> Self {
+                unimplemented!()
+            }
+
+            fn to_bits(self) -> Bits {
+                unimplemented!()
+            }
+
+            fn is_zero(self) -> bool {
+                self.0[0].is_zero & self.0[1].is_zero
+            }
+
+            fn random(rand: impl RngCore) -> Self {
+                [$sub_field::random(rand), $sub_field::random(rand)]
+            }
+
+            fn double(self) -> Self {
+                self + self
+            }
+
+            fn square(self) -> Self {
+                self * self
+            }
+
+            fn double_assign(&mut self) {
+                self += self
+            }
+
+            fn square_assign(&mut self) {
+                self *= self
+            }
+        }
 
         impl $extention_field {
             pub const fn zero() -> $extention_field {
