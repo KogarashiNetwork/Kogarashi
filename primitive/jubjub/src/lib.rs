@@ -1,4 +1,4 @@
-// Copyright (C) 2021-2022 Artree (JP) LLC.
+// Copyright (C) 2022-2023 Invers (JP) INC.
 // SPDX-License-Identifier: Apache-2.0
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! # Jubjub curve implementation
+//!
+//! - [`Fp`]
+//! - [`JubjubAffine`]
+//! - [`JubjubProjective`]
+//!
+//! ## Overview
+//!
+//! This coordinate provides the functionalities as following.
+//!
+//! - Curve addition
+//! - Curve doubling
+//! - Convert each coordinate system
+//!
+//! ### Reference
+//!
+//! We implement coordinate system to refer the following.
+//! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
+
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(dead_code)]
 
-pub mod coordinate;
+mod coordinate;
 mod error;
-pub mod fp;
+mod fp;
+
+pub use coordinate::{JubjubAffine, JubjubProjective};
+pub use fp::Fp;

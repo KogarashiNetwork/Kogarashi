@@ -1,5 +1,5 @@
 [package]
-authors = ['NoCtrlZ<shinsaku.ashizawa@artree.co.jp>']
+authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
 description = 'zkSNARK plonk pallet'
 name = "zero-crypto"
 version = "0.1.1"

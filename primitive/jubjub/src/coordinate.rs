@@ -1,36 +1,3 @@
-// Copyright (C) 2022-2023 Artree (JP) LLC.
-// SPDX-License-Identifier: Apache-2.0
-
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// 	http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-//! # Elliptic Curve Coordinate System
-//!
-//! - [`JubjubAffine`]
-//! - [`JubjubProjective`]
-//!
-//! ## Overview
-//!
-//! This coordinate provides the functionalities as following.
-//!
-//! - Curve addition
-//! - Curve doubling
-//! - Convert each coordinate system
-//!
-//! ### Reference
-//!
-//! We implement coordinate system to refer the following.
-//! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
-
 use crate::fp::Fp;
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;

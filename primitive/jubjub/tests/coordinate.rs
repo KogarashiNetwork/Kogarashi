@@ -2,7 +2,7 @@ use proptest::prelude::*;
 use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
 use zero_crypto::common::{Group, PrimeField, Projective};
-use zero_jubjub::{coordinate::JubjubProjective, fp::Fp};
+use zero_jubjub::{Fp, JubjubProjective};
 
 prop_compose! {
     fn arb_fp()(bytes in [any::<u8>(); 16]) -> Fp {

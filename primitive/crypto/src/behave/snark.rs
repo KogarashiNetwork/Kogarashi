@@ -15,6 +15,10 @@ use super::{algebra::Field, comp::ParallelCmp};
 /// This is used for pairing
 pub trait PairingField: PrimeField + ParityCmp {}
 
+/// This is extention field
+/// This is extention of pairing field
+pub trait ExtentionField: ParityCmp {}
+
 /// This is fft field
 /// This is used for fft and has roots of unity
 #[cfg(feature = "std")]
