@@ -41,7 +41,7 @@ macro_rules! extention_field_operation {
             fn mul_assign(&mut self, rhs: $extention_field) {
                 let re = (self.0[0] * rhs.0[0]) - (self.0[1] * rhs.0[1]);
                 let im = (self.0[0] * rhs.0[1] + (self.0[1] * rhs.0[0]));
-                self.0 = $extention_field([re, im])
+                self.0 = [re, im]
             }
         }
 
@@ -52,7 +52,7 @@ macro_rules! extention_field_operation {
             #[inline]
             fn div(self, rhs: $extention_field) -> $extention_field {
                 let inv = rhs.invert().unwrap();
-                self * &inv
+                self * inv
             }
         }
 
@@ -76,7 +76,8 @@ macro_rules! extention_field_operation {
         }
 
         impl PrimeField for $extention_field {
-            const MODULUS: $sub_field = $sub_field::MODULUS;
+            // wrong if this is problem
+            const MODULUS: $extention_field = $g;
 
             const INV: u64 = $sub_field::INV;
 
@@ -89,11 +90,11 @@ macro_rules! extention_field_operation {
             }
 
             fn is_zero(self) -> bool {
-                self.0[0].is_zero & self.0[1].is_zero
+                self.0[0].is_zero() & self.0[1].is_zero()
             }
 
-            fn random(rand: impl RngCore) -> Self {
-                [$sub_field::random(rand), $sub_field::random(rand)]
+            fn random(mut rand: impl RngCore) -> Self {
+                $extention_field([$sub_field::random(&mut rand), $sub_field::random(rand)])
             }
 
             // TODO should be optimized
@@ -106,11 +107,66 @@ macro_rules! extention_field_operation {
             }
 
             fn double_assign(&mut self) {
-                self += self
+                *self += self.clone()
             }
 
             fn square_assign(&mut self) {
-                self *= self
+                *self *= self.clone()
+            }
+        }
+
+        impl PartialOrd for $extention_field {
+            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+                Some(self.cmp(other))
+            }
+
+            fn lt(&self, other: &Self) -> bool {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a != b {
+                        return a < b;
+                    }
+                }
+                false
+            }
+
+            fn le(&self, other: &Self) -> bool {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a != b {
+                        return a < b;
+                    }
+                }
+                true
+            }
+
+            fn gt(&self, other: &Self) -> bool {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a != b {
+                        return a > b;
+                    }
+                }
+                false
+            }
+
+            fn ge(&self, other: &Self) -> bool {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a != b {
+                        return a > b;
+                    }
+                }
+                true
+            }
+        }
+
+        impl Ord for $extention_field {
+            fn cmp(&self, other: &Self) -> Ordering {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a < b {
+                        return Ordering::Less;
+                    } else if a > b {
+                        return Ordering::Greater;
+                    }
+                }
+                Ordering::Equal
             }
         }
 
