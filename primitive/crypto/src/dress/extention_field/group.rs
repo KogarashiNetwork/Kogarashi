@@ -7,7 +7,14 @@ macro_rules! extention_field_group_operation {
             const IDENTITY: Self = $extention_field::zero();
 
             fn invert(self) -> Option<Self> {
-                Some(self)
+                match self.is_zero() {
+                    true => None,
+                    _ => {
+                        let t = self.0[0].square() + self.0[1].square();
+                        let t_inv = t.invert().unwrap();
+                        Some($extention_field([t_inv * self.0[0], t_inv * -self.0[1]]))
+                    }
+                }
             }
         }
 

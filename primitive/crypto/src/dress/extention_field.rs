@@ -45,6 +45,36 @@ macro_rules! extention_field_operation {
             }
         }
 
+        #[allow(clippy::suspicious_arithmetic_impl)]
+        impl Div for $extention_field {
+            type Output = $extention_field;
+
+            #[inline]
+            fn div(self, rhs: $extention_field) -> $extention_field {
+                let inv = rhs.invert().unwrap();
+                self * &inv
+            }
+        }
+
+        #[allow(clippy::suspicious_arithmetic_impl)]
+        impl<'a, 'b> Div<&'b $extention_field> for &'a $extention_field {
+            type Output = $extention_field;
+
+            #[inline]
+            fn div(self, rhs: &'b $extention_field) -> $extention_field {
+                let inv = rhs.invert().unwrap();
+                self * &inv
+            }
+        }
+
+        #[allow(clippy::suspicious_op_assign_impl)]
+        impl DivAssign for $extention_field {
+            fn div_assign(&mut self, rhs: $extention_field) {
+                let inv = rhs.invert().unwrap();
+                *self *= inv
+            }
+        }
+
         impl PrimeField for $extention_field {
             const MODULUS: $sub_field = $sub_field::MODULUS;
 
@@ -66,6 +96,7 @@ macro_rules! extention_field_operation {
                 [$sub_field::random(rand), $sub_field::random(rand)]
             }
 
+            // TODO should be optimized
             fn double(self) -> Self {
                 self + self
             }
