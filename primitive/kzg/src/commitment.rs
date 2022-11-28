@@ -1,14 +1,14 @@
-use zero_bls12_381::{Fr, G1Projective, G2Projective};
+use zero_bls12_381::{Fr, G1Affine, G1Projective, G2Affine, G2Projective};
 use zero_crypto::common::Commitment;
 
 pub struct KzgCommitment {}
 
 impl Commitment for KzgCommitment {
-    type G1Affine;
+    type G1Affine = G1Affine;
 
     type G1Projective = G1Projective;
 
-    type G2Affine;
+    type G2Affine = G2Affine;
 
     type G2Projective = G2Projective;
 
@@ -17,11 +17,13 @@ impl Commitment for KzgCommitment {
 
 #[cfg(test)]
 mod tests {
+    use super::KzgCommitment;
     use crate::keypair::KeyPair;
     use crate::poly::Polynomial;
 
     use proptest::prelude::*;
     use rand::SeedableRng;
+    use rand_core::RngCore;
     use rand_xorshift::XorShiftRng;
     use zero_bls12_381::{Fr, G1Projective, G2Projective};
     use zero_crypto::common::*;
@@ -58,7 +60,8 @@ mod tests {
         #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
         fn commit_g1_test(r in arb_fr()) {
-            let keypair = KeyPair::setup(r);
+            let k = 10;
+            let keypair = KeyPair::<KzgCommitment>::setup(10, r);
         }
     }
 }

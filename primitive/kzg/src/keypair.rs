@@ -12,7 +12,7 @@ pub struct KeyPair<C: Commitment> {
 
 impl<C: Commitment> KeyPair<C> {
     // setup polynomial evaluation domain
-    pub fn setup<R: RngCore>(k: u64, r: C::ScalarField) -> Self {
+    pub fn setup(k: u64, r: C::ScalarField) -> Self {
         let n = 1 << k;
         let g1_g = C::G1Projective::GENERATOR;
         let g2_g = C::G2Projective::GENERATOR;
