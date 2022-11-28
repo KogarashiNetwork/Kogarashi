@@ -26,6 +26,7 @@ use frame_support::weights::{DispatchInfo, IdentityFee, Weight};
 use pallet_transaction_payment::CurrencyAdapter;
 use sp_core::H256;
 use sp_runtime::{testing::Header, traits::IdentityLookup};
+use zero_elgamal::EncryptedNumber;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -84,12 +85,16 @@ parameter_types! {
     pub const MaxLocks: u32 = 50;
 }
 impl Config for Test {
-    type Balance = u64;
+    type EncryptedBalance = EncryptedNumber;
     type DustRemoval = ();
     type Event = Event;
     type ExistentialDeposit = ExistentialDeposit;
-    type AccountStore =
-        StorageMapShim<super::Account<Test>, system::Provider<Test>, u64, super::AccountData<u64>>;
+    type AccountStore = StorageMapShim<
+        super::Account<Test>,
+        system::Provider<Test>,
+        u64,
+        super::AccountData<Self::EncryptedBalance>,
+    >;
     type MaxLocks = MaxLocks;
     type WeightInfo = ();
 }

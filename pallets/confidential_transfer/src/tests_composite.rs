@@ -26,6 +26,7 @@ use pallet_transaction_payment::CurrencyAdapter;
 use sp_core::H256;
 use sp_io;
 use sp_runtime::{testing::Header, traits::IdentityLookup};
+use zero_elgamal::EncryptedNumber;
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 
@@ -81,7 +82,7 @@ impl pallet_transaction_payment::Config for Test {
 }
 
 impl Config for Test {
-    type Balance = u64;
+    type EncryptedBalance = EncryptedNumber;
     type DustRemoval = ();
     type Event = Event;
     type ExistentialDeposit = ExistentialDeposit;

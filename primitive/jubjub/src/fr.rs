@@ -1,9 +1,10 @@
 use crate::error::Error;
+use serde::{Deserialize, Serialize};
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
-#[derive(Debug, Clone, Copy, Decode, Encode)]
+#[derive(Debug, Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fr(pub(crate) [u64; 4]);
 
 const MODULUS: [u64; 4] = [
