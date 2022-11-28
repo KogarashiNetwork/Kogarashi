@@ -67,3 +67,79 @@ curve_operation!(
     GENERATOR,
     IDENTITY
 );
+
+#[cfg(test)]
+mod tests {
+    use super::{Fr, G1Projective, PrimeField, Projective, GENERATOR, IDENTITY};
+    use proptest::prelude::*;
+    use rand::SeedableRng;
+    use rand_xorshift::XorShiftRng;
+
+    prop_compose! {
+        fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fr {
+            Fr::random(XorShiftRng::from_seed(bytes))
+        }
+    }
+
+    prop_compose! {
+        fn arb_point()(k in arb_fr()) -> G1Projective {
+            GENERATOR * k
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(1000))]
+        #[test]
+        fn g1_identity_test(a in arb_point()) {
+            // a + (-a) = e
+            let e = a - a;
+
+            // a + e = a
+            let a_prime = a + IDENTITY;
+
+            assert_eq!(e, IDENTITY);
+            assert_eq!(a_prime, a);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(1000))]
+        #[test]
+        fn g1_add_test(a in arb_point(), b in arb_point(), c in arb_point()) {
+            // a + b + c = c + a + b
+            let ab = a +b;
+            let abc = ab +c;
+            let ca = c +a;
+            let cab = ca+b;
+
+            // 2 * (a + b) = 2 * a + 2 * b
+            let double_ab = ab.double();
+            let aa = a.double();
+            let bb = b.double();
+            let aabb = aa + bb;
+
+            assert!(abc.is_on_curve());
+            assert!(cab.is_on_curve());
+            assert!(double_ab.is_on_curve());
+            assert!(aabb.is_on_curve());
+            assert_eq!(abc, cab);
+            assert_eq!(double_ab, aabb);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(1000))]
+        #[test]
+        fn g1_double_test(a in arb_point()) {
+            // a + a = a * 8
+            let scalared_a = a * Fr([8,0,0,0]);
+            let aa = a.double();
+            let aaa = aa.double();
+            let aaaa = aaa.double();
+
+            assert!(scalared_a.is_on_curve());
+            assert!(aaaa.is_on_curve());
+            assert_eq!(scalared_a, aaaa);
+        }
+    }
+}

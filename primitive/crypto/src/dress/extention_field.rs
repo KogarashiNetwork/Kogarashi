@@ -11,6 +11,8 @@ macro_rules! extention_field_operation {
 
         extention_field_built_in!($extention_field);
 
+        const_extention_field_operation!($extention_field, $sub_field);
+
         impl ExtentionField for $extention_field {}
 
         impl Field for $extention_field {}
@@ -169,16 +171,6 @@ macro_rules! extention_field_operation {
                 Ordering::Equal
             }
         }
-
-        impl $extention_field {
-            pub const fn zero() -> $extention_field {
-                $extention_field([$sub_field::zero(), $sub_field::zero()])
-            }
-
-            pub const fn one() -> $extention_field {
-                $extention_field([$sub_field::one(), $sub_field::zero()])
-            }
-        }
     };
 }
 
@@ -215,4 +207,19 @@ macro_rules! extention_field_built_in {
     };
 }
 
-pub use {extention_field_built_in, extention_field_operation};
+#[macro_export]
+macro_rules! const_extention_field_operation {
+    ($extention_field:ident, $sub_field:ident) => {
+        impl $extention_field {
+            pub const fn zero() -> Self {
+                Self([$sub_field::zero(), $sub_field::zero()])
+            }
+
+            pub const fn one() -> Self {
+                Self([$sub_field::one(), $sub_field::zero()])
+            }
+        }
+    };
+}
+
+pub use {const_extention_field_operation, extention_field_built_in, extention_field_operation};

@@ -64,13 +64,13 @@ mod tests {
     use rand_xorshift::XorShiftRng;
 
     prop_compose! {
-        fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fp {
+        fn arb_fp()(bytes in [any::<u8>(); 16]) -> Fp {
             Fp::random(XorShiftRng::from_seed(bytes))
         }
     }
 
     prop_compose! {
-        fn arb_cdn()(k in arb_fr()) -> JubjubProjective {
+        fn arb_cdn()(k in arb_fp()) -> JubjubProjective {
             GENERATOR * k
         }
     }
