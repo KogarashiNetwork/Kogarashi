@@ -1,5 +1,4 @@
 use crate::fq::Fq;
-use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::dress::extention_field::*;
 
 // sextic twist of Fp12
@@ -27,7 +26,7 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(100000))]
         #[test]
-        fn fq_add_test(a in arb_jubjub_fq()) {
+        fn fq2_add_test(a in arb_jubjub_fq()) {
             // a + a = a * 2
             let b = a + a;
             let c = a.double();
@@ -38,7 +37,7 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(100000))]
         #[test]
-        fn fq_sub_test(a in arb_jubjub_fq()) {
+        fn fq2_sub_test(a in arb_jubjub_fq()) {
             // a - a = a * 2 - a * 2
             let b = a - a;
             let c = a.double();
@@ -46,6 +45,41 @@ mod tests {
             let e = c - d;
 
             assert_eq!(b, e);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(10000))]
+        #[test]
+        fn fq2_mul_test(a in arb_jubjub_fq(), b in arb_jubjub_fq(), c in arb_jubjub_fq()) {
+            // a * b + a * c
+            let ab = a * b;
+            let ac = a * c;
+            let d = ab + ac;
+
+            // a * (b + c)
+            let bc = b + c;
+            let e = a * bc;
+
+            assert_eq!(d, e);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(10000))]
+        #[test]
+        fn fq2_square_test(a in arb_jubjub_fq(), b in arb_jubjub_fq()) {
+            // (a * a) * (b * b)
+            let aa = a * a;
+            let bb = b * b;
+            let c = aa * bb;
+
+            // a^2 * b^2
+            let aa = a.square();
+            let bb = b.square();
+            let d = aa * bb;
+
+            assert_eq!(c, d);
         }
     }
 }
