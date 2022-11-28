@@ -15,6 +15,7 @@ mod tests {
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
+    use zero_crypto::behave::Group;
     use zero_crypto::common::PrimeField;
 
     prop_compose! {
@@ -80,6 +81,22 @@ mod tests {
             let d = aa * bb;
 
             assert_eq!(c, d);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(10000))]
+        #[test]
+        fn fq2_invert_test(a in arb_jubjub_fq()) {
+            let inv = a.invert();
+
+            match inv {
+                Some(x) => {
+                    let b = a * x;
+                    assert_eq!(b, Fq2::one())
+                },
+                None => {}
+            }
         }
     }
 }
