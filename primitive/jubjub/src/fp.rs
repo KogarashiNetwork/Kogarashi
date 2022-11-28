@@ -53,14 +53,6 @@ const ROOT_OF_UNITY: Fp = Fp([
 fft_field_operation!(Fp, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 
 impl Fp {
-    pub(crate) const fn zero() -> Self {
-        Self(zero())
-    }
-
-    pub(crate) const fn one() -> Self {
-        Self(one(R2, MODULUS, INV))
-    }
-
     pub(crate) const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
