@@ -74,7 +74,7 @@ macro_rules! prime_field_operation {
 
         field_built_in!($field);
 
-        const_field_operation!($field, $r, $r2, $p, $inv);
+        const_field_operation!($field, $r);
 
         impl PrimeField for $field {
             const MODULUS: Self = $field($p);
@@ -239,7 +239,7 @@ macro_rules! field_built_in {
 
 #[macro_export]
 macro_rules! const_field_operation {
-    ($field:ident, $r:ident, $r2:ident, $p:ident, $inv:ident) => {
+    ($field:ident, $r:ident) => {
         impl $field {
             pub const fn zero() -> Self {
                 Self(zero())
