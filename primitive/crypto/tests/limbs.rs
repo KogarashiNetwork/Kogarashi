@@ -105,7 +105,10 @@ mod jubjub_limbs_tests {
         fn jubjub_field_power_test(a in arb_jubjub_fr()) {
             let one = from_raw([1, 0, 0, 0]);
             let identity = pow(a, sub(zero(), [1, 0, 0, 0], MODULUS), one, MODULUS, INV);
-            assert_eq!(one, identity)
+            let zero_power = pow(a, [0, 0, 0, 0], one, MODULUS, INV);
+
+            assert_eq!(one, identity);
+            assert_eq!(one, zero_power);
         }
     }
 }
@@ -208,10 +211,13 @@ mod bls12_381_limbs_tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(10000))]
         #[test]
-        fn jubjub_field_power_test(a in arb_bls12_381_fp()) {
+        fn bls12_381_field_power_test(a in arb_bls12_381_fp()) {
             let one = from_raw([1, 0, 0, 0, 0, 0]);
             let identity = pow(a, sub(zero(), [1, 0, 0, 0, 0, 0], MODULUS), one, MODULUS, INV);
-            assert_eq!(one, identity)
+            let zero_power = pow(a, [0, 0, 0, 0, 0, 0], one, MODULUS, INV);
+
+            assert_eq!(one, identity);
+            assert_eq!(one, zero_power);
         }
     }
 }

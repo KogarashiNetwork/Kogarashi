@@ -55,11 +55,10 @@ mod tests {
         #[test]
         fn kzg_setup_test(r in arb_fr()) {
             let k = 5;
-            let mut g1 = G1Projective::GENERATOR;
+            let g1 = G1Projective::GENERATOR;
             let keypair = KeyPair::<KzgCommitment>::setup(k, r);
-            keypair.g1.iter().for_each(|param| {
-                assert_eq!(*param, G1Affine::from(g1));
-                g1 *= r;
+            keypair.g1.iter().enumerate().for_each(|(i, param)| {
+                assert_eq!(*param, G1Affine::from(g1 * r.pow(i as u64)));
             });
         }
     }

@@ -32,6 +32,8 @@ pub trait FftField: PrimeField + ParallelCmp + From<u64> {
     fn zero() -> Self;
 
     fn one() -> Self;
+
+    fn pow(self, val: u64) -> Self;
 }
 
 /// This is polynomial

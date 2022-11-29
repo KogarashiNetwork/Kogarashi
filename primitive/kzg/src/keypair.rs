@@ -13,22 +13,17 @@ impl<C: Commitment> KeyPair<C> {
     // setup polynomial evaluation domain
     pub fn setup(k: u64, r: C::ScalarField) -> Self {
         // G1, r * G1, r^2 * G1, ..., r^n-1 * G1
-        let mut acc = C::ScalarField::one();
         let g1 = (0..(1 << k))
-            .map(|_| {
+            .map(|n| {
                 // r^i * G1
-                let tw = C::G1Projective::GENERATOR * acc;
-                // r^i+1
-                acc *= r;
+                let tw = C::G1Projective::GENERATOR * r.pow(n);
                 C::G1Affine::from(tw)
             })
             .collect::<Vec<_>>();
 
-        let mut acc = C::ScalarField::one();
         let g2 = (0..(1 << k))
-            .map(|_| {
-                let tw = C::G2Projective::GENERATOR * acc;
-                acc *= r;
+            .map(|n| {
+                let tw = C::G2Projective::GENERATOR * r.pow(n);
                 C::G2Affine::from(tw)
             })
             .collect::<Vec<_>>();
