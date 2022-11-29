@@ -70,7 +70,7 @@ curve_operation!(
 
 #[cfg(test)]
 mod tests {
-    use super::{Fr, G1Projective, PrimeField, Projective, GENERATOR, IDENTITY};
+    use super::{Fr, G1Affine, G1Projective, PrimeField, Projective, GENERATOR, IDENTITY};
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
@@ -140,6 +140,19 @@ mod tests {
             assert!(scalared_a.is_on_curve());
             assert!(aaaa.is_on_curve());
             assert_eq!(scalared_a, aaaa);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(1000))]
+        #[test]
+        fn g1_conversion_test(a in arb_point(), b in arb_point()) {
+            // projective -> affine -> projective
+            let affine = G1Affine::from(a);
+            let projective = G1Projective::from(affine);
+
+            assert!(projective.is_on_curve());
+            assert_eq!(a, projective);
         }
     }
 }

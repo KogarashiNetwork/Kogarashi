@@ -24,7 +24,7 @@ mod tests {
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
-    use zero_bls12_381::{Fr, G1Projective, G2Projective};
+    use zero_bls12_381::{Fr, G1Affine, G1Projective, G2Projective};
     use zero_crypto::common::*;
 
     prop_compose! {
@@ -39,26 +39,29 @@ mod tests {
         }
     }
 
-    fn evaluate_g1(poly: &Polynomial<Fr>, base: G1Projective) -> G1Projective {
-        let mut acc = G1Projective::IDENTITY;
-        let mut exp = G1Projective::IDENTITY;
+    fn evaluate<P: Projective>(poly: &Polynomial<P::ScalarField>, base: P) -> P {
+        let mut acc = P::IDENTITY;
+        let mut exp = P::IDENTITY;
 
         for coeff in poly.0.iter().rev() {
-            acc += base * *coeff;
-            exp += base
+            acc += exp * *coeff;
+            exp += base;
         }
         acc
     }
 
-    fn evaluate_g2(poly: &Polynomial<Fr>, base: G2Projective) -> G2Projective {
-        let mut acc = G2Projective::IDENTITY;
-        let mut exp = G2Projective::IDENTITY;
-
-        for coeff in poly.0.iter().rev() {
-            acc += base * *coeff;
-            exp += base
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(3))]
+        #[test]
+        fn kzg_setup_test(r in arb_fr()) {
+            let k = 5;
+            let mut g1 = G1Projective::GENERATOR;
+            let keypair = KeyPair::<KzgCommitment>::setup(k, r);
+            keypair.g1.iter().for_each(|param| {
+                assert_eq!(*param, G1Affine::from(g1));
+                g1 *= r;
+            });
         }
-        acc
     }
 
     proptest! {
@@ -70,12 +73,12 @@ mod tests {
             let g2_g = G2Projective::GENERATOR * r;
             let keypair = KeyPair::<KzgCommitment>::setup(k, r);
             let g1_commitment = keypair.commit_to_g1(&poly);
-            let g2_commitment = keypair.commit_to_g2(&poly);
-            let g1_evaluation = evaluate_g1(&poly, g1_g);
-            let g2_evaluation = evaluate_g2(&poly, g2_g);
+            // let g2_commitment = keypair.commit_to_g2(&poly);
+            let g1_evaluation = evaluate(&poly, g1_g);
+            // let g2_evaluation = evaluate(&poly, g2_g);
 
             assert_eq!(g1_commitment, g1_evaluation);
-            assert_eq!(g2_commitment, g2_evaluation);
+            // assert_eq!(g2_commitment, g2_evaluation);
         }
     }
 }

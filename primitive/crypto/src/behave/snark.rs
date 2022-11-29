@@ -63,5 +63,5 @@ pub trait Commitment {
         + Mul<Self::ScalarField, Output = Self::G2Projective>;
 
     // scalar field of point
-    type ScalarField: PrimeField;
+    type ScalarField: FftField;
 }
