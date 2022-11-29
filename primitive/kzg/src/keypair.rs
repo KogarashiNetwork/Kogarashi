@@ -44,14 +44,13 @@ impl<C: Commitment> KeyPair<C> {
 
     // commit polynomial to g2 projective group
     pub fn commit_to_g2(&self, poly: &Polynomial<C::ScalarField>) -> C::G2Projective {
-        let mut acc = C::G2Projective::IDENTITY;
+        assert!(poly.0.len() == self.g2.len());
 
         poly.0
             .iter()
             .zip(self.g2.iter().rev())
-            .for_each(|(scalar, base)| {
-                acc += C::G2Projective::from(*base) * *scalar;
-            });
-        acc
+            .fold(C::G2Projective::IDENTITY, |acc, (coeff, base)| {
+                acc + C::G2Projective::from(*base) * *coeff
+            })
     }
 }

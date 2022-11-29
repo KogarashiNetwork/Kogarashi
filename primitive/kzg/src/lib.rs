@@ -4,3 +4,5 @@ mod commitment;
 mod fft;
 mod keypair;
 mod poly;
+
+pub use commitment::KzgCommitment;

@@ -99,17 +99,8 @@ mod tests {
             // a + e = a
             let a_prime = a + IDENTITY;
 
-            // a^0 * g = g
-            let g_prime = GENERATOR * scalar.pow(0);
-
-            // a^1 * g = a * g
-            let a_power = scalar.pow(1);
-            let ag = GENERATOR * scalar;
-
             assert_eq!(e, IDENTITY);
             assert_eq!(a_prime, a);
-            assert_eq!(g_prime, GENERATOR);
-            assert_eq!(ag, GENERATOR * a_power);
         }
     }
 
