@@ -45,5 +45,5 @@ mod g2;
 
 pub use fq::Fq;
 pub use fr::Fr;
-pub use g1::G1Projective;
-pub use g2::G2Projective;
+pub use g1::{G1Affine, G1Projective};
+pub use g2::{G2Affine, G2Projective};

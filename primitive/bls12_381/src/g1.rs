@@ -70,7 +70,9 @@ curve_operation!(
 
 #[cfg(test)]
 mod tests {
-    use super::{Fr, G1Projective, PrimeField, Projective, GENERATOR, IDENTITY};
+    use super::{
+        FftField, Fr, G1Affine, G1Projective, PrimeField, Projective, GENERATOR, IDENTITY,
+    };
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
@@ -88,9 +90,9 @@ mod tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(1000))]
+        #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
-        fn g1_identity_test(a in arb_point()) {
+        fn g1_identity_and_generator_test(a in arb_point(), scalar in arb_fr()) {
             // a + (-a) = e
             let e = a - a;
 
@@ -140,6 +142,36 @@ mod tests {
             assert!(scalared_a.is_on_curve());
             assert!(aaaa.is_on_curve());
             assert_eq!(scalared_a, aaaa);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(1000))]
+        #[test]
+        fn g1_scalar_test(g in arb_point()) {
+            // 8 * G + 16 * G = 24 * G
+            let ag = g * Fr([8, 0, 0, 0]);
+            let bg = g * Fr([16, 0, 0, 0]);
+            let agbg = ag + bg;
+
+            let abg = g * Fr([24, 0, 0, 0]);
+
+            assert!(agbg.is_on_curve());
+            assert!(abg.is_on_curve());
+            assert_eq!(agbg, abg);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(1000))]
+        #[test]
+        fn g1_conversion_test(a in arb_point()) {
+            // projective -> affine -> projective
+            let affine = G1Affine::from(a);
+            let projective = G1Projective::from(affine);
+
+            assert!(projective.is_on_curve());
+            assert_eq!(a, projective);
         }
     }
 }

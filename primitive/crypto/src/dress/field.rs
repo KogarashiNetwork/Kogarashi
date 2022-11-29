@@ -188,6 +188,10 @@ macro_rules! fft_field_operation {
             fn one() -> Self {
                 $field(one($r2, $p, $i))
             }
+
+            fn pow(self, val: u64) -> Self {
+                Self(pow(self.0, [val, 0, 0, 0], $r, $p, $i))
+            }
         }
 
         impl From<u64> for $field {

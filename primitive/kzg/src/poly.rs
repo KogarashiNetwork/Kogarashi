@@ -71,7 +71,7 @@ impl<F: FftField> Polynomial<F> {
         // p(x) - p(at) / x - at
         let quotient = self.divide(at);
         // p(s)
-        let s_eval = self.evaluate(s);
+        let s_eval = self.commit(&domain);
         // p(at)
         let a_eval = self.evaluate(at);
         // p(s) - p(at) / s - at

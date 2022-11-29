@@ -32,6 +32,8 @@ pub trait FftField: PrimeField + ParallelCmp + From<u64> {
     fn zero() -> Self;
 
     fn one() -> Self;
+
+    fn pow(self, val: u64) -> Self;
 }
 
 /// This is polynomial
@@ -55,11 +57,13 @@ pub trait Commitment {
         + Mul<Self::ScalarField, Output = Self::G1Projective>;
 
     // g2 group affine point
-    type G2Affine: Affine;
+    type G2Affine: Affine + From<Self::G2Projective>;
 
     // g2 group projective point
-    type G2Projective: Projective;
+    type G2Projective: Projective
+        + From<Self::G2Affine>
+        + Mul<Self::ScalarField, Output = Self::G2Projective>;
 
     // scalar field of point
-    type ScalarField: PrimeField;
+    type ScalarField: FftField;
 }

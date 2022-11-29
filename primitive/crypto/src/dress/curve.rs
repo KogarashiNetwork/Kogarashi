@@ -167,6 +167,18 @@ macro_rules! curve_built_in {
             }
         }
 
+        impl From<$affine> for $projective {
+            fn from(a: $affine) -> $projective {
+                a.to_projective()
+            }
+        }
+
+        impl From<$projective> for $affine {
+            fn from(p: $projective) -> $affine {
+                p.to_affine()
+            }
+        }
+
         impl Display for $affine {
             fn fmt(&self, f: &mut Formatter) -> FmtResult {
                 write!(f, "x: 0x")?;
