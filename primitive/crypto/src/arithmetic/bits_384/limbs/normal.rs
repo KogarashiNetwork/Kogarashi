@@ -175,6 +175,35 @@ pub fn invert(
 }
 
 pub fn pow(a: [u64; 6], b: [u64; 6], mut identity: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
+    let zero: [u64; 6] = [0; 6];
+    if b == zero {
+        return identity;
+    } else if a == zero {
+        return zero;
+    }
+    let bits = to_bits(b);
+    for &bit in bits.iter() {
+        identity = square(identity, p, inv);
+        if bit == 1 {
+            identity = mul(identity, a, p, inv);
+        }
+    }
+    identity
+}
+
+pub fn raw_pow(
+    a: [u64; 6],
+    b: [u64; 6],
+    mut identity: [u64; 6],
+    p: [u64; 6],
+    inv: u64,
+) -> [u64; 6] {
+    let zero: [u64; 6] = [0; 6];
+    if b == zero {
+        return [1, 0, 0, 0, 0, 0];
+    } else if a == zero {
+        return zero;
+    }
     let bits = to_bits(b);
     for &bit in bits.iter() {
         identity = square(identity, p, inv);

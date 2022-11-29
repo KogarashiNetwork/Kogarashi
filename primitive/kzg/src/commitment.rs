@@ -39,30 +39,31 @@ mod tests {
         }
     }
 
-    fn evaluate<P: Projective>(poly: &Polynomial<P::ScalarField>, base: P) -> P {
+    fn evaluate<P: Projective>(poly: &Polynomial<P::ScalarField>, at: P::ScalarField) -> P {
         let mut acc = P::IDENTITY;
-        let mut exp = P::IDENTITY;
+        let mut identity = P::ScalarField::IDENTITY;
 
         for coeff in poly.0.iter().rev() {
-            acc += exp * *coeff;
-            exp += base;
+            let product = *coeff * identity;
+            acc += P::GENERATOR * product;
+            identity *= at;
         }
         acc
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(5))]
+        #![proptest_config(ProptestConfig::with_cases(3))]
         #[test]
-        fn kzg_setup_test(r in arb_fr()) {
-            let k = 5;
-            let g1 = G1Projective::GENERATOR;
-            let keypair = KeyPair::<KzgCommitment>::setup(k, r);
-            let mut acc = Fr::one();
+        fn kzg_evaluate_test(at in arb_fr(), poly in arb_poly(8)) {
+            let evaluation: G1Projective = evaluate(&poly, at);
 
-            for param in keypair.g1.iter() {
-                assert_eq!(*param, G1Affine::from(g1 * acc));
-                acc *= r;
+            let mut acc = G1Projective::IDENTITY;
+            for (i, coeff) in poly.0.iter().rev().enumerate() {
+                let product = *coeff * at.pow(i as u64);
+                acc += G1Projective::GENERATOR * product;
             }
+
+            assert_eq!(evaluation, acc);
         }
     }
 
@@ -76,7 +77,7 @@ mod tests {
             let keypair = KeyPair::<KzgCommitment>::setup(k, r);
             let g1_commitment = keypair.commit_to_g1(&poly);
             // let g2_commitment = keypair.commit_to_g2(&poly);
-            let g1_evaluation = evaluate(&poly, g1_g);
+            let g1_evaluation = evaluate(&poly, r);
             // let g2_evaluation = evaluate(&poly, g2_g);
 
             assert_eq!(g1_commitment, g1_evaluation);

@@ -70,7 +70,9 @@ curve_operation!(
 
 #[cfg(test)]
 mod tests {
-    use super::{Fr, G1Affine, G1Projective, PrimeField, Projective, GENERATOR, IDENTITY};
+    use super::{
+        FftField, Fr, G1Affine, G1Projective, PrimeField, Projective, GENERATOR, IDENTITY,
+    };
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
@@ -88,17 +90,26 @@ mod tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(1000))]
+        #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
-        fn g1_identity_test(a in arb_point()) {
+        fn g1_identity_and_generator_test(a in arb_point(), scalar in arb_fr()) {
             // a + (-a) = e
             let e = a - a;
 
             // a + e = a
             let a_prime = a + IDENTITY;
 
+            // a^0 * g = g
+            let g_prime = GENERATOR * scalar.pow(0);
+
+            // a^1 * g = a * g
+            let a_power = scalar.pow(1);
+            let ag = GENERATOR * scalar;
+
             assert_eq!(e, IDENTITY);
             assert_eq!(a_prime, a);
+            assert_eq!(g_prime, GENERATOR);
+            assert_eq!(ag, GENERATOR * a_power);
         }
     }
 
@@ -146,7 +157,24 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(1000))]
         #[test]
-        fn g1_conversion_test(a in arb_point(), b in arb_point()) {
+        fn g1_scalar_test(g in arb_point()) {
+            // 8 * G + 16 * G = 24 * G
+            let ag = g * Fr([8, 0, 0, 0]);
+            let bg = g * Fr([16, 0, 0, 0]);
+            let agbg = ag + bg;
+
+            let abg = g * Fr([24, 0, 0, 0]);
+
+            assert!(agbg.is_on_curve());
+            assert!(abg.is_on_curve());
+            assert_eq!(agbg, abg);
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(1000))]
+        #[test]
+        fn g1_conversion_test(a in arb_point()) {
             // projective -> affine -> projective
             let affine = G1Affine::from(a);
             let projective = G1Projective::from(affine);

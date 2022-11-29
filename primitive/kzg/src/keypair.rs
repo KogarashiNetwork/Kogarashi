@@ -14,16 +14,15 @@ impl<C: Commitment> KeyPair<C> {
     pub fn setup(k: u64, r: C::ScalarField) -> Self {
         // G1, r * G1, r^2 * G1, ..., r^n-1 * G1
         let g1 = (0..(1 << k))
-            .map(|n| {
-                // r^i * G1
-                let tw = C::G1Projective::GENERATOR * r.pow(n);
+            .map(|i| {
+                let tw = C::G1Projective::GENERATOR * r.pow(i);
                 C::G1Affine::from(tw)
             })
             .collect::<Vec<_>>();
 
         let g2 = (0..(1 << k))
-            .map(|n| {
-                let tw = C::G2Projective::GENERATOR * r.pow(n);
+            .map(|i| {
+                let tw = C::G2Projective::GENERATOR * r.pow(i);
                 C::G2Affine::from(tw)
             })
             .collect::<Vec<_>>();
