@@ -51,15 +51,18 @@ mod tests {
     }
 
     proptest! {
-        #![proptest_config(ProptestConfig::with_cases(3))]
+        #![proptest_config(ProptestConfig::with_cases(5))]
         #[test]
         fn kzg_setup_test(r in arb_fr()) {
             let k = 5;
             let g1 = G1Projective::GENERATOR;
             let keypair = KeyPair::<KzgCommitment>::setup(k, r);
-            keypair.g1.iter().enumerate().for_each(|(i, param)| {
-                assert_eq!(*param, G1Affine::from(g1 * r.pow(i as u64)));
-            });
+            let mut acc = Fr::one();
+
+            for param in keypair.g1.iter() {
+                assert_eq!(*param, G1Affine::from(g1 * acc));
+                acc *= r;
+            }
         }
     }
 
