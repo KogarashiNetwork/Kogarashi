@@ -1,17 +1,23 @@
 use zero_bls12_381::{Fr, G1Affine, G1Projective, G2Affine, G2Projective};
 use zero_crypto::common::Commitment;
 
+// kate polynomial commiment
 pub struct KzgCommitment {}
 
 impl Commitment for KzgCommitment {
+    // affine point group
     type G1Affine = G1Affine;
 
+    // projective point group
     type G1Projective = G1Projective;
 
+    // the other affine point group
     type G2Affine = G2Affine;
 
+    // the other affine point group
     type G2Projective = G2Projective;
 
+    // scalar point of point group
     type ScalarField = Fr;
 }
 
@@ -58,13 +64,10 @@ mod tests {
         fn kzg_commit_test(r in arb_fr(), poly in arb_poly(5)) {
             let k = 5;
             let keypair = KeyPair::<KzgCommitment>::setup(k, r);
-            let g1_commitment = keypair.commit_to_g1(&poly);
-            let g2_commitment = keypair.commit_to_g2(&poly);
+            let g1_commitment = keypair.commit(&poly);
             let g1_evaluation = evaluate(&poly, r);
-            let g2_evaluation = evaluate(&poly, r);
 
             assert_eq!(g1_commitment, g1_evaluation);
-            assert_eq!(g2_commitment, g2_evaluation);
         }
     }
 }
