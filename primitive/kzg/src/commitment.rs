@@ -17,7 +17,7 @@ impl Commitment for KzgCommitment {
 
 #[cfg(test)]
 mod tests {
-    use super::KzgCommitment;
+    use super::{G1Projective, KzgCommitment};
     use crate::keypair::KeyPair;
     use crate::poly::Polynomial;
 

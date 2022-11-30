@@ -48,7 +48,7 @@ impl<C: Commitment> KeyPair<C> {
         // p(s)
         let s_eval = self.commit(poly);
         // p(at)
-        let a_eval = evaluate::<C>(poly, C::G1Projective::GENERATOR * at);
+        let a_eval = C::G1Projective::GENERATOR * poly.evaluate(at);
         // p(s) - p(at) / s - at
         let q_eval = self.commit(&quotient);
         // s - at
@@ -61,19 +61,4 @@ impl<C: Commitment> KeyPair<C> {
             denominator: C::G2Affine::from(denominator),
         }
     }
-}
-
-fn evaluate<C: Commitment>(
-    poly: &Polynomial<C::ScalarField>,
-    base: C::G1Projective,
-) -> C::G1Projective {
-    let mut acc = C::G1Projective::IDENTITY;
-    let mut identity = C::G1Projective::IDENTITY;
-
-    for coeff in poly.0.iter().rev() {
-        let product = identity * *coeff;
-        acc += product;
-        identity += base;
-    }
-    acc
 }
