@@ -27,11 +27,12 @@ impl<C: Commitment> KeyPair<C> {
 
     // commit polynomial to g1 projective group
     pub fn commit(&self, poly: &Polynomial<C::ScalarField>) -> C::G1Projective {
-        assert!(poly.0.len() == self.g1.len());
+        assert!(poly.0.len() <= self.g1.len());
+        let diff = self.g1.len() - poly.0.len();
 
         poly.0
             .iter()
-            .zip(self.g1.iter().rev())
+            .zip(self.g1.iter().rev().skip(diff))
             .fold(C::G1Projective::IDENTITY, |acc, (coeff, base)| {
                 acc + C::G1Projective::from(*base) * *coeff
             })
