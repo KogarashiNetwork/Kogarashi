@@ -58,13 +58,10 @@ mod tests {
         fn kzg_commit_test(r in arb_fr(), poly in arb_poly(5)) {
             let k = 5;
             let keypair = KeyPair::<KzgCommitment>::setup(k, r);
-            let g1_commitment = keypair.commit_to_g1(&poly);
-            let g2_commitment = keypair.commit_to_g2(&poly);
+            let g1_commitment = keypair.commit(&poly);
             let g1_evaluation = evaluate(&poly, r);
-            let g2_evaluation = evaluate(&poly, r);
 
             assert_eq!(g1_commitment, g1_evaluation);
-            assert_eq!(g2_commitment, g2_evaluation);
         }
     }
 }

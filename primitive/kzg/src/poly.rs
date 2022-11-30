@@ -1,7 +1,7 @@
 /// the terminology bellow is aligned with the following paper
 /// https://www.iacr.org/archive/asiacrypt2010/6477178/6477178.pdf
 use rand_core::RngCore;
-use zero_crypto::behave::FftField;
+use zero_crypto::behave::{FftField, Group, PrimeField, Projective};
 
 // a_n-1 , a_n-2, ... , a_0
 #[derive(Debug, Clone, PartialEq)]

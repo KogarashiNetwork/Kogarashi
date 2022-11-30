@@ -4,5 +4,6 @@ mod commitment;
 mod fft;
 mod keypair;
 mod poly;
+mod witness;
 
 pub use commitment::KzgCommitment;

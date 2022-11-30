@@ -1,4 +1,5 @@
 use crate::poly::Polynomial;
+use crate::witness::Witness;
 use zero_crypto::behave::*;
 
 // key pair structure
@@ -6,7 +7,7 @@ use zero_crypto::behave::*;
 pub struct KeyPair<C: Commitment> {
     k: u64,
     pub(crate) g1: Vec<C::G1Affine>,
-    pub(crate) g2: Vec<C::G2Affine>,
+    pub(crate) g2: C::G2Affine,
 }
 
 impl<C: Commitment> KeyPair<C> {
@@ -19,19 +20,13 @@ impl<C: Commitment> KeyPair<C> {
                 C::G1Affine::from(tw)
             })
             .collect::<Vec<_>>();
-
-        let g2 = (0..(1 << k))
-            .map(|i| {
-                let tw = C::G2Projective::GENERATOR * r.pow(i);
-                C::G2Affine::from(tw)
-            })
-            .collect::<Vec<_>>();
+        let g2 = C::G2Affine::from(C::G2Projective::GENERATOR * r);
 
         Self { k, g1, g2 }
     }
 
     // commit polynomial to g1 projective group
-    pub fn commit_to_g1(&self, poly: &Polynomial<C::ScalarField>) -> C::G1Projective {
+    pub fn commit(&self, poly: &Polynomial<C::ScalarField>) -> C::G1Projective {
         assert!(poly.0.len() == self.g1.len());
 
         poly.0
@@ -42,15 +37,43 @@ impl<C: Commitment> KeyPair<C> {
             })
     }
 
-    // commit polynomial to g2 projective group
-    pub fn commit_to_g2(&self, poly: &Polynomial<C::ScalarField>) -> C::G2Projective {
-        assert!(poly.0.len() == self.g2.len());
+    // create witness for f(a)
+    pub fn create_witness(
+        self,
+        poly: &Polynomial<C::ScalarField>,
+        at: C::ScalarField,
+    ) -> Witness<C> {
+        // p(x) - p(at) / x - at
+        let quotient = poly.divide(at);
+        // p(s)
+        let s_eval = self.commit(poly);
+        // p(at)
+        let a_eval = evaluate::<C>(poly, C::G1Projective::GENERATOR * at);
+        // p(s) - p(at) / s - at
+        let q_eval = self.commit(&quotient);
+        // s - at
+        let denominator = C::G2Projective::from(self.g2) - C::G2Projective::GENERATOR * at;
 
-        poly.0
-            .iter()
-            .zip(self.g2.iter().rev())
-            .fold(C::G2Projective::IDENTITY, |acc, (coeff, base)| {
-                acc + C::G2Projective::from(*base) * *coeff
-            })
+        Witness {
+            s_eval: C::G1Affine::from(s_eval),
+            a_eval: C::G1Affine::from(a_eval),
+            q_eval: C::G1Affine::from(q_eval),
+            denominator: C::G2Affine::from(denominator),
+        }
     }
+}
+
+fn evaluate<C: Commitment>(
+    poly: &Polynomial<C::ScalarField>,
+    base: C::G1Projective,
+) -> C::G1Projective {
+    let mut acc = C::G1Projective::IDENTITY;
+    let mut identity = C::G1Projective::IDENTITY;
+
+    for coeff in poly.0.iter().rev() {
+        let product = identity * *coeff;
+        acc += product;
+        identity += base;
+    }
+    acc
 }
