@@ -57,8 +57,6 @@ macro_rules! construct_extention_field {
     ($extention_field:ident, $sub_field:ident, $limbs_length:ident) => {
         #[derive(Debug, Clone, Copy, Decode, Encode)]
         pub struct $extention_field(pub(crate) [$sub_field; $limbs_length]);
-
-        const ZERO: $extention_field = $extention_field([$sub_field::zero(); $limbs_length]);
     };
 }
 

@@ -1,5 +1,5 @@
 use crate::fq::Fq;
-use crate::fq2::Fq2;
+use crate::fqn::Fq2;
 use crate::fr::Fr;
 use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::common::*;

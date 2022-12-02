@@ -2,9 +2,19 @@ use crate::fq::Fq;
 use zero_crypto::dress::extention_field::*;
 
 // sextic twist of Fp12
-const LIMBS_LENGTH: usize = 2;
+// degree 2 extension field
+const TWO_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 2;
 
-extention_field_operation!(Fq2, Fq, LIMBS_LENGTH);
+extention_field_operation!(Fq2, Fq, TWO_DEGREE_EXTENTION_LIMBS_LENGTH);
+
+// degree 6 extension field
+const SIX_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 3;
+
+construct_extention_field!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
+
+extention_field_built_in!(Fq6);
+
+const_extention_field_operation!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
 
 #[cfg(test)]
 mod tests {
@@ -16,7 +26,7 @@ mod tests {
     use zero_crypto::common::PrimeField;
 
     prop_compose! {
-        fn arb_jubjub_fq()(bytes in [any::<u8>(); 16]) -> Fq2 {
+        fn arb_jubjub_fq2()(bytes in [any::<u8>(); 16]) -> Fq2 {
             Fq2::random(XorShiftRng::from_seed(bytes))
         }
     }
@@ -24,7 +34,7 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(100000))]
         #[test]
-        fn fq2_add_test(a in arb_jubjub_fq()) {
+        fn fq2_add_test(a in arb_jubjub_fq2()) {
             // a + a = a * 2
             let b = a + a;
             let c = a.double();
@@ -35,7 +45,7 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(100000))]
         #[test]
-        fn fq2_sub_test(a in arb_jubjub_fq()) {
+        fn fq2_sub_test(a in arb_jubjub_fq2()) {
             // a - a = a * 2 - a * 2
             let b = a - a;
             let c = a.double();
@@ -49,7 +59,7 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(10000))]
         #[test]
-        fn fq2_mul_test(a in arb_jubjub_fq(), b in arb_jubjub_fq(), c in arb_jubjub_fq()) {
+        fn fq2_mul_test(a in arb_jubjub_fq2(), b in arb_jubjub_fq2(), c in arb_jubjub_fq2()) {
             // a * b + a * c
             let ab = a * b;
             let ac = a * c;
@@ -66,7 +76,7 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(10000))]
         #[test]
-        fn fq2_square_test(a in arb_jubjub_fq(), b in arb_jubjub_fq()) {
+        fn fq2_square_test(a in arb_jubjub_fq2(), b in arb_jubjub_fq2()) {
             // (a * a) * (b * b)
             let aa = a * a;
             let bb = b * b;
@@ -84,7 +94,7 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(10000))]
         #[test]
-        fn fq2_invert_test(a in arb_jubjub_fq()) {
+        fn fq2_invert_test(a in arb_jubjub_fq2()) {
             let inv = a.invert();
 
             match inv {

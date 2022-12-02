@@ -38,8 +38,7 @@
 #![allow(dead_code)]
 
 mod fq;
-mod fq2;
-mod fq6;
+mod fqn;
 mod fr;
 mod g1;
 mod g2;
