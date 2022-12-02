@@ -2,16 +2,9 @@ use crate::fq::Fq;
 use zero_crypto::dress::extention_field::*;
 
 // sextic twist of Fp12
-#[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct Fq2(pub(crate) [Fq; 2]);
-
-const ZERO: Fq2 = Fq2([Fq::zero(); 2]);
-
-const ONE: [Fq; 2] = [Fq::one(), Fq::zero()];
-
 const LIMBS_LENGTH: usize = 2;
 
-extention_field_operation!(Fq2, Fq, ZERO, ONE, LIMBS_LENGTH);
+extention_field_operation!(Fq2, Fq, LIMBS_LENGTH);
 
 #[cfg(test)]
 mod tests {

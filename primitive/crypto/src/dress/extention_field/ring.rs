@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! extention_field_ring_operation {
-    ($extention_field:ident, $g:ident) => {
-        extention_field_group_operation!($extention_field, $g);
+    ($extention_field:ident) => {
+        extention_field_group_operation!($extention_field);
 
         impl Ring for $extention_field {}
 

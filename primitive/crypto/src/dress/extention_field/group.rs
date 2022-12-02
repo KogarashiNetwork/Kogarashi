@@ -1,10 +1,10 @@
 #[macro_export]
 macro_rules! extention_field_group_operation {
-    ($extention_field:ident, $g:ident) => {
+    ($extention_field:ident) => {
         impl Group for $extention_field {
-            const GENERATOR: Self = $extention_field::zero();
+            const GENERATOR: Self = $extention_field::dummy();
 
-            const IDENTITY: Self = $extention_field::zero();
+            const IDENTITY: Self = $extention_field::dummy();
 
             fn invert(self) -> Option<Self> {
                 match self.is_zero() {

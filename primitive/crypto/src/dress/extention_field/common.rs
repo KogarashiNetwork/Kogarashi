@@ -33,17 +33,33 @@ macro_rules! extention_field_built_in {
 
 #[macro_export]
 macro_rules! const_extention_field_operation {
-    ($extention_field:ident, $sub_field:ident, $limbs_length:ident, $one:ident) => {
+    ($extention_field:ident, $sub_field:ident, $limbs_length:ident) => {
         impl $extention_field {
             pub const fn zero() -> Self {
                 Self([$sub_field::zero(); $limbs_length])
             }
 
             pub const fn one() -> Self {
-                Self($one)
+                let mut limbs = [$sub_field::zero(); $limbs_length];
+                limbs[0] = $sub_field::one();
+                Self(limbs)
+            }
+
+            pub const fn dummy() -> Self {
+                unimplemented!()
             }
         }
     };
 }
 
-pub use {const_extention_field_operation, extention_field_built_in};
+#[macro_export]
+macro_rules! construct_extention_field {
+    ($extention_field:ident, $sub_field:ident, $limbs_length:ident) => {
+        #[derive(Debug, Clone, Copy, Decode, Encode)]
+        pub struct $extention_field(pub(crate) [$sub_field; $limbs_length]);
+
+        const ZERO: $extention_field = $extention_field([$sub_field::zero(); $limbs_length]);
+    };
+}
+
+pub use {const_extention_field_operation, construct_extention_field, extention_field_built_in};

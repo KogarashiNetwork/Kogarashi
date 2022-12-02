@@ -8,12 +8,14 @@ pub use ring::*;
 
 #[macro_export]
 macro_rules! extention_field_operation {
-    ($extention_field:ident, $sub_field:ident, $g:ident, $one:ident, $limbs_length:ident) => {
-        extention_field_ring_operation!($extention_field, $g);
+    ($extention_field:ident, $sub_field:ident, $limbs_length:ident) => {
+        extention_field_ring_operation!($extention_field);
 
         extention_field_built_in!($extention_field);
 
-        const_extention_field_operation!($extention_field, $sub_field, $limbs_length, $one);
+        const_extention_field_operation!($extention_field, $sub_field, $limbs_length);
+
+        construct_extention_field!($extention_field, $sub_field, $limbs_length);
 
         impl ExtentionField for $extention_field {}
 
@@ -81,7 +83,7 @@ macro_rules! extention_field_operation {
 
         impl PrimeField for $extention_field {
             // wrong if this is problem
-            const MODULUS: $extention_field = $g;
+            const MODULUS: $extention_field = $extention_field::dummy();
 
             const INV: u64 = $sub_field::INV;
 
