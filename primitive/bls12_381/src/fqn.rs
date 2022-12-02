@@ -16,6 +16,15 @@ extention_field_built_in!(Fq6);
 
 const_extention_field_operation!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
 
+// degree 12 extension field
+const TWELV_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 2;
+
+construct_extention_field!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
+
+extention_field_built_in!(Fq12);
+
+const_extention_field_operation!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
+
 #[cfg(test)]
 mod tests {
     use super::Fq2;

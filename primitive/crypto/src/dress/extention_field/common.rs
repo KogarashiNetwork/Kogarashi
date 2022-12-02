@@ -16,15 +16,20 @@ macro_rules! extention_field_built_in {
 
         impl Display for $extention_field {
             fn fmt(&self, f: &mut Formatter) -> FmtResult {
-                write!(f, "0x")?;
-                for i in self.0[0].0.iter().rev() {
+                for i in self.0.iter().rev() {
+                    write!(f, "0x")?;
                     write!(f, "{:016x}", *i)?;
                 }
-                write!(f, " + 0x")?;
-                for i in self.0[1].0.iter().rev() {
+                Ok(())
+            }
+        }
+
+        impl LowerHex for $extention_field {
+            fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                for i in self.0.iter().rev() {
+                    write!(f, "0x")?;
                     write!(f, "{:016x}", *i)?;
                 }
-                write!(f, "*u")?;
                 Ok(())
             }
         }
