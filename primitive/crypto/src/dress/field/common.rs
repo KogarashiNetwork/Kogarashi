@@ -23,6 +23,16 @@ macro_rules! field_built_in {
                 Ok(())
             }
         }
+
+        impl LowerHex for $element {
+            fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                write!(f, "0x")?;
+                for i in self.0.iter().rev() {
+                    write!(f, "{:016x}", *i)?;
+                }
+                Ok(())
+            }
+        }
     };
 }
 

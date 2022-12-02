@@ -5,9 +5,13 @@ use zero_crypto::dress::extention_field::*;
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct Fq2(pub(crate) [Fq; 2]);
 
-const ZERO: Fq2 = Fq2([Fq([0, 0, 0, 0, 0, 0]), Fq([0, 0, 0, 0, 0, 0])]);
+const ZERO: Fq2 = Fq2([Fq::zero(); 2]);
 
-extention_field_operation!(Fq2, Fq, ZERO);
+const ONE: [Fq; 2] = [Fq::one(), Fq::zero()];
+
+const LIMBS_LENGTH: usize = 2;
+
+extention_field_operation!(Fq2, Fq, ZERO, ONE, LIMBS_LENGTH);
 
 #[cfg(test)]
 mod tests {

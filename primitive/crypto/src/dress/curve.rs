@@ -183,11 +183,11 @@ macro_rules! curve_built_in {
             fn fmt(&self, f: &mut Formatter) -> FmtResult {
                 write!(f, "x: 0x")?;
                 for i in self.x.0.iter().rev() {
-                    write!(f, "{:?}", *i)?;
+                    write!(f, "{:016x}", *i)?;
                 }
                 write!(f, " y: 0x")?;
                 for i in self.y.0.iter().rev() {
-                    write!(f, "{:?}", *i)?;
+                    write!(f, "{:016x}", *i)?;
                 }
                 Ok(())
             }

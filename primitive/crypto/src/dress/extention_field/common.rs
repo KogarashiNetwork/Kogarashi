@@ -33,14 +33,14 @@ macro_rules! extention_field_built_in {
 
 #[macro_export]
 macro_rules! const_extention_field_operation {
-    ($extention_field:ident, $sub_field:ident) => {
+    ($extention_field:ident, $sub_field:ident, $limbs_length:ident, $one:ident) => {
         impl $extention_field {
             pub const fn zero() -> Self {
-                Self([$sub_field::zero(), $sub_field::zero()])
+                Self([$sub_field::zero(); $limbs_length])
             }
 
             pub const fn one() -> Self {
-                Self([$sub_field::one(), $sub_field::zero()])
+                Self($one)
             }
         }
     };
