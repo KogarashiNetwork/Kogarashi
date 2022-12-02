@@ -9,7 +9,7 @@ pub use ring::*;
 #[macro_export]
 macro_rules! extention_field_operation {
     ($extention_field:ident, $sub_field:ident, $limbs_length:ident) => {
-        extention_field_ring_operation!($extention_field);
+        extention_field_ring_operation!($extention_field, $sub_field, $limbs_length);
 
         extention_field_built_in!($extention_field);
 
@@ -96,11 +96,17 @@ macro_rules! extention_field_operation {
             }
 
             fn is_zero(self) -> bool {
-                self.0[0].is_zero() & self.0[1].is_zero()
+                let mut acc = true;
+                self.0.iter().for_each(|a| acc = acc && a.is_zero());
+                acc
             }
 
             fn random(mut rand: impl RngCore) -> Self {
-                $extention_field([$sub_field::random(&mut rand), $sub_field::random(rand)])
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = $sub_field::random(&mut rand);
+                }
+                $extention_field(limbs)
             }
 
             // TODO should be optimized
