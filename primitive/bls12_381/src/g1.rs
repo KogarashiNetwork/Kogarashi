@@ -70,9 +70,7 @@ curve_operation!(
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        FftField, Fr, G1Affine, G1Projective, PrimeField, Projective, GENERATOR, IDENTITY,
-    };
+    use super::{Fr, G1Affine, G1Projective, PrimeField, Projective, GENERATOR, IDENTITY};
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
@@ -92,7 +90,7 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
-        fn g1_identity_and_generator_test(a in arb_point(), scalar in arb_fr()) {
+        fn g1_identity_and_generator_test(a in arb_point()) {
             // a + (-a) = e
             let e = a - a;
 

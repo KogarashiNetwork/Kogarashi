@@ -39,6 +39,7 @@
 
 mod fq;
 mod fq2;
+mod fq6;
 mod fr;
 mod g1;
 mod g2;
