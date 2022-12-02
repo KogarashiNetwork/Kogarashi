@@ -1,10 +1,10 @@
 #[macro_export]
 macro_rules! extention_field_group_operation {
-    ($extention_field:ident, $g:ident) => {
+    ($extention_field:ident) => {
         impl Group for $extention_field {
-            const GENERATOR: Self = $extention_field::zero();
+            const GENERATOR: Self = $extention_field::dummy();
 
-            const IDENTITY: Self = $extention_field::zero();
+            const IDENTITY: Self = $extention_field::dummy();
 
             fn invert(self) -> Option<Self> {
                 match self.is_zero() {
@@ -20,14 +20,11 @@ macro_rules! extention_field_group_operation {
 
         impl PartialEq for $extention_field {
             fn eq(&self, other: &Self) -> bool {
-                self.0[0].0[0] == other.0[0].0[0]
-                    && self.0[0].0[1] == other.0[0].0[1]
-                    && self.0[0].0[2] == other.0[0].0[2]
-                    && self.0[0].0[3] == other.0[0].0[3]
-                    && self.0[1].0[0] == other.0[1].0[0]
-                    && self.0[1].0[1] == other.0[1].0[1]
-                    && self.0[1].0[2] == other.0[1].0[2]
-                    && self.0[1].0[3] == other.0[1].0[3]
+                let mut acc = true;
+                self.0.iter().zip(other.0.iter()).for_each(|(a, b)| {
+                    acc = acc && a == b;
+                });
+                acc
             }
         }
 

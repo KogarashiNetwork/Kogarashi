@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! extention_field_ring_operation {
-    ($extention_field:ident, $g:ident) => {
-        extention_field_group_operation!($extention_field, $g);
+    ($extention_field:ident, $sub_field:ident, $limbs_length:ident) => {
+        extention_field_group_operation!($extention_field);
 
         impl Ring for $extention_field {}
 
@@ -10,7 +10,11 @@ macro_rules! extention_field_ring_operation {
 
             #[inline]
             fn add(self, rhs: $extention_field) -> Self {
-                $extention_field([self.0[0] + rhs.0[0], self.0[1] + rhs.0[1]])
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = self.0[i] + rhs.0[i];
+                }
+                $extention_field(limbs)
             }
         }
 
@@ -19,13 +23,21 @@ macro_rules! extention_field_ring_operation {
 
             #[inline]
             fn add(self, rhs: &'b $extention_field) -> $extention_field {
-                $extention_field([self.0[0] + rhs.0[0], self.0[1] + rhs.0[1]])
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = self.0[i] + rhs.0[i];
+                }
+                $extention_field(limbs)
             }
         }
 
         impl AddAssign for $extention_field {
             fn add_assign(&mut self, rhs: $extention_field) {
-                self.0 = [self.0[0] + rhs.0[0], self.0[1] + rhs.0[1]]
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = self.0[i] + rhs.0[i];
+                }
+                self.0 = limbs
             }
         }
 
@@ -34,7 +46,11 @@ macro_rules! extention_field_ring_operation {
 
             #[inline]
             fn neg(self) -> Self {
-                $extention_field([-self.0[0], -self.0[1]])
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = -self.0[i];
+                }
+                $extention_field(limbs)
             }
         }
 
@@ -43,7 +59,11 @@ macro_rules! extention_field_ring_operation {
 
             #[inline]
             fn neg(self) -> $extention_field {
-                $extention_field([-self.0[0], -self.0[1]])
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = -self.0[i];
+                }
+                $extention_field(limbs)
             }
         }
 
@@ -52,7 +72,11 @@ macro_rules! extention_field_ring_operation {
 
             #[inline]
             fn sub(self, rhs: $extention_field) -> Self {
-                $extention_field([self.0[0] - rhs.0[0], self.0[1] - rhs.0[1]])
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = self.0[i] - rhs.0[i];
+                }
+                $extention_field(limbs)
             }
         }
 
@@ -61,13 +85,21 @@ macro_rules! extention_field_ring_operation {
 
             #[inline]
             fn sub(self, rhs: &'b $extention_field) -> $extention_field {
-                $extention_field([self.0[0] - rhs.0[0], self.0[1] - rhs.0[1]])
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = self.0[i] - rhs.0[i];
+                }
+                $extention_field(limbs)
             }
         }
 
         impl SubAssign for $extention_field {
             fn sub_assign(&mut self, rhs: $extention_field) {
-                self.0 = [self.0[0] - rhs.0[0], self.0[1] - rhs.0[1]]
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = self.0[i] - rhs.0[i];
+                }
+                self.0 = limbs
             }
         }
     };

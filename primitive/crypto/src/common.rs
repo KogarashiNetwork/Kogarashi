@@ -2,7 +2,7 @@ pub use super::behave::*;
 pub use crate::arithmetic::utils::*;
 pub use core::{
     cmp::Ordering,
-    fmt::{Display, Formatter, Result as FmtResult},
+    fmt::{Display, Formatter, LowerHex, Result as FmtResult},
     ops::{Add, Div, Mul, Neg, Sub},
     ops::{AddAssign, DivAssign, MulAssign, SubAssign},
 };
