@@ -26,7 +26,8 @@ members = [
     "primitive/jubjub",
     "primitive/kzg",
     "pallets/confidential_transfer",
-    "pallets/plonk"
+    "pallets/plonk",
+    "example/plonk-circuits"
 ]
 
 [features]
