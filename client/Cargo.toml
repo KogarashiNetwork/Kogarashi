@@ -5,6 +5,15 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[[bin]]
+name = "balance"
+path = "src/balance.rs"
+
+[[bin]]
+name = "transfer"
+path = "src/transfer.rs"
+
+
 [dependencies]
 anyhow = "1.0"
 tokio = { version = "1.10.0", features = ["full"] }
@@ -16,6 +25,8 @@ sp-runtime = "3.0.0"
 sp-version = "3.0.0"
 sp-core = "3.0.0"
 reqwest = { version = "0.11.12", features = ["json"] }
+pallet-balances = "3.0.0"
+frame-system = "3.0.0"
 
 [workspace]
 members = []

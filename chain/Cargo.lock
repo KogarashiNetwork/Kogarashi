@@ -4541,7 +4541,7 @@ checksum = "989d43012e2ca1c4a02507c67282691a0a3207f9dc67cec596b43fe925b3d325"
 [[package]]
 name = "plonk"
 version = "0.8.2"
-source = "git+https://github.com/zero-network/plonk?branch=no_std_support#363a0c3d2a2443726b17df7b695cb2a7664c8ee5"
+source = "git+https://github.com/zero-network/plonk?rev=4f7ae664709a7814ae166acfc9e2ce17c6ef45be#4f7ae664709a7814ae166acfc9e2ce17c6ef45be"
 dependencies = [
  "plonk-core",
  "plonk-hashing",
@@ -4550,7 +4550,7 @@ dependencies = [
 [[package]]
 name = "plonk-core"
 version = "0.1.0"
-source = "git+https://github.com/zero-network/plonk?branch=no_std_support#363a0c3d2a2443726b17df7b695cb2a7664c8ee5"
+source = "git+https://github.com/zero-network/plonk?rev=4f7ae664709a7814ae166acfc9e2ce17c6ef45be#4f7ae664709a7814ae166acfc9e2ce17c6ef45be"
 dependencies = [
  "ark-bls12-381",
  "ark-ec",
@@ -4572,7 +4572,7 @@ dependencies = [
 [[package]]
 name = "plonk-hashing"
 version = "0.8.2"
-source = "git+https://github.com/zero-network/plonk?branch=no_std_support#363a0c3d2a2443726b17df7b695cb2a7664c8ee5"
+source = "git+https://github.com/zero-network/plonk?rev=4f7ae664709a7814ae166acfc9e2ce17c6ef45be#4f7ae664709a7814ae166acfc9e2ce17c6ef45be"
 dependencies = [
  "plonk-core",
 ]

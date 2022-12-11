@@ -1,4 +1,5 @@
-use rpc::rpc_to_localhost;
+// use rpc::rpc_to_localhost;
+// use rpc::get_runtime_version;
 use sp_keyring::AccountKeyring;
 
 mod extrinsic;
@@ -14,9 +15,10 @@ async fn main() {
     )
     .await;
     println!("Extrinsic: {xt}");
-    let res = rpc_to_localhost("author_submitExtrinsic", [xt])
-        .await
-        .unwrap();
+    // let res = rpc_to_localhost("author_submitExtrinsic", [xt])
+    //     .await
+    //     .unwrap();
+    rpc::get_storage().await;
 
-    println!("Result: {res}");
+    // println!("Result: {res}");
 }

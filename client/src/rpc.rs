@@ -1,8 +1,10 @@
 use std::str::FromStr;
 
 use serde_json::{json, Value};
-use sp_core::H256;
+use sp_core::{H256, Decode};
 use sp_version::RuntimeVersion;
+use sp_core::{hashing};
+use sp_keyring::AccountKeyring;
 
 const LOCALHOST_RPC_URL: &str = "http://localhost:9933";
 
@@ -45,4 +47,31 @@ pub async fn get_runtime_version() -> RuntimeVersion {
         .await
         .unwrap();
     serde_json::from_value(runtime_version_json).unwrap()
+}
+
+pub async fn get_storage(account: &sp_runtime::AccountId32) {
+    let storage_prefix = "System";
+    let storage_name = "Account";
+
+    let storage_prefix_hashed = hashing::twox_128(storage_prefix.as_bytes());
+    let storage_name_hashed = hashing::twox_128(storage_name.as_bytes());
+    let account_id_hashed = hashing::blake2_128(account.as_ref());
+
+    let mut storage_key = Vec::new();
+    storage_key.extend_from_slice(&storage_prefix_hashed);
+    storage_key.extend_from_slice(&storage_name_hashed);
+    storage_key.extend_from_slice(&account_id_hashed);
+    storage_key.extend_from_slice(account.as_ref());
+
+    let storage_key_hex = format!("0x{}", hex::encode(&storage_key));
+
+    let result_hex = rpc_to_localhost("state_getStorage", (storage_key_hex,))
+        .await
+        .unwrap();
+
+    let result_scaled = hex::decode(result_hex.as_str().unwrap().trim_start_matches("0x")).unwrap();
+
+    type PolkadotAccountInfo = frame_system::AccountInfo<u32, pallet_balances::AccountData<u128>>;
+    let account_info = PolkadotAccountInfo::decode(&mut result_scaled.as_ref()).expect("Failed to decode account info");
+    println!("{:?}", account_info.data.free);
 }
