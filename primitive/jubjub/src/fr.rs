@@ -79,7 +79,7 @@ impl Fr {
         Self(one(R2, MODULUS, INV))
     }
 
-    pub(crate) const fn to_mont_form(val: [u64; 4]) -> Self {
+    pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
 

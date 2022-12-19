@@ -47,7 +47,6 @@ use sp_std::marker::PhantomData;
 /// Weight functions needed for pallet_balances.
 pub trait WeightInfo {
     fn transfer() -> Weight;
-    fn transfer_keep_alive() -> Weight;
     fn set_balance_creating() -> Weight;
     fn set_balance_killing() -> Weight;
     fn force_transfer() -> Weight;
@@ -58,11 +57,6 @@ pub struct SubstrateWeight<T>(PhantomData<T>);
 impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
     fn transfer() -> Weight {
         (100_698_000 as Weight)
-            .saturating_add(T::DbWeight::get().reads(1 as Weight))
-            .saturating_add(T::DbWeight::get().writes(1 as Weight))
-    }
-    fn transfer_keep_alive() -> Weight {
-        (69_407_000 as Weight)
             .saturating_add(T::DbWeight::get().reads(1 as Weight))
             .saturating_add(T::DbWeight::get().writes(1 as Weight))
     }
@@ -87,11 +81,6 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 impl WeightInfo for () {
     fn transfer() -> Weight {
         (100_698_000 as Weight)
-            .saturating_add(RocksDbWeight::get().reads(1 as Weight))
-            .saturating_add(RocksDbWeight::get().writes(1 as Weight))
-    }
-    fn transfer_keep_alive() -> Weight {
-        (69_407_000 as Weight)
             .saturating_add(RocksDbWeight::get().reads(1 as Weight))
             .saturating_add(RocksDbWeight::get().writes(1 as Weight))
     }

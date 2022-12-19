@@ -131,7 +131,7 @@ macro_rules! curve_built_in {
 
         impl Default for $affine {
             fn default() -> Self {
-                unimplemented!()
+                $projective::GENERATOR.to_affine()
             }
         }
 

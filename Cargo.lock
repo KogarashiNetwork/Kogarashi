@@ -1696,7 +1696,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
 
 [[package]]
-name = "pallet-confidential-transfer"
+name = "pallet-encrypted-balance"
 version = "0.1.0"
 dependencies = [
  "frame-benchmarking",
@@ -1704,7 +1704,9 @@ dependencies = [
  "frame-system",
  "pallet-transaction-payment",
  "parity-scale-codec",
+ "proptest",
  "serde",
+ "sp-arithmetic",
  "sp-core",
  "sp-io",
  "sp-runtime",
@@ -3415,6 +3417,7 @@ dependencies = [
 name = "zero-elgamal"
 version = "0.1.0"
 dependencies = [
+ "num-traits",
  "parity-scale-codec",
  "proptest",
  "rand 0.8.5",
@@ -3444,7 +3447,7 @@ version = "0.1.0"
 dependencies = [
  "ed25519",
  "ed25519-dalek",
- "pallet-confidential-transfer",
+ "pallet-encrypted-balance",
  "rand_core 0.5.1",
  "rand_core 0.6.3",
  "zero-elgamal",

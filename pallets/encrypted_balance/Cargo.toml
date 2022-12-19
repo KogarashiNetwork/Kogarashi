@@ -1,5 +1,5 @@
 [package]
-name = "pallet-confidential-transfer"
+name = "pallet-encrypted-balance"
 version = "0.1.0"
 authors = ["Parity Technologies <admin@parity.io>"]
 edition = "2018"
@@ -14,9 +14,10 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 serde = { version = "1.0.101", default-features = false, optional = true }
-codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive"] }
+codec = { package = "parity-scale-codec", version = "2.1.0", default-features = false, features = ["derive"] }
 sp-std = { version = "3.0.0", default-features = false }
 sp-runtime = { version = "3.0.0", default-features = false }
+sp-arithmetic = { version = "3.0.0", default-features = false }
 frame-benchmarking = { version = "3.0.0", default-features = false, optional = true }
 frame-support = { version = "3.0.0", default-features = false }
 frame-system = { version = "3.0.0", default-features = false }
@@ -26,6 +27,7 @@ zero-elgamal = { version = "0.1.0", default-features = false, path = "../../prim
 sp-io = { version = "3.0.0", default-features = false }
 sp-core = { version = "3.0.0", default-features = false }
 pallet-transaction-payment = { version = "3.0.0", default-features = false }
+proptest = "1"
 
 [features]
 default = ["std"]

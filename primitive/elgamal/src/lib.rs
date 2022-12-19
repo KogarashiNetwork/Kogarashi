@@ -24,15 +24,14 @@
 
 use core::ops::{Add, Sub};
 
+use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use zero_crypto::behave::*;
-use zero_jubjub::{
-    coordinate::{JubjubAffine, JubjubProjective},
-    fr::Fr,
-};
+use zero_jubjub::coordinate::{JubjubAffine, JubjubProjective};
+pub use zero_jubjub::fr::Fr;
 
-#[derive(Debug, Default, Clone, Copy, Decode, Encode, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Default, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
 pub struct EncryptedNumber {
     s: JubjubAffine,
     t: JubjubAffine,
@@ -85,6 +84,26 @@ impl Sub for EncryptedNumber {
             s: (self.s.to_projective() - rhs.s.to_projective()).to_affine(),
             t: (self.t.to_projective() - rhs.t.to_projective()).to_affine(),
         }
+    }
+}
+
+impl CheckedAdd for EncryptedNumber {
+    #[inline]
+    fn checked_add(&self, rhs: &Self) -> Option<Self> {
+        Some(Self {
+            s: (self.s.to_projective() + rhs.s.to_projective()).to_affine(),
+            t: (self.t.to_projective() + rhs.t.to_projective()).to_affine(),
+        })
+    }
+}
+
+impl CheckedSub for EncryptedNumber {
+    #[inline]
+    fn checked_sub(&self, rhs: &Self) -> Option<Self> {
+        Some(Self {
+            s: (self.s.to_projective() - rhs.s.to_projective()).to_affine(),
+            t: (self.t.to_projective() - rhs.t.to_projective()).to_affine(),
+        })
     }
 }
 

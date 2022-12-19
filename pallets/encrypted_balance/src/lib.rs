@@ -98,7 +98,7 @@
 //! ```
 //! use frame_support::traits::Currency;
 //! # pub trait Config: frame_system::Config {
-//! # 	type Currency: Currency<Self::AccountId>;
+//! #   type Currency: Currency<Self::AccountId>;
 //! # }
 //!
 //! pub type BalanceOf<T> = <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
@@ -113,26 +113,26 @@
 //! use frame_support::traits::{WithdrawReasons, LockableCurrency};
 //! use sp_runtime::traits::Bounded;
 //! pub trait Config: frame_system::Config {
-//! 	type Currency: LockableCurrency<Self::AccountId, Moment=Self::BlockNumber>;
+//!     type Currency: LockableCurrency<Self::AccountId, Moment=Self::BlockNumber>;
 //! }
 //! # struct StakingLedger<T: Config> {
-//! # 	stash: <T as frame_system::Config>::AccountId,
-//! # 	total: <<T as Config>::Currency as frame_support::traits::Currency<<T as frame_system::Config>::AccountId>>::Balance,
-//! # 	phantom: std::marker::PhantomData<T>,
+//! #   stash: <T as frame_system::Config>::AccountId,
+//! #   total: <<T as Config>::Currency as frame_support::traits::Currency<<T as frame_system::Config>::AccountId>>::Balance,
+//! #   phantom: std::marker::PhantomData<T>,
 //! # }
 //! # const STAKING_ID: [u8; 8] = *b"staking ";
 //!
 //! fn update_ledger<T: Config>(
-//! 	controller: &T::AccountId,
-//! 	ledger: &StakingLedger<T>
+//!     controller: &T::AccountId,
+//!     ledger: &StakingLedger<T>
 //! ) {
-//! 	T::Currency::set_lock(
-//! 		STAKING_ID,
-//! 		&ledger.stash,
-//! 		ledger.total,
-//! 		WithdrawReasons::all()
-//! 	);
-//! 	// <Ledger<T>>::insert(controller, ledger); // Commented out as we don't have access to Staking's storage here.
+//!     T::Currency::set_lock(
+//!         STAKING_ID,
+//!         &ledger.stash,
+//!         ledger.total,
+//!         WithdrawReasons::all()
+//!     );
+//!     // <Ledger<T>>::insert(controller, ledger); // Commented out as we don't have access to Staking's storage here.
 //! }
 //! # fn main() {}
 //! ```
@@ -155,23 +155,24 @@ mod tests_composite;
 mod tests_local;
 pub mod weights;
 
-use codec::{Codec, Decode, Encode};
+use codec::{Decode, Encode};
 use encrypted_currency::EncryptedCurrency;
 #[cfg(feature = "std")]
 use frame_support::traits::GenesisBuild;
-use frame_support::traits::{StoredMap, WithdrawReasons};
+use frame_support::traits::StoredMap;
 use sp_runtime::{
-    traits::{AtLeast32BitUnsigned, MaybeSerializeDeserialize, StaticLookup, StoredMapError, Zero},
+    traits::{CheckedAdd, CheckedSub, MaybeSerializeDeserialize, StaticLookup, StoredMapError},
     DispatchResult, RuntimeDebug,
 };
+use sp_std::fmt::Debug;
 use sp_std::prelude::*;
-use sp_std::{fmt::Debug, ops::BitOr};
 pub use weights::WeightInfo;
 
 pub use pallet::*;
 
 #[frame_support::pallet]
 pub mod pallet {
+
     use super::*;
     use frame_support::pallet_prelude::*;
     use frame_system::pallet_prelude::*;
@@ -180,9 +181,9 @@ pub mod pallet {
     pub trait Config<I: 'static = ()>: frame_system::Config {
         /// The balance of an account.
         type EncryptedBalance: Parameter
+            + CheckedAdd
+            + CheckedSub
             + Member
-            + AtLeast32BitUnsigned
-            + Codec
             + Default
             + Copy
             + MaybeSerializeDeserialize
@@ -206,7 +207,10 @@ pub mod pallet {
     impl<T: Config<I>, I: 'static> Hooks<BlockNumberFor<T>> for Pallet<T, I> {}
 
     #[pallet::call]
-    impl<T: Config<I>, I: 'static> Pallet<T, I> {
+    impl<T: Config<I>, I: 'static> Pallet<T, I>
+    // where
+    //     pallet::Call<T, I>: Codec,
+    {
         /// Transfer some liquid free balance to another account.
         ///
         /// `transfer` will set the `FreeBalance` of the sender and receiver.
@@ -238,7 +242,7 @@ pub mod pallet {
         pub fn transfer(
             origin: OriginFor<T>,
             dest: <T::Lookup as StaticLookup>::Source,
-            #[pallet::compact] value: T::EncryptedBalance,
+            value: T::EncryptedBalance,
         ) -> DispatchResultWithPostInfo {
             let transactor = ensure_signed(origin)?;
             let dest = T::Lookup::lookup(dest)?;
@@ -271,7 +275,7 @@ pub mod pallet {
         pub(super) fn set_balance(
             origin: OriginFor<T>,
             who: <T::Lookup as StaticLookup>::Source,
-            #[pallet::compact] new_balance: T::EncryptedBalance,
+            new_balance: T::EncryptedBalance,
         ) -> DispatchResultWithPostInfo {
             ensure_root(origin)?;
             let who = T::Lookup::lookup(who)?;
@@ -294,7 +298,7 @@ pub mod pallet {
             origin: OriginFor<T>,
             source: <T::Lookup as StaticLookup>::Source,
             dest: <T::Lookup as StaticLookup>::Source,
-            #[pallet::compact] value: T::EncryptedBalance,
+            value: T::EncryptedBalance,
         ) -> DispatchResultWithPostInfo {
             ensure_root(origin)?;
             let source = T::Lookup::lookup(source)?;
@@ -314,18 +318,6 @@ pub mod pallet {
         Transfer(T::AccountId, T::AccountId, T::EncryptedBalance),
         /// A balance was set by root. \[who, free, reserved\]
         BalanceSet(T::AccountId, T::EncryptedBalance),
-    }
-
-    /// Old name generated by `decl_event`.
-    #[deprecated(note = "use `Event` instead")]
-    pub type RawEvent<T, I = ()> = Event<T, I>;
-
-    #[pallet::error]
-    pub enum Error<T, I = ()> {
-        /// Got an overflow after adding
-        Overflow,
-        /// Balance too low to send value
-        InsufficientBalance,
     }
 
     /// The balance of an account.
@@ -375,14 +367,7 @@ pub mod pallet {
             );
 
             for &(ref who, balance) in self.balances.iter() {
-                assert!(T::AccountStore::insert(
-                    who,
-                    AccountData {
-                        balance,
-                        ..Default::default()
-                    }
-                )
-                .is_ok());
+                assert!(T::AccountStore::insert(who, AccountData { balance }).is_ok());
             }
         }
     }
@@ -405,39 +390,6 @@ impl<T: Config<I>, I: 'static> GenesisConfig<T, I> {
     }
 }
 
-/// Simplified reasons for withdrawing balance.
-#[derive(Encode, Decode, Clone, Copy, PartialEq, Eq, RuntimeDebug)]
-pub enum Reasons {
-    /// Paying system transaction fees.
-    Fee = 0,
-    /// Any reason other than paying system transaction fees.
-    Misc = 1,
-    /// Any reason at all.
-    All = 2,
-}
-
-impl From<WithdrawReasons> for Reasons {
-    fn from(r: WithdrawReasons) -> Reasons {
-        if r == WithdrawReasons::from(WithdrawReasons::TRANSACTION_PAYMENT) {
-            Reasons::Fee
-        } else if r.contains(WithdrawReasons::TRANSACTION_PAYMENT) {
-            Reasons::All
-        } else {
-            Reasons::Misc
-        }
-    }
-}
-
-impl BitOr for Reasons {
-    type Output = Reasons;
-    fn bitor(self, other: Reasons) -> Reasons {
-        if self == other {
-            return self;
-        }
-        Reasons::All
-    }
-}
-
 /// All balance information for an account.
 #[derive(Encode, Decode, Clone, PartialEq, Eq, Default, RuntimeDebug)]
 pub struct AccountData<EncryptedBalance> {
@@ -447,6 +399,13 @@ pub struct AccountData<EncryptedBalance> {
     /// This is the only balance that matters in terms of most operations on tokens. It
     /// alone is used to determine the balance when in the contract execution environment.
     pub balance: EncryptedBalance,
+}
+
+impl<EncryptedBalance: Copy> AccountData<EncryptedBalance> {
+    /// The total balance in this account including any that is reserved and ignoring any frozen.
+    fn total(&self) -> EncryptedBalance {
+        self.balance
+    }
 }
 
 // A value placed in storage that represents the current version of the Balances storage.
@@ -465,6 +424,10 @@ impl Default for Releases {
 }
 
 impl<T: Config<I>, I: 'static> Pallet<T, I> {
+    fn account(who: &T::AccountId) -> AccountData<T::EncryptedBalance> {
+        T::AccountStore::get(who)
+    }
+
     /// Mutate an account to some new value, or delete it entirely with `None`. Will enforce
     /// `ExistentialDeposit` law, annulling the account as needed.
     ///
@@ -518,6 +481,10 @@ where
 {
     type EncryptedBalance = T::EncryptedBalance;
 
+    fn total_balance(who: &T::AccountId) -> Self::EncryptedBalance {
+        Self::account(who).total()
+    }
+
     // Transfer some free balance from `transactor` to `dest`, respecting existence requirements.
     // Is a no-op if value to be transferred is zero or the `transactor` is the same as `dest`.
     fn transfer(
@@ -525,15 +492,14 @@ where
         dest: &T::AccountId,
         value: Self::EncryptedBalance,
     ) -> DispatchResult {
-        if value.is_zero() || transactor == dest {
+        if transactor == dest {
             return Ok(());
         }
 
         Self::try_mutate_account(dest, |to_account, _| -> DispatchResult {
             Self::try_mutate_account(transactor, |from_account, _| -> DispatchResult {
-                // Here goes the proof
                 from_account.balance = from_account.balance - value;
-                to_account.balance = to_account.balance - value;
+                to_account.balance = to_account.balance + value;
 
                 Ok(())
             })
@@ -543,5 +509,12 @@ where
         Self::deposit_event(Event::Transfer(transactor.clone(), dest.clone(), value));
 
         Ok(())
+    }
+
+    fn deposit_creating(who: &T::AccountId, value: Self::EncryptedBalance) -> DispatchResult {
+        Self::try_mutate_account(who, |account, _| -> DispatchResult {
+            account.balance = value;
+            Ok(())
+        })
     }
 }
