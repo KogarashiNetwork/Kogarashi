@@ -7,13 +7,12 @@ edition = "2021"
 
 [dependencies]
 zero-crypto = { version = '0.1.0', path = '../crypto' }
+zero-bls12-381 = { version = '0.1.0', path = '../bls12_381' }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
-rand = { version = "0.8", default-features = false }
-rand_xorshift = { version = "0.3", default-features = false }
+rand_core = { version="0.6", default-features = false }
 rayon = "1.5.1"
 
 [dev-dependencies]
-zero-bls12-381 = { version = '0.1.0', path = '../bls12_381' }
 rand = { version = "0.8", default-features = false }
 rand_xorshift = { version = "0.3", default-features = false }
 proptest = "1"

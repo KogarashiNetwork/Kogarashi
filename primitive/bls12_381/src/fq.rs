@@ -16,8 +16,6 @@ const MODULUS: [u64; 6] = [
 
 const GENERATOR: [u64; 6] = [2, 0, 0, 0, 0, 0];
 
-const IDENTITY: [u64; 6] = [1, 0, 0, 0, 0, 0];
-
 /// R = 2^384 mod p
 const R: [u64; 6] = [
     0x760900000002fffd,
@@ -50,17 +48,9 @@ const R3: [u64; 6] = [
 
 const INV: u64 = 0x89f3fffcfffcfffd;
 
-pairing_field_operation!(Fq, MODULUS, GENERATOR, IDENTITY, INV, R2, R3);
+pairing_field_operation!(Fq, MODULUS, GENERATOR, INV, R, R2, R3);
 
 impl Fq {
-    pub(crate) const fn zero() -> Self {
-        Self(zero())
-    }
-
-    pub(crate) const fn one() -> Self {
-        Self(R)
-    }
-
     pub(crate) const fn to_mont_form(val: [u64; 6]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }

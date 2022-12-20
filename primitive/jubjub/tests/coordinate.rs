@@ -2,16 +2,16 @@ use proptest::prelude::*;
 use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
 use zero_crypto::common::{Group, PrimeField, Projective};
-use zero_jubjub::{coordinate::JubjubProjective, fr::Fr};
+use zero_jubjub::{Fp, JubjubProjective};
 
 prop_compose! {
-    fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fr {
-        Fr::random(XorShiftRng::from_seed(bytes))
+    fn arb_fp()(bytes in [any::<u8>(); 16]) -> Fp {
+        Fp::random(XorShiftRng::from_seed(bytes))
     }
 }
 
 prop_compose! {
-    fn arb_point()(k in arb_fr()) -> JubjubProjective {
+    fn arb_point()(k in arb_fp()) -> JubjubProjective {
         JubjubProjective::GENERATOR * k
     }
 }
@@ -67,7 +67,7 @@ proptest! {
     #[test]
     fn jubjub_point_double(a in arb_point()) {
         // a + a = a * 8
-        let scalared_a = a * Fr::from_u64(8);
+        let scalared_a = a * Fp::from_u64(8);
         let aa =a.double();
         let a_4 = aa.double();
         let a_8 = a_4.double();

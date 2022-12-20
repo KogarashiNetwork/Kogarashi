@@ -26,13 +26,13 @@ macro_rules! decl_tests {
         use frame_system::RawOrigin;
         use sp_runtime::traits::BadOrigin;
         use $crate::*;
-        use zero_elgamal::Fr;
+        use zero_elgamal::Fp;
 
-        const ID_1_PK: Fr = Fr::to_mont_form([1, 0, 0, 0]);
-        const ID_2_PK: Fr = Fr::to_mont_form([2, 0, 0, 0]);
-        const ID_1_RANDOM: Fr = Fr::to_mont_form([1, 2, 3, 4]);
-        const ID_2_RANDOM: Fr = Fr::to_mont_form([4, 3, 2, 1]);
-        const TRANSFER_RANDOM: Fr = Fr::to_mont_form([4, 2, 1, 3]);
+        const ID_1_PK: Fp = Fp::to_mont_form([1, 0, 0, 0]);
+        const ID_2_PK: Fp = Fp::to_mont_form([2, 0, 0, 0]);
+        const ID_1_RANDOM: Fp = Fp::to_mont_form([1, 2, 3, 4]);
+        const ID_2_RANDOM: Fp = Fp::to_mont_form([4, 3, 2, 1]);
+        const TRANSFER_RANDOM: Fp = Fp::to_mont_form([4, 2, 1, 3]);
 
         #[test]
         fn balance_transfer_works() {

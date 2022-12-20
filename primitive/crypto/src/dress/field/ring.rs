@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! ring_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident) => {
-        group_operation!($field, $p, $g, $e, $inv);
+    ($field:ident, $p:ident, $g:ident, $r:ident, $inv:ident) => {
+        group_operation!($field, $p, $g, $r, $inv);
 
         impl Ring for $field {}
 

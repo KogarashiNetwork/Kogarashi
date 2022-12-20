@@ -1,4 +1,4 @@
-// Copyright (C) 2021-2022 Artree (JP) LLC.
+// Copyright (C) 2020-2023 Invers (JP) INC.
 // SPDX-License-Identifier: Apache-2.0
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,13 +23,12 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use core::ops::{Add, Sub};
-
 use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use zero_crypto::behave::*;
-use zero_jubjub::coordinate::{JubjubAffine, JubjubProjective};
-pub use zero_jubjub::fr::Fr;
+pub use zero_jubjub::Fp;
+use zero_jubjub::{JubjubAffine, JubjubProjective};
 
 #[derive(Debug, Default, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
 pub struct EncryptedNumber {
@@ -39,17 +38,17 @@ pub struct EncryptedNumber {
 
 #[allow(unused_variables)]
 impl EncryptedNumber {
-    pub fn encrypt(private_key: Fr, value: u32, random: Fr) -> Self {
+    pub fn encrypt(private_key: Fp, value: u32, random: Fp) -> Self {
         let g = JubjubProjective::GENERATOR;
         let public_key = g * private_key;
-        let left = g * Fr::from_u64(value as u64) + public_key * random;
+        let left = g * Fp::from_u64(value as u64) + public_key * random;
         EncryptedNumber {
             s: left.to_affine(),
             t: (g * random).to_affine(),
         }
     }
 
-    pub fn decrypt(&self, private_key: Fr) -> Option<u32> {
+    pub fn decrypt(&self, private_key: Fp) -> Option<u32> {
         let g = JubjubProjective::GENERATOR;
         let decrypted_message = self.s.to_projective() - (self.t.to_projective() * private_key);
 
@@ -117,8 +116,8 @@ mod tests {
     use crate::EncryptedNumber;
 
     prop_compose! {
-        fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fr {
-            Fr::random(XorShiftRng::from_seed(bytes))
+        fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fp {
+            Fp::random(XorShiftRng::from_seed(bytes))
         }
     }
     proptest! {
@@ -179,9 +178,9 @@ mod tests {
             } else {
                 (alice_transfer_randomness, alice_randomness)
             };
-            let alice_randomness = Fr::from_u64(alice_randomness);
-            let bob_randomness = Fr::from_u64(bob_randomness);
-            let alice_transfer_randomness = Fr::from_u64(alice_transfer_randomness);
+            let alice_randomness = Fp::from_u64(alice_randomness);
+            let bob_randomness = Fp::from_u64(bob_randomness);
+            let alice_transfer_randomness = Fp::from_u64(alice_transfer_randomness);
 
             let alice_balance_enc = EncryptedNumber::encrypt(alice_pk, alice_balance, alice_randomness);
             let bob_balance_enc = EncryptedNumber::encrypt(bob_pk, bob_balance, bob_randomness);

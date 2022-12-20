@@ -1391,6 +1391,7 @@ dependencies = [
  "parity-scale-codec",
  "proptest",
  "rand 0.8.5",
+ "rand_core 0.6.3",
  "rand_xorshift",
  "rayon",
  "zero-bls12-381",
@@ -3403,7 +3404,7 @@ dependencies = [
 
 [[package]]
 name = "zero-crypto"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "parity-scale-codec",
  "proptest",

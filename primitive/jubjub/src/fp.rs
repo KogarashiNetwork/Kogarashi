@@ -5,7 +5,8 @@ use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
 #[derive(Debug, Clone, Copy, Decode, Encode, Serialize, Deserialize)]
-pub struct Fr(pub(crate) [u64; 4]);
+
+pub struct Fp(pub(crate) [u64; 4]);
 
 const MODULUS: [u64; 4] = [
     0xd0970e5ed6f72cb7,
@@ -15,13 +16,6 @@ const MODULUS: [u64; 4] = [
 ];
 
 const GENERATOR: [u64; 4] = [2, 0, 0, 0];
-
-const IDENTITY: [u64; 4] = [
-    2735949640168245209,
-    17516141824802482000,
-    10602903914100036852,
-    695520747347596742,
-];
 
 /// R = 2^256 mod r
 const R: [u64; 4] = [
@@ -47,43 +41,25 @@ const R3: [u64; 4] = [
     0x05874f84946737ec,
 ];
 
-pub const INV: u64 = 0x1ba3a358ef788ef9;
+const INV: u64 = 0x1ba3a358ef788ef9;
 
 const S: usize = 1;
 
-const ROOT_OF_UNITY: Fr = Fr([
+const ROOT_OF_UNITY: Fp = Fp([
     0xaa9f02ab1d6124de,
     0xb3524a6466112932,
     0x7342261215ac260b,
     0x4d6b87b1da259e2,
 ]);
 
-fft_field_operation!(
-    Fr,
-    MODULUS,
-    GENERATOR,
-    IDENTITY,
-    INV,
-    ROOT_OF_UNITY,
-    R2,
-    R3,
-    S
-);
+fft_field_operation!(Fp, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 
-impl Fr {
-    pub(crate) const fn zero() -> Self {
-        Self(zero())
-    }
-
-    pub(crate) const fn one() -> Self {
-        Self(one(R2, MODULUS, INV))
-    }
-
+impl Fp {
     pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
 
-    pub fn from_hex(hex: &str) -> Result<Fr, Error> {
+    pub fn from_hex(hex: &str) -> Result<Fp, Error> {
         let max_len = 64;
         let hex = hex.strip_prefix("0x").unwrap_or(hex);
         let length = hex.len();
@@ -107,9 +83,9 @@ impl Fr {
         }
         let mut limbs: [u64; 4] = [0; 4];
         for i in 0..hex.len() {
-            limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
+            limbs[i] = Fp::bytes_to_u64(&hex[i]).unwrap();
         }
-        Ok(Fr(mul(limbs, R2, MODULUS, INV)))
+        Ok(Fp(mul(limbs, R2, MODULUS, INV)))
     }
 
     fn as_bytes(&self) -> [u8; 64] {
@@ -149,7 +125,7 @@ mod tests {
         #![proptest_config(ProptestConfig::with_cases(50))]
         #[test]
         fn test_binary_method(x in any::<u16>()) {
-            let fr = Fr::from_u64(x as u64);
+            let fr = Fp::from_u64(x as u64);
             let g = JubjubProjective::GENERATOR;
             let mul = g * fr;
             let rev_mul = g * fr;
@@ -166,11 +142,11 @@ mod tests {
 
     #[test]
     fn test_from_hex() {
-        let a = Fr::from_hex("0x64774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab")
+        let a = Fp::from_hex("0x64774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab")
             .unwrap();
         assert_eq!(
             a,
-            Fr([
+            Fp([
                 0x4ddc8f91e171cd75,
                 0x9b925835a7d203fb,
                 0x0cdb538ead47e463,
@@ -181,9 +157,9 @@ mod tests {
 
     #[test]
     fn test_cmp() {
-        let a = Fr::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad82")
+        let a = Fp::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad82")
             .unwrap();
-        let b = Fr::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad83")
+        let b = Fp::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad83")
             .unwrap();
 
         assert!(a <= a);

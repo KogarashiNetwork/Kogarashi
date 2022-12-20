@@ -80,10 +80,10 @@ pub struct ExtBuilder {}
 
 impl ExtBuilder {
     pub fn build(self) -> sp_io::TestExternalities {
-        let pk1 = Fr::to_mont_form([1, 0, 0, 0]);
-        let pk2 = Fr::to_mont_form([2, 0, 0, 0]);
-        let rand1 = Fr::to_mont_form([1, 2, 3, 4]);
-        let rand2 = Fr::to_mont_form([4, 3, 2, 1]);
+        let pk1 = Fp::to_mont_form([1, 0, 0, 0]);
+        let pk2 = Fp::to_mont_form([2, 0, 0, 0]);
+        let rand1 = Fp::to_mont_form([1, 2, 3, 4]);
+        let rand2 = Fp::to_mont_form([4, 3, 2, 1]);
         let mut t = frame_system::GenesisConfig::default()
             .build_storage::<Test>()
             .unwrap();

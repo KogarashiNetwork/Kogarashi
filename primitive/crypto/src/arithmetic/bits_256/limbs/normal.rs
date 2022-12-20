@@ -122,6 +122,12 @@ pub fn invert(
 }
 
 pub fn pow(a: [u64; 4], b: [u64; 4], mut identity: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
+    let zero: [u64; 4] = [0; 4];
+    if b == zero {
+        return identity;
+    } else if a == zero {
+        return zero;
+    }
     let bits = to_bits(b);
     for &bit in bits.iter() {
         identity = square(identity, p, inv);

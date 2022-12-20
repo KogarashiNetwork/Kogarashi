@@ -22,15 +22,18 @@ The **Zero Network** is the `substrate-based` blockchain and that transaction in
 We are supporting the confidential transactions for transfers and contracts executions. We are focusing on ensuring the `security assumption` and `privacy system` so after the research amd development phase, we are going to improve the performance by optimization of bytecode and libraries. We are also planning to support the `anonymous` and `rollup` transactions.
 
 ## Directory Structure
-- `/node`: The substrate-based blockchain implementation.
-- `/primitive`: The primitive components implementations which is compatible with [`Polkadot`](https://polkadot.network/).
-    - `/elgamal`: The `lifted-ElGamal` encrypiton implementation.
-    - `/jubjub`: The `Twisted Edwards curve` implementation.
-    - `/snarks`: The [`Polkadot`](https://polkadot.network/) friendly and high performance `plonk` research and development.
+- `/chain`: The substrate-based blockchain runtime implementation.
+- `/client`: The substrate-based blockchain client rpc implementation.
+- `/example`: The confidential transfer circom implementation.
 - `/pallets`: The `pallet` implementations which are used on runtime.
-    - `/confidential_smart_contract`: The confidential smart contract execution pallet extention of [`contracts`](https://github.com/paritytech/substrate/tree/master/frame/contracts).
     - `/confidential_transfer`: The confidential transfer pallet using encrypted balance by `lifted-ElGamal` enctyption extention of [`balance`](https://github.com/paritytech/substrate/tree/master/frame/balances).
-    - `/zkink`: The [`Substrate`](https://substrate.io/) confidential smart contract `eDSL` and compiler extention of [`ink!`](https://github.com/paritytech/ink/tree/v3.0.0).
+    - `/plonk`: The plonk pallet compatible with Substrate.
+- `/primitive`: The primitive libraries which are compatible with [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec).
+    - `/bls12_381`: The `BLS12 381` curve.
+    - `/elgamal`: The `lifted-ElGamal` encrypiton.
+    - `/hash`: The hash function R&D
+    - `/jubjub`: The `Twisted Edwards curve`.
+    - `/kzg`: The kzg commitment.
 
 ## Test
 The `cargo-make` we are using.
@@ -54,7 +57,7 @@ The white paper is work in progress. You can find the light paper [here](https:/
 - [Zexe](https://eprint.iacr.org/2018/962.pdf)
 
 ## License
-Copyright 2020-2022 The Artree LLC.
+Copyright 2020-2023 The Invers INC.
 
 This software is under the `Apache License`.
 You can check more detail [here](./LICENSE).

@@ -91,10 +91,10 @@ pub struct ExtBuilder {}
 
 impl ExtBuilder {
     pub fn build(self) -> sp_io::TestExternalities {
-        let pk1 = Fr::to_mont_form([1, 0, 0, 0]);
-        let pk2 = Fr::to_mont_form([2, 0, 0, 0]);
-        let rand1 = Fr::to_mont_form([1, 2, 3, 4]);
-        let rand2 = Fr::to_mont_form([4, 3, 2, 1]);
+        let pk1 = Fp::to_mont_form([1, 0, 0, 0]);
+        let pk2 = Fp::to_mont_form([2, 0, 0, 0]);
+        let rand1 = Fp::to_mont_form([1, 2, 3, 4]);
+        let rand2 = Fp::to_mont_form([4, 3, 2, 1]);
         let mut t = frame_system::GenesisConfig::default()
             .build_storage::<Test>()
             .unwrap();
@@ -128,8 +128,8 @@ decl_tests! { Test, ExtBuilder }
 
 #[test]
 fn emit_events() {
-    let pk = Fr::to_mont_form([3, 0, 0, 0]);
-    let randomness = Fr::to_mont_form([4, 3, 5, 6]);
+    let pk = Fp::to_mont_form([3, 0, 0, 0]);
+    let randomness = Fp::to_mont_form([4, 3, 5, 6]);
     let balance = EncryptedNumber::encrypt(pk, 42, randomness);
     <ExtBuilder>::default().build().execute_with(|| {
         assert_ok!(EncryptedBalances::set_balance(

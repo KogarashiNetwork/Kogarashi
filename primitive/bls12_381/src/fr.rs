@@ -19,8 +19,6 @@ const GENERATOR: [u64; 4] = [
     0x351332208fc5a8c4,
 ];
 
-const IDENTITY: [u64; 4] = [1, 0, 0, 0];
-
 /// R = 2^256 mod r
 const R: [u64; 4] = [
     0x00000001fffffffe,
@@ -56,27 +54,9 @@ const ROOT_OF_UNITY: Fr = Fr([
     0x5bf3adda19e9b27b,
 ]);
 
-fft_field_operation!(
-    Fr,
-    MODULUS,
-    GENERATOR,
-    IDENTITY,
-    INV,
-    ROOT_OF_UNITY,
-    R2,
-    R3,
-    S
-);
+fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 
 impl Fr {
-    pub const fn zero() -> Self {
-        Self(zero())
-    }
-
-    pub const fn one() -> Self {
-        Self(one(R2, MODULUS, INV))
-    }
-
     pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }

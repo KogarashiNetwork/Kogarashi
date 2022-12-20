@@ -1,19 +1,25 @@
 // This trait resresents elliptic curve and its scalar field
-/// y^2 = x^3 + ax + b
 use super::{algebra::Ring, basic::Basic, comp::ParityCmp, field::PrimeField};
+/// y^2 = x^3 + ax + b
+use core::ops::Mul;
 
-pub trait Affine: ParityCmp + Basic + PartialEq + Eq {
+pub trait Affine:
+    ParityCmp + Basic + PartialEq + Eq + Into<Self::Projective> + From<Self::Projective>
+{
     // scalar field of curve
     type ScalarField: PrimeField;
+
+    // range field of curve
+    type RangeField: PrimeField;
 
     // projective coordinate representation
     type Projective: Projective;
 
     // a param
-    const PARAM_A: Self::ScalarField;
+    const PARAM_A: Self::RangeField;
 
     // b param
-    const PARAM_B: Self::ScalarField;
+    const PARAM_B: Self::RangeField;
 
     // convert affine to projective representation
     fn to_projective(self) -> Self::Projective;
@@ -25,18 +31,28 @@ pub trait Affine: ParityCmp + Basic + PartialEq + Eq {
     fn is_on_curve(self) -> bool;
 }
 
-pub trait Projective: ParityCmp + Basic + Ring {
+pub trait Projective:
+    ParityCmp
+    + Basic
+    + Ring
+    + Mul<Self::ScalarField, Output = Self>
+    + Into<Self::Affine>
+    + From<Self::Affine>
+{
     // scalar field of curve
     type ScalarField: PrimeField;
+
+    // range field of curve
+    type RangeField: PrimeField;
 
     // affine coordinate representation
     type Affine: Affine;
 
     // a param
-    const PARAM_A: Self::ScalarField;
+    const PARAM_A: Self::RangeField;
 
     // b param
-    const PARAM_B: Self::ScalarField;
+    const PARAM_B: Self::RangeField;
 
     // convert projective to affine representation
     fn to_affine(self) -> Self::Affine;
@@ -51,20 +67,20 @@ pub trait Projective: ParityCmp + Basic + Ring {
     fn is_on_curve(self) -> bool;
 
     // get x coordinate
-    fn get_x(&self) -> Self::ScalarField;
+    fn get_x(&self) -> Self::RangeField;
 
     // get y coordinate
-    fn get_y(&self) -> Self::ScalarField;
+    fn get_y(&self) -> Self::RangeField;
 
     // get z coordinate
-    fn get_z(&self) -> Self::ScalarField;
+    fn get_z(&self) -> Self::RangeField;
 
     // set x coordinate
-    fn set_x(&mut self, value: Self::ScalarField);
+    fn set_x(&mut self, value: Self::RangeField);
 
     // set y coordinate
-    fn set_y(&mut self, value: Self::ScalarField);
+    fn set_y(&mut self, value: Self::RangeField);
 
     // set z coordinate
-    fn set_z(&mut self, value: Self::ScalarField);
+    fn set_z(&mut self, value: Self::RangeField);
 }
