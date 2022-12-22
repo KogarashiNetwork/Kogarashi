@@ -19,13 +19,14 @@
 
 #![cfg(test)]
 
-use crate::{self as pallet_balances, decl_tests, Config, Module};
+use crate::{self as pallet_balances, decl_tests, Config};
 use frame_support::parameter_types;
-use frame_support::weights::{DispatchInfo, IdentityFee, Weight};
-use pallet_transaction_payment::CurrencyAdapter;
+use frame_support::traits::StorageMapShim;
+use frame_system as system;
 use sp_core::H256;
-use sp_io;
 use sp_runtime::{testing::Header, traits::IdentityLookup};
+use zero_elgamal::EncryptedNumber;
+
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 
@@ -35,8 +36,8 @@ frame_support::construct_runtime!(
         NodeBlock = Block,
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
-        System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
+        System: frame_system::{Module, Call, Config, Storage, Event<T>} = 0,
+        EncryptedBalances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>} = 1,
     }
 );
 
@@ -64,73 +65,44 @@ impl frame_system::Config for Test {
     type BlockHashCount = BlockHashCount;
     type Version = ();
     type PalletInfo = PalletInfo;
-    type AccountData = super::AccountData<u64>;
+    type AccountData = ();
     type OnNewAccount = ();
     type OnKilledAccount = ();
     type SystemWeightInfo = ();
     type SS58Prefix = ();
 }
-parameter_types! {
-    pub const TransactionByteFee: u64 = 1;
-}
-impl pallet_transaction_payment::Config for Test {
-    type OnChargeTransaction = CurrencyAdapter<Module<Test>, ()>;
-    type TransactionByteFee = TransactionByteFee;
-    type WeightToFee = IdentityFee<u64>;
-    type FeeMultiplierUpdate = ();
-}
 
+parameter_types! {
+    pub const MaxLocks: u32 = 50;
+}
 impl Config for Test {
-    type Balance = u64;
-    type DustRemoval = ();
+    type EncryptedBalance = EncryptedNumber;
     type Event = Event;
-    type ExistentialDeposit = ExistentialDeposit;
-    type AccountStore = frame_system::Pallet<Test>;
-    type MaxLocks = ();
+    type AccountStore = StorageMapShim<
+        super::Account<Test>,
+        frame_system::Provider<Test>,
+        u64,
+        super::AccountData<Self::EncryptedBalance>,
+    >;
     type WeightInfo = ();
 }
+#[derive(Default)]
+pub struct ExtBuilder {}
 
-pub struct ExtBuilder {
-    existential_deposit: u64,
-    monied: bool,
-}
-impl Default for ExtBuilder {
-    fn default() -> Self {
-        Self {
-            existential_deposit: 1,
-            monied: false,
-        }
-    }
-}
 impl ExtBuilder {
-    pub fn existential_deposit(mut self, existential_deposit: u64) -> Self {
-        self.existential_deposit = existential_deposit;
-        self
-    }
-    pub fn monied(mut self, monied: bool) -> Self {
-        self.monied = monied;
-        self
-    }
-    pub fn set_associated_consts(&self) {
-        EXISTENTIAL_DEPOSIT.with(|v| *v.borrow_mut() = self.existential_deposit);
-    }
     pub fn build(self) -> sp_io::TestExternalities {
-        self.set_associated_consts();
+        let pk1 = Fp::to_mont_form([1, 0, 0, 0]);
+        let pk2 = Fp::to_mont_form([2, 0, 0, 0]);
+        let rand1 = Fp::to_mont_form([1, 2, 3, 4]);
+        let rand2 = Fp::to_mont_form([4, 3, 2, 1]);
         let mut t = frame_system::GenesisConfig::default()
             .build_storage::<Test>()
             .unwrap();
         pallet_balances::GenesisConfig::<Test> {
-            balances: if self.monied {
-                vec![
-                    (1, 10 * self.existential_deposit),
-                    (2, 20 * self.existential_deposit),
-                    (3, 30 * self.existential_deposit),
-                    (4, 40 * self.existential_deposit),
-                    (12, 10 * self.existential_deposit),
-                ]
-            } else {
-                vec![]
-            },
+            balances: vec![
+                (1, EncryptedNumber::encrypt(pk1, 50, rand1)),
+                (2, EncryptedNumber::encrypt(pk2, 0, rand2)),
+            ],
         }
         .assimilate_storage(&mut t)
         .unwrap();
@@ -141,4 +113,38 @@ impl ExtBuilder {
     }
 }
 
-decl_tests! { Test, ExtBuilder, EXISTENTIAL_DEPOSIT }
+fn events() -> Vec<Event> {
+    let evt = System::events()
+        .into_iter()
+        .map(|evt| evt.event)
+        .collect::<Vec<_>>();
+
+    System::reset_events();
+
+    evt
+}
+
+decl_tests! { Test, ExtBuilder }
+
+#[test]
+fn emit_events() {
+    let pk = Fp::to_mont_form([3, 0, 0, 0]);
+    let randomness = Fp::to_mont_form([4, 3, 5, 6]);
+    let balance = EncryptedNumber::encrypt(pk, 42, randomness);
+    <ExtBuilder>::default().build().execute_with(|| {
+        assert_ok!(EncryptedBalances::set_balance(
+            RawOrigin::Root.into(),
+            3,
+            balance
+        ));
+
+        assert_eq!(
+            events(),
+            [
+                Event::frame_system(system::Event::NewAccount(3)),
+                Event::pallet_balances(crate::Event::Endowed(3, balance)),
+                Event::pallet_balances(crate::Event::BalanceSet(3, balance))
+            ]
+        );
+    });
+}

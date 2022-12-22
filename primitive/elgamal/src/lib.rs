@@ -22,11 +22,15 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
+use core::ops::{Add, Sub};
+use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
+use serde::{Deserialize, Serialize};
 use zero_crypto::behave::*;
-use zero_jubjub::{Fp, JubjubAffine, JubjubProjective};
+pub use zero_jubjub::Fp;
+use zero_jubjub::{JubjubAffine, JubjubProjective};
 
-#[derive(Debug, Clone, Decode, Encode, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
 pub struct EncryptedNumber {
     s: JubjubAffine,
     t: JubjubAffine,
@@ -57,19 +61,48 @@ impl EncryptedNumber {
         }
         None
     }
+}
 
-    pub fn add(&self, other: &Self) -> Self {
+impl Add for EncryptedNumber {
+    type Output = Self;
+    #[inline]
+    fn add(self, rhs: Self) -> Self::Output {
         Self {
-            s: (self.s.to_projective() + other.s.to_projective()).to_affine(),
-            t: (self.t.to_projective() + other.t.to_projective()).to_affine(),
+            s: (self.s.to_projective() + rhs.s.to_projective()).to_affine(),
+            t: (self.t.to_projective() + rhs.t.to_projective()).to_affine(),
         }
     }
+}
 
-    pub fn sub(&self, other: &Self) -> Self {
+impl Sub for EncryptedNumber {
+    type Output = Self;
+
+    #[inline]
+    fn sub(self, rhs: Self) -> Self::Output {
         Self {
-            s: (self.s.to_projective() - other.s.to_projective()).to_affine(),
-            t: (self.t.to_projective() - other.t.to_projective()).to_affine(),
+            s: (self.s.to_projective() - rhs.s.to_projective()).to_affine(),
+            t: (self.t.to_projective() - rhs.t.to_projective()).to_affine(),
         }
+    }
+}
+
+impl CheckedAdd for EncryptedNumber {
+    #[inline]
+    fn checked_add(&self, rhs: &Self) -> Option<Self> {
+        Some(Self {
+            s: (self.s.to_projective() + rhs.s.to_projective()).to_affine(),
+            t: (self.t.to_projective() + rhs.t.to_projective()).to_affine(),
+        })
+    }
+}
+
+impl CheckedSub for EncryptedNumber {
+    #[inline]
+    fn checked_sub(&self, rhs: &Self) -> Option<Self> {
+        Some(Self {
+            s: (self.s.to_projective() - rhs.s.to_projective()).to_affine(),
+            t: (self.t.to_projective() - rhs.t.to_projective()).to_affine(),
+        })
     }
 }
 
@@ -113,8 +146,8 @@ mod tests {
 
             let enc_balance1 = EncryptedNumber::encrypt(priv_k, balance1, random1);
             let enc_balance2 = EncryptedNumber::encrypt(priv_k, balance2, random2);
-            let enc_sub = enc_balance1.sub(&enc_balance2);
-            let enc_add = enc_balance1.add(&enc_balance2);
+            let enc_sub = enc_balance1 - enc_balance2;
+            let enc_add = enc_balance1 + enc_balance2;
 
             let dec_sub = enc_sub.decrypt(priv_k);
             let dec_add = enc_add.decrypt(priv_k);
@@ -157,8 +190,8 @@ mod tests {
             let transfer_amount_enc_bob =
                 EncryptedNumber::encrypt(bob_pk, transfer_amount, alice_transfer_randomness);
 
-            let alice_after_balance_enc = alice_balance_enc.sub(&transfer_amount_enc_alice);
-            let bob_after_balance_enc = bob_balance_enc.add(&transfer_amount_enc_bob);
+            let alice_after_balance_enc = alice_balance_enc - transfer_amount_enc_alice;
+            let bob_after_balance_enc = bob_balance_enc + transfer_amount_enc_bob;
 
             let alice_randomness_sum = alice_randomness - alice_transfer_randomness;
             let bob_randomness_sum = bob_randomness + alice_transfer_randomness;

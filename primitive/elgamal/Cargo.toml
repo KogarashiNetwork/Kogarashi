@@ -9,9 +9,11 @@ license = "Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
+parity-scale-codec = { version = "2.1.0", default-features = false, features = ["derive"] }
 zero-jubjub = { path = "../jubjub" }
 zero-crypto = { path = '../crypto' }
+serde = { version = "1", default-features = false, features = ["derive"] }
+num-traits = "0.2.15"
 
 [dev-dependencies]
 rand = { version = "0.8", default-features = false }

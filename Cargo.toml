@@ -9,7 +9,7 @@ license = "Apache-2.0"
 [dependencies]
 zero-jubjub = { version = "0.1", default-features = false, path = "./primitive/jubjub" }
 zero-elgamal = { version = "0.1", default-features = false, path = "./primitive/elgamal" }
-pallet-confidential-transfer = { version = "0.1", default-features = false, path = "./pallets/confidential_transfer" }
+pallet-encrypted-balance = { version = "0.1", default-features = false, path = "./pallets/encrypted_balance" }
 rand_core = { version = "0.5", features = ["std"] }
 
 [dev-dependencies]
@@ -25,13 +25,13 @@ members = [
     "primitive/hash",
     "primitive/jubjub",
     "primitive/kzg",
-    "pallets/confidential_transfer",
-    "pallets/plonk",
-    "example/plonk-circuits"
+    "example/plonk-circuits",
+    "pallets/encrypted_balance",
+    "pallets/plonk"
 ]
 
 [features]
 default = ['std']
 std = [
-    'pallet-confidential-transfer/std'
+    'pallet-encrypted-balance/std'
 ]
