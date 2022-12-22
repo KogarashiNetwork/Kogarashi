@@ -49,9 +49,11 @@ pub async fn get_runtime_version() -> RuntimeVersion {
     serde_json::from_value(runtime_version_json).unwrap()
 }
 
-pub async fn get_storage(account: &sp_runtime::AccountId32) {
+pub async fn get_storage() {
     let storage_prefix = "System";
     let storage_name = "Account";
+
+    let account = AccountKeyring::Alice.to_account_id();
 
     let storage_prefix_hashed = hashing::twox_128(storage_prefix.as_bytes());
     let storage_name_hashed = hashing::twox_128(storage_name.as_bytes());
