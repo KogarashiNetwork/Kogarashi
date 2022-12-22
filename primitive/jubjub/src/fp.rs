@@ -1,9 +1,11 @@
 use crate::error::Error;
+use serde::{Deserialize, Serialize};
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
-#[derive(Debug, Clone, Copy, Decode, Encode)]
+#[derive(Debug, Clone, Copy, Decode, Encode, Serialize, Deserialize)]
+
 pub struct Fp(pub(crate) [u64; 4]);
 
 const MODULUS: [u64; 4] = [
@@ -53,7 +55,7 @@ const ROOT_OF_UNITY: Fp = Fp([
 fft_field_operation!(Fp, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 
 impl Fp {
-    pub(crate) const fn to_mont_form(val: [u64; 4]) -> Self {
+    pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
 

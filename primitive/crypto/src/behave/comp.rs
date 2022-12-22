@@ -8,3 +8,5 @@ pub trait ParityCmp: Decode + Encode {}
 /// This is parallelize compatible pallet
 #[cfg(feature = "std")]
 pub trait ParallelCmp: Send + Sync {}
+
+pub trait RuntimeCmp: Send + Sync + Sized + Eq + PartialEq + Clone + 'static {}
