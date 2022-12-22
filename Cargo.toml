@@ -25,6 +25,7 @@ members = [
     "primitive/hash",
     "primitive/jubjub",
     "primitive/kzg",
+    "example/plonk-circuits",
     "pallets/encrypted_balance",
     "pallets/plonk"
 ]

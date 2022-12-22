@@ -1904,6 +1904,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "plonk-circuits"
+version = "0.1.0"
+dependencies = [
+ "ark-bls12-381",
+ "ark-ec",
+ "ark-ed-on-bls12-381",
+ "ark-ff",
+ "ark-poly",
+ "ark-poly-commit",
+ "derivative",
+ "plonk",
+ "rand_core 0.6.3",
+]
+
+[[package]]
 name = "plonk-core"
 version = "0.1.0"
 source = "git+https://github.com/zero-network/plonk?rev=4f7ae664709a7814ae166acfc9e2ce17c6ef45be#4f7ae664709a7814ae166acfc9e2ce17c6ef45be"
