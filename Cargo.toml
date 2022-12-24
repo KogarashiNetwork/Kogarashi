@@ -7,8 +7,12 @@ edition = "2021"
 license = "Apache-2.0"
 
 [dependencies]
-zero-jubjub = { version = "0.1", default-features = false, path = "./primitive/jubjub" }
+zero-bls12-381 = { version = "0.1", default-features = false, path = "./primitive/bls12_381" }
+zero-crypto = { version = "0.1", default-features = false, path = "./primitive/crypto" }
 zero-elgamal = { version = "0.1", default-features = false, path = "./primitive/elgamal" }
+zero-jubjub = { version = "0.1", default-features = false, path = "./primitive/jubjub" }
+zero-kzg = { version = "0.1", path = "./primitive/kzg" }
+zero-pairing = { version = "0.1", default-features = false, path = "./primitive/pairing" }
 pallet-encrypted-balance = { version = "0.1", default-features = false, path = "./pallets/encrypted_balance" }
 rand_core = { version = "0.5", features = ["std"] }
 
@@ -25,6 +29,7 @@ members = [
     "primitive/hash",
     "primitive/jubjub",
     "primitive/kzg",
+    "primitive/pairing",
     "example/plonk-circuits",
     "pallets/encrypted_balance",
     "pallets/plonk"
