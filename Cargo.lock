@@ -3477,6 +3477,9 @@ dependencies = [
 [[package]]
 name = "zero-pairing"
 version = "0.1.0"
+dependencies = [
+ "zero-bls12-381",
+]
 
 [[package]]
 name = "zeroize"

@@ -3,21 +3,12 @@
 use core::ops::Mul;
 
 use super::{
-    comp::ParityCmp,
     curve::{Affine, Projective},
     field::PrimeField,
 };
 
 #[cfg(feature = "std")]
 use super::{algebra::Field, comp::ParallelCmp};
-
-/// This is pairing field
-/// This is used for pairing
-pub trait PairingField: PrimeField + ParityCmp {}
-
-/// This is extention field
-/// This is extention of pairing field
-pub trait ExtentionField: ParityCmp {}
 
 /// This is fft field
 /// This is used for fft and has roots of unity
