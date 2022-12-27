@@ -87,8 +87,92 @@ macro_rules! bls12_pairing {
                 $pairng_coeff(tmp0, tmp3, tmp6)
             }
 
-            fn add_eval(self) -> $range_field {
-                todo!()
+            fn add_eval(mut self, rhs: $g2) -> $pairng_coeff {
+                // Adaptation of Algorithm 27, https://eprint.iacr.org/2010/354.pdf
+                let mut zsquared = self.z;
+                zsquared.square();
+
+                let mut ysquared = rhs.y;
+                ysquared.square();
+
+                let mut t0 = zsquared;
+                t0.mul_assign(rhs.x);
+
+                let mut t1 = rhs.y;
+                t1.add_assign(self.z);
+                t1.square();
+                t1.sub_assign(ysquared);
+                t1.sub_assign(zsquared);
+                t1.mul_assign(zsquared);
+
+                let mut t2 = t0;
+                t2.sub_assign(self.x);
+
+                let mut t3 = t2;
+                t3.square();
+
+                let mut t4 = t3;
+                t4.double();
+                t4.double();
+
+                let mut t5 = t4;
+                t5.mul_assign(t2);
+
+                let mut t6 = t1;
+                t6.sub_assign(self.y);
+                t6.sub_assign(self.y);
+
+                let mut t9 = t6;
+                t9.mul_assign(rhs.x);
+
+                let mut t7 = t4;
+                t7.mul_assign(self.x);
+
+                self.x = t6;
+                self.x.square();
+                self.x.sub_assign(t5);
+                self.x.sub_assign(t7);
+                self.x.sub_assign(t7);
+
+                self.z.add_assign(t2);
+                self.z.square();
+                self.z.sub_assign(zsquared);
+                self.z.sub_assign(t3);
+
+                let mut t10 = rhs.y;
+                t10.add_assign(self.z);
+
+                let mut t8 = t7;
+                t8.sub_assign(self.x);
+                t8.mul_assign(t6);
+
+                t0 = self.y;
+                t0.mul_assign(t5);
+                t0.double();
+
+                self.y = t8;
+                self.y.sub_assign(t0);
+
+                t10.square();
+                t10.sub_assign(ysquared);
+
+                let mut ztsquared = self.z;
+                ztsquared.square();
+
+                t10.sub_assign(ztsquared);
+
+                t9.double();
+                t9.sub_assign(t10);
+
+                t10 = self.z;
+                t10.double();
+
+                t6 = -t6;
+
+                t1 = t6;
+                t1.double();
+
+                $pairng_coeff(t10, t1, t9)
             }
         }
     };

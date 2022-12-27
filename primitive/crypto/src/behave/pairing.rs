@@ -19,7 +19,7 @@ pub trait G2Pairing: Projective {
 
     fn double_eval(self) -> Self::PairingCoeff;
 
-    fn add_eval(self) -> Self::PairingRange;
+    fn add_eval(self, rhs: Self) -> Self::PairingCoeff;
 }
 
 /// pairing abstraction
