@@ -1,21 +1,39 @@
-use super::{comp::ParityCmp, curve::Affine, field::PrimeField, Projective};
+use super::{
+    comp::ParityCmp, curve::Affine, extension_field::ExtensionField, field::PrimeField, Projective,
+};
 
 /// pairing field
 pub trait PairingField: PrimeField + ParityCmp {}
 
 /// pairing function range field
-pub trait PairingRange: ExtentionField {
+pub trait PairingRange: ExtensionField {
+    type G1Affine: Affine;
+
+    type G2Coeff: ParityCmp;
+
+    type QuadraticField: ExtensionField;
+
+    fn mul_by_014(
+        self,
+        c0: Self::QuadraticField,
+        c1: Self::QuadraticField,
+        c4: Self::QuadraticField,
+    ) -> Self;
+
+    fn untwist(self, coeffs: Self::G2Coeff, g1: Self::G1Affine) -> Self;
+
+    fn conjugate(self) -> Self;
+
     fn final_exp(self) -> Self;
 }
-
-/// extention field
-pub trait ExtentionField: ParityCmp {}
 
 /// G2 group pairing interface
 pub trait G2Pairing: Projective {
     type PairingRange: PairingRange;
 
     type PairingCoeff: ParityCmp;
+
+    type PairingRepr: ParityCmp;
 
     fn double_eval(self) -> Self::PairingCoeff;
 
@@ -36,14 +54,12 @@ pub trait Pairing {
     // g2 group projective point
     type G2Projective: G2Pairing;
 
+    type G2PairngRepr: ParityCmp;
+
     // range of pairing function
     type PairingRange: PairingRange;
 
     fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange;
 
-    fn miller_loop(
-        g2_affine: Self::G2Affine,
-        g2_projective: Self::G2Projective,
-        poly: Self::PairingRange,
-    ) -> Self::PairingRange;
+    fn miller_loop(g1: Self::G1Affine, g2: Self::G2PairngRepr) -> Self::PairingRange;
 }

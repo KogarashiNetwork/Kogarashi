@@ -1,22 +1,49 @@
 use crate::fq::Fq;
-use zero_crypto::dress::extention_field::*;
+use crate::g1::G1Affine;
+use crate::g2::PairingCoeff;
+use zero_crypto::dress::extension_field::*;
+use zero_crypto::dress::pairing::bls12_range_field_pairing;
 
 // sextic twist of Fp12
 // degree 2 extension field
 const TWO_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 2;
-extention_field_operation!(Fq2, Fq, TWO_DEGREE_EXTENTION_LIMBS_LENGTH);
+extension_field_operation!(Fq2, Fq, TWO_DEGREE_EXTENTION_LIMBS_LENGTH);
 
 // degree 6 extension field
 const SIX_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 3;
-construct_extention_field!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
-extention_field_built_in!(Fq6);
-const_extention_field_operation!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
+higher_degree_extension_field_operation!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
 
 // degree 12 extension field
 const TWELV_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 2;
-construct_extention_field!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
-extention_field_built_in!(Fq12);
-const_extention_field_operation!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
+higher_degree_extension_field_operation!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
+
+// pairing extension for degree 12 extension field
+bls12_range_field_pairing!(Fq12, Fq2, G1Affine, PairingCoeff);
+
+impl Fq2 {
+    fn get_invert(self) -> Option<Self> {
+        match self.is_zero() {
+            true => None,
+            _ => {
+                let t = self.0[0].square() + self.0[1].square();
+                let t_inv = t.invert().unwrap();
+                Some(Self([t_inv * self.0[0], t_inv * -self.0[1]]))
+            }
+        }
+    }
+}
+
+impl Fq6 {
+    fn get_invert(self) -> Option<Self> {
+        todo!()
+    }
+}
+
+impl Fq12 {
+    fn get_invert(self) -> Option<Self> {
+        todo!()
+    }
+}
 
 #[cfg(test)]
 mod tests {
