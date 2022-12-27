@@ -99,6 +99,10 @@ pub struct G2PairingAffine {
     infinity: bool,
 }
 
+const BLS_X: u64 = 0xd201000000010000;
+
+const BLS_X_IS_NEGATIVE: bool = true;
+
 curve_operation!(
     Fr,
     Fq2,
@@ -109,7 +113,14 @@ curve_operation!(
     GENERATOR,
     IDENTITY
 );
-bls12_pairing!(G2Projective, PairingCoeff, G2PairingAffine, Fq12);
+bls12_pairing!(
+    G2Projective,
+    PairingCoeff,
+    G2PairingAffine,
+    Fq12,
+    BLS_X,
+    BLS_X_IS_NEGATIVE
+);
 
 #[cfg(test)]
 mod tests {

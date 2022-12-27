@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! bls12_pairing {
-    ($g2:ident, $pairng_coeff:ident, $pairing_affine:ident, $range_field:ident) => {
+    ($g2:ident, $pairng_coeff:ident, $g2_pairing_affine:ident, $range_field:ident, $bls_x:ident, $bls_x_is_negative:ident) => {
         use zero_crypto::behave::{G2Pairing, PairingRange, ParityCmp};
 
         impl PairingRange for $range_field {
@@ -173,6 +173,47 @@ macro_rules! bls12_pairing {
                 t1.double();
 
                 $pairng_coeff(t10, t1, t9)
+            }
+        }
+
+        impl Default for $g2_pairing_affine {
+            fn default() -> Self {
+                $g2_pairing_affine {
+                    coeffs: vec![],
+                    infinity: true,
+                }
+            }
+        }
+
+        impl From<$g2> for $g2_pairing_affine {
+            fn from(a: $g2) -> $g2_pairing_affine {
+                if a.is_identity() {
+                    $g2_pairing_affine::default()
+                } else {
+                    let mut coeffs = vec![];
+                    let mut acc = a;
+
+                    let mut found_one = false;
+                    for i in (0..64).rev().map(|b| (((BLS_X >> 1) >> b) & 1) == 1) {
+                        if !found_one {
+                            found_one = i;
+                            continue;
+                        }
+
+                        coeffs.push(acc.double_eval());
+
+                        if i {
+                            coeffs.push(acc.add_eval(a));
+                        }
+                    }
+
+                    coeffs.push(acc.double_eval());
+
+                    $g2_pairing_affine {
+                        coeffs,
+                        infinity: false,
+                    }
+                }
             }
         }
     };
