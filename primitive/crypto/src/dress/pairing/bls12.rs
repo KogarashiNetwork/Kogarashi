@@ -11,10 +11,14 @@ macro_rules! bls12_pairing {
 
         impl ParityCmp for $pairng_coeff {}
 
+        impl ParityCmp for $g2_pairing_affine {}
+
         impl G2Pairing for $g2 {
             type PairingRange = $range_field;
 
             type PairingCoeff = $pairng_coeff;
+
+            type PairingRepr = $g2_pairing_affine;
 
             fn double_eval(mut self) -> $pairng_coeff {
                 // Adaptation of Algorithm 26, https://eprint.iacr.org/2010/354.pdf

@@ -17,6 +17,8 @@ pub trait G2Pairing: Projective {
 
     type PairingCoeff: ParityCmp;
 
+    type PairingRepr: ParityCmp;
+
     fn double_eval(self) -> Self::PairingCoeff;
 
     fn add_eval(self, rhs: Self) -> Self::PairingCoeff;
@@ -36,14 +38,12 @@ pub trait Pairing {
     // g2 group projective point
     type G2Projective: G2Pairing;
 
+    type G2PairngRepr: ParityCmp;
+
     // range of pairing function
     type PairingRange: PairingRange;
 
     fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange;
 
-    fn miller_loop(
-        g2_affine: Self::G2Affine,
-        g2_projective: Self::G2Projective,
-        poly: Self::PairingRange,
-    ) -> Self::PairingRange;
+    fn miller_loop(g1: Self::G1Affine, g2: Self::G2PairngRepr) -> Self::PairingRange;
 }
