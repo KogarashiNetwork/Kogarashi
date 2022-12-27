@@ -90,7 +90,7 @@ pub struct G2Affine {
 
 /// The coefficient for pairing affine format
 #[derive(Debug, Clone, Decode, Encode)]
-pub struct PairingCoeff(Fq2, Fq2, Fq2);
+pub struct PairingCoeff(pub(crate) Fq2, pub(crate) Fq2, pub(crate) Fq2);
 
 /// The pairing format coordinate
 #[derive(Debug, Clone, Decode, Encode)]

@@ -9,6 +9,15 @@ pub trait PairingRange: ExtentionField {
 
     type G2Coeff: ParityCmp;
 
+    type QuadraticField: ExtentionField;
+
+    fn mul_by_014(
+        self,
+        c0: Self::QuadraticField,
+        c1: Self::QuadraticField,
+        c4: Self::QuadraticField,
+    ) -> Self;
+
     fn untwist(self, coeffs: Self::G2Coeff, g1: Self::G1Affine) -> Self;
 
     fn conjugate(self) -> Self;

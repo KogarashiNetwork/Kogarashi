@@ -52,8 +52,8 @@ const PARAM_B: Fq = Fq([
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct G1Affine {
-    x: Fq,
-    y: Fq,
+    pub(crate) x: Fq,
+    pub(crate) y: Fq,
     is_infinity: bool,
 }
 

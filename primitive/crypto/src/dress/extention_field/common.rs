@@ -1,8 +1,11 @@
 #[macro_export]
 macro_rules! extention_field_built_in {
-    ($extention_field:ident) => {
+    ($extention_field:ident, $sub_field:ident, $limbs_length:ident) => {
         use zero_crypto::behave::*;
         use zero_crypto::common::*;
+
+        const_extention_field_operation!($extention_field, $sub_field, $limbs_length);
+        construct_extention_field!($extention_field, $sub_field, $limbs_length);
 
         impl ExtentionField for $extention_field {}
 

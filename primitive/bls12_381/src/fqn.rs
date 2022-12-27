@@ -11,18 +11,14 @@ extention_field_operation!(Fq2, Fq, TWO_DEGREE_EXTENTION_LIMBS_LENGTH);
 
 // degree 6 extension field
 const SIX_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 3;
-construct_extention_field!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
-extention_field_built_in!(Fq6);
-const_extention_field_operation!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
+extention_field_built_in!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
 
 // degree 12 extension field
 const TWELV_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 2;
-construct_extention_field!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
-extention_field_built_in!(Fq12);
-const_extention_field_operation!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
+extention_field_built_in!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
 
 // pairing extention for degree 12 extention field
-bls12_range_field_pairing!(Fq12, G1Affine, PairingCoeff);
+bls12_range_field_pairing!(Fq12, Fq2, G1Affine, PairingCoeff);
 
 #[cfg(test)]
 mod tests {

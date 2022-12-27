@@ -10,9 +10,7 @@ pub use ring::*;
 macro_rules! extention_field_operation {
     ($extention_field:ident, $sub_field:ident, $limbs_length:ident) => {
         extention_field_ring_operation!($extention_field, $sub_field, $limbs_length);
-        extention_field_built_in!($extention_field);
-        const_extention_field_operation!($extention_field, $sub_field, $limbs_length);
-        construct_extention_field!($extention_field, $sub_field, $limbs_length);
+        extention_field_built_in!($extention_field, $sub_field, $limbs_length);
 
         impl Field for $extention_field {}
 
