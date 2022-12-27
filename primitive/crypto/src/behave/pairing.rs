@@ -1,15 +1,17 @@
-use super::{comp::ParityCmp, curve::Affine, field::PrimeField, Projective};
+use super::{
+    comp::ParityCmp, curve::Affine, extension_field::ExtensionField, field::PrimeField, Projective,
+};
 
 /// pairing field
 pub trait PairingField: PrimeField + ParityCmp {}
 
 /// pairing function range field
-pub trait PairingRange: ExtentionField {
+pub trait PairingRange: ExtensionField {
     type G1Affine: Affine;
 
     type G2Coeff: ParityCmp;
 
-    type QuadraticField: ExtentionField;
+    type QuadraticField: ExtensionField;
 
     fn mul_by_014(
         self,
@@ -24,9 +26,6 @@ pub trait PairingRange: ExtentionField {
 
     fn final_exp(self) -> Self;
 }
-
-/// extention field
-pub trait ExtentionField: ParityCmp {}
 
 /// G2 group pairing interface
 pub trait G2Pairing: Projective {

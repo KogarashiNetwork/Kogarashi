@@ -1,38 +1,38 @@
 #[macro_export]
-macro_rules! extention_field_ring_operation {
-    ($extention_field:ident, $sub_field:ident, $limbs_length:ident) => {
-        extention_field_group_operation!($extention_field);
+macro_rules! extension_field_ring_operation {
+    ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
+        extension_field_group_operation!($extension_field);
 
-        impl Ring for $extention_field {}
+        impl Ring for $extension_field {}
 
-        impl Add for $extention_field {
+        impl Add for $extension_field {
             type Output = Self;
 
             #[inline]
-            fn add(self, rhs: $extention_field) -> Self {
+            fn add(self, rhs: $extension_field) -> Self {
                 let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
                 for i in 0..$limbs_length {
                     limbs[i] = self.0[i] + rhs.0[i];
                 }
-                $extention_field(limbs)
+                $extension_field(limbs)
             }
         }
 
-        impl<'a, 'b> Add<&'b $extention_field> for &'a $extention_field {
-            type Output = $extention_field;
+        impl<'a, 'b> Add<&'b $extension_field> for &'a $extension_field {
+            type Output = $extension_field;
 
             #[inline]
-            fn add(self, rhs: &'b $extention_field) -> $extention_field {
+            fn add(self, rhs: &'b $extension_field) -> $extension_field {
                 let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
                 for i in 0..$limbs_length {
                     limbs[i] = self.0[i] + rhs.0[i];
                 }
-                $extention_field(limbs)
+                $extension_field(limbs)
             }
         }
 
-        impl AddAssign for $extention_field {
-            fn add_assign(&mut self, rhs: $extention_field) {
+        impl AddAssign for $extension_field {
+            fn add_assign(&mut self, rhs: $extension_field) {
                 let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
                 for i in 0..$limbs_length {
                     limbs[i] = self.0[i] + rhs.0[i];
@@ -41,7 +41,7 @@ macro_rules! extention_field_ring_operation {
             }
         }
 
-        impl Neg for $extention_field {
+        impl Neg for $extension_field {
             type Output = Self;
 
             #[inline]
@@ -50,51 +50,51 @@ macro_rules! extention_field_ring_operation {
                 for i in 0..$limbs_length {
                     limbs[i] = -self.0[i];
                 }
-                $extention_field(limbs)
+                $extension_field(limbs)
             }
         }
 
-        impl<'a> Neg for &'a $extention_field {
-            type Output = $extention_field;
+        impl<'a> Neg for &'a $extension_field {
+            type Output = $extension_field;
 
             #[inline]
-            fn neg(self) -> $extention_field {
+            fn neg(self) -> $extension_field {
                 let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
                 for i in 0..$limbs_length {
                     limbs[i] = -self.0[i];
                 }
-                $extention_field(limbs)
+                $extension_field(limbs)
             }
         }
 
-        impl Sub for $extention_field {
+        impl Sub for $extension_field {
             type Output = Self;
 
             #[inline]
-            fn sub(self, rhs: $extention_field) -> Self {
+            fn sub(self, rhs: $extension_field) -> Self {
                 let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
                 for i in 0..$limbs_length {
                     limbs[i] = self.0[i] - rhs.0[i];
                 }
-                $extention_field(limbs)
+                $extension_field(limbs)
             }
         }
 
-        impl<'a, 'b> Sub<&'b $extention_field> for &'a $extention_field {
-            type Output = $extention_field;
+        impl<'a, 'b> Sub<&'b $extension_field> for &'a $extension_field {
+            type Output = $extension_field;
 
             #[inline]
-            fn sub(self, rhs: &'b $extention_field) -> $extention_field {
+            fn sub(self, rhs: &'b $extension_field) -> $extension_field {
                 let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
                 for i in 0..$limbs_length {
                     limbs[i] = self.0[i] - rhs.0[i];
                 }
-                $extention_field(limbs)
+                $extension_field(limbs)
             }
         }
 
-        impl SubAssign for $extention_field {
-            fn sub_assign(&mut self, rhs: $extention_field) {
+        impl SubAssign for $extension_field {
+            fn sub_assign(&mut self, rhs: $extension_field) {
                 let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
                 for i in 0..$limbs_length {
                     limbs[i] = self.0[i] - rhs.0[i];
@@ -105,4 +105,4 @@ macro_rules! extention_field_ring_operation {
     };
 }
 
-pub use extention_field_ring_operation;
+pub use extension_field_ring_operation;

@@ -26,7 +26,7 @@ We are supporting the confidential transactions for transfers and contracts exec
 - `/client`: The substrate-based blockchain client rpc implementation.
 - `/example`: The confidential transfer circom implementation.
 - `/pallets`: The `pallet` implementations which are used on runtime.
-    - `/confidential_transfer`: The confidential transfer pallet using encrypted balance by `lifted-ElGamal` enctyption extention of [`balance`](https://github.com/paritytech/substrate/tree/master/frame/balances).
+    - `/confidential_transfer`: The confidential transfer pallet using encrypted balance by `lifted-ElGamal` enctyption extension of [`balance`](https://github.com/paritytech/substrate/tree/master/frame/balances).
     - `/plonk`: The plonk pallet compatible with Substrate.
 - `/primitive`: The primitive libraries which are compatible with [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec).
     - `/bls12_381`: The `BLS12 381` curve.

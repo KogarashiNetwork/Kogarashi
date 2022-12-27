@@ -1,82 +1,111 @@
-mod common;
-mod group;
-mod ring;
+#[macro_export]
+macro_rules! extension_field_built_in {
+    ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
+        use zero_crypto::behave::*;
+        use zero_crypto::common::*;
 
-pub use common::*;
-pub use group::*;
-pub use ring::*;
+        const_extension_field_operation!($extension_field, $sub_field, $limbs_length);
+        construct_extension_field!($extension_field, $sub_field, $limbs_length);
+
+        impl ExtensionField for $extension_field {}
+
+        impl ParityCmp for $extension_field {}
+
+        impl Basic for $extension_field {}
+
+        impl Default for $extension_field {
+            fn default() -> Self {
+                Self::zero()
+            }
+        }
+
+        impl Display for $extension_field {
+            fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                for i in self.0.iter().rev() {
+                    write!(f, "0x")?;
+                    write!(f, "{:016x}", *i)?;
+                }
+                Ok(())
+            }
+        }
+
+        impl LowerHex for $extension_field {
+            fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                for i in self.0.iter().rev() {
+                    write!(f, "0x")?;
+                    write!(f, "{:016x}", *i)?;
+                }
+                Ok(())
+            }
+        }
+    };
+}
 
 #[macro_export]
-macro_rules! extention_field_operation {
-    ($extention_field:ident, $sub_field:ident, $limbs_length:ident) => {
-        extention_field_ring_operation!($extention_field, $sub_field, $limbs_length);
-        extention_field_built_in!($extention_field, $sub_field, $limbs_length);
+macro_rules! const_extension_field_operation {
+    ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
+        impl $extension_field {
+            pub const fn zero() -> Self {
+                Self([$sub_field::zero(); $limbs_length])
+            }
 
-        impl Field for $extention_field {}
+            pub const fn one() -> Self {
+                let mut limbs = [$sub_field::zero(); $limbs_length];
+                limbs[0] = $sub_field::one();
+                Self(limbs)
+            }
 
-        impl Mul for $extention_field {
-            type Output = Self;
-
-            #[inline]
-            fn mul(self, rhs: $extention_field) -> Self {
-                let re = (self.0[0] * rhs.0[0]) - (self.0[1] * rhs.0[1]);
-                let im = (self.0[0] * rhs.0[1] + (self.0[1] * rhs.0[0]));
-                $extention_field([re, im])
+            pub const fn dummy() -> Self {
+                unimplemented!()
             }
         }
+    };
+}
 
-        impl<'a, 'b> Mul<&'b $extention_field> for &'a $extention_field {
-            type Output = $extention_field;
+#[macro_export]
+macro_rules! construct_extension_field {
+    ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
+        #[derive(Debug, Clone, Copy, Decode, Encode)]
+        pub struct $extension_field(pub(crate) [$sub_field; $limbs_length]);
+    };
+}
 
-            #[inline]
-            fn mul(self, rhs: &'b $extention_field) -> $extention_field {
-                let re = (self.0[0] * rhs.0[0]) - (self.0[1] * rhs.0[1]);
-                let im = (self.0[0] * rhs.0[1] + (self.0[1] * rhs.0[0]));
-                $extention_field([re, im])
-            }
-        }
-
-        impl MulAssign for $extention_field {
-            fn mul_assign(&mut self, rhs: $extention_field) {
-                let re = (self.0[0] * rhs.0[0]) - (self.0[1] * rhs.0[1]);
-                let im = (self.0[0] * rhs.0[1] + (self.0[1] * rhs.0[0]));
-                self.0 = [re, im]
-            }
-        }
-
+#[macro_export]
+macro_rules! common_extension_field_operation {
+    ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
         #[allow(clippy::suspicious_arithmetic_impl)]
-        impl Div for $extention_field {
-            type Output = $extention_field;
+        impl Div for $extension_field {
+            type Output = $extension_field;
 
             #[inline]
-            fn div(self, rhs: $extention_field) -> $extention_field {
+            fn div(self, rhs: $extension_field) -> $extension_field {
                 let inv = rhs.invert().unwrap();
                 self * inv
             }
         }
 
         #[allow(clippy::suspicious_arithmetic_impl)]
-        impl<'a, 'b> Div<&'b $extention_field> for &'a $extention_field {
-            type Output = $extention_field;
+        impl<'a, 'b> Div<&'b $extension_field> for &'a $extension_field {
+            type Output = $extension_field;
 
             #[inline]
-            fn div(self, rhs: &'b $extention_field) -> $extention_field {
+            fn div(self, rhs: &'b $extension_field) -> $extension_field {
                 let inv = rhs.invert().unwrap();
                 self * &inv
             }
         }
 
         #[allow(clippy::suspicious_op_assign_impl)]
-        impl DivAssign for $extention_field {
-            fn div_assign(&mut self, rhs: $extention_field) {
+        impl DivAssign for $extension_field {
+            fn div_assign(&mut self, rhs: $extension_field) {
                 let inv = rhs.invert().unwrap();
                 *self *= inv
             }
         }
 
-        impl PrimeField for $extention_field {
+        impl PrimeField for $extension_field {
             // wrong if this is problem
-            const MODULUS: $extention_field = $extention_field::dummy();
+            const MODULUS: $extension_field = $extension_field::dummy();
 
             const INV: u64 = $sub_field::INV;
 
@@ -99,7 +128,7 @@ macro_rules! extention_field_operation {
                 for i in 0..$limbs_length {
                     limbs[i] = $sub_field::random(&mut rand);
                 }
-                $extention_field(limbs)
+                $extension_field(limbs)
             }
 
             // TODO should be optimized
@@ -120,7 +149,7 @@ macro_rules! extention_field_operation {
             }
         }
 
-        impl PartialOrd for $extention_field {
+        impl PartialOrd for $extension_field {
             fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
                 Some(self.cmp(other))
             }
@@ -162,7 +191,7 @@ macro_rules! extention_field_operation {
             }
         }
 
-        impl Ord for $extention_field {
+        impl Ord for $extension_field {
             fn cmp(&self, other: &Self) -> Ordering {
                 for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
                     if a < b {
@@ -177,4 +206,7 @@ macro_rules! extention_field_operation {
     };
 }
 
-pub use extention_field_operation;
+pub use {
+    common_extension_field_operation, const_extension_field_operation, construct_extension_field,
+    extension_field_built_in,
+};
