@@ -4,6 +4,8 @@ macro_rules! extention_field_built_in {
         use zero_crypto::behave::*;
         use zero_crypto::common::*;
 
+        impl ExtentionField for $extention_field {}
+
         impl ParityCmp for $extention_field {}
 
         impl Basic for $extention_field {}

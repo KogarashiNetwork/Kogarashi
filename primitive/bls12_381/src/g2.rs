@@ -1,9 +1,9 @@
 use crate::fq::Fq;
-use crate::fqn::Fq2;
+use crate::fqn::{Fq12, Fq2};
 use crate::fr::Fr;
 use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::common::*;
-use zero_crypto::dress::curve::*;
+use zero_crypto::dress::{curve::*, pairing::bls12_pairing};
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
@@ -88,6 +88,21 @@ pub struct G2Affine {
     is_infinity: bool,
 }
 
+/// The coefficient for pairing affine format
+#[derive(Debug, Clone, Decode, Encode)]
+pub struct PairingCoeff(Fq2, Fq2, Fq2);
+
+/// The pairing format coordinate
+#[derive(Debug, Clone, Decode, Encode)]
+pub struct G2PairingAffine {
+    coeffs: Vec<PairingCoeff>,
+    infinity: bool,
+}
+
+const BLS_X: u64 = 0xd201000000010000;
+
+const BLS_X_IS_NEGATIVE: bool = true;
+
 curve_operation!(
     Fr,
     Fq2,
@@ -97,6 +112,14 @@ curve_operation!(
     G2Projective,
     GENERATOR,
     IDENTITY
+);
+bls12_pairing!(
+    G2Projective,
+    PairingCoeff,
+    G2PairingAffine,
+    Fq12,
+    BLS_X,
+    BLS_X_IS_NEGATIVE
 );
 
 #[cfg(test)]

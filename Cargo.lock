@@ -1385,20 +1385,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f9b7d56ba4a8344d6be9729995e6b06f928af29998cdf79fe390cbf6b1fee838"
 
 [[package]]
-name = "kzg"
-version = "0.1.0"
-dependencies = [
- "parity-scale-codec",
- "proptest",
- "rand 0.8.5",
- "rand_core 0.6.3",
- "rand_xorshift",
- "rayon",
- "zero-bls12-381",
- "zero-crypto",
-]
-
-[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3458,6 +3444,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "zero-kzg"
+version = "0.1.0"
+dependencies = [
+ "parity-scale-codec",
+ "proptest",
+ "rand 0.8.5",
+ "rand_core 0.6.3",
+ "rand_xorshift",
+ "rayon",
+ "zero-bls12-381",
+ "zero-crypto",
+]
+
+[[package]]
 name = "zero-network"
 version = "0.1.0"
 dependencies = [
@@ -3466,8 +3466,20 @@ dependencies = [
  "pallet-encrypted-balance",
  "rand_core 0.5.1",
  "rand_core 0.6.3",
+ "zero-bls12-381",
+ "zero-crypto",
  "zero-elgamal",
  "zero-jubjub",
+ "zero-kzg",
+ "zero-pairing",
+]
+
+[[package]]
+name = "zero-pairing"
+version = "0.1.0"
+dependencies = [
+ "zero-bls12-381",
+ "zero-crypto",
 ]
 
 [[package]]
