@@ -7,6 +7,27 @@ struct Keccak {
     r: u32,
     c: u32,
     s: Vec<u8>,
+    state: State,
+}
+
+struct State {
+    w: u32,
+    l: u32,
+    x: Vec<u8>,
+    y: Vec<u8>,
+    z: Vec<u8>,
+}
+
+impl State {
+    fn init(w: u32, l: u32) -> Self {
+        Self {
+            w,
+            l,
+            x: [0; 5].to_vec(),
+            y: [0; 5].to_vec(),
+            z: (0..w).map(|_| 0).collect(),
+        }
+    }
 }
 
 impl Keccak {
@@ -16,6 +37,7 @@ impl Keccak {
                 r: 1088,
                 c: 512,
                 s: Vec::new(),
+                state: State::init(64, 6),
             },
             _ => unimplemented!(),
         }
@@ -41,6 +63,25 @@ fn h2b(bytes: &HexBytes, n: usize) -> Bits {
         output.append(&mut bits);
     }
     trunc(n, output)
+}
+
+fn multirate_padding(mut bytes: Vec<u8>, r: u32) -> Vec<u8> {
+    let m = bytes.len();
+    let p = r / 8;
+    let q = p - m as u32 % p;
+
+    if q == 1 {
+        bytes.push(0x86);
+    } else if q == 2 {
+        bytes.append(&mut Vec::from([0x06, 0x80]));
+    } else {
+        let offset = q - 2;
+        bytes.push(0x06);
+        bytes.append(&mut (0..offset).map(|_| 0).collect::<Vec<u8>>());
+        bytes.push(0x80);
+    }
+
+    bytes
 }
 
 #[cfg(test)]
