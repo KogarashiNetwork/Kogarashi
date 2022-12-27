@@ -88,6 +88,17 @@ pub struct G2Affine {
     is_infinity: bool,
 }
 
+/// The coefficient for pairing affine format
+#[derive(Debug, Clone, Decode, Encode)]
+pub struct PairingCoeff(Fq2, Fq2, Fq2);
+
+/// The pairing format coordinate
+#[derive(Debug, Clone, Decode, Encode)]
+pub struct G2PairingAffine {
+    coeffs: Vec<PairingCoeff>,
+    infinity: bool,
+}
+
 curve_operation!(
     Fr,
     Fq2,
@@ -98,7 +109,7 @@ curve_operation!(
     GENERATOR,
     IDENTITY
 );
-bls12_pairing!(G2Projective, Fq12);
+bls12_pairing!(G2Projective, PairingCoeff, G2PairingAffine, Fq12);
 
 #[cfg(test)]
 mod tests {

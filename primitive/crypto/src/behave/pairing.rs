@@ -15,7 +15,9 @@ pub trait ExtentionField: ParityCmp {}
 pub trait G2Pairing: Projective {
     type PairingRange: PairingRange;
 
-    fn double_eval(self) -> Self::PairingRange;
+    type PairingCoeff: ParityCmp;
+
+    fn double_eval(self) -> Self::PairingCoeff;
 
     fn add_eval(self) -> Self::PairingRange;
 }
