@@ -1,5 +1,8 @@
 use crate::fq::Fq;
+use crate::g1::G1Affine;
+use crate::g2::PairingCoeff;
 use zero_crypto::dress::extention_field::*;
+use zero_crypto::dress::pairing::bls12_range_field_pairing;
 
 // sextic twist of Fp12
 // degree 2 extension field
@@ -17,6 +20,9 @@ const TWELV_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 2;
 construct_extention_field!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
 extention_field_built_in!(Fq12);
 const_extention_field_operation!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
+
+// pairing extention for degree 12 extention field
+bls12_range_field_pairing!(Fq12, G1Affine, PairingCoeff);
 
 #[cfg(test)]
 mod tests {

@@ -5,6 +5,14 @@ pub trait PairingField: PrimeField + ParityCmp {}
 
 /// pairing function range field
 pub trait PairingRange: ExtentionField {
+    type G1Affine: Affine;
+
+    type G2Coeff: ParityCmp;
+
+    fn untwist(self, coeffs: Self::G2Coeff, g1: Self::G1Affine) -> Self;
+
+    fn conjugate(self) -> Self;
+
     fn final_exp(self) -> Self;
 }
 

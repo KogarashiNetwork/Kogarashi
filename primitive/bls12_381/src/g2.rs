@@ -3,7 +3,7 @@ use crate::fqn::{Fq12, Fq2};
 use crate::fr::Fr;
 use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::common::*;
-use zero_crypto::dress::{curve::*, pairing::bls12_pairing};
+use zero_crypto::dress::{curve::*, pairing::bls12_g2_pairing};
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
@@ -113,7 +113,7 @@ curve_operation!(
     GENERATOR,
     IDENTITY
 );
-bls12_pairing!(
+bls12_g2_pairing!(
     G2Projective,
     PairingCoeff,
     G2PairingAffine,
