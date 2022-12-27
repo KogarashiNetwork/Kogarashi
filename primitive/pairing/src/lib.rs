@@ -15,10 +15,43 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use zero_bls12_381::{Fq, Fq12, Fq2, Fq6};
+use zero_bls12_381::{Fq, Fq12, Fq2, Fq6, G1Affine, G1Projective, G2Affine, G2Projective};
+use zero_crypto::behave::Pairing;
 
-#[derive(Copy, Clone, Debug)]
-pub struct Pairing(Fq12);
+// tate pairing with miller algorithm
+pub struct TatePairing {}
+
+impl Pairing for TatePairing {
+    type G1Affine = G1Affine;
+
+    type G2Affine = G2Affine;
+
+    type G1Projective = G1Projective;
+
+    type G2Projective = G2Projective;
+
+    type PairingRange = Fq12;
+
+    fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange {
+        pairing(g1, g2)
+    }
+
+    fn miller_loop(
+        g2_affine: Self::G2Affine,
+        g2_projective: Self::G2Projective,
+        poly: Self::PairingRange,
+    ) -> Self::PairingRange {
+        miller_loop(g2_affine, g2_projective, poly)
+    }
+}
+
+fn pairing(g1: G1Affine, g2: G2Affine) -> Fq12 {
+    Fq12::zero()
+}
+
+fn miller_loop(g2_affine: G2Affine, g2_projective: G2Projective, poly: Fq12) -> Fq12 {
+    Fq12::zero()
+}
 
 #[cfg(test)]
 mod tests {

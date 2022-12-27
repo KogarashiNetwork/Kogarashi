@@ -1,4 +1,4 @@
-use super::{comp::ParityCmp, curve::Affine, field::PrimeField};
+use super::{comp::ParityCmp, curve::Affine, field::PrimeField, Projective};
 
 /// pairing field
 pub trait PairingField: PrimeField + ParityCmp {}
@@ -11,6 +11,15 @@ pub trait PairingRange: PairingField {
 /// extention field
 pub trait ExtentionField: ParityCmp {}
 
+/// G2 group pairing interface
+pub trait G2Pairing: Affine {
+    type PairingRange: PairingRange;
+
+    fn double_eval(self) -> Self::PairingRange;
+
+    fn add_eval(self) -> Self;
+}
+
 /// pairing abstraction
 pub trait Pairing {
     // g1 group affine point
@@ -19,10 +28,20 @@ pub trait Pairing {
     // g2 group affine point
     type G2Affine: Affine;
 
+    // g1 group projective point
+    type G1Projective: Projective;
+
+    // g2 group projective point
+    type G2Projective: G2Pairing;
+
     // range of pairing function
-    type PairngRange: ExtentionField;
+    type PairingRange: PairingRange;
 
-    fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairngRange;
+    fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange;
 
-    fn miller_loop();
+    fn miller_loop(
+        g2_affine: Self::G2Affine,
+        g2_projective: Self::G2Projective,
+        poly: Self::PairingRange,
+    ) -> Self::PairingRange;
 }
