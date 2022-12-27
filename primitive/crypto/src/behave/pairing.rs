@@ -4,7 +4,7 @@ use super::{comp::ParityCmp, curve::Affine, field::PrimeField, Projective};
 pub trait PairingField: PrimeField + ParityCmp {}
 
 /// pairing function range field
-pub trait PairingRange: PairingField {
+pub trait PairingRange: ExtentionField {
     fn final_exp(self) -> Self;
 }
 
@@ -12,12 +12,12 @@ pub trait PairingRange: PairingField {
 pub trait ExtentionField: ParityCmp {}
 
 /// G2 group pairing interface
-pub trait G2Pairing: Affine {
+pub trait G2Pairing: Projective {
     type PairingRange: PairingRange;
 
     fn double_eval(self) -> Self::PairingRange;
 
-    fn add_eval(self) -> Self;
+    fn add_eval(self) -> Self::PairingRange;
 }
 
 /// pairing abstraction

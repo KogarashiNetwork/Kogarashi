@@ -4,25 +4,18 @@ use zero_crypto::dress::extention_field::*;
 // sextic twist of Fp12
 // degree 2 extension field
 const TWO_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 2;
-
 extention_field_operation!(Fq2, Fq, TWO_DEGREE_EXTENTION_LIMBS_LENGTH);
 
 // degree 6 extension field
 const SIX_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 3;
-
 construct_extention_field!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
-
 extention_field_built_in!(Fq6);
-
 const_extention_field_operation!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
 
 // degree 12 extension field
 const TWELV_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 2;
-
 construct_extention_field!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
-
 extention_field_built_in!(Fq12);
-
 const_extention_field_operation!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
 
 #[cfg(test)]
