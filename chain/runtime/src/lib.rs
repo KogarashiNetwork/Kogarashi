@@ -236,7 +236,6 @@ parameter_types! {
     pub const MaxLocks: u32 = 50;
 }
 
-// TODO: should be replaced with encrypted balance
 impl pallet_confidential_transfer::Config for Runtime {
     type MaxLocks = MaxLocks;
     /// The type for recording an account's balance.

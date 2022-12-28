@@ -11,11 +11,11 @@ extension_field_operation!(Fq2, Fq, TWO_DEGREE_EXTENTION_LIMBS_LENGTH);
 
 // degree 6 extension field
 const SIX_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 3;
-higher_degree_extension_field_operation!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
+extension_field_operation!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
 
 // degree 12 extension field
 const TWELV_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 2;
-higher_degree_extension_field_operation!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
+extension_field_operation!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
 
 // pairing extension for degree 12 extension field
 bls12_range_field_pairing!(Fq12, Fq2, G1Affine, PairingCoeff);
@@ -31,108 +31,143 @@ impl Fq2 {
             }
         }
     }
+
+    fn mul_ext_field(self, rhs: Self) -> Self {
+        let re = (self.0[0] * rhs.0[0]) - (self.0[1] * rhs.0[1]);
+        let im = (self.0[0] * rhs.0[1]) + (self.0[1] * rhs.0[0]);
+        Self([re, im])
+    }
+
+    fn square_ext_field(self) -> Self {
+        self * self
+    }
+
+    fn mul_by_nonres(self) -> Self {
+        Self([self.0[0] - self.0[1], self.0[0] + self.0[1]])
+    }
 }
 
 impl Fq6 {
     fn get_invert(self) -> Option<Self> {
-        todo!()
+        let c0 = (self.0[1] * self.0[2]).mul_by_nonresidue();
+        let c0 = self.0[0].square() - c0;
+
+        let c1 = self.0[2].square().mul_by_nonresidue();
+        let c1 = c1 - (self.0[0] * self.0[1]);
+
+        let c2 = self.0[1].square();
+        let c2 = c2 - (self.0[0] * self.0[2]);
+
+        let tmp = ((self.0[1] * c2) + (self.0[2] * c1)).mul_by_nonresidue();
+        let tmp = tmp + (self.0[0] * c0);
+
+        tmp.invert().map(|t| Self([t * c0, t * c1, t * c2]))
+    }
+
+    fn mul_ext_field(self, rhs: Self) -> Self {
+        let mut a_a = self.0[0];
+        let mut b_b = self.0[1];
+        let mut c_c = self.0[2];
+        a_a *= rhs.0[0];
+        b_b *= rhs.0[1];
+        c_c *= rhs.0[2];
+
+        let mut t1 = rhs.0[1];
+        t1 += rhs.0[2];
+        {
+            let mut tmp = self.0[1];
+            tmp += self.0[2];
+
+            t1 *= tmp;
+            t1 -= b_b;
+            t1 -= c_c;
+            t1 = t1.mul_by_nonresidue();
+            t1 += a_a;
+        }
+
+        let mut t3 = rhs.0[0];
+        t3 += rhs.0[2];
+        {
+            let mut tmp = self.0[0];
+            tmp += self.0[2];
+
+            t3 *= tmp;
+            t3 -= a_a;
+            t3 += b_b;
+            t3 -= c_c;
+        }
+
+        let mut t2 = rhs.0[0];
+        t2 += rhs.0[1];
+        {
+            let mut tmp = self.0[0];
+            tmp += self.0[1];
+
+            t2 *= tmp;
+            t2 -= a_a;
+            t2 -= b_b;
+            c_c = c_c.mul_by_nonresidue();
+            t2 += c_c;
+        }
+
+        Self([t1, t2, t3])
+    }
+
+    fn square_ext_field(self) -> Self {
+        let s0 = self.0[0].square();
+        let ab = self.0[0] * self.0[1];
+        let s1 = ab.double();
+        let mut s2 = self.0[0];
+        s2 -= self.0[1];
+        s2 += self.0[2];
+        s2 = s2.square();
+        let bc = self.0[1] * self.0[2];
+        let s3 = bc.double();
+        let s4 = self.0[2].square();
+
+        let tmp1 = s3.mul_by_nonresidue() + s0;
+        let tmp2 = s4.mul_by_nonresidue() + s1;
+        let tmp3 = s1 + s2 + s3 - s0 - s4;
+
+        Self([tmp1, tmp2, tmp3])
+    }
+
+    fn mul_by_nonres(self) -> Self {
+        Self([self.0[2].mul_by_nonresidue(), self.0[0], self.0[1]])
     }
 }
 
 impl Fq12 {
     fn get_invert(self) -> Option<Self> {
-        todo!()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::Fq2;
-    use proptest::prelude::*;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
-    use zero_crypto::behave::Group;
-    use zero_crypto::common::PrimeField;
-
-    prop_compose! {
-        fn arb_jubjub_fq2()(bytes in [any::<u8>(); 16]) -> Fq2 {
-            Fq2::random(XorShiftRng::from_seed(bytes))
-        }
+        (self.0[0].square() - self.0[1].square().mul_by_nonresidue())
+            .invert()
+            .map(|t| Self([self.0[0] * t, self.0[1] * -t]))
     }
 
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100000))]
-        #[test]
-        fn fq2_add_test(a in arb_jubjub_fq2()) {
-            // a + a = a * 2
-            let b = a + a;
-            let c = a.double();
-            assert_eq!(b, c);
-        }
+    fn mul_ext_field(self, rhs: Self) -> Self {
+        let aa = self.0[0] * rhs.0[0];
+        let bb = self.0[1] * rhs.0[1];
+        let o = rhs.0[0] + rhs.0[1];
+        let c1 = self.0[1] + self.0[0];
+        let c1 = c1 * o;
+        let c1 = c1 - aa;
+        let c1 = c1 - bb;
+        let c0 = bb.mul_by_nonresidue();
+        let c0 = c0 + aa;
+
+        Self([c0, c1])
     }
 
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100000))]
-        #[test]
-        fn fq2_sub_test(a in arb_jubjub_fq2()) {
-            // a - a = a * 2 - a * 2
-            let b = a - a;
-            let c = a.double();
-            let d = a.double();
-            let e = c - d;
+    fn square_ext_field(self) -> Self {
+        let ab = self.0[0] * self.0[1];
+        let c0c1 = self.0[0] + self.0[1];
+        let c0 = self.0[1].mul_by_nonresidue() + self.0[0];
+        let tmp = c0 * c0c1 - ab;
 
-            assert_eq!(b, e);
-        }
+        Self([tmp - ab.mul_by_nonresidue(), ab.double()])
     }
 
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(10000))]
-        #[test]
-        fn fq2_mul_test(a in arb_jubjub_fq2(), b in arb_jubjub_fq2(), c in arb_jubjub_fq2()) {
-            // a * b + a * c
-            let ab = a * b;
-            let ac = a * c;
-            let d = ab + ac;
-
-            // a * (b + c)
-            let bc = b + c;
-            let e = a * bc;
-
-            assert_eq!(d, e);
-        }
-    }
-
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(10000))]
-        #[test]
-        fn fq2_square_test(a in arb_jubjub_fq2(), b in arb_jubjub_fq2()) {
-            // (a * a) * (b * b)
-            let aa = a * a;
-            let bb = b * b;
-            let c = aa * bb;
-
-            // a^2 * b^2
-            let aa = a.square();
-            let bb = b.square();
-            let d = aa * bb;
-
-            assert_eq!(c, d);
-        }
-    }
-
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(10000))]
-        #[test]
-        fn fq2_invert_test(a in arb_jubjub_fq2()) {
-            let inv = a.invert();
-
-            match inv {
-                Some(x) => {
-                    let b = a * x;
-                    assert_eq!(b, Fq2::one())
-                },
-                None => {}
-            }
-        }
+    fn mul_by_nonres(self) -> Self {
+        unimplemented!()
     }
 }
