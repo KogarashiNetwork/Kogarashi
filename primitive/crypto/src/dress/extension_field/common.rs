@@ -141,7 +141,7 @@ macro_rules! common_extension_field_operation {
             }
 
             fn square(self) -> Self {
-                self * self
+                self.square_ext_field()
             }
 
             fn double_assign(&mut self) {

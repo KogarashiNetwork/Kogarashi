@@ -38,6 +38,10 @@ impl Fq2 {
         Self([re, im])
     }
 
+    fn square_ext_field(self) -> Self {
+        self * self
+    }
+
     fn mul_by_nonres(self) -> Self {
         Self([self.0[0] - self.0[1], self.0[0] + self.0[1]])
     }
@@ -109,6 +113,25 @@ impl Fq6 {
         Self([t1, t2, t3])
     }
 
+    fn square_ext_field(self) -> Self {
+        let s0 = self.0[0].square();
+        let ab = self.0[0] * self.0[1];
+        let s1 = ab.double();
+        let mut s2 = self.0[0];
+        s2 -= self.0[1];
+        s2 += self.0[2];
+        s2 = s2.square();
+        let bc = self.0[1] * self.0[2];
+        let s3 = bc.double();
+        let s4 = self.0[2].square();
+
+        let tmp1 = s3.mul_by_nonresidue() + s0;
+        let tmp2 = s4.mul_by_nonresidue() + s1;
+        let tmp3 = s1 + s2 + s3 - s0 - s4;
+
+        Self([tmp1, tmp2, tmp3])
+    }
+
     fn mul_by_nonres(self) -> Self {
         Self([self.0[2].mul_by_nonresidue(), self.0[0], self.0[1]])
     }
@@ -122,20 +145,26 @@ impl Fq12 {
     }
 
     fn mul_ext_field(self, rhs: Self) -> Self {
-        let mut aa = self.0[0];
-        aa *= rhs.0[0];
-        let mut bb = self.0[1];
-        bb *= rhs.0[1];
-        let mut o = rhs.0[0];
-        o += rhs.0[1];
-        let mut tmp = self.0[0] + self.0[1];
-        tmp *= o;
-        tmp -= aa;
-        tmp -= bb;
-        let mut tmp2 = bb;
-        tmp2 = tmp2.mul_by_nonresidue();
-        tmp2 += aa;
-        Self([tmp, tmp2])
+        let aa = self.0[0] * rhs.0[0];
+        let bb = self.0[1] * rhs.0[1];
+        let o = rhs.0[0] + rhs.0[1];
+        let c1 = self.0[1] + self.0[0];
+        let c1 = c1 * o;
+        let c1 = c1 - aa;
+        let c1 = c1 - bb;
+        let c0 = bb.mul_by_nonresidue();
+        let c0 = c0 + aa;
+
+        Self([c0, c1])
+    }
+
+    fn square_ext_field(self) -> Self {
+        let ab = self.0[0] * self.0[1];
+        let c0c1 = self.0[0] + self.0[1];
+        let c0 = self.0[1].mul_by_nonresidue() + self.0[0];
+        let tmp = c0 * c0c1 - ab;
+
+        Self([tmp - ab.mul_by_nonresidue(), ab.double()])
     }
 
     fn mul_by_nonres(self) -> Self {
