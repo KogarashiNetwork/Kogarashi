@@ -7,7 +7,11 @@ macro_rules! extension_field_built_in {
         const_extension_field_operation!($extension_field, $sub_field, $limbs_length);
         construct_extension_field!($extension_field, $sub_field, $limbs_length);
 
-        impl ExtensionField for $extension_field {}
+        impl ExtensionField for $extension_field {
+            fn mul_by_nonresidue(self) -> Self {
+                self.mul_by_nonres()
+            }
+        }
 
         impl ParityCmp for $extension_field {}
 
