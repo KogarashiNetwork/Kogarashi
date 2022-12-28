@@ -33,7 +33,7 @@ impl Fq2 {
     }
 
     fn mul_by_nonres(self) -> Self {
-        todo!()
+        Self([self.0[0] - self.0[1], self.0[0] + self.0[1]])
     }
 }
 
@@ -75,13 +75,13 @@ impl Fq6 {
         tmp1 += tmp2;
 
         match tmp1.invert() {
-            Some(t) => Some(Fq6([t * c0, t * c1, t * c2])),
+            Some(t) => Some(Self([t * c0, t * c1, t * c2])),
             None => None,
         }
     }
 
     fn mul_by_nonres(self) -> Self {
-        todo!()
+        Self([self.0[2].mul_by_nonresidue(), self.0[0], self.0[1]])
     }
 }
 
@@ -95,11 +95,11 @@ impl Fq12 {
         c0s -= c1s;
 
         c0s.invert()
-            .map(|t| Fq12([t * self.0[0], -(t * self.0[1])]))
+            .map(|t| Self([t * self.0[0], -(t * self.0[1])]))
     }
 
     fn mul_by_nonres(self) -> Self {
-        todo!()
+        unimplemented!()
     }
 }
 
