@@ -22,7 +22,7 @@ pub trait PairingRange: ExtensionField {
 
     fn untwist(self, coeffs: Self::G2Coeff, g1: Self::G1Affine) -> Self;
 
-    fn final_exp(self) -> Self;
+    fn final_exp(self) -> Option<Self>;
 }
 
 /// G2 group pairing interface

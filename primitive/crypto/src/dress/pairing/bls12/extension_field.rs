@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! peculiar_extension_field_operation {
-    ($fq2:ident, $fq6:ident, $fq12:ident) => {
+    ($fq2:ident, $fq6:ident, $fq12:ident, $frobenius_coeff_fq2_c1:ident, $frobenius_coeff_fq6_c1:ident, $frobenius_coeff_fq12_c1:ident, $bls_x_is_negative:ident) => {
         impl $fq2 {
             fn get_invert(self) -> Option<Self> {
                 match self.is_zero() {
@@ -25,6 +25,10 @@ macro_rules! peculiar_extension_field_operation {
 
             fn mul_by_nonres(self) -> Self {
                 Self([self.0[0] - self.0[1], self.0[0] + self.0[1]])
+            }
+
+            fn frobenius_map(self, power: usize) -> Self {
+                Self([self.0[0], self.0[1] * $frobenius_coeff_fq2_c1[power % 2]])
             }
         }
 
@@ -116,6 +120,18 @@ macro_rules! peculiar_extension_field_operation {
             fn mul_by_nonres(self) -> Self {
                 Self([self.0[2].mul_by_nonresidue(), self.0[0], self.0[1]])
             }
+
+            fn frobenius_map(self, power: usize) -> Self {
+                self.0[0].frobenius_map(power);
+                self.0[1].frobenius_map(power);
+                self.0[2].frobenius_map(power);
+
+                Self([
+                    self.0[0],
+                    self.0[1] * $frobenius_coeff_fq6_c1[power % 6],
+                    self.0[2] * $frobenius_coeff_fq6_c1[power % 6],
+                ])
+            }
         }
 
         impl $fq12 {
@@ -150,6 +166,47 @@ macro_rules! peculiar_extension_field_operation {
 
             fn mul_by_nonres(self) -> Self {
                 unimplemented!()
+            }
+
+            fn conjugate(self) -> Self {
+                Self([self.0[0], -self.0[1]])
+            }
+
+            fn frobenius_map(&mut self, power: usize) -> Self {
+                self.0[0].frobenius_map(power);
+                self.0[1].frobenius_map(power);
+
+                Self([
+                    self.0[0],
+                    $fq6([
+                        self.0[1].0[0] * $frobenius_coeff_fq12_c1[power % 12],
+                        self.0[1].0[1] * $frobenius_coeff_fq12_c1[power % 12],
+                        self.0[1].0[2] * $frobenius_coeff_fq12_c1[power % 12],
+                    ]),
+                ])
+            }
+
+            fn pow(self, exp: u64) -> Self {
+                let mut res = Self::one();
+
+                let mut found_one = false;
+                for i in (0..64).rev().map(|b| (((exp >> 1) >> b) & 1) == 1) {
+                    if found_one {
+                        res = res.square();
+                    } else {
+                        found_one = i.into();
+                    }
+
+                    if i.into() {
+                        res = res.square();
+                    }
+                }
+
+                if $bls_x_is_negative {
+                    res.conjugate()
+                } else {
+                    res
+                }
             }
         }
     };

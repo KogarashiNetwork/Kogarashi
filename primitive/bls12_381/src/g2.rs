@@ -1,6 +1,7 @@
 use crate::fq::Fq;
 use crate::fqn::{Fq12, Fq2};
 use crate::fr::Fr;
+use crate::params::BLS_X;
 use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::{curve::*, pairing::bls12_g2_pairing};
@@ -99,10 +100,6 @@ pub struct G2PairingAffine {
     infinity: bool,
 }
 
-const BLS_X: u64 = 0xd201000000010000;
-
-const BLS_X_IS_NEGATIVE: bool = true;
-
 curve_operation!(
     Fr,
     Fq2,
@@ -113,14 +110,7 @@ curve_operation!(
     GENERATOR,
     IDENTITY
 );
-bls12_g2_pairing!(
-    G2Projective,
-    PairingCoeff,
-    G2PairingAffine,
-    Fq12,
-    BLS_X,
-    BLS_X_IS_NEGATIVE
-);
+bls12_g2_pairing!(G2Projective, PairingCoeff, G2PairingAffine, Fq12);
 
 #[cfg(test)]
 mod tests {
