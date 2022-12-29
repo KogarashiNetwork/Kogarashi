@@ -31,10 +31,6 @@ macro_rules! bls12_range_field_pairing {
                 todo!()
             }
 
-            fn conjugate(self) -> Self {
-                todo!()
-            }
-
             fn final_exp(self) -> Self {
                 todo!()
             }
