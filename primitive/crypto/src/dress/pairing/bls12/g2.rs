@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! bls12_g2_pairing {
-    ($g2:ident, $pairng_coeff:ident, $g2_pairing_affine:ident, $range_field:ident, $bls_x:ident, $bls_x_is_negative:ident) => {
+    ($g2:ident, $pairng_coeff:ident, $g2_pairing_affine:ident, $range_field:ident) => {
         use zero_crypto::behave::{G2Pairing, PairingRange, ParityCmp};
 
         impl ParityCmp for $pairng_coeff {}
