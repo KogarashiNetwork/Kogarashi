@@ -3,9 +3,7 @@ macro_rules! bls12_range_field_pairing {
     ($range_field:ident, $quadratic_field:ident, $g1_affine:ident, $pairng_coeff:ident, $bls_x:ident, $bls_x_is_negative:ident) => {
         impl PairingRange for $range_field {
             type G1Affine = $g1_affine;
-
             type G2Coeff = $pairng_coeff;
-
             type QuadraticField = $quadratic_field;
 
             // twisting isomorphism from E to E'

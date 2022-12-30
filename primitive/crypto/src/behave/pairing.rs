@@ -8,9 +8,7 @@ pub trait PairingField: PrimeField + ParityCmp {}
 /// pairing function range field
 pub trait PairingRange: ExtensionField {
     type G1Affine: Affine;
-
     type G2Coeff: ParityCmp;
-
     type QuadraticField: ExtensionField;
 
     fn mul_by_014(
@@ -28,9 +26,7 @@ pub trait PairingRange: ExtensionField {
 /// G2 group pairing interface
 pub trait G2Pairing: Projective {
     type PairingRange: PairingRange;
-
     type PairingCoeff: ParityCmp;
-
     type PairingRepr: ParityCmp;
 
     fn double_eval(self) -> Self::PairingCoeff;
@@ -42,23 +38,17 @@ pub trait G2Pairing: Projective {
 pub trait Pairing {
     // g1 group affine point
     type G1Affine: Affine;
-
     // g2 group affine point
     type G2Affine: Affine;
-
     // g1 group projective point
     type G1Projective: Projective;
-
     // g2 group projective point
     type G2Projective: G2Pairing;
-
     type G2PairngRepr: ParityCmp;
-
     // range of pairing function
     type PairingRange: PairingRange;
 
     const X: u64;
-
     const X_ISNEGATIVE: bool;
 
     fn pairing(g1: Self::G1Affine, g2: Self::G2PairngRepr) -> Self::PairingRange;
