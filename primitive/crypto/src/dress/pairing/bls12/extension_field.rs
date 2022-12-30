@@ -168,7 +168,7 @@ macro_rules! peculiar_extension_field_operation {
                 unimplemented!()
             }
 
-            fn conjugate(self) -> Self {
+            pub fn conjugate(self) -> Self {
                 Self([self.0[0], -self.0[1]])
             }
 

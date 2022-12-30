@@ -57,7 +57,11 @@ pub trait Pairing {
     // range of pairing function
     type PairingRange: PairingRange;
 
-    fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange;
+    const X: u64;
+
+    const X_ISNEGATIVE: bool;
+
+    fn pairing(g1: Self::G1Affine, g2: Self::G2PairngRepr) -> Self::PairingRange;
 
     fn miller_loop(g1: Self::G1Affine, g2: Self::G2PairngRepr) -> Self::PairingRange;
 }
