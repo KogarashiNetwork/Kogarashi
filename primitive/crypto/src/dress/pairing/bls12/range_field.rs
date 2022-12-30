@@ -19,7 +19,7 @@ macro_rules! bls12_range_field_pairing {
                 c1.0[0] *= g1.x;
                 c1.0[1] *= g1.x;
 
-                Self::default()
+                self.mul_by_014(coeffs.2, c1, c0)
             }
 
             fn mul_by_014(

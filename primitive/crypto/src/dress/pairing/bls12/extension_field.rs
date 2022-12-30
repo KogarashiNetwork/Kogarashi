@@ -132,6 +132,24 @@ macro_rules! peculiar_extension_field_operation {
                     self.0[2] * $frobenius_coeff_fq6_c1[power % 6],
                 ])
             }
+
+            pub fn mul_by_1(&self, c1: $fq2) -> Self {
+                Self([
+                    (self.0[2] * c1).mul_by_nonresidue(),
+                    self.0[0] * c1,
+                    self.0[1] * c1,
+                ])
+            }
+
+            pub fn mul_by_01(&self, c0: $fq2, c1: $fq2) -> Self {
+                let a_a = self.0[0] * c0;
+                let b_b = self.0[1] * c1;
+                let t1 = (self.0[2] * c1).mul_by_nonresidue() + a_a;
+                let t2 = (c0 + c1) * (self.0[0] + self.0[1]) - a_a - b_b;
+                let t3 = self.0[2] * c0 + b_b;
+
+                Self([t1, t2, t3])
+            }
         }
 
         impl $fq12 {
@@ -207,6 +225,18 @@ macro_rules! peculiar_extension_field_operation {
                 } else {
                     res
                 }
+            }
+
+            fn mul_by_014(self, c0: $fq2, c1: $fq2, c4: $fq2) -> Self {
+                let aa = self.0[0].mul_by_01(c0, c1);
+                let bb = self.0[1].mul_by_1(c4);
+                let o = c1 + c4;
+                let c1 = self.0[1] + self.0[0];
+                let c1 = c1.mul_by_01(c0, o);
+                let c0 = bb;
+                let c0 = c0.mul_by_nonresidue();
+
+                Self([c0 + aa, c1 - aa - bb])
             }
         }
     };
