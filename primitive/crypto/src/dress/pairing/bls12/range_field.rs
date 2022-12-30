@@ -3,9 +3,7 @@ macro_rules! bls12_range_field_pairing {
     ($range_field:ident, $quadratic_field:ident, $g1_affine:ident, $pairng_coeff:ident, $bls_x:ident, $bls_x_is_negative:ident) => {
         impl PairingRange for $range_field {
             type G1Affine = $g1_affine;
-
             type G2Coeff = $pairng_coeff;
-
             type QuadraticField = $quadratic_field;
 
             // twisting isomorphism from E to E'
@@ -19,7 +17,7 @@ macro_rules! bls12_range_field_pairing {
                 c1.0[0] *= g1.x;
                 c1.0[1] *= g1.x;
 
-                Self::default()
+                self.mul_by_014(coeffs.2, c1, c0)
             }
 
             fn mul_by_014(

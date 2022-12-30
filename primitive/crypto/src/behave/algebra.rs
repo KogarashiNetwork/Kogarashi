@@ -6,7 +6,6 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAss
 /// This has generator, identity and inverse
 pub trait Group: PartialEq + Eq {
     const GENERATOR: Self;
-
     const IDENTITY: Self;
 
     fn invert(self) -> Option<Self>

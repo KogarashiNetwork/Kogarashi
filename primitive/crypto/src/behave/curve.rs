@@ -1,5 +1,9 @@
 // This trait resresents elliptic curve and its scalar field
-use super::{algebra::Ring, basic::Basic, comp::ParityCmp, field::PrimeField};
+use super::{
+    algebra::Ring,
+    comp::{Basic, ParityCmp},
+    field::PrimeField,
+};
 /// y^2 = x^3 + ax + b
 use core::ops::Mul;
 
@@ -41,16 +45,13 @@ pub trait Projective:
 {
     // scalar field of curve
     type ScalarField: PrimeField;
-
     // range field of curve
     type RangeField: PrimeField;
-
     // affine coordinate representation
     type Affine: Affine;
 
     // a param
     const PARAM_A: Self::RangeField;
-
     // b param
     const PARAM_B: Self::RangeField;
 

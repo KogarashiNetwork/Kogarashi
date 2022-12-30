@@ -8,7 +8,7 @@ pub use ring::*;
 macro_rules! curve_operation {
     ($scalar:ident, $range:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $g:ident, $e:ident) => {
         curve_built_in!($affine, $projective);
-
+        affine_group_operation!($affine, $g, $e);
         projective_ring_operation!($projective, $scalar, $g, $e);
 
         impl Affine for $affine {
@@ -42,18 +42,6 @@ macro_rules! curve_operation {
                 }
             }
         }
-
-        impl PartialEq for $affine {
-            fn eq(&self, other: &Self) -> bool {
-                if self.is_identity() || other.is_identity() {
-                    self.is_identity() && other.is_identity()
-                } else {
-                    self.x == other.x && self.y == other.y
-                }
-            }
-        }
-
-        impl Eq for $affine {}
 
         impl Projective for $projective {
             type ScalarField = $scalar;

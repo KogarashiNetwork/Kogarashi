@@ -1,6 +1,9 @@
 // This trait resresents prime field
 
-use super::{algebra::Field, basic::Basic, comp::ParityCmp};
+use super::{
+    algebra::Field,
+    comp::{Basic, ParityCmp},
+};
 use crate::arithmetic::utils::Bits;
 
 use rand_core::RngCore;

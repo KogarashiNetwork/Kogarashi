@@ -1,4 +1,7 @@
-use super::{algebra::Field, basic::Basic, comp::ParityCmp};
+use super::{
+    algebra::Field,
+    comp::{Basic, ParityCmp},
+};
 
 /// extension field
 pub trait ExtensionField: Field + Basic + ParityCmp + PartialOrd + Ord {

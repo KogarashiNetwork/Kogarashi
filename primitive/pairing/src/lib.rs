@@ -15,13 +15,13 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use zero_bls12_381::{
-    Fq, Fq12, Fq2, Fq6, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective,
-};
-use zero_crypto::behave::Pairing;
+use zero_bls12_381::params::{BLS_X, BLS_X_IS_NEGATIVE};
+use zero_bls12_381::{Fq12, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective};
+use zero_crypto::behave::{Pairing, PairingRange};
+use zero_crypto::common::PrimeField;
 
 // tate pairing with miller algorithm
-pub struct TatePairing {}
+pub struct TatePairing;
 
 impl Pairing for TatePairing {
     type G1Affine = G1Affine;
@@ -30,29 +30,63 @@ impl Pairing for TatePairing {
     type G2Projective = G2Projective;
     type G2PairngRepr = G2PairingAffine;
     type PairingRange = Fq12;
+    const X: u64 = BLS_X;
+    const X_ISNEGATIVE: bool = BLS_X_IS_NEGATIVE;
 
-    fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange {
-        pairing(g1, g2)
+    fn pairing(g1: Self::G1Affine, g2: Self::G2PairngRepr) -> Self::PairingRange {
+        Self::miller_loop(g1, g2).final_exp().unwrap()
     }
 
     fn miller_loop(g1: Self::G1Affine, g2: Self::G2PairngRepr) -> Self::PairingRange {
-        miller_loop(g1, g2)
+        let mut acc = Self::PairingRange::one();
+
+        let mut found_one = false;
+        for i in (0..64).rev().map(|b| (((BLS_X >> 1) >> b) & 1) == 1) {
+            if !found_one {
+                found_one = i;
+                continue;
+            }
+
+            for coeff in g2.coeffs.iter() {
+                acc = acc.untwist(*coeff, g1);
+            }
+
+            if i {
+                for coeff in g2.coeffs.iter() {
+                    acc = acc.untwist(*coeff, g1);
+                }
+            }
+
+            acc = acc.square();
+        }
+
+        for coeff in g2.coeffs.iter() {
+            acc = acc.untwist(*coeff, g1);
+        }
+
+        if Self::X_ISNEGATIVE {
+            acc.conjugate()
+        } else {
+            acc
+        }
     }
 }
 
-fn pairing(g1: G1Affine, g2: G2Affine) -> Fq12 {
-    Fq12::zero()
-}
-
-fn miller_loop(g1: G1Affine, g2: G2PairingAffine) -> Fq12 {
-    Fq12::zero()
-}
-
 #[cfg(test)]
-mod tests {
+mod pairing_tests {
+    use super::*;
+    use zero_crypto::common::Group;
+
     #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+    fn generator_pairing() {
+        let g1 = G1Affine::GENERATOR;
+        let g2 = G2PairingAffine::from(G2Projective::GENERATOR);
+
+        assert_eq!(Fq12::one(), TatePairing::pairing(g1, g2));
+    }
+
+    #[test]
+    fn test_final_exp() {
+        assert_eq!(Fq12::one().final_exp().unwrap(), Fq12::one());
     }
 }

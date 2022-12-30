@@ -2,7 +2,7 @@ use zero_bls12_381::{Fr, G1Affine, G1Projective, G2Affine, G2Projective};
 use zero_crypto::common::Commitment;
 
 // kate polynomial commiment
-pub struct KzgCommitment {}
+pub struct KzgCommitment;
 
 impl Commitment for KzgCommitment {
     // affine point group

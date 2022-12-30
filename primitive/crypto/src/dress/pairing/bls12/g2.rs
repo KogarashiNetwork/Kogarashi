@@ -4,7 +4,6 @@ macro_rules! bls12_g2_pairing {
         use zero_crypto::behave::{G2Pairing, PairingRange, ParityCmp};
 
         impl ParityCmp for $pairng_coeff {}
-
         impl ParityCmp for $g2_pairing_affine {}
 
         impl G2Pairing for $g2 {

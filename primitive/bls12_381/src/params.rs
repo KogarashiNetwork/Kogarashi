@@ -1,7 +1,7 @@
 use crate::{Fq, Fq2};
 
-pub(crate) const BLS_X: u64 = 0xd201000000010000;
-pub(crate) const BLS_X_IS_NEGATIVE: bool = true;
+pub const BLS_X: u64 = 0xd201000000010000;
+pub const BLS_X_IS_NEGATIVE: bool = true;
 
 pub(crate) const FROBENIUS_COEFF_FQ2_C1: [Fq; 2] = [
     // Fq(-1)**(((q^0) - 1) / 2)
