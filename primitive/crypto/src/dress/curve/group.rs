@@ -1,4 +1,46 @@
 #[macro_export]
+macro_rules! affine_group_operation {
+    ($affine:ident, $g:ident, $e:ident) => {
+        impl Group for $affine {
+            const GENERATOR: Self = Self {
+                x: $g.x,
+                y: $g.y,
+                is_infinity: false,
+            };
+
+            const IDENTITY: Self = Self {
+                x: $e.x,
+                y: $e.y,
+                is_infinity: false,
+            };
+
+            fn invert(self) -> Option<Self> {
+                match self.is_infinity {
+                    true => None,
+                    false => Some(Self {
+                        x: self.x,
+                        y: -self.y,
+                        is_infinity: false,
+                    }),
+                }
+            }
+        }
+
+        impl PartialEq for $affine {
+            fn eq(&self, other: &Self) -> bool {
+                if self.is_identity() || other.is_identity() {
+                    self.is_identity() && other.is_identity()
+                } else {
+                    self.x == other.x && self.y == other.y
+                }
+            }
+        }
+
+        impl Eq for $affine {}
+    };
+}
+
+#[macro_export]
 macro_rules! projective_group_operation {
     ($projective:ident, $g:ident, $e:ident) => {
         impl Group for $projective {
@@ -33,4 +75,4 @@ macro_rules! projective_group_operation {
     };
 }
 
-pub use projective_group_operation;
+pub use {affine_group_operation, projective_group_operation};
