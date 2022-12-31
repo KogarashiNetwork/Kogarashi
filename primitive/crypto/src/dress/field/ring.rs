@@ -3,71 +3,62 @@ macro_rules! ring_operation {
     ($field:ident, $p:ident, $g:ident, $r:ident, $inv:ident) => {
         group_operation!($field, $p, $g, $r, $inv);
 
-        impl Ring for $field {}
+        impl Ring for $field {
+            const MULTIPLICATIVE_IDENTITY: $field = $field::one();
+        }
 
-        impl Add for $field {
-            type Output = Self;
+        impl PartialOrd for $field {
+            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+                Some(self.cmp(other))
+            }
 
-            #[inline]
-            fn add(self, rhs: $field) -> Self {
-                $field(add(self.0, rhs.0, $p))
+            fn lt(&self, other: &Self) -> bool {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a != b {
+                        return a < b;
+                    }
+                }
+                false
+            }
+
+            fn le(&self, other: &Self) -> bool {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a != b {
+                        return a < b;
+                    }
+                }
+                true
+            }
+
+            fn gt(&self, other: &Self) -> bool {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a != b {
+                        return a > b;
+                    }
+                }
+                false
+            }
+
+            fn ge(&self, other: &Self) -> bool {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a != b {
+                        return a > b;
+                    }
+                }
+                true
             }
         }
 
-        impl<'a, 'b> Add<&'b $field> for &'a $field {
-            type Output = $field;
-
-            #[inline]
-            fn add(self, rhs: &'b $field) -> $field {
-                $field(add(self.0, rhs.0, $p))
-            }
-        }
-
-        impl AddAssign for $field {
-            fn add_assign(&mut self, rhs: $field) {
-                self.0 = add(self.0, rhs.0, $p)
-            }
-        }
-
-        impl Neg for $field {
-            type Output = Self;
-
-            #[inline]
-            fn neg(self) -> Self {
-                $field(neg(self.0, $p))
-            }
-        }
-
-        impl<'a> Neg for &'a $field {
-            type Output = $field;
-
-            #[inline]
-            fn neg(self) -> $field {
-                $field(neg(self.0, $p))
-            }
-        }
-
-        impl Sub for $field {
-            type Output = Self;
-
-            #[inline]
-            fn sub(self, rhs: $field) -> Self {
-                $field(sub(self.0, rhs.0, $p))
-            }
-        }
-
-        impl<'a, 'b> Sub<&'b $field> for &'a $field {
-            type Output = $field;
-
-            #[inline]
-            fn sub(self, rhs: &'b $field) -> $field {
-                $field(sub(self.0, rhs.0, $p))
-            }
-        }
-
-        impl SubAssign for $field {
-            fn sub_assign(&mut self, rhs: $field) {
-                self.0 = sub(self.0, rhs.0, $p)
+        impl Ord for $field {
+            fn cmp(&self, other: &Self) -> Ordering {
+                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
+                    if a < b {
+                        return Ordering::Less;
+                    } else if a > b {
+                        return Ordering::Greater;
+                    }
+                }
+                Ordering::Equal
             }
         }
     };

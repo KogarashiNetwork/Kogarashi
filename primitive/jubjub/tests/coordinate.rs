@@ -1,7 +1,7 @@
 use proptest::prelude::*;
 use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
-use zero_crypto::common::{Group, PrimeField, Projective};
+use zero_crypto::common::{Curve, Group, PrimeField};
 use zero_jubjub::{Fp, JubjubProjective};
 
 prop_compose! {
@@ -19,7 +19,7 @@ prop_compose! {
 #[test]
 fn jubjub_is_on_curve() {
     assert!(JubjubProjective::GENERATOR.is_on_curve());
-    assert!(JubjubProjective::IDENTITY.is_on_curve());
+    assert!(JubjubProjective::ADDITIVE_IDENTITY.is_on_curve());
 }
 
 proptest! {
@@ -30,9 +30,9 @@ proptest! {
         let identity = a - a;
 
         // a + e = a
-        let a_prime = a + JubjubProjective::IDENTITY;
+        let a_prime = a + JubjubProjective::ADDITIVE_IDENTITY;
 
-        assert_eq!(identity, JubjubProjective::IDENTITY);
+        assert_eq!(identity, JubjubProjective::ADDITIVE_IDENTITY);
         assert_eq!(a_prime, a);
     }
 }

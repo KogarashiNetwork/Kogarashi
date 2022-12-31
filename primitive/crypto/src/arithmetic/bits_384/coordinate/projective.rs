@@ -18,7 +18,7 @@ pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
         if s1 == s2 {
             return double_point(lhs);
         } else {
-            return <P as Group>::IDENTITY;
+            return <P as Group>::ADDITIVE_IDENTITY;
         }
     }
 
@@ -40,7 +40,7 @@ pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
 
 pub fn double_point<P: Projective>(point: P) -> P {
     if point.is_identity() || point.get_y().is_zero() {
-        <P as Group>::IDENTITY
+        <P as Group>::ADDITIVE_IDENTITY
     } else {
         let xx = point.get_x().square();
         let t = xx.double() + xx;

@@ -13,31 +13,6 @@ macro_rules! field_operation {
 
         impl Field for $field {}
 
-        impl Mul for $field {
-            type Output = Self;
-
-            #[inline]
-            fn mul(self, rhs: $field) -> Self {
-                $field(mul(self.0, rhs.0, $p, $inv))
-            }
-        }
-
-        impl<'a, 'b> Mul<&'b $field> for &'a $field {
-            type Output = $field;
-
-            #[inline]
-            fn mul(self, rhs: &'b $field) -> $field {
-                $field(mul(self.0, rhs.0, $p, $inv))
-            }
-        }
-
-        impl MulAssign for $field {
-            fn mul_assign(&mut self, rhs: $field) {
-                self.0 = mul(self.0, rhs.0, $p, $inv)
-            }
-        }
-
-        #[allow(clippy::suspicious_arithmetic_impl)]
         impl Div for $field {
             type Output = $field;
 
@@ -48,18 +23,6 @@ macro_rules! field_operation {
             }
         }
 
-        #[allow(clippy::suspicious_arithmetic_impl)]
-        impl<'a, 'b> Div<&'b $field> for &'a $field {
-            type Output = $field;
-
-            #[inline]
-            fn div(self, rhs: &'b $field) -> $field {
-                let inv = rhs.invert().unwrap();
-                self * &inv
-            }
-        }
-
-        #[allow(clippy::suspicious_op_assign_impl)]
         impl DivAssign for $field {
             fn div_assign(&mut self, rhs: $field) {
                 let inv = rhs.invert().unwrap();
@@ -113,61 +76,6 @@ macro_rules! prime_field_operation {
 
             fn square_assign(&mut self) {
                 self.0 = square(self.0, $p, $inv)
-            }
-        }
-
-        impl PartialOrd for $field {
-            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-                Some(self.cmp(other))
-            }
-
-            fn lt(&self, other: &Self) -> bool {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a != b {
-                        return a < b;
-                    }
-                }
-                false
-            }
-
-            fn le(&self, other: &Self) -> bool {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a != b {
-                        return a < b;
-                    }
-                }
-                true
-            }
-
-            fn gt(&self, other: &Self) -> bool {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a != b {
-                        return a > b;
-                    }
-                }
-                false
-            }
-
-            fn ge(&self, other: &Self) -> bool {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a != b {
-                        return a > b;
-                    }
-                }
-                true
-            }
-        }
-
-        impl Ord for $field {
-            fn cmp(&self, other: &Self) -> Ordering {
-                for (a, b) in self.0.iter().rev().zip(other.0.iter().rev()) {
-                    if a < b {
-                        return Ordering::Less;
-                    } else if a > b {
-                        return Ordering::Greater;
-                    }
-                }
-                Ordering::Equal
             }
         }
     };

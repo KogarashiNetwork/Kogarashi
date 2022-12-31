@@ -131,7 +131,7 @@ mod tests {
             let rev_mul = g * fr;
             assert_eq!(mul, rev_mul);
 
-            let mut acc = JubjubProjective::IDENTITY;
+            let mut acc = JubjubProjective::ADDITIVE_IDENTITY;
             for _ in 0..x {
                 acc += g;
             }
