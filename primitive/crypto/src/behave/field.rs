@@ -6,10 +6,8 @@ use super::{
 };
 use crate::arithmetic::utils::Bits;
 
-use rand_core::RngCore;
-
 /// This is prime field trait
-pub trait PrimeField: Field + Basic + ParityCmp + PartialOrd + Ord {
+pub trait PrimeField: Field + Basic + ParityCmp {
     // prime order of this field
     const MODULUS: Self;
 
@@ -21,8 +19,6 @@ pub trait PrimeField: Field + Basic + ParityCmp + PartialOrd + Ord {
     fn to_bits(self) -> Bits;
 
     fn is_zero(self) -> bool;
-
-    fn random(rand: impl RngCore) -> Self;
 
     fn double(self) -> Self;
 

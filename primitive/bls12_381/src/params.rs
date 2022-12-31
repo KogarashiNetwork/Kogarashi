@@ -3,6 +3,90 @@ use crate::{Fq, Fq2};
 pub const BLS_X: u64 = 0xd201000000010000;
 pub const BLS_X_IS_NEGATIVE: bool = true;
 
+// g1 curve parameters
+pub(crate) const G1_GENERATOR_X: Fq = Fq([
+    0x5cb38790fd530c16,
+    0x7817fc679976fff5,
+    0x154f95c7143ba1c1,
+    0xf0ae6acdf3d0e747,
+    0xedce6ecc21dbf440,
+    0x120177419e0bfb75,
+]);
+pub(crate) const G1_GENERATOR_Y: Fq = Fq([
+    0xbaac93d50ce72271,
+    0x8c22631a7918fd8e,
+    0xdd595f13570725ce,
+    0x51ac582950405194,
+    0x0e1c8c3fad0059c0,
+    0x0bbc3efc5008a26a,
+]);
+pub(crate) const G1_PARAM_A: Fq = Fq([0, 0, 0, 0, 0, 0]);
+pub(crate) const G1_PARAM_B: Fq = Fq([
+    0xaa270000000cfff3,
+    0x53cc0032fc34000a,
+    0x478fe97a6b0a807f,
+    0xb1d37ebee6ba24d7,
+    0x8ec9733bbf78ab2f,
+    0x09d645513d83de7e,
+]);
+
+// g2 curve parameters
+pub(crate) const G2_GENERATOR_X: Fq2 = Fq2([
+    Fq([
+        0xf5f28fa202940a10,
+        0xb3f5fb2687b4961a,
+        0xa1a893b53e2ae580,
+        0x9894999d1a3caee9,
+        0x6f67b7631863366b,
+        0x058191924350bcd7,
+    ]),
+    Fq([
+        0xa5a9c0759e23f606,
+        0xaaa0c59dbccd60c3,
+        0x3bb17e18e2867806,
+        0x1b1ab6cc8541b367,
+        0xc2b6ed0ef2158547,
+        0x11922a097360edf3,
+    ]),
+]);
+pub(crate) const G2_GENERATOR_Y: Fq2 = Fq2([
+    Fq([
+        0x4c730af860494c4a,
+        0x597cfa1f5e369c5a,
+        0xe7e6856caa0a635a,
+        0xbbefb5e96e0d495f,
+        0x07d3a975f0ef25a2,
+        0x0083fd8e7e80dae5,
+    ]),
+    Fq([
+        0xadc0fc92df64b05d,
+        0x18aa270a2b1461dc,
+        0x86adac6a3be4eba0,
+        0x79495c4ec93da33a,
+        0xe7175850a43ccaed,
+        0x0b2bc2a163de1bf2,
+    ]),
+]);
+pub(crate) const G2_PARAM_A: Fq2 = Fq2([Fq([0, 0, 0, 0, 0, 0]), Fq([0, 0, 0, 0, 0, 0])]);
+pub(crate) const G2_PARAM_B: Fq2 = Fq2([
+    Fq([
+        0xaa270000000cfff3,
+        0x53cc0032fc34000a,
+        0x478fe97a6b0a807f,
+        0xb1d37ebee6ba24d7,
+        0x8ec9733bbf78ab2f,
+        0x09d645513d83de7e,
+    ]),
+    Fq([
+        0xaa270000000cfff3,
+        0x53cc0032fc34000a,
+        0x478fe97a6b0a807f,
+        0xb1d37ebee6ba24d7,
+        0x8ec9733bbf78ab2f,
+        0x09d645513d83de7e,
+    ]),
+]);
+
 pub(crate) const FROBENIUS_COEFF_FQ2_C1: [Fq; 2] = [
     // Fq(-1)**(((q^0) - 1) / 2)
     Fq([

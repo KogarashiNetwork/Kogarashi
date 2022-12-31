@@ -39,7 +39,7 @@ pub struct EncryptedNumber {
 #[allow(unused_variables)]
 impl EncryptedNumber {
     pub fn encrypt(private_key: Fp, value: u32, random: Fp) -> Self {
-        let g = JubjubProjective::GENERATOR;
+        let g = JubjubProjective::ADDITIVE_GENERATOR;
         let public_key = g * private_key;
         let left = g * Fp::from_u64(value as u64) + public_key * random;
         EncryptedNumber {
@@ -49,10 +49,10 @@ impl EncryptedNumber {
     }
 
     pub fn decrypt(&self, private_key: Fp) -> Option<u32> {
-        let g = JubjubProjective::GENERATOR;
+        let g = JubjubProjective::ADDITIVE_GENERATOR;
         let decrypted_message = self.s.to_projective() - (self.t.to_projective() * private_key);
 
-        let mut acc = JubjubProjective::IDENTITY;
+        let mut acc = JubjubProjective::ADDITIVE_IDENTITY;
         for i in 0..150000 {
             if acc == decrypted_message {
                 return Some(i);

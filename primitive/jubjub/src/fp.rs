@@ -55,6 +55,11 @@ const ROOT_OF_UNITY: Fp = Fp([
 fft_field_operation!(Fp, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 
 impl Fp {
+    #[cfg(test)]
+    pub const fn new(val: [u64; 4]) -> Self {
+        Self(val)
+    }
+
     pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
@@ -118,27 +123,6 @@ impl Fp {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::coordinate::JubjubProjective;
-    use proptest::prelude::*;
-
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(50))]
-        #[test]
-        fn test_binary_method(x in any::<u16>()) {
-            let fr = Fp::from_u64(x as u64);
-            let g = JubjubProjective::GENERATOR;
-            let mul = g * fr;
-            let rev_mul = g * fr;
-            assert_eq!(mul, rev_mul);
-
-            let mut acc = JubjubProjective::IDENTITY;
-            for _ in 0..x {
-                acc += g;
-            }
-
-            assert_eq!(acc, mul);
-        }
-    }
 
     #[test]
     fn test_from_hex() {

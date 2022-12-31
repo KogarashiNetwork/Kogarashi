@@ -1,62 +1,20 @@
 // This trait resresents elliptic curve and its scalar field
 use super::{
-    algebra::Ring,
+    algebra::Group,
     comp::{Basic, ParityCmp},
     field::PrimeField,
 };
-/// y^2 = x^3 + ax + b
-use core::ops::Mul;
 
-pub trait Affine:
-    ParityCmp + Basic + PartialEq + Eq + Into<Self::Projective> + From<Self::Projective>
-{
-    // scalar field of curve
-    type ScalarField: PrimeField;
-
+/// elliptic curve rational points group
+/// rational points group behaves as abelian group
+pub trait Curve: ParityCmp + Basic + Group {
     // range field of curve
-    type RangeField: PrimeField;
-
-    // projective coordinate representation
-    type Projective: Projective;
+    type Range: PrimeField;
 
     // a param
-    const PARAM_A: Self::RangeField;
-
+    const PARAM_A: Self::Range;
     // b param
-    const PARAM_B: Self::RangeField;
-
-    // convert affine to projective representation
-    fn to_projective(self) -> Self::Projective;
-
-    // check that point is on curve
-    fn is_identity(self) -> bool;
-
-    // check that point is on curve
-    fn is_on_curve(self) -> bool;
-}
-
-pub trait Projective:
-    ParityCmp
-    + Basic
-    + Ring
-    + Mul<Self::ScalarField, Output = Self>
-    + Into<Self::Affine>
-    + From<Self::Affine>
-{
-    // scalar field of curve
-    type ScalarField: PrimeField;
-    // range field of curve
-    type RangeField: PrimeField;
-    // affine coordinate representation
-    type Affine: Affine;
-
-    // a param
-    const PARAM_A: Self::RangeField;
-    // b param
-    const PARAM_B: Self::RangeField;
-
-    // convert projective to affine representation
-    fn to_affine(self) -> Self::Affine;
+    const PARAM_B: Self::Range;
 
     // check that point is on curve
     fn is_identity(self) -> bool;
@@ -66,22 +24,42 @@ pub trait Projective:
 
     // check that point is on curve
     fn is_on_curve(self) -> bool;
+}
+
+/// rational point affine representation
+/// affine representation check that a point is infinite by the struct field
+pub trait Affine: Curve + Into<Self::Projective> + From<Self::Projective> {
+    // projective coordinate representation
+    type Projective: Projective;
+
+    // convert affine to projective representation
+    fn to_projective(self) -> Self::Projective;
+}
+
+/// rational point projective representation
+/// projective representation check that a point is infinite by z coordinate
+pub trait Projective: Curve + Into<Self::Affine> + From<Self::Affine> {
+    // affine coordinate representation
+    type Affine: Affine;
+
+    // convert projective to affine representation
+    fn to_affine(self) -> Self::Affine;
 
     // get x coordinate
-    fn get_x(&self) -> Self::RangeField;
+    fn get_x(&self) -> Self::Range;
 
     // get y coordinate
-    fn get_y(&self) -> Self::RangeField;
+    fn get_y(&self) -> Self::Range;
 
     // get z coordinate
-    fn get_z(&self) -> Self::RangeField;
+    fn get_z(&self) -> Self::Range;
 
     // set x coordinate
-    fn set_x(&mut self, value: Self::RangeField);
+    fn set_x(&mut self, value: Self::Range);
 
     // set y coordinate
-    fn set_y(&mut self, value: Self::RangeField);
+    fn set_y(&mut self, value: Self::Range);
 
     // set z coordinate
-    fn set_z(&mut self, value: Self::RangeField);
+    fn set_z(&mut self, value: Self::Range);
 }

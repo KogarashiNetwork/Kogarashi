@@ -1,6 +1,15 @@
 use super::{
-    comp::ParityCmp, curve::Affine, extension_field::ExtensionField, field::PrimeField, Projective,
+    algebra::Field,
+    comp::{Basic, ParityCmp},
+    curve::Affine,
+    field::PrimeField,
+    Projective,
 };
+
+/// extension field
+pub trait ExtensionField: Field + Basic + ParityCmp {
+    fn mul_by_nonresidue(self) -> Self;
+}
 
 /// pairing field
 pub trait PairingField: PrimeField + ParityCmp {}

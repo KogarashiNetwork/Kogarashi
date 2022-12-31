@@ -45,27 +45,19 @@ pub struct JubjubProjective {
     pub(crate) z: Fp,
 }
 
-const IDENTITY: JubjubProjective = JubjubProjective {
-    x: Fp::zero(),
-    y: Fp::zero(),
-    z: Fp::zero(),
-};
+const GENERATOR_X: Fp = Fp::to_mont_form([
+    0x7c24d812779a3316,
+    0x72e38f4ebd4070f3,
+    0x03b3fe93f505a6f2,
+    0xc4c71e5a4102960,
+]);
 
-const GENERATOR: JubjubProjective = JubjubProjective {
-    x: Fp::to_mont_form([
-        0x7c24d812779a3316,
-        0x72e38f4ebd4070f3,
-        0x03b3fe93f505a6f2,
-        0xc4c71e5a4102960,
-    ]),
-    y: Fp::to_mont_form([
-        0xd2047ef3463de4af,
-        0x01ca03640d236cbf,
-        0xd3033593ae386e92,
-        0xaa87a50921b80ec,
-    ]),
-    z: Fp::one(),
-};
+const GENERATOR_Y: Fp = Fp::to_mont_form([
+    0xd2047ef3463de4af,
+    0x01ca03640d236cbf,
+    0xd3033593ae386e92,
+    0xaa87a50921b80ec,
+]);
 
 const PARAM_A: Fp = Fp::zero();
 
@@ -86,41 +78,8 @@ curve_operation!(
     PARAM_B,
     JubjubAffine,
     JubjubProjective,
-    GENERATOR,
-    IDENTITY
+    GENERATOR_X,
+    GENERATOR_Y
 );
 
-#[cfg(test)]
-mod tests {
-    use super::{Fp, JubjubProjective, PrimeField, GENERATOR};
-    use proptest::prelude::*;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
-
-    prop_compose! {
-        fn arb_fp()(bytes in [any::<u8>(); 16]) -> Fp {
-            Fp::random(XorShiftRng::from_seed(bytes))
-        }
-    }
-
-    prop_compose! {
-        fn arb_cdn()(k in arb_fp()) -> JubjubProjective {
-            GENERATOR * k
-        }
-    }
-
-    #[test]
-    fn test_coordinate_cmp() {
-        let a = JubjubProjective {
-            x: Fp::one(),
-            y: Fp::one(),
-            z: Fp::one(),
-        };
-        let b = JubjubProjective {
-            x: Fp::one(),
-            y: Fp::zero(),
-            z: Fp::one(),
-        };
-        assert_ne!(a, b)
-    }
-}
+curve_test!(jubjub, Fp, JubjubAffine, JubjubProjective, 1000);

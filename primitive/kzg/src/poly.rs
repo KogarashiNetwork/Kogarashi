@@ -1,7 +1,7 @@
 /// the terminology bellow is aligned with the following paper
 /// https://www.iacr.org/archive/asiacrypt2010/6477178/6477178.pdf
 use rand_core::RngCore;
-use zero_crypto::behave::{Commitment, FftField, Group};
+use zero_crypto::behave::FftField;
 
 // a_n-1 , a_n-2, ... , a_0
 #[derive(Debug, Clone, PartialEq)]
@@ -102,7 +102,7 @@ mod tests {
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
     use zero_bls12_381::Fr;
-    use zero_crypto::behave::PrimeField;
+    use zero_crypto::behave::{Group, PrimeField};
 
     prop_compose! {
         fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fr {
@@ -117,7 +117,7 @@ mod tests {
     }
 
     fn naive_multiply<F: PrimeField>(a: Vec<F>, b: Vec<F>) -> Vec<F> {
-        let mut c = vec![F::default(); a.len() + b.len() - 1];
+        let mut c = vec![F::zero(); a.len() + b.len() - 1];
         a.iter().enumerate().for_each(|(i_a, coeff_a)| {
             b.iter().enumerate().for_each(|(i_b, coeff_b)| {
                 c[i_a + i_b] += *coeff_a * *coeff_b;
@@ -137,7 +137,7 @@ mod tests {
 
             // naive polynomial evaluation
             poly.0.iter().rev().for_each(|coeff| {
-                naive_eval += coeff * &exp;
+                naive_eval += *coeff * exp;
                 exp *= at;
             });
 

@@ -71,22 +71,3 @@ impl Pairing for TatePairing {
         }
     }
 }
-
-#[cfg(test)]
-mod pairing_tests {
-    use super::*;
-    use zero_crypto::common::Group;
-
-    #[test]
-    fn generator_pairing() {
-        let g1 = G1Affine::GENERATOR;
-        let g2 = G2PairingAffine::from(G2Projective::GENERATOR);
-
-        assert_eq!(Fq12::one(), TatePairing::pairing(g1, g2));
-    }
-
-    #[test]
-    fn test_final_exp() {
-        assert_eq!(Fq12::one().final_exp().unwrap(), Fq12::one());
-    }
-}

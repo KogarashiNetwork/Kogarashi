@@ -8,9 +8,7 @@ macro_rules! bls12_g2_pairing {
 
         impl G2Pairing for $g2 {
             type PairingRange = $range_field;
-
             type PairingCoeff = $pairng_coeff;
-
             type PairingRepr = $g2_pairing_affine;
 
             fn double_eval(mut self) -> $pairng_coeff {

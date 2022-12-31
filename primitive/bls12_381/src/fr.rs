@@ -54,13 +54,18 @@ const ROOT_OF_UNITY: Fr = Fr([
     0x5bf3adda19e9b27b,
 ]);
 
-fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
-
 impl Fr {
+    #[cfg(test)]
+    pub const fn new(val: [u64; 4]) -> Self {
+        Self(val)
+    }
+
     pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
 }
+
+fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 
 #[test]
 fn test_root_of_unity() {
