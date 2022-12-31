@@ -1,5 +1,5 @@
 #[macro_export]
-macro_rules! extension_field_group_operation {
+macro_rules! ext_field_group_operation {
     ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
         impl Group for $extension_field {
             type Scalar = $extension_field;
@@ -136,6 +136,30 @@ macro_rules! extension_field_group_operation {
             }
         }
 
+        impl Mul for $extension_field {
+            type Output = Self;
+
+            #[inline]
+            fn mul(self, rhs: $extension_field) -> Self {
+                self.mul_ext_field(rhs)
+            }
+        }
+
+        impl<'a, 'b> Mul<&'b $extension_field> for &'a $extension_field {
+            type Output = $extension_field;
+
+            #[inline]
+            fn mul(self, rhs: &'b $extension_field) -> $extension_field {
+                self.mul_ext_field(*rhs)
+            }
+        }
+
+        impl MulAssign for $extension_field {
+            fn mul_assign(&mut self, rhs: $extension_field) {
+                *self = self.mul_ext_field(rhs)
+            }
+        }
+
         impl $extension_field {
             pub const fn zero() -> Self {
                 Self([$sub_field::zero(); $limbs_length])
@@ -154,4 +178,4 @@ macro_rules! extension_field_group_operation {
     };
 }
 
-pub use extension_field_group_operation;
+pub use ext_field_group_operation;

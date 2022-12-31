@@ -20,7 +20,7 @@ fn pairing_test() {
     // let c = a * b;
     // let expected = TatePairing::pairing(g1 * c, G2PairingAffine::from(g2.to_projective()));
 
-    let g = g1 * a;
+    // let g = g1 * a;
     // let h = g2 * b;
     // let res = TatePairing::pairing(g, G2PairingAffine::from(h.to_projective()));
 

@@ -1,7 +1,7 @@
 #[macro_export]
-macro_rules! extension_field_ring_operation {
+macro_rules! ext_field_ring_operation {
     ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
-        extension_field_group_operation!($extension_field, $sub_field, $limbs_length);
+        ext_field_group_operation!($extension_field, $sub_field, $limbs_length);
 
         impl Ring for $extension_field {
             const MULTIPLICATIVE_IDENTITY: $extension_field = $extension_field::one();
@@ -74,4 +74,4 @@ macro_rules! extension_field_ring_operation {
     };
 }
 
-pub use extension_field_ring_operation;
+pub use ext_field_ring_operation;
