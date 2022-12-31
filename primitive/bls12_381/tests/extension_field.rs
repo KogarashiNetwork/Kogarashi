@@ -7,7 +7,7 @@ fn arb_ext_fq<F: PrimeField>() -> F {
     F::random(OsRng)
 }
 
-macro_rules! extension_field_test {
+macro_rules! bls12_extension_field_test {
     ($test_name:ident, $ext_field:ident, $iter_times:expr) => {
         paste! {
             #[test]
@@ -107,6 +107,6 @@ macro_rules! extension_field_test {
     };
 }
 
-extension_field_test!(fq2_field, Fq2, 1000);
-extension_field_test!(fq6_field, Fq6, 500);
-extension_field_test!(fq12_field, Fq12, 500);
+bls12_extension_field_test!(fq2_field, Fq2, 1000);
+bls12_extension_field_test!(fq6_field, Fq6, 500);
+bls12_extension_field_test!(fq12_field, Fq12, 500);
