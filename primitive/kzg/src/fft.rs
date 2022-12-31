@@ -144,7 +144,7 @@ mod tests {
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
     use zero_bls12_381::Fr;
-    use zero_crypto::behave::PrimeField;
+    use zero_crypto::behave::{Group, PrimeField};
     use zero_crypto::common::Vec;
 
     prop_compose! {

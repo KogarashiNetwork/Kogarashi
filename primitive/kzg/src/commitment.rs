@@ -30,7 +30,7 @@ mod tests {
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
-    use zero_bls12_381::Fr;
+    use zero_bls12_381::{Fr, G1Projective};
     use zero_crypto::common::*;
 
     prop_compose! {
@@ -45,15 +45,12 @@ mod tests {
         }
     }
 
-    fn evaluate<P: Projective, S: Projective::Scalar>(
-        poly: &Polynomial<P::Scalar>,
-        at: P::Scalar,
-    ) -> P {
-        let mut acc = P::ADDITIVE_IDENTITY;
-        let mut identity = P::Scalar::ADDITIVE_IDENTITY;
+    fn evaluate(poly: &Polynomial<Fr>, at: Fr) -> G1Projective {
+        let mut acc = G1Projective::ADDITIVE_IDENTITY;
+        let mut identity = Fr::ADDITIVE_IDENTITY;
 
         for coeff in poly.0.iter().rev() {
-            let interm = P::GENERATOR * identity;
+            let interm = G1Projective::GENERATOR * identity;
             let product = interm * *coeff;
             acc += product;
             identity *= at;
