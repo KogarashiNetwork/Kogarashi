@@ -75,10 +75,16 @@ impl Pairing for TatePairing {
 #[cfg(test)]
 mod pairing_tests {
     use super::*;
+    use rand_core::OsRng;
+    use zero_bls12_381::Fr;
     use zero_crypto::common::Group;
 
+    fn arb_fr() -> Fr {
+        Fr::random(OsRng)
+    }
+
     #[test]
-    fn generator_pairing() {
+    fn generator_pairing_test() {
         let g1 = G1Affine::GENERATOR;
         let g2 = G2PairingAffine::from(G2Projective::GENERATOR);
 
@@ -86,7 +92,20 @@ mod pairing_tests {
     }
 
     #[test]
-    fn test_final_exp() {
+    fn pairing_test() {
+        let g1 = G1Affine::GENERATOR;
+        let g2 = G2Affine::GENERATOR;
+
+        let a = arb_fr();
+        let b = arb_fr();
+        let c = a * b;
+
+        let g = g1 * a;
+        let h = g2 * b;
+    }
+
+    #[test]
+    fn final_exp_test() {
         assert_eq!(Fq12::one().final_exp().unwrap(), Fq12::one());
     }
 }

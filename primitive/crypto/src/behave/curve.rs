@@ -8,7 +8,13 @@ use super::{
 use core::ops::Mul;
 
 pub trait Affine:
-    ParityCmp + Basic + PartialEq + Eq + Into<Self::Projective> + From<Self::Projective>
+    ParityCmp
+    + Basic
+    + PartialEq
+    + Eq
+    + Into<Self::Projective>
+    + From<Self::Projective>
+    + Mul<Self::ScalarField, Output = Self>
 {
     // scalar field of curve
     type ScalarField: PrimeField;

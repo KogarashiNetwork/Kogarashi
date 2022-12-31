@@ -8,18 +8,15 @@ pub use ring::*;
 macro_rules! curve_operation {
     ($scalar:ident, $range:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $g:ident, $e:ident) => {
         curve_built_in!($affine, $projective);
-        affine_group_operation!($affine, $g, $e);
+        affine_ring_operation!($affine, $scalar,$g, $e);
         projective_ring_operation!($projective, $scalar, $g, $e);
 
         impl Affine for $affine {
             type ScalarField = $scalar;
-
             type RangeField = $range;
-
             type Projective = $projective;
 
             const PARAM_A: $range = $a;
-
             const PARAM_B: $range = $b;
 
             fn to_projective(self) -> Self::Projective {
@@ -43,15 +40,21 @@ macro_rules! curve_operation {
             }
         }
 
+        impl Mul<$scalar> for $affine {
+            type Output = Self;
+
+            #[inline]
+            fn mul(self, scalar: $scalar) -> Self {
+                self * scalar
+            }
+        }
+
         impl Projective for $projective {
             type ScalarField = $scalar;
-
             type RangeField = $range;
-
             type Affine = $affine;
 
             const PARAM_A: $range = $a;
-
             const PARAM_B: $range = $b;
 
             fn to_affine(self) -> Self::Affine {
@@ -136,11 +139,8 @@ macro_rules! curve_built_in {
         use zero_crypto::common::*;
 
         impl ParityCmp for $affine {}
-
         impl ParityCmp for $projective {}
-
         impl Basic for $affine {}
-
         impl Basic for $projective {}
 
         impl Default for $affine {
