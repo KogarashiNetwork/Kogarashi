@@ -1,17 +1,15 @@
 mod group;
-mod ring;
 mod test;
 
 pub use group::*;
-pub use ring::*;
 pub use test::*;
 
 #[macro_export]
 macro_rules! curve_operation {
-    ($scalar:ident, $range:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $g:ident, $e:ident) => {
+    ($scalar:ident, $range:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $x:ident, $y:ident) => {
         curve_built_in!($affine, $projective);
-        affine_group_operation!($affine, $scalar,$g, $e);
-        projective_group_operation!($projective, $scalar, $g, $e);
+        affine_group_operation!($affine, $range, $scalar, $x, $y);
+        projective_group_operation!($projective, $range, $scalar, $x, $y);
 
         impl Curve for $affine {
             type Range = $range;
@@ -89,7 +87,7 @@ macro_rules! curve_operation {
                 Self::Affine {
                     x: self.x * inv_z,
                     y: self.y * inv_z,
-                    is_infinity: self.z == Self::Range::zero()
+                    is_infinity: self.z == Self::Range::zero(),
                 }
             }
 
@@ -110,7 +108,7 @@ macro_rules! curve_operation {
             }
 
             fn set_y(&mut self, value: Self::Range) {
-               self.y = value;
+                self.y = value;
             }
 
             fn set_z(&mut self, value: Self::Range) {

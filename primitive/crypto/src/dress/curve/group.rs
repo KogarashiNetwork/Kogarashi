@@ -1,18 +1,18 @@
 #[macro_export]
 macro_rules! affine_group_operation {
-    ($affine:ident, $scalar:ident, $g:ident, $e:ident) => {
+    ($affine:ident, $range:ident, $scalar:ident, $x:ident, $y:ident) => {
         impl Group for $affine {
             type Scalar = $scalar;
 
             const GENERATOR: Self = Self {
-                x: $g.x,
-                y: $g.y,
+                x: $x,
+                y: $y,
                 is_infinity: false,
             };
 
             const ADDITIVE_IDENTITY: Self = Self {
-                x: $e.x,
-                y: $e.y,
+                x: $range::zero(),
+                y: $range::zero(),
                 is_infinity: false,
             };
 
@@ -132,23 +132,30 @@ macro_rules! affine_group_operation {
 
 #[macro_export]
 macro_rules! projective_group_operation {
-    ($projective:ident, $scalar:ident, $g:ident, $e:ident) => {
+    ($projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident) => {
         impl Group for $projective {
             type Scalar = $scalar;
 
-            const GENERATOR: Self = $g;
+            const GENERATOR: Self = Self {
+                x: $x,
+                y: $y,
+                z: $range::one(),
+            };
 
-            const ADDITIVE_IDENTITY: Self = $e;
+            const ADDITIVE_IDENTITY: Self = Self {
+                x: $range::zero(),
+                y: $range::one(),
+                z: $range::zero(),
+            };
 
             fn invert(self) -> Option<Self> {
                 match self.z.is_zero() {
                     true => None,
-                    false => Some(
-                        Self {
-                            x: self.x,
-                            y: -self.y,
-                            z: self.z,
-                })
+                    false => Some(Self {
+                        x: self.x,
+                        y: -self.y,
+                        z: self.z,
+                    }),
                 }
             }
 
