@@ -1,7 +1,6 @@
 mod algebra;
 mod comp;
 mod curve;
-mod extension_field;
 mod fft;
 mod field;
 mod pairing;
@@ -9,7 +8,6 @@ mod pairing;
 pub use algebra::*;
 pub use comp::*;
 pub use curve::*;
-pub use extension_field::*;
 pub use fft::*;
 pub use field::*;
 pub use pairing::*;
