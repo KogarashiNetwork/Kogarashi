@@ -67,3 +67,5 @@ curve_operation!(
     GENERATOR,
     IDENTITY
 );
+
+curve_test!(bls12_381, Fr, G1Affine, G1Projective, 1000);

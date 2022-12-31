@@ -111,3 +111,4 @@ curve_operation!(
     IDENTITY
 );
 bls12_g2_pairing!(G2Projective, PairingCoeff, G2PairingAffine, Fq12);
+curve_test!(bls12_381, Fr, G2Affine, G2Projective, 1000);

@@ -90,4 +90,4 @@ curve_operation!(
     IDENTITY
 );
 
-projective_curve_test!(jubjub_projective, Fp, JubjubProjective, 1000);
+curve_test!(jubjub, Fp, JubjubAffine, JubjubProjective, 1000);
