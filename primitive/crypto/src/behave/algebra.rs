@@ -44,6 +44,9 @@ pub trait Group:
 /// default element is multiplicative generator
 pub trait Ring: Group + Mul<Output = Self> + MulAssign + PartialOrd + Ord + Default {
     const MULTIPLICATIVE_IDENTITY: Self;
+
+    // return one element
+    fn one() -> Self;
 }
 
 /// field trait which ensures the existence of inverse for both multiplicative and additive arithmetic

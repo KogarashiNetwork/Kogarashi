@@ -117,7 +117,7 @@ mod tests {
     }
 
     fn naive_multiply<F: PrimeField>(a: Vec<F>, b: Vec<F>) -> Vec<F> {
-        let mut c = vec![F::default(); a.len() + b.len() - 1];
+        let mut c = vec![F::zero(); a.len() + b.len() - 1];
         a.iter().enumerate().for_each(|(i_a, coeff_a)| {
             b.iter().enumerate().for_each(|(i_b, coeff_b)| {
                 c[i_a + i_b] += *coeff_a * *coeff_b;

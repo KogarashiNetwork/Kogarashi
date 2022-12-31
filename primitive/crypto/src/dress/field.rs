@@ -1,14 +1,15 @@
-mod common;
 mod group;
 mod ring;
 
-pub use common::*;
 pub use group::*;
 pub use ring::*;
 
 #[macro_export]
 macro_rules! field_operation {
     ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
+        use zero_crypto::behave::*;
+        use zero_crypto::common::*;
+
         ring_operation!($field, $p, $g, $e, $r2, $r3, $inv);
 
         impl Field for $field {}
@@ -36,10 +37,7 @@ macro_rules! field_operation {
 macro_rules! prime_field_operation {
     ($field:ident, $p:ident, $g:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
         field_operation!($field, $p, $g, $r, $inv, $r, $r2, $r3);
-
         field_built_in!($field);
-
-        const_field_operation!($field, $r);
 
         impl PrimeField for $field {
             const MODULUS: Self = $field($p);
@@ -86,10 +84,6 @@ macro_rules! fft_field_operation {
             const S: usize = $s;
 
             const ROOT_OF_UNITY: Self = $u;
-
-            fn one() -> Self {
-                $field(one($r2, $p, $i))
-            }
 
             fn pow(self, val: u64) -> Self {
                 Self(pow(self.0, [val, 0, 0, 0], $r, $p, $i))

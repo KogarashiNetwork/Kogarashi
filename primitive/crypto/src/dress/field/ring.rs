@@ -5,6 +5,16 @@ macro_rules! ring_operation {
 
         impl Ring for $field {
             const MULTIPLICATIVE_IDENTITY: $field = $field::one();
+
+            fn one() -> Self {
+                Self::MULTIPLICATIVE_IDENTITY
+            }
+        }
+
+        impl Default for $field {
+            fn default() -> Self {
+                $field::one()
+            }
         }
 
         impl PartialOrd for $field {

@@ -135,6 +135,22 @@ macro_rules! extension_field_group_operation {
                 self.0 = limbs
             }
         }
+
+        impl $extension_field {
+            pub const fn zero() -> Self {
+                Self([$sub_field::zero(); $limbs_length])
+            }
+
+            pub const fn one() -> Self {
+                let mut limbs = [$sub_field::zero(); $limbs_length];
+                limbs[0] = $sub_field::one();
+                Self(limbs)
+            }
+
+            pub const fn dummy() -> Self {
+                unimplemented!()
+            }
+        }
     };
 }
 

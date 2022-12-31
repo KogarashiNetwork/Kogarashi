@@ -114,6 +114,16 @@ macro_rules! group_operation {
                 *self = $field(mul(self.0, rhs.0, $p, $inv))
             }
         }
+
+        impl $field {
+            pub const fn zero() -> Self {
+                Self(zero())
+            }
+
+            pub const fn one() -> Self {
+                Self($r)
+            }
+        }
     };
 }
 
