@@ -11,13 +11,13 @@ macro_rules! curve_test {
                 C::ADDITIVE_GENERATOR * C::Scalar::random(OsRng)
             }
 
-            // paste! {
-            //     #[test]
-            //     fn [< $test_name _affine_is_on_curve_test >]() {
-            //         assert!($affine::ADDITIVE_GENERATOR.is_on_curve());
-            //         assert!($affine::ADDITIVE_IDENTITY.is_on_curve());
-            //     }
-            // }
+            paste! {
+                #[test]
+                fn [< $test_name _affine_is_on_curve_test >]() {
+                    assert!($affine::ADDITIVE_GENERATOR.is_on_curve());
+                    assert!($affine::ADDITIVE_IDENTITY.is_on_curve());
+                }
+            }
 
             // paste! {
             //     #[test]
