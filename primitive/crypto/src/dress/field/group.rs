@@ -4,8 +4,12 @@ macro_rules! group_operation {
         impl Group for $field {
             type Scalar = $field;
 
-            const GENERATOR: Self = $field($g);
+            const ADDITIVE_GENERATOR: Self = $field($g);
             const ADDITIVE_IDENTITY: Self = $field($r);
+
+            fn zero() -> Self {
+                Self(zero())
+            }
 
             fn invert(self) -> Option<Self> {
                 match invert(self.0, little_fermat($p), $r, $p, $inv) {

@@ -4,7 +4,7 @@ macro_rules! affine_group_operation {
         impl Group for $affine {
             type Scalar = $scalar;
 
-            const GENERATOR: Self = Self {
+            const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
                 y: $y,
                 is_infinity: false,
@@ -15,6 +15,10 @@ macro_rules! affine_group_operation {
                 y: $range::zero(),
                 is_infinity: false,
             };
+
+            fn zero() -> Self {
+                Self::ADDITIVE_GENERATOR
+            }
 
             fn invert(self) -> Option<Self> {
                 match self.is_infinity {
@@ -28,7 +32,7 @@ macro_rules! affine_group_operation {
             }
 
             fn random(rand: impl RngCore) -> Self {
-                Self::GENERATOR * $scalar::random(rand)
+                Self::ADDITIVE_GENERATOR * $scalar::random(rand)
             }
         }
 
@@ -136,7 +140,7 @@ macro_rules! projective_group_operation {
         impl Group for $projective {
             type Scalar = $scalar;
 
-            const GENERATOR: Self = Self {
+            const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
                 y: $y,
                 z: $range::one(),
@@ -147,6 +151,10 @@ macro_rules! projective_group_operation {
                 y: $range::one(),
                 z: $range::zero(),
             };
+
+            fn zero() -> Self {
+                Self::ADDITIVE_IDENTITY
+            }
 
             fn invert(self) -> Option<Self> {
                 match self.z.is_zero() {
@@ -160,7 +168,7 @@ macro_rules! projective_group_operation {
             }
 
             fn random(rand: impl RngCore) -> Self {
-                Self::GENERATOR * $scalar::random(rand)
+                Self::ADDITIVE_GENERATOR * $scalar::random(rand)
             }
         }
 

@@ -153,13 +153,13 @@ macro_rules! curve_built_in {
 
         impl Default for $affine {
             fn default() -> Self {
-                $projective::GENERATOR.to_affine()
+                $projective::ADDITIVE_GENERATOR.to_affine()
             }
         }
 
         impl Default for $projective {
             fn default() -> Self {
-                Self::GENERATOR
+                Self::ADDITIVE_GENERATOR
             }
         }
 

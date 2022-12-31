@@ -16,11 +16,11 @@ impl<C: Commitment> KeyPair<C> {
         // G1, r * G1, r^2 * G1, ..., r^n-1 * G1
         let g1 = (0..(1 << k))
             .map(|i| {
-                let tw = C::G1Projective::GENERATOR * r.pow(i);
+                let tw = C::G1Projective::ADDITIVE_GENERATOR * r.pow(i);
                 C::G1Affine::from(tw)
             })
             .collect::<Vec<_>>();
-        let g2 = C::G2Affine::from(C::G2Projective::GENERATOR * r);
+        let g2 = C::G2Affine::from(C::G2Projective::ADDITIVE_GENERATOR * r);
 
         Self { k, g1, g2 }
     }
@@ -49,11 +49,11 @@ impl<C: Commitment> KeyPair<C> {
         // p(s)
         let s_eval = self.commit(poly);
         // p(at)
-        let a_eval = C::G1Projective::GENERATOR * poly.evaluate(at);
+        let a_eval = C::G1Projective::ADDITIVE_GENERATOR * poly.evaluate(at);
         // p(s) - p(at) / s - at
         let q_eval = self.commit(&quotient);
         // s - at
-        let denominator = C::G2Projective::from(self.g2) - C::G2Projective::GENERATOR * at;
+        let denominator = C::G2Projective::from(self.g2) - C::G2Projective::ADDITIVE_GENERATOR * at;
 
         Witness {
             s_eval: C::G1Affine::from(s_eval),

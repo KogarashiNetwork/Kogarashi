@@ -44,6 +44,7 @@ The white paper is work in progress. You can find the light paper [here](https:/
 - [Lifted-ElGamal Enctyption](https://github.com/herumi/mcl/blob/master/misc/she/she.pdf)
 - [Zether](https://crypto.stanford.edu/~buenz/papers/zether.pdf)
 - [Zexe](https://eprint.iacr.org/2018/962.pdf)
+- [Zerochain](https://github.com/LayerXcom/zero-chain)
 
 ## License
 Copyright 2020-2023 The Invers INC.

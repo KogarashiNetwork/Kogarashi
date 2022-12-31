@@ -22,10 +22,13 @@ pub trait Group:
     type Scalar: Group;
 
     // generator of group
-    const GENERATOR: Self;
+    const ADDITIVE_GENERATOR: Self;
     // additive identity of group
     // a * e = a for any a
     const ADDITIVE_IDENTITY: Self;
+
+    // return zero element
+    fn zero() -> Self;
 
     // get inverse of group element
     fn invert(self) -> Option<Self>
@@ -38,7 +41,8 @@ pub trait Group:
 
 /// ring trait which supports additive and multiplicative arithmetics
 /// both arithmetics hold associative and distributive property
-pub trait Ring: Group + Mul<Output = Self> + MulAssign + PartialOrd + Ord {
+/// default element is multiplicative generator
+pub trait Ring: Group + Mul<Output = Self> + MulAssign + PartialOrd + Ord + Default {
     const MULTIPLICATIVE_IDENTITY: Self;
 }
 

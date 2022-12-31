@@ -48,10 +48,10 @@ const R3: [u64; 6] = [
 
 const INV: u64 = 0x89f3fffcfffcfffd;
 
-pairing_field_operation!(Fq, MODULUS, GENERATOR, INV, R, R2, R3);
-
 impl Fq {
     pub(crate) const fn to_mont_form(val: [u64; 6]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
 }
+
+pairing_field_operation!(Fq, MODULUS, GENERATOR, INV, R, R2, R3);

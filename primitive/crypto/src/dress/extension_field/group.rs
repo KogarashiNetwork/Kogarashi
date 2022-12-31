@@ -4,9 +4,14 @@ macro_rules! extension_field_group_operation {
         impl Group for $extension_field {
             type Scalar = $extension_field;
 
-            const GENERATOR: Self = $extension_field::dummy();
+            // Todo: this is not actual generator
+            const ADDITIVE_GENERATOR: Self = $extension_field::zero();
 
-            const ADDITIVE_IDENTITY: Self = $extension_field::dummy();
+            const ADDITIVE_IDENTITY: Self = $extension_field::zero();
+
+            fn zero() -> Self {
+                Self::ADDITIVE_GENERATOR
+            }
 
             fn invert(self) -> Option<Self> {
                 self.get_invert()

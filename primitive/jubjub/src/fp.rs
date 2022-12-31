@@ -123,27 +123,6 @@ impl Fp {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::curve::JubjubProjective;
-    use proptest::prelude::*;
-
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(50))]
-        #[test]
-        fn test_binary_method(x in any::<u16>()) {
-            let fr = Fp::from_u64(x as u64);
-            let g = JubjubProjective::GENERATOR;
-            let mul = g * fr;
-            let rev_mul = g * fr;
-            assert_eq!(mul, rev_mul);
-
-            let mut acc = JubjubProjective::ADDITIVE_IDENTITY;
-            for _ in 0..x {
-                acc += g;
-            }
-
-            assert_eq!(acc, mul);
-        }
-    }
 
     #[test]
     fn test_from_hex() {

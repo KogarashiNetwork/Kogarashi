@@ -12,13 +12,13 @@ prop_compose! {
 
 prop_compose! {
     fn arb_point()(k in arb_fp()) -> JubjubProjective {
-        JubjubProjective::GENERATOR * k
+        JubjubProjective::ADDITIVE_GENERATOR * k
     }
 }
 
 #[test]
 fn jubjub_is_on_curve() {
-    assert!(JubjubProjective::GENERATOR.is_on_curve());
+    assert!(JubjubProjective::ADDITIVE_GENERATOR.is_on_curve());
     assert!(JubjubProjective::ADDITIVE_IDENTITY.is_on_curve());
 }
 

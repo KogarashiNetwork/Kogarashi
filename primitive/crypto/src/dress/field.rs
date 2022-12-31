@@ -87,10 +87,6 @@ macro_rules! fft_field_operation {
 
             const ROOT_OF_UNITY: Self = $u;
 
-            fn zero() -> Self {
-                $field(zero())
-            }
-
             fn one() -> Self {
                 $field(one($r2, $p, $i))
             }

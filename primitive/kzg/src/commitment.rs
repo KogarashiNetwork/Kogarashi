@@ -50,7 +50,7 @@ mod tests {
         let mut identity = Fr::ADDITIVE_IDENTITY;
 
         for coeff in poly.0.iter().rev() {
-            let interm = G1Projective::GENERATOR * identity;
+            let interm = G1Projective::ADDITIVE_GENERATOR * identity;
             let product = interm * *coeff;
             acc += product;
             identity *= at;
