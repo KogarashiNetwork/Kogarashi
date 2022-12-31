@@ -1,5 +1,6 @@
 // trait resresenting abstract algebra concept
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use rand_core::RngCore;
 
 /// group trait which supports additive and scalar arithmetic
 /// additive and scalar arithmetic hold associative and distributive property
@@ -30,6 +31,9 @@ pub trait Group:
     fn invert(self) -> Option<Self>
     where
         Self: Sized;
+
+    // get randome element
+    fn random(rand: impl RngCore) -> Self;
 }
 
 /// ring trait which supports additive and multiplicative arithmetics

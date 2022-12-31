@@ -11,6 +11,14 @@ macro_rules! extension_field_group_operation {
             fn invert(self) -> Option<Self> {
                 self.get_invert()
             }
+
+            fn random(mut rand: impl RngCore) -> Self {
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = $sub_field::random(&mut rand);
+                }
+                $extension_field(limbs)
+            }
         }
 
         impl PartialEq for $extension_field {

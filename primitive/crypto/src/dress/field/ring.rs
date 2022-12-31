@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! ring_operation {
-    ($field:ident, $p:ident, $g:ident, $r:ident, $inv:ident) => {
-        group_operation!($field, $p, $g, $r, $inv);
+    ($field:ident, $p:ident, $g:ident, $r:ident, $r2:ident, $r3:ident, $inv:ident) => {
+        group_operation!($field, $p, $g, $r, $r2, $r3, $inv);
 
         impl Ring for $field {
             const MULTIPLICATIVE_IDENTITY: $field = $field::one();

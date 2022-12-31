@@ -52,7 +52,7 @@ impl EncryptedNumber {
         let g = JubjubProjective::GENERATOR;
         let decrypted_message = self.s.to_projective() - (self.t.to_projective() * private_key);
 
-        let mut acc = JubjubProjective::IDENTITY;
+        let mut acc = JubjubProjective::ADDITIVE_IDENTITY;
         for i in 0..150000 {
             if acc == decrypted_message {
                 return Some(i);

@@ -8,8 +8,8 @@ pub use ring::*;
 
 #[macro_export]
 macro_rules! field_operation {
-    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident) => {
-        ring_operation!($field, $p, $g, $e, $inv);
+    ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
+        ring_operation!($field, $p, $g, $e, $r2, $r3, $inv);
 
         impl Field for $field {}
 
@@ -35,7 +35,7 @@ macro_rules! field_operation {
 #[macro_export]
 macro_rules! prime_field_operation {
     ($field:ident, $p:ident, $g:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
-        field_operation!($field, $p, $g, $r, $inv);
+        field_operation!($field, $p, $g, $r, $inv, $r, $r2, $r3);
 
         field_built_in!($field);
 
@@ -56,10 +56,6 @@ macro_rules! prime_field_operation {
 
             fn is_zero(self) -> bool {
                 self.0.iter().all(|x| *x == 0)
-            }
-
-            fn random(rand: impl RngCore) -> Self {
-                Self(random_limbs(rand, $r2, $r3, $p, $inv))
             }
 
             fn double(self) -> Self {

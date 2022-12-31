@@ -26,6 +26,10 @@ macro_rules! affine_group_operation {
                     }),
                 }
             }
+
+            fn random(rand: impl RngCore) -> Self {
+                Self::GENERATOR * $scalar::random(rand)
+            }
         }
 
         impl PartialEq for $affine {
@@ -146,6 +150,10 @@ macro_rules! projective_group_operation {
                             z: self.z,
                 })
                 }
+            }
+
+            fn random(rand: impl RngCore) -> Self {
+                Self::GENERATOR * $scalar::random(rand)
             }
         }
 

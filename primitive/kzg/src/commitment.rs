@@ -45,9 +45,12 @@ mod tests {
         }
     }
 
-    fn evaluate<P: Projective>(poly: &Polynomial<P::ScalarField>, at: P::ScalarField) -> P {
-        let mut acc = P::IDENTITY;
-        let mut identity = P::ScalarField::IDENTITY;
+    fn evaluate<P: Projective, S: Projective::Scalar>(
+        poly: &Polynomial<P::Scalar>,
+        at: P::Scalar,
+    ) -> P {
+        let mut acc = P::ADDITIVE_IDENTITY;
+        let mut identity = P::Scalar::ADDITIVE_IDENTITY;
 
         for coeff in poly.0.iter().rev() {
             let interm = P::GENERATOR * identity;

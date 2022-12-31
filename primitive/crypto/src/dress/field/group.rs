@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! group_operation {
-    ($field:ident, $p:ident, $g:ident, $r:ident, $inv:ident) => {
+    ($field:ident, $p:ident, $g:ident, $r:ident, $r2:ident, $r3:ident, $inv:ident) => {
         impl Group for $field {
             type Scalar = $field;
 
@@ -12,6 +12,10 @@ macro_rules! group_operation {
                     Some(x) => Some(Self(x)),
                     None => None,
                 }
+            }
+
+            fn random(rand: impl RngCore) -> Self {
+                Self(random_limbs(rand, $r2, $r3, $p, $inv))
             }
         }
 

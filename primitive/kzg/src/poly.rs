@@ -137,7 +137,7 @@ mod tests {
 
             // naive polynomial evaluation
             poly.0.iter().rev().for_each(|coeff| {
-                naive_eval += coeff * &exp;
+                naive_eval += *coeff * exp;
                 exp *= at;
             });
 

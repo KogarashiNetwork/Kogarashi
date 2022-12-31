@@ -33,7 +33,7 @@ impl<C: Commitment> KeyPair<C> {
         poly.0
             .iter()
             .zip(self.g1.iter().rev().skip(diff))
-            .fold(C::G1Projective::IDENTITY, |acc, (coeff, base)| {
+            .fold(C::G1Projective::ADDITIVE_IDENTITY, |acc, (coeff, base)| {
                 acc + C::G1Projective::from(*base) * *coeff
             })
     }

@@ -127,14 +127,6 @@ macro_rules! common_extension_field_operation {
                 acc
             }
 
-            fn random(mut rand: impl RngCore) -> Self {
-                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
-                for i in 0..$limbs_length {
-                    limbs[i] = $sub_field::random(&mut rand);
-                }
-                $extension_field(limbs)
-            }
-
             // TODO should be optimized
             fn double(self) -> Self {
                 self + self

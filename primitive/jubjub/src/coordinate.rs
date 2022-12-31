@@ -92,7 +92,7 @@ curve_operation!(
 
 #[cfg(test)]
 mod tests {
-    use super::{Fp, JubjubProjective, PrimeField, GENERATOR};
+    use super::{Fp, Group, JubjubProjective, GENERATOR};
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
