@@ -90,37 +90,4 @@ curve_operation!(
     IDENTITY
 );
 
-#[cfg(test)]
-mod tests {
-    use super::{Fp, Group, JubjubProjective, GENERATOR};
-    use proptest::prelude::*;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
-
-    prop_compose! {
-        fn arb_fp()(bytes in [any::<u8>(); 16]) -> Fp {
-            Fp::random(XorShiftRng::from_seed(bytes))
-        }
-    }
-
-    prop_compose! {
-        fn arb_cdn()(k in arb_fp()) -> JubjubProjective {
-            GENERATOR * k
-        }
-    }
-
-    #[test]
-    fn test_coordinate_cmp() {
-        let a = JubjubProjective {
-            x: Fp::one(),
-            y: Fp::one(),
-            z: Fp::one(),
-        };
-        let b = JubjubProjective {
-            x: Fp::one(),
-            y: Fp::zero(),
-            z: Fp::one(),
-        };
-        assert_ne!(a, b)
-    }
-}
+projective_curve_test!(jubjub_projective, Fp, JubjubProjective, 1000);

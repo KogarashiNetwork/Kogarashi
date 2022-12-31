@@ -119,5 +119,5 @@ macro_rules! bls12_curve_test {
     };
 }
 
-// bls12_curve_test!(g1_projective, G1Projective, 1000);
-// bls12_curve_test!(g2_projective, G2Projective, 500);
+bls12_curve_test!(g1_projective, G1Projective, 1000);
+bls12_curve_test!(g2_projective, G2Projective, 500);

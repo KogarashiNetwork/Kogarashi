@@ -35,9 +35,9 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(dead_code)]
 
-mod coordinate;
+mod curve;
 mod error;
 mod fp;
 
-pub use coordinate::{JubjubAffine, JubjubProjective};
+pub use curve::{JubjubAffine, JubjubProjective};
 pub use fp::Fp;

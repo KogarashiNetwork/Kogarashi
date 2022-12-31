@@ -17,105 +17,105 @@ macro_rules! bls12_curve_test {
             }
         }
 
-        // paste! {
-        //     #[test]
-        //     fn [< $test_name _identity_test >]() {
-        //         let a = arb_point::<$curve>();
-        //         // a + (-a) = e
-        //         let identity = a - a;
+        paste! {
+            #[test]
+            fn [< $test_name _identity_test >]() {
+                let a = arb_point::<$curve>();
+                // a + (-a) = e
+                let identity = a - a;
 
-        //         // a + e = a
-        //         let a_prime = a + $curve::ADDITIVE_IDENTITY;
+                // a + e = a
+                let a_prime = a + $curve::ADDITIVE_IDENTITY;
 
-        //         assert_eq!(identity, $curve::ADDITIVE_IDENTITY);
-        //         assert_eq!(a_prime, a);
-        //     }
-        // }
+                assert_eq!(identity, $curve::ADDITIVE_IDENTITY);
+                assert_eq!(a_prime, a);
+            }
+        }
 
-        // paste! {
-        //     #[test]
-        //     fn [< $test_name _addition_test >]() {
-        //         for _ in 0..$iter_times {
-        //             let a = arb_point::<$curve>();
-        //             let b = arb_point::<$curve>();
-        //             let c = arb_point::<$curve>();
+        paste! {
+            #[test]
+            fn [< $test_name _addition_test >]() {
+                for _ in 0..$iter_times {
+                    let a = arb_point::<$curve>();
+                    let b = arb_point::<$curve>();
+                    let c = arb_point::<$curve>();
 
-        //             // a + b + c = c + a + b
-        //             let ab = a + b;
-        //             let abc = ab + c;
-        //             let ca = c + a;
-        //             let cab = ca + b;
+                    // a + b + c = c + a + b
+                    let ab = a + b;
+                    let abc = ab + c;
+                    let ca = c + a;
+                    let cab = ca + b;
 
-        //             // 2 * (a + b) = 2 * a + 2 * b
-        //             let double_ab = ab.double();
-        //             let aa = a.double();
-        //             let bb = b.double();
-        //             let aabb = aa + bb;
+                    // 2 * (a + b) = 2 * a + 2 * b
+                    let double_ab = ab.double();
+                    let aa = a.double();
+                    let bb = b.double();
+                    let aabb = aa + bb;
 
-        //             assert!(abc.is_on_curve());
-        //             assert!(cab.is_on_curve());
-        //             assert!(double_ab.is_on_curve());
-        //             assert!(aabb.is_on_curve());
-        //             assert_eq!(abc, cab);
-        //             assert_eq!(double_ab, aabb);
-        //         }
-        //     }
-        // }
+                    assert!(abc.is_on_curve());
+                    assert!(cab.is_on_curve());
+                    assert!(double_ab.is_on_curve());
+                    assert!(aabb.is_on_curve());
+                    assert_eq!(abc, cab);
+                    assert_eq!(double_ab, aabb);
+                }
+            }
+        }
 
-        // paste! {
-        //     #[test]
-        //     fn [< $test_name _doubling_test >]() {
-        //         for _ in 0..$iter_times {
-        //             let a = arb_point::<$curve>();
+        paste! {
+            #[test]
+            fn [< $test_name _doubling_test >]() {
+                for _ in 0..$iter_times {
+                    let a = arb_point::<$curve>();
 
-        //             // a + a = a * 8
-        //             let scalared_a = a * Fr::from_u64(8);
-        //             let aa =a.double();
-        //             let a_4 = aa.double();
-        //             let a_8 = a_4.double();
+                    // a + a = a * 8
+                    let scalared_a = a * Fr::from_u64(8);
+                    let aa =a.double();
+                    let a_4 = aa.double();
+                    let a_8 = a_4.double();
 
-        //             assert!(scalared_a.is_on_curve());
-        //             assert!(a_8.is_on_curve());
-        //             assert_eq!(scalared_a, a_8);
-        //         }
-        //     }
-        // }
+                    assert!(scalared_a.is_on_curve());
+                    assert!(a_8.is_on_curve());
+                    assert_eq!(scalared_a, a_8);
+                }
+            }
+        }
 
-        // paste! {
-        //     #[test]
-        //     fn [< $test_name _scalar_test >]() {
-        //         for _ in 0..$iter_times {
-        //             let g = arb_point::<$curve>();
+        paste! {
+            #[test]
+            fn [< $test_name _scalar_test >]() {
+                for _ in 0..$iter_times {
+                    let g = arb_point::<$curve>();
 
-        //             // 8 * G + 16 * G = 24 * G
-        //             let ag = g * Fr::new([8, 0, 0, 0]);
-        //             let bg = g * Fr::new([16, 0, 0, 0]);
-        //             let agbg = ag + bg;
+                    // 8 * G + 16 * G = 24 * G
+                    let ag = g * Fr::new([8, 0, 0, 0]);
+                    let bg = g * Fr::new([16, 0, 0, 0]);
+                    let agbg = ag + bg;
 
-        //             let abg = g * Fr::new([24, 0, 0, 0]);
+                    let abg = g * Fr::new([24, 0, 0, 0]);
 
-        //             assert!(agbg.is_on_curve());
-        //             assert!(abg.is_on_curve());
-        //             assert_eq!(agbg, abg);
-        //         }
-        //     }
-        // }
+                    assert!(agbg.is_on_curve());
+                    assert!(abg.is_on_curve());
+                    assert_eq!(agbg, abg);
+                }
+            }
+        }
 
-        // paste! {
-        //     #[test]
-        //     fn [< $test_name _conversion_test >]() {
-        //         for _ in 0..$iter_times {
-        //             let a = arb_point::<$curve>();
+        paste! {
+            #[test]
+            fn [< $test_name _conversion_test >]() {
+                for _ in 0..$iter_times {
+                    let a = arb_point::<$curve>();
 
-        //             // affine -> projective -> affine
-        //             let projective = a.to_projective();
-        //             let affine = $curve::from(projective);
+                    // affine -> projective -> affine
+                    let projective = a.to_projective();
+                    let affine = $curve::from(projective);
 
-        //             assert!(affine.is_on_curve());
-        //             assert_eq!(a, affine);
-        //         }
-        //     }
-        // }
+                    assert!(affine.is_on_curve());
+                    assert_eq!(a, affine);
+                }
+            }
+        }
     };
 }
 

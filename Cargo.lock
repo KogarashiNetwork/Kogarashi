@@ -3435,6 +3435,7 @@ name = "zero-jubjub"
 version = "0.1.0"
 dependencies = [
  "parity-scale-codec",
+ "paste",
  "proptest",
  "rand 0.8.5",
  "rand_core 0.6.3",

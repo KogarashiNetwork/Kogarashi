@@ -1,8 +1,10 @@
 mod group;
 mod ring;
+mod test;
 
 pub use group::*;
 pub use ring::*;
+pub use test::*;
 
 #[macro_export]
 macro_rules! curve_operation {
