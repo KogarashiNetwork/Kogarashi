@@ -13,7 +13,7 @@ macro_rules! affine_group_operation {
             const ADDITIVE_IDENTITY: Self = Self {
                 x: $range::zero(),
                 y: $range::zero(),
-                is_infinity: false,
+                is_infinity: true,
             };
 
             fn zero() -> Self {
@@ -63,11 +63,11 @@ macro_rules! affine_group_operation {
             }
         }
 
-        impl<'a, 'b> Mul<&'b $scalar> for &'a $affine {
-            type Output = $affine;
+        impl Mul<$scalar> for $affine {
+            type Output = Self;
 
             #[inline]
-            fn mul(self, scalar: &'b $scalar) -> $affine {
+            fn mul(self, scalar: $scalar) -> Self {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.clone();
                 let bits: Vec<u8> = scalar
@@ -82,6 +82,15 @@ macro_rules! affine_group_operation {
                     acc.double();
                 }
                 res
+            }
+        }
+
+        impl<'a, 'b> Mul<&'b $scalar> for &'a $affine {
+            type Output = $affine;
+
+            #[inline]
+            fn mul(self, scalar: &'b $scalar) -> $affine {
+                self * scalar
             }
         }
 

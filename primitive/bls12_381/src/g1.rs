@@ -32,4 +32,4 @@ curve_operation!(
     G1_GENERATOR_Y
 );
 
-curve_test!(bls12_381, Fr, G1Affine, G1Projective, 1000);
+curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);

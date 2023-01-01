@@ -62,20 +62,15 @@ macro_rules! curve_operation {
             type Projective = $projective;
 
             fn to_projective(self) -> Self::Projective {
-                Self::Projective {
-                    x: self.x,
-                    y: self.y,
-                    z: Self::Range::one(),
+                if self.is_identity() {
+                    Self::Projective::ADDITIVE_IDENTITY
+                } else {
+                    Self::Projective {
+                        x: self.x,
+                        y: self.y,
+                        z: Self::Range::one(),
+                    }
                 }
-            }
-        }
-
-        impl Mul<$scalar> for $affine {
-            type Output = Self;
-
-            #[inline]
-            fn mul(self, scalar: $scalar) -> Self {
-                self * scalar
             }
         }
 
@@ -83,11 +78,13 @@ macro_rules! curve_operation {
             type Affine = $affine;
 
             fn to_affine(self) -> Self::Affine {
-                let inv_z = self.z.invert().unwrap();
-                Self::Affine {
-                    x: self.x * inv_z,
-                    y: self.y * inv_z,
-                    is_infinity: self.z == Self::Range::zero(),
+                match self.z.invert() {
+                    Some(z_inv) => Self::Affine {
+                        x: self.x * z_inv,
+                        y: self.y * z_inv,
+                        is_infinity: self.z == Self::Range::zero(),
+                    },
+                    None => Self::Affine::ADDITIVE_IDENTITY,
                 }
             }
 
