@@ -30,6 +30,7 @@ fn pairing_test() {
     let h = g2 * b;
     let res = TatePairing::pairing(g, G2PairingAffine::from(h.to_projective()));
 
+    println!("{:?}", res);
     assert_eq!(res, expected)
 }
 

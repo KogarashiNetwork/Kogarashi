@@ -26,7 +26,17 @@ macro_rules! bls12_range_field_pairing {
                 c1: Self::QuadraticField,
                 c4: Self::QuadraticField,
             ) -> Self {
-                todo!()
+                let aa = self.0[0].mul_by_01(c0, c1);
+                let bb = self.0[1].mul_by_1(c4);
+                let o = c1 + c4;
+                let c1 = self.0[1] + self.0[0];
+                let c1 = c1.mul_by_01(c0, o);
+                let c1 = c1 - aa - bb;
+                let c0 = bb;
+                let c0 = c0.mul_by_nonresidue();
+                let c0 = c0 + aa;
+
+                Self([c0, c1])
             }
 
             fn final_exp(self) -> Option<Self> {

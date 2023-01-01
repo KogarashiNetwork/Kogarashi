@@ -34,3 +34,31 @@ peculiar_extension_field_operation!(
     FROBENIUS_COEFF_FQ12_C1,
     BLS_X_IS_NEGATIVE
 );
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rand_core::OsRng;
+
+    #[test]
+    fn fq2_mul_nonresidue_test() {
+        let b = Fq2([Fq::one(); TWO_DEGREE_EXTENTION_LIMBS_LENGTH]);
+        for _ in 0..100 {
+            let a = Fq2::random(OsRng);
+            let expected = a * b;
+
+            assert_eq!(a.mul_by_nonresidue(), expected)
+        }
+    }
+
+    #[test]
+    fn fq6_mul_nonresidue_test() {
+        let b = Fq6([Fq2::zero(), Fq2::one(), Fq2::zero()]);
+        for _ in 0..100 {
+            let a = Fq6::random(OsRng);
+            let expected = a * b;
+
+            assert_eq!(a.mul_by_nonresidue(), expected)
+        }
+    }
+}
