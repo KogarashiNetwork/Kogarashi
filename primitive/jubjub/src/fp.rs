@@ -118,6 +118,11 @@ impl Fp {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use paste::paste;
+    use rand_core::OsRng;
+    use zero_crypto::dress::field::field_test;
+
+    field_test!(fp_field, Fp, 1000);
 
     #[test]
     fn test_from_hex() {

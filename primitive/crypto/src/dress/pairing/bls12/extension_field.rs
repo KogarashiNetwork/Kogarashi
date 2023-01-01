@@ -190,7 +190,7 @@ macro_rules! peculiar_extension_field_operation {
                 Self([self.0[0], -self.0[1]])
             }
 
-            fn frobenius_map(&mut self, power: usize) -> Self {
+            fn frobenius_map(self, power: usize) -> Self {
                 self.0[0].frobenius_map(power);
                 self.0[1].frobenius_map(power);
 

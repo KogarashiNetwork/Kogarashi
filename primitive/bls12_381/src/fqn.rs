@@ -38,7 +38,13 @@ peculiar_extension_field_operation!(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use paste::paste;
     use rand_core::OsRng;
+    use zero_crypto::dress::field::field_test;
+
+    field_test!(fq2_field, Fq2, 1000);
+    field_test!(fq6_field, Fq6, 500);
+    field_test!(fq12_field, Fq12, 500);
 
     #[test]
     fn fq2_mul_nonresidue_test() {
@@ -98,6 +104,24 @@ mod tests {
             ]);
 
             assert_eq!(a.mul_by_014(c0, c1, c5), a * b);
+        }
+    }
+
+    #[test]
+    fn fq12_frobenius_map_test() {
+        for _ in 0..1000 {
+            let a = Fq12::random(OsRng);
+
+            assert_eq!(a, a.frobenius_map(12));
+        }
+    }
+
+    #[test]
+    fn fq12_pow_test() {
+        for _ in 0..1000 {
+            let a = Fq12::random(OsRng);
+
+            assert_eq!(a, a.frobenius_map(12));
         }
     }
 }

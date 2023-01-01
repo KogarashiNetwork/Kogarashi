@@ -1,19 +1,11 @@
-use paste::paste;
-use rand_core::OsRng;
-use zero_bls12_381::{Fq12, Fq2, Fq6};
-use zero_crypto::behave::{Group, PrimeField};
-
-fn arb_ext_fq<F: PrimeField>() -> F {
-    F::random(OsRng)
-}
-
-macro_rules! bls12_extension_field_test {
-    ($test_name:ident, $ext_field:ident, $iter_times:expr) => {
+#[macro_export]
+macro_rules! field_test {
+    ($test_name:ident, $field:ident, $iter_times:expr) => {
         paste! {
             #[test]
             fn [< $test_name _addition_test >]() {
                 for _ in 0..$iter_times {
-                    let a = arb_ext_fq::<$ext_field>();
+                    let a = $field::random(OsRng);
 
                     // a + a = a * 2
                     let b = a + a;
@@ -28,7 +20,7 @@ macro_rules! bls12_extension_field_test {
             #[test]
             fn [< $test_name _subtraction_test >]() {
                 for _ in 0..$iter_times {
-                    let a = arb_ext_fq::<$ext_field>();
+                    let a = $field::random(OsRng);
 
                     // a - a = a * 2 - a * 2
                     let b = a - a;
@@ -45,9 +37,9 @@ macro_rules! bls12_extension_field_test {
             #[test]
             fn [< $test_name _multiplication_test >]() {
                 for _ in 0..$iter_times {
-                    let a = arb_ext_fq::<$ext_field>();
-                    let b = arb_ext_fq::<$ext_field>();
-                    let c = arb_ext_fq::<$ext_field>();
+                    let a = $field::random(OsRng);
+                    let b = $field::random(OsRng);
+                    let c = $field::random(OsRng);
 
                     // a * b + a * c
                     let ab = a * b;
@@ -67,8 +59,8 @@ macro_rules! bls12_extension_field_test {
             #[test]
             fn [< $test_name _squaring_test >]() {
                 for _ in 0..$iter_times {
-                    let a = arb_ext_fq::<$ext_field>();
-                    let b = arb_ext_fq::<$ext_field>();
+                    let a = $field::random(OsRng);
+                    let b = $field::random(OsRng);
 
                     // (a * a) * (b * b)
                     let aa = a * a;
@@ -89,7 +81,7 @@ macro_rules! bls12_extension_field_test {
             #[test]
             fn [< $test_name _inversion_test >]() {
                 for _ in 0..$iter_times {
-                    let a = arb_ext_fq::<$ext_field>();
+                    let a = $field::random(OsRng);
 
                     // a * a^-1 = e
                     let inv = a.invert();
@@ -97,7 +89,7 @@ macro_rules! bls12_extension_field_test {
                     match inv {
                         Some(x) => {
                             let b = a * x;
-                            assert_eq!(b, $ext_field::one())
+                            assert_eq!(b, $field::one())
                         },
                         None => {}
                     }
@@ -107,6 +99,4 @@ macro_rules! bls12_extension_field_test {
     };
 }
 
-bls12_extension_field_test!(fq2_field, Fq2, 1000);
-bls12_extension_field_test!(fq6_field, Fq6, 500);
-bls12_extension_field_test!(fq12_field, Fq12, 500);
+pub use field_test;
