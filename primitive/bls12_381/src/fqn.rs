@@ -84,4 +84,20 @@ mod tests {
             assert_eq!(a.mul_by_01(c0, c1), a * b);
         }
     }
+
+    #[test]
+    fn fq12_mul_by_014_test() {
+        for _ in 0..1000 {
+            let c0 = Fq2::random(OsRng);
+            let c1 = Fq2::random(OsRng);
+            let c5 = Fq2::random(OsRng);
+            let a = Fq12::random(OsRng);
+            let b = Fq12([
+                Fq6([c0, c1, Fq2::zero()]),
+                Fq6([Fq2::zero(), c5, Fq2::zero()]),
+            ]);
+
+            assert_eq!(a.mul_by_014(c0, c1, c5), a * b);
+        }
+    }
 }
