@@ -43,7 +43,7 @@ mod tests {
     #[test]
     fn fq2_mul_nonresidue_test() {
         let b = Fq2([Fq::one(); TWO_DEGREE_EXTENTION_LIMBS_LENGTH]);
-        for _ in 0..100 {
+        for _ in 0..1000 {
             let a = Fq2::random(OsRng);
             let expected = a * b;
 
@@ -54,11 +54,34 @@ mod tests {
     #[test]
     fn fq6_mul_nonresidue_test() {
         let b = Fq6([Fq2::zero(), Fq2::one(), Fq2::zero()]);
-        for _ in 0..100 {
+        for _ in 0..1000 {
             let a = Fq6::random(OsRng);
             let expected = a * b;
 
             assert_eq!(a.mul_by_nonresidue(), expected)
+        }
+    }
+
+    #[test]
+    fn fq6_mul_by_1_test() {
+        for _ in 0..1000 {
+            let c1 = Fq2::random(OsRng);
+            let a = Fq6::random(OsRng);
+            let b = Fq6([Fq2::zero(), c1, Fq2::zero()]);
+
+            assert_eq!(a.mul_by_1(c1), a * b);
+        }
+    }
+
+    #[test]
+    fn fq6_mul_by_01_test() {
+        for _ in 0..1000 {
+            let c0 = Fq2::random(OsRng);
+            let c1 = Fq2::random(OsRng);
+            let a = Fq6::random(OsRng);
+            let b = Fq6([c0, c1, Fq2::zero()]);
+
+            assert_eq!(a.mul_by_01(c0, c1), a * b);
         }
     }
 }
