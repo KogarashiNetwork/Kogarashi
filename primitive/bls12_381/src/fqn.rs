@@ -34,3 +34,85 @@ peculiar_extension_field_operation!(
     FROBENIUS_COEFF_FQ12_C1,
     BLS_X_IS_NEGATIVE
 );
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use paste::paste;
+    use rand_core::OsRng;
+    use zero_crypto::dress::field::field_test;
+
+    field_test!(fq2_field, Fq2, 1000);
+    field_test!(fq6_field, Fq6, 500);
+    field_test!(fq12_field, Fq12, 500);
+
+    #[test]
+    fn fq2_mul_nonresidue_test() {
+        let b = Fq2([Fq::one(); 2]);
+        for _ in 0..1000 {
+            let a = Fq2::random(OsRng);
+            let expected = a * b;
+
+            assert_eq!(a.mul_by_nonresidue(), expected)
+        }
+    }
+
+    #[test]
+    fn fq6_mul_nonresidue_test() {
+        let b = Fq6([Fq2::zero(), Fq2::one(), Fq2::zero()]);
+        for _ in 0..1000 {
+            let a = Fq6::random(OsRng);
+            let expected = a * b;
+
+            assert_eq!(a.mul_by_nonresidue(), expected)
+        }
+    }
+
+    #[test]
+    fn fq6_mul_by_1_test() {
+        for _ in 0..1000 {
+            let c1 = Fq2::random(OsRng);
+            let a = Fq6::random(OsRng);
+            let b = Fq6([Fq2::zero(), c1, Fq2::zero()]);
+
+            assert_eq!(a.mul_by_1(c1), a * b);
+        }
+    }
+
+    #[test]
+    fn fq6_mul_by_01_test() {
+        for _ in 0..1000 {
+            let c0 = Fq2::random(OsRng);
+            let c1 = Fq2::random(OsRng);
+            let a = Fq6::random(OsRng);
+            let b = Fq6([c0, c1, Fq2::zero()]);
+
+            assert_eq!(a.mul_by_01(c0, c1), a * b);
+        }
+    }
+
+    #[test]
+    fn fq12_mul_by_014_test() {
+        for _ in 0..1000 {
+            let c0 = Fq2::random(OsRng);
+            let c1 = Fq2::random(OsRng);
+            let c5 = Fq2::random(OsRng);
+            let a = Fq12::random(OsRng);
+            let b = Fq12([
+                Fq6([c0, c1, Fq2::zero()]),
+                Fq6([Fq2::zero(), c5, Fq2::zero()]),
+            ]);
+
+            assert_eq!(a.mul_by_014(c0, c1, c5), a * b);
+        }
+    }
+
+    #[test]
+    fn fq12_frobenius_map_test() {
+        for _ in 0..1000 {
+            let a = Fq12::random(OsRng);
+
+            assert_eq!(a, a.frobenius_map(12));
+        }
+    }
+}

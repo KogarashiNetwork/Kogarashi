@@ -1,10 +1,12 @@
 mod field;
 mod group;
 mod ring;
+mod test;
 
 pub use field::*;
 pub use group::*;
 pub use ring::*;
+pub use test::*;
 
 #[macro_export]
 macro_rules! prime_field_operation {

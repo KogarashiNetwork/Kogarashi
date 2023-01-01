@@ -118,6 +118,11 @@ impl Fp {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use paste::paste;
+    use rand_core::OsRng;
+    use zero_crypto::dress::field::field_test;
+
+    field_test!(fp_field, Fp, 1000);
 
     #[test]
     fn test_from_hex() {
@@ -132,20 +137,5 @@ mod tests {
                 0x01a19f85f00d79b8,
             ])
         )
-    }
-
-    #[test]
-    fn test_cmp() {
-        let a = Fp::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad82")
-            .unwrap();
-        let b = Fp::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad83")
-            .unwrap();
-
-        assert!(a <= a);
-        assert!(a >= a);
-        assert!(a == a);
-        assert!(a < b);
-        assert!(a <= b);
-        assert!(a != b);
     }
 }
