@@ -3480,7 +3480,7 @@ dependencies = [
 name = "zero-pairing"
 version = "0.1.0"
 dependencies = [
- "rand_core 0.6.3",
+ "rand 0.8.5",
  "rand_xorshift",
  "zero-bls12-381",
  "zero-crypto",

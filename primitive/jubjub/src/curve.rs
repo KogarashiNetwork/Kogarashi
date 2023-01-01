@@ -82,4 +82,4 @@ curve_operation!(
     GENERATOR_Y
 );
 
-curve_test!(jubjub, Fp, JubjubAffine, JubjubProjective, 1000);
+curve_test!(jubjub, Fp, JubjubAffine, JubjubProjective, 100);

@@ -43,15 +43,6 @@ macro_rules! group_operation {
             }
         }
 
-        impl<'a, 'b> Add<&'b $field> for &'a $field {
-            type Output = $field;
-
-            #[inline]
-            fn add(self, rhs: &'b $field) -> $field {
-                $field(add(self.0, rhs.0, $p))
-            }
-        }
-
         impl AddAssign for $field {
             fn add_assign(&mut self, rhs: $field) {
                 self.0 = add(self.0, rhs.0, $p)
@@ -67,29 +58,11 @@ macro_rules! group_operation {
             }
         }
 
-        impl<'a> Neg for &'a $field {
-            type Output = $field;
-
-            #[inline]
-            fn neg(self) -> $field {
-                $field(neg(self.0, $p))
-            }
-        }
-
         impl Sub for $field {
             type Output = Self;
 
             #[inline]
             fn sub(self, rhs: $field) -> Self {
-                $field(sub(self.0, rhs.0, $p))
-            }
-        }
-
-        impl<'a, 'b> Sub<&'b $field> for &'a $field {
-            type Output = $field;
-
-            #[inline]
-            fn sub(self, rhs: &'b $field) -> $field {
                 $field(sub(self.0, rhs.0, $p))
             }
         }
