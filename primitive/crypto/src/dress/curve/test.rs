@@ -60,24 +60,24 @@ macro_rules! curve_test {
                 }
             }
 
-            // paste! {
-            //     #[test]
-            //     fn [< $test_name _affine_doubling_test >]() {
-            //         for _ in 0..$iter_times {
-            //             let a = $affine::random(OsRng);
+            paste! {
+                #[test]
+                fn [< $test_name _affine_doubling_test >]() {
+                    for _ in 0..$iter_times {
+                        let a = $affine::random(OsRng);
 
-            //             // a + a = a * 8
-            //             let scalared_a = a * $field::from_u64(8);
-            //             let aa =a.double();
-            //             let a_4 = aa.double();
-            //             let a_8 = a_4.double();
+                        // a + a = a * 8
+                        let scalared_a = a * $field::from_u64(8);
+                        let aa =a.double();
+                        let a_4 = aa.double();
+                        let a_8 = a_4.double();
 
-            //             assert!(scalared_a.is_on_curve());
-            //             assert!(a_8.is_on_curve());
-            //             assert_eq!(scalared_a, a_8);
-            //         }
-            //     }
-            // }
+                        assert!(scalared_a.is_on_curve());
+                        assert!(a_8.is_on_curve());
+                        assert_eq!(scalared_a, a_8);
+                    }
+                }
+            }
 
             paste! {
                 #[test]
