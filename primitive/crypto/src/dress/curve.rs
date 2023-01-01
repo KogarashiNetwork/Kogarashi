@@ -150,13 +150,13 @@ macro_rules! curve_built_in {
 
         impl Default for $affine {
             fn default() -> Self {
-                $projective::ADDITIVE_GENERATOR.to_affine()
+                $projective::ADDITIVE_IDENTITY.to_affine()
             }
         }
 
         impl Default for $projective {
             fn default() -> Self {
-                Self::ADDITIVE_GENERATOR
+                Self::ADDITIVE_IDENTITY
             }
         }
 

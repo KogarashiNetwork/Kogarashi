@@ -55,11 +55,6 @@ const ROOT_OF_UNITY: Fr = Fr([
 ]);
 
 impl Fr {
-    #[cfg(test)]
-    pub const fn new(val: [u64; 4]) -> Self {
-        Self(val)
-    }
-
     pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
