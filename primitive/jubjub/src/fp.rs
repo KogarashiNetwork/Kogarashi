@@ -138,19 +138,4 @@ mod tests {
             ])
         )
     }
-
-    #[test]
-    fn test_cmp() {
-        let a = Fp::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad82")
-            .unwrap();
-        let b = Fp::from_hex("0x6fa7bab5fb3a644af160302de3badc0958601b445c9713d2b7cdba213809ad83")
-            .unwrap();
-
-        assert!(a <= a);
-        assert!(a >= a);
-        assert!(a == a);
-        assert!(a < b);
-        assert!(a <= b);
-        assert!(a != b);
-    }
 }

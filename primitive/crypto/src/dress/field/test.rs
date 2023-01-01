@@ -3,6 +3,23 @@ macro_rules! field_test {
     ($test_name:ident, $field:ident, $iter_times:expr) => {
         paste! {
             #[test]
+            fn [< $test_name _comparator_test >]() {
+                for _ in 0..$iter_times {
+                    let a = $field::random(OsRng);
+                    let b = a.square();
+
+                    assert!(a == a);
+                    assert!(a >= a);
+                    assert!(a <= a);
+                    assert!(!(a > a));
+                    assert!(!(a < a));
+                    assert!(a != b);
+                }
+            }
+        }
+
+        paste! {
+            #[test]
             fn [< $test_name _addition_test >]() {
                 for _ in 0..$iter_times {
                     let a = $field::random(OsRng);

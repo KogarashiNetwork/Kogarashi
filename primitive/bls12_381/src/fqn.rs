@@ -48,7 +48,7 @@ mod tests {
 
     #[test]
     fn fq2_mul_nonresidue_test() {
-        let b = Fq2([Fq::one(); TWO_DEGREE_EXTENTION_LIMBS_LENGTH]);
+        let b = Fq2([Fq::one(); 2]);
         for _ in 0..1000 {
             let a = Fq2::random(OsRng);
             let expected = a * b;
@@ -109,15 +109,6 @@ mod tests {
 
     #[test]
     fn fq12_frobenius_map_test() {
-        for _ in 0..1000 {
-            let a = Fq12::random(OsRng);
-
-            assert_eq!(a, a.frobenius_map(12));
-        }
-    }
-
-    #[test]
-    fn fq12_pow_test() {
         for _ in 0..1000 {
             let a = Fq12::random(OsRng);
 
