@@ -169,6 +169,12 @@ macro_rules! curve_repr_common_operation {
     ($curve_repr:ident, $scalar:ident) => {
         impl Eq for $curve_repr {}
 
+        impl Default for $curve_repr {
+            fn default() -> Self {
+                Self::ADDITIVE_IDENTITY
+            }
+        }
+
         impl AddAssign for $curve_repr {
             fn add_assign(&mut self, rhs: $curve_repr) {
                 *self = *self + rhs;

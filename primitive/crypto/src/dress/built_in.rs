@@ -34,30 +34,6 @@ macro_rules! curve_built_in {
         impl Basic for $affine {}
         impl Basic for $projective {}
 
-        impl Default for $affine {
-            fn default() -> Self {
-                Self::ADDITIVE_IDENTITY
-            }
-        }
-
-        impl Default for $projective {
-            fn default() -> Self {
-                Self::ADDITIVE_IDENTITY
-            }
-        }
-
-        impl From<$affine> for $projective {
-            fn from(a: $affine) -> $projective {
-                a.to_projective()
-            }
-        }
-
-        impl From<$projective> for $affine {
-            fn from(p: $projective) -> $affine {
-                p.to_affine()
-            }
-        }
-
         impl Display for $affine {
             fn fmt(&self, f: &mut Formatter) -> FmtResult {
                 write!(f, "x: 0x")?;

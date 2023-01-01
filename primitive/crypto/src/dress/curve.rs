@@ -61,6 +61,12 @@ macro_rules! curve_operation {
             }
         }
 
+        impl From<$affine> for $projective {
+            fn from(a: $affine) -> $projective {
+                a.to_projective()
+            }
+        }
+
         impl Affine for $affine {
             type Projective = $projective;
 
@@ -74,6 +80,12 @@ macro_rules! curve_operation {
                         z: Self::Range::one(),
                     }
                 }
+            }
+        }
+
+        impl From<$projective> for $affine {
+            fn from(p: $projective) -> $affine {
+                p.to_affine()
             }
         }
 
