@@ -38,12 +38,12 @@ macro_rules! prime_extention_field_operation {
                 unimplemented!()
             }
 
-            fn to_bits(self) -> Bits {
-                unimplemented!()
-            }
-
             fn is_zero(self) -> bool {
                 self.0.iter().all(|x| x.is_zero())
+            }
+
+            fn to_bits(self) -> Bits {
+                unimplemented!()
             }
 
             // TODO should be optimized

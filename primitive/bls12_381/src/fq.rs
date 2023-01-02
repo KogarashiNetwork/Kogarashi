@@ -52,6 +52,16 @@ impl Fq {
     pub(crate) const fn to_mont_form(val: [u64; 6]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
+
+    pub(crate) const fn to_repr(val: [u64; 6]) -> Self {
+        Self(mont(
+            [
+                val[0], val[1], val[2], val[3], val[4], val[5], 0, 0, 0, 0, 0, 0,
+            ],
+            MODULUS,
+            INV,
+        ))
+    }
 }
 
 pairing_field_operation!(Fq, MODULUS, GENERATOR, INV, R, R2, R3);

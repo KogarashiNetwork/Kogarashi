@@ -23,12 +23,12 @@ macro_rules! prime_field_operation {
                 Self(from_u64(val))
             }
 
-            fn to_bits(self) -> Bits {
-                to_bits(self.0)
-            }
-
             fn is_zero(self) -> bool {
                 self.0.iter().all(|x| *x == 0)
+            }
+
+            fn to_bits(self) -> Bits {
+                to_bits(self.0)
             }
 
             fn double(self) -> Self {

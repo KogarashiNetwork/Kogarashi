@@ -58,6 +58,14 @@ impl Fr {
     pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
+
+    pub(crate) const fn to_repr(val: [u64; 4]) -> Self {
+        Self(mont(
+            [val[0], val[1], val[2], val[3], 0, 0, 0, 0],
+            MODULUS,
+            INV,
+        ))
+    }
 }
 
 fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);

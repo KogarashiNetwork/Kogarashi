@@ -59,6 +59,14 @@ impl Fp {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
 
+    pub const fn to_repr(val: [u64; 4]) -> Self {
+        Self(mont(
+            [val[0], val[1], val[2], val[3], 0, 0, 0, 0],
+            MODULUS,
+            INV,
+        ))
+    }
+
     pub fn from_hex(hex: &str) -> Result<Fp, Error> {
         let max_len = 64;
         let hex = hex.strip_prefix("0x").unwrap_or(hex);

@@ -78,4 +78,23 @@ macro_rules! curve_built_in {
     };
 }
 
-pub use {curve_built_in, field_built_in};
+#[macro_export]
+macro_rules! field_repr {
+    ($element:ident) => {
+        impl FieldRepr for $element {
+            fn to_repr(self) -> Self {}
+        }
+
+        impl Debug for $element {
+            fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                write!(f, "0x")?;
+                for i in self.0.iter().rev() {
+                    write!(f, "{:016x}", *i)?;
+                }
+                Ok(())
+            }
+        }
+    };
+}
+
+pub use {curve_built_in, field_built_in, field_repr};
