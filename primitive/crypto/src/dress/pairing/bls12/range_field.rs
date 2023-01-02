@@ -40,48 +40,117 @@ macro_rules! bls12_range_field_pairing {
             }
 
             fn final_exp(self) -> Option<Self> {
-                let mut f1 = self;
-                f1.conjugate();
+                #[must_use]
+                fn fp4_square(a: Fq2, b: Fq2) -> (Fq2, Fq2) {
+                    let t0 = a.square();
+                    let t1 = b.square();
+                    let mut t2 = t1.mul_by_nonresidue();
+                    let c0 = t2 + t0;
+                    t2 = a + b;
+                    t2 = t2.square();
+                    t2 -= t0;
+                    let c1 = t2 - t1;
 
-                match self.invert() {
-                    Some(mut f2) => {
-                        let mut r = f1;
-                        r *= f2;
-                        f2 = r.frobenius_map(2);
-                        r *= f2;
-
-                        let mut x = $bls_x;
-                        let y0 = r.square();
-                        let mut y1 = y0.pow(x);
-                        x >>= 1;
-                        let mut y2 = y1.pow(x);
-                        x <<= 1;
-                        let mut y3 = r.conjugate();
-                        y1 *= y3.conjugate();
-                        y1 *= y2;
-                        y2 = y1;
-                        y2 = y2.pow(x);
-                        y3 = y2;
-                        y3 = y3.pow(x);
-                        y1 = y1.conjugate();
-                        y3 *= y1;
-                        y1 = y1.conjugate();
-                        y1 = y1.frobenius_map(3);
-                        y2 = y2.frobenius_map(2);
-                        y1 *= y2;
-                        y2 = y3;
-                        y2 = y2.pow(x);
-                        y2 *= y0;
-                        y2 *= r;
-                        y1 *= y2;
-                        y2 = y3;
-                        y2 = y2.frobenius_map(1);
-                        y1 *= y2;
-
-                        Some(y1)
-                    }
-                    None => None,
+                    (c0, c1)
                 }
+                // Adaptation of Algorithm 5.5.4, Guide to Pairing-Based Cryptography
+                // Faster Squaring in the Cyclotomic Subgroup of Sixth Degree Extensions
+                // https://eprint.iacr.org/2009/565.pdf
+                #[must_use]
+                fn cyclotomic_square(f: Fq12) -> Fq12 {
+                    let mut z0 = f.0[0].0[0];
+                    let mut z4 = f.0[0].0[1];
+                    let mut z3 = f.0[0].0[2];
+                    let mut z2 = f.0[1].0[0];
+                    let mut z1 = f.0[1].0[1];
+                    let mut z5 = f.0[1].0[2];
+
+                    let (t0, t1) = fp4_square(z0, z1);
+
+                    // For A
+                    z0 = t0 - z0;
+                    z0 = z0 + z0 + t0;
+
+                    z1 = t1 + z1;
+                    z1 = z1 + z1 + t1;
+
+                    let (mut t0, t1) = fp4_square(z2, z3);
+                    let (t2, t3) = fp4_square(z4, z5);
+
+                    // For C
+                    z4 = t0 - z4;
+                    z4 = z4 + z4 + t0;
+
+                    z5 = t1 + z5;
+                    z5 = z5 + z5 + t1;
+
+                    // For B
+                    t0 = t3.mul_by_nonresidue();
+                    z2 = t0 + z2;
+                    z2 = z2 + z2 + t0;
+
+                    z3 = t2 - z3;
+                    z3 = z3 + z3 + t2;
+
+                    Fq12([Fq6([z0, z4, z3]), Fq6([z2, z1, z5])])
+                }
+                #[must_use]
+                fn cycolotomic_exp(f: Fq12) -> Fq12 {
+                    let x = BLS_X;
+                    let mut tmp = Fq12::one();
+                    let mut found_one = false;
+                    for i in (0..64).rev().map(|b| ((x >> b) & 1) == 1) {
+                        if found_one {
+                            tmp = cyclotomic_square(tmp)
+                        } else {
+                            found_one = i;
+                        }
+
+                        if i {
+                            tmp *= f;
+                        }
+                    }
+
+                    tmp.conjugate()
+                }
+
+                let mut f = self;
+                let mut t0 = f
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map();
+                f.invert().map(|mut t1| {
+                    let mut t2 = t0 * t1;
+                    t1 = t2;
+                    t2 = t2.frobenius_map().frobenius_map();
+                    t2 *= t1;
+                    t1 = cyclotomic_square(t2).conjugate();
+                    let mut t3 = cycolotomic_exp(t2);
+                    let mut t4 = cyclotomic_square(t3);
+                    let mut t5 = t1 * t3;
+                    t1 = cycolotomic_exp(t5);
+                    t0 = cycolotomic_exp(t1);
+                    let mut t6 = cycolotomic_exp(t0);
+                    t6 *= t4;
+                    t4 = cycolotomic_exp(t6);
+                    t5 = t5.conjugate();
+                    t4 *= t5 * t2;
+                    t5 = t2.conjugate();
+                    t1 *= t2;
+                    t1 = t1.frobenius_map().frobenius_map().frobenius_map();
+                    t6 *= t5;
+                    t6 = t6.frobenius_map();
+                    t3 *= t0;
+                    t3 = t3.frobenius_map().frobenius_map();
+                    t3 *= t1;
+                    t3 *= t6;
+                    f = t3 * t4;
+
+                    f
+                })
             }
         }
     };

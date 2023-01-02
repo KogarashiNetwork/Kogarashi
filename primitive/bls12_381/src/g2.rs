@@ -42,5 +42,5 @@ curve_operation!(
     G2_GENERATOR_X,
     G2_GENERATOR_Y
 );
-bls12_g2_pairing!(G2Projective, PairingCoeff, G2PairingAffine, Fq12);
+bls12_g2_pairing!(G2Projective, G2Affine, PairingCoeff, G2PairingAffine, Fq12);
 curve_test!(bls12_381, Fr, G2Affine, G2Projective, 50);

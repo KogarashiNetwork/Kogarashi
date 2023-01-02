@@ -2,7 +2,7 @@ use rand_core::RngCore;
 use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::dress::field::*;
 
-#[derive(Debug, Clone, Copy, Decode, Encode)]
+#[derive(Clone, Copy, Decode, Encode)]
 pub struct Fq(pub(crate) [u64; 6]);
 
 const MODULUS: [u64; 6] = [

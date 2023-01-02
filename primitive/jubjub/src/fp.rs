@@ -4,7 +4,7 @@ use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
-#[derive(Debug, Clone, Copy, Decode, Encode, Serialize, Deserialize)]
+#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 
 pub struct Fp(pub(crate) [u64; 4]);
 

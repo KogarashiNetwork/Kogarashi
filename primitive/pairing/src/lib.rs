@@ -13,11 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![cfg_attr(not(feature = "std"), no_std)]
+// #![cfg_attr(not(feature = "std"), no_std)]
+
+use std::print;
 
 use zero_bls12_381::params::{BLS_X, BLS_X_IS_NEGATIVE};
 use zero_bls12_381::{Fq12, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective};
-use zero_crypto::behave::{Pairing, PairingRange};
+use zero_crypto::behave::{G2Pairing, Pairing, PairingRange};
 use zero_crypto::common::PrimeField;
 
 // tate pairing with miller algorithm
@@ -28,18 +30,20 @@ impl Pairing for TatePairing {
     type G2Affine = G2Affine;
     type G1Projective = G1Projective;
     type G2Projective = G2Projective;
-    type G2PairngRepr = G2PairingAffine;
+    type G2PairngRepr = G2Projective;
     type PairingRange = Fq12;
     const X: u64 = BLS_X;
     const X_ISNEGATIVE: bool = BLS_X_IS_NEGATIVE;
 
-    fn pairing(g1: Self::G1Affine, g2: Self::G2PairngRepr) -> Self::PairingRange {
+    fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange {
         Self::miller_loop(g1, g2).final_exp().unwrap()
     }
 
-    fn miller_loop(g1: Self::G1Affine, g2: Self::G2PairngRepr) -> Self::PairingRange {
+    fn miller_loop(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange {
         let mut acc = Self::PairingRange::one();
+        let g2_projective = Self::G2Projective::from(g2);
 
+        print!("\n\nstart {:?}", acc);
         let mut found_one = false;
         for i in (0..64).rev().map(|b| (((BLS_X >> 1) >> b) & 1) == 1) {
             if !found_one {
@@ -47,23 +51,21 @@ impl Pairing for TatePairing {
                 continue;
             }
 
-            for coeff in g2.coeffs.iter() {
-                acc = acc.untwist(*coeff, g1);
-            }
+            let coeffs = g2_projective.double_eval();
+            acc = acc.untwist(coeffs, g1);
 
             if i {
-                for coeff in g2.coeffs.iter() {
-                    acc = acc.untwist(*coeff, g1);
-                }
+                let coeffs = g2_projective.add_eval(g2);
+                acc = acc.untwist(coeffs, g1);
             }
 
-            acc = acc.square();
+            acc.square_assign();
         }
 
-        for coeff in g2.coeffs.iter() {
-            acc = acc.untwist(*coeff, g1);
-        }
+        let coeffs = g2_projective.double_eval();
+        acc = acc.untwist(coeffs, g1);
 
+        print!("\n\nend {:?}", acc);
         if Self::X_ISNEGATIVE {
             acc.conjugate()
         } else {

@@ -7,7 +7,7 @@ use zero_pairing::TatePairing;
 #[test]
 fn generator_pairing_test() {
     let g1 = G1Affine::ADDITIVE_GENERATOR;
-    let g2 = G2PairingAffine::from(G2Projective::ADDITIVE_GENERATOR);
+    let g2 = G2Affine::ADDITIVE_GENERATOR;
 
     assert_eq!(Fq12::one(), TatePairing::pairing(g1, g2));
 }
@@ -17,21 +17,25 @@ fn pairing_test() {
     let g1 = G1Affine::ADDITIVE_GENERATOR;
     let g2 = G2Affine::ADDITIVE_GENERATOR;
 
-    let a = Fr::random(XorShiftRng::from_seed([
+    let mut rng = XorShiftRng::from_seed([
         0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    ]));
-    let b = Fr::random(XorShiftRng::from_seed([
+    ]);
+    let mut rng_alt = XorShiftRng::from_seed([
         0xf, 0xe, 0xd, 0xc, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1, 0x0,
-    ]));
-    let c = a * b;
-    let expected = TatePairing::pairing(g1 * c, G2PairingAffine::from(g2.to_projective()));
+    ]);
+    for _ in 0..1 {
+        let a = Fr::random(&mut rng);
+        let b = Fr::random(&mut rng_alt);
+        let c = a * b;
+        let expected = TatePairing::pairing(g1 * c, g2);
 
-    let g = g1 * a;
-    let h = g2 * b;
-    let res = TatePairing::pairing(g, G2PairingAffine::from(h.to_projective()));
+        let g = g1 * a;
+        let h = g2 * b;
+        let res = TatePairing::pairing(g, h);
 
-    println!("{:?}", res);
-    assert_eq!(res, expected)
+        println!("\n\n result {:?} \n\n expected {:?}", res, expected);
+        assert_eq!(res, expected)
+    }
 }
 
 #[test]

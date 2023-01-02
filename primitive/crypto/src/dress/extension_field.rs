@@ -12,7 +12,7 @@ macro_rules! extension_field_operation {
         prime_extention_field_operation!($extension_field, $sub_field, $limbs_length);
         field_built_in!($extension_field);
 
-        #[derive(Debug, Clone, Copy, Decode, Encode)]
+        #[derive(Clone, Copy, Decode, Encode)]
         pub struct $extension_field(pub(crate) [$sub_field; $limbs_length]);
 
         impl ExtensionField for $extension_field {

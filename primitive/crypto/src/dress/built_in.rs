@@ -4,6 +4,16 @@ macro_rules! field_built_in {
         impl ParityCmp for $element {}
         impl Basic for $element {}
 
+        impl Debug for $element {
+            fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                write!(f, "0x")?;
+                for i in self.0.iter().rev() {
+                    write!(f, "{:016x}", *i)?;
+                }
+                Ok(())
+            }
+        }
+
         impl Display for $element {
             fn fmt(&self, f: &mut Formatter) -> FmtResult {
                 write!(f, "0x")?;
