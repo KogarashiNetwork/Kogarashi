@@ -33,18 +33,22 @@ impl Pairing for TatePairing {
     type G2PairngRepr = G2Projective;
     type PairingRange = Fq12;
     const X: u64 = BLS_X;
-    const X_ISNEGATIVE: bool = BLS_X_IS_NEGATIVE;
+    const X_IS_NEGATIVE: bool = BLS_X_IS_NEGATIVE;
 
     fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange {
-        Self::miller_loop(g1, g2).final_exp().unwrap()
+        let miller_result = Self::miller_loop(g1, g2);
+        println!("miller result {:?}", miller_result);
+        match miller_result.final_exp() {
+            Some(x) => x,
+            None => Self::PairingRange::one(),
+        }
     }
 
     fn miller_loop(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange {
         let mut acc = Self::PairingRange::one();
-        let g2_projective = Self::G2Projective::from(g2);
-
-        print!("\n\nstart {:?}", acc);
+        let mut g2_projective = Self::G2Projective::from(g2);
         let mut found_one = false;
+
         for i in (0..64).rev().map(|b| (((BLS_X >> 1) >> b) & 1) == 1) {
             if !found_one {
                 found_one = i;
@@ -65,11 +69,9 @@ impl Pairing for TatePairing {
         let coeffs = g2_projective.double_eval();
         acc = acc.untwist(coeffs, g1);
 
-        print!("\n\nend {:?}", acc);
-        if Self::X_ISNEGATIVE {
-            acc.conjugate()
-        } else {
-            acc
+        if Self::X_IS_NEGATIVE {
+            acc = acc.conjugate();
         }
+        acc
     }
 }

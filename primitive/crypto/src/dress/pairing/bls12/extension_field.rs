@@ -210,7 +210,7 @@ macro_rules! peculiar_extension_field_operation {
                 let c1 = self.0[1].frobenius_map()
                     * $fq6([$frobenius_coeff_fq12_c1[1], Fq2::zero(), Fq2::zero()]);
 
-                Fq12([c0, c1])
+                Self([c0, c1])
             }
 
             fn frobenius_maps(self, power: usize) -> Self {
@@ -223,29 +223,6 @@ macro_rules! peculiar_extension_field_operation {
                 ]);
 
                 Self([c0, c1])
-            }
-
-            fn pow(self, exp: u64) -> Self {
-                let mut res = Self::one();
-
-                let mut found_one = false;
-                for i in (0..64).rev().map(|b| (((exp >> 1) >> b) & 1) == 1) {
-                    if found_one {
-                        res = res.square();
-                    } else {
-                        found_one = i.into();
-                    }
-
-                    if i.into() {
-                        res = res.square();
-                    }
-                }
-
-                if $bls_x_is_negative {
-                    res.conjugate()
-                } else {
-                    res
-                }
             }
 
             fn mul_by_014(self, c0: $fq2, c1: $fq2, c4: $fq2) -> Self {

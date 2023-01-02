@@ -12,206 +12,69 @@ macro_rules! bls12_g2_pairing {
             type PairingRepr = $g2_pairing_affine;
             type G2Affine = $g2_affine;
 
-            fn double_eval(mut self) -> $pairng_coeff {
+            fn double_eval(&mut self) -> $pairng_coeff {
                 // Adaptation of Algorithm 26, https://eprint.iacr.org/2010/354.pdf
-                let mut tmp0 = self.x;
-                tmp0.square_assign();
-
-                let mut tmp1 = self.y;
-                tmp1.square_assign();
-
-                let mut tmp2 = tmp1;
-                tmp2.square_assign();
-
-                let mut tmp3 = tmp1;
-                tmp3.add_assign(self.x);
-                tmp3.square_assign();
-                tmp3.sub_assign(tmp0);
-                tmp3.sub_assign(tmp2);
-                tmp3.double_assign();
-
-                let mut tmp4 = tmp0;
-                tmp4.double_assign();
-                tmp4.add_assign(tmp0);
-
-                let mut tmp6 = self.x;
-                tmp6.add_assign(tmp4);
-
-                let mut tmp5 = tmp4;
-                tmp5.square_assign();
-
-                let mut zsquared = self.z;
-                zsquared.square_assign();
-
-                self.x = tmp5;
-                self.x.sub_assign(tmp3);
-                self.x.sub_assign(tmp3);
-
-                self.z.add_assign(self.y);
-                self.z.square_assign();
-                self.z.sub_assign(tmp1);
-                self.z.sub_assign(zsquared);
-
-                self.y = tmp3;
-                self.y.sub_assign(self.x);
-                self.y.mul_assign(tmp4);
-
-                tmp2.double_assign();
-                tmp2.double_assign();
-                tmp2.double_assign();
-
-                self.y.sub_assign(tmp2);
-
-                tmp3 = tmp4;
-                tmp3.mul_assign(zsquared);
-                tmp3.double_assign();
-                tmp3 = -tmp3;
-
-                tmp6.square();
-                tmp6.sub_assign(tmp0);
-                tmp6.sub_assign(tmp5);
-
-                tmp1.double_assign();
-                tmp1.double_assign();
-
-                tmp6.sub_assign(tmp1);
-
-                tmp0 = self.z;
-                tmp0.mul_assign(zsquared);
-                tmp0.double_assign();
+                let tmp0 = self.x.square();
+                let tmp1 = self.y.square();
+                let tmp2 = tmp1.square();
+                let tmp3 = (tmp1 + self.x).square() - tmp0 - tmp2;
+                let tmp3 = tmp3 + tmp3;
+                let tmp4 = tmp0 + tmp0 + tmp0;
+                let tmp6 = self.x + tmp4;
+                let tmp5 = tmp4.square();
+                let zsquared = self.z.square();
+                self.x = tmp5 - tmp3 - tmp3;
+                self.z = (self.z + self.y).square() - tmp1 - zsquared;
+                self.y = (tmp3 - self.x) * tmp4;
+                let tmp2 = tmp2 + tmp2;
+                let tmp2 = tmp2 + tmp2;
+                let tmp2 = tmp2 + tmp2;
+                self.y -= tmp2;
+                let tmp3 = tmp4 * zsquared;
+                let tmp3 = tmp3 + tmp3;
+                let tmp3 = -tmp3;
+                let tmp6 = tmp6.square() - tmp0 - tmp5;
+                let tmp1 = tmp1 + tmp1;
+                let tmp1 = tmp1 + tmp1;
+                let tmp6 = tmp6 - tmp1;
+                let tmp0 = self.z * zsquared;
+                let tmp0 = tmp0 + tmp0;
 
                 $pairng_coeff(tmp0, tmp3, tmp6)
             }
 
-            fn add_eval(mut self, rhs: $g2_affine) -> $pairng_coeff {
+            fn add_eval(&mut self, rhs: $g2_affine) -> $pairng_coeff {
                 // Adaptation of Algorithm 27, https://eprint.iacr.org/2010/354.pdf
-                let mut zsquared = self.z;
-                zsquared.square_assign();
-
-                let mut ysquared = rhs.y;
-                ysquared.square_assign();
-
-                let mut t0 = zsquared;
-                t0.mul_assign(rhs.x);
-
-                let mut t1 = rhs.y;
-                t1.add_assign(self.z);
-                t1.square_assign();
-                t1.sub_assign(ysquared);
-                t1.sub_assign(zsquared);
-                t1.mul_assign(zsquared);
-
-                let mut t2 = t0;
-                t2.sub_assign(self.x);
-
-                let mut t3 = t2;
-                t3.square_assign();
-
-                let mut t4 = t3;
-                t4.double_assign();
-                t4.double_assign();
-
-                let mut t5 = t4;
-                t5.mul_assign(t2);
-
-                let mut t6 = t1;
-                t6.sub_assign(self.y);
-                t6.sub_assign(self.y);
-
-                let mut t9 = t6;
-                t9.mul_assign(rhs.x);
-
-                let mut t7 = t4;
-                t7.mul_assign(self.x);
-
-                self.x = t6;
-                self.x.square_assign();
-                self.x.sub_assign(t5);
-                self.x.sub_assign(t7);
-                self.x.sub_assign(t7);
-
-                self.z.add_assign(t2);
-                self.z.square_assign();
-                self.z.sub_assign(zsquared);
-                self.z.sub_assign(t3);
-
-                let mut t10 = rhs.y;
-                t10.add_assign(self.z);
-
-                let mut t8 = t7;
-                t8.sub_assign(self.x);
-                t8.mul_assign(t6);
-
-                t0 = self.y;
-                t0.mul_assign(t5);
-                t0.double_assign();
-
-                self.y = t8;
-                self.y.sub_assign(t0);
-
-                t10.square_assign();
-                t10.sub_assign(ysquared);
-
-                let mut ztsquared = self.z;
-                ztsquared.square_assign();
-
-                t10.sub_assign(ztsquared);
-
-                t9.double_assign();
-                t9.sub_assign(t10);
-
-                t10 = self.z;
-                t10.double_assign();
-
-                t6 = -t6;
-
-                t1 = t6;
-                t1.double_assign();
+                let zsquared = self.z.square();
+                let ysquared = rhs.y.square();
+                let t0 = zsquared * rhs.x;
+                let t1 = ((rhs.y + self.z).square() - ysquared - zsquared) * zsquared;
+                let t2 = t0 - self.x;
+                let t3 = t2.square();
+                let t4 = t3 + t3;
+                let t4 = t4 + t4;
+                let t5 = t4 * t2;
+                let t6 = t1 - self.y - self.y;
+                let t9 = t6 * rhs.x;
+                let t7 = t4 * self.x;
+                self.x = t6.square() - t5 - t7 - t7;
+                self.z = (self.z + t2).square() - zsquared - t3;
+                let t10 = rhs.y + self.z;
+                let t8 = (t7 - self.x) * t6;
+                let t0 = self.y * t5;
+                let t0 = t0 + t0;
+                self.y = t8 - t0;
+                let t10 = t10.square() - ysquared;
+                let ztsquared = self.z.square();
+                let t10 = t10 - ztsquared;
+                let t9 = t9 + t9 - t10;
+                let t10 = self.z + self.z;
+                let t6 = -t6;
+                let t1 = t6 + t6;
 
                 $pairng_coeff(t10, t1, t9)
             }
         }
-
-        impl Default for $g2_pairing_affine {
-            fn default() -> Self {
-                $g2_pairing_affine {
-                    coeffs: vec![],
-                    infinity: true,
-                }
-            }
-        }
-
-        // impl From<$g2_projective> for $g2_pairing_affine {
-        //     fn from(a: $g2_projective) -> $g2_pairing_affine {
-        //         if a.is_identity() {
-        //             $g2_pairing_affine::default()
-        //         } else {
-        //             let mut coeffs = vec![];
-        //             let mut acc = a;
-
-        //             let mut found_one = false;
-        //             for i in (0..64).rev().map(|b| (((BLS_X >> 1) >> b) & 1) == 1) {
-        //                 if !found_one {
-        //                     found_one = i;
-        //                     continue;
-        //                 }
-
-        //                 coeffs.push(acc.double_eval());
-
-        //                 if i {
-        //                     coeffs.push(acc.add_eval(a));
-        //                 }
-        //             }
-
-        //             coeffs.push(acc.double_eval());
-
-        //             $g2_pairing_affine {
-        //                 coeffs,
-        //                 infinity: false,
-        //             }
-        //         }
-        //     }
-        // }
     };
 }
 

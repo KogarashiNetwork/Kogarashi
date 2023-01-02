@@ -39,9 +39,9 @@ pub trait G2Pairing: Projective {
     type PairingRepr: ParityCmp;
     type G2Affine: Affine;
 
-    fn double_eval(self) -> Self::PairingCoeff;
+    fn double_eval(&mut self) -> Self::PairingCoeff;
 
-    fn add_eval(self, rhs: Self::G2Affine) -> Self::PairingCoeff;
+    fn add_eval(&mut self, rhs: Self::G2Affine) -> Self::PairingCoeff;
 }
 
 /// pairing abstraction
@@ -59,7 +59,7 @@ pub trait Pairing {
     type PairingRange: PairingRange;
 
     const X: u64;
-    const X_ISNEGATIVE: bool;
+    const X_IS_NEGATIVE: bool;
 
     fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange;
 

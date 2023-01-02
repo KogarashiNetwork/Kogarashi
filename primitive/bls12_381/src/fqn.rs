@@ -2,8 +2,8 @@ use crate::fq::Fq;
 use crate::g1::G1Affine;
 use crate::g2::PairingCoeff;
 use crate::params::{
-    BLS_X, BLS_X_IS_NEGATIVE, FROBENIUS_COEFF_FQ12_C1, FROBENIUS_COEFF_FQ2_C1,
-    FROBENIUS_COEFF_FQ6_C1, FROBENIUS_COEFF_FQ6_C2,
+    BLS_X, FROBENIUS_COEFF_FQ12_C1, FROBENIUS_COEFF_FQ2_C1, FROBENIUS_COEFF_FQ6_C1,
+    FROBENIUS_COEFF_FQ6_C2,
 };
 use zero_crypto::dress::extension_field::*;
 use zero_crypto::dress::pairing::{bls12_range_field_pairing, peculiar_extension_field_operation};
@@ -45,7 +45,7 @@ mod tests {
 
     field_test!(fq2_field, Fq2, 1000);
     field_test!(fq6_field, Fq6, 500);
-    field_test!(fq12_field, Fq12, 1);
+    field_test!(fq12_field, Fq12, 100);
 
     #[test]
     fn fq2_mul_nonresidue_test() {
