@@ -59,12 +59,24 @@ impl Fr {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
 
-    pub(crate) const fn to_repr(val: [u64; 4]) -> Self {
-        Self(mont(
-            [val[0], val[1], val[2], val[3], 0, 0, 0, 0],
+    pub(crate) const fn to_repr(self) -> [u64; 4] {
+        mont(
+            [self.0[0], self.0[1], self.0[2], self.0[3], 0, 0, 0, 0],
             MODULUS,
             INV,
-        ))
+        )
+    }
+}
+
+impl Debug for Fr {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        write!(f, "0x")?;
+        for limb in self.to_repr().iter().rev() {
+            for byte in limb.to_be_bytes() {
+                write!(f, "{:02x}", byte)?;
+            }
+        }
+        Ok(())
     }
 }
 

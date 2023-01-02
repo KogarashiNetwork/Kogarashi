@@ -2,7 +2,6 @@ use super::{
     algebra::Field,
     comp::{Basic, ParityCmp},
     curve::Affine,
-    field::PrimeField,
     Projective,
 };
 
@@ -10,9 +9,6 @@ use super::{
 pub trait ExtensionField: Field + Basic + ParityCmp {
     fn mul_by_nonresidue(self) -> Self;
 }
-
-/// pairing field
-pub trait PairingField: PrimeField + ParityCmp {}
 
 /// pairing function range field
 pub trait PairingRange: ExtensionField {

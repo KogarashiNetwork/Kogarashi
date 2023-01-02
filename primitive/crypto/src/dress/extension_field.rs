@@ -10,10 +10,12 @@ pub use ring::*;
 macro_rules! extension_field_operation {
     ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
         prime_extention_field_operation!($extension_field, $sub_field, $limbs_length);
-        field_built_in!($extension_field);
 
         #[derive(Clone, Copy, Decode, Encode)]
         pub struct $extension_field(pub(crate) [$sub_field; $limbs_length]);
+
+        impl ParityCmp for $extension_field {}
+        impl Basic for $extension_field {}
 
         impl ExtensionField for $extension_field {
             fn mul_by_nonresidue(self) -> Self {

@@ -12,7 +12,9 @@ pub use test::*;
 macro_rules! prime_field_operation {
     ($field:ident, $p:ident, $g:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
         field_operation!($field, $p, $g, $r, $inv, $r, $r2, $r3);
-        field_built_in!($field);
+
+        impl ParityCmp for $field {}
+        impl Basic for $field {}
 
         impl PrimeField for $field {
             const MODULUS: Self = $field($p);
@@ -75,13 +77,4 @@ macro_rules! fft_field_operation {
     };
 }
 
-#[macro_export]
-macro_rules! pairing_field_operation {
-    ($field:ident, $p:ident, $g:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
-        prime_field_operation!($field, $p, $g, $inv, $r, $r2, $r3);
-
-        impl PairingField for $field {}
-    };
-}
-
-pub use {fft_field_operation, pairing_field_operation, prime_field_operation};
+pub use {fft_field_operation, prime_field_operation};

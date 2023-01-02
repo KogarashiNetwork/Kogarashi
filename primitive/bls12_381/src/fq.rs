@@ -1,5 +1,6 @@
 use rand_core::RngCore;
 use zero_crypto::arithmetic::bits_384::*;
+use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
 #[derive(Clone, Copy, Decode, Encode)]
@@ -53,15 +54,27 @@ impl Fq {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
 
-    pub(crate) const fn to_repr(val: [u64; 6]) -> Self {
-        Self(mont(
+    pub(crate) const fn to_repr(self) -> [u64; 6] {
+        mont(
             [
-                val[0], val[1], val[2], val[3], val[4], val[5], 0, 0, 0, 0, 0, 0,
+                self.0[0], self.0[1], self.0[2], self.0[3], self.0[4], self.0[5], 0, 0, 0, 0, 0, 0,
             ],
             MODULUS,
             INV,
-        ))
+        )
     }
 }
 
-pairing_field_operation!(Fq, MODULUS, GENERATOR, INV, R, R2, R3);
+impl Debug for Fq {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        write!(f, "0x")?;
+        for limb in self.to_repr().iter().rev() {
+            for byte in limb.to_be_bytes() {
+                write!(f, "{:02x}", byte)?;
+            }
+        }
+        Ok(())
+    }
+}
+
+prime_field_operation!(Fq, MODULUS, GENERATOR, INV, R, R2, R3);
