@@ -16,6 +16,18 @@ macro_rules! prime_field_operation {
         impl ParityCmp for $field {}
         impl Basic for $field {}
 
+        impl Debug for $field {
+            fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                write!(f, "0x")?;
+                for limb in self.to_repr().iter().rev() {
+                    for byte in limb.to_be_bytes() {
+                        write!(f, "{:02x}", byte)?;
+                    }
+                }
+                Ok(())
+            }
+        }
+
         impl PrimeField for $field {
             const MODULUS: Self = $field($p);
 

@@ -36,28 +36,6 @@ peculiar_extension_field_operation!(
     BLS_X_IS_NEGATIVE
 );
 
-impl Debug for Fq2 {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        write!(f, "{:?} + {:?} u", self.0[0], self.0[1])
-    }
-}
-
-impl Debug for Fq6 {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        write!(
-            f,
-            "{:?} + ({:?}) v + ({:?}) v^2",
-            self.0[0], self.0[1], self.0[2]
-        )
-    }
-}
-
-impl Debug for Fq12 {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        write!(f, "{:?} + ({:?}) w", self.0[0], self.0[1])
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

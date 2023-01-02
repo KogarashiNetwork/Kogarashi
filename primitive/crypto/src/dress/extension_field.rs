@@ -58,11 +58,11 @@ macro_rules! prime_extention_field_operation {
             }
 
             fn double_assign(&mut self) {
-                *self += self.double()
+                *self = self.double()
             }
 
             fn square_assign(&mut self) {
-                *self *= self.square()
+                *self = self.square()
             }
         }
     };

@@ -16,6 +16,8 @@ pub trait PairingRange: ExtensionField {
     type G2Coeff: ParityCmp;
     type QuadraticField: ExtensionField;
 
+    fn generator() -> Self;
+
     fn mul_by_014(
         self,
         c0: Self::QuadraticField,

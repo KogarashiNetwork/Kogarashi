@@ -1,6 +1,28 @@
 #[macro_export]
 macro_rules! peculiar_extension_field_operation {
     ($fq2:ident, $fq6:ident, $fq12:ident, $frobenius_coeff_fq2_c1:ident, $frobenius_coeff_fq6_c1:ident, $frobenius_coeff_fq6_c2:ident, $frobenius_coeff_fq12_c1:ident, $bls_x_is_negative:ident) => {
+        impl Debug for $fq2 {
+            fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                write!(f, "{:?} + {:?} u", self.0[0], self.0[1])
+            }
+        }
+
+        impl Debug for $fq6 {
+            fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                write!(
+                    f,
+                    "{:?} + ({:?}) v + ({:?}) v^2",
+                    self.0[0], self.0[1], self.0[2]
+                )
+            }
+        }
+
+        impl Debug for $fq12 {
+            fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                write!(f, "{:?} + ({:?}) w", self.0[0], self.0[1])
+            }
+        }
+
         impl $fq2 {
             fn get_invert(self) -> Option<Self> {
                 match self.is_zero() {

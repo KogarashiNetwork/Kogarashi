@@ -15,10 +15,8 @@
 
 // #![cfg_attr(not(feature = "std"), no_std)]
 
-use std::print;
-
 use zero_bls12_381::params::{BLS_X, BLS_X_IS_NEGATIVE};
-use zero_bls12_381::{Fq12, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective};
+use zero_bls12_381::{Fq12, G1Affine, G1Projective, G2Affine, G2Projective};
 use zero_crypto::behave::{G2Pairing, Pairing, PairingRange};
 use zero_crypto::common::PrimeField;
 
@@ -37,7 +35,6 @@ impl Pairing for TatePairing {
 
     fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange {
         let miller_result = Self::miller_loop(g1, g2);
-        println!("miller result {:?}", miller_result);
         match miller_result.final_exp() {
             Some(x) => x,
             None => Self::PairingRange::one(),
@@ -57,7 +54,6 @@ impl Pairing for TatePairing {
 
             let coeffs = g2_projective.double_eval();
             acc = acc.untwist(coeffs, g1);
-
             if i {
                 let coeffs = g2_projective.add_eval(g2);
                 acc = acc.untwist(coeffs, g1);
@@ -70,8 +66,9 @@ impl Pairing for TatePairing {
         acc = acc.untwist(coeffs, g1);
 
         if Self::X_IS_NEGATIVE {
-            acc = acc.conjugate();
+            acc.conjugate()
+        } else {
+            acc
         }
-        acc
     }
 }

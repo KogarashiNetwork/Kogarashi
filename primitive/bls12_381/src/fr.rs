@@ -68,18 +68,6 @@ impl Fr {
     }
 }
 
-impl Debug for Fr {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        write!(f, "0x")?;
-        for limb in self.to_repr().iter().rev() {
-            for byte in limb.to_be_bytes() {
-                write!(f, "{:02x}", byte)?;
-            }
-        }
-        Ok(())
-    }
-}
-
 fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 
 #[test]

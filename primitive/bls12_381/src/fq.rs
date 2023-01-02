@@ -65,16 +65,4 @@ impl Fq {
     }
 }
 
-impl Debug for Fq {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        write!(f, "0x")?;
-        for limb in self.to_repr().iter().rev() {
-            for byte in limb.to_be_bytes() {
-                write!(f, "{:02x}", byte)?;
-            }
-        }
-        Ok(())
-    }
-}
-
 prime_field_operation!(Fq, MODULUS, GENERATOR, INV, R, R2, R3);
