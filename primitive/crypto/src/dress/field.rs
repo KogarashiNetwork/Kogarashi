@@ -42,7 +42,7 @@ macro_rules! prime_field_operation {
             }
 
             fn to_bits(self) -> Bits {
-                to_bits(self.0)
+                to_bits(self.to_repr())
             }
 
             fn double(self) -> Self {

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// #![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 use zero_bls12_381::params::{BLS_X, BLS_X_IS_NEGATIVE};
 use zero_bls12_381::{Fq12, G1Affine, G1Projective, G2Affine, G2Projective};
@@ -34,8 +34,7 @@ impl Pairing for TatePairing {
     const X_IS_NEGATIVE: bool = BLS_X_IS_NEGATIVE;
 
     fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange {
-        let miller_result = Self::miller_loop(g1, g2);
-        match miller_result.final_exp() {
+        match Self::miller_loop(g1, g2).final_exp() {
             Some(x) => x,
             None => Self::PairingRange::one(),
         }
