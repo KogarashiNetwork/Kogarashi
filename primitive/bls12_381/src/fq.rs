@@ -65,6 +65,11 @@ impl Fq {
         )
     }
 
+    /// Internal representation of `Fp`
+    pub const fn internal_repr(&self) -> &[u64; 6] {
+        &self.0
+    }
+
     pub fn to_bytes(&self) -> [u8; 48] {
         let tmp = self.montgomery_reduce();
 

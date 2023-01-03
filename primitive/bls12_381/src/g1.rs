@@ -67,6 +67,49 @@ fn endomorphism(p: &G1Affine) -> G1Affine {
 curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);
 
 impl G1Affine {
+    pub const RAW_SIZE: usize = 97;
+
+    pub unsafe fn from_slice_unchecked(bytes: &[u8]) -> Self {
+        let mut x = [0u64; 6];
+        let mut y = [0u64; 6];
+        let mut z = [0u8; 8];
+
+        bytes
+            .chunks_exact(8)
+            .zip(x.iter_mut().chain(y.iter_mut()))
+            .for_each(|(c, n)| {
+                z.copy_from_slice(c);
+                *n = u64::from_le_bytes(z);
+            });
+
+        let x = Fq(x);
+        let y = Fq(y);
+
+        let is_infinity = if bytes.len() >= Self::RAW_SIZE {
+            true
+        } else {
+            false
+        };
+
+        Self { x, y, is_infinity }
+    }
+
+    pub fn to_raw_bytes(&self) -> [u8; Self::RAW_SIZE] {
+        let mut bytes = [0u8; Self::RAW_SIZE];
+        let chunks = bytes.chunks_mut(8);
+
+        self.x
+            .internal_repr()
+            .iter()
+            .chain(self.y.internal_repr().iter())
+            .zip(chunks)
+            .for_each(|(n, c)| c.copy_from_slice(&n.to_le_bytes()));
+
+        bytes[Self::RAW_SIZE - 1] = self.is_infinity.into();
+
+        bytes
+    }
+
     pub fn is_torsion_free(&self) -> Choice {
         // Algorithm from Section 6 of https://eprint.iacr.org/2021/1130
         // Updated proof of correctness in https://eprint.iacr.org/2022/352
