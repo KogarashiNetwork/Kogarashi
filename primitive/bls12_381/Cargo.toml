@@ -2,15 +2,15 @@
 authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
 name = "zero-bls12-381"
 description = 'lifted elgamal encryption implementation'
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zero-crypto = { path = '../crypto' }
-rand_core = { version="0.6", default-features = false }
+zero-crypto = { version = "0.1.2" }
+rand_core = { version = "0.6", default-features = false }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 
 [dev-dependencies]

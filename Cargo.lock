@@ -3393,7 +3393,7 @@ checksum = "85e60b0d1b5f99db2556934e21937020776a5d31520bf169e851ac44e6420214"
 
 [[package]]
 name = "zero-bls12-381"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "parity-scale-codec",
  "paste",
@@ -3401,7 +3401,7 @@ dependencies = [
  "rand 0.8.5",
  "rand_core 0.6.3",
  "rand_xorshift",
- "zero-crypto",
+ "zero-crypto 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -3417,6 +3417,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "zero-crypto"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e10d191c9494cf5e9828b366dc83f79ce2444a5ecb6285fe1b7c04cbd3dc2d2b"
+dependencies = [
+ "parity-scale-codec",
+ "rand_core 0.6.3",
+ "sp-std",
+]
+
+[[package]]
 name = "zero-elgamal"
 version = "0.1.0"
 dependencies = [
@@ -3426,7 +3437,7 @@ dependencies = [
  "rand 0.8.5",
  "rand_xorshift",
  "serde",
- "zero-crypto",
+ "zero-crypto 0.1.2",
  "zero-jubjub",
 ]
 
@@ -3442,7 +3453,7 @@ dependencies = [
  "rand_xorshift",
  "serde",
  "sp-std",
- "zero-crypto",
+ "zero-crypto 0.1.2",
 ]
 
 [[package]]
@@ -3456,7 +3467,7 @@ dependencies = [
  "rand_xorshift",
  "rayon",
  "zero-bls12-381",
- "zero-crypto",
+ "zero-crypto 0.1.2",
 ]
 
 [[package]]
@@ -3469,7 +3480,7 @@ dependencies = [
  "rand_core 0.5.1",
  "rand_core 0.6.3",
  "zero-bls12-381",
- "zero-crypto",
+ "zero-crypto 0.1.2",
  "zero-elgamal",
  "zero-jubjub",
  "zero-kzg",
@@ -3483,7 +3494,7 @@ dependencies = [
  "rand 0.8.5",
  "rand_xorshift",
  "zero-bls12-381",
- "zero-crypto",
+ "zero-crypto 0.1.2",
 ]
 
 [[package]]
