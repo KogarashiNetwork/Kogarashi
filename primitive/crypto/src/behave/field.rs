@@ -16,8 +16,6 @@ pub trait PrimeField: Field + Basic + ParityCmp {
     // mongomery reduction inverse
     const INV: u64;
 
-    fn from_u64(val: u64) -> Self;
-
     fn is_zero(self) -> bool;
 
     fn to_bits(self) -> Bits;

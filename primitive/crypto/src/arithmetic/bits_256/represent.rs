@@ -10,8 +10,8 @@ pub const fn one(r2: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
     to_mont_form([1, 0, 0, 0], r2, p, inv)
 }
 
-pub const fn from_u64(val: u64) -> [u64; 4] {
-    [val, 0, 0, 0]
+pub const fn from_u64(val: u64, r2: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
+    to_mont_form([val, 0, 0, 0], r2, p, inv)
 }
 
 pub const fn from_u512(

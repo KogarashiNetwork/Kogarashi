@@ -36,10 +36,6 @@ macro_rules! prime_extention_field_operation {
 
             const INV: u64 = $sub_field::INV;
 
-            fn from_u64(val: u64) -> Self {
-                unimplemented!()
-            }
-
             fn is_zero(self) -> bool {
                 self.0.iter().all(|x| x.is_zero())
             }

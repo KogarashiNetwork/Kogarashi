@@ -33,10 +33,6 @@ macro_rules! prime_field_operation {
 
             const INV: u64 = $inv;
 
-            fn from_u64(val: u64) -> Self {
-                Self(from_u64(val))
-            }
-
             fn is_zero(self) -> bool {
                 self.0.iter().all(|x| *x == 0)
             }
@@ -81,7 +77,7 @@ macro_rules! fft_field_operation {
 
         impl From<u64> for $field {
             fn from(val: u64) -> $field {
-                $field(mul(from_u64(val), $r2, $p, $i))
+                $field(from_u64(val, $r2, $p, $i))
             }
         }
 

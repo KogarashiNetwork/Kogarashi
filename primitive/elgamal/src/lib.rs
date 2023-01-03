@@ -41,7 +41,7 @@ impl EncryptedNumber {
     pub fn encrypt(private_key: Fp, value: u32, random: Fp) -> Self {
         let g = JubjubProjective::ADDITIVE_GENERATOR;
         let public_key = g * private_key;
-        let left = g * Fp::from_u64(value as u64) + public_key * random;
+        let left = g * Fp::from(value as u64) + public_key * random;
         EncryptedNumber {
             s: left.to_affine(),
             t: (g * random).to_affine(),
@@ -178,9 +178,9 @@ mod tests {
             } else {
                 (alice_transfer_randomness, alice_randomness)
             };
-            let alice_randomness = Fp::from_u64(alice_randomness);
-            let bob_randomness = Fp::from_u64(bob_randomness);
-            let alice_transfer_randomness = Fp::from_u64(alice_transfer_randomness);
+            let alice_randomness = Fp::from(alice_randomness);
+            let bob_randomness = Fp::from(bob_randomness);
+            let alice_transfer_randomness = Fp::from(alice_transfer_randomness);
 
             let alice_balance_enc = EncryptedNumber::encrypt(alice_pk, alice_balance, alice_randomness);
             let bob_balance_enc = EncryptedNumber::encrypt(bob_pk, bob_balance, bob_randomness);
