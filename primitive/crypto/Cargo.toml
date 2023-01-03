@@ -13,6 +13,7 @@ license = "Apache-2.0"
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 rand_core = { version="0.6", default-features = false }
 sp-std = { version = '3.0.0', default-features = false }
+subtle = { version = "2.0", default-features = false }
 
 [dev-dependencies]
 rand = { version = "0.8", default-features = false }

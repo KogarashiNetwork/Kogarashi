@@ -12,6 +12,8 @@ license = "Apache-2.0"
 zero-crypto = { path = '../crypto' }
 rand_core = { version="0.6", default-features = false }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
+dusk-bytes = { version = "0.1" }
+subtle = { version = "2.0", default-features = false }
 
 [dev-dependencies]
 paste = "1.0.11"

@@ -88,6 +88,15 @@ macro_rules! group_operation {
             }
         }
 
+        impl<'a, 'b> Mul<&'b $field> for &'a $field {
+            type Output = $field;
+
+            #[inline]
+            fn mul(self, rhs: &'b $field) -> $field {
+                self.mul(rhs)
+            }
+        }
+
         impl $field {
             pub const fn zero() -> Self {
                 Self(zero())

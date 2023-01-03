@@ -59,7 +59,7 @@ impl Fp {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
 
-    pub(crate) const fn to_repr(self) -> [u64; 4] {
+    pub(crate) const fn montgomery_reduce(self) -> [u64; 4] {
         mont(
             [self.0[0], self.0[1], self.0[2], self.0[3], 0, 0, 0, 0],
             MODULUS,

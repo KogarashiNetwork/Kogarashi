@@ -5,6 +5,7 @@ use crate::params::{
     BLS_X, FROBENIUS_COEFF_FQ12_C1, FROBENIUS_COEFF_FQ2_C1, FROBENIUS_COEFF_FQ6_C1,
     FROBENIUS_COEFF_FQ6_C2,
 };
+use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zero_crypto::dress::extension_field::*;
 use zero_crypto::dress::pairing::{bls12_range_field_pairing, peculiar_extension_field_operation};
 
@@ -35,6 +36,119 @@ peculiar_extension_field_operation!(
     FROBENIUS_COEFF_FQ12_C1,
     BLS_X_IS_NEGATIVE
 );
+
+impl ConditionallySelectable for Fq2 {
+    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
+        Fq2([
+            Fq::conditional_select(&a.0[0], &b.0[0], choice),
+            Fq::conditional_select(&a.0[1], &b.0[1], choice),
+        ])
+    }
+}
+
+impl ConditionallySelectable for Fq6 {
+    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
+        Fq6([
+            Fq2::conditional_select(&a.0[0], &b.0[0], choice),
+            Fq2::conditional_select(&a.0[1], &b.0[1], choice),
+            Fq2::conditional_select(&a.0[2], &b.0[2], choice),
+        ])
+    }
+}
+
+impl ConditionallySelectable for Fq12 {
+    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
+        Fq12([
+            Fq6::conditional_select(&a.0[0], &b.0[0], choice),
+            Fq6::conditional_select(&a.0[1], &b.0[1], choice),
+        ])
+    }
+}
+
+impl ConstantTimeEq for Fq2 {
+    fn ct_eq(&self, other: &Self) -> Choice {
+        self.0[0].ct_eq(&other.0[0]) & self.0[1].ct_eq(&other.0[1])
+    }
+}
+
+impl Fq2 {
+    /// Returns whether or not this element is strictly lexicographically
+    /// larger than its negation.
+    #[inline]
+    pub fn lexicographically_largest(&self) -> Choice {
+        // If this element's c1 coefficient is lexicographically largest
+        // then it is lexicographically largest. Otherwise, in the event
+        // the c1 coefficient is zero and the c0 coefficient is
+        // lexicographically largest, then this element is lexicographically
+        // largest.
+
+        self.0[1].lexicographically_largest()
+            | (Choice::from(self.0[1].is_zero() as u8) & self.0[0].lexicographically_largest())
+    }
+
+    pub fn sqrt(&self) -> CtOption<Self> {
+        // Algorithm 9, https://eprint.iacr.org/2012/685.pdf
+        // with constant time modifications.
+
+        CtOption::new(Fq2::zero(), Choice::from(self.is_zero() as u8)).or_else(|| {
+            // a1 = self^((p - 3) / 4)
+            let a1 = self.pow_vartime(&[
+                0xee7fbfffffffeaaa,
+                0x7aaffffac54ffff,
+                0xd9cc34a83dac3d89,
+                0xd91dd2e13ce144af,
+                0x92c6e9ed90d2eb35,
+                0x680447a8e5ff9a6,
+            ]);
+
+            // alpha = a1^2 * self = self^((p - 3) / 2 + 1) = self^((p - 1) / 2)
+            let alpha = a1.square() * *self;
+
+            // x0 = self^((p + 1) / 4)
+            let x0 = a1 * *self;
+
+            // In the event that alpha = -1, the element is order p - 1 and so
+            // we're just trying to get the square of an element of the subfield
+            // Fp. This is given by x0 * u, since u = sqrt(-1). Since the element
+            // x0 = a + bu has b = 0, the solution is therefore au.
+            CtOption::new(Fq2([-x0.0[1], x0.0[0]]), alpha.ct_eq(&(&Fq2::one()).neg()))
+                // Otherwise, the correct solution is (1 + alpha)^((q - 1) // 2) * x0
+                .or_else(|| {
+                    CtOption::new(
+                        (alpha + Fq2::one()).pow_vartime(&[
+                            0xdcff7fffffffd555,
+                            0xf55ffff58a9ffff,
+                            0xb39869507b587b12,
+                            0xb23ba5c279c2895f,
+                            0x258dd3db21a5d66b,
+                            0xd0088f51cbff34d,
+                        ]) * x0,
+                        Choice::from(1),
+                    )
+                })
+                // Only return the result if it's really the square root (and so
+                // self is actually quadratic nonresidue)
+                .and_then(|sqrt| CtOption::new(sqrt, sqrt.square().ct_eq(self)))
+        })
+    }
+
+    /// Although this is labeled "vartime", it is only
+    /// variable time with respect to the exponent. It
+    /// is also not exposed in the public API.
+    pub fn pow_vartime(&self, by: &[u64; 6]) -> Self {
+        let mut res = Self::one();
+        for e in by.iter().rev() {
+            for i in (0..64).rev() {
+                res = res.square();
+
+                if ((*e >> i) & 1) == 1 {
+                    res *= *self;
+                }
+            }
+        }
+        res
+    }
+}
 
 #[cfg(test)]
 mod tests {

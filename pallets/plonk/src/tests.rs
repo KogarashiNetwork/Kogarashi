@@ -96,7 +96,7 @@ fn plonk_test() {
     let (x, y) = JubJubParameters::AFFINE_GENERATOR_COEFFS;
     let generator: GroupAffine<JubJubParameters> = GroupAffine::new(x, y);
     let point_f_pi: GroupAffine<JubJubParameters> =
-        AffineCurve::mul(&generator, JubJubScalar::from(2u64).into_repr()).into_affine();
+        AffineCurve::mul(&generator, JubJubScalar::from(2u64).inmontgomery_reduce()).into_affine();
     // Prover POV
     let (proof, pi) = {
         let mut circuit: TestCircuit<BlsScalar, JubJubParameters> = TestCircuit {

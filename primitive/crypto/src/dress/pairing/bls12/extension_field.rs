@@ -53,7 +53,7 @@ macro_rules! peculiar_extension_field_operation {
                 Self([self.0[0], -self.0[1]])
             }
 
-            fn frobenius_map(&self) -> Self {
+            pub fn frobenius_map(&self) -> Self {
                 self.conjugate()
             }
 

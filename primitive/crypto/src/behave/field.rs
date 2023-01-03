@@ -33,5 +33,5 @@ pub trait FieldRepr: Debug {
     const LIMBS_LENGTH: usize;
 
     // map from montgomery to normal form
-    fn to_repr(self) -> Self;
+    fn montgomery_reduce(self) -> Self;
 }
