@@ -1,6 +1,6 @@
 use crate::fqn::{Fq12, Fq2};
 use crate::fr::Fr;
-use crate::params::{BLS_X, G2_GENERATOR_X, G2_GENERATOR_Y, G2_PARAM_A, G2_PARAM_B};
+use crate::params::{G2_GENERATOR_X, G2_GENERATOR_Y, G2_PARAM_A, G2_PARAM_B};
 use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::{curve::*, pairing::bls12_g2_pairing};
@@ -42,5 +42,5 @@ curve_operation!(
     G2_GENERATOR_X,
     G2_GENERATOR_Y
 );
-bls12_g2_pairing!(G2Projective, PairingCoeff, G2PairingAffine, Fq12);
+bls12_g2_pairing!(G2Projective, G2Affine, PairingCoeff, G2PairingAffine, Fq12);
 curve_test!(bls12_381, Fr, G2Affine, G2Projective, 50);

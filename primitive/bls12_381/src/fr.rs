@@ -2,7 +2,7 @@ use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
-#[derive(Debug, Clone, Copy, Decode, Encode)]
+#[derive(Clone, Copy, Decode, Encode)]
 pub struct Fr(pub(crate) [u64; 4]);
 
 const MODULUS: [u64; 4] = [
@@ -57,6 +57,14 @@ const ROOT_OF_UNITY: Fr = Fr([
 impl Fr {
     pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
+    }
+
+    pub(crate) const fn to_repr(self) -> [u64; 4] {
+        mont(
+            [self.0[0], self.0[1], self.0[2], self.0[3], 0, 0, 0, 0],
+            MODULUS,
+            INV,
+        )
     }
 }
 

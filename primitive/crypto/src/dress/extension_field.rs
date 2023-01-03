@@ -10,10 +10,12 @@ pub use ring::*;
 macro_rules! extension_field_operation {
     ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
         prime_extention_field_operation!($extension_field, $sub_field, $limbs_length);
-        field_built_in!($extension_field);
 
-        #[derive(Debug, Clone, Copy, Decode, Encode)]
+        #[derive(Clone, Copy, Decode, Encode)]
         pub struct $extension_field(pub(crate) [$sub_field; $limbs_length]);
+
+        impl ParityCmp for $extension_field {}
+        impl Basic for $extension_field {}
 
         impl ExtensionField for $extension_field {
             fn mul_by_nonresidue(self) -> Self {
@@ -34,16 +36,12 @@ macro_rules! prime_extention_field_operation {
 
             const INV: u64 = $sub_field::INV;
 
-            fn from_u64(val: u64) -> Self {
-                unimplemented!()
+            fn is_zero(self) -> bool {
+                self.0.iter().all(|x| x.is_zero())
             }
 
             fn to_bits(self) -> Bits {
                 unimplemented!()
-            }
-
-            fn is_zero(self) -> bool {
-                self.0.iter().all(|x| x.is_zero())
             }
 
             // TODO should be optimized
@@ -56,11 +54,11 @@ macro_rules! prime_extention_field_operation {
             }
 
             fn double_assign(&mut self) {
-                *self += self.double()
+                *self = self.double()
             }
 
             fn square_assign(&mut self) {
-                *self *= self.square()
+                *self = self.square()
             }
         }
     };

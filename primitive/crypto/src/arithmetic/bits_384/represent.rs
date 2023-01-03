@@ -3,15 +3,15 @@ use crate::arithmetic::utils::Bits;
 use rand_core::RngCore;
 
 pub const fn zero() -> [u64; 6] {
-    [0, 0, 0, 0, 0, 0]
+    [0; 6]
 }
 
 pub const fn one(r2: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
     to_mont_form([1, 0, 0, 0, 0, 0], r2, p, inv)
 }
 
-pub const fn from_u64(val: u64) -> [u64; 6] {
-    [val, 0, 0, 0, 0, 0]
+pub const fn from_u64(val: u64, r2: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
+    to_mont_form([val, 0, 0, 0, 0, 0], r2, p, inv)
 }
 
 pub const fn from_u512(
@@ -43,11 +43,12 @@ pub const fn to_mont_form(val: [u64; 6], r2: [u64; 6], p: [u64; 6], inv: u64) ->
 pub fn to_bits(val: [u64; 6]) -> Bits {
     let mut index = 384;
     let mut bits: [u8; 384] = [0; 384];
-    for mut x in val {
-        for _ in 0..64 {
-            index -= 1;
-            bits[index] = (x & 1) as u8;
-            x >>= 1;
+    for limb in val {
+        for byte in limb.to_le_bytes().iter() {
+            for i in 0..8 {
+                index -= 1;
+                bits[index] = (byte >> i & 1) as u8;
+            }
         }
     }
     bits.to_vec()

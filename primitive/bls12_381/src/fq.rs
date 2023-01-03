@@ -1,8 +1,9 @@
 use rand_core::RngCore;
 use zero_crypto::arithmetic::bits_384::*;
+use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
-#[derive(Debug, Clone, Copy, Decode, Encode)]
+#[derive(Clone, Copy, Decode, Encode)]
 pub struct Fq(pub(crate) [u64; 6]);
 
 const MODULUS: [u64; 6] = [
@@ -52,6 +53,16 @@ impl Fq {
     pub(crate) const fn to_mont_form(val: [u64; 6]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
+
+    pub(crate) const fn to_repr(self) -> [u64; 6] {
+        mont(
+            [
+                self.0[0], self.0[1], self.0[2], self.0[3], self.0[4], self.0[5], 0, 0, 0, 0, 0, 0,
+            ],
+            MODULUS,
+            INV,
+        )
+    }
 }
 
-pairing_field_operation!(Fq, MODULUS, GENERATOR, INV, R, R2, R3);
+prime_field_operation!(Fq, MODULUS, GENERATOR, INV, R, R2, R3);

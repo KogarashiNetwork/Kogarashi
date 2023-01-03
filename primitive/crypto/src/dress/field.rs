@@ -12,23 +12,33 @@ pub use test::*;
 macro_rules! prime_field_operation {
     ($field:ident, $p:ident, $g:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
         field_operation!($field, $p, $g, $r, $inv, $r, $r2, $r3);
-        field_built_in!($field);
+
+        impl ParityCmp for $field {}
+        impl Basic for $field {}
+
+        impl Debug for $field {
+            fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                write!(f, "0x")?;
+                for limb in self.to_repr().iter().rev() {
+                    for byte in limb.to_be_bytes() {
+                        write!(f, "{:02x}", byte)?;
+                    }
+                }
+                Ok(())
+            }
+        }
 
         impl PrimeField for $field {
             const MODULUS: Self = $field($p);
 
             const INV: u64 = $inv;
 
-            fn from_u64(val: u64) -> Self {
-                Self(from_u64(val))
+            fn is_zero(self) -> bool {
+                self.0.iter().all(|x| *x == 0)
             }
 
             fn to_bits(self) -> Bits {
-                to_bits(self.0)
-            }
-
-            fn is_zero(self) -> bool {
-                self.0.iter().all(|x| *x == 0)
+                to_bits(self.to_repr())
             }
 
             fn double(self) -> Self {
@@ -67,7 +77,7 @@ macro_rules! fft_field_operation {
 
         impl From<u64> for $field {
             fn from(val: u64) -> $field {
-                $field(mul(from_u64(val), $r2, $p, $i))
+                $field(from_u64(val, $r2, $p, $i))
             }
         }
 
@@ -75,13 +85,4 @@ macro_rules! fft_field_operation {
     };
 }
 
-#[macro_export]
-macro_rules! pairing_field_operation {
-    ($field:ident, $p:ident, $g:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
-        prime_field_operation!($field, $p, $g, $inv, $r, $r2, $r3);
-
-        impl PairingField for $field {}
-    };
-}
-
-pub use {fft_field_operation, pairing_field_operation, prime_field_operation};
+pub use {fft_field_operation, prime_field_operation};

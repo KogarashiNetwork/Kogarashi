@@ -53,11 +53,7 @@ macro_rules! ext_field_group_operation {
 
         impl AddAssign for $extension_field {
             fn add_assign(&mut self, rhs: $extension_field) {
-                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
-                for i in 0..$limbs_length {
-                    limbs[i] = self.0[i] + rhs.0[i];
-                }
-                self.0 = limbs
+                *self = *self + rhs;
             }
         }
 
@@ -89,11 +85,7 @@ macro_rules! ext_field_group_operation {
 
         impl SubAssign for $extension_field {
             fn sub_assign(&mut self, rhs: $extension_field) {
-                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
-                for i in 0..$limbs_length {
-                    limbs[i] = self.0[i] - rhs.0[i];
-                }
-                self.0 = limbs
+                *self = *self - rhs
             }
         }
 
@@ -108,7 +100,7 @@ macro_rules! ext_field_group_operation {
 
         impl MulAssign for $extension_field {
             fn mul_assign(&mut self, rhs: $extension_field) {
-                *self = self.mul_ext_field(rhs)
+                *self = *self * rhs;
             }
         }
 

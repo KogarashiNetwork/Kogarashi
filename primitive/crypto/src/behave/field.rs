@@ -1,5 +1,7 @@
 // This trait resresents prime field
 
+use core::fmt::Debug;
+
 use super::{
     algebra::Field,
     comp::{Basic, ParityCmp},
@@ -14,11 +16,9 @@ pub trait PrimeField: Field + Basic + ParityCmp {
     // mongomery reduction inverse
     const INV: u64;
 
-    fn from_u64(val: u64) -> Self;
+    fn is_zero(self) -> bool;
 
     fn to_bits(self) -> Bits;
-
-    fn is_zero(self) -> bool;
 
     fn double(self) -> Self;
 
@@ -27,4 +27,11 @@ pub trait PrimeField: Field + Basic + ParityCmp {
     fn double_assign(&mut self);
 
     fn square_assign(&mut self);
+}
+
+pub trait FieldRepr: Debug {
+    const LIMBS_LENGTH: usize;
+
+    // map from montgomery to normal form
+    fn to_repr(self) -> Self;
 }

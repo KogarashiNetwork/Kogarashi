@@ -4,7 +4,7 @@ use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
-#[derive(Debug, Clone, Copy, Decode, Encode, Serialize, Deserialize)]
+#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 
 pub struct Fp(pub(crate) [u64; 4]);
 
@@ -57,6 +57,14 @@ fft_field_operation!(Fp, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 impl Fp {
     pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
+    }
+
+    pub(crate) const fn to_repr(self) -> [u64; 4] {
+        mont(
+            [self.0[0], self.0[1], self.0[2], self.0[3], 0, 0, 0, 0],
+            MODULUS,
+            INV,
+        )
     }
 
     pub fn from_hex(hex: &str) -> Result<Fp, Error> {

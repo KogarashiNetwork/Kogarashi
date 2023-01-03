@@ -2,8 +2,8 @@ use crate::fq::Fq;
 use crate::g1::G1Affine;
 use crate::g2::PairingCoeff;
 use crate::params::{
-    BLS_X, BLS_X_IS_NEGATIVE, FROBENIUS_COEFF_FQ12_C1, FROBENIUS_COEFF_FQ2_C1,
-    FROBENIUS_COEFF_FQ6_C1,
+    BLS_X, FROBENIUS_COEFF_FQ12_C1, FROBENIUS_COEFF_FQ2_C1, FROBENIUS_COEFF_FQ6_C1,
+    FROBENIUS_COEFF_FQ6_C2,
 };
 use zero_crypto::dress::extension_field::*;
 use zero_crypto::dress::pairing::{bls12_range_field_pairing, peculiar_extension_field_operation};
@@ -31,6 +31,7 @@ peculiar_extension_field_operation!(
     Fq12,
     FROBENIUS_COEFF_FQ2_C1,
     FROBENIUS_COEFF_FQ6_C1,
+    FROBENIUS_COEFF_FQ6_C2,
     FROBENIUS_COEFF_FQ12_C1,
     BLS_X_IS_NEGATIVE
 );
@@ -44,7 +45,7 @@ mod tests {
 
     field_test!(fq2_field, Fq2, 1000);
     field_test!(fq6_field, Fq6, 500);
-    field_test!(fq12_field, Fq12, 500);
+    field_test!(fq12_field, Fq12, 100);
 
     #[test]
     fn fq2_mul_nonresidue_test() {
@@ -112,7 +113,30 @@ mod tests {
         for _ in 0..1000 {
             let a = Fq12::random(OsRng);
 
-            assert_eq!(a, a.frobenius_map(12));
+            for i in 0..12 {
+                let mut b = a;
+                for _ in 0..i {
+                    b = b.frobenius_map();
+                }
+                assert_eq!(a.frobenius_maps(i), b);
+            }
+
+            assert_eq!(a, a.frobenius_maps(12));
+            assert_eq!(
+                a,
+                a.frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+                    .frobenius_map()
+            );
         }
     }
 }

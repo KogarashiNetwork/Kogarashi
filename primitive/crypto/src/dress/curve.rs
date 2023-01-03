@@ -10,9 +10,13 @@ macro_rules! curve_operation {
         use zero_crypto::behave::*;
         use zero_crypto::common::*;
 
-        curve_built_in!($affine, $projective);
         affine_group_operation!($affine, $range, $scalar, $x, $y);
         projective_group_operation!($projective, $range, $scalar, $x, $y);
+
+        impl ParityCmp for $affine {}
+        impl ParityCmp for $projective {}
+        impl Basic for $affine {}
+        impl Basic for $projective {}
 
         impl Curve for $affine {
             type Range = $range;
