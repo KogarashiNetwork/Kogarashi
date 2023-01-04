@@ -32,7 +32,7 @@ pub struct PairingCoeff(pub(crate) Fq2, pub(crate) Fq2, pub(crate) Fq2);
 #[derive(Debug, Clone, Decode, Encode)]
 pub struct G2PairingAffine {
     pub coeffs: Vec<PairingCoeff>,
-    infinity: bool,
+    is_infinity: bool,
 }
 
 curve_operation!(

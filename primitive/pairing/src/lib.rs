@@ -16,9 +16,10 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use zero_bls12_381::params::{BLS_X, BLS_X_IS_NEGATIVE};
-use zero_bls12_381::{Fq12, G1Affine, G1Projective, G2Affine, G2Projective};
-use zero_crypto::behave::{G2Pairing, Pairing, PairingRange};
-use zero_crypto::common::PrimeField;
+use zero_bls12_381::{
+    Fq12, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective, PairingCoeff,
+};
+use zero_crypto::common::{Curve, G2Pairing, Pairing, PairingRange, PrimeField, Vec};
 
 // tate pairing with miller algorithm
 pub struct TatePairing;
@@ -28,7 +29,7 @@ impl Pairing for TatePairing {
     type G2Affine = G2Affine;
     type G1Projective = G1Projective;
     type G2Projective = G2Projective;
-    type G2PairngRepr = G2Projective;
+    type G2PairngRepr = G2PairingAffine;
     type PairingRange = Fq12;
     const X: u64 = BLS_X;
     const X_IS_NEGATIVE: bool = BLS_X_IS_NEGATIVE;
@@ -51,18 +52,57 @@ impl Pairing for TatePairing {
                 continue;
             }
 
-            let coeffs = g2_projective.double_eval();
-            acc = acc.untwist(coeffs, g1);
+            acc = acc.untwist(g2_projective.double_eval(), g1);
+
             if i {
-                let coeffs = g2_projective.add_eval(g2);
-                acc = acc.untwist(coeffs, g1);
+                acc = acc.untwist(g2_projective.add_eval(g2), g1);
             }
 
             acc.square_assign();
         }
 
-        let coeffs = g2_projective.double_eval();
-        acc = acc.untwist(coeffs, g1);
+        acc = acc.untwist(g2_projective.double_eval(), g1);
+
+        if Self::X_IS_NEGATIVE {
+            acc.conjugate()
+        } else {
+            acc
+        }
+    }
+
+    fn multi_miller_loop(pairs: &[(Self::G1Affine, Self::G2PairngRepr)]) -> Self::PairingRange {
+        let pairs = pairs
+            .iter()
+            .filter(|(a, b)| !a.is_identity() && !b.is_identity())
+            .collect::<Vec<_>>();
+        let mut acc = Self::PairingRange::one();
+        let mut counter = 0;
+        let mut found_one = false;
+
+        for i in (0..64).rev().map(|b| (((BLS_X >> 1) >> b) & 1) == 1) {
+            if !found_one {
+                found_one = i;
+                continue;
+            }
+
+            for (g1, g2) in pairs.iter() {
+                acc = acc.untwist(g2.coeffs[counter], *g1);
+            }
+            counter += 1;
+
+            if i {
+                for (g1, g2) in pairs.iter() {
+                    acc = acc.untwist(g2.coeffs[counter], *g1);
+                }
+                counter += 1;
+            }
+
+            acc.square_assign();
+        }
+
+        for (g1, g2) in pairs {
+            acc = acc.untwist(g2.coeffs[counter], *g1);
+        }
 
         if Self::X_IS_NEGATIVE {
             acc.conjugate()
