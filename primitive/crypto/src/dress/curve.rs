@@ -85,6 +85,14 @@ macro_rules! curve_operation {
                     }
                 }
             }
+
+            fn get_x(&self) -> Self::Range {
+                self.x
+            }
+
+            fn get_y(&self) -> Self::Range {
+                self.y
+            }
         }
 
         impl From<$projective> for $affine {

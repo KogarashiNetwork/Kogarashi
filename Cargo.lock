@@ -993,6 +993,7 @@ dependencies = [
  "tempdir",
  "zero-bls12-381",
  "zero-crypto",
+ "zero-jubjub",
  "zero-pairing",
 ]
 

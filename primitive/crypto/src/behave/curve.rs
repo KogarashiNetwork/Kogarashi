@@ -34,6 +34,12 @@ pub trait Affine: Curve + Into<Self::Projective> + From<Self::Projective> {
 
     // convert affine to projective representation
     fn to_projective(self) -> Self::Projective;
+
+    // get x coordinate
+    fn get_x(&self) -> Self::Range;
+
+    // get y coordinate
+    fn get_y(&self) -> Self::Range;
 }
 
 /// rational point projective representation

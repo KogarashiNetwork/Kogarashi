@@ -1,5 +1,7 @@
-use dusk_bytes::{Error as BytesError, HexDebug, Serializable};
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
+use core::borrow::Borrow;
+use core::iter::{Product, Sum};
+use dusk_bytes::{Error as BytesError, Serializable};
+use subtle::{Choice, ConditionallySelectable};
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::arithmetic::utils::*;
 use zero_crypto::common::*;
@@ -50,7 +52,7 @@ pub const INV: u64 = 0xfffffffeffffffff;
 
 const S: usize = 32;
 
-const ROOT_OF_UNITY: Fr = Fr([
+pub const ROOT_OF_UNITY: Fr = Fr([
     0xb9b58d8c5f0e466a,
     0x5b1b4c801819d7ec,
     0x0af53ae352a31e64,
@@ -72,6 +74,114 @@ impl Fr {
 }
 
 fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
+
+#[test]
+fn test_root_of_unity() {
+    let s = Fr::S;
+    let mut root_of_unity = Fr::ROOT_OF_UNITY;
+    (0..s).for_each(|_| root_of_unity.square_assign());
+    assert_eq!(root_of_unity, Fr::one())
+}
+
+// below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
+// [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
+// Dusk-Network team and, @str4d and @ebfull
+
+/// Two adacity
+pub const TWO_ADACITY: u32 = 32;
+
+/// Generator of the Scalar field
+pub const MULTIPLICATIVE_GENERATOR: Fr = Fr([7, 0, 0, 0]);
+
+impl Fr {
+    fn from_u512(limbs: [u64; 8]) -> Fr {
+        // We reduce an arbitrary 512-bit number by decomposing it into two 256-bit digits
+        // with the higher bits multiplied by 2^256. Thus, we perform two reductions
+        //
+        // 1. the lower bits are multiplied by R^2, as normal
+        // 2. the upper bits are multiplied by R^2 * 2^256 = R^3
+        //
+        // and computing their sum in the field. It remains to see that arbitrary 256-bit
+        // numbers can be placed into Montgomery form safely using the reduction. The
+        // reduction works so long as the product is less than R=2^256 multiplied by
+        // the modulus. This holds because for any `c` smaller than the modulus, we have
+        // that (2^256 - 1)*c is an acceptable product for the reduction. Therefore, the
+        // reduction always works so long as `c` is in the field; in this case it is either the
+        // constant `R2` or `R3`.
+        let d0 = Fr([limbs[0], limbs[1], limbs[2], limbs[3]]);
+        let d1 = Fr([limbs[4], limbs[5], limbs[6], limbs[7]]);
+        // Convert to Montgomery form
+        d0 * Self(R2) + d1 * Self(R3)
+    }
+
+    /// Converts a 512-bit little endian integer into
+    /// a `Scalar` by reducing by the modulus.
+    pub fn from_bytes_wide(bytes: &[u8; 64]) -> Fr {
+        Fr::from_u512([
+            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[0..8]).unwrap()),
+            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[8..16]).unwrap()),
+            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[16..24]).unwrap()),
+            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[24..32]).unwrap()),
+            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[32..40]).unwrap()),
+            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[40..48]).unwrap()),
+            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[48..56]).unwrap()),
+            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[56..64]).unwrap()),
+        ])
+    }
+
+    pub fn reduce(&self) -> Fr {
+        Self(self.montgomery_reduce())
+    }
+
+    pub fn divn(&mut self, mut n: u32) {
+        if n >= 256 {
+            *self = Self::from(0);
+            return;
+        }
+
+        while n >= 64 {
+            let mut t = 0;
+            for i in self.0.iter_mut().rev() {
+                core::mem::swap(&mut t, i);
+            }
+            n -= 64;
+        }
+
+        if n > 0 {
+            let mut t = 0;
+            for i in self.0.iter_mut().rev() {
+                let t2 = *i << (64 - n);
+                *i >>= n;
+                *i |= t;
+                t = t2;
+            }
+        }
+    }
+}
+
+impl<T> Product<T> for Fr
+where
+    T: Borrow<Fr>,
+{
+    fn product<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        iter.fold(Fr::one(), |acc, item| acc * *item.borrow())
+    }
+}
+
+impl<T> Sum<T> for Fr
+where
+    T: Borrow<Fr>,
+{
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + *item.borrow())
+    }
+}
 
 impl Serializable<32> for Fr {
     type Error = BytesError;
@@ -137,12 +247,4 @@ impl ConditionallySelectable for Fr {
             u64::conditional_select(&a.0[3], &b.0[3], choice),
         ])
     }
-}
-
-#[test]
-fn test_root_of_unity() {
-    let s = Fr::S;
-    let mut root_of_unity = Fr::ROOT_OF_UNITY;
-    (0..s).for_each(|_| root_of_unity.square_assign());
-    assert_eq!(root_of_unity, Fr::one())
 }

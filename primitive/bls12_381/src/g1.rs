@@ -3,7 +3,9 @@ use crate::fr::Fr;
 use crate::params::{
     BLS_X, BLS_X_IS_NEGATIVE, G1_GENERATOR_X, G1_GENERATOR_Y, G1_PARAM_A, G1_PARAM_B,
 };
-use dusk_bytes::{Error as BytesError, HexDebug, Serializable};
+use core::borrow::Borrow;
+use core::iter::Sum;
+use dusk_bytes::{Error as BytesError, Serializable};
 use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::common::*;
@@ -36,7 +38,12 @@ curve_operation!(
     G1_GENERATOR_Y
 );
 
-/// A nontrivial third root of unity in Fp
+curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);
+
+// below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
+// [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
+// Dusk-Network team and, @str4d and @ebfull
+
 pub const BETA: Fq = Fq([
     0x30f1361b798a64e8,
     0xf3b8ddab7ece5a2a,
@@ -63,8 +70,6 @@ fn endomorphism(p: &G1Affine) -> G1Affine {
     res.x *= BETA;
     res
 }
-
-curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);
 
 impl G1Affine {
     pub const RAW_SIZE: usize = 97;
@@ -142,6 +147,120 @@ impl G1Projective {
             xself = -xself;
         }
         xself
+    }
+
+    /// Converts a batch of `G1Projective` elements into `G1Affine` elements. This
+    /// function will panic if `p.len() != q.len()`.
+    pub fn batch_normalize(p: &[Self], q: &mut [G1Affine]) {
+        assert_eq!(p.len(), q.len());
+
+        let mut acc = Fq::one();
+        for (p, q) in p.iter().zip(q.iter_mut()) {
+            // We use the `x` field of `G1Affine` to store the product
+            // of previous z-coordinates seen.
+            q.x = acc;
+
+            // We will end up skipping all identities in p
+            acc = Fq::conditional_select(&(acc * p.z), &acc, Choice::from(p.is_identity() as u8));
+        }
+
+        // This is the inverse, as all z-coordinates are nonzero and the ones
+        // that are not are skipped.
+        acc = acc.invert().unwrap();
+
+        for (p, q) in p.iter().rev().zip(q.iter_mut().rev()) {
+            let skip = p.is_identity();
+
+            // Compute tmp = 1/z
+            let tmp = q.x * acc;
+
+            // Cancel out z-coordinate in denominator of `acc`
+            acc = Fq::conditional_select(&(acc * p.z), &acc, Choice::from(skip as u8));
+
+            // Set the coordinates to the correct value
+            let tmp2 = tmp.square();
+            let tmp3 = tmp2 * tmp;
+
+            q.x = p.x * tmp2;
+            q.y = p.y * tmp3;
+            q.is_infinity = false;
+
+            *q = G1Affine::conditional_select(
+                &q,
+                &G1Affine::ADDITIVE_IDENTITY,
+                Choice::from(skip as u8),
+            );
+        }
+    }
+
+    /// Adds this point to another point in the affine model.
+    pub fn add_mixed(&self, rhs: G1Affine) -> G1Projective {
+        // This Jacobian point addition technique is based on the implementation in libsecp256k1,
+        // which assumes that rhs has z=1. Let's address the case of zero z-coordinates generally.
+
+        // If self is the identity, return rhs. Otherwise, return self. The other cases will be
+        // predicated on neither self nor rhs being the identity.
+        let f1 = Choice::from(self.is_identity() as u8);
+        let res = G1Projective::conditional_select(self, &G1Projective::from(rhs), f1);
+        let f2 = Choice::from(rhs.is_identity() as u8);
+
+        // If neither are the identity but x1 = x2 and y1 != y2, then return the identity
+        let u1 = self.x;
+        let s1 = self.y;
+        let z = self.z.square();
+        let u2 = rhs.x * z;
+        let z = z * self.z;
+        let s2 = rhs.y * z;
+        let f3 = u1.ct_eq(&u2) & (!s1.ct_eq(&s2));
+        let res = G1Projective::conditional_select(
+            &res,
+            &G1Projective::ADDITIVE_IDENTITY,
+            (!f1) & (!f2) & f3,
+        );
+
+        let t = u1 + u2;
+        let m = s1 + s2;
+        let rr = t.square();
+        let m_alt = -u2;
+        let tt = u1 * m_alt;
+        let rr = rr + tt;
+
+        // Correct for x1 != x2 but y1 = -y2, which can occur because p - 1 is divisible by 3.
+        // libsecp256k1 does this by substituting in an alternative (defined) expression for lambda.
+        let degenerate = m.is_zero() & rr.is_zero();
+        let rr_alt = s1 + s1;
+        let m_alt = m_alt + u1;
+        let rr_alt = Fq::conditional_select(&rr_alt, &rr, !Choice::from(degenerate as u8));
+        let m_alt = Fq::conditional_select(&m_alt, &m, !Choice::from(degenerate as u8));
+
+        let n = m_alt.square();
+        let q = n * t;
+
+        let n = n.square();
+        let n = Fq::conditional_select(&n, &m, Choice::from(degenerate as u8));
+        let t = rr_alt.square();
+        let z3 = m_alt * self.z;
+        let z3 = z3 + z3;
+        let q = -q;
+        let t = t + q;
+        let x3 = t;
+        let t = t + t;
+        let t = t + q;
+        let t = t * rr_alt;
+        let t = t + n;
+        let y3 = -t;
+        let x3 = x3 + x3;
+        let x3 = x3 + x3;
+        let y3 = y3 + y3;
+        let y3 = y3 + y3;
+
+        let tmp = G1Projective {
+            x: x3,
+            y: y3,
+            z: z3,
+        };
+
+        G1Projective::conditional_select(&res, &tmp, (!f1) & (!f2) & (!f3))
     }
 }
 
@@ -239,6 +358,30 @@ impl Serializable<48> for G1Affine {
     }
 }
 
+impl<T> Sum<T> for G1Projective
+where
+    T: Borrow<G1Projective>,
+{
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + *item.borrow())
+    }
+}
+
+impl<T> Sum<T> for G1Affine
+where
+    T: Borrow<G1Affine>,
+{
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + *item.borrow())
+    }
+}
+
 impl ConditionallySelectable for G1Affine {
     fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
         G1Affine {
@@ -284,4 +427,104 @@ impl ConditionallySelectable for G1Projective {
             z: Fq::conditional_select(&a.z, &b.z, choice),
         }
     }
+}
+
+/// Performs a Variable Base Multiscalar Multiplication.
+pub fn msm_variable_base(points: &[G1Affine], scalars: &[Fr]) -> G1Projective {
+    #[cfg(feature = "parallel")]
+    use rayon::prelude::*;
+
+    let c = if scalars.len() < 32 {
+        3
+    } else {
+        ln_without_floats(scalars.len()) + 2
+    };
+
+    let num_bits = 255usize;
+    let fr_one = Fr::one();
+
+    let zero = G1Projective::ADDITIVE_GENERATOR;
+    let window_starts: Vec<_> = (0..num_bits).step_by(c).collect();
+
+    #[cfg(feature = "parallel")]
+    let window_starts_iter = window_starts.into_par_iter();
+    #[cfg(not(feature = "parallel"))]
+    let window_starts_iter = window_starts.into_iter();
+
+    // Each window is of size `c`.
+    // We divide up the bits 0..num_bits into windows of size `c`, and
+    // in parallel process each such window.
+    let window_sums: Vec<_> = window_starts_iter
+        .map(|w_start| {
+            let mut res = zero;
+            // We don't need the "zero" bucket, so we only have 2^c - 1 buckets
+            let mut buckets = vec![zero; (1 << c) - 1];
+            scalars
+                .iter()
+                .zip(points)
+                .filter(|(s, _)| !(*s == &Fr::zero()))
+                .for_each(|(&scalar, base)| {
+                    if scalar == fr_one {
+                        // We only process unit scalars once in the first window.
+                        if w_start == 0 {
+                            res = res.add_mixed(*base);
+                        }
+                    } else {
+                        let mut scalar = scalar.reduce();
+
+                        // We right-shift by w_start, thus getting rid of the
+                        // lower bits.
+                        scalar.divn(w_start as u32);
+
+                        // We mod the remaining bits by the window size.
+                        let scalar = scalar.0[0] % (1 << c);
+
+                        // If the scalar is non-zero, we update the corresponding
+                        // bucket.
+                        // (Recall that `buckets` doesn't have a zero bucket.)
+                        if scalar != 0 {
+                            buckets[(scalar - 1) as usize] =
+                                buckets[(scalar - 1) as usize].add_mixed(*base);
+                        }
+                    }
+                });
+
+            let mut running_sum = G1Projective::ADDITIVE_GENERATOR;
+            for b in buckets.into_iter().rev() {
+                running_sum = running_sum + b;
+                res += running_sum;
+            }
+
+            res
+        })
+        .collect();
+
+    // We store the sum for the lowest window.
+    let lowest = *window_sums.first().unwrap();
+    // We're traversing windows from high to low.
+    window_sums[1..]
+        .iter()
+        .rev()
+        .fold(zero, |mut total, sum_i| {
+            total += *sum_i;
+            for _ in 0..c {
+                total = total.double();
+            }
+            total
+        })
+        + lowest
+}
+
+fn ln_without_floats(a: usize) -> usize {
+    // log2(a) * ln(2)
+    (log2(a) * 69 / 100) as usize
+}
+
+fn log2(x: usize) -> u32 {
+    if x <= 1 {
+        return 0;
+    }
+
+    let n = x.leading_zeros();
+    core::mem::size_of::<usize>() as u32 * 8 - n
 }

@@ -2,7 +2,7 @@ use crate::fq::Fq;
 use crate::fqn::{Fq12, Fq2};
 use crate::fr::Fr;
 use crate::params::*;
-use dusk_bytes::{Error as BytesError, HexDebug, Serializable};
+use dusk_bytes::{Error as BytesError, Serializable};
 use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::common::*;
@@ -47,6 +47,10 @@ curve_operation!(
 );
 bls12_g2_pairing!(G2Projective, G2Affine, PairingCoeff, G2PairingAffine, Fq12);
 curve_test!(bls12_381, Fr, G2Affine, G2Projective, 50);
+
+// below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
+// [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
+// Dusk-Network team and, @str4d and @ebfull
 
 const B: Fq2 = Fq2([
     Fq([

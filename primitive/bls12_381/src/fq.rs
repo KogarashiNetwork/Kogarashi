@@ -64,7 +64,13 @@ impl Fq {
             INV,
         )
     }
+}
 
+// below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
+// [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
+// Dusk-Network team and, @str4d and @ebfull
+
+impl Fq {
     /// Internal representation of `Fp`
     pub const fn internal_repr(&self) -> &[u64; 6] {
         &self.0
