@@ -3800,6 +3800,7 @@ dependencies = [
 name = "zero-jubjub"
 version = "0.1.0"
 dependencies = [
+ "dusk-bytes",
  "parity-scale-codec",
  "paste",
  "proptest",
@@ -3808,6 +3809,7 @@ dependencies = [
  "rand_xorshift",
  "serde",
  "sp-std",
+ "zero-bls12-381",
  "zero-crypto",
 ]
 

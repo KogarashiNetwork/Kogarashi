@@ -67,7 +67,7 @@ macro_rules! curve_test {
                         let a = $affine::random(OsRng);
 
                         // a + a = a * 8
-                        let scalared_a = a * $field::from(8);
+                        let scalared_a = a * $field::from(8 as u64);
                         let aa =a.double();
                         let a_4 = aa.double();
                         let a_8 = a_4.double();
@@ -86,11 +86,11 @@ macro_rules! curve_test {
                         let g = $affine::random(OsRng);
 
                         // 7 * G + 16 * G = 23 * G
-                        let ag = g * $field::from(7);
-                        let bg = g * $field::from(16);
+                        let ag = g * $field::from(7 as u64);
+                        let bg = g * $field::from(16 as u64);
                         let agbg = ag + bg;
 
-                        let abg = g * $field::from(23);
+                        let abg = g * $field::from(23 as u64);
 
                         assert!(agbg.is_on_curve());
                         assert!(abg.is_on_curve());
@@ -176,7 +176,7 @@ macro_rules! curve_test {
                         let a = $projective::random(OsRng);
 
                         // a + a = a * 8
-                        let scalared_a = a * $field::from(8);
+                        let scalared_a = a * $field::from(8 as u64);
                         let aa =a.double();
                         let a_4 = aa.double();
                         let a_8 = a_4.double();
@@ -195,11 +195,11 @@ macro_rules! curve_test {
                         let g = $projective::random(OsRng);
 
                         // 7 * G + 16 * G = 23 * G
-                        let ag = g * $field::from(7);
-                        let bg = g * $field::from(16);
+                        let ag = g * $field::from(7 as u64);
+                        let bg = g * $field::from(16 as u64);
                         let agbg = ag + bg;
 
-                        let abg = g * $field::from(23);
+                        let abg = g * $field::from(23 as u64);
 
                         assert!(agbg.is_on_curve());
                         assert!(abg.is_on_curve());

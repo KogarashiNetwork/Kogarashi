@@ -39,5 +39,5 @@ mod curve;
 mod error;
 mod fp;
 
-pub use curve::{JubjubAffine, JubjubProjective};
+pub use curve::{batch_normalize, JubJubExtended, JubjubAffine, JubjubProjective};
 pub use fp::Fp;

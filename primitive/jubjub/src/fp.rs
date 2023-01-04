@@ -1,5 +1,7 @@
 use crate::error::Error;
+use dusk_bytes::Serializable;
 use serde::{Deserialize, Serialize};
+use zero_bls12_381::Fr;
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
@@ -145,5 +147,174 @@ mod tests {
                 0x01a19f85f00d79b8,
             ])
         )
+    }
+}
+
+impl Fp {
+    /// Reduces bit representation of numbers, such that
+    /// they can be evaluated in terms of the least significant bit.
+    pub fn reduce(&self) -> Self {
+        Self(self.montgomery_reduce())
+    }
+
+    /// Evaluate if a `Scalar, from Fr` is even or not.
+    pub fn is_even(&self) -> bool {
+        self.0[0] % 2 == 0
+    }
+
+    /// Compute the result from `Scalar (mod 2^k)`.
+    ///
+    /// # Panics
+    ///
+    /// If the given k is > 32 (5 bits) as the value gets
+    /// greater than the limb.  
+    pub fn mod_2_pow_k(&self, k: u8) -> u8 {
+        (self.0[0] & ((1 << k) - 1)) as u8
+    }
+
+    /// Compute the result from `Scalar (mods k)`.
+    ///
+    /// # Panics
+    ///
+    /// If the given `k > 32 (5 bits)` || `k == 0` as the value gets
+    /// greater than the limb.   
+    pub fn mods_2_pow_k(&self, w: u8) -> i8 {
+        assert!(w < 32u8);
+        let modulus = self.mod_2_pow_k(w) as i8;
+        let two_pow_w_minus_one = 1i8 << (w - 1);
+
+        match modulus >= two_pow_w_minus_one {
+            false => modulus,
+            true => modulus - ((1u8 << w) as i8),
+        }
+    }
+
+    /// SHR impl
+    #[inline]
+    pub fn divn(&mut self, mut n: u32) {
+        if n >= 256 {
+            *self = Self::from(0u64);
+            return;
+        }
+
+        while n >= 64 {
+            let mut t = 0;
+            for i in self.0.iter_mut().rev() {
+                core::mem::swap(&mut t, i);
+            }
+            n -= 64;
+        }
+
+        if n > 0 {
+            let mut t = 0;
+            for i in self.0.iter_mut().rev() {
+                let t2 = *i << (64 - n);
+                *i >>= n;
+                *i |= t;
+                t = t2;
+            }
+        }
+    }
+
+    /// Computes the windowed-non-adjacent for a
+    /// given an element in the JubJub Scalar field.
+    pub fn compute_windowed_naf(&self, width: u8) -> [i8; 256] {
+        let mut k = self.reduce();
+        let mut i = 0;
+        let one = Fp::one().reduce();
+        let mut res = [0i8; 256];
+
+        while k >= one {
+            if !k.is_even() {
+                let ki = k.mods_2_pow_k(width);
+                res[i] = ki;
+                k = k - Fp::from(ki);
+            } else {
+                res[i] = 0i8;
+            };
+
+            k.divn(1u32);
+            i += 1;
+        }
+        res
+    }
+}
+
+impl From<i8> for Fp {
+    fn from(val: i8) -> Fp {
+        match (val >= 0, val < 0) {
+            (true, false) => Fp([val.abs() as u64, 0u64, 0u64, 0u64]),
+            (false, true) => -Fp([val.abs() as u64, 0u64, 0u64, 0u64]),
+            (_, _) => unreachable!(),
+        }
+    }
+}
+
+impl From<Fp> for Fr {
+    fn from(scalar: Fp) -> Fr {
+        let bls_scalar = Fr::from_bytes(&scalar.to_bytes());
+
+        // The order of a JubJub's Scalar field is shorter than a BLS Scalar,
+        // so convert any jubjub scalar to a BLS' Scalar should always be
+        // safe.
+        assert!(
+            bls_scalar.is_ok(),
+            "Failed to convert a Scalar from JubJub to BLS"
+        );
+
+        bls_scalar.unwrap()
+    }
+}
+
+impl Serializable<32> for Fp {
+    type Error = Error;
+
+    /// Converts an element of `Self` into a byte representation in
+    /// little-endian byte order.
+    fn to_bytes(&self) -> [u8; Self::SIZE] {
+        // Turn into canonical form by computing
+        // (a.R) / R = a
+        let tmp = self.montgomery_reduce();
+
+        let mut res = [0; Self::SIZE];
+        res[0..8].copy_from_slice(&tmp[0].to_le_bytes());
+        res[8..16].copy_from_slice(&tmp[1].to_le_bytes());
+        res[16..24].copy_from_slice(&tmp[2].to_le_bytes());
+        res[24..32].copy_from_slice(&tmp[3].to_le_bytes());
+
+        res
+    }
+
+    /// Attempts to convert a little-endian byte representation of
+    /// a field element into an element of `Self`, failing if the input
+    /// is not canonical (is not smaller than r).
+    fn from_bytes(bytes: &[u8; Self::SIZE]) -> Result<Self, Self::Error> {
+        let mut tmp = Self([0, 0, 0, 0]);
+
+        tmp.0[0] = u64::from_le_bytes(bytes[0..8].try_into().unwrap());
+        tmp.0[1] = u64::from_le_bytes(bytes[8..16].try_into().unwrap());
+        tmp.0[2] = u64::from_le_bytes(bytes[16..24].try_into().unwrap());
+        tmp.0[3] = u64::from_le_bytes(bytes[24..32].try_into().unwrap());
+
+        // Try to subtract the modulus
+        let (_, borrow) = sbb(tmp.0[0], MODULUS[0], 0);
+        let (_, borrow) = sbb(tmp.0[1], MODULUS[1], borrow);
+        let (_, borrow) = sbb(tmp.0[2], MODULUS[2], borrow);
+        let (_, borrow) = sbb(tmp.0[3], MODULUS[3], borrow);
+
+        // If the element is smaller than MODULUS then the
+        // subtraction will underflow, producing a borrow value
+        // of 0xffff...ffff. Otherwise, it'll be zero.
+        let is_some = (borrow as u8) & 1;
+
+        if is_some == 0 {
+            return Err(Error::BytesInvalid);
+        }
+
+        // Convert to Montgomery form by computing
+        // (a.R^0 * R^2) / R = a.R
+        tmp *= Self(R2);
+
+        Ok(tmp)
     }
 }
