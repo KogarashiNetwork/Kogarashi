@@ -3765,6 +3765,7 @@ dependencies = [
  "rand 0.8.5",
  "rand_core 0.6.3",
  "rand_xorshift",
+ "serde",
  "subtle 2.4.1",
  "zero-crypto",
 ]
@@ -3809,6 +3810,7 @@ dependencies = [
  "rand_xorshift",
  "serde",
  "sp-std",
+ "subtle 2.4.1",
  "zero-bls12-381",
  "zero-crypto",
 ]

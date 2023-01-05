@@ -16,77 +16,126 @@
 //! # Elliptic Curve Coordinate System
 //!
 //! - [`JubjubAffine`]
-//! - [`JubjubProjective`]
 //!
-//! ## Overview
-//!
-//! This coordinate provides the functionalities as following.
-//!
-//! - Curve addition
-//! - Curve doubling
-//! - Convert each coordinate system
-//!
-//! ### Reference
-//!
-//! We implement coordinate system to refer the following.
-//! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
 
-use crate::fp::Fp;
 use serde::{Deserialize, Serialize};
-use zero_crypto::arithmetic::bits_256::*;
+use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
+use zero_bls12_381::Fr;
 use zero_crypto::common::*;
-use zero_crypto::dress::curve::*;
-
-/// The projective form of coordinate
-#[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct JubjubProjective {
-    pub(crate) x: Fp,
-    pub(crate) y: Fp,
-    pub(crate) z: Fp,
-}
-
-const GENERATOR_X: Fp = Fp::to_mont_form([
-    0x7c24d812779a3316,
-    0x72e38f4ebd4070f3,
-    0x03b3fe93f505a6f2,
-    0xc4c71e5a4102960,
-]);
-
-const GENERATOR_Y: Fp = Fp::to_mont_form([
-    0xd2047ef3463de4af,
-    0x01ca03640d236cbf,
-    0xd3033593ae386e92,
-    0xaa87a50921b80ec,
-]);
-
-const PARAM_A: Fp = Fp::zero();
-
-const PARAM_B: Fp = Fp::to_mont_form([4, 0, 0, 0]);
-
-/// The projective form of coordinate
-#[derive(Debug, Clone, Copy, Decode, Encode, Serialize, Deserialize)]
-pub struct JubjubAffine {
-    x: Fp,
-    y: Fp,
-    is_infinity: bool,
-}
-
-curve_operation!(
-    Fp,
-    Fp,
-    PARAM_A,
-    PARAM_B,
-    JubjubAffine,
-    JubjubProjective,
-    GENERATOR_X,
-    GENERATOR_Y
-);
-
-curve_test!(jubjub, Fp, JubjubAffine, JubjubProjective, 100);
 
 // below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
 // [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
 // Dusk-Network team and, @str4d and @ebfull
+
+/// The affine form of coordinate
+#[derive(Debug, Clone, Copy, Decode, Encode, Serialize, Deserialize)]
+pub struct JubjubAffine {
+    x: Fr,
+    y: Fr,
+}
+
+impl JubjubAffine {
+    /// Use a fixed generator point.
+    /// The point is then reduced according to the prime field. We need only to
+    /// state the coordinates, so users can exploit its properties
+    /// which are proven by tests, checking:
+    /// - It lies on the curve,
+    /// - Is of prime order,
+    /// - Is not the identity point.
+    /// Using:
+    ///     x = 0x3fd2814c43ac65a6f1fbf02d0fd6cce62e3ebb21fd6c54ed4df7b7ffec7beaca
+    //      y = 0x0000000000000000000000000000000000000000000000000000000000000012
+    pub const ADDITIVE_IDENTITY: Self = Self {
+        x: Fr::to_mont_form([
+            0x4df7b7ffec7beaca,
+            0x2e3ebb21fd6c54ed,
+            0xf1fbf02d0fd6cce6,
+            0x3fd2814c43ac65a6,
+        ]),
+        y: Fr::to_mont_form([
+            0x0000000000000012,
+            000000000000000000,
+            000000000000000000,
+            000000000000,
+        ]),
+    };
+
+    /// Returns the `x`-coordinate of this point.
+    pub const fn get_x(&self) -> Fr {
+        self.x
+    }
+
+    /// Returns the `y`-coordinate of this point.
+    pub const fn get_y(&self) -> Fr {
+        self.y
+    }
+
+    /// Constructs an JubjubAffine given `x` and `y` without checking
+    /// that the point is on the curve.
+    pub const fn from_raw_unchecked(x: Fr, y: Fr) -> JubjubAffine {
+        JubjubAffine { x, y }
+    }
+}
+
+impl Neg for JubjubAffine {
+    type Output = JubjubAffine;
+
+    /// This computes the negation of a point `P = (x, y)`
+    /// as `-P = (-x, y)`.
+    #[inline]
+    fn neg(self) -> JubjubAffine {
+        JubjubAffine {
+            x: -self.x,
+            y: self.y,
+        }
+    }
+}
+
+impl ConstantTimeEq for JubjubAffine {
+    fn ct_eq(&self, other: &Self) -> Choice {
+        self.x.ct_eq(&other.x) & self.y.ct_eq(&other.y)
+    }
+}
+
+impl PartialEq for JubjubAffine {
+    fn eq(&self, other: &Self) -> bool {
+        self.ct_eq(other).unwrap_u8() == 1
+    }
+}
+
+impl ConditionallySelectable for JubjubAffine {
+    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
+        JubjubAffine {
+            x: Fr::conditional_select(&a.x, &b.x, choice),
+            y: Fr::conditional_select(&a.y, &b.y, choice),
+        }
+    }
+}
+
+/// Use a fixed generator point.
+/// The point is then reduced according to the prime field. We need only to
+/// state the coordinates, so users can exploit its properties
+/// which are proven by tests, checking:
+/// - It lies on the curve,
+/// - Is of prime order,
+/// - Is not the identity point.
+/// Using:
+///     x = 0x3fd2814c43ac65a6f1fbf02d0fd6cce62e3ebb21fd6c54ed4df7b7ffec7beaca
+//      y = 0x0000000000000000000000000000000000000000000000000000000000000012
+pub const GENERATOR: JubjubAffine = JubjubAffine {
+    x: Fr::to_mont_form([
+        0x4df7b7ffec7beaca,
+        0x2e3ebb21fd6c54ed,
+        0xf1fbf02d0fd6cce6,
+        0x3fd2814c43ac65a6,
+    ]),
+    y: Fr::to_mont_form([
+        0x0000000000000012,
+        000000000000000000,
+        000000000000000000,
+        000000000000,
+    ]),
+};
 
 /// This represents an extended point `(X, Y, Z, T1, T2)`
 /// with `Z` nonzero, corresponding to the affine point
@@ -101,20 +150,20 @@ curve_test!(jubjub, Fp, JubjubAffine, JubjubProjective, 100);
 /// * Compare it with another extended point using `PartialEq` or `ct_eq()`.
 #[derive(Clone, Debug, Copy)]
 pub struct JubJubExtended {
-    x: Fp,
-    y: Fp,
-    z: Fp,
-    t1: Fp,
-    t2: Fp,
+    x: Fr,
+    y: Fr,
+    z: Fr,
+    t1: Fr,
+    t2: Fr,
 }
 
 impl JubJubExtended {
     pub const ADDITIVE_GENERATOR: Self = Self {
-        x: Fp::zero(),
-        y: Fp::one(),
-        z: Fp::one(),
-        t1: Fp::zero(),
-        t2: Fp::zero(),
+        x: Fr::zero(),
+        y: Fr::one(),
+        z: Fr::one(),
+        t1: Fr::zero(),
+        t2: Fr::zero(),
     };
 
     /// Constructs an extended point (with `Z = 1`) from
@@ -123,24 +172,24 @@ impl JubJubExtended {
         Self {
             x: affine.x,
             y: affine.y,
-            z: Fp::one(),
+            z: Fr::one(),
             t1: affine.x,
             t2: affine.y,
         }
     }
 
     /// Returns the `x`-coordinate of this point.
-    pub const fn get_x(&self) -> Fp {
+    pub const fn get_x(&self) -> Fr {
         self.x
     }
 
     /// Returns the `y`-coordinate of this point.
-    pub const fn get_y(&self) -> Fp {
+    pub const fn get_y(&self) -> Fr {
         self.y
     }
 
     /// Returns the `z`-coordinate of this point.
-    pub const fn get_z(&self) -> Fp {
+    pub const fn get_z(&self) -> Fr {
         self.z
     }
 
@@ -247,10 +296,10 @@ impl JubJubExtended {
 /// of the curve. This is not exposed in the API because it is
 /// an implementation detail.
 struct CompletedPoint {
-    x: Fp,
-    y: Fp,
-    z: Fp,
-    t: Fp,
+    x: Fr,
+    y: Fr,
+    z: Fr,
+    t: Fr,
 }
 
 impl CompletedPoint {
@@ -276,12 +325,12 @@ impl CompletedPoint {
 /// This takes a mutable slice of `JubJubExtended`s and "normalizes" them using
 /// only a single inversion for the entire batch. This normalization results in
 /// all of the points having a Z-coordinate of one. Further, an iterator is
-/// returned which can be used to obtain `JubJubAffine`s for each element in the
+/// returned which can be used to obtain `JubjubAffine`s for each element in the
 /// slice.
 ///
 /// This costs 5 multiplications per element, and a field inversion.
 pub fn batch_normalize<'a>(y: &'a mut [JubJubExtended]) -> impl Iterator<Item = JubjubAffine> + 'a {
-    let mut acc = Fp::one();
+    let mut acc = Fr::one();
     for p in y.iter_mut() {
         // We use the `t1` field of `JubJubExtended` to store the product
         // of previous z-coordinates seen.
@@ -304,7 +353,7 @@ pub fn batch_normalize<'a>(y: &'a mut [JubJubExtended]) -> impl Iterator<Item = 
         // Set the coordinates to the correct value
         q.x *= tmp; // Multiply by 1/z
         q.y *= tmp; // Multiply by 1/z
-        q.z = Fp::one(); // z-coordinate is now one
+        q.z = Fr::one(); // z-coordinate is now one
         q.t1 = q.x;
         q.t2 = q.y;
 
@@ -315,11 +364,7 @@ pub fn batch_normalize<'a>(y: &'a mut [JubJubExtended]) -> impl Iterator<Item = 
     // doesn't encode this fact. Let us offer affine points
     // to the caller.
 
-    y.iter().map(|p| JubjubAffine {
-        x: p.x,
-        y: p.y,
-        is_infinity: false,
-    })
+    y.iter().map(|p| JubjubAffine { x: p.x, y: p.y })
 }
 
 impl From<JubjubAffine> for JubJubExtended {
@@ -331,11 +376,7 @@ impl From<JubjubAffine> for JubJubExtended {
 impl JubjubAffine {
     /// Constructs an JubjubAffine given `x` and `y` without checking
     /// that the point is on the curve.
-    pub const fn from_raw_unchecked(x: Fp, y: Fp) -> JubjubAffine {
-        JubjubAffine {
-            x,
-            y,
-            is_infinity: false,
-        }
+    pub const fn to_mont_form_unchecked(x: Fr, y: Fr) -> JubjubAffine {
+        JubjubAffine { x, y }
     }
 }

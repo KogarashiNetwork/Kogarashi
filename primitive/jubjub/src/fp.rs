@@ -1,6 +1,7 @@
 use crate::error::Error;
 use dusk_bytes::Serializable;
 use serde::{Deserialize, Serialize};
+use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zero_bls12_381::Fr;
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;
@@ -266,6 +267,12 @@ impl From<Fp> for Fr {
     }
 }
 
+impl ConstantTimeEq for Fp {
+    fn ct_eq(&self, other: &Self) -> Choice {
+        self.0.ct_eq(&other.0)
+    }
+}
+
 impl Serializable<32> for Fp {
     type Error = Error;
 
@@ -316,5 +323,16 @@ impl Serializable<32> for Fp {
         tmp *= Self(R2);
 
         Ok(tmp)
+    }
+}
+
+impl ConditionallySelectable for Fp {
+    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
+        Fp([
+            u64::conditional_select(&a.0[0], &b.0[0], choice),
+            u64::conditional_select(&a.0[1], &b.0[1], choice),
+            u64::conditional_select(&a.0[2], &b.0[2], choice),
+            u64::conditional_select(&a.0[3], &b.0[3], choice),
+        ])
     }
 }

@@ -1,13 +1,14 @@
 use core::borrow::Borrow;
 use core::iter::{Product, Sum};
 use dusk_bytes::{Error as BytesError, Serializable};
-use subtle::{Choice, ConditionallySelectable};
+use serde::{Deserialize, Serialize};
+use subtle::{Choice, ConditionallySelectable, ConstantTimeEq};
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::arithmetic::utils::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
-#[derive(Clone, Copy, Decode, Encode)]
+#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fr(pub [u64; 4]);
 
 const MODULUS: [u64; 4] = [
@@ -157,6 +158,20 @@ impl Fr {
             }
         }
     }
+
+    /// Computes `2^X` where X is a `u64` without the need to generate
+    /// an array in the stack as `pow` & `pow_vartime` require.
+    pub fn pow_of_2(by: u64) -> Self {
+        let two = Self::from(2u64);
+        let mut res = Self::one();
+        for i in (0..64).rev() {
+            res = res.square();
+            let mut tmp = res;
+            tmp *= two;
+            res.conditional_assign(&tmp, (((by >> i) & 0x1) as u8).into());
+        }
+        res
+    }
 }
 
 impl<T> Product<T> for Fr
@@ -246,5 +261,11 @@ impl ConditionallySelectable for Fr {
             u64::conditional_select(&a.0[2], &b.0[2], choice),
             u64::conditional_select(&a.0[3], &b.0[3], choice),
         ])
+    }
+}
+
+impl ConstantTimeEq for Fr {
+    fn ct_eq(&self, other: &Self) -> Choice {
+        self.0.ct_eq(&other.0)
     }
 }
