@@ -2,7 +2,7 @@ use core::borrow::Borrow;
 use core::iter::{Product, Sum};
 use dusk_bytes::{Error as BytesError, Serializable};
 use serde::{Deserialize, Serialize};
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq};
+use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::arithmetic::utils::*;
 use zero_crypto::common::*;
@@ -157,6 +157,45 @@ impl Fr {
                 t = t2;
             }
         }
+    }
+
+    /// Exponentiates `self` by `by`, where `by` is a
+    /// little-endian order integer exponent.
+    ///
+    /// **This operation is variable time with respect
+    /// to the exponent.** If the exponent is fixed,
+    /// this operation is effectively constant time.
+    pub fn pow_vartime(&self, by: &[u64; 4]) -> Self {
+        let mut res = Self::one();
+        for e in by.iter().rev() {
+            for i in (0..64).rev() {
+                res = res.square();
+
+                if ((*e >> i) & 1) == 1 {
+                    res.mul_assign(self);
+                }
+            }
+        }
+        res
+    }
+
+    /// Computes the square root of this element, if it exists.
+    pub fn sqrt(&self) -> CtOption<Self> {
+        // Because r = 3 (mod 4)
+        // sqrt can be done with only one exponentiation,
+        // via the computation of  self^((r + 1) // 4) (mod r)
+        let sqrt = self.pow_vartime(&[
+            0xb425c397b5bdcb2e,
+            0x299a0824f3320420,
+            0x4199cec0404d0ec0,
+            0x039f6d3a994cebea,
+        ]);
+
+        CtOption::new(
+            sqrt,
+            (&sqrt * &sqrt).ct_eq(self), /* Only return Some if it's the
+                                          * square root. */
+        )
     }
 
     /// Computes `2^X` where X is a `u64` without the need to generate
