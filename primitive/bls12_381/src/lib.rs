@@ -42,6 +42,7 @@ mod fqn;
 mod fr;
 mod g1;
 mod g2;
+mod gt;
 pub mod params;
 
 pub use fq::Fq;

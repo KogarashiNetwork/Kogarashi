@@ -218,7 +218,7 @@ impl Fr {
                 res = res.square();
 
                 if ((*e >> i) & 1) == 1 {
-                    res.mul_assign(self);
+                    res.mul_assign(*self);
                 }
             }
         }

@@ -27,10 +27,7 @@ macro_rules! group_operation {
 
         impl PartialEq for $field {
             fn eq(&self, other: &Self) -> bool {
-                self.0[0] == other.0[0]
-                    && self.0[1] == other.0[1]
-                    && self.0[2] == other.0[2]
-                    && self.0[3] == other.0[3]
+                self.0.iter().zip(other.0.iter()).all(|(a, b)| a == b)
             }
         }
 
@@ -96,6 +93,15 @@ macro_rules! group_operation {
 #[macro_export]
 macro_rules! group_arithmetic_extension {
     ($field:ident) => {
+        impl<'a> Neg for &'a $field {
+            type Output = $field;
+
+            #[inline]
+            fn neg(self) -> $field {
+                -self
+            }
+        }
+
         impl AddAssign for $field {
             fn add_assign(&mut self, rhs: $field) {
                 *self = *self + rhs;
@@ -177,15 +183,8 @@ macro_rules! group_arithmetic_extension {
         }
 
         impl MulAssign<<Self as Group>::Scalar> for $field {
-            fn mul_assign(&mut self, rhs: $field) {
+            fn mul_assign(&mut self, rhs: <Self as Group>::Scalar) {
                 *self = *self * rhs;
-            }
-        }
-
-        impl<'b> MulAssign<&'b $field> for $field {
-            #[inline]
-            fn mul_assign(&mut self, rhs: &'b $field) {
-                *self = &*self * rhs;
             }
         }
 
@@ -193,8 +192,8 @@ macro_rules! group_arithmetic_extension {
             type Output = Self;
 
             #[inline]
-            fn mul(self, rhs: &'b $field) -> Self {
-                &self * rhs
+            fn mul(self, rhs: &'b $field) -> $field {
+                self * rhs
             }
         }
 

@@ -86,3 +86,16 @@ fn multi_miller_loop_test() {
         assert_eq!(expected, test);
     }
 }
+
+#[test]
+fn unitary_test() {
+    let g = G1Affine::ADDITIVE_GENERATOR;
+    let h = G2Affine::ADDITIVE_GENERATOR;
+
+    let p = TatePairing::pairing(g, h).conjugate();
+    let q = TatePairing::pairing(g, -h);
+    let r = TatePairing::pairing(-g, h);
+
+    assert_eq!(p, q);
+    assert_eq!(q, r);
+}
