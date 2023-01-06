@@ -96,6 +96,23 @@ macro_rules! affine_group_operation {
                 res
             }
         }
+
+        impl<'b> Mul<&'b <Self as Group>::Scalar> for $affine {
+            type Output = $affine;
+
+            fn mul(self, rhs: &'b <Self as Group>::Scalar) -> $affine {
+                let mut res = Self::Output::ADDITIVE_IDENTITY;
+                let mut acc = self.clone();
+                let bits: Vec<u8> = rhs.to_bits().into_iter().skip_while(|x| *x == 0).collect();
+                for &b in bits.iter().rev() {
+                    if b == 1 {
+                        res += acc.clone();
+                    }
+                    acc = acc.double();
+                }
+                res
+            }
+        }
     };
 }
 
@@ -197,6 +214,23 @@ macro_rules! projective_group_operation {
                 res
             }
         }
+
+        impl<'b> Mul<&'b <Self as Group>::Scalar> for $projective {
+            type Output = $projective;
+
+            fn mul(self, rhs: &'b <Self as Group>::Scalar) -> $projective {
+                let mut res = Self::Output::ADDITIVE_IDENTITY;
+                let mut acc = self.clone();
+                let bits: Vec<u8> = rhs.to_bits().into_iter().skip_while(|x| *x == 0).collect();
+                for &b in bits.iter().rev() {
+                    if b == 1 {
+                        res += acc.clone();
+                    }
+                    acc = acc.double();
+                }
+                res
+            }
+        }
     };
 }
 
@@ -286,22 +320,6 @@ macro_rules! curve_arithmetic_extension {
         impl MulAssign<<Self as Group>::Scalar> for $curve {
             fn mul_assign(&mut self, rhs: <Self as Group>::Scalar) {
                 *self = *self * rhs;
-            }
-        }
-
-        impl<'b> Mul<&'b <Self as Group>::Scalar> for $curve {
-            type Output = $curve;
-
-            fn mul(self, rhs: &'b <Self as Group>::Scalar) -> $curve {
-                self * rhs
-            }
-        }
-
-        impl<'a> Mul<$curve> for &'a $curve {
-            type Output = $curve;
-
-            fn mul(self, rhs: $curve) -> $curve {
-                self * rhs
             }
         }
     };
