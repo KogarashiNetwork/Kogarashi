@@ -1,6 +1,9 @@
 // This trait resresents prime field
 
-use core::fmt::Debug;
+use core::{
+    fmt::Debug,
+    ops::{BitAnd, BitXor},
+};
 
 use super::{
     algebra::Field,
@@ -29,7 +32,7 @@ pub trait PrimeField: Field + Basic + ParityCmp {
     fn square_assign(&mut self);
 }
 
-pub trait FieldRepr: Debug {
+pub trait FieldRepr: Debug + BitAnd + BitXor + Sized {
     const LIMBS_LENGTH: usize;
 
     // map from montgomery to normal form

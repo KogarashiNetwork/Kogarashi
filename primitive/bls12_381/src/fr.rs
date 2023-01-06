@@ -74,6 +74,52 @@ impl Fr {
     }
 }
 
+impl<'a, 'b> BitXor<&'b Fr> for &'a Fr {
+    type Output = Fr;
+
+    fn bitxor(self, rhs: &'b Fr) -> Fr {
+        let a_red = self.montgomery_reduce();
+        let b_red = rhs.montgomery_reduce();
+        Fr::to_mont_form([
+            a_red[0] ^ b_red[0],
+            a_red[1] ^ b_red[1],
+            a_red[2] ^ b_red[2],
+            a_red[3] ^ b_red[3],
+        ])
+    }
+}
+
+impl BitXor<Fr> for Fr {
+    type Output = Fr;
+
+    fn bitxor(self, rhs: Fr) -> Fr {
+        &self ^ &rhs
+    }
+}
+
+impl<'a, 'b> BitAnd<&'b Fr> for &'a Fr {
+    type Output = Fr;
+
+    fn bitand(self, rhs: &'b Fr) -> Fr {
+        let a_red = self.montgomery_reduce();
+        let b_red = rhs.montgomery_reduce();
+        Fr::to_mont_form([
+            a_red[0] & b_red[0],
+            a_red[1] & b_red[1],
+            a_red[2] & b_red[2],
+            a_red[3] & b_red[3],
+        ])
+    }
+}
+
+impl BitAnd<Fr> for Fr {
+    type Output = Self;
+
+    fn bitand(self, rhs: Self) -> Fr {
+        &self & &rhs
+    }
+}
+
 fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 
 #[test]

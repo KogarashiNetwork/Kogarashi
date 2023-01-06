@@ -18,6 +18,7 @@
 //! - [`JubjubAffine`]
 //!
 
+use crate::fp::Fp;
 use dusk_bytes::{Error as BytesError, Serializable};
 use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zero_bls12_381::Fr;
@@ -1160,3 +1161,23 @@ pub fn batch_normalize<'a>(y: &'a mut [JubJubExtended]) -> impl Iterator<Item = 
 
     y.iter().map(|p| JubJubAffine { x: p.x, y: p.y })
 }
+
+impl<'a, 'b> Mul<&'b Fp> for &'a AffineNielsPoint {
+    type Output = JubJubExtended;
+
+    fn mul(self, other: &'b Fp) -> JubJubExtended {
+        self.multiply(&other.to_bytes())
+    }
+}
+
+impl_binops_multiplicative_mixed!(AffineNielsPoint, Fp, JubJubExtended);
+
+impl<'a, 'b> Mul<&'b Fp> for &'a JubJubExtended {
+    type Output = JubJubExtended;
+
+    fn mul(self, other: &'b Fp) -> JubJubExtended {
+        self.multiply(&other.to_bytes())
+    }
+}
+
+impl_binops_multiplicative!(JubJubExtended, Fp);
