@@ -109,7 +109,7 @@ macro_rules! curve_operation {
                     Some(z_inv) => Self::Affine {
                         x: self.x * z_inv,
                         y: self.y * z_inv,
-                        is_infinity: self.z == Self::Range::zero(),
+                        is_infinity: false,
                     },
                     None => Self::Affine::ADDITIVE_IDENTITY,
                 }

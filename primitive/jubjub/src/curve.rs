@@ -1130,7 +1130,7 @@ pub fn batch_normalize<'a>(y: &'a mut [JubJubExtended]) -> impl Iterator<Item = 
         // We use the `t1` field of `JubJubExtended` to store the product
         // of previous z-coordinates seen.
         p.t1 = acc;
-        acc *= &p.z;
+        acc *= p.z;
     }
 
     // This is the inverse, as all z-coordinates are nonzero.
@@ -1143,11 +1143,11 @@ pub fn batch_normalize<'a>(y: &'a mut [JubJubExtended]) -> impl Iterator<Item = 
         let tmp = q.t1 * acc;
 
         // Cancel out z-coordinate in denominator of `acc`
-        acc *= &q.z;
+        acc *= q.z;
 
         // Set the coordinates to the correct value
-        q.x *= &tmp; // Multiply by 1/z
-        q.y *= &tmp; // Multiply by 1/z
+        q.x *= tmp; // Multiply by 1/z
+        q.y *= tmp; // Multiply by 1/z
         q.z = Fr::one(); // z-coordinate is now one
         q.t1 = q.x;
         q.t2 = q.y;

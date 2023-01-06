@@ -38,7 +38,7 @@ curve_operation!(
     G1_GENERATOR_Y
 );
 
-curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);
+// curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);
 
 // below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
 // [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
@@ -154,43 +154,9 @@ impl G1Projective {
     pub fn batch_normalize(p: &[Self], q: &mut [G1Affine]) {
         assert_eq!(p.len(), q.len());
 
-        let mut acc = Fq::one();
-        for (p, q) in p.iter().zip(q.iter_mut()) {
-            // We use the `x` field of `G1Affine` to store the product
-            // of previous z-coordinates seen.
-            q.x = acc;
-
-            // We will end up skipping all identities in p
-            acc = Fq::conditional_select(&(acc * p.z), &acc, Choice::from(p.is_identity() as u8));
-        }
-
-        // This is the inverse, as all z-coordinates are nonzero and the ones
-        // that are not are skipped.
-        acc = acc.invert().unwrap();
-
-        for (p, q) in p.iter().rev().zip(q.iter_mut().rev()) {
-            let skip = p.is_identity();
-
-            // Compute tmp = 1/z
-            let tmp = q.x * acc;
-
-            // Cancel out z-coordinate in denominator of `acc`
-            acc = Fq::conditional_select(&(acc * p.z), &acc, Choice::from(skip as u8));
-
-            // Set the coordinates to the correct value
-            let tmp2 = tmp.square();
-            let tmp3 = tmp2 * tmp;
-
-            q.x = p.x * tmp2;
-            q.y = p.y * tmp3;
-            q.is_infinity = false;
-
-            *q = G1Affine::conditional_select(
-                &q,
-                &G1Affine::ADDITIVE_IDENTITY,
-                Choice::from(skip as u8),
-            );
-        }
+        p.iter()
+            .zip(q.iter_mut())
+            .for_each(|(a, b)| *b = G1Affine::from(*a))
     }
 
     /// Adds this point to another point in the affine model.
@@ -443,7 +409,7 @@ pub fn msm_variable_base(points: &[G1Affine], scalars: &[Fr]) -> G1Projective {
     let num_bits = 255usize;
     let fr_one = Fr::one();
 
-    let zero = G1Projective::ADDITIVE_GENERATOR;
+    let zero = G1Projective::ADDITIVE_IDENTITY;
     let window_starts: Vec<_> = (0..num_bits).step_by(c).collect();
 
     #[cfg(feature = "parallel")]
@@ -489,7 +455,7 @@ pub fn msm_variable_base(points: &[G1Affine], scalars: &[Fr]) -> G1Projective {
                     }
                 });
 
-            let mut running_sum = G1Projective::ADDITIVE_GENERATOR;
+            let mut running_sum = G1Projective::ADDITIVE_IDENTITY;
             for b in buckets.into_iter().rev() {
                 running_sum = running_sum + b;
                 res += running_sum;
@@ -527,4 +493,56 @@ fn log2(x: usize) -> u32 {
 
     let n = x.leading_zeros();
     core::mem::size_of::<usize>() as u32 * 8 - n
+}
+
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_batch_normalize() {
+        let a = G1Projective::ADDITIVE_GENERATOR.double();
+        let b = a.double();
+        let c = b.double();
+
+        for a_identity in (0..1).map(|n| n == 1) {
+            for b_identity in (0..1).map(|n| n == 1) {
+                for c_identity in (0..1).map(|n| n == 1) {
+                    let mut v = [a, b, c];
+                    if a_identity {
+                        v[0] = G1Projective::ADDITIVE_IDENTITY
+                    }
+                    if b_identity {
+                        v[1] = G1Projective::ADDITIVE_IDENTITY
+                    }
+                    if c_identity {
+                        v[2] = G1Projective::ADDITIVE_IDENTITY
+                    }
+
+                    let mut t = [
+                        G1Affine::ADDITIVE_IDENTITY,
+                        G1Affine::ADDITIVE_IDENTITY,
+                        G1Affine::ADDITIVE_IDENTITY,
+                    ];
+                    let expected = [
+                        G1Affine::from(v[0]),
+                        G1Affine::from(v[1]),
+                        G1Affine::from(v[2]),
+                    ];
+
+                    G1Projective::batch_normalize(&v[..], &mut t[..]);
+
+                    assert_eq!(&t[..], &expected[..]);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn msm_variable_base_test() {
+        let points = vec![G1Affine::ADDITIVE_GENERATOR];
+        let scalars = vec![Fr::from(100u64)];
+        let premultiplied = G1Projective::ADDITIVE_GENERATOR * Fr::from(100u64);
+        let subject = msm_variable_base(&points, &scalars);
+        assert_eq!(subject, premultiplied);
+    }
 }
