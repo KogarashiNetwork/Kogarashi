@@ -72,6 +72,15 @@ macro_rules! group_operation {
             }
         }
 
+        impl<'a, 'b> Mul<&'b $field> for &'a $field {
+            type Output = $field;
+
+            #[inline]
+            fn mul(self, rhs: &'b $field) -> $field {
+                $field(mul(self.0, rhs.0, $p, $inv))
+            }
+        }
+
         impl $field {
             pub const fn zero() -> Self {
                 Self(zero())
@@ -110,7 +119,7 @@ macro_rules! group_arithmetic_extension {
         }
 
         impl<'b> Add<&'b $field> for $field {
-            type Output = Self;
+            type Output = $field;
 
             #[inline]
             fn add(self, rhs: &'b $field) -> Self {
@@ -119,10 +128,10 @@ macro_rules! group_arithmetic_extension {
         }
 
         impl<'a> Add<$field> for &'a $field {
-            type Output = Self;
+            type Output = $field;
 
             #[inline]
-            fn add(self, rhs: $field) -> Self {
+            fn add(self, rhs: $field) -> $field {
                 self + rhs
             }
         }
@@ -177,15 +186,6 @@ macro_rules! group_arithmetic_extension {
             #[inline]
             fn mul_assign(&mut self, rhs: &'b $field) {
                 *self = &*self * rhs;
-            }
-        }
-
-        impl<'a, 'b> Mul<&'b $field> for &'a $field {
-            type Output = $field;
-
-            #[inline]
-            fn mul(self, rhs: &'b $field) -> $field {
-                self * rhs
             }
         }
 
