@@ -1,6 +1,6 @@
 use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
-use zero_bls12_381::{Fq12, Fr, G1Affine, G2Affine};
+use zero_bls12_381::{Fq12, Fr, G1Affine, G2Affine, G2PairingAffine};
 use zero_crypto::behave::{Group, Pairing, PairingRange};
 use zero_pairing::TatePairing;
 
@@ -21,13 +21,10 @@ fn pairing_test() {
     let mut rng = XorShiftRng::from_seed([
         0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
     ]);
-    let mut rng_alt = XorShiftRng::from_seed([
-        0xf, 0xe, 0xd, 0xc, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1, 0x0,
-    ]);
 
     for _ in 0..10 {
         let a = Fr::random(&mut rng);
-        let b = Fr::random(&mut rng_alt);
+        let b = Fr::random(&mut rng);
         let c = a * b;
 
         let g = G1Affine::from(g1 * a);
@@ -44,4 +41,48 @@ fn pairing_test() {
 #[test]
 fn final_exp_test() {
     assert_eq!(Fq12::one().final_exp().unwrap(), Fq12::one());
+}
+
+#[test]
+fn multi_miller_loop_test() {
+    let mut rng = XorShiftRng::from_seed([
+        0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    ]);
+
+    for _ in 0..5 {
+        let a1 = G1Affine::ADDITIVE_GENERATOR;
+        let b1 = G2Affine::ADDITIVE_GENERATOR;
+        let a2 = a1 * Fr::random(&mut rng);
+        let b2 = b1 * Fr::random(&mut rng);
+        let a3 = a1 * Fr::random(&mut rng);
+        let b3 = b1 * Fr::random(&mut rng);
+        let a4 = a1 * Fr::random(&mut rng);
+        let b4 = b1 * Fr::random(&mut rng);
+        let a5 = a1 * Fr::random(&mut rng);
+        let b5 = b1 * Fr::random(&mut rng);
+
+        let b1_pairing = G2PairingAffine::from(b1);
+        let b2_pairing = G2PairingAffine::from(b2);
+        let b3_pairing = G2PairingAffine::from(b3);
+        let b4_pairing = G2PairingAffine::from(b4);
+        let b5_pairing = G2PairingAffine::from(b5);
+
+        let expected = TatePairing::pairing(a1, b1)
+            * TatePairing::pairing(a2, b2)
+            * TatePairing::pairing(a3, b3)
+            * TatePairing::pairing(a4, b4)
+            * TatePairing::pairing(a5, b5);
+
+        let test = TatePairing::multi_miller_loop(&[
+            (a1, b1_pairing),
+            (a2, b2_pairing),
+            (a3, b3_pairing),
+            (a4, b4_pairing),
+            (a5, b5_pairing),
+        ])
+        .final_exp()
+        .unwrap();
+
+        assert_eq!(expected, test);
+    }
 }

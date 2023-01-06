@@ -16,9 +16,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use zero_bls12_381::params::{BLS_X, BLS_X_IS_NEGATIVE};
-use zero_bls12_381::{
-    Fq12, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective, PairingCoeff,
-};
+use zero_bls12_381::{Fq12, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective};
 use zero_crypto::common::{Curve, G2Pairing, Pairing, PairingRange, PrimeField, Vec};
 
 // tate pairing with miller algorithm
