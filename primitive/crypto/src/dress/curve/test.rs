@@ -68,9 +68,7 @@ macro_rules! curve_test {
 
                         // a + a = a * 8
                         let scalared_a = a * $field::from(8 as u64);
-                        let aa =a.double();
-                        let a_4 = aa.double();
-                        let a_8 = a_4.double();
+                        let a_8 =a.double().double().double();
 
                         assert!(scalared_a.is_on_curve());
                         assert!(a_8.is_on_curve());
@@ -177,9 +175,7 @@ macro_rules! curve_test {
 
                         // a + a = a * 8
                         let scalared_a = a * $field::from(8 as u64);
-                        let aa =a.double();
-                        let a_4 = aa.double();
-                        let a_8 = a_4.double();
+                        let a_8 =a.double().double().double();
 
                         assert!(scalared_a.is_on_curve());
                         assert!(a_8.is_on_curve());
@@ -220,6 +216,86 @@ macro_rules! curve_test {
 
                         assert!(projective.is_on_curve());
                         assert_eq!(a, projective);
+                    }
+                }
+            }
+
+            paste! {
+                #[test]
+                fn [< $test_name _mix_addition_test >]() {
+                    let a = $affine::random(OsRng);
+                    let b = $projective::random(OsRng);
+                    let c = $affine::random(OsRng);
+
+                    // a + b + c = c + a + b
+                    let ab = a + b;
+                    let abc = ab + c;
+                    let ca = c + a;
+                    let cab = ca + b;
+
+                    // 2 * (a + b) = 2 * a + 2 * b
+                    let double_ab = ab.double();
+                    let aa = a.double();
+                    let bb = b.double();
+                    let aabb = aa + bb;
+
+                    assert!(abc.is_on_curve());
+                    assert!(cab.is_on_curve());
+                    assert!(double_ab.is_on_curve());
+                    assert!(aabb.is_on_curve());
+                    assert_eq!(abc, cab);
+                    assert_eq!(double_ab, aabb);
+                }
+            }
+
+            paste! {
+                #[test]
+                fn [< $test_name _mix_doubling_test >]() {
+                    for _ in 0..$iter_times {
+                        let a = $projective::random(OsRng);
+                        let b = a.to_affine();
+
+                        // a + a = a * 8
+                        let scalared_a = a * $field::from(8 as u64);
+                        let a_8 = a.double().double().double();
+                        let b_8 = b.double().double().double();
+
+                        assert!(scalared_a.is_on_curve());
+                        assert!(a_8.is_on_curve());
+                        assert_eq!(scalared_a, a_8);
+                        assert_eq!($affine::from(a_8), b_8);
+                    }
+                }
+            }
+
+            paste! {
+                #[test]
+                fn [< $test_name _mix_scalar_test >]() {
+                    for _ in 0..$iter_times {
+                        let g = $projective::random(OsRng);
+                        let h = $affine::random(OsRng);
+
+                        // 7 * G + 16 * G = 23 * G
+                        let ag = g * $field::from(7 as u64);
+                        let bg = g * $field::from(16 as u64);
+                        let agbg = ag + bg;
+
+                        let abg = g * $field::from(23 as u64);
+
+                        // 7 * H + 16 * H = 23 * H
+                        let ah = h * $field::from(7 as u64);
+                        let bh = h * $field::from(16 as u64);
+                        let ahbh = ah + bh;
+
+                        let abh = h * $field::from(23 as u64);
+
+                        assert!(agbg.is_on_curve());
+                        assert!(abg.is_on_curve());
+                        assert_eq!(agbg, abg);
+                        assert!(ahbh.is_on_curve());
+                        assert!(abh.is_on_curve());
+                        assert_eq!(ahbh, abh);
+                        assert_eq!($affine::from(agbg), ahbh);
                     }
                 }
             }
