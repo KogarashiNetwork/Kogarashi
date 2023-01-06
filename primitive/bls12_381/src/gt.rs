@@ -2,8 +2,8 @@ use crate::{Fq12, Fr};
 use zero_crypto::common::*;
 use zero_crypto::group_arithmetic_extension;
 
-#[derive(Clone, Copy)]
-pub struct Gt(Fq12);
+#[derive(Debug, Clone, Copy)]
+pub struct Gt(pub Fq12);
 
 impl Group for Gt {
     type Scalar = Fr;

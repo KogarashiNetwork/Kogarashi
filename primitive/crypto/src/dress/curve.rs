@@ -12,6 +12,7 @@ macro_rules! curve_operation {
 
         affine_group_operation!($affine, $range, $scalar, $x, $y);
         projective_group_operation!($projective, $range, $scalar, $x, $y);
+        mixed_curve_operation!($affine, $projective);
 
         impl ParityCmp for $affine {}
         impl ParityCmp for $projective {}
@@ -142,4 +143,53 @@ macro_rules! curve_operation {
     };
 }
 
-pub use curve_operation;
+#[macro_export]
+macro_rules! mixed_curve_operation {
+    ($affine:ident, $projective:ident) => {
+        impl Add<$projective> for $affine {
+            type Output = $projective;
+
+            fn add(self, rhs: $projective) -> $projective {
+                add_point(self.to_projective(), rhs)
+            }
+        }
+
+        impl Sub<$projective> for $affine {
+            type Output = $projective;
+
+            fn sub(self, rhs: $projective) -> $projective {
+                add_point(self.to_projective(), -rhs)
+            }
+        }
+
+        impl Add<$affine> for $projective {
+            type Output = $projective;
+
+            fn add(self, rhs: $affine) -> $projective {
+                add_point(self, rhs.to_projective())
+            }
+        }
+
+        impl Sub<$affine> for $projective {
+            type Output = $projective;
+
+            fn sub(self, rhs: $affine) -> $projective {
+                add_point(self, -rhs.to_projective())
+            }
+        }
+
+        impl AddAssign<$affine> for $projective {
+            fn add_assign(&mut self, rhs: $affine) {
+                *self += rhs.to_projective()
+            }
+        }
+
+        impl SubAssign<$affine> for $projective {
+            fn sub_assign(&mut self, rhs: $affine) {
+                *self -= rhs.to_projective()
+            }
+        }
+    };
+}
+
+pub use {curve_operation, mixed_curve_operation};

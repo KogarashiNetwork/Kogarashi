@@ -1,6 +1,6 @@
 use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
-use zero_bls12_381::{Fq12, Fr, G1Affine, G2Affine, G2PairingAffine};
+use zero_bls12_381::{Fq12, Fr, G1Affine, G2Affine, G2PairingAffine, Gt};
 use zero_crypto::behave::{Group, Pairing, PairingRange};
 use zero_pairing::TatePairing;
 
@@ -8,7 +8,7 @@ use zero_pairing::TatePairing;
 fn generator_pairing_test() {
     let g1 = G1Affine::ADDITIVE_GENERATOR;
     let g2 = G2Affine::ADDITIVE_GENERATOR;
-    let gt = Fq12::generator();
+    let gt = Gt::ADDITIVE_GENERATOR;
 
     assert_eq!(gt, TatePairing::pairing(g1, g2));
 }
@@ -40,7 +40,7 @@ fn pairing_test() {
 
 #[test]
 fn final_exp_test() {
-    assert_eq!(Fq12::one().final_exp().unwrap(), Fq12::one());
+    assert_eq!(Fq12::one().final_exp(), Gt::ADDITIVE_IDENTITY);
 }
 
 #[test]
@@ -68,10 +68,10 @@ fn multi_miller_loop_test() {
         let b5_pairing = G2PairingAffine::from(b5);
 
         let expected = TatePairing::pairing(a1, b1)
-            * TatePairing::pairing(a2, b2)
-            * TatePairing::pairing(a3, b3)
-            * TatePairing::pairing(a4, b4)
-            * TatePairing::pairing(a5, b5);
+            + TatePairing::pairing(a2, b2)
+            + TatePairing::pairing(a3, b3)
+            + TatePairing::pairing(a4, b4)
+            + TatePairing::pairing(a5, b5);
 
         let test = TatePairing::multi_miller_loop(&[
             (a1, b1_pairing),
@@ -80,8 +80,7 @@ fn multi_miller_loop_test() {
             (a4, b4_pairing),
             (a5, b5_pairing),
         ])
-        .final_exp()
-        .unwrap();
+        .final_exp();
 
         assert_eq!(expected, test);
     }
@@ -92,7 +91,7 @@ fn unitary_test() {
     let g = G1Affine::ADDITIVE_GENERATOR;
     let h = G2Affine::ADDITIVE_GENERATOR;
 
-    let p = TatePairing::pairing(g, h).conjugate();
+    let p = -TatePairing::pairing(g, h);
     let q = TatePairing::pairing(g, -h);
     let r = TatePairing::pairing(-g, h);
 

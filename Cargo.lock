@@ -916,6 +916,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "dusk-bls12_381"
+version = "0.11.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41fc81248ab76f1739dd4241ea2e7037a4d4cb0bd170443a7049e13b0e09acd6"
+dependencies = [
+ "bytecheck",
+ "byteorder",
+ "canonical",
+ "canonical_derive",
+ "dusk-bytes",
+ "rand_core 0.6.3",
+ "rayon",
+ "rkyv",
+ "subtle 2.4.1",
+]
+
+[[package]]
 name = "dusk-bytes"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -937,6 +954,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "dusk-jubjub"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c228f2adec5255faf67fe6d106caa093a6c2ef798dca42019b684716528250ff"
+dependencies = [
+ "bytecheck",
+ "canonical",
+ "canonical_derive",
+ "dusk-bls12_381",
+ "dusk-bytes",
+ "rand_core 0.6.3",
+ "rkyv",
+ "subtle 2.4.1",
+]
+
+[[package]]
 name = "dusk-plonk"
 version = "0.13.1"
 dependencies = [
@@ -946,8 +979,10 @@ dependencies = [
  "canonical_derive",
  "cfg-if",
  "criterion",
+ "dusk-bls12_381",
  "dusk-bytes",
  "dusk-cdf",
+ "dusk-jubjub",
  "hashbrown 0.9.1",
  "itertools 0.9.0",
  "merlin 3.0.0",
@@ -1377,6 +1412,9 @@ name = "hashbrown"
 version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
+dependencies = [
+ "ahash 0.7.6",
+]
 
 [[package]]
 name = "hermit-abi"
@@ -2532,6 +2570,7 @@ version = "0.7.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cec2b3485b07d96ddfd3134767b8a447b45ea4eb91448d0a35180ec0ffd5ed15"
 dependencies = [
+ "hashbrown 0.12.3",
  "ptr_meta",
  "rkyv_derive",
  "seahash",

@@ -1,10 +1,11 @@
 #[macro_export]
 macro_rules! bls12_range_field_pairing {
-    ($range_field:ident, $quadratic_field:ident, $g1_affine:ident, $pairng_coeff:ident, $bls_x:ident, $bls_x_is_negative:ident) => {
+    ($range_field:ident, $quadratic_field:ident, $gt:ident, $g1_affine:ident, $pairng_coeff:ident, $bls_x:ident, $bls_x_is_negative:ident) => {
         impl PairingRange for $range_field {
             type G1Affine = $g1_affine;
             type G2Coeff = $pairng_coeff;
             type QuadraticField = $quadratic_field;
+            type Gt = $gt;
 
             // twisting isomorphism from E to E'
             fn untwist(self, coeffs: Self::G2Coeff, g1: Self::G1Affine) -> Self {
@@ -39,7 +40,7 @@ macro_rules! bls12_range_field_pairing {
                 Self([c0, c1])
             }
 
-            fn final_exp(self) -> Option<Self> {
+            fn final_exp(self) -> Self::Gt {
                 #[must_use]
                 fn fp4_square(a: Fq2, b: Fq2) -> (Fq2, Fq2) {
                     let t0 = a.square();
@@ -115,35 +116,38 @@ macro_rules! bls12_range_field_pairing {
 
                 let mut f = self;
                 let mut t0 = f.frobenius_maps(6);
-                f.invert().map(|mut t1| {
-                    let mut t2 = t0 * t1;
-                    t1 = t2;
-                    t2 = t2.frobenius_maps(2);
-                    t2 *= t1;
-                    t1 = cyclotomic_square(t2).conjugate();
-                    let mut t3 = cycolotomic_exp(t2);
-                    let mut t4 = cyclotomic_square(t3);
-                    let mut t5 = t1 * t3;
-                    t1 = cycolotomic_exp(t5);
-                    t0 = cycolotomic_exp(t1);
-                    let mut t6 = cycolotomic_exp(t0);
-                    t6 *= t4;
-                    t4 = cycolotomic_exp(t6);
-                    t5 = t5.conjugate();
-                    t4 *= t5 * t2;
-                    t5 = t2.conjugate();
-                    t1 *= t2;
-                    t1 = t1.frobenius_maps(3);
-                    t6 *= t5;
-                    t6 = t6.frobenius_map();
-                    t3 *= t0;
-                    t3 = t3.frobenius_maps(2);
-                    t3 *= t1;
-                    t3 *= t6;
-                    f = t3 * t4;
+                $gt(f
+                    .invert()
+                    .map(|mut t1| {
+                        let mut t2 = t0 * t1;
+                        t1 = t2;
+                        t2 = t2.frobenius_maps(2);
+                        t2 *= t1;
+                        t1 = cyclotomic_square(t2).conjugate();
+                        let mut t3 = cycolotomic_exp(t2);
+                        let mut t4 = cyclotomic_square(t3);
+                        let mut t5 = t1 * t3;
+                        t1 = cycolotomic_exp(t5);
+                        t0 = cycolotomic_exp(t1);
+                        let mut t6 = cycolotomic_exp(t0);
+                        t6 *= t4;
+                        t4 = cycolotomic_exp(t6);
+                        t5 = t5.conjugate();
+                        t4 *= t5 * t2;
+                        t5 = t2.conjugate();
+                        t1 *= t2;
+                        t1 = t1.frobenius_maps(3);
+                        t6 *= t5;
+                        t6 = t6.frobenius_map();
+                        t3 *= t0;
+                        t3 = t3.frobenius_maps(2);
+                        t3 *= t1;
+                        t3 *= t6;
+                        f = t3 * t4;
 
-                    f
-                })
+                        f
+                    })
+                    .unwrap())
             }
         }
 
