@@ -268,20 +268,13 @@ impl ConstantTimeEq for G2Projective {
     fn ct_eq(&self, other: &Self) -> Choice {
         // Is (xz^2, yz^3, z) equal to (x'z'^2, yz'^3, z') when converted to affine?
 
-        let z = other.z.square();
-        let x1 = self.x * z;
-        let z = z * other.z;
-        let y1 = self.y * z;
-        let z = self.z.square();
-        let x2 = other.x * z;
-        let z = z * self.z;
-        let y2 = other.y * z;
+        let self_is_zero = Choice::from(self.is_identity() as u8);
+        let other_is_zero = Choice::from(other.is_identity() as u8);
 
-        let self_is_zero = Choice::from(self.z.is_zero() as u8);
-        let other_is_zero = Choice::from(other.z.is_zero() as u8);
+        let is_same = self.x * other.z == other.x * self.z && self.y * other.z == other.y * self.z;
 
         (self_is_zero & other_is_zero) // Both point at infinity
-            | ((!self_is_zero) & (!other_is_zero) & x1.ct_eq(&x2) & y1.ct_eq(&y2))
+            | Choice::from(is_same as u8)
         // Neither point at infinity, coordinates are the same
     }
 }

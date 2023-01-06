@@ -211,14 +211,6 @@ macro_rules! curve_arithmetic_extension {
             }
         }
 
-        impl<'a> Neg for &'a $curve {
-            type Output = $curve;
-
-            fn neg(self) -> $curve {
-                -self
-            }
-        }
-
         impl AddAssign for $curve {
             fn add_assign(&mut self, rhs: $curve) {
                 *self = *self + rhs;
