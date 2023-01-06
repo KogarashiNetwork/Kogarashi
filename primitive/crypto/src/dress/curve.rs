@@ -180,13 +180,13 @@ macro_rules! mixed_curve_operation {
 
         impl AddAssign<$affine> for $projective {
             fn add_assign(&mut self, rhs: $affine) {
-                *self += rhs.to_projective()
+                *self = add_point(*self, rhs.to_projective())
             }
         }
 
         impl SubAssign<$affine> for $projective {
             fn sub_assign(&mut self, rhs: $affine) {
-                *self -= rhs.to_projective()
+                *self = add_point(*self, -rhs.to_projective())
             }
         }
     };

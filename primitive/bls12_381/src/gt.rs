@@ -1,6 +1,5 @@
 use crate::{Fq12, Fr};
 use zero_crypto::common::*;
-use zero_crypto::group_arithmetic_extension;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Gt(pub Fq12);
@@ -78,10 +77,26 @@ impl Mul<Fr> for Gt {
     }
 }
 
+impl MulAssign<Fr> for Gt {
+    fn mul_assign(&mut self, rhs: Fr) {
+        *self = *self * rhs;
+    }
+}
+
+impl AddAssign for Gt {
+    fn add_assign(&mut self, rhs: Gt) {
+        *self = *self + rhs;
+    }
+}
+
+impl SubAssign for Gt {
+    fn sub_assign(&mut self, rhs: Gt) {
+        *self = *self - rhs;
+    }
+}
+
 impl Gt {
     pub fn double(&self) -> Gt {
         Gt(self.0.square())
     }
 }
-
-group_arithmetic_extension!(Gt);

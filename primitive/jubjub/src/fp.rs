@@ -1,7 +1,7 @@
 use crate::error::Error;
 use dusk_bytes::Serializable;
 use serde::{Deserialize, Serialize};
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
+use subtle::{Choice, ConditionallySelectable, ConstantTimeEq};
 use zero_bls12_381::Fr;
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;

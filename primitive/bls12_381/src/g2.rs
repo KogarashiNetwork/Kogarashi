@@ -2,6 +2,8 @@ use crate::fq::Fq;
 use crate::fqn::{Fq12, Fq2};
 use crate::fr::Fr;
 use crate::params::*;
+use core::borrow::Borrow;
+use core::iter::Sum;
 use dusk_bytes::{Error as BytesError, Serializable};
 use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zero_crypto::arithmetic::bits_384::*;
@@ -306,5 +308,17 @@ impl ConditionallySelectable for G2Projective {
             y: Fq2::conditional_select(&a.y, &b.y, choice),
             z: Fq2::conditional_select(&a.z, &b.z, choice),
         }
+    }
+}
+
+impl<T> Sum<T> for G2Projective
+where
+    T: Borrow<G2Projective>,
+{
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + item.borrow())
     }
 }
