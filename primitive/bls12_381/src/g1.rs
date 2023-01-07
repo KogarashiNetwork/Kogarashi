@@ -155,76 +155,6 @@ impl G1Projective {
             .zip(q.iter_mut())
             .for_each(|(a, b)| *b = G1Affine::from(*a))
     }
-
-    /// Adds this point to another point in the affine model.
-    pub fn add_mixed(&self, rhs: G1Affine) -> G1Projective {
-        // This Jacobian point addition technique is based on the implementation in libsecp256k1,
-        // which assumes that rhs has z=1. Let's address the case of zero z-coordinates generally.
-
-        // If self is the identity, return rhs. Otherwise, return self. The other cases will be
-        // predicated on neither self nor rhs being the identity.
-        let f1 = Choice::from(self.is_identity() as u8);
-        let res = G1Projective::conditional_select(self, &G1Projective::from(rhs), f1);
-        let f2 = Choice::from(rhs.is_identity() as u8);
-
-        // If neither are the identity but x1 = x2 and y1 != y2, then return the identity
-        let u1 = self.x;
-        let s1 = self.y;
-        let z = self.z.square();
-        let u2 = rhs.x * z;
-        let z = z * self.z;
-        let s2 = rhs.y * z;
-        let f3 = u1.ct_eq(&u2) & (!s1.ct_eq(&s2));
-        let res = G1Projective::conditional_select(
-            &res,
-            &G1Projective::ADDITIVE_IDENTITY,
-            (!f1) & (!f2) & f3,
-        );
-
-        let t = u1 + u2;
-        let m = s1 + s2;
-        let rr = t.square();
-        let m_alt = -u2;
-        let tt = u1 * m_alt;
-        let rr = rr + tt;
-
-        // Correct for x1 != x2 but y1 = -y2, which can occur because p - 1 is divisible by 3.
-        // libsecp256k1 does this by substituting in an alternative (defined) expression for lambda.
-        let degenerate = m.is_zero() & rr.is_zero();
-        let rr_alt = s1 + s1;
-        let m_alt = m_alt + u1;
-        let rr_alt = Fq::conditional_select(&rr_alt, &rr, !Choice::from(degenerate as u8));
-        let m_alt = Fq::conditional_select(&m_alt, &m, !Choice::from(degenerate as u8));
-
-        let n = m_alt.square();
-        let q = n * t;
-
-        let n = n.square();
-        let n = Fq::conditional_select(&n, &m, Choice::from(degenerate as u8));
-        let t = rr_alt.square();
-        let z3 = m_alt * self.z;
-        let z3 = z3 + z3;
-        let q = -q;
-        let t = t + q;
-        let x3 = t;
-        let t = t + t;
-        let t = t + q;
-        let t = t * rr_alt;
-        let t = t + n;
-        let y3 = -t;
-        let x3 = x3 + x3;
-        let x3 = x3 + x3;
-        let y3 = y3 + y3;
-        let y3 = y3 + y3;
-
-        let tmp = G1Projective {
-            x: x3,
-            y: y3,
-            z: z3,
-        };
-
-        G1Projective::conditional_select(&res, &tmp, (!f1) & (!f2) & (!f3))
-    }
 }
 
 impl Serializable<48> for G1Affine {
@@ -424,7 +354,7 @@ pub fn msm_variable_base(points: &[G1Affine], scalars: &[Fr]) -> G1Projective {
                     if scalar == fr_one {
                         // We only process unit scalars once in the first window.
                         if w_start == 0 {
-                            res = res.add_mixed(*base);
+                            res = res + (*base);
                         }
                     } else {
                         let mut scalar = scalar.reduce();
@@ -441,7 +371,7 @@ pub fn msm_variable_base(points: &[G1Affine], scalars: &[Fr]) -> G1Projective {
                         // (Recall that `buckets` doesn't have a zero bucket.)
                         if scalar != 0 {
                             buckets[(scalar - 1) as usize] =
-                                buckets[(scalar - 1) as usize].add_mixed(*base);
+                                buckets[(scalar - 1) as usize] + (*base);
                         }
                     }
                 });
