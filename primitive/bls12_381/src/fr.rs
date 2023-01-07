@@ -122,12 +122,21 @@ impl BitAnd<Fr> for Fr {
 
 fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 
-#[test]
-fn test_root_of_unity() {
-    let s = Fr::S;
-    let mut root_of_unity = Fr::ROOT_OF_UNITY;
-    (0..s).for_each(|_| root_of_unity.square_assign());
-    assert_eq!(root_of_unity, Fr::one())
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use paste::paste;
+    use rand_core::OsRng;
+
+    field_test!(bls12_381_scalar, Fr, 1000);
+
+    #[test]
+    fn test_root_of_unity() {
+        let s = Fr::S;
+        let mut root_of_unity = Fr::ROOT_OF_UNITY;
+        (0..s).for_each(|_| root_of_unity.square_assign());
+        assert_eq!(root_of_unity, Fr::one())
+    }
 }
 
 // below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and

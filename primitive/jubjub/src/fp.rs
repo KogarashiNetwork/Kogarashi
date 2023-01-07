@@ -57,6 +57,30 @@ const ROOT_OF_UNITY: Fp = Fp([
 
 fft_field_operation!(Fp, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use paste::paste;
+    use rand_core::OsRng;
+
+    field_test!(fp_field, Fp, 1000);
+
+    #[test]
+    fn test_from_hex() {
+        let a = Fp::from_hex("0x64774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab")
+            .unwrap();
+        assert_eq!(
+            a,
+            Fp([
+                0x4ddc8f91e171cd75,
+                0x9b925835a7d203fb,
+                0x0cdb538ead47e463,
+                0x01a19f85f00d79b8,
+            ])
+        )
+    }
+}
+
 impl Fp {
     pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
@@ -123,31 +147,6 @@ impl Fp {
             }
         }
         Ok(res)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use paste::paste;
-    use rand_core::OsRng;
-    use zero_crypto::dress::field::field_test;
-
-    field_test!(fp_field, Fp, 1000);
-
-    #[test]
-    fn test_from_hex() {
-        let a = Fp::from_hex("0x64774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab")
-            .unwrap();
-        assert_eq!(
-            a,
-            Fp([
-                0x4ddc8f91e171cd75,
-                0x9b925835a7d203fb,
-                0x0cdb538ead47e463,
-                0x01a19f85f00d79b8,
-            ])
-        )
     }
 }
 

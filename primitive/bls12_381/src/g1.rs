@@ -1,8 +1,7 @@
-use crate::fq::Fq;
-use crate::fr::Fr;
 use crate::params::{
     BLS_X, BLS_X_IS_NEGATIVE, G1_GENERATOR_X, G1_GENERATOR_Y, G1_PARAM_A, G1_PARAM_B,
 };
+use crate::{Fq, Fr};
 use core::borrow::Borrow;
 use core::iter::Sum;
 use dusk_bytes::{Error as BytesError, Serializable};
