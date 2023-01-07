@@ -288,7 +288,7 @@ where
     where
         I: Iterator<Item = T>,
     {
-        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + *item.borrow())
+        iter.fold(Self::zero(), |acc, item| acc + *item.borrow())
     }
 }
 
