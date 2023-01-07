@@ -5,215 +5,24 @@ macro_rules! curve_test {
         use paste::paste;
         use rand_core::OsRng;
 
-        paste! {
-            #[test]
-            fn [< $test_name _affine_is_on_curve_test >]() {
-                assert!($affine::ADDITIVE_GENERATOR.is_on_curve());
-                assert!($affine::ADDITIVE_IDENTITY.is_on_curve());
-            }
-        }
+        curve_operation_test!($test_name, affine, $affine, $field, $iter_times);
+        curve_operation_test!($test_name, projective, $projective, $field, $iter_times);
 
         paste! {
             #[test]
-            fn [< $test_name _affine_identity_test >]() {
-                let a = $affine::random(OsRng);
-                // a + (-a) = e
-                let identity = a - a;
-
-                // a + e = a
-                let a_prime = a + $affine::ADDITIVE_IDENTITY;
-
-                assert_eq!(identity, $affine::ADDITIVE_IDENTITY);
-                assert_eq!(a_prime, a);
-            }
-        }
-
-        paste! {
-            #[test]
-            fn [< $test_name _affine_addition_test >]() {
+            fn [< $test_name _coordinate_transformation_test >]() {
                 for _ in 0..$iter_times {
                     let a = $affine::random(OsRng);
-                    let b = $affine::random(OsRng);
-                    let c = $affine::random(OsRng);
-
-                    // a + b + c = c + a + b
-                    let ab = a + b;
-                    let abc = ab + c;
-                    let ca = c + a;
-                    let cab = ca + b;
-
-                    // 2 * (a + b) = 2 * a + 2 * b
-                    let double_ab = ab.double();
-                    let aa = a.double();
-                    let bb = b.double();
-                    let aabb = aa + bb;
-
-                    assert!(abc.is_on_curve());
-                    assert!(cab.is_on_curve());
-                    assert!(double_ab.is_on_curve());
-                    assert!(aabb.is_on_curve());
-                    assert_eq!(abc, cab);
-                    assert_eq!(double_ab, aabb);
-                }
-            }
-        }
-
-        paste! {
-            #[test]
-            fn [< $test_name _affine_doubling_test >]() {
-                for _ in 0..$iter_times {
-                    let a = $affine::random(OsRng);
-
-                    // a + a = a * 8
-                    let scalared_a = a * $field::from(8 as u64);
-                    let a_8 =a.double().double().double();
-
-                    assert!(scalared_a.is_on_curve());
-                    assert!(a_8.is_on_curve());
-                    assert_eq!(scalared_a, a_8);
-                }
-            }
-        }
-
-        paste! {
-            #[test]
-            fn [< $test_name _affine_scalar_test >]() {
-                for _ in 0..$iter_times {
-                    let g = $affine::random(OsRng);
-
-                    // 7 * G + 16 * G = 23 * G
-                    let ag = g * $field::from(7 as u64);
-                    let bg = g * $field::from(16 as u64);
-                    let agbg = ag + bg;
-
-                    let abg = g * $field::from(23 as u64);
-
-                    assert!(agbg.is_on_curve());
-                    assert!(abg.is_on_curve());
-                    assert_eq!(agbg, abg);
-                }
-            }
-        }
-
-        paste! {
-            #[test]
-            fn [< $test_name _affine_conversion_test >]() {
-                for _ in 0..$iter_times {
-                    let a = $affine::random(OsRng);
-
-                    // affine -> projective -> affine
-                    let projective = a.to_projective();
-                    let affine = $affine::from(projective);
-
-                    assert!(affine.is_on_curve());
-                    assert_eq!(a, affine);
-                }
-            }
-        }
-
-        paste! {
-            #[test]
-            fn [< $test_name _projective_is_on_curve_test >]() {
-                assert!($projective::ADDITIVE_GENERATOR.is_on_curve());
-                assert!($projective::ADDITIVE_IDENTITY.is_on_curve());
-            }
-        }
-
-        paste! {
-            #[test]
-            fn [< $test_name _projective_identity_test >]() {
-                let a = $projective::random(OsRng);
-
-                // a + (-a) = e
-                let identity = a - a;
-
-                // a + e = a
-                let a_prime = a + $projective::ADDITIVE_IDENTITY;
-
-                assert_eq!(identity, $projective::ADDITIVE_IDENTITY);
-                assert_eq!(a_prime, a);
-            }
-        }
-
-        paste! {
-            #[test]
-            fn [< $test_name _projective_addition_test >]() {
-                for _ in 0..$iter_times {
-                    let a = $projective::random(OsRng);
-                    let b = $projective::random(OsRng);
-                    let c = $projective::random(OsRng);
-
-                    // a + b + c = c + a + b
-                    let ab = a + b;
-                    let abc = ab + c;
-                    let ca = c + a;
-                    let cab = ca + b;
-
-                    // 2 * (a + b) = 2 * a + 2 * b
-                    let double_ab = ab.double();
-                    let aa = a.double();
-                    let bb = b.double();
-                    let aabb = aa + bb;
-
-                    assert!(abc.is_on_curve());
-                    assert!(cab.is_on_curve());
-                    assert!(double_ab.is_on_curve());
-                    assert!(aabb.is_on_curve());
-                    assert_eq!(abc, cab);
-                    assert_eq!(double_ab, aabb);
-                }
-            }
-        }
-
-        paste! {
-            #[test]
-            fn [< $test_name _projective_doubling_test >]() {
-                for _ in 0..$iter_times {
-                    let a = $projective::random(OsRng);
-
-                    // a + a = a * 8
-                    let scalared_a = a * $field::from(8 as u64);
-                    let a_8 =a.double().double().double();
-
-                    assert!(scalared_a.is_on_curve());
-                    assert!(a_8.is_on_curve());
-                    assert_eq!(scalared_a, a_8);
-                }
-            }
-        }
-
-        paste! {
-            #[test]
-            fn [< $test_name _projective_scalar_test >]() {
-                for _ in 0..$iter_times {
-                    let g = $projective::random(OsRng);
-
-                    // 7 * G + 16 * G = 23 * G
-                    let ag = g * $field::from(7 as u64);
-                    let bg = g * $field::from(16 as u64);
-                    let agbg = ag + bg;
-
-                    let abg = g * $field::from(23 as u64);
-
-                    assert!(agbg.is_on_curve());
-                    assert!(abg.is_on_curve());
-                    assert_eq!(agbg, abg);
-                }
-            }
-        }
-
-        paste! {
-            #[test]
-            fn [< $test_name _projective_conversion_test >]() {
-                for _ in 0..$iter_times {
-                    let a = $projective::random(OsRng);
+                    let b = $projective::from(a);
 
                     // projective -> affine -> projective
-                    let affine = a.to_affine();
-                    let projective = $projective::from(affine);
+                    let projective = $projective::from(a);
+                    let affine = $affine::from(b);
 
+                    assert!(affine.is_on_curve());
                     assert!(projective.is_on_curve());
-                    assert_eq!(a, projective);
+                    assert_eq!(a, affine);
+                    assert_eq!(b, projective);
                 }
             }
         }
@@ -260,7 +69,7 @@ macro_rules! curve_test {
             fn [< $test_name _mix_doubling_test >]() {
                 for _ in 0..$iter_times {
                     let a = $affine::random(OsRng);
-                    let b = $projective::random(OsRng);
+                    let b = $projective::from(a);
                     let s = $field::from(8 as u64);
 
                     // a + a = a * 8
@@ -288,19 +97,19 @@ macro_rules! curve_test {
                     let g = $affine::random(OsRng);
                     let h = $projective::from(g);
 
-                    // 7 * G + 16 * G = 23 * G
+                    // 2 * (7 * G + 16 * G) = 46 * G
                     let ag = g * $field::from(7 as u64);
                     let bg = g * $field::from(16 as u64);
-                    let agbg = ag + bg;
+                    let agbg = (ag + bg).double();
 
-                    let abg = g * $field::from(23 as u64);
+                    let abg = g * $field::from(46 as u64);
 
-                    // 7 * H + 16 * H = 23 * H
+                    // 2 * (7 * H + 16 * H) = 46 * H
                     let ah = h * $field::from(7 as u64);
                     let bh = h * $field::from(16 as u64);
-                    let ahbh = ah + bh;
+                    let ahbh = (ah + bh).double();
 
-                    let abh = h * $field::from(23 as u64);
+                    let abh = h * $field::from(46 as u64);
 
                     assert_eq!(agbg, abg);
                     assert_eq!(ahbh, abh);
@@ -314,4 +123,99 @@ macro_rules! curve_test {
     };
 }
 
-pub use curve_test;
+#[macro_export]
+macro_rules! curve_operation_test {
+    ($test_name:ident, $curve_name:ident, $curve:ident, $field:ident, $iter_times:expr) => {
+        paste! {
+            #[test]
+            fn [< $test_name _ $curve_name _is_on_curve_test >]() {
+                assert!($curve::ADDITIVE_GENERATOR.is_on_curve());
+                assert!($curve::ADDITIVE_IDENTITY.is_on_curve());
+            }
+        }
+
+        paste! {
+            #[test]
+            fn [< $test_name _ $curve_name _identity_test >]() {
+                let a = $curve::random(OsRng);
+                // a + (-a) = e
+                let identity = a - a;
+
+                // a + e = a
+                let a_prime = a + $curve::ADDITIVE_IDENTITY;
+
+                assert_eq!(identity, $curve::ADDITIVE_IDENTITY);
+                assert_eq!(a_prime, a);
+            }
+        }
+
+        paste! {
+            #[test]
+            fn [< $test_name _ $curve_name _addition_test >]() {
+                for _ in 0..$iter_times {
+                    let a = $curve::random(OsRng);
+                    let b = $curve::random(OsRng);
+                    let c = $curve::random(OsRng);
+
+                    // a + b + c = c + a + b
+                    let ab = a + b;
+                    let abc = ab + c;
+                    let ca = c + a;
+                    let cab = ca + b;
+
+                    // 2 * (a + b) = 2 * a + 2 * b
+                    let double_ab = ab.double();
+                    let aa = a.double();
+                    let bb = b.double();
+                    let aabb = aa + bb;
+
+                    assert!(abc.is_on_curve());
+                    assert!(cab.is_on_curve());
+                    assert!(double_ab.is_on_curve());
+                    assert!(aabb.is_on_curve());
+                    assert_eq!(abc, cab);
+                    assert_eq!(double_ab, aabb);
+                }
+            }
+        }
+
+        paste! {
+            #[test]
+            fn [< $test_name _ $curve_name _doubling_test >]() {
+                for _ in 0..$iter_times {
+                    let a = $curve::random(OsRng);
+
+                    // a + a = a * 8
+                    let scalared_a = a * $field::from(8 as u64);
+                    let a_8 = a.double().double().double();
+
+                    assert!(scalared_a.is_on_curve());
+                    assert!(a_8.is_on_curve());
+                    assert_eq!(scalared_a, a_8);
+                }
+            }
+        }
+
+        paste! {
+            #[test]
+            fn [< $test_name _ $curve_name _scalar_test >]() {
+                for _ in 0..$iter_times {
+                    let g = $curve::random(OsRng);
+
+                    // 7 * G + 16 * G = 23 * G
+                    let ag = g * $field::from(7 as u64);
+                    let bg = g * $field::from(16 as u64);
+                    let agbg = ag + bg;
+
+                    let abg = g * $field::from(23 as u64);
+
+                    assert!(agbg.is_on_curve());
+                    assert!(abg.is_on_curve());
+                    assert_eq!(agbg, abg);
+                }
+            }
+        }
+    };
+}
+
+pub use {curve_operation_test, curve_test};
