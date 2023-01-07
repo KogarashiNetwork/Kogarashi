@@ -19,7 +19,7 @@ macro_rules! affine_group_operation {
             };
 
             fn zero() -> Self {
-                Self::ADDITIVE_GENERATOR
+                Self::ADDITIVE_IDENTITY
             }
 
             fn invert(self) -> Option<Self> {
@@ -76,17 +76,13 @@ macro_rules! affine_group_operation {
             }
         }
 
-        impl Mul<$scalar> for $affine {
+        impl Mul<<Self as Group>::Scalar> for $affine {
             type Output = Self;
 
-            fn mul(self, scalar: $scalar) -> Self {
+            fn mul(self, rhs: <Self as Group>::Scalar) -> Self {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.clone();
-                let bits: Vec<u8> = scalar
-                    .to_bits()
-                    .into_iter()
-                    .skip_while(|x| *x == 0)
-                    .collect();
+                let bits: Vec<u8> = rhs.to_bits().into_iter().skip_while(|x| *x == 0).collect();
                 for &b in bits.iter().rev() {
                     if b == 1 {
                         res += acc.clone();
@@ -194,10 +190,10 @@ macro_rules! projective_group_operation {
             }
         }
 
-        impl Mul<$scalar> for $projective {
+        impl Mul<<Self as Group>::Scalar> for $projective {
             type Output = Self;
 
-            fn mul(self, scalar: $scalar) -> Self {
+            fn mul(self, scalar: <Self as Group>::Scalar) -> Self {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.clone();
                 let bits: Vec<u8> = scalar

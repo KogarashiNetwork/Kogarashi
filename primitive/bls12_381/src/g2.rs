@@ -48,7 +48,6 @@ curve_operation!(
     G2_GENERATOR_Y
 );
 bls12_g2_pairing!(G2Projective, G2Affine, PairingCoeff, G2PairingAffine, Fq12);
-curve_test!(bls12_381, Fr, G2Affine, G2Projective, 50);
 
 // below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
 // [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
@@ -314,4 +313,11 @@ where
     {
         iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + item.borrow())
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::curve_test;
+
+    curve_test!(bls12_381, Fr, G2Affine, G2Projective, 50);
 }

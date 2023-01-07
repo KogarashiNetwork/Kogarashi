@@ -38,8 +38,6 @@ curve_operation!(
     G1_GENERATOR_Y
 );
 
-// curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);
-
 // below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
 // [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
 // Dusk-Network team and, @str4d and @ebfull
@@ -489,9 +487,12 @@ fn log2(x: usize) -> u32 {
     core::mem::size_of::<usize>() as u32 * 8 - n
 }
 
+#[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+
+    curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);
 
     #[test]
     fn test_batch_normalize() {

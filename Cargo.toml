@@ -26,7 +26,6 @@ members = [
     "primitive/bls12_381",
     "primitive/crypto",
     "primitive/elgamal",
-    "primitive/hash",
     "primitive/jubjub",
     "primitive/kzg",
     "primitive/pairing",
