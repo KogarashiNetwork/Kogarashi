@@ -20,6 +20,7 @@
 
 use crate::fp::Fp;
 use dusk_bytes::{Error as BytesError, Serializable};
+use serde::{Deserialize, Serialize};
 use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zero_bls12_381::Fr;
 use zero_crypto::common::*;
@@ -189,7 +190,7 @@ const FR_MODULUS_BYTES: [u8; 32] = [
 
 /// This represents a Jubjub point in the affine `(x, y)`
 /// coordinates.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
 pub struct JubJubAffine {
     x: Fr,
     y: Fr,
@@ -1181,3 +1182,11 @@ impl<'a, 'b> Mul<&'b Fp> for &'a JubJubExtended {
 }
 
 impl_binops_multiplicative!(JubJubExtended, Fp);
+
+impl Eq for JubJubAffine {}
+
+impl Default for JubJubAffine {
+    fn default() -> Self {
+        JubJubAffine::identity()
+    }
+}
