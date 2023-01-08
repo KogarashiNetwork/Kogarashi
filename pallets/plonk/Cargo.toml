@@ -15,8 +15,9 @@ frame-system = { default-features = false, version = '3.0.0' }
 frame-support = { default-features = false, version = '3.0.0' }
 frame-benchmarking = { default-features = false, optional = true, version = '3.1.0' }
 sp-std = { default-features = false, version = '3.0.0' }
-plonk = { git = "https://github.com/zero-network/plonk", rev = "4f7ae664709a7814ae166acfc9e2ce17c6ef45be", default-features = false }
-plonk-core = { git = "https://github.com/zero-network/plonk", rev = "4f7ae664709a7814ae166acfc9e2ce17c6ef45be", default-features = false }
+zero-plonk = { path = "../../primitive/plonk", default-features = false }
+zero-jubjub = { path = "../../primitive/jubjub", default-features = false }
+zero-crypto = { path = "../../primitive/crypto", default-features = false }
 
 [dev-dependencies]
 serde = { version = "1.0.119" }
@@ -41,6 +42,7 @@ paste = "1.0.6"
 rand_core = {version = "0.6", default-features=false, features = ["getrandom"] }
 tempdir = "0.3"
 ark-vesta = "0.3"
+rand = "0.8"
 
 [features]
 default = ['std']
@@ -50,7 +52,7 @@ std = [
 	'frame-system/std',
 	'frame-benchmarking/std',
 	'sp-std/std',
-	"plonk/std"
+	"zero-plonk/std"
 ]
 runtime-benchmarks = [
 	'frame-benchmarking',

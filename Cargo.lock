@@ -937,31 +937,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dusk-plonk"
-version = "0.13.1"
-dependencies = [
- "backtrace",
- "bytecheck",
- "canonical",
- "canonical_derive",
- "cfg-if",
- "criterion",
- "dusk-bytes",
- "dusk-cdf",
- "hashbrown 0.9.1",
- "itertools 0.9.0",
- "merlin 3.0.0",
- "rand 0.8.5",
- "rand_core 0.6.3",
- "rayon",
- "tempdir",
- "zero-bls12-381",
- "zero-crypto",
- "zero-jubjub",
- "zero-pairing",
-]
-
-[[package]]
 name = "dusk-varint"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1901,8 +1876,7 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "paste",
- "plonk",
- "plonk-core",
+ "rand 0.8.5",
  "rand_core 0.6.3",
  "serde",
  "sp-core",
@@ -1910,6 +1884,9 @@ dependencies = [
  "sp-runtime",
  "sp-std",
  "tempdir",
+ "zero-crypto",
+ "zero-jubjub",
+ "zero-plonk",
 ]
 
 [[package]]
@@ -3779,6 +3756,31 @@ dependencies = [
  "rand_xorshift",
  "zero-bls12-381",
  "zero-crypto",
+]
+
+[[package]]
+name = "zero-plonk"
+version = "0.13.1"
+dependencies = [
+ "backtrace",
+ "bytecheck",
+ "canonical",
+ "canonical_derive",
+ "cfg-if",
+ "criterion",
+ "dusk-bytes",
+ "dusk-cdf",
+ "hashbrown 0.9.1",
+ "itertools 0.9.0",
+ "merlin 3.0.0",
+ "rand 0.8.5",
+ "rand_core 0.6.3",
+ "rayon",
+ "tempdir",
+ "zero-bls12-381",
+ "zero-crypto",
+ "zero-jubjub",
+ "zero-pairing",
 ]
 
 [[package]]
