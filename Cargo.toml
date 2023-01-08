@@ -24,6 +24,7 @@ rand_core = "0.6"
 [workspace]
 members = [
     "primitive/bls12_381",
+    "primitive/circuits",
     "primitive/crypto",
     "primitive/elgamal",
     "primitive/jubjub",
