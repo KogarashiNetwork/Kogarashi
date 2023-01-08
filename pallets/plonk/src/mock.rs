@@ -1,4 +1,6 @@
-use crate as pallet_template;
+#[allow(dead_code)]
+use crate as plonk_pallet;
+use crate::*;
 use frame_support::parameter_types;
 use frame_system as system;
 use sp_core::H256;
@@ -18,7 +20,7 @@ frame_support::construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        TemplateModule: pallet_template::{Module, Call, Storage, Event<T>},
+        TemplateModule: plonk_pallet::{Module, Call, Storage, Event<T>},
     }
 );
 
@@ -52,8 +54,47 @@ impl system::Config for Test {
     type SS58Prefix = SS58Prefix;
 }
 
-impl pallet_template::Config for Test {
+use zero_plonk::prelude::{Error as CircuitError, *};
+
+pub struct DummyCircuit {
+    a: JubJubScalar,
+    b: JubJubExtended,
+}
+
+impl DummyCircuit {
+    pub fn new(a: JubJubScalar) -> Self {
+        Self {
+            a,
+            b: zero_jubjub::GENERATOR_EXTENDED * &a,
+        }
+    }
+}
+
+impl Default for DummyCircuit {
+    fn default() -> Self {
+        Self::new(JubJubScalar::from(7u64))
+    }
+}
+
+impl Circuit for DummyCircuit {
+    fn circuit<C>(&self, composer: &mut C) -> Result<(), CircuitError>
+    where
+        C: Composer,
+    {
+        let w_a = composer.append_witness(self.a);
+        let w_b = composer.append_point(self.b);
+
+        let w_x = composer.component_mul_generator(w_a, zero_jubjub::GENERATOR_EXTENDED)?;
+
+        composer.assert_equal_point(w_b, w_x);
+
+        Ok(())
+    }
+}
+
+impl plonk_pallet::Config for Test {
     type Event = Event;
+    type CustomCircuit = DummyCircuit;
 }
 
 // Build genesis storage according to the mock runtime.

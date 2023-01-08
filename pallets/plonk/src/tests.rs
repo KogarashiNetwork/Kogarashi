@@ -1,128 +1,121 @@
-// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE
-// or https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
-// <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
-// option. This file may not be copied, modified, or distributed
-// except according to those terms.
-//
-// Copyright (c) ZK-GARAGE. All rights reserved.
+use crate::mock::{new_test_ext, DummyCircuit};
+use crate::{self as plonk};
+use crate::{pallet::Config, types::*};
 
-//! PLONK Example
+use frame_support::dispatch::{DispatchErrorWithPostInfo, PostDispatchInfo};
+use frame_support::{assert_ok, construct_runtime, parameter_types};
+use sp_core::H256;
+use sp_runtime::{
+    testing::Header,
+    traits::{BlakeTwo256, IdentityLookup},
+    DispatchError,
+};
 
-use ark_bls12_381::{Bls12_381, Fr as BlsScalar};
-use ark_ec::models::twisted_edwards_extended::GroupAffine;
-use ark_ec::{AffineCurve, ProjectiveCurve, TEModelParameters};
-use ark_ed_on_bls12_381::{EdwardsParameters as JubJubParameters, Fr as JubJubScalar};
-use ark_ff::PrimeField;
-use ark_poly::polynomial::univariate::DensePolynomial;
-use ark_poly_commit::{sonic_pc::SonicKZG10, PolynomialCommitment};
-use plonk::error::to_pc_error;
-use plonk_core::circuit::{verify_proof, Circuit};
-use plonk_core::constraint_system::StandardComposer;
-use plonk_core::error::Error;
-use plonk_core::prelude::*;
-use rand_core::OsRng;
+type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
+type Block = frame_system::mocking::MockBlock<TestRuntime>;
 
-// Implements a circuit that checks:
-// 1) a + b = c where C is a PI
-// 2) a <= 2^6
-// 3) b <= 2^4
-// 4) a * b = d where D is a PI
-// 5) JubJub::GENERATOR * e(JubJubScalar) = f where F is a PI
-#[derive(derivative::Derivative)]
-#[derivative(Debug(bound = ""), Default(bound = ""))]
-pub struct TestCircuit<F, P>
-where
-    F: PrimeField,
-    P: TEModelParameters<BaseField = F>,
-{
-    a: F,
-    b: F,
-    c: F,
-    d: F,
-    e: P::ScalarField,
-    f: GroupAffine<P>,
+construct_runtime!(
+    pub enum TestRuntime where
+        Block = Block,
+        NodeBlock = Block,
+        UncheckedExtrinsic = UncheckedExtrinsic,
+    {
+        System: frame_system::{Module, Call, Config, Storage, Event<T>},
+        Plonk: plonk::{Module, Call, Storage, Event<T>},
+    }
+);
+
+parameter_types! {
+    pub const BlockHashCount: u64 = 250;
+    pub BlockWeights: frame_system::limits::BlockWeights =
+        frame_system::limits::BlockWeights::simple_max(1024);
 }
 
-impl<F, P> Circuit<F, P> for TestCircuit<F, P>
-where
-    F: PrimeField,
-    P: TEModelParameters<BaseField = F>,
-{
-    const CIRCUIT_ID: [u8; 32] = [0xff; 32];
+impl frame_system::Config for TestRuntime {
+    type BaseCallFilter = ();
+    type BlockWeights = ();
+    type BlockLength = ();
+    type Origin = Origin;
+    type Index = u64;
+    type Call = Call;
+    type BlockNumber = u64;
+    type Hash = H256;
+    type Hashing = BlakeTwo256;
+    type AccountId = u64;
+    type Lookup = IdentityLookup<Self::AccountId>;
+    type Header = Header;
+    type Event = Event;
+    type BlockHashCount = BlockHashCount;
+    type DbWeight = ();
+    type Version = ();
+    type PalletInfo = PalletInfo;
+    type AccountData = ();
+    type OnNewAccount = ();
+    type OnKilledAccount = ();
+    type SystemWeightInfo = ();
+    type SS58Prefix = ();
+}
 
-    fn gadget(&mut self, composer: &mut StandardComposer<F, P>) -> Result<(), Error> {
-        let a = composer.add_input(self.a);
-        let b = composer.add_input(self.b);
-        let zero = composer.zero_var();
+impl Config for TestRuntime {
+    type CustomCircuit = DummyCircuit;
+    type Event = Event;
+}
 
-        // Make first constraint a + b = c (as public input)
-        composer.arithmetic_gate(|gate| {
-            gate.witness(a, b, Some(zero))
-                .add(F::one(), F::one())
-                .pi(-self.c)
+#[cfg(test)]
+mod plonk_test {
+    use super::*;
+    use crate::types::JubJubScalar;
+    use rand::rngs::StdRng;
+    use rand::SeedableRng;
+    use zero_crypto::behave::Group;
+    use zero_plonk::prelude::Compiler;
+
+    fn get_rng() -> FullcodecRng {
+        FullcodecRng::from_seed([
+            0x59, 0x62, 0xbe, 0x5d, 0x76, 0x3d, 0x31, 0x8d, 0x17, 0xdb, 0x37, 0x32, 0x54, 0x06,
+            0xbc, 0xe5,
+        ])
+    }
+
+    #[test]
+    fn trusted_setup() {
+        new_test_ext().execute_with(|| {
+            let rng = get_rng();
+            assert_ok!(Plonk::trusted_setup(Origin::signed(1), 12, rng));
+
+            let rng = get_rng();
+            assert_eq!(
+                Plonk::trusted_setup(Origin::signed(1), 12, rng),
+                Err(DispatchErrorWithPostInfo {
+                    post_info: PostDispatchInfo::from(()),
+                    error: DispatchError::Other("already setup"),
+                })
+            );
+        })
+    }
+
+    #[test]
+    fn default_test() {
+        let rng = get_rng();
+        let a = JubJubScalar::random(rng.clone());
+        let label = b"demo";
+
+        new_test_ext().execute_with(|| {
+            assert_ok!(Plonk::trusted_setup(Origin::signed(1), 12, rng));
+
+            let rng = &mut StdRng::seed_from_u64(8349u64);
+            let pp = Plonk::public_parameter().unwrap();
+
+            let (prover, verifier) =
+                Compiler::compile::<DummyCircuit>(&pp, label).expect("failed to compile circuit");
+
+            let (proof, public_inputs) = prover
+                .prove(rng, &DummyCircuit::new(a))
+                .expect("failed to prove");
+
+            verifier
+                .verify(&proof, &public_inputs)
+                .expect("failed to verify proof");
         });
-
-        // Check that a and b are in range
-        composer.range_gate(a, 6);
-        composer.range_gate(b, 4);
-        // Make second constraint a * b = d
-        composer.arithmetic_gate(|gate| gate.witness(a, b, Some(zero)).mul(F::one()).pi(-self.d));
-        let e = composer.add_input(from_embedded_curve_scalar::<F, P>(self.e));
-        let (x, y) = P::AFFINE_GENERATOR_COEFFS;
-        let generator = GroupAffine::new(x, y);
-        let scalar_mul_result = composer.fixed_base_scalar_mul(e, generator);
-        // Apply the constrain
-        composer.assert_equal_public_point(scalar_mul_result, self.f);
-        Ok(())
     }
-
-    fn padded_circuit_size(&self) -> usize {
-        1 << 9
-    }
-}
-
-#[test]
-fn plonk_test() {
-    // Generate CRS
-    type PC = SonicKZG10<Bls12_381, DensePolynomial<BlsScalar>>;
-    let pp = PC::setup(1 << 10, None, &mut OsRng)
-        .map_err(to_pc_error::<BlsScalar, PC>)
-        .unwrap();
-
-    let mut circuit = TestCircuit::<BlsScalar, JubJubParameters>::default();
-    // Compile the circuit
-    let (pk_p, (vk, _pi_pos)) = circuit.compile::<PC>(&pp).unwrap();
-
-    let (x, y) = JubJubParameters::AFFINE_GENERATOR_COEFFS;
-    let generator: GroupAffine<JubJubParameters> = GroupAffine::new(x, y);
-    let point_f_pi: GroupAffine<JubJubParameters> =
-        AffineCurve::mul(&generator, JubJubScalar::from(2u64).into_repr()).into_affine();
-    // Prover POV
-    let (proof, pi) = {
-        let mut circuit: TestCircuit<BlsScalar, JubJubParameters> = TestCircuit {
-            a: BlsScalar::from(20u64),
-            b: BlsScalar::from(5u64),
-            c: BlsScalar::from(25u64),
-            d: BlsScalar::from(100u64),
-            e: JubJubScalar::from(2u64),
-            f: point_f_pi,
-        };
-        circuit.gen_proof::<PC>(&pp, pk_p, b"Test")
-    }
-    .unwrap();
-
-    // Verifier POV
-    let verifier_data = VerifierData::new(vk, pi);
-
-    assert_eq!(
-        false,
-        verify_proof::<BlsScalar, JubJubParameters, PC>(
-            &pp,
-            verifier_data.key,
-            &proof,
-            &verifier_data.pi,
-            b"Test",
-        )
-        .is_err()
-    );
 }

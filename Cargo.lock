@@ -937,31 +937,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dusk-plonk"
-version = "0.13.1"
-dependencies = [
- "backtrace",
- "bytecheck",
- "canonical",
- "canonical_derive",
- "cfg-if",
- "criterion",
- "dusk-bytes",
- "dusk-cdf",
- "hashbrown 0.9.1",
- "itertools 0.9.0",
- "merlin 3.0.0",
- "rand 0.8.5",
- "rand_core 0.6.3",
- "rayon",
- "tempdir",
- "zero-bls12-381",
- "zero-crypto",
- "zero-jubjub",
- "zero-pairing",
-]
-
-[[package]]
 name = "dusk-varint"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1365,12 +1340,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hashbrown"
-version = "0.12.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
-
-[[package]]
 name = "hermit-abi"
 version = "0.1.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1467,16 +1436,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "indexmap"
-version = "1.9.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10a35a97730320ffe8e2d410b5d3b69279b98d2c14bdb8b70ea89ecf7888d41e"
-dependencies = [
- "autocfg",
- "hashbrown 0.12.3",
 ]
 
 [[package]]
@@ -1860,6 +1819,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
 
 [[package]]
+name = "pallet-confidential-transfer"
+version = "0.1.0"
+
+[[package]]
 name = "pallet-encrypted-balance"
 version = "0.1.0"
 dependencies = [
@@ -1901,15 +1864,19 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "paste",
- "plonk",
- "plonk-core",
+ "rand 0.8.5",
  "rand_core 0.6.3",
+ "rand_xorshift 0.3.0 (git+https://github.com/zero-network/rngs?branch=master)",
  "serde",
  "sp-core",
  "sp-io",
  "sp-runtime",
  "sp-std",
  "tempdir",
+ "zero-bls12-381",
+ "zero-crypto",
+ "zero-jubjub",
+ "zero-plonk",
 ]
 
 [[package]]
@@ -2081,60 +2048,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
-name = "plonk"
-version = "0.8.2"
-source = "git+https://github.com/zero-network/plonk?rev=4f7ae664709a7814ae166acfc9e2ce17c6ef45be#4f7ae664709a7814ae166acfc9e2ce17c6ef45be"
-dependencies = [
- "plonk-core",
- "plonk-hashing",
-]
-
-[[package]]
-name = "plonk-circuits"
-version = "0.1.0"
-dependencies = [
- "ark-bls12-381",
- "ark-ec",
- "ark-ed-on-bls12-381",
- "ark-ff",
- "ark-poly",
- "ark-poly-commit",
- "derivative",
- "plonk",
- "rand_core 0.6.3",
-]
-
-[[package]]
-name = "plonk-core"
-version = "0.1.0"
-source = "git+https://github.com/zero-network/plonk?rev=4f7ae664709a7814ae166acfc9e2ce17c6ef45be#4f7ae664709a7814ae166acfc9e2ce17c6ef45be"
-dependencies = [
- "ark-bls12-381",
- "ark-ec",
- "ark-ff",
- "ark-poly",
- "ark-poly-commit",
- "ark-serialize",
- "ark-std",
- "blake2",
- "derivative",
- "hashbrown 0.11.2",
- "indexmap",
- "itertools 0.10.5",
- "merlin 3.0.0",
- "num-traits",
- "rand_core 0.6.3",
-]
-
-[[package]]
-name = "plonk-hashing"
-version = "0.8.2"
-source = "git+https://github.com/zero-network/plonk?rev=4f7ae664709a7814ae166acfc9e2ce17c6ef45be#4f7ae664709a7814ae166acfc9e2ce17c6ef45be"
-dependencies = [
- "plonk-core",
-]
-
-[[package]]
 name = "plotters"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2223,7 +2136,7 @@ dependencies = [
  "quick-error 2.0.1",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex-syntax",
  "rusty-fork",
  "tempfile",
@@ -2402,6 +2315,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d25bf25ec5ae4a3f1b92f929810509a2f53d7dca2f50b794ff57e3face536c8f"
 dependencies = [
  "rand_core 0.6.3",
+]
+
+[[package]]
+name = "rand_xorshift"
+version = "0.3.0"
+source = "git+https://github.com/zero-network/rngs?branch=master#241cb572bb885794784f70d35c1c2bd3ad314367"
+dependencies = [
+ "parity-scale-codec",
+ "rand_core 0.6.3",
+ "sp-std",
 ]
 
 [[package]]
@@ -3689,7 +3612,7 @@ dependencies = [
  "proptest",
  "rand 0.8.5",
  "rand_core 0.6.3",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "subtle 2.4.1",
  "zero-crypto",
@@ -3703,7 +3626,7 @@ dependencies = [
  "proptest",
  "rand 0.8.5",
  "rand_core 0.6.3",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std",
  "subtle 2.4.1",
 ]
@@ -3716,7 +3639,7 @@ dependencies = [
  "parity-scale-codec",
  "proptest",
  "rand 0.8.5",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "zero-crypto",
  "zero-jubjub",
@@ -3732,7 +3655,7 @@ dependencies = [
  "proptest",
  "rand 0.8.5",
  "rand_core 0.6.3",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "sp-std",
  "subtle 2.4.1",
@@ -3748,7 +3671,7 @@ dependencies = [
  "proptest",
  "rand 0.8.5",
  "rand_core 0.6.3",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rayon",
  "zero-bls12-381",
  "zero-crypto",
@@ -3776,9 +3699,35 @@ name = "zero-pairing"
 version = "0.1.0"
 dependencies = [
  "rand 0.8.5",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "zero-bls12-381",
  "zero-crypto",
+]
+
+[[package]]
+name = "zero-plonk"
+version = "0.13.1"
+dependencies = [
+ "backtrace",
+ "bytecheck",
+ "canonical",
+ "canonical_derive",
+ "cfg-if",
+ "criterion",
+ "dusk-bytes",
+ "dusk-cdf",
+ "hashbrown 0.9.1",
+ "itertools 0.9.0",
+ "merlin 3.0.0",
+ "parity-scale-codec",
+ "rand 0.8.5",
+ "rand_core 0.6.3",
+ "rayon",
+ "tempdir",
+ "zero-bls12-381",
+ "zero-crypto",
+ "zero-jubjub",
+ "zero-pairing",
 ]
 
 [[package]]
