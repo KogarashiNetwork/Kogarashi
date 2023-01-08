@@ -1,5 +1,5 @@
 # Zero Network
-[![CI Check](https://github.com/zero-network/zero/actions/workflows/ci.yml/badge.svg)](https://github.com/zero-network/zero/actions/workflows/ci.yml) [![Repository](https://img.shields.io/badge/github-zero-blueviolet?logo=github)](https://github.com/zero-network/zero) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE)  
+[![Merged Check](https://github.com/zero-network/zero/actions/workflows/merged.yml/badge.svg)](https://github.com/zero-network/zero/actions/workflows/merged.yml) [![Repository](https://img.shields.io/badge/github-zero-blueviolet?logo=github)](https://github.com/zero-network/zero) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE)  
 
 The Zero Network is a public blockchain capable of confidential transfers and confidential smart contracts. These functionalities build upon only the **cryptographic hardness assumption** not `L2 technologies`, `TEE` and `centralized security assumption`.
 

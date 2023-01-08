@@ -53,9 +53,7 @@ impl system::Config for Test {
     type SystemWeightInfo = ();
     type SS58Prefix = SS58Prefix;
 }
-use rand::rngs::StdRng;
-use rand::SeedableRng;
-use zero_crypto::behave::Group;
+
 use zero_plonk::prelude::{Error as CircuitError, *};
 
 pub struct DummyCircuit {

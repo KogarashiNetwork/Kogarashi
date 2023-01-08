@@ -181,7 +181,7 @@ impl<T: Config> Plonk<T::AccountId> for Pallet<T> {
         match Self::public_parameter() {
             Some(pp) => {
                 let label = b"verify";
-                let (prover, verifier) = Compiler::compile::<T::CustomCircuit>(&pp, label)
+                let (_, verifier) = Compiler::compile::<T::CustomCircuit>(&pp, label)
                     .expect("failed to compile circuit");
                 match verifier.verify(&proof, &public_inputs) {
                     Ok(_) => return Ok(().into()),
