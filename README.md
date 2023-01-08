@@ -29,6 +29,8 @@ The `cargo-make` we are using.
 
 - Unit Test
 ```
+git submodule init
+git submodule update
 makers test
 ```
 

@@ -26,33 +26,33 @@ use core::ops::{Add, Sub};
 use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
-use zero_crypto::behave::*;
 pub use zero_jubjub::Fp;
-use zero_jubjub::{JubjubAffine, JubjubProjective};
+use zero_jubjub::{JubJubAffine, JubJubExtended, GENERATOR_EXTENDED};
 
 #[derive(Debug, Default, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
 pub struct EncryptedNumber {
-    s: JubjubAffine,
-    t: JubjubAffine,
+    s: JubJubAffine,
+    t: JubJubAffine,
 }
 
 #[allow(unused_variables)]
 impl EncryptedNumber {
     pub fn encrypt(private_key: Fp, value: u32, random: Fp) -> Self {
-        let g = JubjubProjective::ADDITIVE_GENERATOR;
+        let g = GENERATOR_EXTENDED;
         let public_key = g * private_key;
         let left = g * Fp::from(value as u64) + public_key * random;
         EncryptedNumber {
-            s: left.to_affine(),
-            t: (g * random).to_affine(),
+            s: JubJubAffine::from(left),
+            t: JubJubAffine::from(g * random),
         }
     }
 
     pub fn decrypt(&self, private_key: Fp) -> Option<u32> {
-        let g = JubjubProjective::ADDITIVE_GENERATOR;
-        let decrypted_message = self.s.to_projective() - (self.t.to_projective() * private_key);
+        let g = GENERATOR_EXTENDED;
+        let decrypted_message =
+            JubJubExtended::from(self.s) - (JubJubExtended::from(self.t) * private_key);
 
-        let mut acc = JubjubProjective::ADDITIVE_IDENTITY;
+        let mut acc = JubJubExtended::identity();
         for i in 0..150000 {
             if acc == decrypted_message {
                 return Some(i);
@@ -68,8 +68,8 @@ impl Add for EncryptedNumber {
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
         Self {
-            s: (self.s.to_projective() + rhs.s.to_projective()).to_affine(),
-            t: (self.t.to_projective() + rhs.t.to_projective()).to_affine(),
+            s: JubJubAffine::from(JubJubExtended::from(self.s) + JubJubExtended::from(rhs.s)),
+            t: JubJubAffine::from(JubJubExtended::from(self.t) + JubJubExtended::from(rhs.t)),
         }
     }
 }
@@ -80,8 +80,8 @@ impl Sub for EncryptedNumber {
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         Self {
-            s: (self.s.to_projective() - rhs.s.to_projective()).to_affine(),
-            t: (self.t.to_projective() - rhs.t.to_projective()).to_affine(),
+            s: JubJubAffine::from(JubJubExtended::from(self.s) - JubJubExtended::from(rhs.s)),
+            t: JubJubAffine::from(JubJubExtended::from(self.t) - JubJubExtended::from(rhs.t)),
         }
     }
 }
@@ -90,8 +90,8 @@ impl CheckedAdd for EncryptedNumber {
     #[inline]
     fn checked_add(&self, rhs: &Self) -> Option<Self> {
         Some(Self {
-            s: (self.s.to_projective() + rhs.s.to_projective()).to_affine(),
-            t: (self.t.to_projective() + rhs.t.to_projective()).to_affine(),
+            s: JubJubAffine::from(JubJubExtended::from(self.s) + JubJubExtended::from(rhs.s)),
+            t: JubJubAffine::from(JubJubExtended::from(self.t) + JubJubExtended::from(rhs.t)),
         })
     }
 }
@@ -100,8 +100,8 @@ impl CheckedSub for EncryptedNumber {
     #[inline]
     fn checked_sub(&self, rhs: &Self) -> Option<Self> {
         Some(Self {
-            s: (self.s.to_projective() - rhs.s.to_projective()).to_affine(),
-            t: (self.t.to_projective() - rhs.t.to_projective()).to_affine(),
+            s: JubJubAffine::from(JubJubExtended::from(self.s) - JubJubExtended::from(rhs.s)),
+            t: JubJubAffine::from(JubJubExtended::from(self.t) - JubJubExtended::from(rhs.t)),
         })
     }
 }
@@ -112,6 +112,7 @@ mod tests {
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
+    use zero_crypto::behave::*;
 
     use crate::EncryptedNumber;
 

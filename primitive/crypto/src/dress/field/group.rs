@@ -1,6 +1,8 @@
 #[macro_export]
 macro_rules! group_operation {
     ($field:ident, $p:ident, $g:ident, $r:ident, $r2:ident, $r3:ident, $inv:ident) => {
+        group_arithmetic_extension!($field);
+
         impl Group for $field {
             type Scalar = $field;
 
@@ -25,10 +27,7 @@ macro_rules! group_operation {
 
         impl PartialEq for $field {
             fn eq(&self, other: &Self) -> bool {
-                self.0[0] == other.0[0]
-                    && self.0[1] == other.0[1]
-                    && self.0[2] == other.0[2]
-                    && self.0[3] == other.0[3]
+                self.0.iter().zip(other.0.iter()).all(|(a, b)| a == b)
             }
         }
 
@@ -37,22 +36,44 @@ macro_rules! group_operation {
         impl Add for $field {
             type Output = Self;
 
-            #[inline]
             fn add(self, rhs: $field) -> Self {
                 $field(add(self.0, rhs.0, $p))
             }
         }
 
-        impl AddAssign for $field {
-            fn add_assign(&mut self, rhs: $field) {
-                self.0 = add(self.0, rhs.0, $p)
+        impl<'a, 'b> Add<&'b $field> for &'a $field {
+            type Output = $field;
+
+            fn add(self, rhs: &'b $field) -> $field {
+                $field(add(self.0, rhs.0, $p))
+            }
+        }
+
+        impl<'a> Add<$field> for &'a $field {
+            type Output = $field;
+
+            fn add(self, rhs: $field) -> $field {
+                $field(add(self.0, rhs.0, $p))
+            }
+        }
+
+        impl<'b> AddAssign<&'b $field> for $field {
+            fn add_assign(&mut self, rhs: &'b $field) {
+                *self = $field(add(self.0, rhs.0, $p))
+            }
+        }
+
+        impl<'b> Add<&'b $field> for $field {
+            type Output = $field;
+
+            fn add(self, rhs: &'b $field) -> Self {
+                $field(add(self.0, rhs.0, $p))
             }
         }
 
         impl Neg for $field {
             type Output = Self;
 
-            #[inline]
             fn neg(self) -> Self {
                 $field(neg(self.0, $p))
             }
@@ -61,30 +82,102 @@ macro_rules! group_operation {
         impl Sub for $field {
             type Output = Self;
 
-            #[inline]
             fn sub(self, rhs: $field) -> Self {
                 $field(sub(self.0, rhs.0, $p))
-            }
-        }
-
-        impl SubAssign for $field {
-            fn sub_assign(&mut self, rhs: $field) {
-                self.0 = sub(self.0, rhs.0, $p)
             }
         }
 
         impl Mul<<Self as Group>::Scalar> for $field {
             type Output = Self;
 
-            #[inline]
             fn mul(self, rhs: $field) -> Self {
                 $field(mul(self.0, rhs.0, $p, $inv))
             }
         }
 
+        impl<'b> MulAssign<&'b $field> for $field {
+            fn mul_assign(&mut self, rhs: &'b $field) {
+                *self = &*self * rhs;
+            }
+        }
+
+        impl<'a, 'b> Mul<&'b $field> for &'a $field {
+            type Output = $field;
+
+            fn mul(self, rhs: &'b $field) -> $field {
+                $field(mul(self.0, rhs.0, $p, $inv))
+            }
+        }
+
+        impl<'b> Mul<&'b $field> for $field {
+            type Output = $field;
+
+            fn mul(self, rhs: &'b $field) -> $field {
+                $field(mul(self.0, rhs.0, $p, $inv))
+            }
+        }
+
+        impl<'a> Mul<$field> for &'a $field {
+            type Output = $field;
+
+            fn mul(self, rhs: $field) -> $field {
+                $field(mul(self.0, rhs.0, $p, $inv))
+            }
+        }
+
+        impl<'a> Neg for &'a $field {
+            type Output = $field;
+
+            fn neg(self) -> $field {
+                -self
+            }
+        }
+
+        impl AddAssign for $field {
+            fn add_assign(&mut self, rhs: $field) {
+                *self = *self + rhs;
+            }
+        }
+
+        impl SubAssign for $field {
+            fn sub_assign(&mut self, rhs: $field) {
+                *self = *self - rhs;
+            }
+        }
+
+        impl<'b> SubAssign<&'b $field> for $field {
+            fn sub_assign(&mut self, rhs: &'b $field) {
+                *self = $field(sub(self.0, rhs.0, $p))
+            }
+        }
+
+        impl<'a, 'b> Sub<&'b $field> for &'a $field {
+            type Output = $field;
+
+            fn sub(self, rhs: &'b $field) -> $field {
+                $field(sub(self.0, rhs.0, $p))
+            }
+        }
+
+        impl<'b> Sub<&'b $field> for $field {
+            type Output = $field;
+
+            fn sub(self, rhs: &'b $field) -> Self {
+                $field(sub(self.0, rhs.0, $p))
+            }
+        }
+
+        impl<'a> Sub<$field> for &'a $field {
+            type Output = $field;
+
+            fn sub(self, rhs: $field) -> $field {
+                $field(sub(self.0, rhs.0, $p))
+            }
+        }
+
         impl MulAssign<<Self as Group>::Scalar> for $field {
-            fn mul_assign(&mut self, rhs: $field) {
-                *self = $field(mul(self.0, rhs.0, $p, $inv))
+            fn mul_assign(&mut self, rhs: <Self as Group>::Scalar) {
+                *self = *self * rhs;
             }
         }
 
@@ -100,4 +193,9 @@ macro_rules! group_operation {
     };
 }
 
-pub use group_operation;
+#[macro_export]
+macro_rules! group_arithmetic_extension {
+    ($field:ident) => {};
+}
+
+pub use {group_arithmetic_extension, group_operation};

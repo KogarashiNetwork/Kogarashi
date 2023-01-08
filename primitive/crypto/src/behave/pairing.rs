@@ -2,7 +2,7 @@ use super::{
     algebra::Field,
     comp::{Basic, ParityCmp},
     curve::Affine,
-    Projective,
+    Group, Projective,
 };
 
 /// extension field
@@ -15,8 +15,7 @@ pub trait PairingRange: ExtensionField {
     type G1Affine: Affine;
     type G2Coeff: ParityCmp;
     type QuadraticField: ExtensionField;
-
-    fn generator() -> Self;
+    type Gt: Group;
 
     fn mul_by_014(
         self,
@@ -27,7 +26,7 @@ pub trait PairingRange: ExtensionField {
 
     fn untwist(self, coeffs: Self::G2Coeff, g1: Self::G1Affine) -> Self;
 
-    fn final_exp(self) -> Option<Self>;
+    fn final_exp(self) -> Self::Gt;
 }
 
 /// G2 group pairing interface
@@ -52,14 +51,18 @@ pub trait Pairing {
     type G1Projective: Projective;
     // g2 group projective point
     type G2Projective: G2Pairing;
-    type G2PairngRepr: G2Pairing;
+    // g2 pairing representation
+    type G2PairngRepr: ParityCmp;
     // range of pairing function
     type PairingRange: PairingRange;
+    type Gt: Group;
 
     const X: u64;
     const X_IS_NEGATIVE: bool;
 
-    fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange;
+    fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::Gt;
 
     fn miller_loop(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange;
+
+    fn multi_miller_loop(pairs: &[(Self::G1Affine, Self::G2PairngRepr)]) -> Self::PairingRange;
 }

@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zero-crypto = { version = '0.1.0', path = '../crypto' }
-zero-bls12-381 = { version = '0.1.0', path = '../bls12_381' }
+zero-crypto = { path = '../crypto' }
+zero-bls12-381 = { path = '../bls12_381' }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 rand_core = { version="0.6", default-features = false }
 rayon = "1.5.1"

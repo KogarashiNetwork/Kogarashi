@@ -19,7 +19,7 @@ macro_rules! prime_field_operation {
         impl Debug for $field {
             fn fmt(&self, f: &mut Formatter) -> FmtResult {
                 write!(f, "0x")?;
-                for limb in self.to_repr().iter().rev() {
+                for limb in self.montgomery_reduce().iter().rev() {
                     for byte in limb.to_be_bytes() {
                         write!(f, "{:02x}", byte)?;
                     }
@@ -38,7 +38,7 @@ macro_rules! prime_field_operation {
             }
 
             fn to_bits(self) -> Bits {
-                to_bits(self.to_repr())
+                to_bits(self.montgomery_reduce())
             }
 
             fn double(self) -> Self {

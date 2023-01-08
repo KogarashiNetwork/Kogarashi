@@ -12,6 +12,9 @@ parity-scale-codec = { version = "2", default-features = false, features = ["der
 rand_core = { version="0.6", default-features = false }
 sp-std = { version = '3.0.0', default-features = false }
 zero-crypto = { path = '../crypto' }
+zero-bls12-381 = { path = '../bls12_381' }
+dusk-bytes = { version = "0.1" }
+subtle = { version = "2.0", default-features = false }
 
 [dev-dependencies]
 rand = { version = "0.8", default-features = false }

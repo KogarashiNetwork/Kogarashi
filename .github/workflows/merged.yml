@@ -1,0 +1,28 @@
+name: Merged Check
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  test:
+    if: github.event.pull_request.draft == false
+    name: Production Environment Unit Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Update submodules
+        id: update
+        run: git submodule update --remote --recursive
+      - uses: actions-rs/toolchain@v1
+      - name: Update Submodule
+        run: |
+          git submodule update --init --recursive
+          git submodule update --remote --recursive
+      - name: Test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --verbose --release --all --all-features

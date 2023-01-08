@@ -1,7 +1,14 @@
-use crate::{Fq, Fq2};
+use crate::{Fq, Fq2, Fr};
 
 pub const BLS_X: u64 = 0xd201000000010000;
 pub const BLS_X_IS_NEGATIVE: bool = true;
+
+pub const EDWARDS_D: Fr = Fr([
+    0x01065fd6d6343eb1,
+    0x292d7f6d37579d26,
+    0xf5fd9207e6bd7fd4,
+    0x2a9318e74bfa2b48,
+]);
 
 // g1 curve parameters
 pub(crate) const G1_GENERATOR_X: Fq = Fq([

@@ -17,7 +17,6 @@
 //!
 //! - [`Fp`]
 //! - [`JubjubAffine`]
-//! - [`JubjubProjective`]
 //!
 //! ## Overview
 //!
@@ -39,5 +38,5 @@ mod curve;
 mod error;
 mod fp;
 
-pub use curve::{JubjubAffine, JubjubProjective};
+pub use curve::*;
 pub use fp::Fp;

@@ -5,121 +5,115 @@ This is the primitive of `no_std` and [`parity-scale-codec`](https://github.com/
 
 ## Usage
 ### Field
-The following `Fp` support four basic operation.
+The following `Fr` support four basic operation.
 
 ```rust
-use zero_crypto::arithmetic::bits_256::*;
-use zero_crypto::common::*;
-use zero_crypto::dress::field::*;
-
-#[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct Fp(pub(crate) [u64; 4]);
+#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
+pub struct Fr(pub [u64; 4]);
 
 const MODULUS: [u64; 4] = [
-    0xd0970e5ed6f72cb7,
-    0xa6682093ccc81082,
-    0x06673b0101343b00,
-    0x0e7db4ea6533afa9,
+    0xffffffff00000001,
+    0x53bda402fffe5bfe,
+    0x3339d80809a1d805,
+    0x73eda753299d7d48,
 ];
 
-const GENERATOR: [u64; 4] = [2, 0, 0, 0];
+const GENERATOR: [u64; 4] = [
+    0x0000000efffffff1,
+    0x17e363d300189c0f,
+    0xff9c57876f8457b0,
+    0x351332208fc5a8c4,
+];
 
 /// R = 2^256 mod r
 const R: [u64; 4] = [
-    0x25f80bb3b99607d9,
-    0xf315d62f66b6e750,
-    0x932514eeeb8814f4,
-    0x09a6fc6f479155c6,
+    0x00000001fffffffe,
+    0x5884b7fa00034802,
+    0x998c4fefecbc4ff5,
+    0x1824b159acc5056f,
 ];
 
 /// R^2 = 2^512 mod r
 const R2: [u64; 4] = [
-    0x67719aa495e57731,
-    0x51b0cef09ce3fc26,
-    0x69dab7fac026e9a5,
-    0x04f6547b8d127688,
+    0xc999e990f3f29c6d,
+    0x2b6cedcb87925c23,
+    0x05d314967254398f,
+    0x0748d9d99f59ff11,
 ];
 
 /// R^3 = 2^768 mod r
 const R3: [u64; 4] = [
-    0xe0d6c6563d830544,
-    0x323e3883598d0f85,
-    0xf0fea3004c2e2ba8,
-    0x05874f84946737ec,
+    0xc62c1807439b73af,
+    0x1b3e0d188cf06990,
+    0x73d13c71c7b5f418,
+    0x6e2a5bb9c8db33e9,
 ];
 
-pub const INV: u64 = 0x1ba3a358ef788ef9;
+pub const INV: u64 = 0xfffffffeffffffff;
 
-const S: usize = 1;
+const S: usize = 32;
 
-const ROOT_OF_UNITY: Fp = Fp([
-    0xaa9f02ab1d6124de,
-    0xb3524a6466112932,
-    0x7342261215ac260b,
-    0x4d6b87b1da259e2,
+pub const ROOT_OF_UNITY: Fr = Fr([
+    0xb9b58d8c5f0e466a,
+    0x5b1b4c801819d7ec,
+    0x0af53ae352a31e64,
+    0x5bf3adda19e9b27b,
 ]);
 
-fft_field_operation!(Fp, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
+fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use paste::paste;
+    use rand_core::OsRng;
+
+    field_test!(bls12_381_scalar, Fr, 1000);
+}
 ```
 
 ### Curve
-The following `JubjubProjective` supports point arithmetic.
+The following `G1Affine` and `G1Projective` supports point arithmetic.
+
 ```rust
-use crate::fp::Fp;
-use zero_crypto::arithmetic::bits_256::*;
+use crate::fq::Fq;
+use crate::fr::Fr;
+use zero_crypto::arithmetic::bits_384::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::curve::*;
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct JubjubProjective {
-    pub(crate) x: Fp,
-    pub(crate) y: Fp,
-    pub(crate) z: Fp,
+pub struct G1Projective {
+    pub(crate) x: Fq,
+    pub(crate) y: Fq,
+    pub(crate) z: Fq,
 }
-
-const IDENTITY: JubjubProjective = JubjubProjective {
-    x: Fp::zero(),
-    y: Fp::zero(),
-    z: Fp::zero(),
-};
-
-const GENERATOR: JubjubProjective = JubjubProjective {
-    x: Fp::to_mont_form([
-        0x7c24d812779a3316,
-        0x72e38f4ebd4070f3,
-        0x03b3fe93f505a6f2,
-        0xc4c71e5a4102960,
-    ]),
-    y: Fp::to_mont_form([
-        0xd2047ef3463de4af,
-        0x01ca03640d236cbf,
-        0xd3033593ae386e92,
-        0xaa87a50921b80ec,
-    ]),
-    z: Fp::one(),
-};
-
-const PARAM_A: Fp = Fp::zero();
-
-const PARAM_B: Fp = Fp::to_mont_form([4, 0, 0, 0]);
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct JubjubAffine {
-    x: Fp,
-    y: Fp,
+pub struct G1Affine {
+    pub(crate) x: Fq,
+    pub(crate) y: Fq,
     is_infinity: bool,
 }
 
 curve_operation!(
-    Fp,
-    Fp,
-    PARAM_A,
-    PARAM_B,
-    JubjubAffine,
-    JubjubProjective,
-    GENERATOR,
-    IDENTITY
+    Fr,
+    Fq,
+    G1_PARAM_A,
+    G1_PARAM_B,
+    G1Affine,
+    G1Projective,
+    G1_GENERATOR_X,
+    G1_GENERATOR_Y
 );
+
+#[cfg(test)]
+mod tests {
+    #[allow(unused_imports)]
+    use super::*;
+
+    curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);
+}
 ```
