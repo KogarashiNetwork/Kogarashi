@@ -642,10 +642,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "circuits"
-version = "0.1.0"
-
-[[package]]
 name = "clap"
 version = "2.34.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3620,6 +3616,16 @@ dependencies = [
  "serde",
  "subtle 2.4.1",
  "zero-crypto",
+]
+
+[[package]]
+name = "zero-circuits"
+version = "0.1.0"
+dependencies = [
+ "rand 0.8.5",
+ "zero-crypto",
+ "zero-jubjub",
+ "zero-plonk",
 ]
 
 [[package]]
