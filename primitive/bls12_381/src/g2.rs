@@ -27,14 +27,20 @@ pub struct G2Affine {
 }
 
 /// The coefficient for pairing affine format
-#[derive(Debug, Clone, Copy, Decode, Encode)]
+#[derive(Debug, Clone, PartialEq, Eq, Copy, Decode, Encode)]
 pub struct PairingCoeff(pub(crate) Fq2, pub(crate) Fq2, pub(crate) Fq2);
 
 /// The pairing format coordinate
-#[derive(Debug, Clone, Decode, Encode)]
+#[derive(Debug, Clone, Eq, Decode, Encode)]
 pub struct G2PairingAffine {
     pub coeffs: Vec<PairingCoeff>,
     is_infinity: bool,
+}
+
+impl PartialEq for G2PairingAffine {
+    fn eq(&self, other: &Self) -> bool {
+        self.coeffs == other.coeffs && self.is_infinity == other.is_infinity
+    }
 }
 
 curve_operation!(

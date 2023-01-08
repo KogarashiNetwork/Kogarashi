@@ -18,6 +18,8 @@ sp-std = { default-features = false, version = '3.0.0' }
 zero-plonk = { path = "../../primitive/plonk", default-features = false }
 zero-jubjub = { path = "../../primitive/jubjub", default-features = false }
 zero-crypto = { path = "../../primitive/crypto", default-features = false }
+zero-bls12-381 = { path = "../../primitive/bls12_381", default-features = false }
+rand_xorshift = { git = "https://github.com/AstarNetwork/rngs", branch = "master", default-features = false }
 
 [dev-dependencies]
 serde = { version = "1.0.119" }

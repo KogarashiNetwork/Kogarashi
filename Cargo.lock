@@ -1878,12 +1878,14 @@ dependencies = [
  "paste",
  "rand 0.8.5",
  "rand_core 0.6.3",
+ "rand_xorshift 0.3.0 (git+https://github.com/AstarNetwork/rngs?branch=master)",
  "serde",
  "sp-core",
  "sp-io",
  "sp-runtime",
  "sp-std",
  "tempdir",
+ "zero-bls12-381",
  "zero-crypto",
  "zero-jubjub",
  "zero-plonk",
@@ -2200,7 +2202,7 @@ dependencies = [
  "quick-error 2.0.1",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex-syntax",
  "rusty-fork",
  "tempfile",
@@ -2379,6 +2381,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d25bf25ec5ae4a3f1b92f929810509a2f53d7dca2f50b794ff57e3face536c8f"
 dependencies = [
  "rand_core 0.6.3",
+]
+
+[[package]]
+name = "rand_xorshift"
+version = "0.3.0"
+source = "git+https://github.com/AstarNetwork/rngs?branch=master#241cb572bb885794784f70d35c1c2bd3ad314367"
+dependencies = [
+ "parity-scale-codec",
+ "rand_core 0.6.3",
+ "sp-std",
 ]
 
 [[package]]
@@ -3666,7 +3678,7 @@ dependencies = [
  "proptest",
  "rand 0.8.5",
  "rand_core 0.6.3",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "subtle 2.4.1",
  "zero-crypto",
@@ -3680,7 +3692,7 @@ dependencies = [
  "proptest",
  "rand 0.8.5",
  "rand_core 0.6.3",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std",
  "subtle 2.4.1",
 ]
@@ -3693,7 +3705,7 @@ dependencies = [
  "parity-scale-codec",
  "proptest",
  "rand 0.8.5",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "zero-crypto",
  "zero-jubjub",
@@ -3709,7 +3721,7 @@ dependencies = [
  "proptest",
  "rand 0.8.5",
  "rand_core 0.6.3",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "sp-std",
  "subtle 2.4.1",
@@ -3725,7 +3737,7 @@ dependencies = [
  "proptest",
  "rand 0.8.5",
  "rand_core 0.6.3",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rayon",
  "zero-bls12-381",
  "zero-crypto",
@@ -3753,7 +3765,7 @@ name = "zero-pairing"
 version = "0.1.0"
 dependencies = [
  "rand 0.8.5",
- "rand_xorshift",
+ "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "zero-bls12-381",
  "zero-crypto",
 ]
@@ -3773,6 +3785,7 @@ dependencies = [
  "hashbrown 0.9.1",
  "itertools 0.9.0",
  "merlin 3.0.0",
+ "parity-scale-codec",
  "rand 0.8.5",
  "rand_core 0.6.3",
  "rayon",

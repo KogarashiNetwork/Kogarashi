@@ -1,43 +1,9 @@
+use crate::mock::DummyCircuit;
+use crate::types::{JubJubScalar, PublicParameters};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
 use zero_crypto::behave::Group;
-use zero_plonk::prelude::*;
-
-pub struct DummyCircuit {
-    a: JubJubScalar,
-    b: JubJubExtended,
-}
-
-impl DummyCircuit {
-    pub fn new(a: JubJubScalar) -> Self {
-        Self {
-            a,
-            b: zero_jubjub::GENERATOR_EXTENDED * &a,
-        }
-    }
-}
-
-impl Default for DummyCircuit {
-    fn default() -> Self {
-        Self::new(JubJubScalar::from(7u64))
-    }
-}
-
-impl Circuit for DummyCircuit {
-    fn circuit<C>(&self, composer: &mut C) -> Result<(), Error>
-    where
-        C: Composer,
-    {
-        let w_a = composer.append_witness(self.a);
-        let w_b = composer.append_point(self.b);
-
-        let w_x = composer.component_mul_generator(w_a, zero_jubjub::GENERATOR_EXTENDED)?;
-
-        composer.assert_equal_point(w_b, w_x);
-
-        Ok(())
-    }
-}
+use zero_plonk::prelude::Compiler;
 
 #[test]
 fn default_test() {
@@ -50,15 +16,12 @@ fn default_test() {
     let (prover, verifier) =
         Compiler::compile::<DummyCircuit>(&pp, label).expect("failed to compile circuit");
 
-    // default works
-    {
-        let a = JubJubScalar::random(rng.clone());
-        let (proof, public_inputs) = prover
-            .prove(rng, &DummyCircuit::new(a))
-            .expect("failed to prove");
+    let a = JubJubScalar::random(rng.clone());
+    let (proof, public_inputs) = prover
+        .prove(rng, &DummyCircuit::new(a))
+        .expect("failed to prove");
 
-        verifier
-            .verify(&proof, &public_inputs)
-            .expect("failed to verify proof");
-    }
+    verifier
+        .verify(&proof, &public_inputs)
+        .expect("failed to verify proof");
 }
