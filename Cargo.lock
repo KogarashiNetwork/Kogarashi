@@ -1340,12 +1340,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hashbrown"
-version = "0.12.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
-
-[[package]]
 name = "hermit-abi"
 version = "0.1.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1442,16 +1436,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "indexmap"
-version = "1.9.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10a35a97730320ffe8e2d410b5d3b69279b98d2c14bdb8b70ea89ecf7888d41e"
-dependencies = [
- "autocfg",
- "hashbrown 0.12.3",
 ]
 
 [[package]]
@@ -1835,6 +1819,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
 
 [[package]]
+name = "pallet-confidential-transfer"
+version = "0.1.0"
+
+[[package]]
 name = "pallet-encrypted-balance"
 version = "0.1.0"
 dependencies = [
@@ -2058,60 +2046,6 @@ name = "pin-utils"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
-
-[[package]]
-name = "plonk"
-version = "0.8.2"
-source = "git+https://github.com/zero-network/plonk?rev=4f7ae664709a7814ae166acfc9e2ce17c6ef45be#4f7ae664709a7814ae166acfc9e2ce17c6ef45be"
-dependencies = [
- "plonk-core",
- "plonk-hashing",
-]
-
-[[package]]
-name = "plonk-circuits"
-version = "0.1.0"
-dependencies = [
- "ark-bls12-381",
- "ark-ec",
- "ark-ed-on-bls12-381",
- "ark-ff",
- "ark-poly",
- "ark-poly-commit",
- "derivative",
- "plonk",
- "rand_core 0.6.3",
-]
-
-[[package]]
-name = "plonk-core"
-version = "0.1.0"
-source = "git+https://github.com/zero-network/plonk?rev=4f7ae664709a7814ae166acfc9e2ce17c6ef45be#4f7ae664709a7814ae166acfc9e2ce17c6ef45be"
-dependencies = [
- "ark-bls12-381",
- "ark-ec",
- "ark-ff",
- "ark-poly",
- "ark-poly-commit",
- "ark-serialize",
- "ark-std",
- "blake2",
- "derivative",
- "hashbrown 0.11.2",
- "indexmap",
- "itertools 0.10.5",
- "merlin 3.0.0",
- "num-traits",
- "rand_core 0.6.3",
-]
-
-[[package]]
-name = "plonk-hashing"
-version = "0.8.2"
-source = "git+https://github.com/zero-network/plonk?rev=4f7ae664709a7814ae166acfc9e2ce17c6ef45be#4f7ae664709a7814ae166acfc9e2ce17c6ef45be"
-dependencies = [
- "plonk-core",
-]
 
 [[package]]
 name = "plotters"

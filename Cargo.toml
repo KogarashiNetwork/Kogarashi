@@ -30,7 +30,7 @@ members = [
     "primitive/kzg",
     "primitive/pairing",
     "primitive/plonk",
-    "example/plonk-circuits",
+    "pallets/confidential_transfer",
     "pallets/encrypted_balance",
     "pallets/plonk"
 ]

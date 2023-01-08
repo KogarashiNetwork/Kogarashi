@@ -1,7 +1,7 @@
 [package]
 name = "pallet-encrypted-balance"
 version = "0.1.0"
-authors = ["Parity Technologies <admin@parity.io>"]
+authors = ["Inverse Inc <info@inverse.tech>"]
 edition = "2018"
 license = "Apache-2.0"
 homepage = "https://substrate.dev"
