@@ -22,29 +22,11 @@ zero-bls12-381 = { path = "../../primitive/bls12_381", default-features = false 
 rand_xorshift = { git = "https://github.com/zero-network/rngs", branch = "master", default-features = false }
 
 [dev-dependencies]
-serde = { version = "1.0.119" }
+serde = { version = "1.0.125", default-features = false, features = ["derive"] }
+rand = { version = "0.8", default-features = false }
 sp-core = { default-features = false, version = '3.0.0' }
 sp-io = { default-features = false, version = '3.0.0' }
 sp-runtime = { default-features = false, version = '3.0.0' }
-# plonk dependencies
-ark-ff = "0.3"
-ark-sponge = "0.3"
-ark-std = "0.3"
-ark-bls12-377 = "0.3"
-ark-bls12-381 = "0.3"
-ark-ec = "0.3"
-ark-ed-on-bls12-377 = "0.3"
-ark-ed-on-bls12-381 = "0.3"
-ark-poly = "0.3"
-ark-poly-commit = "0.3"
-blake2 = "0.9"
-criterion = "0.3"
-derivative = "2.2.0"
-paste = "1.0.6"
-rand_core = {version = "0.6", default-features=false, features = ["getrandom"] }
-tempdir = "0.3"
-ark-vesta = "0.3"
-rand = "0.8"
 
 [features]
 default = ['std']

@@ -53,9 +53,11 @@
 
 pub use pallet::*;
 
+#[cfg(feature = "std")]
 #[cfg(test)]
 mod mock;
 
+#[cfg(feature = "std")]
 #[cfg(test)]
 mod tests;
 
