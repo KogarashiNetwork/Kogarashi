@@ -4,6 +4,7 @@ use zero_crypto::behave::*;
 
 // key pair structure
 #[derive(Clone, Debug)]
+#[allow(dead_code)]
 pub struct KeyPair<C: Commitment> {
     k: u64,
     pub(crate) g1: Vec<C::G1Affine>,
