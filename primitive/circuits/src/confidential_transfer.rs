@@ -2,6 +2,8 @@ use zero_crypto::common::Group;
 use zero_jubjub::{Fp as JubJubScalar, JubJubAffine, GENERATOR_EXTENDED};
 use zero_plonk::prelude::*;
 
+const BALANCE_BITS: usize = 16;
+
 pub struct ConfidentialTransferCircuit {
     alice_public_key: JubJubAffine,
     bob_public_key: JubJubAffine,
@@ -14,6 +16,7 @@ pub struct ConfidentialTransferCircuit {
     transfer_amount_b: JubJubScalar,
     alice_after_balance: JubJubScalar,
     randomness: JubJubScalar,
+    bits: usize,
 }
 
 impl ConfidentialTransferCircuit {
@@ -42,6 +45,7 @@ impl ConfidentialTransferCircuit {
             transfer_amount_b,
             alice_after_balance,
             randomness,
+            bits: BALANCE_BITS,
         }
     }
 }
@@ -60,6 +64,7 @@ impl Default for ConfidentialTransferCircuit {
             transfer_amount_b: JubJubScalar::ADDITIVE_IDENTITY,
             alice_after_balance: JubJubScalar::ADDITIVE_IDENTITY,
             randomness: JubJubScalar::ADDITIVE_IDENTITY,
+            bits: BALANCE_BITS,
         }
     }
 }
@@ -78,8 +83,6 @@ impl Circuit for ConfidentialTransferCircuit {
             composer.append_point(self.alice_left_encrypted_transfer_amount);
         let alice_right_encrypted_transfer_amount =
             composer.append_point(self.alice_right_encrypted_transfer_amount);
-        let bob_left_encrypted_transfer_amount =
-            composer.append_point(self.bob_left_encrypted_transfer_amount);
         let alice_private_key = composer.append_witness(self.alice_private_key);
         let transfer_amount_b = composer.append_witness(self.transfer_amount_b);
         let alice_after_balance = composer.append_witness(self.alice_after_balance);
@@ -93,19 +96,26 @@ impl Circuit for ConfidentialTransferCircuit {
             composer.component_mul_point(randomness, alice_public_key);
         let left_alice_transfer =
             composer.component_add_point(g_pow_balance, alice_pk_powered_by_randomness);
-        composer.assert_equal_point(left_alice_transfer, alice_left_encrypted_transfer_amount);
+        composer.assert_equal_public_point(
+            left_alice_transfer,
+            self.alice_left_encrypted_transfer_amount,
+        );
 
         // Bob left encrypted transfer check
         let bob_pk_powered_by_randomness = composer.component_mul_point(randomness, bob_public_key);
         let left_bob_transfer =
             composer.component_add_point(g_pow_balance, bob_pk_powered_by_randomness);
-        composer.assert_equal_point(left_bob_transfer, bob_left_encrypted_transfer_amount);
+        composer
+            .assert_equal_public_point(left_bob_transfer, self.bob_left_encrypted_transfer_amount);
 
         // Alice right encrypted transfer check
         let g_pow_randomness = composer.component_mul_generator(randomness, GENERATOR_EXTENDED)?;
-        composer.assert_equal_point(g_pow_randomness, alice_right_encrypted_transfer_amount);
+        composer.assert_equal_public_point(
+            g_pow_randomness,
+            self.alice_right_encrypted_transfer_amount,
+        );
 
-        // Alice after balance is correct
+        // Alice after balance check
         let g_pow_after_balance =
             composer.component_mul_generator(alice_after_balance, GENERATOR_EXTENDED)?;
         let alice_left_transfer_neg =
@@ -122,10 +132,14 @@ impl Circuit for ConfidentialTransferCircuit {
         let x = composer.component_add_point(g_pow_after_balance, right_after_balance);
         composer.assert_equal_point(left_after_balance, x);
 
-        // Public key calculated correctly
+        // Public key calculation check
         let calculated_pk =
             composer.component_mul_generator(alice_private_key, GENERATOR_EXTENDED)?;
-        composer.assert_equal_point(calculated_pk, alice_public_key);
+        composer.assert_equal_public_point(calculated_pk, self.alice_public_key);
+
+        // Transfer amount and ramaining balance range check
+        composer.component_range(transfer_amount_b, self.bits);
+        composer.component_range(alice_after_balance, self.bits);
 
         Ok(())
     }
@@ -140,9 +154,9 @@ mod confidential_transfer_circuit_test {
 
     #[test]
     fn confidential_transfer_circuit_test() {
-        // trusted setup and key pair generation
+        // 1. trusted setup and key pair generation
         let mut rng = StdRng::seed_from_u64(8349u64);
-        let n = 1 << 18;
+        let n = 1 << 14;
         let label = b"demo";
         let trusted_setup = start_timer!(|| "trusted setup");
         let pp = PublicParameters::setup(n, &mut rng).expect("failed to create pp");
@@ -153,10 +167,8 @@ mod confidential_transfer_circuit_test {
             .expect("failed to compile circuit");
         end_timer!(circuit_compile);
 
-        // confidential transfer params
-
-        // transaction sender and recipient key pair
-
+        // 2. confidential transfer params
+        // 2.0. transaction sender and recipient key pair
         let params_generation = start_timer!(|| "params generation");
         let generator = GENERATOR_EXTENDED;
         let alice_private_key = JubJubScalar::random(&mut rng);
@@ -164,7 +176,7 @@ mod confidential_transfer_circuit_test {
         let alice_public_key = generator * alice_private_key;
         let bob_public_key = generator * bob_private_key;
 
-        // encrypt transaction by ElGamal encryption
+        // 2.1. encrypt transaction by ElGamal encryption
         let alice_balance = JubJubScalar::from(1500 as u64);
         let transfer_amount_b = JubJubScalar::from(800 as u64);
         let alice_after_balance = JubJubScalar::from(700 as u64);
@@ -174,13 +186,14 @@ mod confidential_transfer_circuit_test {
         let alice_left_encrypted_balance =
             (generator * alice_balance) + (alice_public_key * alice_original_randomness);
         let alice_right_encrypted_balance = generator * alice_original_randomness;
-        let alice_left_encrypted_transfer_amount = generator * transfer_amount_b;
+        let alice_left_encrypted_transfer_amount =
+            (generator * transfer_amount_b) + (alice_public_key * randomness);
         let alice_right_encrypted_transfer_amount = generator * randomness;
         let bob_left_encrypted_transfer_amount =
             (generator * transfer_amount_b) + (bob_public_key * randomness);
         end_timer!(params_generation);
 
-        // generate proof
+        // 3. generate proof
         let proof_generation = start_timer!(|| "proof generation");
         let (proof, public_inputs) = prover
             .prove(
@@ -202,7 +215,7 @@ mod confidential_transfer_circuit_test {
             .expect("failed to prove");
         end_timer!(proof_generation);
 
-        // verify proof
+        // 4. verify proof
         let verify_proof = start_timer!(|| "verify proof");
         verifier
             .verify(&proof, &public_inputs)
