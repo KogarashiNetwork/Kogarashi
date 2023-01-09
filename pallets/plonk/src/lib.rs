@@ -70,7 +70,7 @@ pub use types::*;
 use frame_support::dispatch::{DispatchErrorWithPostInfo, PostDispatchInfo};
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
-use sp_std::vec::Vec;
+use zero_crypto::common::Vec;
 use zero_plonk::prelude::Compiler;
 
 #[frame_support::pallet]

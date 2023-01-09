@@ -7,12 +7,10 @@ use super::{
     field::PrimeField,
 };
 
-#[cfg(feature = "std")]
 use super::{algebra::Field, comp::ParallelCmp};
 
 /// This is fft field
 /// This is used for fft and has roots of unity
-#[cfg(feature = "std")]
 pub trait FftField: PrimeField + ParallelCmp + From<u64> {
     // factor power of two
     const S: usize;
@@ -24,7 +22,6 @@ pub trait FftField: PrimeField + ParallelCmp + From<u64> {
 
 /// This is polynomial
 /// This has fft functionality and represents polynomial ring
-#[cfg(feature = "std")]
 pub trait Polynomial: Field + ParallelCmp {
     // domain of polynomial
     type Domain: FftField;

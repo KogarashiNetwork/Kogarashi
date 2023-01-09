@@ -14,7 +14,6 @@ codec = { default-features = false, features = ['derive'], package = 'parity-sca
 frame-system = { default-features = false, version = '3.0.0' }
 frame-support = { default-features = false, version = '3.0.0' }
 frame-benchmarking = { default-features = false, optional = true, version = '3.1.0' }
-sp-std = { default-features = false, version = '3.0.0' }
 zero-plonk = { path = "../../primitive/plonk", default-features = false }
 zero-jubjub = { path = "../../primitive/jubjub", default-features = false }
 zero-crypto = { path = "../../primitive/crypto", default-features = false }
@@ -27,19 +26,3 @@ rand = { version = "0.8", default-features = false }
 sp-core = { default-features = false, version = '3.0.0' }
 sp-io = { default-features = false, version = '3.0.0' }
 sp-runtime = { default-features = false, version = '3.0.0' }
-
-[features]
-default = ['std']
-std = [
-	'codec/std',
-	'frame-support/std',
-	'frame-system/std',
-	'frame-benchmarking/std',
-	'sp-std/std',
-	"zero-plonk/std"
-]
-runtime-benchmarks = [
-	'frame-benchmarking',
-	'frame-support/runtime-benchmarks',
-	'frame-system/runtime-benchmarks',
-]

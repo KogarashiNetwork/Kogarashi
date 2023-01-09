@@ -1673,7 +1673,6 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std",
  "zero-bls12-381",
  "zero-crypto",
  "zero-jubjub",
