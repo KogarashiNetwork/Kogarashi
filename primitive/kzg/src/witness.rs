@@ -1,6 +1,7 @@
 use zero_crypto::behave::Commitment;
 
 // witness for polynomial commitment
+#[allow(dead_code)]
 pub struct Witness<C: Commitment> {
     pub(crate) s_eval: C::G1Affine,
     pub(crate) a_eval: C::G1Affine,

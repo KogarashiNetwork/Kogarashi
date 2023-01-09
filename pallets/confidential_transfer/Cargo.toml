@@ -1,12 +1,10 @@
 [package]
 name = "pallet-confidential-transfer"
-description = 'confidential transfer pallet'
-edition = '2018'
-homepage = 'https://github.com/zero-network/zero'
+description = 'Confidential Transfer Pallet'
+version = "0.1.1"
+edition = '2021'
+authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
 license = "Apache-2.0"
-version = "0.1.0"
-readme = 'README.md'
-repository = 'https://github.com/zero-network/zero'
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
