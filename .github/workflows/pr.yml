@@ -11,10 +11,15 @@ jobs:
 
       steps:
         - uses: actions/checkout@v2
+          with:
+            submodules: recursive
+        - name: Update submodules
+          id: update
+          run: git submodule update --remote --recursive
         - uses: actions-rs/toolchain@v1
         - name: Add Target
           run: rustup target add wasm32-unknown-unknown
-        - name: Build
+        - name: Wasm Build
           uses: actions-rs/cargo@v1
           with:
             command: build
@@ -33,10 +38,6 @@ jobs:
         id: update
         run: git submodule update --remote --recursive
       - uses: actions-rs/toolchain@v1
-      - name: Update Submodule
-        run: |
-          git submodule update --init --recursive
-          git submodule update --remote --recursive
       - name: Test
         uses: actions-rs/cargo@v1
         with:
