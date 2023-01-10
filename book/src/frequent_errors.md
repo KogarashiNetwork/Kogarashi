@@ -4,6 +4,7 @@ The main errors happen during development of runtime pallet are followings.
 - `error: duplicate lang item in crate`
 - `error: the wasm32-unknown-unknown target is not supported by default, you may need to enable the "js" feature`
 - `error[E0603]: module "group" is private`
+- `error[E0512]: cannot transmute between types of different sizes, or dependently-sized types`
 
 Explaining causes and remedies.
 
@@ -49,4 +50,15 @@ We need to indicate exact version of `syn` as using expected behavior.
 
 ```
 $ cargo update -p syn --precise 1.0.96
+```
+
+## `error[E0512]: cannot transmute between types of different sizes, or dependently-sized types`
+This error happens on [`runtime-interface`](https://github.com/paritytech/substrate/blob/master/primitives/runtime-interface/src/impls.rs#L44) and both macro available when `#[cfg(all(not(feature = "std"), not(feature = "disable_target_static_assertions")))]` so we need to specify `std` as following.
+
+```toml
+[features]
+default = ["std"]
+std = [
+    "frame-support/std"
+]
 ```

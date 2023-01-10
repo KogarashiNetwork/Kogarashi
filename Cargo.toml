@@ -21,6 +21,8 @@ confidential_transfer = { default-features = false, path = "./pallets/confidenti
 pallet-plonk = { default-features = false, path = "./pallets/plonk" }
 pallet-encrypted-balance = { default-features = false, path = "./pallets/encrypted_balance" }
 
+frame-support = { version = "3.0.0", default-features = false }
+
 [workspace]
 members = [
     "primitive/bls12_381",
