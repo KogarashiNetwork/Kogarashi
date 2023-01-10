@@ -35,9 +35,3 @@ members = [
     "pallets/encrypted_balance",
     "pallets/plonk"
 ]
-
-[features]
-default = ['std']
-std = [
-    'pallet-encrypted-balance/std'
-]

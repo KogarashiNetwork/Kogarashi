@@ -13,7 +13,7 @@ parity-scale-codec = { version = "2.1.0", default-features = false, features = [
 zero-jubjub = { path = "../jubjub" }
 zero-crypto = { path = '../crypto' }
 serde = { version = "1.0.125", default-features = false, features = ["derive"] }
-num-traits = "0.2.15"
+num-traits = { version = "0.2.15", default-features = false }
 
 [dev-dependencies]
 rand = { version = "0.8", default-features = false }

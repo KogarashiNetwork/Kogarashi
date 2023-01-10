@@ -8,8 +8,14 @@ The main errors happen during development of runtime pallet are followings.
 Explaining causes and remedies.
 
 ## `error: duplicate lang item in crate`
+This error happens when we use different version crate but same crate on one crate.
+The error says the dependencies duplication so we can query the crate name as following.
 
+```
+$ cargo tree -e features -i {crate}
+```
 
+If we find the duplication of crate that we use same crate different version multiple times, we should align the version.
 
 ## `error: the wasm32-unknown-unknown target is not supported by default, you may need to enable the "js" feature`
 This error happens `getrandom` crate dependency on `std`.  

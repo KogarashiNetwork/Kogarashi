@@ -28,15 +28,3 @@ sp-io = { version = "3.0.0", default-features = false }
 sp-core = { version = "3.0.0", default-features = false }
 pallet-transaction-payment = { version = "3.0.0", default-features = false }
 proptest = "1"
-
-[features]
-default = ["std"]
-std = [
-	"codec/std",
-	"sp-std/std",
-	"sp-runtime/std",
-	"frame-benchmarking/std",
-	"frame-support/std",
-	"frame-system/std"
-]
-runtime-benchmarks = ["frame-benchmarking"]
