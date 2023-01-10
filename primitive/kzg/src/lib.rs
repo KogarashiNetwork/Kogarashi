@@ -15,13 +15,22 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
+#[cfg(feature = "std")]
 mod commitment;
+#[cfg(feature = "std")]
 mod fft;
+#[cfg(feature = "std")]
 mod keypair;
+#[cfg(feature = "std")]
 mod poly;
+#[cfg(feature = "std")]
 mod witness;
 
+#[cfg(feature = "std")]
 pub use commitment::KzgCommitment;
+#[cfg(feature = "std")]
 pub use fft::Fft;
+#[cfg(feature = "std")]
 pub use keypair::KeyPair;
+#[cfg(feature = "std")]
 pub use witness::Witness;
