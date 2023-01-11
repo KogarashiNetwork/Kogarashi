@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 zero-plonk = { path = "../plonk" }
 zero-jubjub = { path = "../jubjub" }
+zero-elgamal = { path = "../elgamal" }
 zero-crypto = { path = "../crypto" }
 
 [dev-dependencies]

@@ -29,14 +29,26 @@ use serde::{Deserialize, Serialize};
 pub use zero_jubjub::Fp;
 use zero_jubjub::{JubJubAffine, JubJubExtended, GENERATOR_EXTENDED};
 
-#[derive(Debug, Default, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
 pub struct EncryptedNumber {
     s: JubJubAffine,
     t: JubJubAffine,
 }
 
-#[allow(unused_variables)]
+impl Default for EncryptedNumber {
+    fn default() -> Self {
+        Self {
+            s: JubJubAffine::identity(),
+            t: JubJubAffine::identity(),
+        }
+    }
+}
+
 impl EncryptedNumber {
+    pub fn new(s: JubJubAffine, t: JubJubAffine) -> Self {
+        Self { s, t }
+    }
+
     pub fn encrypt(private_key: Fp, value: u32, random: Fp) -> Self {
         let g = GENERATOR_EXTENDED;
         let public_key = g * private_key;
@@ -60,6 +72,10 @@ impl EncryptedNumber {
             acc += g;
         }
         None
+    }
+
+    pub fn get(self) -> (JubJubAffine, JubJubAffine) {
+        (self.s, self.t)
     }
 }
 

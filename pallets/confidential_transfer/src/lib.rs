@@ -1,11 +1,13 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(clippy::unused_unit)]
-//! A simple pallet with two storage values. The pallet itself does not teach any new concepts.
-//! Rather we use this pallet as demonstration case as we demonstrate custom runtime APIs.
-//! This pallet supports a runtime API which will allow querying the runtime for the sum of
-//! the two storage items.
 
 pub use pallet::*;
+
+#[cfg(test)]
+mod tests;
+
+#[cfg(test)]
+mod mock;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -14,10 +16,8 @@ pub mod pallet {
     use pallet_plonk::{Fr, FullcodecRng, Proof};
     use zero_crypto::common::Vec;
 
-    /// Copuliing configuration trait with pallet_plonk.
     #[pallet::config]
     pub trait Config: frame_system::Config + pallet_plonk::Config {
-        /// The overarching event type.
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
     }
 
@@ -43,7 +43,6 @@ pub mod pallet {
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
 
-    // The module's dispatchable functions.
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         // Coupled trusted setup
@@ -57,7 +56,6 @@ pub mod pallet {
             Ok(().into())
         }
 
-        /// Sets the first simple storage value
         #[pallet::weight(10_000)]
         pub fn set_thing_1(
             origin: OriginFor<T>,
@@ -65,7 +63,6 @@ pub mod pallet {
             proof: Proof,
             public_inputs: Vec<Fr>,
         ) -> DispatchResultWithPostInfo {
-            // Define the proof verification
             pallet_plonk::Pallet::<T>::verify(origin, proof, public_inputs)?;
 
             Thing1::<T>::put(val);
@@ -74,7 +71,6 @@ pub mod pallet {
             Ok(().into())
         }
 
-        /// Sets the second stored value
         #[pallet::weight(10_000)]
         pub fn set_thing_2(origin: OriginFor<T>, val: u32) -> DispatchResultWithPostInfo {
             let _ = ensure_signed(origin)?;
@@ -84,11 +80,5 @@ pub mod pallet {
             Self::deposit_event(Event::ValueSet(2, val));
             Ok(().into())
         }
-    }
-}
-
-impl<T: Config> Pallet<T> {
-    pub fn get_sum() -> u32 {
-        Thing1::<T>::get() + Thing2::<T>::get()
     }
 }
