@@ -2,24 +2,26 @@
 name = "zero-network"
 description = 'Zero network blockchain'
 version = "0.1.0"
-authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
+authors = ['AshWhiteHat<phantomofrotten@gmail.com>']
 edition = "2021"
 license = "Apache-2.0"
 
 [dependencies]
-zero-bls12-381 = { version = "0.1", default-features = false, path = "./primitive/bls12_381" }
-zero-crypto = { version = "0.1", default-features = false, path = "./primitive/crypto" }
-zero-elgamal = { version = "0.1", default-features = false, path = "./primitive/elgamal" }
-zero-jubjub = { version = "0.1", default-features = false, path = "./primitive/jubjub" }
-zero-kzg = { version = "0.1", path = "./primitive/kzg" }
-zero-pairing = { version = "0.1", default-features = false, path = "./primitive/pairing" }
-pallet-encrypted-balance = { version = "0.1", default-features = false, path = "./pallets/encrypted_balance" }
-rand_core = { version = "0.5", features = ["std"] }
+# primitive
+zero-bls12-381 = { default-features = false, path = "./primitive/bls12_381" }
+zero-crypto = { default-features = false, path = "./primitive/crypto" }
+zero-elgamal = { default-features = false, path = "./primitive/elgamal" }
+zero-jubjub = { default-features = false, path = "./primitive/jubjub" }
+zero-kzg = { default-features = false, path = "./primitive/kzg" }
+zero-pairing = { default-features = false, path = "./primitive/pairing" }
+zero-plonk = { default-features = false, path = "./primitive/plonk" }
 
-[dev-dependencies]
-ed25519 = "1.3"
-ed25519-dalek = "1"
-rand_core = "0.6"
+# pallet
+confidential_transfer = { default-features = false, path = "./pallets/confidential_transfer" }
+pallet-plonk = { default-features = false, path = "./pallets/plonk" }
+pallet-encrypted-balance = { default-features = false, path = "./pallets/encrypted_balance" }
+
+frame-support = { version = "3.0.0" }
 
 [workspace]
 members = [
@@ -34,10 +36,4 @@ members = [
     "pallets/confidential_transfer",
     "pallets/encrypted_balance",
     "pallets/plonk"
-]
-
-[features]
-default = ['std']
-std = [
-    'pallet-encrypted-balance/std'
 ]

@@ -3,7 +3,6 @@ use core::fmt::Debug;
 use parity_scale_codec::{Decode, Encode};
 
 /// parallelize compatible pallet
-#[cfg(feature = "std")]
 pub trait ParallelCmp: Send + Sync {}
 
 /// parity compatible pallet

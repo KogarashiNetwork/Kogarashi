@@ -1,12 +1,25 @@
 [package]
-name = "pallet-confidential-transfer"
+name = "confidential_transfer"
 description = 'Confidential Transfer Pallet'
 version = "0.1.1"
 edition = '2021'
-authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
+authors = ['AshWhiteHat<phantomofrotten@gmail.com>']
 license = "Apache-2.0"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+codec = { default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0' }
+pallet-plonk = { path = "../plonk", default-features = false }
+zero-crypto = { path = "../../primitive/crypto", default-features = false }
+frame-system = { default-features = false, version = '3.0.0' }
+frame-support = { default-features = false, version = '3.0.0' }
+
+[features]
+default = ["std"]
+std = [
+    'codec/std',
+    "frame-support/std",
+	'frame-system/std',
+]

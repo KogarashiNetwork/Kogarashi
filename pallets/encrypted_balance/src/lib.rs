@@ -149,8 +149,8 @@
 
 #[macro_use]
 mod tests;
-mod benchmarking;
 mod encrypted_currency;
+#[cfg(feature = "std")]
 mod tests_composite;
 mod tests_local;
 pub mod weights;

@@ -1,7 +1,7 @@
 use crate::types::*;
 use frame_support::pallet_prelude::DispatchResultWithPostInfo;
-use sp_std::vec::Vec;
 use zero_bls12_381::Fr;
+use zero_crypto::common::Vec;
 
 /// Abstraction over a plonk zk-SNARKs system
 pub trait Plonk<AccountId> {

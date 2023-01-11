@@ -65,7 +65,6 @@ impl Config for TestRuntime {
 mod plonk_test {
     use super::*;
     use crate::types::JubJubScalar;
-    use rand::rngs::StdRng;
     use rand::SeedableRng;
     use zero_crypto::behave::Group;
     use zero_plonk::prelude::Compiler;
@@ -103,14 +102,14 @@ mod plonk_test {
         new_test_ext().execute_with(|| {
             assert_ok!(Plonk::trusted_setup(Origin::signed(1), 12, rng));
 
-            let rng = &mut StdRng::seed_from_u64(8349u64);
+            let mut rng = get_rng();
             let pp = Plonk::public_parameter().unwrap();
 
             let (prover, verifier) =
                 Compiler::compile::<DummyCircuit>(&pp, label).expect("failed to compile circuit");
 
             let (proof, public_inputs) = prover
-                .prove(rng, &DummyCircuit::new(a))
+                .prove(&mut rng, &DummyCircuit::new(a))
                 .expect("failed to prove");
 
             verifier

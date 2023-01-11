@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use sp_std::vec::Vec;
+
 #[inline(always)]
 pub const fn adc(a: u64, b: u64, c: u64) -> (u64, u64) {
     let t = a as u128 + b as u128 + c as u128;
