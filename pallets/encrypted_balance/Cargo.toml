@@ -31,5 +31,7 @@ proptest = "1"
 [features]
 default = ["std"]
 std = [
-    "frame-support/std"
+    'codec/std',
+    "frame-support/std",
+	'frame-system/std',
 ]

@@ -19,5 +19,7 @@ frame-support = { default-features = false, version = '3.0.0' }
 [features]
 default = ["std"]
 std = [
-    "frame-support/std"
+    'codec/std',
+    "frame-support/std",
+	'frame-system/std',
 ]

@@ -4,27 +4,6 @@ on:
     branches: [ master, develop ]
 
 jobs:
-  build:
-      if: github.event.pull_request.draft == false
-      name: Build Crate
-      runs-on: ubuntu-latest
-
-      steps:
-        - uses: actions/checkout@v2
-          with:
-            submodules: recursive
-        - name: Update submodules
-          id: update
-          run: git submodule update --remote --recursive
-        - uses: actions-rs/toolchain@v1
-        - name: Add Target
-          run: rustup target add wasm32-unknown-unknown
-        - name: Wasm Build
-          uses: actions-rs/cargo@v1
-          with:
-            command: build
-            args: --all-features --no-default-features --target wasm32-unknown-unknown
-
   test:
     if: github.event.pull_request.draft == false
     name: Debug Environment Unit Test
