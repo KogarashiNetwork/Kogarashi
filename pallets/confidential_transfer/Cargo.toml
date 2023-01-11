@@ -3,7 +3,7 @@ name = "confidential_transfer"
 description = 'Confidential Transfer Pallet'
 version = "0.1.1"
 edition = '2021'
-authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
+authors = ['AshWhiteHat<phantomofrotten@gmail.com>']
 license = "Apache-2.0"
 
 

@@ -2,7 +2,7 @@
 name = "zero-network"
 description = 'Zero network blockchain'
 version = "0.1.0"
-authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
+authors = ['AshWhiteHat<phantomofrotten@gmail.com>']
 edition = "2021"
 license = "Apache-2.0"
 

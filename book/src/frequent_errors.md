@@ -5,6 +5,7 @@ The main errors happen during development of runtime pallet are followings.
 - `error: the wasm32-unknown-unknown target is not supported by default, you may need to enable the "js" feature`
 - `error[E0603]: module "group" is private`
 - `error[E0512]: cannot transmute between types of different sizes, or dependently-sized types`
+- `error[E0432]: unresolved import sp_core::to_substrate_wasm_fn_return_value`
 
 Explaining causes and remedies.
 
@@ -59,6 +60,17 @@ This error happens on [`runtime-interface`](https://github.com/paritytech/substr
 [features]
 default = ["std"]
 std = [
-    "frame-support/std"
+    "crate/std"
+]
+```
+
+## `error[E0432]: unresolved import sp_core::to_substrate_wasm_fn_return_value`
+This error happens the crate which has `sp_api` dependency. And to clarify every crate which imported as `default-features = false` is described as `crate/std` in `[features]`.
+
+```toml
+[features]
+default = ["std"]
+std = [
+    "crate/std"
 ]
 ```

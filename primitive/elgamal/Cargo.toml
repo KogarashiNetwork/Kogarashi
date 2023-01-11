@@ -1,5 +1,5 @@
 [package]
-authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
+authors = ['AshWhiteHat<phantomofrotten@gmail.com>']
 name = "zero-elgamal"
 description = 'lifted elgamal encryption implementation'
 version = "0.1.0"

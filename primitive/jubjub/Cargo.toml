@@ -1,5 +1,5 @@
 [package]
-authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
+authors = ['AshWhiteHat<phantomofrotten@gmail.com>']
 description = 'twisted edwards curve implementation'
 name = "zero-jubjub"
 version = "0.1.0"

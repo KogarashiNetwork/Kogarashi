@@ -1,5 +1,5 @@
 [package]
-authors = ['NoCtrlZ<phantomofrotten@gmail.com>']
+authors = ['AshWhiteHat<phantomofrotten@gmail.com>']
 name = "zero-bls12-381"
 description = 'lifted elgamal encryption implementation'
 version = "0.1.1"
