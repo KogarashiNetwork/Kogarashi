@@ -10,7 +10,7 @@ macro_rules! curve_operation {
         use zero_crypto::behave::*;
         use zero_crypto::common::*;
 
-        affine_group_operation!($affine, $range, $scalar, $x, $y);
+        affine_group_operation!($affine, $projective, $range, $scalar, $x, $y);
         projective_group_operation!($projective, $range, $scalar, $x, $y);
         mixed_curve_operation!($affine, $projective);
 
@@ -73,6 +73,7 @@ macro_rules! curve_operation {
         }
 
         impl Affine for $affine {
+            type Scalar = $scalar;
             type Projective = $projective;
 
             fn to_projective(self) -> Self::Projective {

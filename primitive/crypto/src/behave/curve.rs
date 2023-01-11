@@ -4,14 +4,13 @@ use super::{
     comp::{Basic, ParityCmp},
     field::PrimeField,
 };
-use core::ops::{Add, AddAssign, Sub, SubAssign};
+use core::ops::{Add, AddAssign, Mul, Sub, SubAssign};
 
 /// elliptic curve rational points group
 /// rational points group behaves as abelian group
-pub trait Curve: ParityCmp + Basic + Group {
+pub trait Curve: ParityCmp + Basic {
     // range field of curve
     type Range: PrimeField;
-
     // a param
     const PARAM_A: Self::Range;
     // b param
@@ -33,9 +32,14 @@ pub trait Affine:
     Curve
     + Add<Self::Projective, Output = Self::Projective>
     + Sub<Self::Projective, Output = Self::Projective>
+    + Add<Self, Output = Self::Projective>
+    + Sub<Self, Output = Self::Projective>
+    + Mul<Self::Scalar, Output = Self::Projective>
     + Into<Self::Projective>
     + From<Self::Projective>
 {
+    // scalar field of affine
+    type Scalar: PrimeField;
     // projective coordinate representation
     type Projective: Projective;
 
@@ -53,6 +57,7 @@ pub trait Affine:
 /// projective representation check that a point is infinite by z coordinate
 pub trait Projective:
     Curve
+    + Group
     + AddAssign<Self::Affine>
     + Add<Self::Affine, Output = Self>
     + SubAssign<Self::Affine>
