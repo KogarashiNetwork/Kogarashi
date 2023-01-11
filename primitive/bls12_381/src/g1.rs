@@ -264,18 +264,6 @@ where
     }
 }
 
-impl<T> Sum<T> for G1Affine
-where
-    T: Borrow<G1Affine>,
-{
-    fn sum<I>(iter: I) -> Self
-    where
-        I: Iterator<Item = T>,
-    {
-        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + *item.borrow())
-    }
-}
-
 impl ConditionallySelectable for G1Affine {
     fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
         G1Affine {

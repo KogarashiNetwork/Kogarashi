@@ -1,18 +1,32 @@
 #[macro_export]
 macro_rules! affine_group_operation {
-    ($affine:ident, $range:ident, $scalar:ident, $x:ident, $y:ident) => {
-        curve_arithmetic_extension!($affine, $scalar);
+    ($affine:ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident) => {
+        impl PartialEq for $affine {
+            fn eq(&self, other: &Self) -> bool {
+                if self.is_identity() || other.is_identity() {
+                    self.is_identity() && other.is_identity()
+                } else {
+                    self.x == other.x && self.y == other.y
+                }
+            }
+        }
 
-        impl Group for $affine {
-            type Scalar = $scalar;
+        impl Eq for $affine {}
 
-            const ADDITIVE_GENERATOR: Self = Self {
+        impl Default for $affine {
+            fn default() -> Self {
+                Self::ADDITIVE_IDENTITY
+            }
+        }
+
+        impl $affine {
+            pub const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
                 y: $y,
                 is_infinity: false,
             };
 
-            const ADDITIVE_IDENTITY: Self = Self {
+            pub const ADDITIVE_IDENTITY: Self = Self {
                 x: $range::zero(),
                 y: $range::one(),
                 is_infinity: true,
@@ -33,26 +47,16 @@ macro_rules! affine_group_operation {
                 }
             }
 
-            fn random(rand: impl RngCore) -> Self {
+            fn random(rand: impl RngCore) -> $projective {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
             }
         }
 
-        impl PartialEq for $affine {
-            fn eq(&self, other: &Self) -> bool {
-                if self.is_identity() || other.is_identity() {
-                    self.is_identity() && other.is_identity()
-                } else {
-                    self.x == other.x && self.y == other.y
-                }
-            }
-        }
-
         impl Add for $affine {
-            type Output = Self;
+            type Output = $projective;
 
-            fn add(self, rhs: $affine) -> Self {
-                Self::from(add_point(self.to_projective(), rhs.to_projective()))
+            fn add(self, rhs: $affine) -> Self::Output {
+                $projective::from(add_point(self.to_projective(), rhs.to_projective()))
             }
         }
 
@@ -69,17 +73,17 @@ macro_rules! affine_group_operation {
         }
 
         impl Sub for $affine {
-            type Output = Self;
+            type Output = $projective;
 
-            fn sub(self, rhs: $affine) -> Self {
-                Self::from(add_point(self.to_projective(), rhs.neg().to_projective()))
+            fn sub(self, rhs: $affine) -> Self::Output {
+                $projective::from(add_point(self.to_projective(), rhs.neg().to_projective()))
             }
         }
 
-        impl Mul<<Self as Group>::Scalar> for $affine {
-            type Output = Self;
+        impl Mul<<Self as Affine>::Scalar> for $affine {
+            type Output = $projective;
 
-            fn mul(self, rhs: <Self as Group>::Scalar) -> Self {
+            fn mul(self, rhs: <Self as Affine>::Scalar) -> Self::Output {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.clone();
                 let bits: Vec<u8> = rhs.to_bits().into_iter().skip_while(|x| *x == 0).collect();
@@ -93,10 +97,10 @@ macro_rules! affine_group_operation {
             }
         }
 
-        impl<'b> Mul<&'b <Self as Group>::Scalar> for $affine {
-            type Output = $affine;
+        impl<'b> Mul<&'b <Self as Affine>::Scalar> for $affine {
+            type Output = $projective;
 
-            fn mul(self, rhs: &'b <Self as Group>::Scalar) -> $affine {
+            fn mul(self, rhs: &'b <Self as Affine>::Scalar) -> Self::Output {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.clone();
                 let bits: Vec<u8> = rhs.to_bits().into_iter().skip_while(|x| *x == 0).collect();
