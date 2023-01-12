@@ -720,6 +720,11 @@ impl JubJubExtended {
         JubJubExtended { x, y, z, t1, t2 }
     }
 
+    /// Generates a random point
+    pub fn random(rand: impl RngCore) -> Self {
+        GENERATOR_EXTENDED * Fr::random(rand)
+    }
+
     /// Returns the `x`-coordinate of this point.
     pub const fn get_x(&self) -> Fr {
         self.x
