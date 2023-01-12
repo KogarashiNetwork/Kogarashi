@@ -13,26 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! # Jubjub curve implementation
-//!
-//! - [`Fp`]
-//! - [`JubjubAffine`]
-//!
-//! ## Overview
-//!
-//! This coordinate provides the functionalities as following.
-//!
-//! - Curve addition
-//! - Curve doubling
-//! - Convert each coordinate system
-//!
-//! ### Reference
-//!
-//! We implement coordinate system to refer the following.
-//! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
-
+#![doc = include_str!("../README.md")]
 #![cfg_attr(not(feature = "std"), no_std)]
-#![allow(dead_code)]
 
 mod curve;
 mod error;
