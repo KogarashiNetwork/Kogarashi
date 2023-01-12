@@ -13,14 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! # Lifted-ElGamal Pallet
-//!
-//! ## Overview
-//!
-//! This is the additive homomorphic encryption which supports one-time multiplication.
-//! This library is implemented based on [original paper](https://github.com/herumi/mcl/blob/master/misc/she/she.pdf).
-
+#![doc = include_str!("../README.md")]
 #![cfg_attr(not(feature = "std"), no_std)]
+#![deny(missing_docs)]
 
 use core::ops::{Add, Sub};
 use num_traits::{CheckedAdd, CheckedSub};
@@ -29,14 +24,15 @@ use serde::{Deserialize, Serialize};
 pub use zero_jubjub::Fp;
 use zero_jubjub::{JubJubAffine, JubJubExtended, GENERATOR_EXTENDED};
 
+/// Number encrypted by ElGamal encryption
 #[derive(Debug, Default, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
 pub struct EncryptedNumber {
     s: JubJubAffine,
     t: JubJubAffine,
 }
 
-#[allow(unused_variables)]
 impl EncryptedNumber {
+    /// Enctypt number by private key
     pub fn encrypt(private_key: Fp, value: u32, random: Fp) -> Self {
         let g = GENERATOR_EXTENDED;
         let public_key = g * private_key;
@@ -47,6 +43,7 @@ impl EncryptedNumber {
         }
     }
 
+    /// Decrypt encrypted number by brute force
     pub fn decrypt(&self, private_key: Fp) -> Option<u32> {
         let g = GENERATOR_EXTENDED;
         let decrypted_message =
