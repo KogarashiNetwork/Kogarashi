@@ -695,17 +695,6 @@ impl JubJubAffine {
     pub const fn to_mont_form_unchecked(x: Fr, y: Fr) -> JubJubAffine {
         JubJubAffine { x, y }
     }
-
-    /// This is only for debugging purposes and not
-    /// exposed in the public API. Checks that this
-    /// point is on the curve.
-    #[cfg(test)]
-    fn is_on_curve_vartime(&self) -> bool {
-        let x2 = self.x.square();
-        let y2 = self.y.square();
-
-        &y2 - &x2 == Fr::one() + &EDWARDS_D * &x2 * &y2
-    }
 }
 
 impl JubJubExtended {
@@ -913,18 +902,6 @@ impl JubJubExtended {
     #[inline]
     fn multiply(self, by: &[u8; 32]) -> Self {
         self.to_niels().multiply(by)
-    }
-
-    /// This is only for debugging purposes and not
-    /// exposed in the public API. Checks that this
-    /// point is on the curve.
-    #[cfg(test)]
-    fn is_on_curve_vartime(&self) -> bool {
-        let affine = JubJubAffine::from(*self);
-
-        self.z != Fr::zero()
-            && affine.is_on_curve_vartime()
-            && (affine.x * affine.y * self.z == self.t1 * self.t2)
     }
 }
 

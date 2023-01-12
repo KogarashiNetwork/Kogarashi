@@ -26,6 +26,7 @@ zero-elgamal = { path = "../../primitive/elgamal", default-features = false }
 
 # pallet
 pallet-plonk = { path = "../plonk", default-features = false }
+pallet-encrypted-balance = { path = "../encrypted_balance", default-features = false }
 
 [dev-dependencies]
 serde = { version = "1.0.125", default-features = false, features = ["derive"] }

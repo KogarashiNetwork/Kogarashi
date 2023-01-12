@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod plonk_test {
-    use crate::mock::{new_test_ext, Origin, Plonk};
+    use crate::mock::{new_test_ext, ConfidentialTransfer, Origin, Plonk};
 
     use frame_support::assert_ok;
-    use pallet_plonk::*;
+    use pallet_plonk::{FullcodecRng, JubJubAffine, JubJubScalar, GENERATOR_EXTENDED};
     use rand::SeedableRng;
     use zero_circuits::ConfidentialTransferCircuit;
     use zero_crypto::behave::Group;
@@ -21,7 +21,7 @@ mod plonk_test {
     fn confidential_transfer_test() {
         let k = 14;
         let mut rng = get_rng();
-        let label = b"demo";
+        let label = b"verify";
 
         let generator = GENERATOR_EXTENDED;
         let alice_private_key = JubJubScalar::random(&mut rng);
@@ -45,10 +45,14 @@ mod plonk_test {
             (generator * transfer_amount) + (bob_public_key * randomness);
 
         new_test_ext().execute_with(|| {
-            assert_ok!(Plonk::trusted_setup(Origin::signed(1), k, get_rng()));
+            assert_ok!(ConfidentialTransfer::trusted_setup(
+                Origin::signed(1),
+                k,
+                get_rng()
+            ));
             let pp = Plonk::public_parameter().unwrap();
 
-            let (prover, verifier) = Compiler::compile::<ConfidentialTransferCircuit>(&pp, label)
+            let (prover, _) = Compiler::compile::<ConfidentialTransferCircuit>(&pp, label)
                 .expect("failed to compile circuit");
 
             let (proof, public_inputs) = prover
@@ -74,9 +78,12 @@ mod plonk_test {
                 )
                 .expect("failed to prove");
 
-            verifier
-                .verify(&proof, &public_inputs)
-                .expect("failed to verify proof");
+            assert_ok!(ConfidentialTransfer::set_thing_1(
+                Origin::signed(1),
+                15,
+                proof,
+                public_inputs
+            ));
         });
     }
 }

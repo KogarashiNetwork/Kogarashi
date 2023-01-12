@@ -1,7 +1,9 @@
 use crate::{self as confidential_transfer, pallet::Config};
 
 use zero_circuits::ConfidentialTransferCircuit;
+use zero_elgamal::EncryptedNumber;
 
+use frame_support::traits::StorageMapShim;
 use frame_support::{construct_runtime, parameter_types};
 use sp_core::H256;
 use sp_runtime::{
@@ -20,7 +22,8 @@ construct_runtime!(
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
         Plonk: pallet_plonk::{Module, Call, Storage, Event<T>},
-        ConfidentialTransrer: confidential_transfer::{Module, Call, Storage, Event<T>},
+        EncryptedBalance: pallet_encrypted_balance::{Module, Call, Storage, Config<T>, Event<T>},
+        ConfidentialTransfer: confidential_transfer::{Module, Call, Storage, Event<T>},
     }
 );
 
@@ -60,6 +63,17 @@ impl pallet_plonk::Config for TestRuntime {
     type Event = Event;
 }
 
+impl pallet_encrypted_balance::Config for TestRuntime {
+    type EncryptedBalance = EncryptedNumber;
+    type Event = Event;
+    type AccountStore = StorageMapShim<
+        super::Account<TestRuntime>,
+        frame_system::Provider<TestRuntime>,
+        u64,
+        super::AccountData<Self::EncryptedBalance>,
+    >;
+    type WeightInfo = ();
+}
 impl Config for TestRuntime {
     type Event = Event;
 }

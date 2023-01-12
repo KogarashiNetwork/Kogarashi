@@ -123,21 +123,6 @@ impl Fp {
         Ok(Fp(mul(limbs, R2, MODULUS, INV)))
     }
 
-    fn as_bytes(&self) -> [u8; 64] {
-        let mut bytes: [u8; 64] = [0; 64];
-        let mut index = 15;
-        for i in 0..self.0.len() {
-            let mut number = self.0[i];
-            for n in 0..16 {
-                let quotient = number as u128 / 16_u128.pow(15 - n as u32);
-                bytes[index - n] = quotient as u8;
-                number = (number as u128 % 16_u128.pow(15 - n as u32)) as u64;
-            }
-            index += 16;
-        }
-        bytes
-    }
-
     fn bytes_to_u64(bytes: &[u8; 16]) -> Result<u64, Error> {
         let mut res: u64 = 0;
         for (i, byte) in bytes.iter().enumerate() {

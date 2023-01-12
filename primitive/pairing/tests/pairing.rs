@@ -32,9 +32,10 @@ fn pairing_test() {
         let p = TatePairing::pairing(g, h);
 
         let expected = G1Affine::from(g1 * c);
+        let test = G2Affine::from(g2 * c);
 
         assert_eq!(p, TatePairing::pairing(expected, g2));
-        assert_eq!(p, TatePairing::pairing(g1, g2 * c));
+        assert_eq!(p, TatePairing::pairing(g1, test));
     }
 }
 
@@ -52,14 +53,14 @@ fn multi_miller_loop_test() {
     for _ in 0..5 {
         let a1 = G1Affine::ADDITIVE_GENERATOR;
         let b1 = G2Affine::ADDITIVE_GENERATOR;
-        let a2 = a1 * Fr::random(&mut rng);
-        let b2 = b1 * Fr::random(&mut rng);
-        let a3 = a1 * Fr::random(&mut rng);
-        let b3 = b1 * Fr::random(&mut rng);
-        let a4 = a1 * Fr::random(&mut rng);
-        let b4 = b1 * Fr::random(&mut rng);
-        let a5 = a1 * Fr::random(&mut rng);
-        let b5 = b1 * Fr::random(&mut rng);
+        let a2 = G1Affine::from(a1 * Fr::random(&mut rng));
+        let b2 = G2Affine::from(b1 * Fr::random(&mut rng));
+        let a3 = G1Affine::from(a1 * Fr::random(&mut rng));
+        let b3 = G2Affine::from(b1 * Fr::random(&mut rng));
+        let a4 = G1Affine::from(a1 * Fr::random(&mut rng));
+        let b4 = G2Affine::from(b1 * Fr::random(&mut rng));
+        let a5 = G1Affine::from(a1 * Fr::random(&mut rng));
+        let b5 = G2Affine::from(b1 * Fr::random(&mut rng));
 
         let b1_pairing = G2PairingAffine::from(b1);
         let b2_pairing = G2PairingAffine::from(b2);

@@ -17,7 +17,9 @@ pub mod pallet {
     use zero_crypto::common::Vec;
 
     #[pallet::config]
-    pub trait Config: frame_system::Config + pallet_plonk::Config {
+    pub trait Config:
+        frame_system::Config + pallet_plonk::Config + pallet_encrypted_balance::Config
+    {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
     }
 
