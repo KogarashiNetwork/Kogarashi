@@ -4,6 +4,7 @@ use zero_plonk::prelude::*;
 
 const BALANCE_BITS: usize = 16;
 
+/// Confidential transfer circuit
 pub struct ConfidentialTransferCircuit {
     alice_public_key: JubJubAffine,
     bob_public_key: JubJubAffine,
@@ -20,6 +21,7 @@ pub struct ConfidentialTransferCircuit {
 }
 
 impl ConfidentialTransferCircuit {
+    /// Init confidential tranfer circuit
     pub fn new(
         alice_public_key: JubJubAffine,
         bob_public_key: JubJubAffine,
