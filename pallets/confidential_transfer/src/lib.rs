@@ -14,6 +14,7 @@ pub mod pallet {
     use frame_support::pallet_prelude::*;
     use frame_system::pallet_prelude::*;
     use pallet_plonk::{Fr, FullcodecRng, Proof};
+    use zero_circuits::ConfidentialTransferTransaction;
     use zero_crypto::common::Vec;
 
     #[pallet::config]
@@ -59,27 +60,23 @@ pub mod pallet {
         }
 
         #[pallet::weight(10_000)]
-        pub fn set_thing_1(
+        pub fn confidential_transfer(
             origin: OriginFor<T>,
             val: u32,
             proof: Proof,
             public_inputs: Vec<Fr>,
+            transaction_params: ConfidentialTransferTransaction,
         ) -> DispatchResultWithPostInfo {
+            let transactor = ensure_signed(origin)?;
+            let dest = T::Lookup::lookup(dest)?;
             pallet_plonk::Pallet::<T>::verify(origin, proof, public_inputs)?;
-
-            Thing1::<T>::put(val);
+            pallet_encrypted_balance::Pallet::<T>::transfer(
+                transactor,
+                &dest,
+                transaction_params.sender_encrypted_transfer_amount,
+            );
 
             Self::deposit_event(Event::ValueSet(1, val));
-            Ok(().into())
-        }
-
-        #[pallet::weight(10_000)]
-        pub fn set_thing_2(origin: OriginFor<T>, val: u32) -> DispatchResultWithPostInfo {
-            let _ = ensure_signed(origin)?;
-
-            Thing2::<T>::put(val);
-
-            Self::deposit_event(Event::ValueSet(2, val));
             Ok(().into())
         }
     }

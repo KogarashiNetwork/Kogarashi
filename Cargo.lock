@@ -3400,6 +3400,7 @@ name = "zero-circuits"
 version = "0.1.0"
 dependencies = [
  "ark-std",
+ "parity-scale-codec",
  "rand 0.8.5",
  "zero-crypto",
  "zero-elgamal",

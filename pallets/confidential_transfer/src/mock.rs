@@ -1,5 +1,6 @@
 use crate::{self as confidential_transfer, pallet::Config};
 
+use pallet_encrypted_balance::{Account, AccountData};
 use zero_circuits::ConfidentialTransferCircuit;
 use zero_elgamal::EncryptedNumber;
 
@@ -67,10 +68,10 @@ impl pallet_encrypted_balance::Config for TestRuntime {
     type EncryptedBalance = EncryptedNumber;
     type Event = Event;
     type AccountStore = StorageMapShim<
-        super::Account<TestRuntime>,
+        Account<TestRuntime>,
         frame_system::Provider<TestRuntime>,
         u64,
-        super::AccountData<Self::EncryptedBalance>,
+        AccountData<Self::EncryptedBalance>,
     >;
     type WeightInfo = ();
 }

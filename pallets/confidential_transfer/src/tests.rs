@@ -5,7 +5,7 @@ mod plonk_test {
     use frame_support::assert_ok;
     use pallet_plonk::{FullcodecRng, JubJubAffine, JubJubScalar, GENERATOR_EXTENDED};
     use rand::SeedableRng;
-    use zero_circuits::ConfidentialTransferCircuit;
+    use zero_circuits::{ConfidentialTransferCircuit, ConfidentialTransferTransaction};
     use zero_crypto::behave::Group;
     use zero_elgamal::EncryptedNumber;
     use zero_plonk::prelude::Compiler;
@@ -41,8 +41,22 @@ mod plonk_test {
         let alice_left_encrypted_transfer_amount =
             (generator * transfer_amount) + (alice_public_key * randomness);
         let alice_right_encrypted_transfer_amount = generator * randomness;
-        let recipient_encrypted_transfer_amount =
+        let bob_encrypted_transfer_amount =
             (generator * transfer_amount) + (bob_public_key * randomness);
+        let alice_encrypted_transfer_amount = EncryptedNumber::new(
+            JubJubAffine::from(alice_left_encrypted_transfer_amount),
+            JubJubAffine::from(alice_right_encrypted_transfer_amount),
+        );
+        let alice_public_key = alice_public_key.into();
+        let bob_public_key = bob_public_key.into();
+        let bob_encrypted_transfer_amount = bob_encrypted_transfer_amount.into();
+
+        let transaction_params = ConfidentialTransferTransaction {
+            sender_public_key: alice_public_key,
+            recipient_public_key: bob_public_key,
+            sender_encrypted_transfer_amount: alice_encrypted_transfer_amount,
+            recipient_encrypted_transfer_amount: bob_encrypted_transfer_amount,
+        };
 
         new_test_ext().execute_with(|| {
             assert_ok!(ConfidentialTransfer::trusted_setup(
@@ -59,8 +73,8 @@ mod plonk_test {
                 .prove(
                     &mut rng,
                     &ConfidentialTransferCircuit::new(
-                        JubJubAffine::from(alice_public_key),
-                        JubJubAffine::from(bob_public_key),
+                        alice_public_key,
+                        bob_public_key,
                         EncryptedNumber::new(
                             JubJubAffine::from(alice_left_encrypted_balance),
                             JubJubAffine::from(alice_right_encrypted_balance),
@@ -69,7 +83,7 @@ mod plonk_test {
                             JubJubAffine::from(alice_left_encrypted_transfer_amount),
                             JubJubAffine::from(alice_right_encrypted_transfer_amount),
                         ),
-                        JubJubAffine::from(recipient_encrypted_transfer_amount),
+                        bob_encrypted_transfer_amount,
                         alice_private_key,
                         transfer_amount,
                         alice_after_balance,
@@ -78,11 +92,12 @@ mod plonk_test {
                 )
                 .expect("failed to prove");
 
-            assert_ok!(ConfidentialTransfer::set_thing_1(
+            assert_ok!(ConfidentialTransfer::confidential_transfer(
                 Origin::signed(1),
                 15,
                 proof,
-                public_inputs
+                public_inputs,
+                transaction_params
             ));
         });
     }

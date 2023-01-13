@@ -1,4 +1,4 @@
-use zero_crypto::common::Group;
+use zero_crypto::common::{Decode, Encode, Group, ParityCmp};
 use zero_elgamal::EncryptedNumber;
 use zero_jubjub::{Fp as JubJubScalar, JubJubAffine, GENERATOR_EXTENDED};
 use zero_plonk::prelude::*;
@@ -136,6 +136,21 @@ impl Circuit for ConfidentialTransferCircuit {
         Ok(())
     }
 }
+
+/// confidential transfer public input
+#[derive(Clone, Debug, Decode, Encode, Eq, PartialEq)]
+pub struct ConfidentialTransferTransaction {
+    /// sender public key
+    pub sender_public_key: JubJubAffine,
+    /// recipient public key
+    pub recipient_public_key: JubJubAffine,
+    /// encrypted transfer amount by sender
+    pub sender_encrypted_transfer_amount: EncryptedNumber,
+    /// encrypted transfer amount by recipient
+    pub recipient_encrypted_transfer_amount: JubJubAffine,
+}
+
+impl ParityCmp for ConfidentialTransferTransaction {}
 
 #[cfg(test)]
 mod confidential_transfer_circuit_test {
