@@ -33,7 +33,7 @@ makers test
 
 ## Documentation
 
-The white paper is work in progress. You can find the light paper [here](https://zero-network.github.io/).
+The white paper is work in progress. You can find the light paper and libraries documentation [here](https://zero-network.github.io/zero/).
 
 ## Reference
 
