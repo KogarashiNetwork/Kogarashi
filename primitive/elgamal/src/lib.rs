@@ -25,13 +25,27 @@ pub use zero_jubjub::Fp;
 use zero_jubjub::{JubJubAffine, JubJubExtended, GENERATOR_EXTENDED};
 
 /// Number encrypted by ElGamal encryption
-#[derive(Debug, Default, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
 pub struct EncryptedNumber {
     s: JubJubAffine,
     t: JubJubAffine,
 }
 
+impl Default for EncryptedNumber {
+    fn default() -> Self {
+        Self {
+            s: JubJubAffine::identity(),
+            t: JubJubAffine::identity(),
+        }
+    }
+}
+
 impl EncryptedNumber {
+    /// Init encrypted number
+    pub fn new(s: JubJubAffine, t: JubJubAffine) -> Self {
+        Self { s, t }
+    }
+
     /// Enctypt number by private key
     pub fn encrypt(private_key: Fp, value: u32, random: Fp) -> Self {
         let g = GENERATOR_EXTENDED;
@@ -57,6 +71,11 @@ impl EncryptedNumber {
             acc += g;
         }
         None
+    }
+
+    /// Get left and right affine point
+    pub fn get(self) -> (JubJubAffine, JubJubAffine) {
+        (self.s, self.t)
     }
 }
 

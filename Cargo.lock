@@ -423,9 +423,22 @@ version = "0.1.1"
 dependencies = [
  "frame-support",
  "frame-system",
+ "pallet-encrypted-balance",
  "pallet-plonk",
  "parity-scale-codec",
+ "rand 0.8.5",
+ "rand_xorshift 0.3.0 (git+https://github.com/zero-network/rngs?branch=master)",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "zero-bls12-381",
+ "zero-circuits",
  "zero-crypto",
+ "zero-elgamal",
+ "zero-jubjub",
+ "zero-plonk",
 ]
 
 [[package]]
@@ -3387,8 +3400,10 @@ name = "zero-circuits"
 version = "0.1.0"
 dependencies = [
  "ark-std",
+ "parity-scale-codec",
  "rand 0.8.5",
  "zero-crypto",
+ "zero-elgamal",
  "zero-jubjub",
  "zero-plonk",
 ]
