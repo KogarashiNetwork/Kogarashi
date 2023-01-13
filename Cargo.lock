@@ -3581,6 +3581,7 @@ dependencies = [
  "pallet-plonk",
  "rand 0.8.5",
  "zero-bls12-381",
+ "zero-circuits",
  "zero-crypto",
  "zero-elgamal",
  "zero-jubjub",

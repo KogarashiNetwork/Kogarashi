@@ -9,6 +9,7 @@ license = "Apache-2.0"
 [dependencies]
 # primitive
 zero-bls12-381 = { default-features = false, path = "./primitive/bls12_381" }
+zero-circuits = { default-features = false, path = "./primitive/circuits" }
 zero-crypto = { default-features = false, path = "./primitive/crypto" }
 zero-elgamal = { default-features = false, path = "./primitive/elgamal" }
 zero-jubjub = { default-features = false, path = "./primitive/jubjub" }
@@ -43,6 +44,10 @@ members = [
 ]
 
 [[bench]]
+name = "circuit"
+harness = false
+
+[[bench]]
 name = "jubjub_curve"
 harness = false
 
@@ -56,6 +61,10 @@ harness = false
 
 [[bench]]
 name = "bls12_381_field"
+harness = false
+
+[[bench]]
+name = "msm"
 harness = false
 
 [profile.bench]
