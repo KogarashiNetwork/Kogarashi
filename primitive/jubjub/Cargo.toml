@@ -2,7 +2,7 @@
 authors = ['AshWhiteHat<phantomofrotten@gmail.com>']
 description = 'twisted edwards curve implementation'
 name = "zero-jubjub"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "Apache-2.0"
 
@@ -11,8 +11,8 @@ serde = { version = "1.0.125", default-features = false, features = ["derive"] }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 rand_core = { version="0.6", default-features = false }
 sp-std = { version = '3.0.0', default-features = false }
-zero-crypto = { path = '../crypto' }
-zero-bls12-381 = { path = '../bls12_381' }
+zero-crypto = { version = '0.2.1', default-features = false }
+zero-bls12-381 = { version = '0.2.0', default-features = false }
 dusk-bytes = { version = "0.1" }
 subtle = { version = "2.0", default-features = false }
 

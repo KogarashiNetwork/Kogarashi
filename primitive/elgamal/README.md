@@ -1,4 +1,4 @@
-# ElGamal Encryption
+# ElGamal Encryption [![crates.io badge](https://img.shields.io/crates/v/zero-elgamal.svg)](https://crates.io/crates/zero-elgamal)
 This crate provides additive homomorphic ElGamal encryption over jubjub curve and also supports fully `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec).
 
 ## Scheme

@@ -2,7 +2,7 @@
 authors = ['AshWhiteHat<phantomofrotten@gmail.com>']
 name = "zero-bls12-381"
 description = 'lifted elgamal encryption implementation'
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 license = "Apache-2.0"
 
@@ -10,7 +10,7 @@ license = "Apache-2.0"
 
 [dependencies]
 serde = { version = "1.0.125", default-features = false, features = ["derive"] }
-zero-crypto = { path = '../crypto' }
+zero-crypto = { version = "0.2.1", default-features = false }
 rand_core = { version="0.6", default-features = false }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 dusk-bytes = { version = "0.1" }
