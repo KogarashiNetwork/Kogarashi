@@ -24,38 +24,23 @@ pub trait Curve: ParityCmp + Basic {
 
     // check that point is on curve
     fn is_on_curve(self) -> bool;
-}
-
-/// rational point affine representation
-/// affine representation check that a point is infinite by the struct field
-pub trait Affine:
-    Curve
-    + Add<Self::Projective, Output = Self::Projective>
-    + Sub<Self::Projective, Output = Self::Projective>
-    + Add<Self, Output = Self::Projective>
-    + Sub<Self, Output = Self::Projective>
-    + Mul<Self::Scalar, Output = Self::Projective>
-    + Into<Self::Projective>
-    + From<Self::Projective>
-{
-    // scalar field of affine
-    type Scalar: PrimeField;
-    // projective coordinate representation
-    type Projective: Projective;
-
-    // convert affine to projective representation
-    fn to_projective(self) -> Self::Projective;
 
     // get x coordinate
     fn get_x(&self) -> Self::Range;
 
     // get y coordinate
     fn get_y(&self) -> Self::Range;
+
+    // set x coordinate
+    fn set_x(&mut self, value: Self::Range);
+
+    // set y coordinate
+    fn set_y(&mut self, value: Self::Range);
 }
 
-/// rational point projective representation
-/// projective representation check that a point is infinite by z coordinate
-pub trait Projective:
+/// extend curve point representation
+/// projective, jacobian and so on
+pub trait CurveExtend:
     Curve
     + Group
     + AddAssign<Self::Affine>
@@ -70,21 +55,34 @@ pub trait Projective:
 
     // convert projective to affine representation
     fn to_affine(self) -> Self::Affine;
+}
 
-    // get x coordinate
-    fn get_x(&self) -> Self::Range;
+/// rational point affine representation
+/// affine representation check that a point is infinite by the struct field
+pub trait Affine:
+    Curve
+    + Add<Self::CurveExtend, Output = Self::CurveExtend>
+    + Sub<Self::CurveExtend, Output = Self::CurveExtend>
+    + Add<Self, Output = Self::CurveExtend>
+    + Sub<Self, Output = Self::CurveExtend>
+    + Mul<Self::Scalar, Output = Self::CurveExtend>
+    + Into<Self::CurveExtend>
+    + From<Self::CurveExtend>
+{
+    // scalar field of affine
+    type Scalar: PrimeField;
+    // projective coordinate representation
+    type CurveExtend: CurveExtend;
 
-    // get y coordinate
-    fn get_y(&self) -> Self::Range;
+    // convert affine to projective representation
+    fn to_extend(self) -> Self::CurveExtend;
+}
 
+/// rational point projective representation
+/// projective representation check that a point is infinite by z coordinate
+pub trait Projective: CurveExtend {
     // get z coordinate
     fn get_z(&self) -> Self::Range;
-
-    // set x coordinate
-    fn set_x(&mut self, value: Self::Range);
-
-    // set y coordinate
-    fn set_y(&mut self, value: Self::Range);
 
     // set z coordinate
     fn set_z(&mut self, value: Self::Range);

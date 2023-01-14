@@ -29,8 +29,9 @@ macro_rules! curve_operation {
                 self.is_infinity
             }
 
+            // TODO: inefficient
             fn double(self) -> Self {
-                Self::from(double_point(self.to_projective()))
+                Self::from(double_point(self.to_extend()))
             }
 
             fn is_on_curve(self) -> bool {
@@ -39,6 +40,22 @@ macro_rules! curve_operation {
                 } else {
                     self.y.square() == self.x.square() * self.x + Self::PARAM_B
                 }
+            }
+
+            fn get_x(&self) -> Self::Range {
+                self.x
+            }
+
+            fn get_y(&self) -> Self::Range {
+                self.y
+            }
+
+            fn set_x(&mut self, value: Self::Range) {
+                self.x = value;
+            }
+
+            fn set_y(&mut self, value: Self::Range) {
+                self.y = value;
             }
         }
 
@@ -64,29 +81,6 @@ macro_rules! curve_operation {
                         == self.x.square() * self.x + Self::PARAM_B * self.z.square() * self.z
                 }
             }
-        }
-
-        impl From<$affine> for $projective {
-            fn from(a: $affine) -> $projective {
-                a.to_projective()
-            }
-        }
-
-        impl Affine for $affine {
-            type Scalar = $scalar;
-            type Projective = $projective;
-
-            fn to_projective(self) -> Self::Projective {
-                if self.is_identity() {
-                    Self::Projective::ADDITIVE_IDENTITY
-                } else {
-                    Self::Projective {
-                        x: self.x,
-                        y: self.y,
-                        z: Self::Range::one(),
-                    }
-                }
-            }
 
             fn get_x(&self) -> Self::Range {
                 self.x
@@ -95,15 +89,17 @@ macro_rules! curve_operation {
             fn get_y(&self) -> Self::Range {
                 self.y
             }
-        }
 
-        impl From<$projective> for $affine {
-            fn from(p: $projective) -> $affine {
-                p.to_affine()
+            fn set_x(&mut self, value: Self::Range) {
+                self.x = value;
+            }
+
+            fn set_y(&mut self, value: Self::Range) {
+                self.y = value;
             }
         }
 
-        impl Projective for $projective {
+        impl CurveExtend for $projective {
             type Affine = $affine;
 
             fn to_affine(self) -> Self::Affine {
@@ -116,25 +112,40 @@ macro_rules! curve_operation {
                     None => Self::Affine::ADDITIVE_IDENTITY,
                 }
             }
+        }
 
-            fn get_x(&self) -> Self::Range {
-                self.x
+        impl From<$affine> for $projective {
+            fn from(a: $affine) -> $projective {
+                a.to_extend()
             }
+        }
 
-            fn get_y(&self) -> Self::Range {
-                self.y
+        impl Affine for $affine {
+            type Scalar = $scalar;
+            type CurveExtend = $projective;
+
+            fn to_extend(self) -> Self::CurveExtend {
+                if self.is_identity() {
+                    Self::CurveExtend::ADDITIVE_IDENTITY
+                } else {
+                    Self::CurveExtend {
+                        x: self.x,
+                        y: self.y,
+                        z: Self::Range::one(),
+                    }
+                }
             }
+        }
 
+        impl From<$projective> for $affine {
+            fn from(p: $projective) -> $affine {
+                p.to_affine()
+            }
+        }
+
+        impl Projective for $projective {
             fn get_z(&self) -> Self::Range {
                 self.z
-            }
-
-            fn set_x(&mut self, value: Self::Range) {
-                self.x = value;
-            }
-
-            fn set_y(&mut self, value: Self::Range) {
-                self.y = value;
             }
 
             fn set_z(&mut self, value: Self::Range) {
@@ -151,7 +162,7 @@ macro_rules! mixed_curve_operation {
             type Output = $projective;
 
             fn add(self, rhs: $projective) -> $projective {
-                add_point(self.to_projective(), rhs)
+                add_point(self.to_extend(), rhs)
             }
         }
 
@@ -159,7 +170,7 @@ macro_rules! mixed_curve_operation {
             type Output = $projective;
 
             fn sub(self, rhs: $projective) -> $projective {
-                add_point(self.to_projective(), -rhs)
+                add_point(self.to_extend(), -rhs)
             }
         }
 
@@ -167,7 +178,7 @@ macro_rules! mixed_curve_operation {
             type Output = $projective;
 
             fn add(self, rhs: $affine) -> $projective {
-                add_point(self, rhs.to_projective())
+                add_point(self, rhs.to_extend())
             }
         }
 
@@ -175,19 +186,19 @@ macro_rules! mixed_curve_operation {
             type Output = $projective;
 
             fn sub(self, rhs: $affine) -> $projective {
-                add_point(self, -rhs.to_projective())
+                add_point(self, -rhs.to_extend())
             }
         }
 
         impl AddAssign<$affine> for $projective {
             fn add_assign(&mut self, rhs: $affine) {
-                *self = add_point(*self, rhs.to_projective())
+                *self = add_point(*self, rhs.to_extend())
             }
         }
 
         impl SubAssign<$affine> for $projective {
             fn sub_assign(&mut self, rhs: $affine) {
-                *self = add_point(*self, -rhs.to_projective())
+                *self = add_point(*self, -rhs.to_extend())
             }
         }
     };

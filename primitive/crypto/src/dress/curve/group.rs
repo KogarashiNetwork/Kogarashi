@@ -56,7 +56,7 @@ macro_rules! affine_group_operation {
             type Output = $projective;
 
             fn add(self, rhs: $affine) -> Self::Output {
-                $projective::from(add_point(self.to_projective(), rhs.to_projective()))
+                $projective::from(add_point(self.to_extend(), rhs.to_extend()))
             }
         }
 
@@ -76,7 +76,7 @@ macro_rules! affine_group_operation {
             type Output = $projective;
 
             fn sub(self, rhs: $affine) -> Self::Output {
-                $projective::from(add_point(self.to_projective(), rhs.neg().to_projective()))
+                $projective::from(add_point(self.to_extend(), rhs.neg().to_extend()))
             }
         }
 
