@@ -7,10 +7,10 @@ edition = "2021"
 
 [dependencies]
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
-zero-plonk = { path = "../plonk" }
-zero-jubjub = { path = "../jubjub" }
-zero-elgamal = { path = "../elgamal" }
-zero-crypto = { path = "../crypto" }
+zero-plonk = { path = '../plonk' }
+zero-jubjub = { path = '../jubjub' }
+zero-elgamal = { path = '../elgamal' }
+zero-crypto = { path = '../crypto' }
 
 [dev-dependencies]
 rand = { version = "0.8", default-features = false }
