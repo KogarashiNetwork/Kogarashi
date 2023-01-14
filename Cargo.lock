@@ -1676,6 +1676,7 @@ dependencies = [
  "sp-runtime",
  "sp-std",
  "zero-elgamal",
+ "zero-jubjub",
 ]
 
 [[package]]

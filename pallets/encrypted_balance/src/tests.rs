@@ -26,7 +26,7 @@ macro_rules! decl_tests {
         use frame_system::RawOrigin;
         use sp_runtime::traits::BadOrigin;
         use $crate::*;
-        use zero_elgamal::Fp;
+        use zero_jubjub::Fp;
 
         const ID_1_PK: Fp = Fp::to_mont_form([1, 0, 0, 0]);
         const ID_2_PK: Fp = Fp::to_mont_form([2, 0, 0, 0]);
