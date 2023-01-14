@@ -23,15 +23,9 @@ macro_rules! curve_operation {
             type Range = $range;
 
             const PARAM_A: $range = $a;
-            const PARAM_B: $range = $b;
 
             fn is_identity(self) -> bool {
                 self.is_infinity
-            }
-
-            // TODO: inefficient
-            fn double(self) -> Self {
-                Self::from(double_point(self.to_extend()))
             }
 
             fn is_on_curve(self) -> bool {
@@ -59,18 +53,17 @@ macro_rules! curve_operation {
             }
         }
 
+        impl WeierstrassCurve for $affine {
+            const PARAM_B: $range = $b;
+        }
+
         impl Curve for $projective {
             type Range = $range;
 
             const PARAM_A: $range = $a;
-            const PARAM_B: $range = $b;
 
             fn is_identity(self) -> bool {
                 self.z == Self::Range::zero()
-            }
-
-            fn double(self) -> Self {
-                double_point(self)
             }
 
             fn is_on_curve(self) -> bool {
@@ -99,8 +92,16 @@ macro_rules! curve_operation {
             }
         }
 
+        impl WeierstrassCurve for $projective {
+            const PARAM_B: $range = $b;
+        }
+
         impl CurveExtend for $projective {
             type Affine = $affine;
+
+            fn double(self) -> Self {
+                double_point(self)
+            }
 
             fn to_affine(self) -> Self::Affine {
                 match self.z.invert() {
@@ -116,19 +117,26 @@ macro_rules! curve_operation {
 
         impl From<$affine> for $projective {
             fn from(a: $affine) -> $projective {
-                a.to_extend()
+                a.to_projective()
             }
         }
 
         impl Affine for $affine {
             type Scalar = $scalar;
-            type CurveExtend = $projective;
+        }
 
-            fn to_extend(self) -> Self::CurveExtend {
+        impl WeierstrassAffine for $affine {
+            type Projective = $projective;
+
+            fn double(self) -> Self::Projective {
+                double_point(self.to_projective())
+            }
+
+            fn to_projective(self) -> Self::Projective {
                 if self.is_identity() {
-                    Self::CurveExtend::ADDITIVE_IDENTITY
+                    Self::Projective::ADDITIVE_IDENTITY
                 } else {
-                    Self::CurveExtend {
+                    Self::Projective {
                         x: self.x,
                         y: self.y,
                         z: Self::Range::one(),
@@ -162,7 +170,7 @@ macro_rules! mixed_curve_operation {
             type Output = $projective;
 
             fn add(self, rhs: $projective) -> $projective {
-                add_point(self.to_extend(), rhs)
+                add_point(self.to_projective(), rhs)
             }
         }
 
@@ -170,7 +178,7 @@ macro_rules! mixed_curve_operation {
             type Output = $projective;
 
             fn sub(self, rhs: $projective) -> $projective {
-                add_point(self.to_extend(), -rhs)
+                add_point(self.to_projective(), -rhs)
             }
         }
 
@@ -178,7 +186,7 @@ macro_rules! mixed_curve_operation {
             type Output = $projective;
 
             fn add(self, rhs: $affine) -> $projective {
-                add_point(self, rhs.to_extend())
+                add_point(self, rhs.to_projective())
             }
         }
 
@@ -186,19 +194,19 @@ macro_rules! mixed_curve_operation {
             type Output = $projective;
 
             fn sub(self, rhs: $affine) -> $projective {
-                add_point(self, -rhs.to_extend())
+                add_point(self, -rhs.to_projective())
             }
         }
 
         impl AddAssign<$affine> for $projective {
             fn add_assign(&mut self, rhs: $affine) {
-                *self = add_point(*self, rhs.to_extend())
+                *self = add_point(*self, rhs.to_projective())
             }
         }
 
         impl SubAssign<$affine> for $projective {
             fn sub_assign(&mut self, rhs: $affine) {
-                *self = add_point(*self, -rhs.to_extend())
+                *self = add_point(*self, -rhs.to_projective())
             }
         }
     };

@@ -56,7 +56,7 @@ macro_rules! affine_group_operation {
             type Output = $projective;
 
             fn add(self, rhs: $affine) -> Self::Output {
-                $projective::from(add_point(self.to_extend(), rhs.to_extend()))
+                $projective::from(add_point(self.to_projective(), rhs.to_projective()))
             }
         }
 
@@ -76,7 +76,7 @@ macro_rules! affine_group_operation {
             type Output = $projective;
 
             fn sub(self, rhs: $affine) -> Self::Output {
-                $projective::from(add_point(self.to_extend(), rhs.neg().to_extend()))
+                $projective::from(add_point(self.to_projective(), rhs.neg().to_projective()))
             }
         }
 
@@ -85,7 +85,7 @@ macro_rules! affine_group_operation {
 
             fn mul(self, rhs: <Self as Affine>::Scalar) -> Self::Output {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
-                let mut acc = self.clone();
+                let mut acc = self.to_projective();
                 let bits: Vec<u8> = rhs.to_bits().into_iter().skip_while(|x| *x == 0).collect();
                 for &b in bits.iter().rev() {
                     if b == 1 {
@@ -102,7 +102,7 @@ macro_rules! affine_group_operation {
 
             fn mul(self, rhs: &'b <Self as Affine>::Scalar) -> Self::Output {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
-                let mut acc = self.clone();
+                let mut acc = self.to_projective();
                 let bits: Vec<u8> = rhs.to_bits().into_iter().skip_while(|x| *x == 0).collect();
                 for &b in bits.iter().rev() {
                     if b == 1 {
