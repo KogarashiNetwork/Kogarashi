@@ -2,7 +2,7 @@
 authors = ['AshWhiteHat<phantomofrotten@gmail.com>']
 name = "zero-bls12-381"
 description = 'lifted elgamal encryption implementation'
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 license = "Apache-2.0"
 

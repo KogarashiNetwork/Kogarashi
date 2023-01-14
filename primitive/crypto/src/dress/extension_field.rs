@@ -32,7 +32,7 @@ macro_rules! prime_extention_field_operation {
 
         impl PrimeField for $extension_field {
             // wrong if this is problem
-            const MODULUS: $extension_field = $extension_field::dummy();
+            const MODULUS: $extension_field = $extension_field::one();
 
             const INV: u64 = $sub_field::INV;
 

@@ -1,9 +1,10 @@
 use sp_runtime::DispatchResult;
+use zero_elgamal::TransferAmountPublic;
 
 /// Abstraction over a fungible assets system.
 pub trait EncryptedCurrency<AccountId> {
     /// The balance of an account.
-    type EncryptedBalance;
+    type EncryptedBalance: TransferAmountPublic;
 
     fn total_balance(who: &AccountId) -> Self::EncryptedBalance;
 

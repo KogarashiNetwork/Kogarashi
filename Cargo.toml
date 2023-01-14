@@ -23,6 +23,9 @@ pallet-encrypted-balance = { default-features = false, path = "./pallets/encrypt
 
 frame-support = { version = "3.0.0" }
 
+[lib]
+doctest = false
+
 [workspace]
 members = [
     "primitive/bls12_381",

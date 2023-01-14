@@ -8,7 +8,7 @@ As a part of our protocol, we combine some cryptgraphic toools. We would like to
 
 ## Contents
 
-Firstly we describe the problems we face to when we realize the privacy preserving blockchain, the difinition of privacy and how we address the problems in [Overview](1_0_overview.md). Finally, we describe the concrete constraints that the proof of transactions should satisfy in [Transaction Constraints](2_0_transaction_constraints.md). Addtionally, we add related research in [Related Tools](3_0_related_research.md).
+Firstly we describe the problems we face to when we realize the privacy preserving blockchain, the difinition of privacy and how we address the problems in [Overview](1_0_overview.md). Finally, we describe the concrete constraints that the proof of transactions should satisfy in [Transaction Constraints](2_0_transaction_constraints.md). Addtionally, we add related research in [Related Tools](5_0_related_tools.md).
 
 - [Zero Network](0_0_zero_network.md)
 - [Overview](1_0_overview.md)
@@ -18,22 +18,23 @@ Firstly we describe the problems we face to when we realize the privacy preservi
     - [Zero Knowledge Scheme](1_4_zero_knowledge_scheme.md)
     - [Transaction Constraints](1_5_transaction_constraints.md)
 - [Transaction Constraints](2_0_transaction_constraints.md)
-- [Libraries](./3_0_libraries.md)
-    - [Confidential Transfer](./3_1_confidential_transfer.md)
-    - [Plonk](./3_2_plonk.md)
-    - [Bls12 381](./3_3_bls12_381.md)
-    - [ElGamal](./3_4_elgamal.md)
-    - [Jubjub](./3_5_jubjub.md)
-    - [Crypto](./3_6_crypto.md)
-- [Related Tools](4_0_related_tools.md)
-    - [Stealth Address](4_1_stealth_address.md)
-    - [Pedersen Commitment](4_2_pedersen_commitment.md)
-    - [Non Interactive Zero Knowledge Proof](4_3_non_interactive_zero_knowlege_proof.md)
-        - [QAP](4_3_1_qap.md)
-        - [Polynomial Commitment](4_3_2_polynomial_commitment.md)
-        - [Homomorphic Encryption](4_3_3_homomorphic_encryption.md)
-- [Tutorial](./5_0_tutorial.md)
-- [Frequent Errors](./6_0_frequent_errors.md)
+- [Primitive](../primitive/README.md)
+    - [Crypto](3_1_crypto.md)
+    - [Jubjub](3_2_jubjub.md)
+    - [Bls12 381](3_3_bls12_381.md)
+    - [ElGamal](3_4_elgamal.md)
+- [Pallet](../pallet/README.md)
+    - [Plonk](4_1_plonk.md)
+    - [Confidential Transfer](4_2_confidential_transfer.md)
+- [Related Tools](5_0_related_tools.md)
+    - [Stealth Address](5_1_stealth_address.md)
+    - [Pedersen Commitment](5_2_pedersen_commitment.md)
+    - [Non Interactive Zero Knowledge Proof](5_3_non_interactive_zero_knowlege_proof.md)
+        - [QAP](5_3_1_qap.md)
+        - [Polynomial Commitment](5_3_2_polynomial_commitment.md)
+        - [Homomorphic Encryption](5_3_3_homomorphic_encryption.md)
+- [Tutorial](6_0_tutorial.md)
+- [Frequent Errors](7_0_frequent_errors.md)
 
 ## Reference
 [`Crypto Note v 2.0`](https://github.com/monero-project/research-lab/blob/master/whitepaper/whitepaper.pdf)  

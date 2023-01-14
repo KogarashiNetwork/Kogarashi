@@ -176,6 +176,7 @@ pub mod pallet {
     use super::*;
     use frame_support::pallet_prelude::*;
     use frame_system::pallet_prelude::*;
+    use zero_elgamal::TransferAmountPublic;
 
     #[pallet::config]
     pub trait Config<I: 'static = ()>: frame_system::Config {
@@ -187,7 +188,8 @@ pub mod pallet {
             + Default
             + Copy
             + MaybeSerializeDeserialize
-            + Debug;
+            + Debug
+            + TransferAmountPublic;
 
         /// The overarching event type.
         type Event: From<Event<Self, I>> + IsType<<Self as frame_system::Config>::Event>;

@@ -21,8 +21,7 @@ use core::ops::{Add, Sub};
 use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
-pub use zero_jubjub::Fp;
-use zero_jubjub::{JubJubAffine, JubJubExtended, GENERATOR_EXTENDED};
+use zero_jubjub::{Fp, JubJubAffine, JubJubExtended, GENERATOR_EXTENDED};
 
 /// Number encrypted by ElGamal encryption
 #[derive(Debug, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
@@ -74,7 +73,7 @@ impl EncryptedNumber {
     }
 
     /// Get left and right affine point
-    pub fn get(self) -> (JubJubAffine, JubJubAffine) {
+    pub fn get_coordinate(self) -> (JubJubAffine, JubJubAffine) {
         (self.s, self.t)
     }
 }
@@ -122,13 +121,25 @@ impl CheckedSub for EncryptedNumber {
     }
 }
 
+/// interface for circuit public inputs
+pub trait TransferAmountPublic {
+    /// get s and t cypher text
+    fn get(self) -> (JubJubAffine, JubJubAffine);
+}
+
+impl TransferAmountPublic for EncryptedNumber {
+    fn get(self) -> (JubJubAffine, JubJubAffine) {
+        self.get_coordinate()
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::*;
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
     use zero_crypto::behave::*;
+    use zero_jubjub::Fp;
 
     use crate::EncryptedNumber;
 

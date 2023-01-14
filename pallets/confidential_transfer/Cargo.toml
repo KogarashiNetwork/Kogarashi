@@ -39,6 +39,8 @@ sp-runtime = { version = '3.0.0', default-features = false }
 default = ["std"]
 std = [
     'codec/std',
-    "frame-support/std",
+    'frame-support/std',
 	'frame-system/std',
+    'pallet-plonk/std',
+    'pallet-encrypted-balance/std',
 ]

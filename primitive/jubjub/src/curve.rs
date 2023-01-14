@@ -25,6 +25,52 @@ use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zero_bls12_381::Fr;
 use zero_crypto::common::*;
 
+/// This represents a Jubjub point in the affine `(x, y)`
+/// coordinates.
+#[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
+pub struct JubJubAffine {
+    x: Fr,
+    y: Fr,
+}
+
+impl Basic for JubJubAffine {}
+
+impl ParityCmp for JubJubAffine {}
+
+impl Curve for JubJubAffine {
+    type Range = Fr;
+
+    const PARAM_A: Fr = Fr::one();
+
+    fn is_identity(self) -> bool {
+        self.x == Fr::zero() && self.y == Fr::one()
+    }
+
+    fn is_on_curve(self) -> bool {
+        unimplemented!()
+    }
+
+    fn get_x(&self) -> Self::Range {
+        self.x
+    }
+
+    fn get_y(&self) -> Self::Range {
+        self.y
+    }
+
+    fn set_x(&mut self, value: Self::Range) {
+        self.x = value
+    }
+
+    fn set_y(&mut self, value: Self::Range) {
+        self.y = value
+    }
+}
+
+impl Affine for JubJubAffine {
+    type Scalar = Fr;
+}
+
 // below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
 // [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
 // Dusk-Network team and, @str4d and @ebfull
@@ -187,14 +233,6 @@ const FR_MODULUS_BYTES: [u8; 32] = [
     183, 44, 247, 214, 94, 14, 151, 208, 130, 16, 200, 204, 147, 32, 104, 166, 0, 59, 52, 1, 1, 59,
     103, 6, 169, 175, 51, 101, 234, 180, 125, 14,
 ];
-
-/// This represents a Jubjub point in the affine `(x, y)`
-/// coordinates.
-#[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
-pub struct JubJubAffine {
-    x: Fr,
-    y: Fr,
-}
 
 impl Neg for JubJubAffine {
     type Output = JubJubAffine;

@@ -1,4 +1,4 @@
-# Jubjub Curve
+# Jubjub Curve [![crates.io badge](https://img.shields.io/crates/v/zero-jubjub.svg)](https://crates.io/crates/zero-jubjub)
 This crate provides jubjub curve arithmetic and also supports fully `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec).
 
 **This crate uses [https://github.com/zkcrypto/jubjub](https://github.com/zkcrypto/jubjub) algorithm designed by @str4d and @ebfull.**
