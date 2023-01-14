@@ -18,4 +18,6 @@ subtle = { version = "2.0", default-features = false }
 [dev-dependencies]
 rand = { version = "0.8", default-features = false }
 rand_xorshift = { version = "0.3", default-features = false }
+serde = { version = "1.0.125", default-features = false, features = ["derive"] }
+zero-bls12-381 = { version = "0.2.0", default-features = false }
 proptest = "1"

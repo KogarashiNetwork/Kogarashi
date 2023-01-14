@@ -3431,8 +3431,10 @@ dependencies = [
  "rand 0.8.5",
  "rand_core 0.6.4",
  "rand_xorshift 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde",
  "sp-std",
  "subtle 2.4.1",
+ "zero-bls12-381 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
