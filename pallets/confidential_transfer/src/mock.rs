@@ -75,6 +75,7 @@ impl pallet_encrypted_balance::Config for TestRuntime {
     >;
     type WeightInfo = ();
 }
+
 impl Config for TestRuntime {
     type Event = Event;
 }

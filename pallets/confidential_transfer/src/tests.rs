@@ -94,7 +94,7 @@ mod plonk_test {
 
             assert_ok!(ConfidentialTransfer::confidential_transfer(
                 Origin::signed(1),
-                15,
+                2,
                 proof,
                 public_inputs,
                 transaction_params

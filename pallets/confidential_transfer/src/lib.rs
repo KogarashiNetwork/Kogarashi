@@ -14,6 +14,7 @@ pub mod pallet {
     use frame_support::pallet_prelude::*;
     use frame_system::pallet_prelude::*;
     use pallet_plonk::{Fr, FullcodecRng, Proof};
+    use sp_runtime::traits::StaticLookup;
     use zero_circuits::ConfidentialTransferTransaction;
     use zero_crypto::common::Vec;
 
@@ -35,48 +36,35 @@ pub mod pallet {
     #[pallet::generate_store(pub(super) trait Store)]
     pub struct Pallet<T>(_);
 
-    #[pallet::storage]
-    #[pallet::getter(fn thing1)]
-    pub type Thing1<T: Config> = StorageValue<_, u32, ValueQuery>;
-
-    #[pallet::storage]
-    #[pallet::getter(fn thing2)]
-    pub type Thing2<T: Config> = StorageValue<_, u32, ValueQuery>;
-
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
-        // Coupled trusted setup
         #[pallet::weight(10_000)]
         pub fn trusted_setup(
             origin: OriginFor<T>,
-            val: u32,
+            degree: u32,
             rng: FullcodecRng,
         ) -> DispatchResultWithPostInfo {
-            pallet_plonk::Pallet::<T>::trusted_setup(origin, val, rng)?;
+            pallet_plonk::Pallet::<T>::trusted_setup(origin, degree, rng)?;
             Ok(().into())
         }
 
         #[pallet::weight(10_000)]
         pub fn confidential_transfer(
             origin: OriginFor<T>,
-            val: u32,
+            dest: <T::Lookup as StaticLookup>::Source,
             proof: Proof,
             public_inputs: Vec<Fr>,
-            transaction_params: ConfidentialTransferTransaction,
+            transaction_params: ConfidentialTransferTransaction<T::EncryptedBalance>,
         ) -> DispatchResultWithPostInfo {
-            let transactor = ensure_signed(origin)?;
-            let dest = T::Lookup::lookup(dest)?;
-            pallet_plonk::Pallet::<T>::verify(origin, proof, public_inputs)?;
+            pallet_plonk::Pallet::<T>::verify(origin.clone(), proof, public_inputs)?;
             pallet_encrypted_balance::Pallet::<T>::transfer(
-                transactor,
-                &dest,
+                origin,
+                dest,
                 transaction_params.sender_encrypted_transfer_amount,
-            );
-
-            Self::deposit_event(Event::ValueSet(1, val));
+            )?;
             Ok(().into())
         }
     }

@@ -75,6 +75,7 @@ impl frame_system::Config for Test {
 parameter_types! {
     pub const MaxLocks: u32 = 50;
 }
+
 impl Config for Test {
     type EncryptedBalance = EncryptedNumber;
     type Event = Event;
@@ -86,6 +87,7 @@ impl Config for Test {
     >;
     type WeightInfo = ();
 }
+
 #[derive(Default)]
 pub struct ExtBuilder {}
 
