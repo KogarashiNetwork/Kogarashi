@@ -1,8 +1,13 @@
 use crate::{self as confidential_transfer, pallet::Config};
 
-use pallet_encrypted_balance::{Account, AccountData};
-use zero_circuits::ConfidentialTransferCircuit;
+use zero_circuits::{ConfidentialTransferCircuit, ConfidentialTransferTransaction};
+
+use rand_core::RngCore;
+use zero_crypto::behave::Group;
 use zero_elgamal::EncryptedNumber;
+use zero_jubjub::{Fp as JubJubScalar, JubJubAffine, GENERATOR_EXTENDED};
+
+use pallet_encrypted_balance::{Account, AccountData};
 
 use frame_support::traits::StorageMapShim;
 use frame_support::{construct_runtime, parameter_types};
@@ -87,4 +92,63 @@ pub(crate) fn new_test_ext() -> sp_io::TestExternalities {
         .build_storage::<TestRuntime>()
         .unwrap()
         .into()
+}
+
+pub(crate) fn generate_confidential_transfer_params(
+    mut rng: impl RngCore,
+) -> (
+    ConfidentialTransferCircuit,
+    ConfidentialTransferTransaction<EncryptedNumber>,
+) {
+    let generator = GENERATOR_EXTENDED;
+    let alice_private_key = JubJubScalar::random(&mut rng);
+    let bob_private_key = JubJubScalar::random(&mut rng);
+    let alice_public_key = generator * alice_private_key;
+    let bob_public_key = generator * bob_private_key;
+
+    let alice_balance = JubJubScalar::from(1500 as u64);
+    let transfer_amount = JubJubScalar::from(800 as u64);
+    let alice_after_balance = JubJubScalar::from(700 as u64);
+    let alice_original_randomness = JubJubScalar::from(789 as u64);
+    let randomness = JubJubScalar::from(123 as u64);
+
+    let alice_t_encrypted_balance =
+        (generator * alice_balance) + (alice_public_key * alice_original_randomness);
+    let alice_s_encrypted_balance = generator * alice_original_randomness;
+    let alice_t_encrypted_transfer_amount =
+        (generator * transfer_amount) + (alice_public_key * randomness);
+    let alice_s_encrypted_transfer_amount = generator * randomness;
+    let bob_encrypted_transfer_amount =
+        (generator * transfer_amount) + (bob_public_key * randomness);
+    let alice_public_key = JubJubAffine::from(alice_public_key);
+    let bob_public_key = JubJubAffine::from(bob_public_key);
+    let alice_t_encrypted_balance = JubJubAffine::from(alice_t_encrypted_balance);
+    let alice_s_encrypted_balance = JubJubAffine::from(alice_s_encrypted_balance);
+    let alice_t_encrypted_transfer_amount = JubJubAffine::from(alice_t_encrypted_transfer_amount);
+    let alice_s_encrypted_transfer_amount = JubJubAffine::from(alice_s_encrypted_transfer_amount);
+    let alice_encrypted_transfer_amount = EncryptedNumber::new(
+        alice_t_encrypted_transfer_amount,
+        alice_s_encrypted_transfer_amount,
+    );
+    let bob_encrypted_transfer_amount = JubJubAffine::from(bob_encrypted_transfer_amount);
+
+    (
+        ConfidentialTransferCircuit::new(
+            alice_public_key,
+            bob_public_key,
+            EncryptedNumber::new(alice_t_encrypted_balance, alice_s_encrypted_balance),
+            alice_encrypted_transfer_amount,
+            bob_encrypted_transfer_amount,
+            alice_private_key,
+            transfer_amount,
+            alice_after_balance,
+            randomness,
+        ),
+        ConfidentialTransferTransaction::new(
+            alice_public_key,
+            bob_public_key,
+            alice_encrypted_transfer_amount,
+            bob_encrypted_transfer_amount,
+        ),
+    )
 }

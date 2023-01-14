@@ -123,11 +123,18 @@ impl CheckedSub for EncryptedNumber {
 
 /// interface for circuit public inputs
 pub trait TransferAmountPublic {
+    /// init transfer amount public
+    fn init(s: JubJubAffine, t: JubJubAffine) -> Self;
+
     /// get s and t cypher text
     fn get(self) -> (JubJubAffine, JubJubAffine);
 }
 
 impl TransferAmountPublic for EncryptedNumber {
+    fn init(s: JubJubAffine, t: JubJubAffine) -> Self {
+        Self::new(s, t)
+    }
+
     fn get(self) -> (JubJubAffine, JubJubAffine) {
         self.get_coordinate()
     }

@@ -3,8 +3,6 @@ name = "zero-circuits"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 zero-plonk = { path = '../plonk' }
@@ -13,6 +11,3 @@ zero-elgamal = { path = '../elgamal' }
 zero-crypto = { path = '../crypto' }
 zero-bls12-381 = { path = '../bls12_381' }
 
-[dev-dependencies]
-rand = { version = "0.8", default-features = false }
-ark-std = { version = "0.3", features = ["print-trace"] }

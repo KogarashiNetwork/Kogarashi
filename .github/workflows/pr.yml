@@ -21,7 +21,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all --all-features
+          args: --release --all --all-features
 
   format:
     if: github.event.pull_request.draft == false
