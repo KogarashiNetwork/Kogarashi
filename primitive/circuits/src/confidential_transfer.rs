@@ -1,6 +1,7 @@
-use zero_crypto::common::{Affine, Basic, Curve, Decode, Encode, Group};
-use zero_elgamal::EncryptedNumber;
-use zero_jubjub::{Fp as JubJubScalar, JubJubAffine, GENERATOR_EXTENDED};
+use zero_bls12_381::Fr;
+use zero_crypto::common::{Decode, Encode, Group};
+use zero_elgamal::{EncryptedNumber, TransferAmountPublic};
+use zero_jubjub::{JubJubAffine, GENERATOR_EXTENDED};
 use zero_plonk::prelude::*;
 
 pub const BALANCE_BITS: usize = 16;
@@ -13,10 +14,10 @@ pub struct ConfidentialTransferCircuit {
     sender_encrypted_balance: EncryptedNumber,
     sender_encrypted_transfer_amount: EncryptedNumber,
     recipient_encrypted_transfer_amount: JubJubAffine,
-    sender_private_key: JubJubScalar,
-    transfer_amount: JubJubScalar,
-    sender_after_balance: JubJubScalar,
-    randomness: JubJubScalar,
+    sender_private_key: Fr,
+    transfer_amount: Fr,
+    sender_after_balance: Fr,
+    randomness: Fr,
     bits: usize,
 }
 
@@ -28,10 +29,10 @@ impl ConfidentialTransferCircuit {
         sender_encrypted_balance: EncryptedNumber,
         sender_encrypted_transfer_amount: EncryptedNumber,
         recipient_encrypted_transfer_amount: JubJubAffine,
-        sender_private_key: JubJubScalar,
-        transfer_amount: JubJubScalar,
-        sender_after_balance: JubJubScalar,
-        randomness: JubJubScalar,
+        sender_private_key: Fr,
+        transfer_amount: Fr,
+        sender_after_balance: Fr,
+        randomness: Fr,
     ) -> Self {
         Self {
             sender_public_key,
@@ -56,10 +57,10 @@ impl Default for ConfidentialTransferCircuit {
             sender_encrypted_balance: EncryptedNumber::default(),
             sender_encrypted_transfer_amount: EncryptedNumber::default(),
             recipient_encrypted_transfer_amount: JubJubAffine::identity(),
-            sender_private_key: JubJubScalar::ADDITIVE_IDENTITY,
-            transfer_amount: JubJubScalar::ADDITIVE_IDENTITY,
-            sender_after_balance: JubJubScalar::ADDITIVE_IDENTITY,
-            randomness: JubJubScalar::ADDITIVE_IDENTITY,
+            sender_private_key: Fr::ADDITIVE_IDENTITY,
+            transfer_amount: Fr::ADDITIVE_IDENTITY,
+            sender_after_balance: Fr::ADDITIVE_IDENTITY,
+            randomness: Fr::ADDITIVE_IDENTITY,
             bits: BALANCE_BITS,
         }
     }
@@ -83,7 +84,7 @@ impl Circuit for ConfidentialTransferCircuit {
         let transfer_amount = composer.append_witness(self.transfer_amount);
         let sender_after_balance = composer.append_witness(self.sender_after_balance);
         let randomness = composer.append_witness(self.randomness);
-        let neg = composer.append_witness(-JubJubScalar::one());
+        let neg = composer.append_witness(-Fr::one());
 
         // Alice left encrypted transfer check
         let g_pow_balance =
@@ -136,32 +137,26 @@ impl Circuit for ConfidentialTransferCircuit {
     }
 }
 
-pub trait Encrypted {
-    type Affine: Basic;
-
-    fn get_s_and_t(self) -> (Self::Affine, Self::Affine);
-}
-
 /// confidential transfer transaction input
 #[derive(Clone, Debug, Decode, Encode, Eq, PartialEq)]
-pub struct ConfidentialTransferTransaction<E: Encrypted> {
+pub struct ConfidentialTransferTransaction<E: TransferAmountPublic> {
     /// sender public key
-    pub sender_public_key: E::Affine,
+    pub sender_public_key: JubJubAffine,
     /// recipient public key
-    pub recipient_public_key: E::Affine,
+    pub recipient_public_key: JubJubAffine,
     /// encrypted transfer amount by sender
     pub sender_encrypted_transfer_amount: E,
     /// encrypted transfer amount by recipient
-    pub recipient_encrypted_transfer_amount: E::Affine,
+    pub recipient_encrypted_transfer_amount: JubJubAffine,
 }
 
-impl<E: Encrypted> ConfidentialTransferTransaction<E> {
+impl<E: TransferAmountPublic> ConfidentialTransferTransaction<E> {
     /// init confidential transfer transaction
     pub fn new(
-        sender_public_key: E::Affine,
-        recipient_public_key: E::Affine,
+        sender_public_key: JubJubAffine,
+        recipient_public_key: JubJubAffine,
         sender_encrypted_transfer_amount: E,
-        recipient_encrypted_transfer_amount: E::Affine,
+        recipient_encrypted_transfer_amount: JubJubAffine,
     ) -> Self {
         Self {
             sender_public_key,
@@ -172,13 +167,9 @@ impl<E: Encrypted> ConfidentialTransferTransaction<E> {
     }
 
     /// output public inputs for confidential transfer transaction
-    pub fn public_inputs(
-        self,
-    ) -> [<<E as Encrypted>::Affine as Curve>::Range; CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH]
-    {
-        let mut public_inputs = [<<E as Encrypted>::Affine as Curve>::Range::zero();
-            CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH];
-        let (sender_s, sender_t) = self.sender_encrypted_transfer_amount.get_s_and_t();
+    pub fn public_inputs(self) -> [Fr; CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH] {
+        let mut public_inputs = [Fr::zero(); CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH];
+        let (sender_s, sender_t) = self.sender_encrypted_transfer_amount.get();
         for (i, public_point) in [
             sender_t,
             self.recipient_encrypted_transfer_amount,
@@ -224,17 +215,17 @@ mod confidential_transfer_circuit_test {
         // 2.0. transaction sender and recipient key pair
         let params_generation = start_timer!(|| "params generation");
         let generator = GENERATOR_EXTENDED;
-        let alice_private_key = JubJubScalar::random(&mut rng);
-        let bob_private_key = JubJubScalar::random(&mut rng);
+        let alice_private_key = Fr::random(&mut rng);
+        let bob_private_key = Fr::random(&mut rng);
         let alice_public_key = generator * alice_private_key;
         let bob_public_key = generator * bob_private_key;
 
         // 2.1. encrypt transaction by ElGamal encryption
-        let alice_balance = JubJubScalar::from(1500 as u64);
-        let transfer_amount = JubJubScalar::from(800 as u64);
-        let alice_after_balance = JubJubScalar::from(700 as u64);
-        let alice_original_randomness = JubJubScalar::from(789 as u64);
-        let randomness = JubJubScalar::from(123 as u64);
+        let alice_balance = Fr::from(1500 as u64);
+        let transfer_amount = Fr::from(800 as u64);
+        let alice_after_balance = Fr::from(700 as u64);
+        let alice_original_randomness = Fr::from(789 as u64);
+        let randomness = Fr::from(123 as u64);
 
         let alice_t_encrypted_balance =
             (generator * alice_balance) + (alice_public_key * alice_original_randomness);
@@ -252,6 +243,10 @@ mod confidential_transfer_circuit_test {
             JubJubAffine::from(alice_t_encrypted_transfer_amount);
         let alice_s_encrypted_transfer_amount =
             JubJubAffine::from(alice_s_encrypted_transfer_amount);
+        let alice_encrypted_transfer_amount = EncryptedNumber::new(
+            alice_t_encrypted_transfer_amount,
+            alice_s_encrypted_transfer_amount,
+        );
         let bob_encrypted_transfer_amount = JubJubAffine::from(bob_encrypted_transfer_amount);
         end_timer!(params_generation);
 
@@ -259,7 +254,7 @@ mod confidential_transfer_circuit_test {
         let transaction = ConfidentialTransferTransaction::new(
             alice_t_encrypted_transfer_amount,
             bob_encrypted_transfer_amount,
-            alice_s_encrypted_transfer_amount,
+            alice_encrypted_transfer_amount,
             alice_public_key,
         );
         let public_inputs = transaction.public_inputs();
@@ -273,10 +268,7 @@ mod confidential_transfer_circuit_test {
                     alice_public_key,
                     bob_public_key,
                     EncryptedNumber::new(alice_t_encrypted_balance, alice_s_encrypted_balance),
-                    EncryptedNumber::new(
-                        alice_t_encrypted_transfer_amount,
-                        alice_s_encrypted_transfer_amount,
-                    ),
+                    alice_encrypted_transfer_amount,
                     bob_encrypted_transfer_amount,
                     alice_private_key,
                     transfer_amount,

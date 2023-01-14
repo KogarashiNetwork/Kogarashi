@@ -11,6 +11,7 @@ zero-plonk = { path = '../plonk' }
 zero-jubjub = { path = '../jubjub' }
 zero-elgamal = { path = '../elgamal' }
 zero-crypto = { path = '../crypto' }
+zero-bls12-381 = { path = '../bls12_381' }
 
 [dev-dependencies]
 rand = { version = "0.8", default-features = false }

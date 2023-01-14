@@ -3416,6 +3416,7 @@ dependencies = [
  "ark-std",
  "parity-scale-codec",
  "rand 0.8.5",
+ "zero-bls12-381 0.2.0",
  "zero-crypto 0.2.1",
  "zero-elgamal",
  "zero-jubjub",
