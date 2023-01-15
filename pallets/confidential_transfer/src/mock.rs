@@ -23,7 +23,7 @@ construct_runtime!(
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
         Plonk: pallet_plonk::{Module, Call, Storage, Event<T>},
-        EncryptedBalance: pallet_encrypted_balance::{Module, Call, Storage, Config<T>, Event<T>},
+        EncryptedCurrency: pallet_encrypted_balance::{Module, Call, Storage, Config<T>, Event<T>},
         ConfidentialTransfer: confidential_transfer::{Module, Call, Storage, Event<T>},
     }
 );
@@ -77,19 +77,24 @@ impl pallet_encrypted_balance::Config for TestRuntime {
 }
 
 impl Config for TestRuntime {
+    type Plonk = Plonk;
+    type EncryptedCurrency = EncryptedCurrency;
     type Event = Event;
 }
 
 // confidential transfer test data
-const ALICE_PRIVATE_KEY: JubJubScalar = JubJubScalar::to_mont_form([1, 0, 0, 0]);
-const BOB_PRIVATE_KEY: JubJubScalar = JubJubScalar::to_mont_form([2, 0, 0, 0]);
+pub(crate) const ALICE_ADDRESS: u64 = 1;
+pub(crate) const BOB_ADDRESS: u64 = 2;
+pub(crate) const ALICE_PRIVATE_KEY: JubJubScalar = JubJubScalar::to_mont_form([1, 0, 0, 0]);
+pub(crate) const BOB_PRIVATE_KEY: JubJubScalar = JubJubScalar::to_mont_form([2, 0, 0, 0]);
 const ALICE_RANDOMNESS: JubJubScalar = JubJubScalar::to_mont_form([1, 2, 3, 4]);
 const BOB_RANDOMNESS: JubJubScalar = JubJubScalar::to_mont_form([4, 3, 2, 1]);
 const TRANFER_RANDOMNESS: JubJubScalar = JubJubScalar::to_mont_form([5, 6, 7, 8]);
-const ALICE_BALANCE: u32 = 1500;
-const BOB_BALANCE: u32 = 0;
-const TRANSFER_AMOUNT: u32 = 800;
-const ALICE_AFTER_BALANCE: u32 = ALICE_BALANCE - TRANSFER_AMOUNT;
+pub(crate) const ALICE_BALANCE: u32 = 1500;
+pub(crate) const BOB_BALANCE: u32 = 0;
+pub(crate) const TRANSFER_AMOUNT: u32 = 800;
+pub(crate) const ALICE_AFTER_BALANCE: u32 = ALICE_BALANCE - TRANSFER_AMOUNT;
+pub(crate) const BOB_AFTER_BALANCE: u32 = BOB_BALANCE + TRANSFER_AMOUNT;
 
 // This function basically just builds a genesis storage key/value store according to
 // our desired mockup.
@@ -102,7 +107,7 @@ pub(crate) fn new_test_ext() -> sp_io::TestExternalities {
         .build_storage::<TestRuntime>()
         .unwrap();
     pallet_encrypted_balance::GenesisConfig::<TestRuntime> {
-        balances: vec![(1, alice_balance), (2, bob_balance)],
+        balances: vec![(ALICE_ADDRESS, alice_balance), (BOB_ADDRESS, bob_balance)],
     }
     .assimilate_storage(&mut t)
     .unwrap();
@@ -130,6 +135,7 @@ pub(crate) fn generate_confidential_transfer_params() -> (
     let alice_public_key = JubJubAffine::from(alice_public_key);
     let bob_public_key = JubJubAffine::from(bob_public_key);
     let bob_encrypted_transfer_amount = JubJubAffine::from(bob_encrypted_transfer_amount);
+    let bob_encrypted_transfer_amount_other = (GENERATOR_EXTENDED * TRANFER_RANDOMNESS).into();
 
     (
         ConfidentialTransferCircuit::new(
@@ -148,6 +154,7 @@ pub(crate) fn generate_confidential_transfer_params() -> (
             bob_public_key,
             alice_transfer_amount,
             bob_encrypted_transfer_amount,
+            bob_encrypted_transfer_amount_other,
         ),
     )
 }

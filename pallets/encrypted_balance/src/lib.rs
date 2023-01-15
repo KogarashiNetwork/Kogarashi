@@ -241,11 +241,17 @@ pub mod pallet {
         pub fn transfer(
             origin: OriginFor<T>,
             dest: <T::Lookup as StaticLookup>::Source,
-            value: T::EncryptedBalance,
+            sender_amount: T::EncryptedBalance,
+            recipient_amount: T::EncryptedBalance,
         ) -> DispatchResultWithPostInfo {
             let transactor = ensure_signed(origin)?;
             let dest = T::Lookup::lookup(dest)?;
-            <Self as EncryptedCurrency<_>>::transfer(&transactor, &dest, value)?;
+            <Self as EncryptedCurrency<_, _>>::transfer(
+                &transactor,
+                &dest,
+                sender_amount,
+                recipient_amount,
+            )?;
             Ok(().into())
         }
 
@@ -297,12 +303,18 @@ pub mod pallet {
             origin: OriginFor<T>,
             source: <T::Lookup as StaticLookup>::Source,
             dest: <T::Lookup as StaticLookup>::Source,
-            value: T::EncryptedBalance,
+            sender_amount: T::EncryptedBalance,
+            recipient_amount: T::EncryptedBalance,
         ) -> DispatchResultWithPostInfo {
             ensure_root(origin)?;
             let source = T::Lookup::lookup(source)?;
             let dest = T::Lookup::lookup(dest)?;
-            <Self as EncryptedCurrency<_>>::transfer(&source, &dest, value)?;
+            <Self as EncryptedCurrency<_, _>>::transfer(
+                &source,
+                &dest,
+                sender_amount,
+                recipient_amount,
+            )?;
             Ok(().into())
         }
     }
@@ -474,13 +486,11 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
 }
 
 // Custom impl
-impl<T: Config<I>, I: 'static> EncryptedCurrency<T::AccountId> for Pallet<T, I>
+impl<T: Config<I>, I: 'static> EncryptedCurrency<T::AccountId, T::EncryptedBalance> for Pallet<T, I>
 where
     T::EncryptedBalance: MaybeSerializeDeserialize + Debug,
 {
-    type EncryptedBalance = T::EncryptedBalance;
-
-    fn total_balance(who: &T::AccountId) -> Self::EncryptedBalance {
+    fn total_balance(who: &T::AccountId) -> T::EncryptedBalance {
         Self::account(who).total()
     }
 
@@ -489,7 +499,8 @@ where
     fn transfer(
         transactor: &T::AccountId,
         dest: &T::AccountId,
-        value: Self::EncryptedBalance,
+        sender_amount: T::EncryptedBalance,
+        recipient_amount: T::EncryptedBalance,
     ) -> DispatchResult {
         if transactor == dest {
             return Ok(());
@@ -497,20 +508,24 @@ where
 
         Self::try_mutate_account(dest, |to_account, _| -> DispatchResult {
             Self::try_mutate_account(transactor, |from_account, _| -> DispatchResult {
-                from_account.balance = from_account.balance - value;
-                to_account.balance = to_account.balance + value;
+                from_account.balance = from_account.balance - sender_amount;
+                to_account.balance = to_account.balance + recipient_amount;
 
                 Ok(())
             })
         })?;
 
         // Emit transfer event.
-        Self::deposit_event(Event::Transfer(transactor.clone(), dest.clone(), value));
+        Self::deposit_event(Event::Transfer(
+            transactor.clone(),
+            dest.clone(),
+            sender_amount,
+        ));
 
         Ok(())
     }
 
-    fn deposit_creating(who: &T::AccountId, value: Self::EncryptedBalance) -> DispatchResult {
+    fn deposit_creating(who: &T::AccountId, value: T::EncryptedBalance) -> DispatchResult {
         Self::try_mutate_account(who, |account, _| -> DispatchResult {
             account.balance = value;
             Ok(())

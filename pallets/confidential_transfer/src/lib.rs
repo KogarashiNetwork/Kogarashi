@@ -27,11 +27,16 @@ mod mock;
 mod confidential_transfer;
 
 pub use confidential_transfer::ConfidentialTransfer;
+use frame_support::pallet_prelude::*;
+use frame_system::pallet_prelude::*;
+use pallet_encrypted_balance::EncryptedCurrency;
+use pallet_plonk::FullcodecRng;
+use pallet_plonk::Plonk;
 
 #[frame_support::pallet]
 pub mod pallet {
-    use frame_support::pallet_prelude::*;
-    use frame_system::pallet_prelude::*;
+    use super::*;
+    use pallet_plonk::Plonk;
     use pallet_plonk::{FullcodecRng, Proof};
     use sp_runtime::traits::StaticLookup;
     use zero_circuits::ConfidentialTransferTransaction;
@@ -40,6 +45,8 @@ pub mod pallet {
     pub trait Config:
         frame_system::Config + pallet_plonk::Config + pallet_encrypted_balance::Config
     {
+        type Plonk: Plonk<Self::AccountId>;
+        type EncryptedCurrency: EncryptedCurrency<Self::AccountId, Self::EncryptedBalance>;
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
     }
 
@@ -72,14 +79,44 @@ pub mod pallet {
             proof: Proof,
             transaction_params: ConfidentialTransferTransaction<T::EncryptedBalance>,
         ) -> DispatchResultWithPostInfo {
-            let public_inputs = transaction_params.clone().public_inputs();
-            pallet_plonk::Pallet::<T>::verify(origin.clone(), proof, public_inputs.to_vec())?;
-            pallet_encrypted_balance::Pallet::<T>::transfer(
-                origin,
-                dest,
-                transaction_params.sender_encrypted_transfer_amount,
+            let transactor = ensure_signed(origin)?;
+            let dest = T::Lookup::lookup(dest)?;
+            <Self as ConfidentialTransfer<_>>::confidential_transfer(
+                &transactor,
+                &dest,
+                proof,
+                transaction_params,
             )?;
             Ok(().into())
         }
+    }
+}
+
+impl<T: Config> ConfidentialTransfer<T::AccountId> for Pallet<T> {
+    type EncryptedBalance = T::EncryptedBalance;
+
+    fn total_balance(who: &T::AccountId) -> Self::EncryptedBalance {
+        T::EncryptedCurrency::total_balance(who)
+    }
+
+    fn trusted_setup(
+        who: &T::AccountId,
+        val: u32,
+        rng: FullcodecRng,
+    ) -> frame_support::pallet_prelude::DispatchResultWithPostInfo {
+        T::Plonk::trusted_setup(who, val, rng)
+    }
+
+    fn confidential_transfer(
+        who: &T::AccountId,
+        dest: &T::AccountId,
+        proof: pallet_plonk::Proof,
+        transaction_params: zero_circuits::ConfidentialTransferTransaction<Self::EncryptedBalance>,
+    ) -> frame_support::pallet_prelude::DispatchResultWithPostInfo {
+        let public_inputs = transaction_params.clone().public_inputs();
+        let (sender_amount, recipient_amount) = transaction_params.clone().transaction_amount();
+        T::Plonk::verify(who, proof, public_inputs.to_vec())?;
+        T::EncryptedCurrency::transfer(who, dest, sender_amount, recipient_amount)?;
+        Ok(().into())
     }
 }

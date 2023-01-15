@@ -1,1 +1,1 @@
-# Crypto
+{{#include ../primitive/crypto/README.md}}

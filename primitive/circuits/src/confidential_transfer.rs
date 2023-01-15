@@ -148,6 +148,8 @@ pub struct ConfidentialTransferTransaction<E: ConfidentialTransferPublicInputs> 
     pub sender_encrypted_transfer_amount: E,
     /// encrypted transfer amount by recipient
     pub recipient_encrypted_transfer_amount: JubJubAffine,
+    /// the other encrypted transfer amount by recipient
+    pub recipient_encrypted_transfer_amount_other: JubJubAffine,
 }
 
 impl<E: ConfidentialTransferPublicInputs> ConfidentialTransferTransaction<E> {
@@ -157,12 +159,14 @@ impl<E: ConfidentialTransferPublicInputs> ConfidentialTransferTransaction<E> {
         recipient_public_key: JubJubAffine,
         sender_encrypted_transfer_amount: E,
         recipient_encrypted_transfer_amount: JubJubAffine,
+        recipient_encrypted_transfer_amount_other: JubJubAffine,
     ) -> Self {
         Self {
             sender_public_key,
             recipient_public_key,
             sender_encrypted_transfer_amount,
             recipient_encrypted_transfer_amount,
+            recipient_encrypted_transfer_amount_other,
         }
     }
 
@@ -184,5 +188,16 @@ impl<E: ConfidentialTransferPublicInputs> ConfidentialTransferTransaction<E> {
             public_inputs[i * 2 + 1] = y;
         }
         public_inputs
+    }
+
+    /// output transfer amount encrypted for each
+    pub fn transaction_amount(self) -> (E, E) {
+        (
+            self.sender_encrypted_transfer_amount,
+            E::init(
+                self.recipient_encrypted_transfer_amount,
+                self.recipient_encrypted_transfer_amount_other,
+            ),
+        )
     }
 }

@@ -1,12 +1,8 @@
 use sp_runtime::DispatchResult;
-use zero_elgamal::ConfidentialTransferPublicInputs;
 
 /// Abstraction over a fungible assets system.
-pub trait EncryptedCurrency<AccountId> {
-    /// The balance of an account.
-    type EncryptedBalance: ConfidentialTransferPublicInputs;
-
-    fn total_balance(who: &AccountId) -> Self::EncryptedBalance;
+pub trait EncryptedCurrency<AccountId, EncryptedBalance> {
+    fn total_balance(who: &AccountId) -> EncryptedBalance;
 
     /// Transfer some liquid free balance to another staker.
     ///
@@ -15,7 +11,8 @@ pub trait EncryptedCurrency<AccountId> {
     fn transfer(
         source: &AccountId,
         dest: &AccountId,
-        value: Self::EncryptedBalance,
+        sender_amount: EncryptedBalance,
+        recipient_amount: EncryptedBalance,
     ) -> DispatchResult;
 
     /// Deposit some `value` into the free balance of `who`, possibly creating a new account.
@@ -25,5 +22,5 @@ pub trait EncryptedCurrency<AccountId> {
     /// - the `value` to be deposited is less than the required ED and the account does not yet exist; or
     /// - the deposit would necessitate the account to exist and there are no provider references; or
     /// - `value` is so large it would cause the balance of `who` to overflow.
-    fn deposit_creating(who: &AccountId, value: Self::EncryptedBalance) -> DispatchResult;
+    fn deposit_creating(who: &AccountId, value: EncryptedBalance) -> DispatchResult;
 }

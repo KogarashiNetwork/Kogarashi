@@ -1,14 +1,19 @@
 #[cfg(test)]
 mod plonk_test {
+    use crate::confidential_transfer::ConfidentialTransfer as TraitConfidentialTransfer;
     use crate::mock::{
         generate_confidential_transfer_params, new_test_ext, ConfidentialTransfer, Origin, Plonk,
+        ALICE_ADDRESS, ALICE_AFTER_BALANCE, ALICE_BALANCE, ALICE_PRIVATE_KEY, BOB_ADDRESS,
+        BOB_AFTER_BALANCE, BOB_BALANCE, BOB_PRIVATE_KEY,
     };
 
     use frame_support::assert_ok;
     use pallet_plonk::FullcodecRng;
-    use rand::SeedableRng;
     use zero_circuits::ConfidentialTransferCircuit;
     use zero_plonk::prelude::Compiler;
+
+    use ark_std::{end_timer, start_timer};
+    use rand::SeedableRng;
 
     fn get_rng() -> FullcodecRng {
         FullcodecRng::from_seed([
@@ -27,26 +32,53 @@ mod plonk_test {
             generate_confidential_transfer_params();
 
         new_test_ext().execute_with(|| {
-            assert_ok!(ConfidentialTransfer::trusted_setup(
-                Origin::signed(1),
-                k,
-                rng.clone()
-            ));
+            // default balance decryption check
+            let alice_balance = ConfidentialTransfer::total_balance(&ALICE_ADDRESS);
+            let alice_raw_balance = alice_balance.decrypt(ALICE_PRIVATE_KEY);
+            let bob_balance = ConfidentialTransfer::total_balance(&BOB_ADDRESS);
+            let bob_raw_balance = bob_balance.decrypt(BOB_PRIVATE_KEY);
 
+            assert_eq!(alice_raw_balance.unwrap(), ALICE_BALANCE);
+            assert_eq!(bob_raw_balance.unwrap(), BOB_BALANCE);
+
+            // trusted setup check
+            let trusted_setup = start_timer!(|| "trusted setup");
+            let result =
+                ConfidentialTransfer::trusted_setup(Origin::signed(ALICE_ADDRESS), k, rng.clone());
+            end_timer!(trusted_setup);
+            assert_ok!(result);
+
+            // proof generation
             let pp = Plonk::public_parameter().unwrap();
             let prover = Compiler::compile::<ConfidentialTransferCircuit>(&pp, label)
                 .expect("failed to compile circuit");
+
+            let proof_generation = start_timer!(|| "proof generation");
             let proof = prover
                 .0
                 .prove(&mut rng, &confidential_transfer_circuit)
                 .expect("failed to prove");
+            end_timer!(proof_generation);
 
-            assert_ok!(ConfidentialTransfer::confidential_transfer(
-                Origin::signed(1),
-                2,
+            // confidential transfer check
+            let confidential_transfer = start_timer!(|| "confidential transfer");
+            let result = ConfidentialTransfer::confidential_transfer(
+                Origin::signed(ALICE_ADDRESS),
+                BOB_ADDRESS,
                 proof.0,
-                confidential_transfer_transaction
-            ));
+                confidential_transfer_transaction,
+            );
+            end_timer!(confidential_transfer);
+            assert_ok!(result);
+
+            // balance transition check
+            let alice_balance = ConfidentialTransfer::total_balance(&ALICE_ADDRESS);
+            let alice_raw_balance = alice_balance.decrypt(ALICE_PRIVATE_KEY);
+            let bob_balance = ConfidentialTransfer::total_balance(&BOB_ADDRESS);
+            let bob_raw_balance = bob_balance.decrypt(BOB_PRIVATE_KEY);
+
+            assert_eq!(alice_raw_balance.unwrap(), ALICE_AFTER_BALANCE);
+            assert_eq!(bob_raw_balance.unwrap(), BOB_AFTER_BALANCE);
         });
     }
 }
