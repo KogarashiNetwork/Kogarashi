@@ -162,15 +162,16 @@
 </ul>
 </li>
 <li><a href="2_0_transaction_constraints.html">Transaction Constraints</a></li>
-<li><a href="../primitive/README.html">Primitive</a>
+<li><a href="3_0_primitive.html">Primitive</a>
 <ul>
 <li><a href="3_1_crypto.html">Crypto</a></li>
 <li><a href="3_2_jubjub.html">Jubjub</a></li>
 <li><a href="3_3_bls12_381.html">Bls12 381</a></li>
 <li><a href="3_4_elgamal.html">ElGamal</a></li>
+<li><a href="3_5_pairing.html">Pairing</a></li>
 </ul>
 </li>
-<li><a href="../pallet/README.html">Pallet</a>
+<li><a href="4_0_pallet.html">Pallet</a>
 <ul>
 <li><a href="4_1_plonk.html">Plonk</a></li>
 <li><a href="4_2_confidential_transfer.html">Confidential Transfer</a></li>
@@ -225,6 +226,22 @@
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 

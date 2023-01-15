@@ -146,24 +146,32 @@
                     <main>
                         <h1 id="primitive"><a class="header" href="#primitive">Primitive</a></h1>
 <p>The <code>Zero Network</code> consist of cryptographic primitives which are compatible with <code>no_std</code> and <a href="https://github.com/paritytech/parity-scale-codec"><code>parity-scale-codec</code></a>. Followings are short summary of primitives.</p>
-<h2 id="zero-crypto"><a class="header" href="#zero-crypto"><a href="../book/3_6_crypto.html">zero-crypto</a> <a href="https://crates.io/crates/zero-crypto"><img src="https://img.shields.io/crates/v/zero-crypto.svg" alt="crates.io badge" /></a></a></h2>
+<ul>
+<li><a href="../book/3_6_crypto.html">zero-crypto</a> <a href="https://crates.io/crates/zero-crypto"><img src="https://img.shields.io/crates/v/zero-crypto.svg" alt="crates.io badge" /></a></li>
+</ul>
+<p>The <code>zero-crypto</code> crate is in charge of basic cryptographic primitive. This includes <code>Field</code>, <code>Curve</code>, <code>ExtensionField</code> and so on, and allows us to easily setup cryptocraphy implementation without implementing actual algorithms and test automatically.</p>
+<ul>
+<li><a href="../book/3_5_jubjub.html">zero-jubjub</a> <a href="https://crates.io/crates/zero-jubjub"><img src="https://img.shields.io/crates/v/zero-jubjub.svg" alt="crates.io badge" /></a></li>
+</ul>
+<p>The <code>zero-jubjub</code> crate is in charge of <code>Jubjub</code> curve arithmetic. This supports <code>Jubjub</code> rational point additive and scalar by finite field.</p>
+<ul>
+<li><a href="../book/3_3_bls12_381.html">zero-bls12-381</a> <a href="https://crates.io/crates/zero-bls12-381"><img src="https://img.shields.io/crates/v/zero-bls12-381.svg" alt="crates.io badge" /></a></li>
+</ul>
+<p>The <code>zero-bls12-381</code> crate is in charge of <code>Bls12 381</code> arithmetic. This supports <code>Bls12 381</code> $G_1$ and $G_2$ rational point additive and multiplicative, and scalar by finite field, and also supports $F_q^2$, $F_q^6$ and $F_q^{12}$ extension field arithmetic.</p>
+<ul>
+<li><a href="../book/3_4_elgamal.html">zero-elgamal</a> <a href="https://crates.io/crates/zero-elgamal"><img src="https://img.shields.io/crates/v/zero-elgamal.svg" alt="crates.io badge" /></a></li>
+</ul>
+<p>The <code>zero-elgamal</code> crate is in charge of additive homomorphic <code>ElGamal</code> arithmetic. This supports <code>ElGamal</code> encryption and decription.</p>
+<ul>
+<li><a href="../book/">zero-pairing</a> <a href="https://crates.io/crates/zero-pairing"><img src="https://img.shields.io/crates/v/zero-pairing.svg" alt="crates.io badge" /></a></li>
+</ul>
+<p>The <code>zero-pairing</code> crate is in charge of <code>Tate Pairing</code> arithmetic. This supports miller loop algorithm and final exponentiation.</p>
+<p>You can import as adding dependencies to our crate.</p>
 <pre><code class="language-toml">[dependencies]
 zero-crypto = { version = &quot;0.2.1&quot; }
-</code></pre>
-<h2 id="zero-jubjub"><a class="header" href="#zero-jubjub"><a href="../book/3_5_jubjub.html">zero-jubjub</a> <a href="https://crates.io/crates/zero-jubjub"><img src="https://img.shields.io/crates/v/zero-jubjub.svg" alt="crates.io badge" /></a></a></h2>
-<pre><code class="language-toml">[dependencies]
 zero-jubjub = { version = &quot;0.2.0&quot; }
-</code></pre>
-<h2 id="zero-bls12-381"><a class="header" href="#zero-bls12-381"><a href="../book/3_3_bls12_381.html">zero-bls12-381</a> <a href="https://crates.io/crates/zero-bls12-381"><img src="https://img.shields.io/crates/v/zero-bls12-381.svg" alt="crates.io badge" /></a></a></h2>
-<pre><code class="language-toml">[dependencies]
 zero-bls12-381 = { version = &quot;0.2.0&quot; }
-</code></pre>
-<h2 id="zero-elgamal"><a class="header" href="#zero-elgamal"><a href="../book/3_4_elgamal.html">zero-elgamal</a> <a href="https://crates.io/crates/zero-elgamal"><img src="https://img.shields.io/crates/v/zero-elgamal.svg" alt="crates.io badge" /></a></a></h2>
-<pre><code class="language-toml">[dependencies]
 zero-elgamal = { version = &quot;0.2.0&quot; }
-</code></pre>
-<h2 id="zero-pairing"><a class="header" href="#zero-pairing"><a href="../book/">zero-pairing</a> <a href="https://crates.io/crates/zero-pairing"><img src="https://img.shields.io/crates/v/zero-pairing.svg" alt="crates.io badge" /></a></a></h2>
-<pre><code class="language-toml">[dependencies]
 zero-pairing = { version = &quot;0.2.0&quot; }
 </code></pre>
 
@@ -196,6 +204,22 @@ zero-pairing = { version = &quot;0.2.0&quot; }
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 
