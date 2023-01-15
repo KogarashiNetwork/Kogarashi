@@ -24,6 +24,10 @@ mod tests;
 #[cfg(test)]
 mod mock;
 
+mod confidential_transfer;
+
+pub use confidential_transfer::ConfidentialTransfer;
+
 #[frame_support::pallet]
 pub mod pallet {
     use frame_support::pallet_prelude::*;

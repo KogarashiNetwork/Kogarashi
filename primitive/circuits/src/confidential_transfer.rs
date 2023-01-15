@@ -1,6 +1,6 @@
 use zero_bls12_381::Fr as BlsScalar;
 use zero_crypto::common::{Decode, Encode, Group};
-use zero_elgamal::{EncryptedNumber, TransferAmountPublic};
+use zero_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
 use zero_jubjub::{Fp as JubJubScalar, JubJubAffine, GENERATOR_EXTENDED};
 use zero_plonk::prelude::*;
 
@@ -139,7 +139,7 @@ impl Circuit for ConfidentialTransferCircuit {
 
 /// confidential transfer transaction input
 #[derive(Clone, Debug, Decode, Encode, Eq, PartialEq)]
-pub struct ConfidentialTransferTransaction<E: TransferAmountPublic> {
+pub struct ConfidentialTransferTransaction<E: ConfidentialTransferPublicInputs> {
     /// sender public key
     pub sender_public_key: JubJubAffine,
     /// recipient public key
@@ -150,7 +150,7 @@ pub struct ConfidentialTransferTransaction<E: TransferAmountPublic> {
     pub recipient_encrypted_transfer_amount: JubJubAffine,
 }
 
-impl<E: TransferAmountPublic> ConfidentialTransferTransaction<E> {
+impl<E: ConfidentialTransferPublicInputs> ConfidentialTransferTransaction<E> {
     /// init confidential transfer transaction
     pub fn new(
         sender_public_key: JubJubAffine,

@@ -32,19 +32,19 @@ mod plonk_test {
                 k,
                 rng.clone()
             ));
+
             let pp = Plonk::public_parameter().unwrap();
-
-            let (prover, _) = Compiler::compile::<ConfidentialTransferCircuit>(&pp, label)
+            let prover = Compiler::compile::<ConfidentialTransferCircuit>(&pp, label)
                 .expect("failed to compile circuit");
-
-            let (proof, _) = prover
+            let proof = prover
+                .0
                 .prove(&mut rng, &confidential_transfer_circuit)
                 .expect("failed to prove");
 
             assert_ok!(ConfidentialTransfer::confidential_transfer(
                 Origin::signed(1),
                 2,
-                proof,
+                proof.0,
                 confidential_transfer_transaction
             ));
         });

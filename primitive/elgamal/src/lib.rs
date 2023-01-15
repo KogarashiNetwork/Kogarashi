@@ -122,7 +122,7 @@ impl CheckedSub for EncryptedNumber {
 }
 
 /// interface for circuit public inputs
-pub trait TransferAmountPublic {
+pub trait ConfidentialTransferPublicInputs {
     /// init transfer amount public
     fn init(s: JubJubAffine, t: JubJubAffine) -> Self;
 
@@ -130,7 +130,7 @@ pub trait TransferAmountPublic {
     fn get(self) -> (JubJubAffine, JubJubAffine);
 }
 
-impl TransferAmountPublic for EncryptedNumber {
+impl ConfidentialTransferPublicInputs for EncryptedNumber {
     fn init(s: JubJubAffine, t: JubJubAffine) -> Self {
         Self::new(s, t)
     }
