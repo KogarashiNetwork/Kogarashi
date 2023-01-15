@@ -245,7 +245,7 @@ pub mod pallet {
         ) -> DispatchResultWithPostInfo {
             let transactor = ensure_signed(origin)?;
             let dest = T::Lookup::lookup(dest)?;
-            <Self as EncryptedCurrency<_>>::transfer(&transactor, &dest, value)?;
+            <Self as EncryptedCurrency<_, _>>::transfer(&transactor, &dest, value)?;
             Ok(().into())
         }
 
@@ -302,7 +302,7 @@ pub mod pallet {
             ensure_root(origin)?;
             let source = T::Lookup::lookup(source)?;
             let dest = T::Lookup::lookup(dest)?;
-            <Self as EncryptedCurrency<_>>::transfer(&source, &dest, value)?;
+            <Self as EncryptedCurrency<_, _>>::transfer(&source, &dest, value)?;
             Ok(().into())
         }
     }
@@ -474,13 +474,11 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
 }
 
 // Custom impl
-impl<T: Config<I>, I: 'static> EncryptedCurrency<T::AccountId> for Pallet<T, I>
+impl<T: Config<I>, I: 'static> EncryptedCurrency<T::AccountId, T::EncryptedBalance> for Pallet<T, I>
 where
     T::EncryptedBalance: MaybeSerializeDeserialize + Debug,
 {
-    type EncryptedBalance = T::EncryptedBalance;
-
-    fn total_balance(who: &T::AccountId) -> Self::EncryptedBalance {
+    fn total_balance(who: &T::AccountId) -> T::EncryptedBalance {
         Self::account(who).total()
     }
 
@@ -489,7 +487,7 @@ where
     fn transfer(
         transactor: &T::AccountId,
         dest: &T::AccountId,
-        value: Self::EncryptedBalance,
+        value: T::EncryptedBalance,
     ) -> DispatchResult {
         if transactor == dest {
             return Ok(());
@@ -510,7 +508,7 @@ where
         Ok(())
     }
 
-    fn deposit_creating(who: &T::AccountId, value: Self::EncryptedBalance) -> DispatchResult {
+    fn deposit_creating(who: &T::AccountId, value: T::EncryptedBalance) -> DispatchResult {
         Self::try_mutate_account(who, |account, _| -> DispatchResult {
             account.balance = value;
             Ok(())

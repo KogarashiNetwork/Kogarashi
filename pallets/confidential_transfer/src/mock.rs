@@ -23,7 +23,7 @@ construct_runtime!(
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
         Plonk: pallet_plonk::{Module, Call, Storage, Event<T>},
-        EncryptedBalance: pallet_encrypted_balance::{Module, Call, Storage, Config<T>, Event<T>},
+        EncryptedCurrency: pallet_encrypted_balance::{Module, Call, Storage, Config<T>, Event<T>},
         ConfidentialTransfer: confidential_transfer::{Module, Call, Storage, Event<T>},
     }
 );
@@ -77,6 +77,8 @@ impl pallet_encrypted_balance::Config for TestRuntime {
 }
 
 impl Config for TestRuntime {
+    type Plonk = Plonk;
+    type EncryptedCurrency = EncryptedCurrency;
     type Event = Event;
 }
 
