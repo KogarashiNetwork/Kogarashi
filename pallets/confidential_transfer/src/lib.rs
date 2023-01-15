@@ -27,10 +27,10 @@ mod mock;
 mod confidential_transfer;
 
 pub use confidential_transfer::ConfidentialTransfer;
-use frame_support::dispatch::{DispatchErrorWithPostInfo, PostDispatchInfo};
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
 use pallet_encrypted_balance::EncryptedCurrency;
+use pallet_plonk::FullcodecRng;
 use pallet_plonk::Plonk;
 
 #[frame_support::pallet]
@@ -95,6 +95,18 @@ pub mod pallet {
 impl<T: Config> ConfidentialTransfer<T::AccountId> for Pallet<T> {
     type EncryptedBalance = T::EncryptedBalance;
 
+    fn total_balance(who: &T::AccountId) -> Self::EncryptedBalance {
+        T::EncryptedCurrency::total_balance(who)
+    }
+
+    fn trusted_setup(
+        who: &T::AccountId,
+        val: u32,
+        rng: FullcodecRng,
+    ) -> frame_support::pallet_prelude::DispatchResultWithPostInfo {
+        T::Plonk::trusted_setup(who, val, rng)
+    }
+
     fn confidential_transfer(
         who: &T::AccountId,
         dest: &T::AccountId,
@@ -102,28 +114,12 @@ impl<T: Config> ConfidentialTransfer<T::AccountId> for Pallet<T> {
         transaction_params: zero_circuits::ConfidentialTransferTransaction<Self::EncryptedBalance>,
     ) -> frame_support::pallet_prelude::DispatchResultWithPostInfo {
         let public_inputs = transaction_params.clone().public_inputs();
-        match T::Plonk::verify(who, proof, public_inputs.to_vec()) {
-            Ok(_) => {
-                match T::EncryptedCurrency::transfer(
-                    who,
-                    dest,
-                    transaction_params.sender_encrypted_transfer_amount,
-                ) {
-                    Ok(_) => return Ok(().into()),
-                    Err(_) => {
-                        return Err(DispatchErrorWithPostInfo {
-                            post_info: PostDispatchInfo::from(()),
-                            error: DispatchError::Other("transfer failed"),
-                        })
-                    }
-                }
-            }
-            Err(_) => {
-                return Err(DispatchErrorWithPostInfo {
-                    post_info: PostDispatchInfo::from(()),
-                    error: DispatchError::Other("invalid proof"),
-                })
-            }
-        }
+        T::Plonk::verify(who, proof, public_inputs.to_vec())?;
+        T::EncryptedCurrency::transfer(
+            who,
+            dest,
+            transaction_params.sender_encrypted_transfer_amount,
+        )?;
+        Ok(().into())
     }
 }
