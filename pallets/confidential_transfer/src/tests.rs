@@ -20,17 +20,17 @@ mod plonk_test {
     #[test]
     fn confidential_transfer_test() {
         let k = 14;
-        let mut rng = get_rng();
         let label = b"verify";
+        let mut rng = get_rng();
 
         let (confidential_transfer_circuit, confidential_transfer_transaction) =
-            generate_confidential_transfer_params(&mut rng);
+            generate_confidential_transfer_params();
 
         new_test_ext().execute_with(|| {
             assert_ok!(ConfidentialTransfer::trusted_setup(
                 Origin::signed(1),
                 k,
-                get_rng()
+                rng.clone()
             ));
             let pp = Plonk::public_parameter().unwrap();
 
