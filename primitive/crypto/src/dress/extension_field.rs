@@ -9,7 +9,7 @@ pub use ring::*;
 #[macro_export]
 macro_rules! extension_field_operation {
     ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
-        prime_extention_field_operation!($extension_field, $sub_field, $limbs_length);
+        prime_extension_field_operation!($extension_field, $sub_field, $limbs_length);
 
         #[derive(Clone, Copy, Decode, Encode)]
         pub struct $extension_field(pub(crate) [$sub_field; $limbs_length]);
@@ -26,7 +26,7 @@ macro_rules! extension_field_operation {
 }
 
 #[macro_export]
-macro_rules! prime_extention_field_operation {
+macro_rules! prime_extension_field_operation {
     ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
         ext_field_operation!($extension_field, $sub_field, $limbs_length);
 
@@ -64,4 +64,4 @@ macro_rules! prime_extention_field_operation {
     };
 }
 
-pub use {extension_field_operation, prime_extention_field_operation};
+pub use {extension_field_operation, prime_extension_field_operation};

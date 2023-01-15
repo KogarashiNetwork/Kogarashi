@@ -5,7 +5,7 @@ This crate provides basic cryptographic implementation as in `Field`, `Curve` an
 ### Field
 The following `Fr` support four basic operation.
 
-```rust
+```ignore
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 use zero_crypto::arithmetic::bits_256::*;
@@ -92,7 +92,7 @@ mod tests {
 ### Curve
 The following `G1Affine` and `G1Projective` supports point arithmetic.
 
-```no_run
+```ignore
 use crate::fq::Fq;
 use crate::fr::Fr;
 use zero_crypto::arithmetic::bits_384::*;

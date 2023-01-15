@@ -540,7 +540,7 @@ $$</p>
 <p><strong>This crate partly uses <a href="https://github.com/dusk-network/bls12_381">https://github.com/dusk-network/bls12_381</a> and <a href="https://github.com/dusk-network/bls12_381">https://github.com/dusk-network/bls12_381</a> implementation designed by Dusk-Network team and, @str4d and @ebfull.</strong>
 We replace field and curve implementation with <code>zero-crypto</code> to make this compatible with <code>Substrate</code>.</p>
 <h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
-<p>This crate includes field and extention fields, curve implementation. There are two curve $G1$ and $G2$ described as following.</p>
+<p>This crate includes field and extension fields, curve implementation. There are two curve $G1$ and $G2$ described as following.</p>
 <p>$G1: y^2 = x^3 + 4$<br />
 $G2: y^2 = x^3 + 4(u + 1)$</p>
 <p>These two group supports bilinearity by pairing. Let $G$ and $H$ be generator of $G1$, and $G2$, and $e$ be pairing function. The relationship is described as following.</p>

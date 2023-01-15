@@ -5,7 +5,7 @@ Pairing friendly bls12-381 curve.
 We replace field and curve implementation with `zero-crypto` to make this compatible with `Substrate`.
 
 ## Overview
-This crate includes field and extention fields, curve implementation. There are two curve $G1$ and $G2$ described as following.
+This crate includes field and extension fields, curve implementation. There are two curve $G1$ and $G2$ described as following.
 
 $G1: y^2 = x^3 + 4$  
 $G2: y^2 = x^3 + 4(u + 1)$
