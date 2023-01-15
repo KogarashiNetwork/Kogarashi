@@ -1,1 +1,1 @@
-# Plonk
+{{#include ../pallets/plonk/README.md}}

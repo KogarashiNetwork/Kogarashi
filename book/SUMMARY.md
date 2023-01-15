@@ -15,6 +15,7 @@
     - [Jubjub](3_2_jubjub.md)
     - [Bls12 381](3_3_bls12_381.md)
     - [ElGamal](3_4_elgamal.md)
+    - [Pairing](3_5_pairing.md)
 - [Pallet](4_0_pallet.md)
     - [Plonk](4_1_plonk.md)
     - [Confidential Transfer](4_2_confidential_transfer.md)

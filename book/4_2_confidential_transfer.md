@@ -1,1 +1,1 @@
-# Confidential Transfer
+{{#include ../pallets/confidential_transfer/README.md}}

@@ -1,1 +1,1 @@
-# ElGamal
+{{#include ../primitive/elgamal/README.md}}
