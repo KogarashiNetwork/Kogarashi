@@ -1,10 +1,16 @@
 [package]
+authors = [
+    'ashWhiteHat<phantomofrotten@gmail.com>',
+    'KiriosK<KiriosK@yandex.ru>'
+]
 name = "confidential_transfer"
 description = 'Confidential Transfer Pallet'
 version = "0.1.1"
 edition = '2021'
-authors = ['AshWhiteHat<phantomofrotten@gmail.com>']
 license = "Apache-2.0"
+homepage = 'https://github.com/zero-network/zero/'
+repository = 'https://github.com/zero-network/zero/'
+readme = 'README.md'
 
 [dependencies]
 rand_xorshift = { git = "https://github.com/zero-network/rngs", branch = "master", default-features = false }

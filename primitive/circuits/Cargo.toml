@@ -1,7 +1,16 @@
 [package]
+authors = [
+    'ashWhiteHat<phantomofrotten@gmail.com>',
+    'KiriosK<KiriosK@yandex.ru>'
+]
 name = "zero-circuits"
+description = 'lifted elgamal encryption implementation'
 version = "0.1.0"
 edition = "2021"
+license = "Apache-2.0"
+homepage = 'https://github.com/zero-network/zero/'
+repository = 'https://github.com/zero-network/zero/'
+readme = 'README.md'
 
 [dependencies]
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
