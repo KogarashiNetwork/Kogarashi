@@ -12,11 +12,14 @@ All public blockchains information as in users balances are literally public and
 
 |Lib|Description||
 |---|---|---|
-|[zero-crypto](https://crates.io/crates/zero-crypto)|Abstract algebra and zk-Snarks primitive implementation as in field, curve and extention field, pairing.|$F_r,F_q,F_{q^2},F_{q^6},F_{q^{12}},E(F_p),E'(F_{q^2}),poly(F_r)$|
+|[zero-crypto](https://crates.io/crates/zero-crypto)|Abstract algebra and zk-Snarks primitive implementation as in field, curve and extension field, pairing.|$F_r,F_q,F_{q^2},F_{q^6},F_{q^{12}},E(F_p),E'(F_{q^2}),poly(F_r)$|
 |[zero-jubjub](https://crates.io/crates/zero-jubjub)|Jubjub curve implementation for circuit domain.|$ax^2 + y^2 = 1 + dx^2y^2,\ where\ a = -1,\ d=-\frac{10240}{10241}$|
 |[zero-bls12-381](https://crates.io/crates/zero-bls12-381)|Bls12 381 implementation for Kate polynomial commitment domain.|$G_1:y^2 =x^3 + 4,\ G_2:y^2 = x^3+4(u+1)$|
 |[zero-elgamal](https://crates.io/crates/zero-elgamal)|ElGamal encryption for encrypted number over Jubjub curve.|$(g^{r + r'}, g^{a + c} * b^{r + r'})$|
 |[zero-pairing](https://crates.io/crates/zero-pairing)|Tate pairing implementation for zk-Snarks over Bls12 381 curve.|$e(aG, bH) = e(G, H)^{ab}\ where\ a,b \in F_r,~G \in G_1,~H \in G_2$|
+|pallet-plonk|Plonk implementation for confidential transfer.|$gen(d) \rightarrow srs,\ com(f, srs) \rightarrow commitment,\ V_{PC} \rightarrow acc\ or\ rej$|
+|pallet-encrypted-balance|Additive homomorphic encrypted balance implementation by ElGamal.|$get(address) \rightarrow (g^{r + r'}, g^{a + c} * b^{r + r'})$|
+|confidential_transfer|Confidential transfer pallet implementation coupling plonk and ElGamal.|$C = g^{b^\star}y^r \land \hat C = g^{b^\star} \hat y^r \land D = g^r \land C_L/C = g^{b'}(C_R/D)^{sk} \land y = g^{sk} \land b^\star \in [0, MAX] \land b' \in [0,MAX] $|
 
 All users balances are encrypted by the `homomorphic encryption` by default and all transactions executions are proved by the `non-interactive zero knowledge proof`. The blockchain runtime is optimized its structure and execution environment for improving encryption scheme. This blockchain supports the privacy and simplicity of use at the same time. Users balances are encrypted as default and transactions are verified by zero knowledge proof on chain. The following functionalities will be available.
 
@@ -43,13 +46,14 @@ zero-pairing = { version = "0.2.0" }
 We are supporting the confidential transactions for transfers and contracts executions. We are focusing on ensuring the `security assumption` and `privacy system` so after the research amd development phase, we are going to improve the performance by optimization of bytecode and libraries. We are also planning to support the `anonymous` and `rollup` transactions. Every cryptographic libraries are totally compatible with `Substrate` runtime.
 
 ## Test
-The `cargo-make` we are using.
 
-- Unit Test
+```shell
+$ git submodule update --init --recursive
+$ cargo test --release --all --all-features
 ```
-git submodule init
-git submodule update
-makers test
+or
+```shell
+$ docker-compose up
 ```
 
 ## Documentation
