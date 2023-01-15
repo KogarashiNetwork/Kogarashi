@@ -1,11 +1,9 @@
 version: '3'
 services:
-  chain:
-    build:
-      context: .
-      dockerfile: chain/Dockerfile
-    container_name: chain
+  test:
+    build: .
+    container_name: test
     tty: true
     stdin_open: true
     volumes:
-      - ./chain:/app
+      - .:/app

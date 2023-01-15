@@ -46,13 +46,14 @@ zero-pairing = { version = "0.2.0" }
 We are supporting the confidential transactions for transfers and contracts executions. We are focusing on ensuring the `security assumption` and `privacy system` so after the research amd development phase, we are going to improve the performance by optimization of bytecode and libraries. We are also planning to support the `anonymous` and `rollup` transactions. Every cryptographic libraries are totally compatible with `Substrate` runtime.
 
 ## Test
-The `cargo-make` we are using.
 
-- Unit Test
+```shell
+$ git submodule update --init --recursive
+$ cargo test --release --all --all-features
 ```
-git submodule init
-git submodule update
-makers test
+or
+```shell
+$ docker-compose up
 ```
 
 ## Documentation
