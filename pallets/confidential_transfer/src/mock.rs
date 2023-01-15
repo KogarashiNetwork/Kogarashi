@@ -1,6 +1,9 @@
-use crate::{self as confidential_transfer, pallet::Config};
+use crate::{
+    self as confidential_transfer,
+    circuit::{ConfidentialTransferCircuit, ConfidentialTransferTransaction},
+    pallet::Config,
+};
 use pallet_encrypted_balance::{Account, AccountData};
-use zero_circuits::{ConfidentialTransferCircuit, ConfidentialTransferTransaction};
 use zero_elgamal::EncryptedNumber;
 use zero_jubjub::{Fp as JubJubScalar, JubJubAffine, GENERATOR_EXTENDED};
 

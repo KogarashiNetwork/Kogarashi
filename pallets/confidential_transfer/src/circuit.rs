@@ -23,6 +23,7 @@ pub struct ConfidentialTransferCircuit {
 
 impl ConfidentialTransferCircuit {
     /// Init confidential tranfer circuit
+    #[allow(dead_code)]
     pub fn new(
         sender_public_key: JubJubAffine,
         recipient_public_key: JubJubAffine,

@@ -27,15 +27,9 @@ confidential_transfer = { default-features = false, path = "./pallets/confidenti
 pallet-plonk = { default-features = false, path = "./pallets/plonk" }
 pallet-encrypted-balance = { default-features = false, path = "./pallets/encrypted_balance" }
 
-frame-support = { version = "3.0.0" }
-
-[lib]
-doctest = false
-
 [workspace]
 members = [
     "primitive/bls12_381",
-    "primitive/circuits",
     "primitive/crypto",
     "primitive/elgamal",
     "primitive/jubjub",
@@ -45,4 +39,13 @@ members = [
     "pallets/confidential_transfer",
     "pallets/encrypted_balance",
     "pallets/plonk"
+]
+
+[features]
+
+default = ["std"]
+std = [
+    'confidential_transfer/std',
+    'pallet-plonk/std',
+    'pallet-encrypted-balance/std',
 ]

@@ -17,5 +17,5 @@ You can import as adding dependencies to our crate.
 
 ```toml
 [dependencies]
-pallet-plonk = { version = "0.2.2" }
+pallet-plonk = { version = "0.2.3" }
 ```

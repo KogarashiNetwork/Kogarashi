@@ -24,22 +24,22 @@ mod tests;
 #[cfg(test)]
 mod mock;
 
-mod confidential_transfer;
+mod circuit;
+mod traits;
 
-pub use confidential_transfer::ConfidentialTransfer;
+pub use circuit::ConfidentialTransferTransaction;
+pub use traits::ConfidentialTransfer;
+
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
 use pallet_encrypted_balance::EncryptedCurrency;
-use pallet_plonk::FullcodecRng;
 use pallet_plonk::Plonk;
+use pallet_plonk::{FullcodecRng, Proof};
 
 #[frame_support::pallet]
 pub mod pallet {
     use super::*;
-    use pallet_plonk::Plonk;
-    use pallet_plonk::{FullcodecRng, Proof};
     use sp_runtime::traits::StaticLookup;
-    use zero_circuits::ConfidentialTransferTransaction;
 
     #[pallet::config]
     pub trait Config:
@@ -103,7 +103,7 @@ impl<T: Config> ConfidentialTransfer<T::AccountId> for Pallet<T> {
         who: &T::AccountId,
         val: u32,
         rng: FullcodecRng,
-    ) -> frame_support::pallet_prelude::DispatchResultWithPostInfo {
+    ) -> DispatchResultWithPostInfo {
         T::Plonk::trusted_setup(who, val, rng)
     }
 
@@ -111,8 +111,8 @@ impl<T: Config> ConfidentialTransfer<T::AccountId> for Pallet<T> {
         who: &T::AccountId,
         dest: &T::AccountId,
         proof: pallet_plonk::Proof,
-        transaction_params: zero_circuits::ConfidentialTransferTransaction<Self::EncryptedBalance>,
-    ) -> frame_support::pallet_prelude::DispatchResultWithPostInfo {
+        transaction_params: ConfidentialTransferTransaction<Self::EncryptedBalance>,
+    ) -> DispatchResultWithPostInfo {
         let public_inputs = transaction_params.clone().public_inputs();
         let (sender_amount, recipient_amount) = transaction_params.clone().transaction_amount();
         T::Plonk::verify(who, proof, public_inputs.to_vec())?;

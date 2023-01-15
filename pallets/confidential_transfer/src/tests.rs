@@ -1,15 +1,15 @@
 #[cfg(test)]
 mod plonk_test {
-    use crate::confidential_transfer::ConfidentialTransfer as TraitConfidentialTransfer;
+    use crate::circuit::ConfidentialTransferCircuit;
     use crate::mock::{
         generate_confidential_transfer_params, new_test_ext, ConfidentialTransfer, Origin, Plonk,
         ALICE_ADDRESS, ALICE_AFTER_BALANCE, ALICE_BALANCE, ALICE_PRIVATE_KEY, BOB_ADDRESS,
         BOB_AFTER_BALANCE, BOB_BALANCE, BOB_PRIVATE_KEY,
     };
+    use crate::traits::ConfidentialTransfer as TraitConfidentialTransfer;
 
     use frame_support::assert_ok;
     use pallet_plonk::FullcodecRng;
-    use zero_circuits::ConfidentialTransferCircuit;
     use zero_plonk::prelude::Compiler;
 
     use ark_std::{end_timer, start_timer};
