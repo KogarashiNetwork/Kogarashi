@@ -1,6 +1,4 @@
-// This file is part of Substrate.
-
-// Copyright (C) 2017-2021 Parity Technologies (UK) Ltd.
+// Copyright (C) 2023-2024 Inverse (JP) LLC.
 // SPDX-License-Identifier: Apache-2.0
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -156,10 +154,11 @@ mod tests_local;
 pub mod weights;
 
 use codec::{Decode, Encode};
-use encrypted_currency::EncryptedCurrency;
+pub use encrypted_currency::EncryptedCurrency;
 #[cfg(feature = "std")]
 use frame_support::traits::GenesisBuild;
 use frame_support::traits::StoredMap;
+pub use pallet::*;
 use sp_runtime::{
     traits::{CheckedAdd, CheckedSub, MaybeSerializeDeserialize, StaticLookup, StoredMapError},
     DispatchResult, RuntimeDebug,
@@ -168,15 +167,13 @@ use sp_std::fmt::Debug;
 use sp_std::prelude::*;
 pub use weights::WeightInfo;
 
-pub use pallet::*;
-
 #[frame_support::pallet]
 pub mod pallet {
 
     use super::*;
     use frame_support::pallet_prelude::*;
     use frame_system::pallet_prelude::*;
-    use zero_elgamal::TransferAmountPublic;
+    use zero_elgamal::ConfidentialTransferPublicInputs;
 
     #[pallet::config]
     pub trait Config<I: 'static = ()>: frame_system::Config {
@@ -189,7 +186,7 @@ pub mod pallet {
             + Copy
             + MaybeSerializeDeserialize
             + Debug
-            + TransferAmountPublic;
+            + ConfidentialTransferPublicInputs;
 
         /// The overarching event type.
         type Event: From<Event<Self, I>> + IsType<<Self as frame_system::Config>::Event>;

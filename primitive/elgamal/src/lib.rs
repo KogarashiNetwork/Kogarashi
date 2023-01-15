@@ -1,4 +1,4 @@
-// Copyright (C) 2020-2023 Invers (JP) INC.
+// Copyright (C) 2023-2024 Invers (JP) INC.
 // SPDX-License-Identifier: Apache-2.0
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -122,12 +122,19 @@ impl CheckedSub for EncryptedNumber {
 }
 
 /// interface for circuit public inputs
-pub trait TransferAmountPublic {
+pub trait ConfidentialTransferPublicInputs {
+    /// init transfer amount public
+    fn init(s: JubJubAffine, t: JubJubAffine) -> Self;
+
     /// get s and t cypher text
     fn get(self) -> (JubJubAffine, JubJubAffine);
 }
 
-impl TransferAmountPublic for EncryptedNumber {
+impl ConfidentialTransferPublicInputs for EncryptedNumber {
+    fn init(s: JubJubAffine, t: JubJubAffine) -> Self {
+        Self::new(s, t)
+    }
+
     fn get(self) -> (JubJubAffine, JubJubAffine) {
         self.get_coordinate()
     }
