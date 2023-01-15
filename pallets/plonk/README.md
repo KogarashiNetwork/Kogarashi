@@ -1,4 +1,4 @@
-# Plonk
+# Plonk [![crates.io badge](https://img.shields.io/crates/v/plonk-pallet.svg)](https://crates.io/crates/plonk-pallet)
 
 ## Abstract
 
