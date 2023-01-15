@@ -28,6 +28,7 @@ parameter_types! {
         frame_system::limits::BlockWeights::simple_max(1024);
     pub static ExistentialDeposit: u64 = 0;
 }
+
 impl frame_system::Config for Test {
     type BaseCallFilter = ();
     type BlockWeights = BlockWeights;

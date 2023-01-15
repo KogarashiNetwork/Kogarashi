@@ -3,7 +3,7 @@ use crate::{self as confidential_transfer, pallet::Config};
 use zero_circuits::{ConfidentialTransferCircuit, ConfidentialTransferTransaction};
 
 use rand_core::RngCore;
-use zero_crypto::behave::Group;
+use zero_crypto::common::Group;
 use zero_elgamal::EncryptedNumber;
 use zero_jubjub::{Fp as JubJubScalar, JubJubAffine, GENERATOR_EXTENDED};
 
@@ -85,13 +85,32 @@ impl Config for TestRuntime {
     type Event = Event;
 }
 
+const ALICE_PRIVATE_KEY: JubJubScalar = JubJubScalar::to_mont_form([1, 0, 0, 0]);
+const BOB_PRIVATE_KEY: JubJubScalar = JubJubScalar::to_mont_form([2, 0, 0, 0]);
+const ALICE_RANDOMNESS: JubJubScalar = JubJubScalar::to_mont_form([1, 2, 3, 4]);
+const BOB_RANDOMNESS: JubJubScalar = JubJubScalar::to_mont_form([4, 3, 2, 1]);
+const ALICE_BALANCE: u32 = 1500;
+const BOB_BALANCE: u32 = 0;
+
 // This function basically just builds a genesis storage key/value store according to
 // our desired mockup.
 pub(crate) fn new_test_ext() -> sp_io::TestExternalities {
-    frame_system::GenesisConfig::default()
+    let alice_balance =
+        EncryptedNumber::encrypt(ALICE_PRIVATE_KEY, ALICE_BALANCE, ALICE_RANDOMNESS);
+    let bob_balance = EncryptedNumber::encrypt(BOB_PRIVATE_KEY, BOB_BALANCE, BOB_RANDOMNESS);
+
+    let mut t = frame_system::GenesisConfig::default()
         .build_storage::<TestRuntime>()
-        .unwrap()
-        .into()
+        .unwrap();
+    pallet_encrypted_balance::GenesisConfig::<TestRuntime> {
+        balances: vec![(1, alice_balance), (2, bob_balance)],
+    }
+    .assimilate_storage(&mut t)
+    .unwrap();
+
+    let mut ext = sp_io::TestExternalities::new(t);
+    ext.execute_with(|| System::set_block_number(1));
+    ext
 }
 
 pub(crate) fn generate_confidential_transfer_params(
@@ -100,11 +119,10 @@ pub(crate) fn generate_confidential_transfer_params(
     ConfidentialTransferCircuit,
     ConfidentialTransferTransaction<EncryptedNumber>,
 ) {
-    let generator = GENERATOR_EXTENDED;
     let alice_private_key = JubJubScalar::random(&mut rng);
     let bob_private_key = JubJubScalar::random(&mut rng);
-    let alice_public_key = generator * alice_private_key;
-    let bob_public_key = generator * bob_private_key;
+    let alice_public_key = GENERATOR_EXTENDED * alice_private_key;
+    let bob_public_key = GENERATOR_EXTENDED * bob_private_key;
 
     let alice_balance = JubJubScalar::from(1500 as u64);
     let transfer_amount = JubJubScalar::from(800 as u64);
@@ -113,13 +131,13 @@ pub(crate) fn generate_confidential_transfer_params(
     let randomness = JubJubScalar::from(123 as u64);
 
     let alice_t_encrypted_balance =
-        (generator * alice_balance) + (alice_public_key * alice_original_randomness);
-    let alice_s_encrypted_balance = generator * alice_original_randomness;
+        (GENERATOR_EXTENDED * alice_balance) + (alice_public_key * alice_original_randomness);
+    let alice_s_encrypted_balance = GENERATOR_EXTENDED * alice_original_randomness;
     let alice_t_encrypted_transfer_amount =
-        (generator * transfer_amount) + (alice_public_key * randomness);
-    let alice_s_encrypted_transfer_amount = generator * randomness;
+        (GENERATOR_EXTENDED * transfer_amount) + (alice_public_key * randomness);
+    let alice_s_encrypted_transfer_amount = GENERATOR_EXTENDED * randomness;
     let bob_encrypted_transfer_amount =
-        (generator * transfer_amount) + (bob_public_key * randomness);
+        (GENERATOR_EXTENDED * transfer_amount) + (bob_public_key * randomness);
     let alice_public_key = JubJubAffine::from(alice_public_key);
     let bob_public_key = JubJubAffine::from(bob_public_key);
     let alice_t_encrypted_balance = JubJubAffine::from(alice_t_encrypted_balance);
