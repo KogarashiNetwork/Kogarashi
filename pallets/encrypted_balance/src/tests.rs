@@ -25,7 +25,12 @@ macro_rules! decl_tests {
 
             <$ext_builder>::default().build().execute_with(|| {
                 let _ = EncryptedBalances::deposit_creating(&1, enc_balance1);
-                assert_ok!(EncryptedBalances::transfer(Some(1).into(), 2, enc_transfer));
+                assert_ok!(EncryptedBalances::transfer(
+                    Some(1).into(),
+                    2,
+                    enc_transfer,
+                    enc_transfer
+                ));
                 assert_eq!(
                     EncryptedBalances::total_balance(&1),
                     enc_balance1 - enc_transfer
@@ -47,13 +52,20 @@ macro_rules! decl_tests {
             <$ext_builder>::default().build().execute_with(|| {
                 let _ = EncryptedBalances::deposit_creating(&1, enc_balance1);
                 assert_noop!(
-                    EncryptedBalances::force_transfer(Some(2).into(), 1, 2, enc_transfer),
+                    EncryptedBalances::force_transfer(
+                        Some(2).into(),
+                        1,
+                        2,
+                        enc_transfer,
+                        enc_transfer
+                    ),
                     BadOrigin,
                 );
                 assert_ok!(EncryptedBalances::force_transfer(
                     RawOrigin::Root.into(),
                     1,
                     2,
+                    enc_transfer,
                     enc_transfer
                 ));
                 assert_eq!(

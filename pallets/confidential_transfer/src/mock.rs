@@ -94,6 +94,7 @@ pub(crate) const ALICE_BALANCE: u32 = 1500;
 pub(crate) const BOB_BALANCE: u32 = 0;
 pub(crate) const TRANSFER_AMOUNT: u32 = 800;
 pub(crate) const ALICE_AFTER_BALANCE: u32 = ALICE_BALANCE - TRANSFER_AMOUNT;
+pub(crate) const BOB_AFTER_BALANCE: u32 = BOB_BALANCE + TRANSFER_AMOUNT;
 
 // This function basically just builds a genesis storage key/value store according to
 // our desired mockup.
@@ -134,6 +135,7 @@ pub(crate) fn generate_confidential_transfer_params() -> (
     let alice_public_key = JubJubAffine::from(alice_public_key);
     let bob_public_key = JubJubAffine::from(bob_public_key);
     let bob_encrypted_transfer_amount = JubJubAffine::from(bob_encrypted_transfer_amount);
+    let bob_encrypted_transfer_amount_other = (GENERATOR_EXTENDED * TRANFER_RANDOMNESS).into();
 
     (
         ConfidentialTransferCircuit::new(
@@ -152,6 +154,7 @@ pub(crate) fn generate_confidential_transfer_params() -> (
             bob_public_key,
             alice_transfer_amount,
             bob_encrypted_transfer_amount,
+            bob_encrypted_transfer_amount_other,
         ),
     )
 }

@@ -8,7 +8,12 @@ pub trait EncryptedCurrency<AccountId, EncryptedBalance> {
     ///
     /// This is a very high-level function. It will ensure all appropriate fees are paid
     /// and no imbalance in the system remains.
-    fn transfer(source: &AccountId, dest: &AccountId, value: EncryptedBalance) -> DispatchResult;
+    fn transfer(
+        source: &AccountId,
+        dest: &AccountId,
+        sender_amount: EncryptedBalance,
+        recipient_amount: EncryptedBalance,
+    ) -> DispatchResult;
 
     /// Deposit some `value` into the free balance of `who`, possibly creating a new account.
     ///

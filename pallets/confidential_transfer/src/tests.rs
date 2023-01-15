@@ -4,7 +4,7 @@ mod plonk_test {
     use crate::mock::{
         generate_confidential_transfer_params, new_test_ext, ConfidentialTransfer, Origin, Plonk,
         ALICE_ADDRESS, ALICE_AFTER_BALANCE, ALICE_BALANCE, ALICE_PRIVATE_KEY, BOB_ADDRESS,
-        BOB_BALANCE, BOB_PRIVATE_KEY,
+        BOB_AFTER_BALANCE, BOB_BALANCE, BOB_PRIVATE_KEY,
     };
 
     use frame_support::assert_ok;
@@ -74,8 +74,11 @@ mod plonk_test {
             // balance transition check
             let alice_balance = ConfidentialTransfer::total_balance(&ALICE_ADDRESS);
             let alice_raw_balance = alice_balance.decrypt(ALICE_PRIVATE_KEY);
+            let bob_balance = ConfidentialTransfer::total_balance(&BOB_ADDRESS);
+            let bob_raw_balance = bob_balance.decrypt(BOB_PRIVATE_KEY);
 
             assert_eq!(alice_raw_balance.unwrap(), ALICE_AFTER_BALANCE);
+            assert_eq!(bob_raw_balance.unwrap(), BOB_AFTER_BALANCE);
         });
     }
 }
