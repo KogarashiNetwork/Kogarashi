@@ -10,6 +10,8 @@
     - [Zero Knowledge Scheme](1_4_zero_knowledge_scheme.md)
     - [Transaction Constraints](1_5_transaction_constraints.md)
 - [Transaction Constraints](2_0_transaction_constraints.md)
+    - [Confidential Transfer](2_1_confidential_transfer.md)
+    - [Confidential Smart Contract](2_2_confidential_smart_contract.md)
 - [Primitive](3_0_primitive.md)
     - [Crypto](3_1_crypto.md)
     - [Jubjub](3_2_jubjub.md)

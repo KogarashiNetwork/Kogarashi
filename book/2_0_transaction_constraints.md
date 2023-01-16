@@ -88,10 +88,6 @@ Generate the signature with private key and prevent front-running attack.
 
 $$ σ = Sign(x, value_{enc}, gasLimit_{enc}, gasPrice_{enc}, nonce_{enc}, π) $$
 
-## Confidential Transfer Constraints
-
-This `Confidential Transfer Constraints` checks that the users transfer condition is valid. On the premise that every balance is encrypted by homomorphic encryption with different key, we need to perform addition and subtraction without revealing actual value. If Alice transfer Bob native token, they need to encrypt same transfer amount with their key in order to add and subtract their account without decrypt. First constraints are that they encrypt same transfer amount with their keys. And the next, we need to clarify that Alice has enough balance and her transfer amount is valid. Second constraints are that Alice balance is more than transfer amount and the transfer amount is not negative. The user needs to generate the proof which proves that the transaction proves above constraints.
-
 ## Confidential Smart Contract
 
 This `Confidential Transfer Constraints` checks that the users smart constract execution is valid. The condition that users proof needs to satisfy is different for each contracts so it's provided by Dapp owner as the same with that the Ethererum Dapp owner provides the ABI of smart contract. When the developers finish implementing the smart contract, the smart contract is compiled and output the Wasm binary and constraints metadata. The constraints metadata is the polynomials expressing the smart contract constraints. The users need the metadata, their secret key and `srs` when they generate the proof.
