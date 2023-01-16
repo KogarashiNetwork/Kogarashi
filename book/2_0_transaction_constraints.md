@@ -2,6 +2,9 @@
 
 In this section, we describe the concrete constraints for the transactions.
 
+- [Confidential Transfer](./2_1_confidential_transfer.md)
+- [Confidential Smart Contract](./2_2_confidential_smart_contract.md)
+
 ## Abstract
 
 The transaction constraints consist of smaller pieces of constraints. There are three types of constraints we have as following.
