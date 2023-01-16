@@ -29,21 +29,9 @@ All users balances are encrypted by the `homomorphic encryption` by default and 
 - **Anonymous Smart Contract**
 - **Rollup Transactions**
 
-## Libraries
+## Documentation
 
-```toml
-[dependencies]
-zero-crypto = { version = "0.2.1" }
-zero-jubjub = { version = "0.2.0" }
-zero-bls12-381 = { version = "0.2.0" }
-zero-elgamal = { version = "0.2.0" }
-zero-pairing = { version = "0.2.0" }
-```
-
-## Progress
-**We are in research and development phase and this is alpha quality software. Please use at your own risk**.
-
-We are supporting the confidential transactions for transfers and contracts executions. We are focusing on ensuring the `security assumption` and `privacy system` so after the research amd development phase, we are going to improve the performance by optimization of bytecode and libraries. We are also planning to support the `anonymous` and `rollup` transactions. Every cryptographic libraries are totally compatible with `Substrate` runtime.
+We describe technical stuff and how to use libraries in [here](https://zero-network.github.io/zero/). You can also check with markdown [document](./book/SUMMARY.md).
 
 ## Test
 
@@ -56,9 +44,10 @@ or
 $ docker-compose up
 ```
 
-## Documentation
+## Progress
+**We are in research and development phase and this is alpha quality software. Please use at your own risk**.
 
-The white paper is work in progress. You can find the light paper and libraries documentation [here](https://zero-network.github.io/zero/).
+We are supporting the confidential transactions for transfers and contracts executions. We are focusing on ensuring the `security assumption` and `privacy system` so after the research amd development phase, we are going to improve the performance by optimization of bytecode and libraries. We are also planning to support the `anonymous` and `rollup` transactions. Every cryptographic libraries are totally compatible with `Substrate` runtime.
 
 ## Reference
 
