@@ -28,6 +28,7 @@ pallet-plonk = { default-features = false, path = "./pallets/plonk" }
 pallet-encrypted-balance = { default-features = false, path = "./pallets/encrypted_balance" }
 
 [dev-dependencies]
+rand = { version = "0.8", default-features = false }
 rand_core = { version="0.6", default-features = false }
 sp-io = { default-features = false, version = '3.0.0' }
 sp-core = { default-features = false, version = '3.0.0' }

@@ -31,6 +31,5 @@
         - [Homomorphic Encryption](5_3_3_homomorphic_encryption.md)
 - [Tutorial](6_0_tutorial.md)
     - [pallet-plonk](./6_1_plonk_pallet.md)
-    - [pallet-encrypted-balance](./6_2_plonk_encrypted_balance.md)
-    - [confidential_transfer](./6_3_confidential_transfer.md)
+    - [confidential_transfer](./6_2_confidential_transfer.md)
 - [Frequent Errors](7_0_frequent_errors.md)

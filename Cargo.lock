@@ -3290,6 +3290,7 @@ dependencies = [
  "pallet-encrypted-balance",
  "pallet-plonk",
  "parity-scale-codec",
+ "rand 0.8.5",
  "rand_core 0.6.4",
  "serde",
  "sp-core",

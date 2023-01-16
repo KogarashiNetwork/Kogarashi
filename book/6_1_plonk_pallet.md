@@ -50,7 +50,7 @@ With this step, you can use the `plonk-pallet` in your pallet through `Module`.
 The next, let's define the `plonk-pallet` function on your pallet. We are going to define the `trusted_setup` function which generates the public parameters refered as to `srs` and the `verify` function which verified the proof. In this tutorial, we use [sum-storage](https://github.com/JoshOrndorff/recipes/blob/master/pallets/sum-storage/src/main.rs) pallet as example and add the `verify` function before set `Thing1` storage value on `set_thing_1`. If the `verify` is success, the `set_thing_1` can set `Thing1` value.
 
 - <your-pallet>/src/main.rs
-```rs
+```rust
     // The module's dispatchable functions.
     #[pallet::call]
     impl<T: Config> Pallet<T> {
@@ -90,7 +90,7 @@ We already imported the `plonk-pallet` functions so we are going to import it to
 In order to use `plonk-pallet` in `TestRuntime`, we need to import `plonk-pallet` crate and define the pallet config to `construct_runtime` as following.
 
 - runtime/src/main.rs
-```
+```rust
 use crate::{self as sum_storage, Config};
 
 use frame_support::dispatch::{DispatchError, DispatchErrorWithPostInfo, PostDispatchInfo};
@@ -218,4 +218,4 @@ fn main() {
 }
 
 ```
-With above tests, we can confirm that your pallet is coupling with `plonk-pallet` and these functions work correctly. You can check the `plonk-pallet` specification [here](https://docs.rs/pallet-plonk/latest/pallet_plonk/). Happy hacking!
+With above tests, we can confirm that your pallet is coupling with `plonk-pallet` and these functions work correctly. You can check the `plonk-pallet` example [here](https://github.com/zero-network/zero/pallet_plonk.rs). Happy hacking!
