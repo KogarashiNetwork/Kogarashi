@@ -48,6 +48,10 @@ name = "circuit"
 harness = false
 
 [[bench]]
+name = "pairing"
+harness = false
+
+[[bench]]
 name = "jubjub_curve"
 harness = false
 
