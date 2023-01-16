@@ -3285,8 +3285,16 @@ name = "zero-network"
 version = "0.1.0"
 dependencies = [
  "confidential_transfer",
+ "frame-support",
+ "frame-system",
  "pallet-encrypted-balance",
  "pallet-plonk",
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
  "zero-bls12-381",
  "zero-crypto",
  "zero-elgamal",

@@ -145,6 +145,29 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="pallet-plonk"><a class="header" href="#pallet-plonk">pallet-plonk</a></h1>
+<p>In this tutorial, we are going to import plonk-pallet to substrate runtime and test its functionalities.</p>
+<p>The steps are following.</p>
+<ol>
+<li>Define the plonk-pallet as depencencies</li>
+<li>Couple the plonk-pallet to your own pallet</li>
+<li>Define the plonk-pallet functions on your pallet</li>
+<li>Import the coupling pallet to TestRuntime and define your Circuit</li>
+<li>Test whether the functions work correctly</li>
+</ol>
+<h2 id="1-define-the-plonk-pallet-as-depencencies"><a class="header" href="#1-define-the-plonk-pallet-as-depencencies">1. Define the plonk-pallet as depencencies</a></h2>
+<p>First of all, you need to define the <code>plonk-pallet</code> when you start to implement your pallet. Please define as following.</p>
+<ul>
+<li><your-pallet>/Cargo.toml</li>
+</ul>
+<pre><code class="language-toml">[dependencies]
+plonk-pallet = { git = &quot;https://github.com/AstarNetwork/plonk&quot;, branch = &quot;master&quot;, default-features = false }
+rand_core = {version=&quot;0.6&quot;, default-features = false }
+</code></pre>
+<p>The <code>plonk-pallet</code> depends on <code>rand_core</code> so please import it.</p>
+<h2 id="2-couple-the-plonk-pallet-to-your-own-pallet"><a class="header" href="#2-couple-the-plonk-pallet-to-your-own-pallet">2. Couple the plonk-pallet to your own pallet</a></h2>
+<h2 id="3-define-the-plonk-pallet-functions-on-your-pallet"><a class="header" href="#3-define-the-plonk-pallet-functions-on-your-pallet">3. Define the plonk-pallet functions on your pallet</a></h2>
+<h2 id="4-import-the-coupling-pallet-to-testruntime-and-define-your-circuit"><a class="header" href="#4-import-the-coupling-pallet-to-testruntime-and-define-your-circuit">4. Import the coupling pallet to TestRuntime and define your Circuit</a></h2>
+<h2 id="5-test-whether-the-functions-work-correctly"><a class="header" href="#5-test-whether-the-functions-work-correctly">5. Test whether the functions work correctly</a></h2>
 
                     </main>
 
@@ -175,6 +198,22 @@
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 
