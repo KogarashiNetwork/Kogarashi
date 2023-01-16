@@ -2,6 +2,9 @@
 
 In this section, we describe the concrete constraints for the transactions.
 
+- [Confidential Transfer](./2_1_confidential_transfer.md)
+- [Confidential Smart Contract](./2_2_confidential_smart_contract.md)
+
 ## Abstract
 
 The transaction constraints consist of smaller pieces of constraints. There are three types of constraints we have as following.
@@ -87,10 +90,6 @@ $$ π = Prove(pk, statement_{common_constraint}[value_{enc}, gasLimit_{enc}, gas
 Generate the signature with private key and prevent front-running attack.
 
 $$ σ = Sign(x, value_{enc}, gasLimit_{enc}, gasPrice_{enc}, nonce_{enc}, π) $$
-
-## Confidential Transfer Constraints
-
-This `Confidential Transfer Constraints` checks that the users transfer condition is valid. On the premise that every balance is encrypted by homomorphic encryption with different key, we need to perform addition and subtraction without revealing actual value. If Alice transfer Bob native token, they need to encrypt same transfer amount with their key in order to add and subtract their account without decrypt. First constraints are that they encrypt same transfer amount with their keys. And the next, we need to clarify that Alice has enough balance and her transfer amount is valid. Second constraints are that Alice balance is more than transfer amount and the transfer amount is not negative. The user needs to generate the proof which proves that the transaction proves above constraints.
 
 ## Confidential Smart Contract
 

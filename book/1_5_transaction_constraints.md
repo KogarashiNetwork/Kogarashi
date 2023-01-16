@@ -8,7 +8,7 @@ When we transfer the assets, as we described at [Hide Transfer Amount](1_2_hide_
 
 ## Smart Contract Execution
 
-When we execute the smart contract, the constraints for each transaction is not the same so we can't modularize the same way with transfer. To define the constraints, we customize the smart contract compiler. The smart contract compiler often input the smart contract language and, output the compiled codes and metadata. We can define the constraints when the developer compile the contract. We costomize this compiler and output the constraints information as metadata. The developers need to show the constraints to user the same way as to show contract ABI to user. The user inputs the transaction constraints and their arguments to generate the proof. We also describe the details constraints in [Transaction Constraints](2_0_transaction_constraints.md) section.
+When we execute the smart contract, the constraints for each transaction is not the same so we can't use same with as in confidential transfer so we generate constraints for each opcode because the opcode operation is always same. We generate proof for each opcode which proves that the opcode was performed correctly and put these together to one proof. It's the same approach with [`zkevm`](https://github.com/privacy-scaling-explorations/zkevm-circuits). The `Substrate` works on `wasm` so we are going to implement `zkwasm`. We also describe the details constraints in [Transaction Constraints](2_0_transaction_constraints.md) section.
 
 ## Summerize
 
