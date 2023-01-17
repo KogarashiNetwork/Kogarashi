@@ -14,20 +14,21 @@ readme = 'README.md'
 
 [dependencies]
 # primitive
-zero-bls12-381 = { version = "0.1.10", default-features = false }
-zero-crypto = { version = "0.1.10", default-features = false }
-zero-elgamal = { version = "0.1.10", default-features = false }
-zero-jubjub = { version = "0.1.10", default-features = false }
-zero-kzg = { version = "0.1.10", default-features = false }
-zero-pairing = { version = "0.1.10", default-features = false }
-zero-plonk = { version = "0.1.10", default-features = false }
+zero-bls12-381 = { path = "./primitive/bls12_381", default-features = false }
+zero-crypto = { path = "./primitive/crypto", default-features = false }
+zero-elgamal = { path = "./primitive/elgamal", default-features = false }
+zero-jubjub = { path = "./primitive/jubjub", default-features = false }
+zero-kzg = { path = "./primitive/kzg", default-features = false }
+zero-pairing = { path = "./primitive/pairing", default-features = false }
+zero-plonk = { path = "./primitive/plonk", default-features = false }
 
 # pallet
-confidential_transfer = { path = "./pallets/confidential_transfer", default-features = false }
 pallet-plonk = { path = "./pallets/plonk", default-features = false }
 pallet-encrypted-balance = { path = "./pallets/encrypted_balance", default-features = false }
+confidential_transfer = { path = "./pallets/confidential_transfer", default-features = false }
 
 [dev-dependencies]
+criterion = "0.4.0"
 rand = { version = "0.8", default-features = false }
 rand_core = { version="0.6", default-features = false }
 sp-io = { default-features = false, version = '3.0.0' }
@@ -52,6 +53,21 @@ members = [
     "pallets/plonk"
 ]
 
+[profile.release]
+panic = "abort"
+codegen-units = 1
+overflow-checks = false
+debug = true
+
+[profile.bench]
+opt-level = 3
+debug = false
+debug-assertions = false
+overflow-checks = false
+lto = true
+incremental = false
+codegen-units = 1
+
 [features]
 default = ["std"]
 std = [
@@ -59,3 +75,31 @@ std = [
     'pallet-plonk/std',
     'pallet-encrypted-balance/std',
 ]
+
+[[bench]]
+name = "confidential_transfer"
+harness = false
+
+[[bench]]
+name = "pairing"
+harness = false
+
+[[bench]]
+name = "jubjub_curve"
+harness = false
+
+[[bench]]
+name = "bls12_381_curve"
+harness = false
+
+[[bench]]
+name = "jubjub_field"
+harness = false
+
+[[bench]]
+name = "bls12_381_field"
+harness = false
+
+[[bench]]
+name = "msm"
+harness = false

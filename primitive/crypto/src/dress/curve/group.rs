@@ -47,7 +47,7 @@ macro_rules! affine_group_operation {
                 }
             }
 
-            fn random(rand: impl RngCore) -> $projective {
+            pub fn random(rand: impl RngCore) -> $projective {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
             }
         }

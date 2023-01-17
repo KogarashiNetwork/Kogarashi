@@ -13,8 +13,8 @@ repository = 'https://github.com/zero-network/zero/'
 readme = 'README.md'
 
 [dependencies]
-zero-crypto = { version = "0.1.10", default-features = false }
-zero-bls12-381 = { version = "0.1.10", default-features = false }
+zero-crypto = { path = "../crypto", default-features = false }
+zero-bls12-381 = { path = "../bls12_381", default-features = false }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 rand_core = { version="0.6", default-features = false }
 rayon = "1.5.1"
