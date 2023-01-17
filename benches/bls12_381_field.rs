@@ -6,7 +6,7 @@ use zero_bls12_381::{Fq, Fq12, Fq2, Fq6, Fr};
 use zero_crypto::common::{FftField, Group, PrimeField};
 
 fn bench_bls12_381_fr(c: &mut Criterion) {
-    let mut group = c.benchmark_group("bls12_381_fq");
+    let mut group = c.benchmark_group("bls12_381_fr");
 
     let x = Fr::random(OsRng);
     let y = Fr::random(OsRng);
