@@ -14,7 +14,7 @@ fn msm(c: &mut Criterion) {
 
         // 8-18 points
         group.bench_function(BenchmarkId::new("msm_based", i), |b| {
-            b.iter(|| msm_variable_base(black_box(&p), black_box(&k)));
+            b.iter(|| black_box(msm_variable_base(black_box(&p), black_box(&k))));
         });
     }
 }

@@ -13,25 +13,25 @@ fn bench_fp(c: &mut Criterion) {
     let p = rand::thread_rng().gen::<u64>();
 
     group.bench_function("add", |b| {
-        b.iter(|| black_box(x) + black_box(y));
+        b.iter(|| black_box(black_box(x) + black_box(y)));
     });
     group.bench_function("sub", |b| {
-        b.iter(|| black_box(x) - black_box(y));
+        b.iter(|| black_box(black_box(x) - black_box(y)));
     });
     group.bench_function("double", |b| {
-        b.iter(|| black_box(x).double());
+        b.iter(|| black_box(black_box(x).double()));
     });
     group.bench_function("mul", |b| {
-        b.iter(|| black_box(x) * black_box(y));
+        b.iter(|| black_box(black_box(x) * black_box(y)));
     });
     group.bench_function("square", |b| {
-        b.iter(|| black_box(x).square());
+        b.iter(|| black_box(black_box(x).square()));
     });
     group.bench_function("pow", |b| {
-        b.iter(|| black_box(x).pow(p));
+        b.iter(|| black_box(black_box(x).pow(p)));
     });
     group.bench_function("invert", |b| {
-        b.iter(|| black_box(x).invert());
+        b.iter(|| black_box(black_box(x).invert()));
     });
 }
 

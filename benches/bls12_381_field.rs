@@ -13,138 +13,64 @@ fn bench_bls12_381_fr(c: &mut Criterion) {
     let p = rand::thread_rng().gen::<u64>();
 
     group.bench_function("add", |b| {
-        b.iter(|| black_box(x) + black_box(y));
+        b.iter(|| black_box(black_box(x) + black_box(y)));
     });
     group.bench_function("sub", |b| {
-        b.iter(|| black_box(x) - black_box(y));
+        b.iter(|| black_box(black_box(x) - black_box(y)));
     });
     group.bench_function("double", |b| {
-        b.iter(|| black_box(x).double());
+        b.iter(|| black_box(black_box(x).double()));
     });
     group.bench_function("mul", |b| {
-        b.iter(|| black_box(x) * black_box(y));
+        b.iter(|| black_box(black_box(x) * black_box(y)));
     });
     group.bench_function("square", |b| {
-        b.iter(|| black_box(x).square());
+        b.iter(|| black_box(black_box(x).square()));
     });
     group.bench_function("pow", |b| {
-        b.iter(|| black_box(x).pow(p));
+        b.iter(|| black_box(black_box(x).pow(p)));
     });
     group.bench_function("invert", |b| {
-        b.iter(|| black_box(x).invert());
+        b.iter(|| black_box(black_box(x).invert()));
     });
 }
 
-fn bench_bls12_381_fq(c: &mut Criterion) {
-    let mut group = c.benchmark_group("bls12_381_fq");
+fn run<PF: PrimeField>(c: &mut Criterion) {
+    let mut group = c.benchmark_group(std::any::type_name::<PF>());
 
-    let x = Fq::random(OsRng);
-    let y = Fq::random(OsRng);
+    let x = PF::random(OsRng);
+    let y = PF::random(OsRng);
 
     group.bench_function("add", |b| {
-        b.iter(|| black_box(x) + black_box(y));
+        b.iter(|| black_box(black_box(x) + black_box(y)));
     });
     group.bench_function("sub", |b| {
-        b.iter(|| black_box(x) - black_box(y));
+        b.iter(|| black_box(black_box(x) - black_box(y)));
     });
     group.bench_function("double", |b| {
-        b.iter(|| black_box(x).double());
+        b.iter(|| black_box(black_box(x).double()));
     });
     group.bench_function("mul", |b| {
-        b.iter(|| black_box(x) * black_box(y));
+        b.iter(|| black_box(black_box(x) * black_box(y)));
     });
     group.bench_function("square", |b| {
-        b.iter(|| black_box(x).square());
+        b.iter(|| black_box(black_box(x).square()));
     });
     group.bench_function("invert", |b| {
-        b.iter(|| black_box(x).invert());
+        b.iter(|| black_box(black_box(x).invert()));
     });
 }
 
-fn bench_bls12_381_fq2(c: &mut Criterion) {
-    let mut group = c.benchmark_group("bls12_381_fq");
-
-    let x = Fq2::random(OsRng);
-    let y = Fq2::random(OsRng);
-
-    group.bench_function("add", |b| {
-        b.iter(|| black_box(x) + black_box(y));
-    });
-    group.bench_function("sub", |b| {
-        b.iter(|| black_box(x) - black_box(y));
-    });
-    group.bench_function("double", |b| {
-        b.iter(|| black_box(x).double());
-    });
-    group.bench_function("mul", |b| {
-        b.iter(|| black_box(x) * black_box(y));
-    });
-    group.bench_function("square", |b| {
-        b.iter(|| black_box(x).square());
-    });
-    group.bench_function("invert", |b| {
-        b.iter(|| black_box(x).invert());
-    });
-}
-
-fn bench_bls12_381_fq6(c: &mut Criterion) {
-    let mut group = c.benchmark_group("bls12_381_fq");
-
-    let x = Fq6::random(OsRng);
-    let y = Fq6::random(OsRng);
-
-    group.bench_function("add", |b| {
-        b.iter(|| black_box(x) + black_box(y));
-    });
-    group.bench_function("sub", |b| {
-        b.iter(|| black_box(x) - black_box(y));
-    });
-    group.bench_function("double", |b| {
-        b.iter(|| black_box(x).double());
-    });
-    group.bench_function("mul", |b| {
-        b.iter(|| black_box(x) * black_box(y));
-    });
-    group.bench_function("square", |b| {
-        b.iter(|| black_box(x).square());
-    });
-    group.bench_function("invert", |b| {
-        b.iter(|| black_box(x).invert());
-    });
-}
-
-fn bench_bls12_381_fq12(c: &mut Criterion) {
-    let mut group = c.benchmark_group("bls12_381_fq");
-
-    let x = Fq12::random(OsRng);
-    let y = Fq12::random(OsRng);
-
-    group.bench_function("add", |b| {
-        b.iter(|| black_box(x) + black_box(y));
-    });
-    group.bench_function("sub", |b| {
-        b.iter(|| black_box(x) - black_box(y));
-    });
-    group.bench_function("double", |b| {
-        b.iter(|| black_box(x).double());
-    });
-    group.bench_function("mul", |b| {
-        b.iter(|| black_box(x) * black_box(y));
-    });
-    group.bench_function("square", |b| {
-        b.iter(|| black_box(x).square());
-    });
-    group.bench_function("invert", |b| {
-        b.iter(|| black_box(x).invert());
-    });
+fn bls12_381_field_benchmark(c: &mut Criterion) {
+    run::<Fq>(c);
+    run::<Fq2>(c);
+    run::<Fq6>(c);
+    run::<Fq12>(c);
 }
 
 criterion_group!(
     bls12_381_field,
     bench_bls12_381_fr,
-    bench_bls12_381_fq,
-    bench_bls12_381_fq2,
-    bench_bls12_381_fq6,
-    bench_bls12_381_fq12
+    bls12_381_field_benchmark
 );
 criterion_main!(bls12_381_field);

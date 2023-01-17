@@ -71,6 +71,12 @@ harness = false
 name = "msm"
 harness = false
 
+[profile.release]
+panic = "abort"
+codegen-units = 1
+overflow-checks = false
+debug = true
+
 [profile.bench]
 opt-level = 3
 debug = false

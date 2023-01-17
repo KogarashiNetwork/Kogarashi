@@ -1,4 +1,4 @@
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rand::rngs::OsRng;
 use zero_bls12_381::{Fq12, Fr, G2PairingAffine};
 use zero_bls12_381::{G1Affine, G2Affine};
@@ -41,13 +41,13 @@ fn pairing(c: &mut Criterion) {
 
     group.bench_function("multi_miller_loop", |b| {
         b.iter(|| {
-            TatePairing::multi_miller_loop(&[
+            black_box(TatePairing::multi_miller_loop(black_box(&[
                 (a1, b1_pairing.clone()),
                 (a2, b2_pairing.clone()),
                 (a3, b3_pairing.clone()),
                 (a4, b4_pairing.clone()),
                 (a5, b5_pairing.clone()),
-            ])
+            ])))
         });
     });
 }
