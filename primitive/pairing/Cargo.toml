@@ -5,7 +5,7 @@ authors = [
 ]
 name = "zero-pairing"
 description = 'lifted elgamal encryption implementation'
-version = "0.2.0"
+version = "0.1.10"
 edition = "2021"
 license = "Apache-2.0"
 homepage = 'https://github.com/zero-network/zero/'
@@ -13,8 +13,8 @@ repository = 'https://github.com/zero-network/zero/'
 readme = 'README.md'
 
 [dependencies]
-zero-crypto = { path = '../crypto' }
-zero-bls12-381 = { path = '../bls12_381' }
+zero-crypto = { version = "0.1.10", default-features = false }
+zero-bls12-381 = { version = "0.1.10", default-features = false }
 
 [dev-dependencies]
 rand_xorshift = { version = "0.3", default-features = false }

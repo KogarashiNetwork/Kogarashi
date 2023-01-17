@@ -14,18 +14,18 @@ readme = 'README.md'
 
 [dependencies]
 # primitive
-zero-bls12-381 = { default-features = false, path = "./primitive/bls12_381" }
-zero-crypto = { default-features = false, path = "./primitive/crypto" }
-zero-elgamal = { default-features = false, path = "./primitive/elgamal" }
-zero-jubjub = { default-features = false, path = "./primitive/jubjub" }
-zero-kzg = { default-features = false, path = "./primitive/kzg" }
-zero-pairing = { default-features = false, path = "./primitive/pairing" }
-zero-plonk = { default-features = false, path = "./primitive/plonk" }
+zero-bls12-381 = { version = "0.1.10", default-features = false }
+zero-crypto = { version = "0.1.10", default-features = false }
+zero-elgamal = { version = "0.1.10", default-features = false }
+zero-jubjub = { version = "0.1.10", default-features = false }
+zero-kzg = { version = "0.1.10", default-features = false }
+zero-pairing = { version = "0.1.10", default-features = false }
+zero-plonk = { version = "0.1.10", default-features = false }
 
 # pallet
-confidential_transfer = { default-features = false, path = "./pallets/confidential_transfer" }
-pallet-plonk = { default-features = false, path = "./pallets/plonk" }
-pallet-encrypted-balance = { default-features = false, path = "./pallets/encrypted_balance" }
+confidential_transfer = { path = "./pallets/confidential_transfer", default-features = false }
+pallet-plonk = { path = "./pallets/plonk", default-features = false }
+pallet-encrypted-balance = { path = "./pallets/encrypted_balance", default-features = false }
 
 [dev-dependencies]
 rand = { version = "0.8", default-features = false }
@@ -53,7 +53,6 @@ members = [
 ]
 
 [features]
-
 default = ["std"]
 std = [
     'confidential_transfer/std',
