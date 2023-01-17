@@ -1,22 +1,3 @@
-// This file is part of Substrate.
-
-// Copyright (C) 2017-2021 Parity Technologies (UK) Ltd.
-// SPDX-License-Identifier: Apache-2.0
-
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// 	http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-//! Macro for creating the tests for the module.
-
 #![cfg(test)]
 
 #[macro_export]
@@ -26,7 +7,7 @@ macro_rules! decl_tests {
         use frame_system::RawOrigin;
         use sp_runtime::traits::BadOrigin;
         use $crate::*;
-        use zero_elgamal::Fp;
+        use zero_jubjub::Fp;
 
         const ID_1_PK: Fp = Fp::to_mont_form([1, 0, 0, 0]);
         const ID_2_PK: Fp = Fp::to_mont_form([2, 0, 0, 0]);
@@ -44,7 +25,12 @@ macro_rules! decl_tests {
 
             <$ext_builder>::default().build().execute_with(|| {
                 let _ = EncryptedBalances::deposit_creating(&1, enc_balance1);
-                assert_ok!(EncryptedBalances::transfer(Some(1).into(), 2, enc_transfer));
+                assert_ok!(EncryptedBalances::transfer(
+                    Some(1).into(),
+                    2,
+                    enc_transfer,
+                    enc_transfer
+                ));
                 assert_eq!(
                     EncryptedBalances::total_balance(&1),
                     enc_balance1 - enc_transfer
@@ -66,13 +52,20 @@ macro_rules! decl_tests {
             <$ext_builder>::default().build().execute_with(|| {
                 let _ = EncryptedBalances::deposit_creating(&1, enc_balance1);
                 assert_noop!(
-                    EncryptedBalances::force_transfer(Some(2).into(), 1, 2, enc_transfer),
+                    EncryptedBalances::force_transfer(
+                        Some(2).into(),
+                        1,
+                        2,
+                        enc_transfer,
+                        enc_transfer
+                    ),
                     BadOrigin,
                 );
                 assert_ok!(EncryptedBalances::force_transfer(
                     RawOrigin::Root.into(),
                     1,
                     2,
+                    enc_transfer,
                     enc_transfer
                 ));
                 assert_eq!(

@@ -12,16 +12,16 @@ use zero_crypto::dress::pairing::{bls12_range_field_pairing, peculiar_extension_
 
 // sextic twist of Fp12
 // degree 2 extension field
-const TWO_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 2;
-extension_field_operation!(Fq2, Fq, TWO_DEGREE_EXTENTION_LIMBS_LENGTH);
+const TWO_DEGREE_EXTENSION_LIMBS_LENGTH: usize = 2;
+extension_field_operation!(Fq2, Fq, TWO_DEGREE_EXTENSION_LIMBS_LENGTH);
 
 // degree 6 extension field
-const SIX_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 3;
-extension_field_operation!(Fq6, Fq2, SIX_DEGREE_EXTENTION_LIMBS_LENGTH);
+const SIX_DEGREE_EXTENSION_LIMBS_LENGTH: usize = 3;
+extension_field_operation!(Fq6, Fq2, SIX_DEGREE_EXTENSION_LIMBS_LENGTH);
 
 // degree 12 extension field
-const TWELV_DEGREE_EXTENTION_LIMBS_LENGTH: usize = 2;
-extension_field_operation!(Fq12, Fq6, TWELV_DEGREE_EXTENTION_LIMBS_LENGTH);
+const TWELV_DEGREE_EXTENSION_LIMBS_LENGTH: usize = 2;
+extension_field_operation!(Fq12, Fq6, TWELV_DEGREE_EXTENSION_LIMBS_LENGTH);
 
 // pairing extension for degree 12 extension field
 bls12_range_field_pairing!(

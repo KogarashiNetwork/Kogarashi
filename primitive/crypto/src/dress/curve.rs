@@ -23,14 +23,9 @@ macro_rules! curve_operation {
             type Range = $range;
 
             const PARAM_A: $range = $a;
-            const PARAM_B: $range = $b;
 
             fn is_identity(self) -> bool {
                 self.is_infinity
-            }
-
-            fn double(self) -> Self {
-                Self::from(double_point(self.to_projective()))
             }
 
             fn is_on_curve(self) -> bool {
@@ -40,20 +35,35 @@ macro_rules! curve_operation {
                     self.y.square() == self.x.square() * self.x + Self::PARAM_B
                 }
             }
+
+            fn get_x(&self) -> Self::Range {
+                self.x
+            }
+
+            fn get_y(&self) -> Self::Range {
+                self.y
+            }
+
+            fn set_x(&mut self, value: Self::Range) {
+                self.x = value;
+            }
+
+            fn set_y(&mut self, value: Self::Range) {
+                self.y = value;
+            }
+        }
+
+        impl WeierstrassCurve for $affine {
+            const PARAM_B: $range = $b;
         }
 
         impl Curve for $projective {
             type Range = $range;
 
             const PARAM_A: $range = $a;
-            const PARAM_B: $range = $b;
 
             fn is_identity(self) -> bool {
                 self.z == Self::Range::zero()
-            }
-
-            fn double(self) -> Self {
-                double_point(self)
             }
 
             fn is_on_curve(self) -> bool {
@@ -62,6 +72,45 @@ macro_rules! curve_operation {
                 } else {
                     self.y.square() * self.z
                         == self.x.square() * self.x + Self::PARAM_B * self.z.square() * self.z
+                }
+            }
+
+            fn get_x(&self) -> Self::Range {
+                self.x
+            }
+
+            fn get_y(&self) -> Self::Range {
+                self.y
+            }
+
+            fn set_x(&mut self, value: Self::Range) {
+                self.x = value;
+            }
+
+            fn set_y(&mut self, value: Self::Range) {
+                self.y = value;
+            }
+        }
+
+        impl WeierstrassCurve for $projective {
+            const PARAM_B: $range = $b;
+        }
+
+        impl CurveExtend for $projective {
+            type Affine = $affine;
+
+            fn double(self) -> Self {
+                double_point(self)
+            }
+
+            fn to_affine(self) -> Self::Affine {
+                match self.z.invert() {
+                    Some(z_inv) => Self::Affine {
+                        x: self.x * z_inv,
+                        y: self.y * z_inv,
+                        is_infinity: false,
+                    },
+                    None => Self::Affine::ADDITIVE_IDENTITY,
                 }
             }
         }
@@ -74,7 +123,14 @@ macro_rules! curve_operation {
 
         impl Affine for $affine {
             type Scalar = $scalar;
+        }
+
+        impl WeierstrassAffine for $affine {
             type Projective = $projective;
+
+            fn double(self) -> Self::Projective {
+                double_point(self.to_projective())
+            }
 
             fn to_projective(self) -> Self::Projective {
                 if self.is_identity() {
@@ -87,14 +143,6 @@ macro_rules! curve_operation {
                     }
                 }
             }
-
-            fn get_x(&self) -> Self::Range {
-                self.x
-            }
-
-            fn get_y(&self) -> Self::Range {
-                self.y
-            }
         }
 
         impl From<$projective> for $affine {
@@ -104,37 +152,8 @@ macro_rules! curve_operation {
         }
 
         impl Projective for $projective {
-            type Affine = $affine;
-
-            fn to_affine(self) -> Self::Affine {
-                match self.z.invert() {
-                    Some(z_inv) => Self::Affine {
-                        x: self.x * z_inv,
-                        y: self.y * z_inv,
-                        is_infinity: false,
-                    },
-                    None => Self::Affine::ADDITIVE_IDENTITY,
-                }
-            }
-
-            fn get_x(&self) -> Self::Range {
-                self.x
-            }
-
-            fn get_y(&self) -> Self::Range {
-                self.y
-            }
-
             fn get_z(&self) -> Self::Range {
                 self.z
-            }
-
-            fn set_x(&mut self, value: Self::Range) {
-                self.x = value;
-            }
-
-            fn set_y(&mut self, value: Self::Range) {
-                self.y = value;
             }
 
             fn set_z(&mut self, value: Self::Range) {

@@ -1,0 +1,1491 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Zero Network Documentation</title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="0_0_zero_network.html"><strong aria-hidden="true">1.</strong> Zero Network</a></li><li class="chapter-item expanded "><a href="1_0_overview.html"><strong aria-hidden="true">2.</strong> Overview</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="1_1_what_is_privacy.html"><strong aria-hidden="true">2.1.</strong> What is Privacy</a></li><li class="chapter-item expanded "><a href="1_2_hide_transfer_amount.html"><strong aria-hidden="true">2.2.</strong> Hide Transfer Amount</a></li><li class="chapter-item expanded "><a href="1_3_gas_limit.html"><strong aria-hidden="true">2.3.</strong> Gas Limit</a></li><li class="chapter-item expanded "><a href="1_4_zero_knowledge_scheme.html"><strong aria-hidden="true">2.4.</strong> Zero Knowledge Scheme</a></li><li class="chapter-item expanded "><a href="1_5_transaction_constraints.html"><strong aria-hidden="true">2.5.</strong> Transaction Constraints</a></li></ol></li><li class="chapter-item expanded "><a href="2_0_transaction_constraints.html"><strong aria-hidden="true">3.</strong> Transaction Constraints</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="2_1_confidential_transfer.html"><strong aria-hidden="true">3.1.</strong> Confidential Transfer</a></li><li class="chapter-item expanded "><a href="2_2_confidential_smart_contract.html"><strong aria-hidden="true">3.2.</strong> Confidential Smart Contract</a></li></ol></li><li class="chapter-item expanded "><a href="3_0_primitive.html"><strong aria-hidden="true">4.</strong> Primitive</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="3_1_crypto.html"><strong aria-hidden="true">4.1.</strong> Crypto</a></li><li class="chapter-item expanded "><a href="3_2_jubjub.html"><strong aria-hidden="true">4.2.</strong> Jubjub</a></li><li class="chapter-item expanded "><a href="3_3_bls12_381.html"><strong aria-hidden="true">4.3.</strong> Bls12 381</a></li><li class="chapter-item expanded "><a href="3_4_elgamal.html"><strong aria-hidden="true">4.4.</strong> ElGamal</a></li><li class="chapter-item expanded "><a href="3_5_pairing.html"><strong aria-hidden="true">4.5.</strong> Pairing</a></li></ol></li><li class="chapter-item expanded "><a href="4_0_pallet.html"><strong aria-hidden="true">5.</strong> Pallet</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="4_1_plonk.html"><strong aria-hidden="true">5.1.</strong> Plonk</a></li><li class="chapter-item expanded "><a href="4_2_encrypted_balance.html"><strong aria-hidden="true">5.2.</strong> Encrypted Balance</a></li><li class="chapter-item expanded "><a href="4_3_confidential_transfer.html"><strong aria-hidden="true">5.3.</strong> Confidential Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="5_0_related_tools.html"><strong aria-hidden="true">6.</strong> Related Tools</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="5_1_stealth_address.html"><strong aria-hidden="true">6.1.</strong> Stealth Address</a></li><li class="chapter-item expanded "><a href="5_2_pedersen_commitment.html"><strong aria-hidden="true">6.2.</strong> Pedersen Commitment</a></li><li class="chapter-item expanded "><a href="5_3_non_interactive_zero_knowlege_proof.html"><strong aria-hidden="true">6.3.</strong> Non Interactive Zero Knowledge Proof</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="5_3_1_qap.html"><strong aria-hidden="true">6.3.1.</strong> QAP</a></li><li class="chapter-item expanded "><a href="5_3_2_polynomial_commitment.html"><strong aria-hidden="true">6.3.2.</strong> Polynomial Commitment</a></li><li class="chapter-item expanded "><a href="5_3_3_homomorphic_encryption.html"><strong aria-hidden="true">6.3.3.</strong> Homomorphic Encryption</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="6_0_tutorial.html"><strong aria-hidden="true">7.</strong> Tutorial</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="6_1_plonk_pallet.html"><strong aria-hidden="true">7.1.</strong> pallet-plonk</a></li><li class="chapter-item expanded "><a href="6_2_confidential_transfer.html"><strong aria-hidden="true">7.2.</strong> confidential_transfer</a></li></ol></li><li class="chapter-item expanded "><a href="7_0_frequent_errors.html"><strong aria-hidden="true">8.</strong> Frequent Errors</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Zero Network Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="zero-network-privacy-preserving-transactions-blockchain-based-on-substrate"><a class="header" href="#zero-network-privacy-preserving-transactions-blockchain-based-on-substrate">Zero Network: Privacy Preserving Transactions Blockchain based on Substrate</a></h1>
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>We describe the blockchain which supports privacy preserving transactions for both transfers and smart constract executions depending only on cryptgraphic hardness assumption. In this document, we describe how we realize privacy with only cryptgraphy instead <code>TEE</code>, <code>L2 solutions</code> and <code>trusted parties</code>, <code>optimistic assumptions</code>.</p>
+<p>As a part of our protocol, we combine some cryptgraphic toools. We would like to intruduce these tools and compare these with other alternative choices, and we finally describe how we implement the privacy preserving transactions with them.</p>
+<h2 id="contents"><a class="header" href="#contents">Contents</a></h2>
+<p>Firstly we describe the problems we face to when we realize the privacy preserving blockchain, the difinition of privacy and how we address the problems in <a href="1_0_overview.html">Overview</a>. Finally, we describe the concrete constraints that the proof of transactions should satisfy in <a href="2_0_transaction_constraints.html">Transaction Constraints</a>. Addtionally, we add related research in <a href="5_0_related_tools.html">Related Tools</a>.</p>
+<ul>
+<li><a href="0_0_zero_network.html">Zero Network</a></li>
+<li><a href="1_0_overview.html">Overview</a>
+<ul>
+<li><a href="1_1_what_is_privacy.html">What is Privacy</a></li>
+<li><a href="1_2_hide_transfer_amount.html">Hide Transfer Amount</a></li>
+<li><a href="1_3_gas_limit.html">Gas Limit</a></li>
+<li><a href="1_4_zero_knowledge_scheme.html">Zero Knowledge Scheme</a></li>
+<li><a href="1_5_transaction_constraints.html">Transaction Constraints</a></li>
+</ul>
+</li>
+<li><a href="2_0_transaction_constraints.html">Transaction Constraints</a></li>
+<li><a href="3_0_primitive.html">Primitive</a>
+<ul>
+<li><a href="3_1_crypto.html">Crypto</a></li>
+<li><a href="3_2_jubjub.html">Jubjub</a></li>
+<li><a href="3_3_bls12_381.html">Bls12 381</a></li>
+<li><a href="3_4_elgamal.html">ElGamal</a></li>
+<li><a href="3_5_pairing.html">Pairing</a></li>
+</ul>
+</li>
+<li><a href="4_0_pallet.html">Pallet</a>
+<ul>
+<li><a href="4_1_plonk.html">Plonk</a></li>
+<li><a href="4_2_encrypted_balance.html">Encrypted Balance</a></li>
+<li><a href="4_3_confidential_transfer.html">Confidential Transfer</a></li>
+</ul>
+</li>
+<li><a href="5_0_related_tools.html">Related Tools</a>
+<ul>
+<li><a href="5_1_stealth_address.html">Stealth Address</a></li>
+<li><a href="5_2_pedersen_commitment.html">Pedersen Commitment</a></li>
+<li><a href="5_3_non_interactive_zero_knowlege_proof.html">Non Interactive Zero Knowledge Proof</a>
+<ul>
+<li><a href="5_3_1_qap.html">QAP</a></li>
+<li><a href="5_3_2_polynomial_commitment.html">Polynomial Commitment</a></li>
+<li><a href="5_3_3_homomorphic_encryption.html">Homomorphic Encryption</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="6_0_tutorial.html">Tutorial</a></li>
+<li><a href="7_0_frequent_errors.html">Frequent Errors</a></li>
+</ul>
+<h2 id="reference"><a class="header" href="#reference">Reference</a></h2>
+<p><a href="https://github.com/monero-project/research-lab/blob/master/whitepaper/whitepaper.pdf"><code>Crypto Note v 2.0</code></a><br />
+<a href="https://github.com/herumi/mcl/blob/master/misc/she/she.pdf"><code>Additive homomorphic encryption which supports one-time multiplication</code></a><br />
+<a href="https://crypto.stanford.edu/~buenz/papers/zether.pdf"><code>Zether: Towards Privacy in a Smart Contract World</code></a><br />
+<a href="https://layerxcom.github.io/zerochain-book/"><code>Zerochain Book</code></a><br />
+<a href="https://ethresear.ch/t/a-zk-evm-specification/11549"><code>A specification for a ZK-EVM</code></a><br />
+<a href="https://github.com/nucypher/Sunscreen_public/blob/master/zk%20thoughts.pdf"><code>ZKPs for privacy-Preserving Smart Contracts and Transactions</code></a><br />
+<a href="https://github.com/AztecProtocol/plonk-with-lookups/blob/master/PLONK-with-lookups.pdf"><code>plonkup: A simplified polynomial protocol for lookup tables</code></a><br />
+<a href="https://eprint.iacr.org/2013/279.pdf"><code>Pinocchio: Nearly Practical Verifiable Computation</code></a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>Basically, all public blockchain state is public for everyone and it can be looked by unknown someone without any permission. To keep the privacy, the projects for example <a href="https://z.cash/"><code>Zcash</code></a> , <a href="https://www.getmonero.org/"><code>Monero</code></a> and so on realized the privacy preserving transfer. Now people can transfer crypto currency with private. However, the real world applications require more complicated functionalities and the blockchain should support various of use case. It was hard to realize the general purpose privacy preserving transactions but recent scaling and privacy technologies evolution allows us to make it practical.</p>
+<p>To achieve general purpose privacy preserving transactions, there are mainly five problems to be addressed. <code>Hide transfer amount</code>, <code>Gas limit</code>, <code>Zero knowledge scheme</code> and <code>Contract constraint</code>, <code>Attack protection</code>. Firstly, we would like to define <code>what is the privacy</code> and describe the solution. Finally, we would like to describe <code>the solution for the attack</code>.</p>
+<h2 id="contents-1"><a class="header" href="#contents-1">Contents</a></h2>
+<p>The introduction contents are following.</p>
+<ol>
+<li><a href="3_1_what_is_privacy.html">What is Privacy</a></li>
+<li><a href="3_2_hide_transfer_amount.html">Hide Transfer Amount</a></li>
+<li><a href="3_3_gas_limit.html">Gas Limit</a></li>
+<li><a href="3_4_zero_knowledge_scheme.html">Zero Knowledge Scheme</a></li>
+<li><a href="3_5_transaction_constraints.html">Transaction Constraints</a></li>
+</ol>
+<p><strong>What is Privacy</strong>: We define what privacy is before we discuss the protocol.<br />
+<strong>Hide Transfer Amount</strong>: We describe how to hide the transaction values.<br />
+<strong>Gas Limit</strong>: We describe how to save the workload avoid to exceed the gas limit.<br />
+<strong>Zero Knowledge Scheme</strong>: We compare the zero knowledge scheme and describe which is suitable for privacy preserving transactions.<br />
+<strong>Transaction Constraints</strong>: We describe how user generates the transaction proof.</p>
+<p>These sections are work in progress and we are going to add the experiment result.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="what-is-privacy"><a class="header" href="#what-is-privacy">What is Privacy</a></h1>
+<p>Before we describe our protocol, we would like to define what the <code>privacy</code> exactly means.</p>
+<h2 id="confidential-vs-anonymous"><a class="header" href="#confidential-vs-anonymous">Confidential vs Anonymous</a></h2>
+<p>There are two types of privacy level <code>confidential</code> and <code>anonymous</code>. The difference between them is that how much information we hide. The <code>confidential</code> means it hides the input and output. The <code>anonymous</code> means it hide the users related the transaction.</p>
+<h2 id="transfer-example"><a class="header" href="#transfer-example">Transfer Example</a></h2>
+<p>If the protocol supports <code>confidential</code>, the users would be able to hide the input and output. When users send the transaction, the input and output are going to be <code>balance</code>, <code>transfer amount</code> and <code>after balance</code>. The function needs to know that the transfer satisfies the conditions for example, the amount is not negative, the balance is more than transfer amount and so on. The <code>confidential</code> transactions can verify these conditions without revealing input and ouput values. We use the homomorphic encryption to realize this feature. You can see it on <a href="1_2_hide_transfer_amount.html"><code>Hide Transfer Amount</code></a> section.</p>
+<p>If the protocol supports <code>anonymous</code>, the users would be able to hide the users information related to transactions in addition to <code>confidential</code>. When users transfer the assets, the users information related to transactions are going to be <code>sender</code> and <code>recipient</code>. There are some ways to hide users information and we describe some of them in related tools. The typical tool to hide the <code>sender</code> is the <a href="https://en.wikipedia.org/wiki/Ring_signature#:~:text=In%20cryptography%2C%20a%20ring%20signature,a%20particular%20set%20of%20people."><code>Ring Signature</code></a> and the <code>recipient</code> is the <a href="3_1_stealth_address.html">Stealth Address</a>.</p>
+<h2 id="summarize"><a class="header" href="#summarize">Summarize</a></h2>
+<p>To summarize the story, the <code>confidential</code> hides the transaction contents and the <code>anonymous</code> hides the transaction senders and recipients. We describe the contents and privacy level in table.</p>
+<div class="table-wrapper"><table><thead><tr><th>Item</th><th>Confidential</th><th>Anonymous</th></tr></thead><tbody>
+<tr><td>Balance</td><td>✅</td><td>✅</td></tr>
+<tr><td>Transfer Amount</td><td>✅</td><td>✅</td></tr>
+<tr><td>Sender</td><td>-</td><td>✅</td></tr>
+<tr><td>Recipient</td><td>-</td><td>✅</td></tr>
+</tbody></table>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="hide-transfer-amount"><a class="header" href="#hide-transfer-amount">Hide Transfer Amount</a></h1>
+<p>In this section, we describe how we hide the transfer amount.</p>
+<h2 id="homomorphic-encryption-vs-commitment"><a class="header" href="#homomorphic-encryption-vs-commitment">Homomorphic Encryption vs Commitment</a></h2>
+<p>We have two options to hide the transfer amount homomorphic encryption and commitment. The homomorphic encryption allows us to calculate the encrypted number. To combine the homomorphic encryption and zero knowledge proof, we can calculate the encrypted number without decrypting and check whether the calculation was done correctly by zero knowledge proof. And the other option is commitment. The commitment uses the one-way function for example hash function. It hides the original value. The user provides the part of original value and check whether original value satisfies the condition. We describe the famous commitment in <a href="3_2_pedersen_commitment.html">Pedersen Commitment</a> section.</p>
+<p>If we use the commitment scheme, we need to generate the randomness for each transaction and prove the validity with it. It's hard for users to deal every randomness and also we support the contract execution so it's not practical to generate randomness for each value. If we use the homomorphic encryption, we can realize it simpler way. We are going to describe how we hide the transfer amount and prove whether that value satisfies the condition in <a href="1_5_transaction_constraints.html">Transaction Constraints</a> section.</p>
+<h2 id="scheme"><a class="header" href="#scheme">Scheme</a></h2>
+<p>To summarize the two scheme difference, it would be following.</p>
+<h3 id="homomorphic-encryption"><a class="header" href="#homomorphic-encryption">Homomorphic Encryption</a></h3>
+<p>The homomorphic encryption can calculate the encrypted number. Let <code>Enc()</code> encrypt function and we can't know the input from output. We can get calculation result without revealing actual value.</p>
+<p>$$ Enc(10) + Enc(5) = Enc(15) $$</p>
+<p>The encrypted value doesn't expose any information so we need to attach the proof which proves the value satisfies the condition. If users try to transfer the asset, user need to prove that the user balance is more than transfer amount, transfer amout is not negative and so on.</p>
+<h3 id="commitment"><a class="header" href="#commitment">Commitment</a></h3>
+<p>The commitment can hide the number and prove that the value satisfies the condition. Let <code>Hash()</code> hash function. To make it hard to know the input from output, we generate the randomness. The hash function takes <code>amount</code> and <code>randomness</code> as argument. If user wants to send <code>3</code> asset and it's balance is <code>10</code>, user would generate the randomness and prove that following equation holds.</p>
+<p>$$ Hash(3, 100) + Hash(7, 200) - Hash(10, 300) = 0 $$</p>
+<p>The transfer amount user wants send and the amount after transfer is equal to current balance when it's added. The hashed value is called commitment. We describe this more detail with example in <a href="3_2_pedersen_commitment.html">Pedersen Commitment</a> section.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="gas-limit"><a class="header" href="#gas-limit">Gas Limit</a></h1>
+<p>In this section, we describe the potential problem that privacy preserving transactions project have.</p>
+<h2 id="transaction-scheme"><a class="header" href="#transaction-scheme">Transaction Scheme</a></h2>
+<p>When we realize the privacy preserving transactions with homomorphic encryption, the transaction sender transaction scheme will first calculate the encrypted value and second generate the proof which proves the validity of these relationship. First schmeme needs to perform homomorphic arithmetic, and second one needs elliptic curve arithmetic and polynomial evaluations. And the verifier need to verify the proof by performing the pairing and homomorphic arithmetic. Both side needs to perform the heavy workload computation. The more computation we perform, the more gas cost we need to pay. If the verify function exceeds the gas limit, we would be unable to realize the protocol. To make it practical, we optimize the workload.</p>
+<h2 id="account-base-vs-utxo"><a class="header" href="#account-base-vs-utxo">Account Base vs UTXO</a></h2>
+<p>When we generate the zero knowledge proof, the more complex data structure we need to prove the condition, the more computation we need. There are mainly two types of data blockchain structure. The <code>account base</code> is just key-value mapping data structure. It's easy to prove the condition. The <code>UTXO</code> uses the input and output transactions when it transfers the asset. It's complicated comparing with <code>account base</code>. However, the <code>UTXO</code> can prevent the double spending with data structure and it's hard to track the transaction history.</p>
+<h2 id="evm-vs-wasm"><a class="header" href="#evm-vs-wasm">EVM vs Wasm</a></h2>
+<p>When we verify the zero knowledge proof, the verify costs depend on efficiency of VM environment. If we perform the verify calculation efficiency, we would save the gas cost. When the Ethereum was launched, it's not designed for perform the zero knowledge functions so we have limitation of optimization once the blockchain is deployed. The Wasm is more efficient and we can customize and create new bytecodes. We have a lot of ways to optimize.</p>
+<h2 id="zero-knowledge-friendly"><a class="header" href="#zero-knowledge-friendly">Zero Knowledge Friendly</a></h2>
+<p>The data structure is the trade off between security and workload. We use the account base data structure because the gas limit is the main bottleneck. We describe the solutions for the security problems when we use the <code>account base</code> data structure in <a href="1_6_attack_protection.html">Attack Protection</a> section. We are going to support Wasm because it's high performance and we can optimize the workload on blockchain. We don't have a plan to support EVM now so our blockchain doesn't have compatible with Ethereum contracts.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="zero-knowledge-scheme"><a class="header" href="#zero-knowledge-scheme">Zero Knowledge Scheme</a></h1>
+<p>In this section, we describe the zero knowledge scheme features.</p>
+<h2 id="snarks-vs-starks-vs-bulletproofs"><a class="header" href="#snarks-vs-starks-vs-bulletproofs"><code>SNARKs</code> vs <code>STARKs</code> vs <code>Bulletproofs</code></a></h2>
+<p>We compare the three types of zero knowledge scheme <code>zk-SNARKs</code>, <code>zk-STARKs</code> and <code>Bulletproofs</code>. The <code>zk-SNARKs</code> is the most efficient. We can verify the proof with const or almost const time and generate proof process is also efficient. The proof size is also small. However, it's necessary to setup the parameters. We can save a lot of workload because of this but it would be the critical security issue. The <code>zk-STARKs</code> doesn't need to setup parameters and it has quantum tolerance. However, its proof size is far bigger than <code>zk-SNARKs</code> and the workload of verification process also far bigger than <code>zk-SNARKs</code>. The <code>Bulletproofs</code> doesn't need to setup parameters and its feature is in the middle between <code>zk-SNARKs</code> and <code>zk-STARKs</code> but it doesn't have quantum tolerance.</p>
+<h2 id="summerize"><a class="header" href="#summerize">Summerize</a></h2>
+<p>To summerize the above comparison, it would be as following table.</p>
+<div class="table-wrapper"><table><thead><tr><th>Scheme</th><th>Trusted Setup</th><th>Prover Cost</th><th>Verifier Cost</th><th>Proof Size</th><th>Quantum Tolerance</th></tr></thead><tbody>
+<tr><td>zk-SNARKs</td><td>Necessary</td><td>Low</td><td>Low</td><td>Small</td><td>No</td></tr>
+<tr><td>zk-STARKs</td><td>Unnecessary</td><td>Moderate</td><td>High</td><td>Large</td><td>Yes</td></tr>
+<tr><td>Bulletproofs</td><td>Unnecessary</td><td>Low</td><td>Moderate</td><td>Moderate</td><td>No</td></tr>
+</tbody></table>
+</div>
+<h2 id="privacy-preserving-transactions-friendly"><a class="header" href="#privacy-preserving-transactions-friendly">Privacy Preserving Transactions Friendly</a></h2>
+<p>The <code>Bulletproofs</code> is mainly used for other privacy preserving transactions project for example <a href="https://aztec.network/"><code>Aztec</code></a>, <a href="https://crypto.stanford.edu/~buenz/papers/zether.pdf"><code>Zether</code></a> and so on. That's because these projects are Ethereum smart contract base projects so if they use the <code>zk-SNARKs</code>, it's necessary to setup the parameters for each deploy smart contracts. It's really hard to collect enough parties to setup the parameters for each deploy. We use the <code>zk-SNARKs</code> because of its efficiency and the <code>plonk</code> allows us to setup parameters without depending on circuit. In other words, once we setup the parameters, we can reuse them when we prove the transactions.　</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="transaction-constraints"><a class="header" href="#transaction-constraints">Transaction Constraints</a></h1>
+<p>In this section, we describe how to generate the proof for each transactions.</p>
+<h2 id="transfer"><a class="header" href="#transfer">Transfer</a></h2>
+<p>When we transfer the assets, as we described at <a href="1_2_hide_transfer_amount.html">Hide Transfer Amount</a> section, at first we encrypt the value and the second we generate the proof which proves the validity of value. In terms of the transfer transactions, the constraints the transfer transactions need to satisfy are always same. We can modularize these constraints and generating the proof. The more details for the constraints, you can see it on <a href="2_0_transaction_constraints.html">Transaction Constraints</a> section.</p>
+<h2 id="smart-contract-execution"><a class="header" href="#smart-contract-execution">Smart Contract Execution</a></h2>
+<p>When we execute the smart contract, the constraints for each transaction is not the same so we can't use same with as in confidential transfer so we generate constraints for each opcode because the opcode operation is always same. We generate proof for each opcode which proves that the opcode was performed correctly and put these together to one proof. It's the same approach with <a href="https://github.com/privacy-scaling-explorations/zkevm-circuits"><code>zkevm</code></a>. The <code>Substrate</code> works on <code>wasm</code> so we are going to implement <code>zkwasm</code>. We also describe the details constraints in <a href="2_0_transaction_constraints.html">Transaction Constraints</a> section.</p>
+<h2 id="summerize-1"><a class="header" href="#summerize-1">Summerize</a></h2>
+<p>In terms of transfer, the contraints are always same so we can modularize these constraints. In terms of smart contract execution, the constraints are different for each smart contract so we customize the compiler and output the constraints when it compiles the smart contracts. The developer provides the constraints for users and they can know the constraints when they generate the proof.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="transaction-constraints-1"><a class="header" href="#transaction-constraints-1">Transaction Constraints</a></h1>
+<p>In this section, we describe the concrete constraints for the transactions.</p>
+<ul>
+<li><a href="./2_1_confidential_transfer.html">Confidential Transfer</a></li>
+<li><a href="./2_2_confidential_smart_contract.html">Confidential Smart Contract</a></li>
+</ul>
+<h2 id="abstract-1"><a class="header" href="#abstract-1">Abstract</a></h2>
+<p>The transaction constraints consist of smaller pieces of constraints. There are three types of constraints we have as following.</p>
+<div class="table-wrapper"><table><thead><tr><th>Constraint Type</th><th>Checking Condition</th><th>Static or Dynamic</th></tr></thead><tbody>
+<tr><td>Common Transaction</td><td>Basic transactions object for example gas, signature and so on</td><td>Static</td></tr>
+<tr><td>Confidential Transfer</td><td>Confidential transfer condition</td><td>Static</td></tr>
+<tr><td>Confidential Smart Contract</td><td>Confidential smart contract condition</td><td>Dynamic</td></tr>
+</tbody></table>
+</div>
+<p>The <code>Common Transaction</code> checks the basic transactions constraints and used for every transaction. When the users transfer assets, they need to generate the proof satisfying both <code>Common Transaction</code> and <code>Confidential Transfer</code> constraints. This consists of static constraints so the condition that the proof needs to satisfy are always same so we can modularize easily. However, when the users execute the smart contract, they need to generate the proof satisfying both <code>Common Transaction</code> and <code>Confidential Smart Contract</code> constraints. This consists of static and dynamic constraints so the condition that the proof needs to satisfy are always different.</p>
+<p>We would like to describe the constraints more detail and how we generate the proof for dynamic constraints.</p>
+<h2 id="process"><a class="header" href="#process">Process</a></h2>
+<p>Every transaction needs to be attached the proof which satisfies the constraints. The proof is generated by proving key according to <code>plonk</code> protocol. The blockchain needs to setup the parameters and the user needs to generate key pair as following.</p>
+<div class="table-wrapper"><table><thead><tr><th>Item</th><th>Description</th></tr></thead><tbody>
+<tr><td>x</td><td>user private key</td></tr>
+<tr><td>y</td><td>user public key</td></tr>
+<tr><td>srs</td><td>setup parameters</td></tr>
+<tr><td>s</td><td>randomness used for setup</td></tr>
+<tr><td>setup()</td><td>setup function</td></tr>
+<tr><td>F</td><td>field</td></tr>
+<tr><td>G</td><td>elliptic curve group</td></tr>
+<tr><td>g</td><td>elliptic curve generator</td></tr>
+<tr><td>d</td><td>polynomial degree</td></tr>
+<tr><td>pk</td><td>proving key</td></tr>
+<tr><td>vk</td><td>verification key</td></tr>
+</tbody></table>
+</div>
+<h3 id="setup"><a class="header" href="#setup">Setup</a></h3>
+<p>Setup the paramaters used for generate and verify proof.</p>
+<p>$$ g ∈ G $$
+$$ setup(d, s) = [g, [s] g, [s^2] g, ... , [s^{d-1}] g] = (pk, vk) $$</p>
+<h3 id="key-pair"><a class="header" href="#key-pair">Key Pair</a></h3>
+<p>Generate the key pair for sign the transaction.</p>
+<p>$$ x ∈ F $$
+$$ y = g^x $$</p>
+<h2 id="common-transaction-constraints"><a class="header" href="#common-transaction-constraints">Common Transaction Constraints</a></h2>
+<p>Every transaction has common object items and this <code>Common Transaction Constraints</code> checks these condition.
+The transaction object items are following.</p>
+<div class="table-wrapper"><table><thead><tr><th>Item</th><th>Description</th></tr></thead><tbody>
+<tr><td>source</td><td>transactor</td></tr>
+<tr><td>target</td><td>destination address</td></tr>
+<tr><td>input</td><td>transaction data</td></tr>
+<tr><td>value</td><td>message value</td></tr>
+<tr><td>gasLimit</td><td>gas limit of transaction</td></tr>
+<tr><td>gasPrice</td><td>gas price of transaction</td></tr>
+<tr><td>nonce</td><td>user account nonce</td></tr>
+</tbody></table>
+</div>
+<p>The <code>Common Transaction Constraints</code> checks that the <strong>value</strong>, <strong>gasLimit</strong> and <strong>gasPrice</strong> are valid.
+We use following function to generate proof and signature.</p>
+<div class="table-wrapper"><table><thead><tr><th>Function</th><th>Description</th></tr></thead><tbody>
+<tr><td>enc()</td><td>ElGamal encryption</td></tr>
+<tr><td>sign()</td><td>sign transaction with private key</td></tr>
+<tr><td>prove()</td><td>proof generation</td></tr>
+</tbody></table>
+</div>
+<h3 id="encrypt-variables"><a class="header" href="#encrypt-variables">Encrypt Variables</a></h3>
+<p>First of all, the number should be encrypted by ElGamal.</p>
+<p>$$ enc(x, value, gasLimit, gasPrice, nonce) = value_{enc}, gasLimit_{enc}, gasPrice_{enc}, nonce_{enc} $$</p>
+<h3 id="generate-proof-and-signature"><a class="header" href="#generate-proof-and-signature">Generate Proof and Signature</a></h3>
+<p>Generate the proof with proving key and prove that this common params satisfy the statement.</p>
+<p>$$ π = Prove(pk, statement_{common_constraint}[value_{enc}, gasLimit_{enc}, gasPrice_{enc}, nonce_{enc}]) $$</p>
+<p>Generate the signature with private key and prevent front-running attack.</p>
+<p>$$ σ = Sign(x, value_{enc}, gasLimit_{enc}, gasPrice_{enc}, nonce_{enc}, π) $$</p>
+<h2 id="confidential-smart-contract"><a class="header" href="#confidential-smart-contract">Confidential Smart Contract</a></h2>
+<p>This <code>Confidential Transfer Constraints</code> checks that the users smart constract execution is valid. The condition that users proof needs to satisfy is different for each contracts so it's provided by Dapp owner as the same with that the Ethererum Dapp owner provides the ABI of smart contract. When the developers finish implementing the smart contract, the smart contract is compiled and output the Wasm binary and constraints metadata. The constraints metadata is the polynomials expressing the smart contract constraints. The users need the metadata, their secret key and <code>srs</code> when they generate the proof.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="confidential-transfer-constraints"><a class="header" href="#confidential-transfer-constraints">Confidential Transfer Constraints</a></h1>
+<p>This <code>Confidential Transfer Constraints</code> checks whether users transfer transaction was done correctly.</p>
+<h2 id="transaction-requirement"><a class="header" href="#transaction-requirement">Transaction Requirement</a></h2>
+<p>Specifically, constraints check following conditions.</p>
+<ol>
+<li>The transfer amount is encrypted by exact sender and recipient public key</li>
+<li>The transfer amount and sender remaining balance are in valid range (not negative)</li>
+<li>The transfer amount and sender remaining balance are calculated correctly</li>
+</ol>
+<p>On the premise that every balances are encrypted by homomorphic encryption with different key and we need to perform addition and subtraction without revealing actual value. If Alice transfer Bob crypto currency, sender and recipient need to encrypt same transfer amount with their key in order to add and subtract their account without decrypt. First constraints are that they encrypt same transfer amount with their keys. And the next, we need to clarify that Alice has enough balance and her transfer amount is valid. Second constraints are that Alice balance is more than transfer amount and the transfer amount is not negative. The user needs to generate the proof which proves that the transaction satisfies above condition.</p>
+<h2 id="transfer-scheme"><a class="header" href="#transfer-scheme">Transfer Scheme</a></h2>
+<p>We describe the confidential transfer scheme here. We assume the case that Alice wants to transfer <code>t</code> amount crypto currency to Bob.</p>
+<p>We define the symbol for each parameters as following.</p>
+<div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Description</th></tr></thead><tbody>
+<tr><td>sk</td><td>Alice private key</td></tr>
+<tr><td>pk</td><td>Alice public key</td></tr>
+<tr><td>pk'</td><td>Bob public key</td></tr>
+<tr><td>t</td><td>Transfer amount</td></tr>
+<tr><td>b</td><td>Alice remaining balance</td></tr>
+<tr><td>enc_bal_left</td><td>Balance encrypted by Alice</td></tr>
+<tr><td>enc_bal_right</td><td>Balance encrypted by Alice</td></tr>
+<tr><td>enc_left</td><td>Transfer amount encrypted by Alice</td></tr>
+<tr><td>enc_right</td><td>Transfer amount encrypted by Alice</td></tr>
+<tr><td>enc_t'</td><td>Transfer amount encrypted by Bob</td></tr>
+<tr><td>r</td><td>Randomness</td></tr>
+<tr><td>g</td><td>Generator of elliptic curve point</td></tr>
+</tbody></table>
+</div>
+<p>We perform this transfer scheme on <a href="./3_2_jubjub.html"><code>jubjub</code></a> curve and the constraints are following.</p>
+<p>$$
+enc_{left} = g^tpk^r\ \land enc_{right} = g^r\ \land enc_t' = (g^{b'}pk'^r)\ \land \ enc_{left}/ enc_{balleft} = g^{b'} (enc_{right}/enc_{balright})^{sk}\ \land t \in [0,Max]\ \land b \in [0,Max]
+$$</p>
+<p>Users generate proof and attach it with transaction.</p>
+<h2 id="transaction-speed"><a class="header" href="#transaction-speed">Transaction Speed</a></h2>
+<p>In my local PC, it takes about 5 seconds to generate proof and 78 milli-seconds to be verified.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="confidential-smart-contract-1"><a class="header" href="#confidential-smart-contract-1">Confidential Smart Contract</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="primitive"><a class="header" href="#primitive">Primitive</a></h1>
+<p>The <code>Zero Network</code> consist of cryptographic primitives which are compatible with <code>no_std</code> and <a href="https://github.com/paritytech/parity-scale-codec"><code>parity-scale-codec</code></a>. Followings are short summary of primitives.</p>
+<ul>
+<li><a href="../book/3_6_crypto.html">zero-crypto</a> <a href="https://crates.io/crates/zero-crypto"><img src="https://img.shields.io/crates/v/zero-crypto.svg" alt="crates.io badge" /></a></li>
+</ul>
+<p>The <code>zero-crypto</code> crate is in charge of basic cryptographic primitive. This includes <code>Field</code>, <code>Curve</code>, <code>ExtensionField</code> and so on, and allows us to easily setup cryptocraphy implementation without implementing actual algorithms and test automatically.</p>
+<ul>
+<li><a href="../book/3_5_jubjub.html">zero-jubjub</a> <a href="https://crates.io/crates/zero-jubjub"><img src="https://img.shields.io/crates/v/zero-jubjub.svg" alt="crates.io badge" /></a></li>
+</ul>
+<p>The <code>zero-jubjub</code> crate is in charge of <code>Jubjub</code> curve arithmetic. This supports <code>Jubjub</code> rational point additive and scalar by finite field.</p>
+<ul>
+<li><a href="../book/3_3_bls12_381.html">zero-bls12-381</a> <a href="https://crates.io/crates/zero-bls12-381"><img src="https://img.shields.io/crates/v/zero-bls12-381.svg" alt="crates.io badge" /></a></li>
+</ul>
+<p>The <code>zero-bls12-381</code> crate is in charge of <code>Bls12 381</code> arithmetic. This supports <code>Bls12 381</code> $G_1$ and $G_2$ rational point additive and multiplicative, and scalar by finite field, and also supports $F_q^2$, $F_q^6$ and $F_q^{12}$ extension field arithmetic.</p>
+<ul>
+<li><a href="../book/3_4_elgamal.html">zero-elgamal</a> <a href="https://crates.io/crates/zero-elgamal"><img src="https://img.shields.io/crates/v/zero-elgamal.svg" alt="crates.io badge" /></a></li>
+</ul>
+<p>The <code>zero-elgamal</code> crate is in charge of additive homomorphic <code>ElGamal</code> arithmetic. This supports <code>ElGamal</code> encryption and decription.</p>
+<ul>
+<li><a href="../book/">zero-pairing</a> <a href="https://crates.io/crates/zero-pairing"><img src="https://img.shields.io/crates/v/zero-pairing.svg" alt="crates.io badge" /></a></li>
+</ul>
+<p>The <code>zero-pairing</code> crate is in charge of <code>Tate Pairing</code> arithmetic. This supports miller loop algorithm and final exponentiation.</p>
+<p>You can import as adding dependencies to our crate.</p>
+<pre><code class="language-toml">[dependencies]
+zero-crypto = { version = &quot;0.2.1&quot; }
+zero-jubjub = { version = &quot;0.2.0&quot; }
+zero-bls12-381 = { version = &quot;0.2.0&quot; }
+zero-elgamal = { version = &quot;0.2.0&quot; }
+zero-pairing = { version = &quot;0.2.0&quot; }
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="crypto"><a class="header" href="#crypto">Crypto <a href="https://crates.io/crates/zero-crypto"><img src="https://img.shields.io/crates/v/zero-crypto.svg" alt="crates.io badge" /></a></a></h1>
+<p>This crate provides basic cryptographic implementation as in <code>Field</code>, <code>Curve</code> and <code>Pairing</code>, <code>Fft</code>, <code>Kzg</code>, and also supports fully <code>no_std</code> and <a href="https://github.com/paritytech/parity-scale-codec"><code>parity-scale-codec</code></a>.</p>
+<h2 id="usage"><a class="header" href="#usage">Usage</a></h2>
+<h3 id="field"><a class="header" href="#field">Field</a></h3>
+<p>The following <code>Fr</code> support four basic operation.</p>
+<pre><code class="language-ignore">use zero_crypto::common::*;
+use zero_crypto::dress::field::*;
+use zero_crypto::arithmetic::bits_256::*;
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
+pub struct Fr(pub [u64; 4]);
+
+const MODULUS: [u64; 4] = [
+    0xffffffff00000001,
+    0x53bda402fffe5bfe,
+    0x3339d80809a1d805,
+    0x73eda753299d7d48,
+];
+
+const GENERATOR: [u64; 4] = [
+    0x0000000efffffff1,
+    0x17e363d300189c0f,
+    0xff9c57876f8457b0,
+    0x351332208fc5a8c4,
+];
+
+/// R = 2^256 mod r
+const R: [u64; 4] = [
+    0x00000001fffffffe,
+    0x5884b7fa00034802,
+    0x998c4fefecbc4ff5,
+    0x1824b159acc5056f,
+];
+
+/// R^2 = 2^512 mod r
+const R2: [u64; 4] = [
+    0xc999e990f3f29c6d,
+    0x2b6cedcb87925c23,
+    0x05d314967254398f,
+    0x0748d9d99f59ff11,
+];
+
+/// R^3 = 2^768 mod r
+const R3: [u64; 4] = [
+    0xc62c1807439b73af,
+    0x1b3e0d188cf06990,
+    0x73d13c71c7b5f418,
+    0x6e2a5bb9c8db33e9,
+];
+
+pub const INV: u64 = 0xfffffffeffffffff;
+
+const S: usize = 32;
+
+pub const ROOT_OF_UNITY: Fr = Fr([
+    0xb9b58d8c5f0e466a,
+    0x5b1b4c801819d7ec,
+    0x0af53ae352a31e64,
+    0x5bf3adda19e9b27b,
+]);
+
+impl Fr {
+    pub const fn to_mont_form(val: [u64; 4]) -&gt; Self {
+        Self(to_mont_form(val, R2, MODULUS, INV))
+    }
+
+    pub(crate) const fn montgomery_reduce(self) -&gt; [u64; 4] {
+        mont(
+            [self.0[0], self.0[1], self.0[2], self.0[3], 0, 0, 0, 0],
+            MODULUS,
+            INV,
+        )
+    }
+}
+
+fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use paste::paste;
+    use rand_core::OsRng;
+
+    field_test!(bls12_381_scalar, Fr, 1000);
+}
+</code></pre>
+<h3 id="curve"><a class="header" href="#curve">Curve</a></h3>
+<p>The following <code>G1Affine</code> and <code>G1Projective</code> supports point arithmetic.</p>
+<pre><code class="language-ignore">use crate::fq::Fq;
+use crate::fr::Fr;
+use zero_crypto::arithmetic::bits_384::*;
+use zero_crypto::common::*;
+use zero_crypto::dress::curve::*;
+
+/// The projective form of coordinate
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct G1Projective {
+    pub(crate) x: Fq,
+    pub(crate) y: Fq,
+    pub(crate) z: Fq,
+}
+
+/// The projective form of coordinate
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct G1Affine {
+    pub(crate) x: Fq,
+    pub(crate) y: Fq,
+    is_infinity: bool,
+}
+
+curve_operation!(
+    Fr,
+    Fq,
+    G1_PARAM_A,
+    G1_PARAM_B,
+    G1Affine,
+    G1Projective,
+    G1_GENERATOR_X,
+    G1_GENERATOR_Y
+);
+
+#[cfg(test)]
+mod tests {
+    #[allow(unused_imports)]
+    use super::*;
+
+    curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="jubjub-curve"><a class="header" href="#jubjub-curve">Jubjub Curve <a href="https://crates.io/crates/zero-jubjub"><img src="https://img.shields.io/crates/v/zero-jubjub.svg" alt="crates.io badge" /></a></a></h1>
+<p>This crate provides jubjub curve arithmetic and also supports fully <code>no_std</code> and <a href="https://github.com/paritytech/parity-scale-codec"><code>parity-scale-codec</code></a>.</p>
+<p><strong>This crate uses <a href="https://github.com/zkcrypto/jubjub">https://github.com/zkcrypto/jubjub</a> algorithm designed by @str4d and @ebfull.</strong>
+We replace field and curve implementation with <code>zero-crypto</code> to make this compatible with <code>Substrate</code>.</p>
+<h1 id="specification"><a class="header" href="#specification">Specification</a></h1>
+<p>The Jubjub curve is one of twisted edwards curve.</p>
+<ul>
+<li>
+<p>Twisted Edwards Curve
+$$
+ax^2 + y^2 = 1 + dx^2y^2
+$$</p>
+</li>
+<li>
+<p>Addition Law
+$$
+(x_3 = \frac{x_1y_1 + y_1x_1}{1 + dx_1x_1y_1y_1}, y_3 = \frac{y_1y_1 + ax_1x_1}{1 - dx_1x_1y_1y_1})
+$$</p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="bls12-381-curve"><a class="header" href="#bls12-381-curve">Bls12 381 Curve <a href="https://crates.io/crates/zero-bls12-381"><img src="https://img.shields.io/crates/v/zero-bls12-381.svg" alt="crates.io badge" /></a></a></h1>
+<p>Pairing friendly bls12-381 curve.</p>
+<p><strong>This crate partly uses <a href="https://github.com/dusk-network/bls12_381">https://github.com/dusk-network/bls12_381</a> and <a href="https://github.com/dusk-network/bls12_381">https://github.com/dusk-network/bls12_381</a> implementation designed by Dusk-Network team and, @str4d and @ebfull.</strong>
+We replace field and curve implementation with <code>zero-crypto</code> to make this compatible with <code>Substrate</code>.</p>
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<p>This crate includes field and extension fields, curve implementation. There are two curve $G1$ and $G2$ described as following.</p>
+<p>$G1: y^2 = x^3 + 4$<br />
+$G2: y^2 = x^3 + 4(u + 1)$</p>
+<p>These two group supports bilinearity by pairing. Let $G$ and $H$ be generator of $G1$, and $G2$, and $e$ be pairing function. The relationship is described as following.</p>
+<p>$e(aG, bH) = e(G, H)^{ab}$</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="elgamal-encryption"><a class="header" href="#elgamal-encryption">ElGamal Encryption <a href="https://crates.io/crates/zero-elgamal"><img src="https://img.shields.io/crates/v/zero-elgamal.svg" alt="crates.io badge" /></a></a></h1>
+<p>This crate provides additive homomorphic ElGamal encryption over jubjub curve and also supports fully <code>no_std</code> and <a href="https://github.com/paritytech/parity-scale-codec"><code>parity-scale-codec</code></a>.</p>
+<h2 id="scheme-1"><a class="header" href="#scheme-1">Scheme</a></h2>
+<p>Alice has balance $a$ and public key $b$.<br />
+She generates the randomness $r$ and computes encrypted balance $(g^r, g^a * b^r)$.<br />
+When Bob transfers $c$ to Alice, he generates the randomness $r'$ and computes encrypted transfer amount $(g^{r'}, g^c * b^{r'})$.<br />
+The sum of encrypted balance and transfer amount is folloing.</p>
+<p>$$
+(g^{r + r'}, g^{a + c} * b^{r + r'})
+$$</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="tate-pairing"><a class="header" href="#tate-pairing">Tate Pairing <a href="https://crates.io/crates/zero-pairing"><img src="https://img.shields.io/crates/v/zero-pairing.svg" alt="crates.io badge" /></a></a></h1>
+<p><strong>This crate uses <a href="https://github.com/zkcrypto/bls12_381">https://github.com/zkcrypto/bls12_381</a> algorithm designed by @str4d and @ebfull.</strong>
+We replace field and curve implementation with <code>zero-crypto</code> to make this compatible with <code>Substrate</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pallet"><a class="header" href="#pallet">Pallet</a></h1>
+<p>The <code>Zero Network</code> supports privacy-preserving transactions. These functionalities are powered by <code>pallets</code>. Followings are short summary of pallets.</p>
+<ul>
+<li><a href="../book/4_1_plonk.html">pallet-plonk</a> <a href="https://crates.io/crates/plonk-pallet"><img src="https://img.shields.io/crates/v/plonk-pallet.svg" alt="crates.io badge" /></a></li>
+</ul>
+<p>The <code>pallet-plonk</code> pallet is a wrapper of plonk library and in charge of proving and verifying the validity of computation.</p>
+<ul>
+<li><a href="../book/4_2_encrypted_balance.html">pallet-encrypted-balance</a></li>
+</ul>
+<p>The <code>pallet-encrypted-balance</code> pallet provides balance encryption by default. This replaces balance storage value with encrypted value.</p>
+<ul>
+<li><a href="../book/4_3_confidential_transfer.html">confidential_transfer</a></li>
+</ul>
+<p>The <code>confidential_transfer</code> pallet provides transfer function with hiding transfer amount. This pallet is coupling <code>pallet-plonk</code> and <code>pallet-encrypted-balance</code>, and changes the balance with encryped and checks the validity of computation.</p>
+<p>You can import as adding dependencies to our crate.</p>
+<pre><code class="language-toml">[dependencies]
+pallet-plonk = { version = &quot;0.2.3&quot; }
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="plonk"><a class="header" href="#plonk">Plonk <a href="https://crates.io/crates/plonk-pallet"><img src="https://img.shields.io/crates/v/plonk-pallet.svg" alt="crates.io badge" /></a></a></h1>
+<h2 id="abstract-2"><a class="header" href="#abstract-2">Abstract</a></h2>
+<p>We implemented the plonk library as a pallet in order for developers to customize circuits and use the plonk protocol on Substrate runtime. This project allowed us to use following functionalities.</p>
+<ul>
+<li>Custom circuit</li>
+<li>Trusted setup</li>
+<li>Generate proof</li>
+<li>Verify proof</li>
+</ul>
+<h2 id="acknowledgements"><a class="header" href="#acknowledgements">Acknowledgements</a></h2>
+<ul>
+<li>Initial rust <a href="https://github.com/ZK-Garage/plonk">implementation</a> of PLONK by ZK-Garage</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="encrypted-balances-module"><a class="header" href="#encrypted-balances-module">Encrypted Balances Module</a></h1>
+<p>The Balances module provides functionality for handling accounts and balances.</p>
+<ul>
+<li><a href="https://docs.rs/pallet-balances/latest/pallet_balances/trait.Trait.html"><code>balances::Trait</code></a></li>
+<li><a href="https://docs.rs/pallet-balances/latest/pallet_balances/enum.Call.html"><code>Call</code></a></li>
+<li><a href="https://docs.rs/pallet-balances/latest/pallet_balances/struct.Module.html"><code>Module</code></a></li>
+</ul>
+<h2 id="overview-1"><a class="header" href="#overview-1">Overview</a></h2>
+<p>The Balances module provides functions for:</p>
+<ul>
+<li>Getting and setting free balances.</li>
+<li>Retrieving total, reserved and unreserved balances.</li>
+<li>Repatriating a reserved balance to a beneficiary account that exists.</li>
+<li>Transferring a balance between accounts (when not reserved).</li>
+<li>Slashing an account balance.</li>
+<li>Account creation and removal.</li>
+<li>Managing total issuance.</li>
+<li>Setting and managing locks.</li>
+</ul>
+<h3 id="terminology"><a class="header" href="#terminology">Terminology</a></h3>
+<ul>
+<li>
+<p><strong>Existential Deposit:</strong> The minimum balance required to create or keep an account open. This prevents
+&quot;dust accounts&quot; from filling storage. When the free plus the reserved balance (i.e. the total balance)
+fall below this, then the account is said to be dead; and it loses its functionality as well as any
+prior history and all information on it is removed from the chain's state.
+No account should ever have a total balance that is strictly between 0 and the existential
+deposit (exclusive). If this ever happens, it indicates either a bug in this module or an
+erroneous raw mutation of storage.</p>
+</li>
+<li>
+<p><strong>Total Issuance:</strong> The total number of units in existence in a system.</p>
+</li>
+<li>
+<p><strong>Reaping an account:</strong> The act of removing an account by resetting its nonce. Happens after its
+total balance has become zero (or, strictly speaking, less than the Existential Deposit).</p>
+</li>
+<li>
+<p><strong>Free Balance:</strong> The portion of a balance that is not reserved. The free balance is the only
+balance that matters for most operations.</p>
+</li>
+<li>
+<p><strong>Reserved Balance:</strong> Reserved balance still belongs to the account holder, but is suspended.
+Reserved balance can still be slashed, but only after all the free balance has been slashed.</p>
+</li>
+<li>
+<p><strong>Imbalance:</strong> A condition when some funds were credited or debited without equal and opposite accounting
+(i.e. a difference between total issuance and account balances). Functions that result in an imbalance will
+return an object of the <code>Imbalance</code> trait that can be managed within your runtime logic. (If an imbalance is
+simply dropped, it should automatically maintain any book-keeping such as total issuance.)</p>
+</li>
+<li>
+<p><strong>Lock:</strong> A freeze on a specified amount of an account's free balance until a specified block number. Multiple
+locks always operate over the same funds, so they &quot;overlay&quot; rather than &quot;stack&quot;.</p>
+</li>
+</ul>
+<h3 id="implementations"><a class="header" href="#implementations">Implementations</a></h3>
+<p>The Balances module provides implementations for the following traits. If these traits provide the functionality
+that you need, then you can avoid coupling with the Balances module.</p>
+<ul>
+<li><a href="https://docs.rs/frame-support/latest/frame_support/traits/trait.Currency.html"><code>Currency</code></a>: Functions for dealing with a
+fungible assets system.</li>
+<li><a href="https://docs.rs/frame-support/latest/frame_support/traits/trait.ReservableCurrency.html"><code>ReservableCurrency</code></a>:
+Functions for dealing with assets that can be reserved from an account.</li>
+<li><a href="https://docs.rs/frame-support/latest/frame_support/traits/trait.LockableCurrency.html"><code>LockableCurrency</code></a>: Functions for
+dealing with accounts that allow liquidity restrictions.</li>
+<li><a href="https://docs.rs/frame-support/latest/frame_support/traits/trait.Imbalance.html"><code>Imbalance</code></a>: Functions for handling
+imbalances between total issuance in the system and account balances. Must be used when a function
+creates new funds (e.g. a reward) or destroys some funds (e.g. a system fee).</li>
+<li><a href="https://docs.rs/frame-support/latest/frame_support/traits/trait.IsDeadAccount.html"><code>IsDeadAccount</code></a>: Determiner to say whether a
+given account is unused.</li>
+</ul>
+<h2 id="interface"><a class="header" href="#interface">Interface</a></h2>
+<h3 id="dispatchable-functions"><a class="header" href="#dispatchable-functions">Dispatchable Functions</a></h3>
+<ul>
+<li><code>transfer</code> - Transfer some liquid free balance to another account.</li>
+<li><code>set_balance</code> - Set the balances of a given account. The origin of this call must be root.</li>
+</ul>
+<h2 id="usage-1"><a class="header" href="#usage-1">Usage</a></h2>
+<p>The following examples show how to use the Balances module in your custom module.</p>
+<h3 id="examples-from-the-frame"><a class="header" href="#examples-from-the-frame">Examples from the FRAME</a></h3>
+<p>The Contract module uses the <code>Currency</code> trait to handle gas payment, and its types inherit from <code>Currency</code>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use frame_support::traits::Currency;
+
+pub type BalanceOf&lt;T&gt; = &lt;&lt;T as Config&gt;::Currency as Currency&lt;&lt;T as frame_system::Config&gt;::AccountId&gt;&gt;::Balance;
+pub type NegativeImbalanceOf&lt;T&gt; = &lt;&lt;T as Config&gt;::Currency as Currency&lt;&lt;T as frame_system::Config&gt;::AccountId&gt;&gt;::NegativeImbalance;
+
+<span class="boring">}</span></code></pre></pre>
+<p>The Staking module uses the <code>LockableCurrency</code> trait to lock a stash account's funds:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use frame_support::traits::{WithdrawReasons, LockableCurrency};
+use sp_runtime::traits::Bounded;
+pub trait Config: frame_system::Config {
+	type Currency: LockableCurrency&lt;Self::AccountId, Moment=Self::BlockNumber&gt;;
+}
+
+fn update_ledger&lt;T: Config&gt;(
+	controller: &amp;T::AccountId,
+	ledger: &amp;StakingLedger&lt;T&gt;
+) {
+	T::Currency::set_lock(
+		STAKING_ID,
+		&amp;ledger.stash,
+		ledger.total,
+		WithdrawReasons::all()
+	);
+	// &lt;Ledger&lt;T&gt;&gt;::insert(controller, ledger); // Commented out as we don't have access to Staking's storage here.
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="genesis-config"><a class="header" href="#genesis-config">Genesis config</a></h2>
+<p>The Balances module depends on the <a href="https://docs.rs/pallet-balances/latest/pallet_balances/struct.GenesisConfig.html"><code>GenesisConfig</code></a>.</p>
+<h2 id="assumptions"><a class="header" href="#assumptions">Assumptions</a></h2>
+<ul>
+<li>Total issued balanced of all accounts should be less than <code>Config::Balance::max_value()</code>.</li>
+</ul>
+<p>License: Apache-2.0</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="confidential-transfer-pallet"><a class="header" href="#confidential-transfer-pallet">Confidential Transfer Pallet</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="related-tools"><a class="header" href="#related-tools">Related Tools</a></h1>
+<h2 id="abstract-3"><a class="header" href="#abstract-3">Abstract</a></h2>
+<p>In this section, we would like to explain about the cryptgraphic scheme used for other privacy project.</p>
+<h2 id="stealth-address"><a class="header" href="#stealth-address"><a href="4_1_stealth_address.html">Stealth Address</a></a></h2>
+<p>The <code>Stealth Address</code> hides the recipient address by creating one time address. Shortly, creating one time address from public key and recovering that private key with using <a href="https://ieeexplore.ieee.org/document/1055638"><code>Diffie-Hellman</code></a> key exchange, users can hide who exactly receives the assets. The <a href="https://www.getmonero.org/"><code>Monero</code></a> uses this technology.</p>
+<h2 id="pedersen-commitment"><a class="header" href="#pedersen-commitment"><a href="4_2_pedersen_commitment.html">Pedersen Commitment</a></a></h2>
+<p>The <code>Pedersen Commitment</code> hides the transfer amount by commitment scheme. Shortly, using zero testing and generating blind factors, users can prove the amount validity without revealing actual amount. The <a href="https://www.getmonero.org/"><code>Monero</code></a> uses this technology.</p>
+<h2 id="non-interactive-zero-knowledge-proof"><a class="header" href="#non-interactive-zero-knowledge-proof"><a href="4_3_non_interactive_zero_knowlege_proof.html">Non Interactive Zero Knowledge Proof</a></a></h2>
+<p>The <code>Non Interactive Zero Knowledge Proof</code> proves the computation validity without revealing information about the value used with computation. In this section, we describe the <code>zk-SNARKs</code>. The <a href="https://z.cash/"><code>Zcash</code></a> uses this technology. Shortly, the <a href="4_3_1_qap.html">QAP</a> converts computation into polynomials, the <a href="4_3_2_polynomial_commitment.html">Polynomial Commitment</a> proves the validity of polynomials and the <a href="4_3_3_homomorphic_encryption.html">Homomorphic Encryption</a> evaluates the polynomials without revealing raw coefficients.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="stealth-address-1"><a class="header" href="#stealth-address-1">Stealth Address</a></h1>
+<h2 id="abstract-4"><a class="header" href="#abstract-4">Abstract</a></h2>
+<p>The <code>Stealth Address</code> is the technology which allows us to hide the <strong>recipient</strong> address.</p>
+<h2 id="details"><a class="header" href="#details">Details</a></h2>
+<p>The blockchain for example <code>Ethereum</code>, we generate the private key and the public key based on private key. The hash of the public key is going to be a address which specifies the <strong>recipient</strong>. This address corresponds one private key and public key pair so we can easily identify who is the <strong>recipient</strong> of the transaction. In our blockchain, we generate <strong>recipient</strong> address for each transactions and make it hard to identify the <strong>recipient</strong>.</p>
+<ol>
+<li>Generates recipient public key pairs</li>
+<li>Generates recipient <code>Stealth Address</code></li>
+<li>Prove the ownership of <code>Stealth Address</code></li>
+</ol>
+<p>Above sequence used for confidential transfer to keep the <strong>recipient</strong> address anonymous.</p>
+<h2 id="generates-recipient-public-key-pairs"><a class="header" href="#generates-recipient-public-key-pairs">Generates Recipient Public Key Pairs</a></h2>
+<p>Every transaction has <strong>recipient</strong> and we hide the <strong>recipient</strong> with stealth address. We assume Alice send transaction to Bod.</p>
+<p>First of all, Bod generates the two key pairs (a, A) and (b, B) such that <code>aG = A</code> and <code>bG = B</code>. <code>a</code> and <code>b</code> are the private keys and, <code>A</code> and <code>B</code> are the public keys.</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Variable</th><th style="text-align: left">Explanation</th><th style="text-align: left">Derivation</th></tr></thead><tbody>
+<tr><td style="text-align: left">a</td><td style="text-align: left">Bob private key</td><td style="text-align: left">a ∈ Fp</td></tr>
+<tr><td style="text-align: left">b</td><td style="text-align: left">Bob private key</td><td style="text-align: left">b ∈ Fp</td></tr>
+<tr><td style="text-align: left">A</td><td style="text-align: left">Bob public key for <code>a</code></td><td style="text-align: left">a * G</td></tr>
+<tr><td style="text-align: left">B</td><td style="text-align: left">Bob public key for <code>b</code></td><td style="text-align: left">b * G</td></tr>
+</tbody></table>
+</div>
+<h2 id="generates-recipient-stealth-address"><a class="header" href="#generates-recipient-stealth-address">Generates Recipient <code>Stealth Address</code></a></h2>
+<p>Secondly, Alice generates the Bob <strong>recipient</strong> address as referred to the <code>Stealth Address</code>. Alice selects the random number <code>r</code> and calculate the <code>Stealth Address</code> with Bob public keys such that following.</p>
+<p>$$ P = H(r*A) * G + B $$</p>
+<p>No one can link P address with <code>A</code> and <code>B</code> because it's concealed by elliptic curve arithmetic. Alice publish the <code>P</code> and <code>R</code> calculated as <code>R = rG</code>.</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Variable</th><th style="text-align: left">Explanation</th><th style="text-align: left">Derivation</th></tr></thead><tbody>
+<tr><td style="text-align: left">r</td><td style="text-align: left">randomness generated by Alice</td><td style="text-align: left">r ∈ Fp</td></tr>
+<tr><td style="text-align: left">H</td><td style="text-align: left">one-way hash function which takes curve point and maps field element</td><td style="text-align: left">e: xG -&gt; Fp</td></tr>
+<tr><td style="text-align: left">R</td><td style="text-align: left">public value generated by Alice</td><td style="text-align: left">r * G</td></tr>
+<tr><td style="text-align: left">P</td><td style="text-align: left">stealth address of Bob</td><td style="text-align: left">H(r*A) * G + B</td></tr>
+</tbody></table>
+</div>
+<h2 id="prove-the-ownership-of-stealth-address"><a class="header" href="#prove-the-ownership-of-stealth-address">Prove the ownership of <code>Stealth Address</code></a></h2>
+<p>Lastly, Bob needs to prove the ownership of <code>Stealth Address</code> to use assets associated with it. Bob knows his private keys <code>a</code> and <code>b</code>. He can calculate the private key of <code>P</code> with <code>x = H(a * R) + b</code>. This is the <a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange#:~:text=Diffie%E2%80%93Hellman%20key%20exchange%20is,Whitfield%20Diffie%20and%20Martin%20Hellman.&amp;text=Diffie%E2%80%93Hellman%20is%20used%20to%20secure%20a%20variety%20of%20Internet%20services."><code>Diffie–Hellman key exchange</code></a> algorithm. Only Bob can know the <code>x</code>. This is how concealing the <strong>recipient</strong> address. Next section, we explain how we conceal the <strong>amount</strong> of transactions.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pedersen-commitment-1"><a class="header" href="#pedersen-commitment-1">Pedersen Commitment</a></h1>
+<h2 id="abstract-5"><a class="header" href="#abstract-5">Abstract</a></h2>
+<p>The <code>Pedersen Commitment</code> is the technology which allows us to check the transfer amount is valid without revealing actual amount.</p>
+<h2 id="details-1"><a class="header" href="#details-1">Details</a></h2>
+<p>This technology uses additivity of elliptic curve. Hiding the transfer amount as scalar of elliptic curve point and mixing random value refer as to <code>blinding factor</code>. Let's take a look the squence.</p>
+<ol>
+<li>Setup the parameters</li>
+<li>Hide the transfer amount</li>
+<li>Verify the transfer amount</li>
+</ol>
+<p>Above sequence used for confidential transfer to keep the transfer amount secret.</p>
+<h2 id="setup-the-parameters"><a class="header" href="#setup-the-parameters">Setup The Parameters</a></h2>
+<p>First of all, we'd like to setup the parameters we are going to use with the <code>Pedersen Commitment</code>. Selecting generator <code>G</code> over prime order elliptic curve group and randomness <code>a</code> less than order prime. Calculating <code>H = aG</code> and making <code>H</code> and <code>G</code> public. We can't predict the <code>a</code> value from <code>H</code> and <code>G</code> because of discrete logarithm.</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Variable</th><th style="text-align: left">Explanation</th><th style="text-align: left">Derivation</th></tr></thead><tbody>
+<tr><td style="text-align: left">p</td><td style="text-align: left">prime number</td><td style="text-align: left">-</td></tr>
+<tr><td style="text-align: left">a</td><td style="text-align: left">random number</td><td style="text-align: left">a ∈ Fp</td></tr>
+<tr><td style="text-align: left">C(x)</td><td style="text-align: left">elliptic curve function</td><td style="text-align: left">-</td></tr>
+<tr><td style="text-align: left">G</td><td style="text-align: left">generator of elliptic curve point</td><td style="text-align: left">G ∈ C(Fp)</td></tr>
+<tr><td style="text-align: left">H</td><td style="text-align: left">generator made by random a</td><td style="text-align: left">H = aG</td></tr>
+</tbody></table>
+</div>
+<h2 id="hide-the-transfer-amount"><a class="header" href="#hide-the-transfer-amount">Hide The Transfer Amount</a></h2>
+<p>Let's assume that Alice has <code>10</code> balance and send Bob to <code>3</code>. We need to check <code>{Alice balance} - {transfer amount} = {Alice after balance}</code> without revealing any information about Alice balance. Alice knows <code>H</code>, <code>G</code> and her balance so she computes following value.</p>
+<ul>
+<li>Alice balance commitment
+$$ C(10) = 10H + x_1G $$</li>
+<li>Transfer amount commitment
+$$ C(3) = 3H + x_2G $$</li>
+<li>Alice after balance commitment
+$$ C(10 - 3) = 7H + x_3G $$</li>
+</ul>
+<p>In above equation, <code>x_1 ~ x_3</code> are called <code>blinding factor</code> and each blinding factor need to be set to hold <code>{Alice balance} - {transfer amount} = {Alice after balance}</code> equation. Let's say <code>x_1 = 330</code>, <code>x_2 = 30</code> and <code>x_3 = 300</code>.</p>
+<h2 id="verify-the-transfer-amount"><a class="header" href="#verify-the-transfer-amount">Verify The Transfer Amount</a></h2>
+<p>In previous section, Alice computes the following commitment.</p>
+<p>$$ C(10, 330) = 10H + 330G $$
+$$ C(3, 30) = 3H + 30G $$
+$$ C(10 - 3, 300) = 7H + 300G $$</p>
+<p>Let's check if Alice transfer amount is valid. The elliptic curve arithmetic supports additive so we can check <code>{Alice balance} - {transfer amount} = {Alice after balance}</code> as following.</p>
+<p>$$ C(10, 330) - C(3, 30) - C(10 - 3, 300) = C(10 - 3 - 7, 330 - 30 - 300) = 0H + 0G = 0 $$</p>
+<p>If above equation holds up, we can know the transfer amount is valid. Through this process, <code>balance</code> and <code>transfer amount</code> are encrypted by elliptic curve so no one can predict actual value from public information. This is how we conceal the transfer transaction and verify the validity.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="non-interactive-zero-knowledge-proof-1"><a class="header" href="#non-interactive-zero-knowledge-proof-1">Non Interactive Zero Knowledge Proof</a></h1>
+<p>The <code>Non Interactive Zero Knowledge Proof</code> referred as to <code>NIZK</code> prove the statement without revealing any information about the statement. There are some types of <code>NIZK</code> for example <code>SNORKs</code>, <code>STARKs</code> and so on. In this section, we describe the <code>SNARKs</code> and especially <a href="https://eprint.iacr.org/2013/279.pdf"><code>Pinocchio Protocol</code></a>. It's a little bit complicated technology so I divide into three parts.</p>
+<h2 id="abstract-6"><a class="header" href="#abstract-6">Abstract</a></h2>
+<p>The <code>SNARKs</code> converts the computation problems into the polynomial equations. We can not only hide the computation itself but also verify the computation faster than compute it again. That's why the <code>SNARKs</code> is also used for scaling solution for example <code>zk rollup</code>.</p>
+<h2 id="detail"><a class="header" href="#detail">Detail</a></h2>
+<p>The <code>SNARKs</code> has three steps.</p>
+<ol>
+<li><a href="4_3_1_qap.html">QAP</a></li>
+</ol>
+<p>Converting computation which we want to prove without revealing additional information into polynomial equations. In <a href="https://eprint.iacr.org/2013/279.pdf"><code>Pinocchio Protocol</code></a>, we need to generate polynonial equations for each computation. The polynomial equations are decided for corresponding computation.</p>
+<ol start="2">
+<li><a href="4_3_2_polynomial_commitment.html">Polynomail Commitment</a></li>
+</ol>
+<p>Hiding the secret as polynomial coefficients, opening with evaluating that polynomials at point, and we can prove the computation was done correctly.</p>
+<ol start="3">
+<li><a href="4_3_3_homomorphic_encryption.html">Homomorphic Encryption</a></li>
+</ol>
+<p>The polynomial coefficients are encrypted to keep the secret so we need perform evaluation with remaining encrypted. The <code>Homomorphic Encryption</code> can perform the multiple time addition and one time multiplication for encrypted number using elliptic curve and pairing.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="qap-quadratic-arithmetic-programs"><a class="header" href="#qap-quadratic-arithmetic-programs">QAP (Quadratic Arithmetic Programs)</a></h1>
+<h2 id="abstract-7"><a class="header" href="#abstract-7">Abstract</a></h2>
+<p>The <code>QAP</code> is the technology which converts <code>computation</code> to <code>polynomial groups</code>. With this, we can check whether the <code>computation</code> was executed correctly just factor the polynomial without execute <code>computation</code> again.</p>
+<h2 id="details-2"><a class="header" href="#details-2">Details</a></h2>
+<p>Let's take a look at details. I give a example. Let's prove that following computation was executed correctly.</p>
+<p>$$a^2 \cdot b^2 = c.$$</p>
+<p>Assume that <code>c</code> is public input. <code>a</code> and <code>b</code> are private input. Prove that knowledge of <code>a</code> and <code>b</code> satisfying above equation.</p>
+<h3 id="flattening"><a class="header" href="#flattening">Flattening</a></h3>
+<p>First of all, let's disassemble the <code>computation</code> to minimum form using multicative.</p>
+<p>$$ 1: a * a = a^2 $$
+$$ 2: b * b = b^2 $$
+$$ 3: a^2 * b^2 = c $$</p>
+<p>Now the computation was disassembled to three gate.</p>
+<h3 id="r1cs"><a class="header" href="#r1cs">R1Cs</a></h3>
+<p>As described, we have three multicative computation and want to check whether each steps are executed correctly to set constraint. Before that, we permute above characters as following.</p>
+<p>$$ [a, a^2, b, b^2, c] -&gt; [v, w, x, y, z] $$</p>
+<p>And now, our computation can be expressed as following table. Left, Right and Output.</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Gate</th><th style="text-align: left">L</th><th style="text-align: left">R</th><th style="text-align: left">O</th></tr></thead><tbody>
+<tr><td style="text-align: left">1</td><td style="text-align: left">v</td><td style="text-align: left">v</td><td style="text-align: left">w</td></tr>
+<tr><td style="text-align: left">2</td><td style="text-align: left">x</td><td style="text-align: left">x</td><td style="text-align: left">y</td></tr>
+<tr><td style="text-align: left">3</td><td style="text-align: left">y</td><td style="text-align: left">w</td><td style="text-align: left">z</td></tr>
+</tbody></table>
+</div>
+<h3 id="qap"><a class="header" href="#qap">QAP</a></h3>
+<p>Let's express above table as polynomail groups. As example, express <code>v</code> polynomial on <code>L</code> column. <code>x</code> cordinate is <code>Gate</code> number and <code>y</code> cordinate is if that variable is used, it's going to be 1 and oserwise 0. In <code>L</code> column, <code>v</code> is only used <code>Gate</code> 1 so express as <code>(1, 1) (2, 0) (3, 0)</code>. Find polynomial using <a href="https://math.iitm.ac.in/public_html/sryedida/caimna/interpolation/lagrange.html"><code>Lagrange interpolation formula</code></a> for each variables.</p>
+<p><em>L column polynomial</em></p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Variable</th><th style="text-align: left">Cordinate</th><th style="text-align: left">Polynomial</th><th style="text-align: left">Name</th></tr></thead><tbody>
+<tr><td style="text-align: left">v</td><td style="text-align: left">(1, 1) (2, 0) (3, 0)</td><td style="text-align: left">$$ \frac{x^2}{2} - \frac{5x}{2} + 3 \ $$</td><td style="text-align: left">Lv</td></tr>
+<tr><td style="text-align: left">w</td><td style="text-align: left">(1, 0) (2, 0) (3, 0)</td><td style="text-align: left">0</td><td style="text-align: left">Lw</td></tr>
+<tr><td style="text-align: left">x</td><td style="text-align: left">(1, 0) (2, 1) (3, 0)</td><td style="text-align: left">$$ -x^2 + 4x - 3 $$</td><td style="text-align: left">Lx</td></tr>
+<tr><td style="text-align: left">y</td><td style="text-align: left">(1, 0) (2, 0) (3, 1)</td><td style="text-align: left">$$ \frac{x^2}{2} - \frac{3x}{2} + 1 \ $$</td><td style="text-align: left">Ly</td></tr>
+<tr><td style="text-align: left">z</td><td style="text-align: left">(1, 0) (2, 0) (3, 0)</td><td style="text-align: left">0</td><td style="text-align: left">Lz</td></tr>
+</tbody></table>
+</div>
+<p>Above polynomial expresses the gate that variable uses. When we pass gate number to polynomial <code>v</code> $$ \frac{x^2}{2} - \frac{5x}{2} + 3 \ $$, we can know which gate the <code>v</code> is used. For example, we pass <code>1</code> to polynomial <code>v</code>, it returns <code>1</code> so the variable <code>v</code> is used on gate <code>1</code> but it returns <code>0</code> when we pass <code>2</code> and <code>3</code> so it's not used on these gate. When we add all polynomial <code>Lv + Lw + Lx + Ly + Lz = L(x)</code>, it returns <code>1</code> when we pass <code>1</code>, <code>2</code> and <code>3</code>. We do the same operation for each column and get polynomials as well.</p>
+<ul>
+<li>L(x)<br />
+<code>Lv + Lw + Lx + Ly + Lz</code></li>
+<li>R(x)<br />
+<code>Rv + Rw + Rx + Ry + Rz</code></li>
+<li>O(x)<br />
+<code>Ov + Ow + Ox + Oy + Oz</code></li>
+</ul>
+<p>We can intruduce above polynomials when we decide the <code>computation</code>.</p>
+<h3 id="proof"><a class="header" href="#proof">Proof</a></h3>
+<p>From now on, we are going to prove the state ment. In here, we use <code>a = 2</code>, <code>b = 3</code> and <code>c = 36</code>. We can get actual value as following.</p>
+<p>$$ [v, w, x, y, z] -&gt; [2, 4, 3, 9, 36] $$</p>
+<p>And we multiply above variables by for each polynomial. For example, <code>L(x)</code> is following.</p>
+<p>$$ L(x) = v * Lv + w * Lw + x * Lx + y * Ly + z * Lz $$</p>
+<p>When we pass the <code>1</code> to <code>L(x)</code>, we can get <code>v</code> because only <code>Lv</code> returns <code>1</code> and others return <code>0</code>. <code>R(x)</code> as well and <code>O(x)</code> returns <code>w</code> so following equation holds.</p>
+<p>$$ L(1) * R(1) - O(1) = v * v - w = 2 * 2 - 4 = 0 $$</p>
+<p>It corresponds the table we saw in <code>R1Cs</code> and above also holds the case <code>x = 2</code> and <code>x = 3</code>. When we want to prove the statement, we are going to make above polynomial with secret <code>[v, w, x, y, z] -&gt; [2, 4, 3, 9, 36]</code> so polynomial would be integrated as one as following.</p>
+<p>$$ L(x) = 2 * Lv + 4 * Lw + 3 * Lx + 9 * Ly + 36 * Lz $$
+$$ R(x) = 2 * Rv + 4 * Rw + 3 * Rx + 9 * Ry + 36 * Rz $$
+$$ O(x) = 2 * Ov + 4 * Ow + 3 * Ox + 9 * Oy + 36 * Oz $$
+$$ L(x) * R(x) - O(x) = P(x) $$</p>
+<p>We make the <code>P(x)</code> to prove the statement.</p>
+<h3 id="verification"><a class="header" href="#verification">Verification</a></h3>
+<p>We can know whether <code>computation</code> was executed correctly to devide <code>P(x)</code> with <code>(x - 1) * (x - 2) * (x - 3)</code>. If it's devided as following prover knows the secret <code>a</code> and <code>b</code> leading <code>c</code>.</p>
+<p>$$ P(x) = (x - 1) * (x - 2) * (x - 3) * T(x) $$</p>
+<h3 id="next"><a class="header" href="#next">Next</a></h3>
+<p>In this section, we understood how to convert <code>computation</code> to <code>polynomial groups</code> but there are some possibility that <code>P(x)</code> was made without using secret. In addition to this, we can know the secret to factor the polynomial. Zk SNARKs addresses the former problem with <code>Polynomial Commitment</code> and latter problem with <code>homomorphic encryption</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="polynomial-commitment"><a class="header" href="#polynomial-commitment">Polynomial Commitment</a></h1>
+<p>In previous <a href="3_1_qap.html">section</a>, we enable to check whether <code>computation</code> was done correctly by the knowledge of polynomial which can be devided by minimal polynomial <code>Z(x)</code> as following.</p>
+<p>$$ L(x) * R(x) - O(x) = Z(x) * T(x) $$</p>
+<p>However, we can create equation easily because <code>Z(x)</code> is public information. Then we need to verify whether <code>L(x), R(x), O(x)</code> are created by using valid input. To do so, we are going to use <code>Polynomial Commitment</code>.</p>
+<h2 id="abstract-8"><a class="header" href="#abstract-8">Abstract</a></h2>
+<p>The <code>Polynomial Commitment</code> check whether the prover know polynomials <code>L(x), R(x), O(x)</code> and these comes from valid input.</p>
+<h2 id="details-3"><a class="header" href="#details-3">Details</a></h2>
+<p>To know polynomials <code>L(x), R(x), O(x)</code> means having knowledge of coefficients of them.</p>
+<h2 id="combination"><a class="header" href="#combination">Combination</a></h2>
+<p>First of all, we combine these polynomials to one in order to make check process easier. Let's say degree of polynomials <code>L(x), R(x), O(x)</code> as <code>d</code>, we can combine them into one as following and let combined polynomial as <code>F(x)</code>.</p>
+<p>$$ L(x) + R(x) * X^{d+1} + O(x) * X^{2d+1} = F(x) $$</p>
+<p>In polynomial <code>F(x)</code>, the coefficients of <code>0~d</code> degree expresses <code>L(x)</code> coefficients, <code>d+1~2d</code> is <code>R(x)</code> and <code>2d+1~3d</code> is <code>O(x)</code> as well. The polynomial <code>F(x)</code> degree is <code>3d</code> and when we denote coefficients as k, it would be following.</p>
+<p>$$ F(x) = k_0 + k_1X + k_2X^2 + ... + k_{3d}X^{3d} $$</p>
+<h2 id="verification-1"><a class="header" href="#verification-1">Verification</a></h2>
+<p>The verification processes are following.</p>
+<ol>
+<li>Bob choses random <code>α, (a_0,...,a_{3d}) ∈ F</code> and compute <code>(b_0,...,b_{3d}) = α(a_0,...,a_{3d})</code>.</li>
+<li>Bob sends Alice to <code>(a_0,...,a_{3d})</code> and <code>(b_0,...,b_{3d})</code>.</li>
+<li>Alice computes following.
+$$ (\acute a_0,...,\acute a_{3d}, \acute b_0,...,\acute b_{3d}) = (a_0 * k_0,...,a_{3d} * k_{3d}, b_0 * k_0,...,b_{3d} * k_{3d}) $$</li>
+<li>Bob checks following.
+$$ (\acute a_0,...,\acute a_{3d}) = α(\acute b_0,...,\acute b_{3d}) $$</li>
+</ol>
+<p>If Alice don't know the coefficients, she couldn't do step <code>3</code>. With using this step, we can know that the prover know polynomials <code>L(x), R(x), O(x)</code> and these comes from valid input.</p>
+<h2 id="next-1"><a class="header" href="#next-1">Next</a></h2>
+<p>In this section, we understood how to check the prover polynomials comming from valid input but these information would be known by verifier. To hide these information from verifier, we are using homomorphic encryption.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="homomorphic-encryption-1"><a class="header" href="#homomorphic-encryption-1">Homomorphic Encryption</a></h1>
+<p>In previous two sections, we enable to check whether <code>computation</code> was done correctly through polynomials equation and these polynomials are generated with valid process with following equations.</p>
+<ul>
+<li>
+<p><a href="3_1_qap.html">QAP</a>
+$$ L(x) * R(x) - O(x) = Z(x) * T(x) $$</p>
+</li>
+<li>
+<p><a href="3_2_polynomial_commitment.html">Polynomial Commitment</a>
+$$ L(x) + R(x) * X^{d+1} + O(x) * X^{2d+1} = F(x) $$
+$$ F(x) = k_0 + k_1X + k_2X^2 + ... + k_{3d}X^{3d} $$
+$$ (\acute a_0,...,\acute a_{3d}, \acute b_0,...,\acute b_{3d}) = (a_0 * k_0,...,a_{3d} * k_{3d}, b_0 * k_0,...,b_{3d} * k_{3d}) $$
+$$ (\acute a_0,...,\acute a_{3d}) = α(\acute b_0,...,\acute b_{3d}) $$</p>
+</li>
+</ul>
+<p>Lastly, we would like to send these information with zero knowledge. To do so, we are going to use <code>Homomorphic Encryption</code>.</p>
+<h2 id="abstract-9"><a class="header" href="#abstract-9">Abstract</a></h2>
+<p>The <code>Homomorphic Encryption</code> achieves above equations evaluation without revealing any information. The difference between homomorphic encryption and normal encryption is that the <code>Homomorphic Encryption</code> can do add, sub and mul remaining encrypted. With this, the verifier doesn't know any information about these polynomials but able to check the relation between them.</p>
+<h2 id="details-4"><a class="header" href="#details-4">Details</a></h2>
+<p>Specifically, if the encryption supports <code>additive</code> and <code>multiplicative</code>, we would call it <code>Full Homomorphic Encryption</code> but it takes so much cost to calculate or ciphertext is too big to transfer through the internet. In this case, we deal the encryption which supports multiple additive and one time multiplicative. We realize these with <code>elliptic curve</code> and <code>pairing</code>.</p>
+<h2 id="elliptic-curve"><a class="header" href="#elliptic-curve">Elliptic Curve</a></h2>
+<p>The <code>elliptic curve</code> is the equation look like following.</p>
+<p>$$ y^2 = x^3 + ax + b $$</p>
+<h2 id="pairing"><a class="header" href="#pairing">Pairing</a></h2>
+<p>The <code>pairing</code> is the mapping which takes two elliptic curve points and map to the element of finitie field as following.</p>
+<p>$$ f: G * G -&gt; F_p $$</p>
+<p>There are some types of pairing functions but it's complicated so describing the relationship with simple model. Let's denote the two generators of elliptic as <code>G1</code>, <code>G2</code> and, each scalar as <code>a</code>, <code>b</code> and generator of finite field as <code>g</code>. We can express the relactionship between these two elliptic curve points and finite field element as following.</p>
+<p>$$ f: aG1 * bG2 -&gt; g^{ab} $$</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="tutorial"><a class="header" href="#tutorial">Tutorial</a></h1>
+<p>In this section, we describe how to use the pallet for privacy-preserving transactions.</p>
+<ul>
+<li><a href="./6_1_plonk_pallet.html">pallet-plonk</a></li>
+<li><a href="./4_2_encrypted_balance.html">pallet-encrypted-balance</a></li>
+<li><a href="./6_3_confidential_transfer.html">confidential_transfer</a></li>
+</ul>
+<p>You can check <a href="./7_0_frequent_errors.html">Frequent Errors</a> when the error happens.</p>
+<h2 id="abstract-10"><a class="header" href="#abstract-10">Abstract</a></h2>
+<p>The privacy-preserving transactions consists of several pallet components. We roughly explain what kind of role for each pallet has.</p>
+<h3 id="pallet-plonk"><a class="header" href="#pallet-plonk"><a href="./6_1_plonk_pallet.html">pallet-plonk</a></a></h3>
+<p><code>plonk</code> is a zk-Snarks scheme and allows us to prove that the computation was done correctly. We perform transaction on <code>off-chain</code> and generate the proof. The blockchain verifies the proof and approve the transaction. We define the constraints circuit for <code>confidential transfers</code> and <code>confidential smart contracts</code> by this pallet.</p>
+<h3 id="pallet-encrypted-balance"><a class="header" href="#pallet-encrypted-balance"><a href="./4_2_encrypted_balance.html">pallet-encrypted-balance</a></a></h3>
+<p>Users balances are encrypted by default. We use additive homomorphic arithmetic to hide the integer in transaction. Combining original <a href="https://github.com/paritytech/substrate/tree/v3.0.0/frame/balances">pallet-balance</a> and <a href="./3_4_elgamal.html"><code>ElGamal</code></a> encryption and we implemented <a href="./4_2_encrypted_balance.html">pallet-encrypted-balance</a>. <strong>This pallet can't be used only by this self, because this doesn't check the validity of additive homomorphic arithmetic</strong>.</p>
+<h3 id="confidential_transfer"><a class="header" href="#confidential_transfer"><a href="./6_2_confidential_transfer.html">confidential_transfer</a></a></h3>
+<p>Users can transfer without being known actual amount by others with this pallet. <code>plonk</code> checks the <a href="./2_1_confidential_transfer.html"><code>confidential transfer constraints</code></a> and <a href="./4_2_encrypted_balance.html">pallet-encrypted-balance</a> performs the additive homomorphic state transition.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pallet-plonk-1"><a class="header" href="#pallet-plonk-1">pallet-plonk</a></h1>
+<p>In this tutorial, we are going to import plonk-pallet to substrate runtime and test its functionalities.</p>
+<p>The steps are following.</p>
+<ol>
+<li>Define the plonk-pallet as depencencies</li>
+<li>Couple the plonk-pallet to your own pallet</li>
+<li>Define the plonk-pallet functions on your pallet</li>
+<li>Import the coupling pallet to TestRuntime and define your Circuit</li>
+<li>Test whether the functions work correctly</li>
+</ol>
+<h2 id="1-define-the-plonk-pallet-as-depencencies"><a class="header" href="#1-define-the-plonk-pallet-as-depencencies">1. Define the plonk-pallet as depencencies</a></h2>
+<p>First of all, you need to define the <code>plonk-pallet</code> when you start to implement your pallet. Please define as following.</p>
+<ul>
+<li><your-pallet>/Cargo.toml</li>
+</ul>
+<pre><code class="language-toml">[dependencies]
+pallet-plonk = { git = &quot;https://github.com/zero-network/zero&quot;, branch = &quot;master&quot;, default-features = false }
+zero-jubjub = { git = &quot;https://github.com/zero-network/zero&quot;, branch = &quot;master&quot;, default-features = false }
+zero-plonk = { git = &quot;https://github.com/zero-network/zero&quot;, branch = &quot;master&quot;, default-features = false }
+rand_core = {version=&quot;0.6&quot;, default-features = false }
+</code></pre>
+<p>The <code>plonk-pallet</code> depends on <code>rand_core</code> so please import it.</p>
+<h2 id="2-couple-the-plonk-pallet-to-your-own-pallet"><a class="header" href="#2-couple-the-plonk-pallet-to-your-own-pallet">2. Couple the plonk-pallet to your own pallet</a></h2>
+<p>The next, the <code>plonk-pallet</code> need to be coupled with your pallet. Please couple the pallet <code>Config</code> as following.</p>
+<ul>
+<li><your-pallet>/src/main.rs</li>
+</ul>
+<pre><code class="language-rs">#[frame_support::pallet]
+pub mod pallet {
+    use frame_support::pallet_prelude::*;
+    use frame_system::pallet_prelude::*;
+    pub use plonk_pallet::{FullcodecRng, Proof, PublicInputValue, Transcript, VerifierData};
+
+    /// Coupling configuration trait with plonk_pallet.
+    #[pallet::config]
+    pub trait Config: frame_system::Config + plonk_pallet::Config {
+        /// The overarching event type.
+        type Event: From&lt;Event&lt;Self&gt;&gt; + IsType&lt;&lt;Self as frame_system::Config&gt;::Event&gt;;
+    }
+</code></pre>
+<p>With this step, you can use the <code>plonk-pallet</code> in your pallet through <code>Module</code>.</p>
+<h2 id="3-define-the-plonk-pallet-functions-on-your-pallet"><a class="header" href="#3-define-the-plonk-pallet-functions-on-your-pallet">3. Define the plonk-pallet functions on your pallet</a></h2>
+<p>The next, let's define the <code>plonk-pallet</code> function on your pallet. We are going to define the <code>trusted_setup</code> function which generates the public parameters refered as to <code>srs</code> and the <code>verify</code> function which verified the proof. In this tutorial, we use <a href="https://github.com/JoshOrndorff/recipes/blob/master/pallets/sum-storage/src/main.rs">sum-storage</a> pallet as example and add the <code>verify</code> function before set <code>Thing1</code> storage value on <code>set_thing_1</code>. If the <code>verify</code> is success, the <code>set_thing_1</code> can set <code>Thing1</code> value.</p>
+<ul>
+<li><your-pallet>/src/main.rs</li>
+</ul>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>    // The module's dispatchable functions.
+    #[pallet::call]
+    impl&lt;T: Config&gt; Pallet&lt;T&gt; {
+        // Coupled trusted setup
+        #[pallet::weight(10_000)]
+        pub fn trusted_setup(
+            origin: OriginFor&lt;T&gt;,
+            val: u32,
+            rng: FullcodecRng,
+        ) -&gt; DispatchResultWithPostInfo {
+            pallet_plonk::Pallet::&lt;T&gt;::trusted_setup(origin, val, rng)?;
+            Ok(().into())
+        }
+
+        /// Sets the first simple storage value
+        #[pallet::weight(10_000)]
+        pub fn set_thing_1(
+            origin: OriginFor&lt;T&gt;,
+            val: u32,
+            proof: Proof,
+            public_inputs: Vec&lt;Fr&gt;,
+        ) -&gt; DispatchResultWithPostInfo {
+            // Define the proof verification
+            pallet_plonk::Pallet::&lt;T&gt;::verify(origin, proof, public_inputs)?;
+
+            Thing1::&lt;T&gt;::put(val);
+
+            Self::deposit_event(Event::ValueSet(1, val));
+            Ok(().into())
+        }
+<span class="boring">}</span></code></pre></pre>
+<p>With this step, we can check whether the proof is valid before setting the <code>Thing1</code> value and only if the proof is valid, the value is set.</p>
+<h2 id="4-import-the-coupling-pallet-to-testruntime-and-define-your-circuit"><a class="header" href="#4-import-the-coupling-pallet-to-testruntime-and-define-your-circuit">4. Import the coupling pallet to TestRuntime and define your Circuit</a></h2>
+<p>We already imported the <code>plonk-pallet</code> functions so we are going to import it to <code>TestRumtime</code> and define your customized <code>Circuit</code>.</p>
+<p>In order to use <code>plonk-pallet</code> in <code>TestRuntime</code>, we need to import <code>plonk-pallet</code> crate and define the pallet config to <code>construct_runtime</code> as following.</p>
+<ul>
+<li>runtime/src/main.rs</li>
+</ul>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use crate::{self as sum_storage, Config};
+
+use frame_support::dispatch::{DispatchError, DispatchErrorWithPostInfo, PostDispatchInfo};
+use frame_support::{assert_ok, construct_runtime, parameter_types};
+
+// Import `plonk_pallet` and dependency
+pub use plonk_pallet::*;
+use rand_core::SeedableRng;
+
+--- snip ---
+
+construct_runtime!(
+    pub enum TestRuntime where
+        Block = Block,
+        NodeBlock = Block,
+        UncheckedExtrinsic = UncheckedExtrinsic,
+    {
+        System: frame_system::{Module, Call, Config, Storage, Event&lt;T&gt;},
+        // Define the `plonk_pallet` in `contruct_runtime`
+        Plonk: plonk_pallet::{Module, Call, Storage, Event&lt;T&gt;},
+        {YourPallet}: {your_pallet}::{Module, Call, Storage, Event&lt;T&gt;},
+    }
+);
+<span class="boring">}</span></code></pre></pre>
+<p>As the final step of runtime configuration, we define the zk-SNARKs circuit and extend the <code>TestRuntime</code> config with it. You can replace <code>TestCircuit</code> with your own circuit.</p>
+<ul>
+<li>runtime/src/main.rs</li>
+</ul>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Implement a circuit that checks:
+// 1) a + b = c where C is a PI
+// 2) a &lt;= 2^6
+// 3) b &lt;= 2^5
+// 4) a * b = d where D is a PI
+// 5) JubJub::GENERATOR * e(JubJubScalar) = f where F is a Public Input
+
+#[derive(Debug, Default)]
+pub struct TestCircuit {
+    pub a: BlsScalar,
+    pub b: BlsScalar,
+    pub c: BlsScalar,
+    pub d: BlsScalar,
+    pub e: JubJubScalar,
+    pub f: JubJubAffine,
+}
+
+impl Circuit for TestCircuit {
+    fn circuit&lt;C&gt;(&amp;self, composer: &amp;mut C) -&gt; Result&lt;(), Error&gt;
+    where
+        C: Composer,
+    {
+        let a = composer.append_witness(self.a);
+        let b = composer.append_witness(self.b);
+
+        // Make first constraint a + b = c
+        let constraint = Constraint::new().left(1).right(1).public(-self.c).a(a).b(b);
+
+        composer.append_gate(constraint);
+
+        // Check that a and b are in range
+        composer.component_range(a, 1 &lt;&lt; 6);
+        composer.component_range(b, 1 &lt;&lt; 5);
+
+        // Make second constraint a * b = d
+        let constraint = Constraint::new()
+            .mult(1)
+            .output(1)
+            .public(-self.d)
+            .a(a)
+            .b(b);
+
+        composer.append_gate(constraint);
+
+        let e = composer.append_witness(self.e);
+        let scalar_mul_result = composer.component_mul_generator(e, GENERATOR_EXTENDED)?;
+        composer.assert_equal_public_point(scalar_mul_result, self.f);
+        Ok(())
+    }
+}
+
+impl plonk_pallet::Config for TestRuntime {
+    type CustomCircuit = TestCircuit;
+    type Event = Event;
+}
+<span class="boring">}</span></code></pre></pre>
+<p>With this step, we finish to setup the plonk runtime environment.</p>
+<h2 id="5-test-whether-the-functions-work-correctly"><a class="header" href="#5-test-whether-the-functions-work-correctly">5. Test whether the functions work correctly</a></h2>
+<p>The plonk functions is available on your pallet so we are going to test them as following tests.</p>
+<ul>
+<li><your-pallet>/src/main.rs</li>
+</ul>
+<pre><pre class="playground"><code class="language-rust">fn main() {
+    let mut rng = get_rng();
+    let label = b&quot;verify&quot;;
+    let test_circuit = TestCircuit {
+        a: BlsScalar::from(20u64),
+        b: BlsScalar::from(5u64),
+        c: BlsScalar::from(25u64),
+        d: BlsScalar::from(100u64),
+        e: JubJubScalar::from(2u64),
+        f: JubJubAffine::from(GENERATOR_EXTENDED * JubJubScalar::from(2u64)),
+    };
+
+    new_test_ext().execute_with(|| {
+        assert_eq!(SumStorage::get_sum(), 0);
+        assert_ok!(Plonk::trusted_setup(Origin::signed(1), 12, rng.clone()));
+
+        let pp = Plonk::public_parameter().unwrap();
+        let (prover, _) =
+            Compiler::compile::&lt;TestCircuit&gt;(&amp;pp, label).expect(&quot;failed to compile circuit&quot;);
+
+        let (proof, public_inputs) = prover
+            .prove(&amp;mut rng, &amp;test_circuit)
+            .expect(&quot;failed to prove&quot;);
+
+        assert_ok!(SumStorage::set_thing_1(
+            Origin::signed(1),
+            42,
+            proof,
+            public_inputs
+        ));
+        assert_eq!(SumStorage::get_sum(), 42);
+    })
+}
+</code></pre></pre>
+<p>With above tests, we can confirm that your pallet is coupling with <code>plonk-pallet</code> and these functions work correctly. You can check the <code>plonk-pallet</code> example <a href="https://github.com/zero-network/zero/pallet_plonk.rs">here</a>. Happy hacking!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="confidential_transfer-1"><a class="header" href="#confidential_transfer-1">confidential_transfer</a></h1>
+<p>In this tutorial, we are going to generate test data and test its functionalities. We assume that you already unserstand what <a href="./2_1_confidential_transfer.html">Confidential Transfer</a> is.</p>
+<p>The steps are following.</p>
+<ol>
+<li>Define the <code>confidential_transfer</code> as depencencies</li>
+<li>Generate test data used for <code>confidential_transfer</code></li>
+<li>Test funcitonalities</li>
+</ol>
+<h2 id="1-define-the-confidential_transfer-as-depencencies"><a class="header" href="#1-define-the-confidential_transfer-as-depencencies">1. Define the confidential_transfer as depencencies</a></h2>
+<p>First of all, you need to define the <code>confidential_transfer</code>.</p>
+<ul>
+<li><your-pallet>/Cargo.toml</li>
+</ul>
+<pre><code class="language-toml">confidential_transfer = { git = &quot;https://github.com/zero-network/zero&quot;, branch = &quot;master&quot;, default-features = false }
+pallet_encrypted_balance = { git = &quot;https://github.com/zero-network/zero&quot;, branch = &quot;master&quot;, default-features = false }
+pallet_plonk = { git = &quot;https://github.com/zero-network/zero&quot;, branch = &quot;master&quot;, default-features = false }
+zero_elgamal = { git = &quot;https://github.com/zero-network/zero&quot;, branch = &quot;master&quot;, default-features = false }
+zero_bls12_381 = { git = &quot;https://github.com/zero-network/zero&quot;, branch = &quot;master&quot;, default-features = false }
+rand_core = {version=&quot;0.6&quot;, default-features = false }
+</code></pre>
+<p>The <code>confidential_transfer</code> depends on <code>rand_core</code> so please import it.</p>
+<h2 id="2-generate-test-data-used-for-confidential_transfer"><a class="header" href="#2-generate-test-data-used-for-confidential_transfer">2. Generate test data used for <code>confidential_transfer</code></a></h2>
+<p>Secondly, we would like like to setup the Alice and Bob account on testing runtime. Define the <code>new_test_ext</code> for genesis config and reflect the testing data for runtime storage.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn new_test_ext(
+    alice_address: u64,
+    alice_private_key: Fp,
+    alice_balance: u32,
+    alice_radomness: Fp,
+    bob_private_key: Fp,
+    bob_address: u64,
+    bob_balance: u32,
+    bob_radomness: Fp,
+) -&gt; sp_io::TestExternalities {
+    let alice_balance = EncryptedNumber::encrypt(alice_private_key, alice_balance, alice_radomness);
+    let bob_balance = EncryptedNumber::encrypt(bob_private_key, bob_balance, bob_radomness);
+
+    let mut t = frame_system::GenesisConfig::default()
+        .build_storage::&lt;TestRuntime&gt;()
+        .unwrap();
+    pallet_encrypted_balance::GenesisConfig::&lt;TestRuntime&gt; {
+        balances: vec![(alice_address, alice_balance), (bob_address, bob_balance)],
+    }
+    .assimilate_storage(&amp;mut t)
+    .unwrap();
+
+    let mut ext = sp_io::TestExternalities::new(t);
+    ext.execute_with(|| System::set_block_number(1));
+    ext
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Thirdly, we define <code>generate_default_test_data</code> to generate parameters used for <code>confidential_transfer</code>.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn generate_default_test_data() -&gt; (u64, Fp, u16, Fp, Fp, u64, u16, Fp, u16, u16, u16) {
+    let mut rng = rand::thread_rng();
+
+    let alice_address = rng.gen::&lt;u64&gt;();
+    let alice_private_key = Fp::random(OsRng);
+    let alice_balance = rng.gen::&lt;u16&gt;();
+    let alice_radomness = Fp::random(OsRng);
+    let bob_private_key = Fp::random(OsRng);
+    let bob_address = rng.gen::&lt;u64&gt;();
+    let bob_balance = rng.gen::&lt;u16&gt;();
+    let bob_radomness = Fp::random(OsRng);
+    let transfer_amount = rng.gen_range(0..alice_balance);
+    let alice_after_balance = alice_balance - transfer_amount;
+    let bob_after_balance = bob_balance + transfer_amount;
+
+    (
+        alice_address,
+        alice_private_key,
+        alice_balance,
+        alice_radomness,
+        bob_private_key,
+        bob_address,
+        bob_balance,
+        bob_radomness,
+        transfer_amount,
+        alice_after_balance,
+        bob_after_balance,
+    )
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="3-test-funcitonalities"><a class="header" href="#3-test-funcitonalities">3. Test funcitonalities</a></h2>
+<p>Finally, we combine previous sections together and test functionalities.</p>
+<pre><pre class="playground"><code class="language-rust">fn main() {
+    let k = 14;
+    let label = b&quot;verify&quot;;
+    let mut rng = get_rng();
+    let (
+        alice_address,
+        alice_private_key,
+        alice_balance,
+        alice_radomness,
+        bob_private_key,
+        bob_address,
+        bob_balance,
+        bob_radomness,
+        transfer_amount,
+        alice_after_balance,
+        bob_after_balance,
+        transfer_randomness,
+    ) = generate_default_test_data();
+    new_test_ext(
+        alice_address,
+        alice_private_key,
+        alice_balance,
+        alice_radomness,
+        bob_private_key,
+        bob_address,
+        bob_balance,
+        bob_radomness,
+    )
+    .execute_with(|| {
+        // default balance decryption check
+        let alice_encrypted_balance = ConfidentialTransfer::total_balance(&amp;alice_address);
+        let alice_raw_balance = alice_encrypted_balance.decrypt(alice_private_key);
+        let bob_encrypted_balance = ConfidentialTransfer::total_balance(&amp;bob_address);
+        let bob_raw_balance = bob_encrypted_balance.decrypt(bob_private_key);
+
+        assert_eq!(alice_raw_balance.unwrap() as u16, alice_balance);
+        assert_eq!(bob_raw_balance.unwrap() as u16, bob_balance);
+
+        // trusted setup check
+        let result =
+            ConfidentialTransfer::trusted_setup(Origin::signed(alice_address), k, rng.clone());
+        assert_ok!(result);
+
+        // proof generation
+        let pp = Plonk::public_parameter().unwrap();
+        let alice_public_key = GENERATOR_EXTENDED * alice_private_key;
+        let bob_public_key = GENERATOR_EXTENDED * bob_private_key;
+        let transfer_amount_scalar = Fp::from(transfer_amount as u64);
+        let alice_after_balance_scalar = Fp::from(alice_after_balance as u64);
+
+        let alice_balance =
+            EncryptedNumber::encrypt(alice_private_key, alice_balance.into(), alice_radomness);
+        let alice_transfer_amount = EncryptedNumber::encrypt(
+            alice_private_key,
+            transfer_amount.into(),
+            transfer_randomness,
+        );
+        let bob_encrypted_transfer_amount =
+            (GENERATOR_EXTENDED * transfer_amount_scalar) + (bob_public_key * transfer_randomness);
+        let alice_public_key = JubJubAffine::from(alice_public_key);
+        let bob_public_key = JubJubAffine::from(bob_public_key);
+        let bob_encrypted_transfer_amount = JubJubAffine::from(bob_encrypted_transfer_amount);
+        let bob_encrypted_transfer_amount_other = (GENERATOR_EXTENDED * transfer_randomness).into();
+
+        let confidential_transfer_circuit = ConfidentialTransferCircuit::new(
+            alice_public_key,
+            bob_public_key,
+            alice_balance,
+            alice_transfer_amount,
+            bob_encrypted_transfer_amount,
+            alice_private_key,
+            transfer_amount_scalar,
+            alice_after_balance_scalar,
+            transfer_randomness,
+        );
+        let prover = Compiler::compile::&lt;ConfidentialTransferCircuit&gt;(&amp;pp, label)
+            .expect(&quot;failed to compile circuit&quot;);
+        let proof = prover
+            .0
+            .prove(&amp;mut rng, &amp;confidential_transfer_circuit)
+            .expect(&quot;failed to prove&quot;);
+
+        // confidential transfer check
+        let transaction_params = ConfidentialTransferTransaction::new(
+            alice_public_key,
+            bob_public_key,
+            alice_transfer_amount,
+            bob_encrypted_transfer_amount,
+            bob_encrypted_transfer_amount_other,
+        );
+        let result = ConfidentialTransfer::confidential_transfer(
+            Origin::signed(alice_address),
+            bob_address,
+            proof.0,
+            transaction_params,
+        );
+        assert_ok!(result);
+
+        // balance transition check
+        let alice_balance = ConfidentialTransfer::total_balance(&amp;alice_address);
+        let alice_raw_balance = alice_balance.decrypt(alice_private_key);
+        let bob_balance = ConfidentialTransfer::total_balance(&amp;bob_address);
+        let bob_raw_balance = bob_balance.decrypt(bob_private_key);
+
+        assert_eq!(alice_raw_balance.unwrap() as u16, alice_after_balance);
+        assert_eq!(bob_raw_balance.unwrap() as u16, bob_after_balance);
+    })
+}</code></pre></pre>
+<p>With above tests, we can confirm that confidential transfer works correctly. You can check the <code>confidential_transfer</code> example <a href="https://github.com/zero-network/zero/confidential_transfer.rs">here</a>. Happy hacking!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="frequent-errors"><a class="header" href="#frequent-errors">Frequent Errors</a></h1>
+<p>The main errors happen during development of runtime pallet are followings.</p>
+<ul>
+<li><code>error: duplicate lang item in crate</code></li>
+<li><code>error: the wasm32-unknown-unknown target is not supported by default, you may need to enable the &quot;js&quot; feature</code></li>
+<li><code>error[E0603]: module &quot;group&quot; is private</code></li>
+<li><code>error[E0512]: cannot transmute between types of different sizes, or dependently-sized types</code></li>
+<li><code>error[E0432]: unresolved import sp_core::to_substrate_wasm_fn_return_value</code></li>
+</ul>
+<p>Explaining causes and remedies.</p>
+<h2 id="error-duplicate-lang-item-in-crate"><a class="header" href="#error-duplicate-lang-item-in-crate"><code>error: duplicate lang item in crate</code></a></h2>
+<p>This error happens when we use different version crate but same crate on one crate.
+The error says the dependencies duplication so we can query the crate name as following.</p>
+<pre><code>$ cargo tree -e features -i {crate}
+</code></pre>
+<p>If we find the duplication of crate that we use same crate different version multiple times, we should align the version.</p>
+<h2 id="error-the-wasm32-unknown-unknown-target-is-not-supported-by-default-you-may-need-to-enable-the-js-feature"><a class="header" href="#error-the-wasm32-unknown-unknown-target-is-not-supported-by-default-you-may-need-to-enable-the-js-feature"><code>error: the wasm32-unknown-unknown target is not supported by default, you may need to enable the &quot;js&quot; feature</code></a></h2>
+<p>This error happens <code>getrandom</code> crate dependency on <code>std</code>.<br />
+We need to disable <code>std</code> feature of <code>getrandom</code>.</p>
+<p>Firstly, checking which libraries depend on <code>getrandom</code> depending on <code>std</code> to execute following command.</p>
+<pre><code>$ cargo tree -e features
+</code></pre>
+<p><code>cargo tree</code> command displays the dependencies tree.<br />
+The libraries with <code>(*)</code> doesn't depend on <code>std</code> but if there is <code>getrandom</code> not marked as <code>(*)</code>, it would cause error.</p>
+<p>Secondly, independing from <code>std</code> library by followings.</p>
+<ul>
+<li>Add <code>default-features = false</code> to crate in <code>Cargo.toml</code> which is not marked as <code>(*)</code></li>
+<li>Add <code>#![cfg_attr(not(feature = &quot;std&quot;), no_std)]</code> if imported crate is made by self.</li>
+</ul>
+<p>And run <code>cargo tree</code> and check whether <code>getrandom</code> is marked as <code>(*)</code></p>
+<p>You can also use <code>cargo nono check</code> to check dependency on <code>std</code>.</p>
+<pre><code>$ cargo nono check
+</code></pre>
+<h2 id="errore0603-module-group-is-private"><a class="header" href="#errore0603-module-group-is-private"><code>error[E0603]: module &quot;group&quot; is private</code></a></h2>
+<p>This error happens <code>syn</code> crate because its interface was change.
+We need to indicate exact version of <code>syn</code> as using expected behavior.</p>
+<pre><code>$ cargo update -p syn --precise 1.0.96
+</code></pre>
+<h2 id="errore0512-cannot-transmute-between-types-of-different-sizes-or-dependently-sized-types"><a class="header" href="#errore0512-cannot-transmute-between-types-of-different-sizes-or-dependently-sized-types"><code>error[E0512]: cannot transmute between types of different sizes, or dependently-sized types</code></a></h2>
+<p>This error happens on <a href="https://github.com/paritytech/substrate/blob/master/primitives/runtime-interface/src/impls.rs#L44"><code>runtime-interface</code></a> and both macro available when <code>#[cfg(all(not(feature = &quot;std&quot;), not(feature = &quot;disable_target_static_assertions&quot;)))]</code> so we need to specify <code>std</code> as following.</p>
+<pre><code class="language-toml">[features]
+default = [&quot;std&quot;]
+std = [
+    &quot;crate/std&quot;
+]
+</code></pre>
+<h2 id="errore0432-unresolved-import-sp_coreto_substrate_wasm_fn_return_value"><a class="header" href="#errore0432-unresolved-import-sp_coreto_substrate_wasm_fn_return_value"><code>error[E0432]: unresolved import sp_core::to_substrate_wasm_fn_return_value</code></a></h2>
+<p>This error happens the crate which has <code>sp_api</code> dependency. And to clarify every crate which imported as <code>default-features = false</code> is described as <code>crate/std</code> in <code>[features]</code>.</p>
+<pre><code class="language-toml">[features]
+default = [&quot;std&quot;]
+std = [
+    &quot;crate/std&quot;
+]
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js" charset="utf-8"></script>
+        <script src="mark.min.js" charset="utf-8"></script>
+        <script src="searcher.js" charset="utf-8"></script>
+
+        <script src="clipboard.min.js" charset="utf-8"></script>
+        <script src="highlight.js" charset="utf-8"></script>
+        <script src="book.js" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            MathJax.Hub.Register.StartupHook('End', function() {
+                window.setTimeout(window.print, 100);
+            });
+        });
+        </script>
+
+    </body>
+</html>

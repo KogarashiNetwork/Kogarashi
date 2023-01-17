@@ -1,13 +1,16 @@
-# Crypto
-[![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE) [![crates.io badge](https://img.shields.io/crates/v/zero-crypto.svg)](https://crates.io/crates/zero-crypto)
-
-This is the primitive of `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec) cryptography libraries.
+# Crypto [![crates.io badge](https://img.shields.io/crates/v/zero-crypto.svg)](https://crates.io/crates/zero-crypto)
+This crate provides basic cryptographic implementation as in `Field`, `Curve` and `Pairing`, `Fft`, `Kzg`, and also supports fully `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec).
 
 ## Usage
 ### Field
 The following `Fr` support four basic operation.
 
-```rust
+```ignore
+use zero_crypto::common::*;
+use zero_crypto::dress::field::*;
+use zero_crypto::arithmetic::bits_256::*;
+use serde::{Deserialize, Serialize};
+
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fr(pub [u64; 4]);
 
@@ -60,6 +63,20 @@ pub const ROOT_OF_UNITY: Fr = Fr([
     0x5bf3adda19e9b27b,
 ]);
 
+impl Fr {
+    pub const fn to_mont_form(val: [u64; 4]) -> Self {
+        Self(to_mont_form(val, R2, MODULUS, INV))
+    }
+
+    pub(crate) const fn montgomery_reduce(self) -> [u64; 4] {
+        mont(
+            [self.0[0], self.0[1], self.0[2], self.0[3], 0, 0, 0, 0],
+            MODULUS,
+            INV,
+        )
+    }
+}
+
 fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
 
 #[cfg(test)]
@@ -75,7 +92,7 @@ mod tests {
 ### Curve
 The following `G1Affine` and `G1Projective` supports point arithmetic.
 
-```rust
+```ignore
 use crate::fq::Fq;
 use crate::fr::Fr;
 use zero_crypto::arithmetic::bits_384::*;

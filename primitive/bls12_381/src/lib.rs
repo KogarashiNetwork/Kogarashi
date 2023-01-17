@@ -1,4 +1,4 @@
-// Copyright (C) 2020-2023 Invers (JP) INC.
+// Copyright (C) 2023-2024 Invers (JP) INC.
 // SPDX-License-Identifier: Apache-2.0
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,27 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! # Bls12 381 Curve Implementation
-//!
-//! - [`Fq`]
-//! - [`Fr`]
-//! - [`G1Projective`]
-//! - [`G2Projective`]
-//!
-//! ## Overview
-//!
-//! This curve provides the functionalities as following.
-//!
-//! - Point addition
-//! - Point doubling
-//! - Point scalar
-//! - G1 and G2 group operation
-//!
-//! ### Reference
-//!
-//! We implement coordinate system to refer the following.
-//! [Projective coordinates for short Weierstrass curves](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html)
-
+#![doc = include_str!("../README.md")]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(dead_code)]
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2020-2023 Invers (JP) INC.
+// Copyright (C) 2023-2024 Invers (JP) INC.
 // SPDX-License-Identifier: Apache-2.0
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,30 +13,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! # Lifted-ElGamal Pallet
-//!
-//! ## Overview
-//!
-//! This is the additive homomorphic encryption which supports one-time multiplication.
-//! This library is implemented based on [original paper](https://github.com/herumi/mcl/blob/master/misc/she/she.pdf).
-
+#![doc = include_str!("../README.md")]
 #![cfg_attr(not(feature = "std"), no_std)]
+#![deny(missing_docs)]
 
 use core::ops::{Add, Sub};
 use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
-pub use zero_jubjub::Fp;
-use zero_jubjub::{JubJubAffine, JubJubExtended, GENERATOR_EXTENDED};
+use zero_jubjub::{Fp, JubJubAffine, JubJubExtended, GENERATOR_EXTENDED};
 
-#[derive(Debug, Default, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
+/// Number encrypted by ElGamal encryption
+#[derive(Debug, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
 pub struct EncryptedNumber {
     s: JubJubAffine,
     t: JubJubAffine,
 }
 
-#[allow(unused_variables)]
+impl Default for EncryptedNumber {
+    fn default() -> Self {
+        Self {
+            s: JubJubAffine::identity(),
+            t: JubJubAffine::identity(),
+        }
+    }
+}
+
 impl EncryptedNumber {
+    /// Init encrypted number
+    pub fn new(s: JubJubAffine, t: JubJubAffine) -> Self {
+        Self { s, t }
+    }
+
+    /// Enctypt number by private key
     pub fn encrypt(private_key: Fp, value: u32, random: Fp) -> Self {
         let g = GENERATOR_EXTENDED;
         let public_key = g * private_key;
@@ -47,6 +56,7 @@ impl EncryptedNumber {
         }
     }
 
+    /// Decrypt encrypted number by brute force
     pub fn decrypt(&self, private_key: Fp) -> Option<u32> {
         let g = GENERATOR_EXTENDED;
         let decrypted_message =
@@ -60,6 +70,11 @@ impl EncryptedNumber {
             acc += g;
         }
         None
+    }
+
+    /// Get left and right affine point
+    pub fn get_coordinate(self) -> (JubJubAffine, JubJubAffine) {
+        (self.s, self.t)
     }
 }
 
@@ -106,13 +121,32 @@ impl CheckedSub for EncryptedNumber {
     }
 }
 
+/// interface for circuit public inputs
+pub trait ConfidentialTransferPublicInputs {
+    /// init transfer amount public
+    fn init(s: JubJubAffine, t: JubJubAffine) -> Self;
+
+    /// get s and t cypher text
+    fn get(self) -> (JubJubAffine, JubJubAffine);
+}
+
+impl ConfidentialTransferPublicInputs for EncryptedNumber {
+    fn init(s: JubJubAffine, t: JubJubAffine) -> Self {
+        Self::new(s, t)
+    }
+
+    fn get(self) -> (JubJubAffine, JubJubAffine) {
+        self.get_coordinate()
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::*;
     use proptest::prelude::*;
     use rand::SeedableRng;
     use rand_xorshift::XorShiftRng;
     use zero_crypto::behave::*;
+    use zero_jubjub::Fp;
 
     use crate::EncryptedNumber;
 

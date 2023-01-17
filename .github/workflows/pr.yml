@@ -6,7 +6,7 @@ on:
 jobs:
   test:
     if: github.event.pull_request.draft == false
-    name: Debug Environment Unit Test
+    name: Unit Test
     runs-on: ubuntu-latest
 
     steps:
@@ -21,11 +21,30 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all --all-features
+          args: --release --all --all-features
 
   format:
     if: github.event.pull_request.draft == false
     name: Code Format Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Update submodules
+        id: update
+        run: git submodule update --remote --recursive
+      - uses: actions-rs/toolchain@v1
+      - run: rustup component add rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+  bench:
+    if: github.event.label.name == 'performance'
+    name: Benchmark
     runs-on: ubuntu-latest
 
     steps:

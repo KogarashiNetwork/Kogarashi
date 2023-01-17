@@ -16,7 +16,7 @@ substrate-wasm-builder = '4.0.0'
 [dependencies]
 codec = { default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0' }
 hex-literal = { optional = true, version = '0.3.1' }
-serde = { version = "1.0.125", optional = true, features = ["derive"] }
+serde = { version = "1.0.102", optional = true, features = ["derive"] }
 
 # Substrate dependencies
 frame-benchmarking = { default-features = false, optional = true, version = '3.0.0' }

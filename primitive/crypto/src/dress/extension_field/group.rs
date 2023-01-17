@@ -114,10 +114,6 @@ macro_rules! ext_field_group_operation {
                 limbs[0] = $sub_field::one();
                 Self(limbs)
             }
-
-            pub const fn dummy() -> Self {
-                unimplemented!()
-            }
         }
     };
 }

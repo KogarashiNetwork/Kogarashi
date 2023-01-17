@@ -1,0 +1,1 @@
+{{#include ../pallets/README.md}}

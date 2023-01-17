@@ -1,15 +1,20 @@
 [package]
+authors = [
+    'ashWhiteHat<phantomofrotten@gmail.com>',
+    'KiriosK<KiriosK@yandex.ru>'
+]
 name = "zero-network"
-description = 'Zero network blockchain'
+description = 'Zero network privacy-preserving blockchain'
 version = "0.1.0"
-authors = ['AshWhiteHat<phantomofrotten@gmail.com>']
 edition = "2021"
 license = "Apache-2.0"
+homepage = 'https://github.com/zero-network/zero/'
+repository = 'https://github.com/zero-network/zero/'
+readme = 'README.md'
 
 [dependencies]
 # primitive
 zero-bls12-381 = { default-features = false, path = "./primitive/bls12_381" }
-zero-circuits = { default-features = false, path = "./primitive/circuits" }
 zero-crypto = { default-features = false, path = "./primitive/crypto" }
 zero-elgamal = { default-features = false, path = "./primitive/elgamal" }
 zero-jubjub = { default-features = false, path = "./primitive/jubjub" }
@@ -22,16 +27,21 @@ confidential_transfer = { default-features = false, path = "./pallets/confidenti
 pallet-plonk = { default-features = false, path = "./pallets/plonk" }
 pallet-encrypted-balance = { default-features = false, path = "./pallets/encrypted_balance" }
 
-frame-support = { version = "3.0.0" }
-
 [dev-dependencies]
 criterion = "0.4.0"
 rand = { version = "0.8", default-features = false }
+rand_core = { version="0.6", default-features = false }
+sp-io = { default-features = false, version = '3.0.0' }
+sp-core = { default-features = false, version = '3.0.0' }
+sp-runtime = { default-features = false, version = '3.0.0' }
+serde = { version = "1.0.102", default-features = false, features = ["derive"] }
+codec = { version = '2.0.0', default-features = false, features = ['derive'], package = 'parity-scale-codec' }
+frame-system = { default-features = false, version = '3.0.0' }
+frame-support = { default-features = false, version = '3.0.0' }
 
 [workspace]
 members = [
     "primitive/bls12_381",
-    "primitive/circuits",
     "primitive/crypto",
     "primitive/elgamal",
     "primitive/jubjub",
@@ -41,6 +51,29 @@ members = [
     "pallets/confidential_transfer",
     "pallets/encrypted_balance",
     "pallets/plonk"
+]
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+overflow-checks = false
+debug = true
+
+[profile.bench]
+opt-level = 3
+debug = false
+debug-assertions = false
+overflow-checks = false
+lto = true
+incremental = false
+codegen-units = 1
+
+[features]
+default = ["std"]
+std = [
+    'confidential_transfer/std',
+    'pallet-plonk/std',
+    'pallet-encrypted-balance/std',
 ]
 
 [[bench]]
@@ -70,18 +103,3 @@ harness = false
 [[bench]]
 name = "msm"
 harness = false
-
-[profile.release]
-panic = "abort"
-codegen-units = 1
-overflow-checks = false
-debug = true
-
-[profile.bench]
-opt-level = 3
-debug = false
-debug-assertions = false
-overflow-checks = false
-lto = true
-incremental = false
-codegen-units = 1
