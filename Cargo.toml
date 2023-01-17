@@ -14,18 +14,18 @@ readme = 'README.md'
 
 [dependencies]
 # primitive
-zero-bls12-381 = { default-features = false, path = "./primitive/bls12_381" }
-zero-crypto = { default-features = false, path = "./primitive/crypto" }
-zero-elgamal = { default-features = false, path = "./primitive/elgamal" }
-zero-jubjub = { default-features = false, path = "./primitive/jubjub" }
-zero-kzg = { default-features = false, path = "./primitive/kzg" }
-zero-pairing = { default-features = false, path = "./primitive/pairing" }
-zero-plonk = { default-features = false, path = "./primitive/plonk" }
+zero-bls12-381 = { path = "./primitive/bls12_381", default-features = false }
+zero-crypto = { path = "./primitive/crypto", default-features = false }
+zero-elgamal = { path = "./primitive/elgamal", default-features = false }
+zero-jubjub = { path = "./primitive/jubjub", default-features = false }
+zero-kzg = { path = "./primitive/kzg", default-features = false }
+zero-pairing = { path = "./primitive/pairing", default-features = false }
+zero-plonk = { path = "./primitive/plonk", default-features = false }
 
 # pallet
-confidential_transfer = { default-features = false, path = "./pallets/confidential_transfer" }
-pallet-plonk = { default-features = false, path = "./pallets/plonk" }
-pallet-encrypted-balance = { default-features = false, path = "./pallets/encrypted_balance" }
+pallet-plonk = { path = "./pallets/plonk", default-features = false }
+pallet-encrypted-balance = { path = "./pallets/encrypted_balance", default-features = false }
+confidential_transfer = { path = "./pallets/confidential_transfer", default-features = false }
 
 [dev-dependencies]
 criterion = "0.4.0"
@@ -77,7 +77,7 @@ std = [
 ]
 
 [[bench]]
-name = "circuit"
+name = "confidential_transfer"
 harness = false
 
 [[bench]]

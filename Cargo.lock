@@ -479,10 +479,10 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std",
- "zero-bls12-381 0.2.0",
- "zero-crypto 0.2.1",
+ "zero-bls12-381",
+ "zero-crypto",
  "zero-elgamal",
- "zero-jubjub 0.2.0",
+ "zero-jubjub",
  "zero-plonk",
 ]
 
@@ -1696,7 +1696,7 @@ dependencies = [
  "sp-runtime",
  "sp-std",
  "zero-elgamal",
- "zero-jubjub 0.2.0",
+ "zero-jubjub",
 ]
 
 [[package]]
@@ -1712,9 +1712,9 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "zero-bls12-381 0.2.0",
- "zero-crypto 0.2.1",
- "zero-jubjub 0.2.0",
+ "zero-bls12-381",
+ "zero-crypto",
+ "zero-jubjub",
  "zero-plonk",
 ]
 
@@ -3327,20 +3327,6 @@ checksum = "85e60b0d1b5f99db2556934e21937020776a5d31520bf169e851ac44e6420214"
 [[package]]
 name = "zero-bls12-381"
 version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f76d3f48015ab700041f48874ce6bdf15b85a3c53891972d18e2de137018df8"
-dependencies = [
- "dusk-bytes",
- "parity-scale-codec",
- "rand_core 0.6.4",
- "serde",
- "subtle 2.4.1",
- "zero-crypto 0.1.10",
-]
-
-[[package]]
-name = "zero-bls12-381"
-version = "0.2.0"
 dependencies = [
  "dusk-bytes",
  "parity-scale-codec",
@@ -3351,23 +3337,12 @@ dependencies = [
  "rand_xorshift",
  "serde",
  "subtle 2.4.1",
- "zero-crypto 0.2.1",
+ "zero-crypto",
 ]
 
 [[package]]
 name = "zero-crypto"
 version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "529e629eebf0b5ddbb2aeaa63cd9413c4074ed0ec0e0594da3d36d0b4d15bbc4"
-dependencies = [
- "parity-scale-codec",
- "rand_core 0.6.4",
- "sp-std",
-]
-
-[[package]]
-name = "zero-crypto"
-version = "0.2.1"
 dependencies = [
  "parity-scale-codec",
  "proptest",
@@ -3379,7 +3354,7 @@ dependencies = [
 
 [[package]]
 name = "zero-elgamal"
-version = "0.2.0"
+version = "0.1.10"
 dependencies = [
  "num-traits",
  "parity-scale-codec",
@@ -3387,29 +3362,13 @@ dependencies = [
  "rand 0.8.5",
  "rand_xorshift",
  "serde",
- "zero-crypto 0.2.1",
- "zero-jubjub 0.2.0",
+ "zero-crypto",
+ "zero-jubjub",
 ]
 
 [[package]]
 name = "zero-jubjub"
 version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aff54c78f273d6c243ef45e9446b6b5d9231841101e3763a2f8502dafca87c99"
-dependencies = [
- "dusk-bytes",
- "parity-scale-codec",
- "rand_core 0.6.4",
- "serde",
- "sp-std",
- "subtle 2.4.1",
- "zero-bls12-381 0.1.10",
- "zero-crypto 0.1.10",
-]
-
-[[package]]
-name = "zero-jubjub"
-version = "0.2.0"
 dependencies = [
  "dusk-bytes",
  "parity-scale-codec",
@@ -3421,13 +3380,13 @@ dependencies = [
  "serde",
  "sp-std",
  "subtle 2.4.1",
- "zero-bls12-381 0.2.0",
- "zero-crypto 0.2.1",
+ "zero-bls12-381",
+ "zero-crypto",
 ]
 
 [[package]]
 name = "zero-kzg"
-version = "0.2.0"
+version = "0.1.10"
 dependencies = [
  "parity-scale-codec",
  "proptest",
@@ -3435,8 +3394,8 @@ dependencies = [
  "rand_core 0.6.4",
  "rand_xorshift",
  "rayon",
- "zero-bls12-381 0.2.0",
- "zero-crypto 0.2.1",
+ "zero-bls12-381",
+ "zero-crypto",
 ]
 
 [[package]]
@@ -3456,33 +3415,23 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "zero-bls12-381 0.2.0",
- "zero-crypto 0.2.1",
+ "zero-bls12-381",
+ "zero-crypto",
  "zero-elgamal",
- "zero-jubjub 0.2.0",
+ "zero-jubjub",
  "zero-kzg",
- "zero-pairing 0.2.0",
+ "zero-pairing",
  "zero-plonk",
 ]
 
 [[package]]
 name = "zero-pairing"
 version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e75cf71f397dac6f1dfc56e6230d570ba3f3901ace68072d6668243efbf274d3"
-dependencies = [
- "zero-bls12-381 0.1.10",
- "zero-crypto 0.1.10",
-]
-
-[[package]]
-name = "zero-pairing"
-version = "0.2.0"
 dependencies = [
  "rand 0.8.5",
  "rand_xorshift",
- "zero-bls12-381 0.2.0",
- "zero-crypto 0.2.1",
+ "zero-bls12-381",
+ "zero-crypto",
 ]
 
 [[package]]
@@ -3506,10 +3455,10 @@ dependencies = [
  "rayon",
  "sp-std",
  "tempdir",
- "zero-bls12-381 0.1.10",
- "zero-crypto 0.1.10",
- "zero-jubjub 0.1.10",
- "zero-pairing 0.1.10",
+ "zero-bls12-381",
+ "zero-crypto",
+ "zero-jubjub",
+ "zero-pairing",
 ]
 
 [[package]]

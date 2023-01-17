@@ -5,7 +5,7 @@ authors = [
 ]
 name = "zero-bls12-381"
 description = 'lifted elgamal encryption implementation'
-version = "0.2.0"
+version = "0.1.10"
 edition = "2021"
 license = "Apache-2.0"
 homepage = 'https://github.com/zero-network/zero/'
@@ -16,7 +16,7 @@ readme = 'README.md'
 
 [dependencies]
 serde = { version = "1.0.102", default-features = false, features = ["derive"] }
-zero-crypto = { path = '../crypto' }
+zero-crypto = { path = "../crypto" }
 rand_core = { version="0.6", default-features = false }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 dusk-bytes = { version = "0.1" }
