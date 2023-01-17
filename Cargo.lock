@@ -63,6 +63,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anes"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4b46cbb362ab8752921c97e041f5e366ee6297bd428a31275b9fcf1e380f7299"
+
+[[package]]
 name = "ansi_term"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -377,14 +383,62 @@ dependencies = [
 ]
 
 [[package]]
+name = "ciborium"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0c137568cc60b904a7724001b35ce2630fd00d5d84805fbb608ab89509d788f"
+dependencies = [
+ "ciborium-io",
+ "ciborium-ll",
+ "serde",
+]
+
+[[package]]
+name = "ciborium-io"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "346de753af073cc87b52b2083a506b38ac176a44cfb05497b622e27be899b369"
+
+[[package]]
+name = "ciborium-ll"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "213030a2b5a4e0c0892b6652260cf6ccac84827b83a85a534e178e3906c4cf1b"
+dependencies = [
+ "ciborium-io",
+ "half",
+]
+
+[[package]]
 name = "clap"
 version = "2.34.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a0610544180c38b88101fecf2dd634b174a62eef6946f84dfc6a7127512b381c"
 dependencies = [
  "bitflags",
- "textwrap",
+ "textwrap 0.11.0",
  "unicode-width",
+]
+
+[[package]]
+name = "clap"
+version = "3.2.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71655c45cb9845d3270c9d6df84ebe72b4dad3c2ba3f7023ad47c144e4e473a5"
+dependencies = [
+ "bitflags",
+ "clap_lex",
+ "indexmap",
+ "textwrap 0.16.0",
+]
+
+[[package]]
+name = "clap_lex"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2850f2f5a82cbf437dd5af4d49848fbdfc27c157c3d010345776f952765261c5"
+dependencies = [
+ "os_str_bytes",
 ]
 
 [[package]]
@@ -425,10 +479,10 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std",
- "zero-bls12-381",
- "zero-crypto",
+ "zero-bls12-381 0.2.0",
+ "zero-crypto 0.2.1",
  "zero-elgamal",
- "zero-jubjub",
+ "zero-jubjub 0.2.0",
  "zero-plonk",
 ]
 
@@ -467,8 +521,8 @@ checksum = "b01d6de93b2b6c65e17c634a26653a29d107b3c98c607c765bf38d041531cd8f"
 dependencies = [
  "atty",
  "cast",
- "clap",
- "criterion-plot",
+ "clap 2.34.0",
+ "criterion-plot 0.4.5",
  "csv",
  "itertools 0.10.5",
  "lazy_static",
@@ -486,10 +540,46 @@ dependencies = [
 ]
 
 [[package]]
+name = "criterion"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e7c76e09c1aae2bc52b3d2f29e13c6572553b30c4aa1b8a49fd70de6412654cb"
+dependencies = [
+ "anes",
+ "atty",
+ "cast",
+ "ciborium",
+ "clap 3.2.23",
+ "criterion-plot 0.5.0",
+ "itertools 0.10.5",
+ "lazy_static",
+ "num-traits",
+ "oorandom",
+ "plotters",
+ "rayon",
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "tinytemplate",
+ "walkdir",
+]
+
+[[package]]
 name = "criterion-plot"
 version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2673cc8207403546f45f5fd319a974b1e6983ad1a3ee7e6041650013be041876"
+dependencies = [
+ "cast",
+ "itertools 0.10.5",
+]
+
+[[package]]
+name = "criterion-plot"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6b50826342786a51a89e2da3a28f1c32b06e387201bc2d19791f622c673706b1"
 dependencies = [
  "cast",
  "itertools 0.10.5",
@@ -784,9 +874,9 @@ checksum = "c9b0705efd4599c15a38151f4721f7bc388306f61084d3bfd50bd07fbca5cb60"
 
 [[package]]
 name = "ed25519"
-version = "1.5.2"
+version = "1.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e9c280362032ea4203659fc489832d0204ef09f247a0506f170dafcac08c369"
+checksum = "91cff35c70bba8a626e3185d8cd48cc11b5437e1a5bcd15b9b5fa3c64b6dfee7"
 dependencies = [
  "signature",
 ]
@@ -1145,6 +1235,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "hashbrown"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
+
+[[package]]
 name = "hermit-abi"
 version = "0.1.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1260,6 +1356,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "indexmap"
+version = "1.9.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1885e79c1fc4b10f0e172c475f458b7f7b93061064d98c3293e98c5ba0c8b399"
+dependencies = [
+ "autocfg",
+ "hashbrown 0.12.3",
 ]
 
 [[package]]
@@ -1569,6 +1675,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
 
 [[package]]
+name = "os_str_bytes"
+version = "6.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b7820b9daea5457c9f21c69448905d723fbd21136ccf521748f23fd49e723ee"
+
+[[package]]
 name = "pallet-encrypted-balance"
 version = "0.2.3"
 dependencies = [
@@ -1584,7 +1696,7 @@ dependencies = [
  "sp-runtime",
  "sp-std",
  "zero-elgamal",
- "zero-jubjub",
+ "zero-jubjub 0.2.0",
 ]
 
 [[package]]
@@ -1600,9 +1712,9 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "zero-bls12-381",
- "zero-crypto",
- "zero-jubjub",
+ "zero-bls12-381 0.2.0",
+ "zero-crypto 0.2.1",
+ "zero-jubjub 0.2.0",
  "zero-plonk",
 ]
 
@@ -1832,9 +1944,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.49"
+version = "1.0.50"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57a8eca9f9c4ffde41714334dee777596264c7825420f521abc92b5b5deb63a5"
+checksum = "6ef7d57beacfaf2d8aee5937dab7b7f28de3cb8b1828479bb5de2a7106f2bae2"
 dependencies = [
  "unicode-ident",
 ]
@@ -2732,9 +2844,9 @@ dependencies = [
 
 [[package]]
 name = "termcolor"
-version = "1.1.3"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bab24d30b911b2376f3a13cc2cd443142f0c81dda04c118693e35b3835757755"
+checksum = "be55cf8942feac5c765c2c993422806843c9a9a45d4d5c407ad6dd2ea95eb9b6"
 dependencies = [
  "winapi-util",
 ]
@@ -2747,6 +2859,12 @@ checksum = "d326610f408c7a4eb6f51c37c330e496b08506c9457c9d34287ecc38809fb060"
 dependencies = [
  "unicode-width",
 ]
+
+[[package]]
+name = "textwrap"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "222a222a5bfe1bba4a77b45ec488a741b3cb8872e5e499451fd7d0129c9c7c3d"
 
 [[package]]
 name = "thiserror"
@@ -3208,6 +3326,20 @@ checksum = "85e60b0d1b5f99db2556934e21937020776a5d31520bf169e851ac44e6420214"
 
 [[package]]
 name = "zero-bls12-381"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0f76d3f48015ab700041f48874ce6bdf15b85a3c53891972d18e2de137018df8"
+dependencies = [
+ "dusk-bytes",
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "serde",
+ "subtle 2.4.1",
+ "zero-crypto 0.1.10",
+]
+
+[[package]]
+name = "zero-bls12-381"
 version = "0.2.0"
 dependencies = [
  "dusk-bytes",
@@ -3219,7 +3351,18 @@ dependencies = [
  "rand_xorshift",
  "serde",
  "subtle 2.4.1",
- "zero-crypto",
+ "zero-crypto 0.2.1",
+]
+
+[[package]]
+name = "zero-crypto"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "529e629eebf0b5ddbb2aeaa63cd9413c4074ed0ec0e0594da3d36d0b4d15bbc4"
+dependencies = [
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "sp-std",
 ]
 
 [[package]]
@@ -3244,8 +3387,24 @@ dependencies = [
  "rand 0.8.5",
  "rand_xorshift",
  "serde",
- "zero-crypto",
- "zero-jubjub",
+ "zero-crypto 0.2.1",
+ "zero-jubjub 0.2.0",
+]
+
+[[package]]
+name = "zero-jubjub"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aff54c78f273d6c243ef45e9446b6b5d9231841101e3763a2f8502dafca87c99"
+dependencies = [
+ "dusk-bytes",
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "serde",
+ "sp-std",
+ "subtle 2.4.1",
+ "zero-bls12-381 0.1.10",
+ "zero-crypto 0.1.10",
 ]
 
 [[package]]
@@ -3262,8 +3421,8 @@ dependencies = [
  "serde",
  "sp-std",
  "subtle 2.4.1",
- "zero-bls12-381",
- "zero-crypto",
+ "zero-bls12-381 0.2.0",
+ "zero-crypto 0.2.1",
 ]
 
 [[package]]
@@ -3276,8 +3435,8 @@ dependencies = [
  "rand_core 0.6.4",
  "rand_xorshift",
  "rayon",
- "zero-bls12-381",
- "zero-crypto",
+ "zero-bls12-381 0.2.0",
+ "zero-crypto 0.2.1",
 ]
 
 [[package]]
@@ -3285,6 +3444,7 @@ name = "zero-network"
 version = "0.1.0"
 dependencies = [
  "confidential_transfer",
+ "criterion 0.4.0",
  "frame-support",
  "frame-system",
  "pallet-encrypted-balance",
@@ -3296,13 +3456,23 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "zero-bls12-381",
- "zero-crypto",
+ "zero-bls12-381 0.2.0",
+ "zero-crypto 0.2.1",
  "zero-elgamal",
- "zero-jubjub",
+ "zero-jubjub 0.2.0",
  "zero-kzg",
- "zero-pairing",
+ "zero-pairing 0.2.0",
  "zero-plonk",
+]
+
+[[package]]
+name = "zero-pairing"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e75cf71f397dac6f1dfc56e6230d570ba3f3901ace68072d6668243efbf274d3"
+dependencies = [
+ "zero-bls12-381 0.1.10",
+ "zero-crypto 0.1.10",
 ]
 
 [[package]]
@@ -3311,20 +3481,20 @@ version = "0.2.0"
 dependencies = [
  "rand 0.8.5",
  "rand_xorshift",
- "zero-bls12-381",
- "zero-crypto",
+ "zero-bls12-381 0.2.0",
+ "zero-crypto 0.2.1",
 ]
 
 [[package]]
 name = "zero-plonk"
-version = "0.13.1"
+version = "0.1.10"
 dependencies = [
  "backtrace",
  "bytecheck",
  "canonical",
  "canonical_derive",
  "cfg-if",
- "criterion",
+ "criterion 0.3.6",
  "dusk-bytes",
  "dusk-cdf",
  "hashbrown 0.9.1",
@@ -3336,10 +3506,10 @@ dependencies = [
  "rayon",
  "sp-std",
  "tempdir",
- "zero-bls12-381",
- "zero-crypto",
- "zero-jubjub",
- "zero-pairing",
+ "zero-bls12-381 0.1.10",
+ "zero-crypto 0.1.10",
+ "zero-jubjub 0.1.10",
+ "zero-pairing 0.1.10",
 ]
 
 [[package]]
