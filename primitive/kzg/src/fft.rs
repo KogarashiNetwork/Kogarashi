@@ -89,6 +89,20 @@ impl<F: FftField> Fft<F> {
             }
         }
     }
+
+    pub fn poly_mul(&self, rhs: &mut Polynomial<F>, lhs: &mut Polynomial<F>) -> Polynomial<F> {
+        self.dft(rhs);
+        self.dft(lhs);
+        let mut mul_poly = Polynomial::new(
+            rhs.0
+                .iter()
+                .zip(lhs.0.iter())
+                .map(|(a, b)| *a * *b)
+                .collect(),
+        );
+        self.idft(&mut mul_poly);
+        mul_poly
+    }
 }
 
 // classic fft using divide and conquer algorithm
@@ -114,7 +128,7 @@ fn classic_fft_arithmetic<F: FftField>(
 }
 
 // butterfly arithmetic polynomial evaluation
-pub(crate) fn butterfly_arithmetic<F: FftField>(
+fn butterfly_arithmetic<F: FftField>(
     left: &mut [F],
     right: &mut [F],
     twiddle_chunk: usize,
@@ -205,6 +219,8 @@ mod tests {
             coeffs_b.resize(1<<5, Fr::zero());
             let mut poly_a = Polynomial(coeffs_a);
             let mut poly_b = Polynomial(coeffs_b);
+            let mut poly_g = poly_a.clone();
+            let mut poly_h = poly_b.clone();
 
             let poly_e = Polynomial(naive_multiply(poly_c, poly_d));
 
@@ -213,8 +229,11 @@ mod tests {
             let mut poly_f = point_mutiply(poly_a, poly_b);
             fft.idft(&mut poly_f);
 
+            let poly_i = fft.poly_mul(&mut poly_g, &mut poly_h);
+
             assert_eq!(poly_e.0.len(), poly_f.0.len());
-            assert_eq!(poly_e, poly_f)
+            assert_eq!(poly_e, poly_f);
+            assert_eq!(poly_e, poly_i)
         }
     }
 }
