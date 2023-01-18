@@ -8,7 +8,7 @@ use zero_crypto::common::Group;
 fn msm(c: &mut Criterion) {
     let mut group = c.benchmark_group("msm");
 
-    for i in 8..=18 {
+    for i in 8..=14 {
         let p = vec![G1Affine::from(G1Affine::random(OsRng)); 1 << i];
         let k = vec![Fr::random(OsRng); 1 << i];
 

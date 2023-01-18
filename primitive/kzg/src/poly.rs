@@ -2,10 +2,11 @@
 /// https://www.iacr.org/archive/asiacrypt2010/6477178/6477178.pdf
 use rand_core::RngCore;
 use zero_crypto::behave::FftField;
+use zero_crypto::common::Vec;
 
 // a_n-1 , a_n-2, ... , a_0
 #[derive(Debug, Clone, PartialEq)]
-pub struct Polynomial<F>(pub(crate) Vec<F>);
+pub struct Polynomial<F>(pub Vec<F>);
 
 pub struct Witness<F> {
     s_eval: F,
@@ -15,6 +16,10 @@ pub struct Witness<F> {
 }
 
 impl<F: FftField> Polynomial<F> {
+    pub fn new(coeffs: Vec<F>) -> Self {
+        Self(coeffs)
+    }
+
     // polynomial evaluation domain
     // r^0, r^1, r^2, ..., r^n
     pub fn setup(k: usize, rng: impl RngCore) -> (F, Vec<F>) {

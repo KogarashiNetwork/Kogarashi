@@ -1,6 +1,7 @@
 use crate::poly::Polynomial;
 use crate::witness::Witness;
 use zero_crypto::behave::*;
+use zero_crypto::common::Vec;
 
 // key pair structure
 #[derive(Clone, Debug)]

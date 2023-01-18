@@ -1,6 +1,6 @@
 use crate::poly::Polynomial;
 use rayon::{join, prelude::*};
-use zero_crypto::common::FftField;
+use zero_crypto::common::{FftField, Vec};
 
 // fft structure
 #[derive(Clone, Debug)]
@@ -8,7 +8,7 @@ pub struct Fft<F: FftField> {
     // polynomial degree 2^k
     k: usize,
     // generator of order 2^{k - 1} multiplicative group used as twiddle factors
-    twiddle_factors: Vec<F>,
+    pub twiddle_factors: Vec<F>,
     // multiplicative group generator inverse
     inv_twiddle_factors: Vec<F>,
     // n inverse for inverse discrete fourier transform
@@ -52,6 +52,10 @@ impl<F: FftField> Fft<F> {
                 .map(|i| i.reverse_bits() >> offset)
                 .collect::<Vec<_>>(),
         }
+    }
+
+    pub fn size(&self) -> usize {
+        1 << self.k
     }
 
     // perform classic discrete fourier transform

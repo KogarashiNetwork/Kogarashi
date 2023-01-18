@@ -3458,6 +3458,7 @@ dependencies = [
  "zero-bls12-381",
  "zero-crypto",
  "zero-jubjub",
+ "zero-kzg",
  "zero-pairing",
 ]
 
