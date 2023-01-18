@@ -5,8 +5,10 @@ use zero_crypto::common::{FftField, Vec};
 // fft structure
 #[derive(Clone, Debug)]
 pub struct Fft<F: FftField> {
-    // polynomial degree 2^k
+    // polynomial degree k of 2^k
     k: usize,
+    // polynomial degree 2^k
+    n: usize,
     // generator of order 2^{k - 1} multiplicative group used as twiddle factors
     pub twiddle_factors: Vec<F>,
     // multiplicative group generator inverse
@@ -45,35 +47,34 @@ impl<F: FftField> Fft<F> {
 
         Fft {
             k,
+            n,
             twiddle_factors,
             inv_twiddle_factors,
-            n_inv: F::from(n).invert().unwrap(),
-            bit_reverse: (0..n as usize)
+            n_inv: F::from(n as u64).invert().unwrap(),
+            bit_reverse: (0..n)
                 .map(|i| i.reverse_bits() >> offset)
                 .collect::<Vec<_>>(),
         }
     }
 
     pub fn size(&self) -> usize {
-        1 << self.k
+        self.n
     }
 
     // perform classic discrete fourier transform
     pub fn dft(&self, coeffs: &mut Polynomial<F>) {
-        let n = 1 << self.k;
-        assert_eq!(coeffs.0.len(), n);
+        coeffs.0.resize(self.n, F::zero());
 
         self.reverse_index(coeffs);
-        classic_fft_arithmetic(&mut coeffs.0, n, 1, &self.twiddle_factors)
+        classic_fft_arithmetic(&mut coeffs.0, self.n, 1, &self.twiddle_factors)
     }
 
     // perform classic inverse discrete fourier transform
     pub fn idft(&self, coeffs: &mut Polynomial<F>) {
-        let n = 1 << self.k;
-        assert_eq!(coeffs.0.len(), n);
+        coeffs.0.resize(self.n, F::zero());
 
         self.reverse_index(coeffs);
-        classic_fft_arithmetic(&mut coeffs.0, n, 1, &self.inv_twiddle_factors);
+        classic_fft_arithmetic(&mut coeffs.0, self.n, 1, &self.inv_twiddle_factors);
         coeffs
             .0
             .par_iter_mut()
