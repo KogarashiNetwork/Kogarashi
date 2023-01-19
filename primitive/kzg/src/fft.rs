@@ -1,18 +1,20 @@
 use crate::poly::Polynomial;
-use rayon::{join, prelude::*};
+use rayon::join;
 use zero_crypto::common::{FftField, Vec};
 
 // fft structure
 #[derive(Clone, Debug)]
 pub struct Fft<F: FftField> {
-    // polynomial degree k of 2^k
-    k: usize,
     // polynomial degree 2^k
     n: usize,
     // generator of order 2^{k - 1} multiplicative group used as twiddle factors
-    pub twiddle_factors: Vec<F>,
+    twiddle_factors: Vec<F>,
     // multiplicative group generator inverse
     inv_twiddle_factors: Vec<F>,
+    // coset domain
+    cosets: Vec<F>,
+    // inverse coset domain
+    inv_cosets: Vec<F>,
     // n inverse for inverse discrete fourier transform
     n_inv: F,
     // bit reverse index
@@ -45,11 +47,32 @@ impl<F: FftField> Fft<F> {
             })
             .collect::<Vec<_>>();
 
+        // precompute cosets
+        let mul_g = F::MULTIPLICATIVE_GENERATOR;
+        let cosets = (0..half_n as usize)
+            .scan(F::one(), |w, _| {
+                let tw = *w;
+                *w *= mul_g;
+                Some(tw)
+            })
+            .collect::<Vec<_>>();
+
+        // precompute inverse cosets
+        let mul_g_inv = mul_g.invert().unwrap();
+        let inv_cosets = (0..half_n as usize)
+            .scan(F::one(), |w, _| {
+                let tw = *w;
+                *w *= mul_g_inv;
+                Some(tw)
+            })
+            .collect::<Vec<_>>();
+
         Fft {
-            k,
             n,
             twiddle_factors,
             inv_twiddle_factors,
+            cosets,
+            inv_cosets,
             n_inv: F::from(n as u64).invert().unwrap(),
             bit_reverse: (0..n)
                 .map(|i| i.reverse_bits() >> offset)
@@ -61,24 +84,41 @@ impl<F: FftField> Fft<F> {
         self.n
     }
 
-    // perform classic discrete fourier transform
+    // perform discrete fourier transform
     pub fn dft(&self, coeffs: &mut Polynomial<F>) {
         coeffs.0.resize(self.n, F::zero());
-
         self.reverse_index(coeffs);
+
         classic_fft_arithmetic(&mut coeffs.0, self.n, 1, &self.twiddle_factors)
     }
 
     // perform classic inverse discrete fourier transform
     pub fn idft(&self, coeffs: &mut Polynomial<F>) {
         coeffs.0.resize(self.n, F::zero());
-
         self.reverse_index(coeffs);
+
         classic_fft_arithmetic(&mut coeffs.0, self.n, 1, &self.inv_twiddle_factors);
+        coeffs.0.iter_mut().for_each(|coeff| *coeff *= self.n_inv)
+    }
+
+    // perform discrete fourier transform on coset
+    pub fn coset_dft(&self, coeffs: &mut Polynomial<F>) {
         coeffs
             .0
-            .par_iter_mut()
-            .for_each(|coeff| *coeff *= self.n_inv)
+            .iter_mut()
+            .zip(self.cosets.iter())
+            .for_each(|(coeff, coset)| *coeff *= *coset);
+        self.dft(coeffs)
+    }
+
+    // perform discrete fourier transform on coset
+    pub fn coset_idft(&self, coeffs: &mut Polynomial<F>) {
+        self.idft(coeffs);
+        coeffs
+            .0
+            .iter_mut()
+            .zip(self.inv_cosets.iter())
+            .for_each(|(coeff, inv_coset)| *coeff *= *inv_coset)
     }
 
     // polynomial coefficients bit reverse permutation
@@ -90,9 +130,9 @@ impl<F: FftField> Fft<F> {
         }
     }
 
-    pub fn poly_mul(&self, rhs: &mut Polynomial<F>, lhs: &mut Polynomial<F>) -> Polynomial<F> {
-        self.dft(rhs);
-        self.dft(lhs);
+    pub fn poly_mul(&self, mut rhs: Polynomial<F>, mut lhs: Polynomial<F>) -> Polynomial<F> {
+        self.dft(&mut rhs);
+        self.dft(&mut lhs);
         let mut mul_poly = Polynomial::new(
             rhs.0
                 .iter()
@@ -219,8 +259,8 @@ mod tests {
             coeffs_b.resize(1<<5, Fr::zero());
             let mut poly_a = Polynomial(coeffs_a);
             let mut poly_b = Polynomial(coeffs_b);
-            let mut poly_g = poly_a.clone();
-            let mut poly_h = poly_b.clone();
+            let poly_g = poly_a.clone();
+            let poly_h = poly_b.clone();
 
             let poly_e = Polynomial(naive_multiply(poly_c, poly_d));
 
@@ -229,7 +269,7 @@ mod tests {
             let mut poly_f = point_mutiply(poly_a, poly_b);
             fft.idft(&mut poly_f);
 
-            let poly_i = fft.poly_mul(&mut poly_g, &mut poly_h);
+            let poly_i = fft.poly_mul(poly_g, poly_h);
 
             assert_eq!(poly_e.0.len(), poly_f.0.len());
             assert_eq!(poly_e, poly_f);

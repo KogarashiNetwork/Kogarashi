@@ -25,6 +25,9 @@ const GENERATOR: [u64; 4] = [
     0x351332208fc5a8c4,
 ];
 
+/// Generator of the Scalar field
+pub const MULTIPLICATIVE_GENERATOR: Fr = Fr([7, 0, 0, 0]);
+
 /// R = 2^256 mod r
 const R: [u64; 4] = [
     0x00000001fffffffe,
@@ -120,7 +123,18 @@ impl BitAnd<Fr> for Fr {
     }
 }
 
-fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
+fft_field_operation!(
+    Fr,
+    MODULUS,
+    GENERATOR,
+    MULTIPLICATIVE_GENERATOR,
+    INV,
+    ROOT_OF_UNITY,
+    R,
+    R2,
+    R3,
+    S
+);
 
 #[cfg(test)]
 mod tests {
@@ -145,9 +159,6 @@ mod tests {
 
 /// Two adacity
 pub const TWO_ADACITY: u32 = 32;
-
-/// Generator of the Scalar field
-pub const MULTIPLICATIVE_GENERATOR: Fr = Fr([7, 0, 0, 0]);
 
 impl Fr {
     fn from_u512(limbs: [u64; 8]) -> Fr {

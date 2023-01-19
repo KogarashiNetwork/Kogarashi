@@ -62,13 +62,15 @@ macro_rules! prime_field_operation {
 
 #[macro_export]
 macro_rules! fft_field_operation {
-    ($field:ident, $p:ident, $g:ident, $i:ident, $u:ident, $r:ident, $r2:ident, $r3:ident, $s:ident) => {
+    ($field:ident, $p:ident, $g:ident, $mul_g:ident, $i:ident, $u:ident, $r:ident, $r2:ident, $r3:ident, $s:ident) => {
         prime_field_operation!($field, $p, $g, $i, $r, $r2, $r3);
 
         impl FftField for $field {
             const S: usize = $s;
 
             const ROOT_OF_UNITY: Self = $u;
+
+            const MULTIPLICATIVE_GENERATOR: Self = $mul_g;
 
             fn pow(self, val: u64) -> Self {
                 Self(pow(self.0, [val, 0, 0, 0], $r, $p, $i))

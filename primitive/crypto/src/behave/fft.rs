@@ -16,6 +16,8 @@ pub trait FftField: PrimeField + ParallelCmp + From<u64> {
     const S: usize;
     // 2^s th root of unity
     const ROOT_OF_UNITY: Self;
+    // multiplicative generator
+    const MULTIPLICATIVE_GENERATOR: Self;
 
     fn pow(self, val: u64) -> Self;
 }
