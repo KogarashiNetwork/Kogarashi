@@ -59,7 +59,7 @@ impl<F: FftField> Fft<F> {
 
         // precompute inverse cosets
         let mul_g_inv = mul_g.invert().unwrap();
-        let inv_cosets = (0..half_n as usize)
+        let inv_cosets = (0..n as usize)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= mul_g_inv;
@@ -114,6 +114,7 @@ impl<F: FftField> Fft<F> {
     // perform discrete fourier transform on coset
     pub fn coset_idft(&self, coeffs: &mut Polynomial<F>) {
         self.idft(coeffs);
+
         coeffs
             .0
             .iter_mut()
