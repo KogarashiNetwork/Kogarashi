@@ -19,6 +19,7 @@ pub struct Fft<F: FftField> {
     n_inv: F,
     // bit reverse index
     bit_reverse: Vec<usize>,
+    pub elements: Vec<F>
 }
 
 impl<F: FftField> Fft<F> {
@@ -67,6 +68,14 @@ impl<F: FftField> Fft<F> {
             })
             .collect::<Vec<_>>();
 
+        let elements = (0..n as usize)
+        .scan(F::one(), |w, _| {
+            let tw = *w;
+            *w *= g;
+            Some(tw)
+        })
+        .collect::<Vec<_>>();
+
         Fft {
             n,
             twiddle_factors,
@@ -77,11 +86,16 @@ impl<F: FftField> Fft<F> {
             bit_reverse: (0..n)
                 .map(|i| i.reverse_bits() >> offset)
                 .collect::<Vec<_>>(),
+                elements
         }
     }
 
     pub fn size(&self) -> usize {
         self.n
+    }
+
+    pub fn generator(&self) -> F {
+        self.twiddle_factors[1]
     }
 
     // perform discrete fourier transform
