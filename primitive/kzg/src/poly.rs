@@ -71,6 +71,11 @@ impl<F: FftField> Polynomial<F> {
         )
     }
 
+    /// σ^n - 1
+    pub fn t(n: u64, tau: F) -> F {
+        tau.pow(n) - F::one()
+    }
+
     // create witness for f(a)
     pub fn create_witness(self, at: F, s: F, domain: Vec<F>) -> Witness<F> {
         // p(x) - p(at) / x - at
