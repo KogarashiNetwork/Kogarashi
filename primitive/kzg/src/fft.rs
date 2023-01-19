@@ -251,6 +251,21 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(100))]
         #[test]
+        fn coset_fft_transformation_test(coeffs in arb_poly(10)) {
+            let mut poly_a = Polynomial(coeffs);
+            let poly_b = poly_a.clone();
+            let classic_fft = Fft::new(10);
+
+            classic_fft.coset_dft(&mut poly_a);
+            classic_fft.coset_idft(&mut poly_a);
+
+            assert_eq!(poly_a, poly_b)
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(100))]
+        #[test]
         fn fft_multiplication_test(mut coeffs_a in arb_poly(4), mut coeffs_b in arb_poly(4)) {
             let fft = Fft::new(5);
             let poly_c = coeffs_a.clone();
