@@ -47,11 +47,11 @@ impl<C: Commitment> KeyPair<C> {
         at: C::ScalarField,
     ) -> Witness<C> {
         // p(x) - p(at) / x - at
-        let quotient = poly.divide(at);
+        let quotient = poly.divide(&at);
         // p(s)
         let s_eval = self.commit(poly);
         // p(at)
-        let a_eval = C::G1Projective::ADDITIVE_GENERATOR * poly.evaluate(at);
+        let a_eval = C::G1Projective::ADDITIVE_GENERATOR * poly.evaluate(&at);
         // p(s) - p(at) / s - at
         let q_eval = self.commit(&quotient);
         // s - at
