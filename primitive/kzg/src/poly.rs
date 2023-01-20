@@ -1,8 +1,7 @@
-/// the terminology bellow is aligned with the following paper
-/// https://www.iacr.org/archive/asiacrypt2010/6477178/6477178.pdf
+use core::iter;
+use core::ops::Add;
 use rand_core::RngCore;
-use zero_crypto::behave::FftField;
-use zero_crypto::common::Vec;
+use zero_crypto::common::*;
 
 // a_n-1 , a_n-2, ... , a_0
 #[derive(Debug, Clone, PartialEq)]
@@ -17,7 +16,9 @@ pub struct Witness<F> {
 
 impl<F: FftField> Polynomial<F> {
     pub fn new(coeffs: Vec<F>) -> Self {
-        Self(coeffs)
+        let mut raw_poly = Self(coeffs);
+        raw_poly.format_degree();
+        raw_poly
     }
 
     // polynomial evaluation domain
@@ -76,6 +77,13 @@ impl<F: FftField> Polynomial<F> {
         tau.pow(n) - F::one()
     }
 
+    /// format polynomial degree by removing zero coeffss
+    pub fn format_degree(&mut self) {
+        while self.0.last().map_or(false, |c| c == &F::zero()) {
+            self.0.pop();
+        }
+    }
+
     // create witness for f(a)
     pub fn create_witness(self, at: F, s: F, domain: Vec<F>) -> Witness<F> {
         // p(x) - p(at) / x - at
@@ -95,6 +103,32 @@ impl<F: FftField> Polynomial<F> {
             q_eval,
             denominator,
         }
+    }
+}
+
+impl<F: FftField> Add for Polynomial<F> {
+    type Output = Polynomial<F>;
+
+    fn add(self, rhs: Polynomial<F>) -> Polynomial<F> {
+        let mut poly = if self.0.len() > rhs.0.len() {
+            Self(
+                self.0
+                    .iter()
+                    .zip(rhs.0.iter().chain(iter::repeat(&F::zero())))
+                    .map(|(a, b)| *a + *b)
+                    .collect(),
+            )
+        } else {
+            Self(
+                rhs.0
+                    .iter()
+                    .zip(self.0.iter().chain(iter::repeat(&F::zero())))
+                    .map(|(a, b)| *a + *b)
+                    .collect(),
+            )
+        };
+        poly.format_degree();
+        poly
     }
 }
 
