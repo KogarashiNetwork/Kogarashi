@@ -15,11 +15,6 @@ jobs:
       - name: Update submodules
         id: update
         run: git submodule update --remote --recursive
-      - uses: actions-rs/toolchain@v1
-      - name: Update Submodule
-        run: |
-          git submodule update --init --recursive
-          git submodule update --remote --recursive
       - name: Test
         uses: actions-rs/cargo@v1
         with:
