@@ -3,7 +3,7 @@ use rayon::join;
 use zero_crypto::common::{FftField, Vec};
 
 // fft structure
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Fft<F: FftField> {
     // polynomial degree 2^k
     n: usize,
