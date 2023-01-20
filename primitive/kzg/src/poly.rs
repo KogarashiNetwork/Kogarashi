@@ -1,8 +1,11 @@
+use core::ops::{Add, Sub};
+
 /// the terminology bellow is aligned with the following paper
 /// https://www.iacr.org/archive/asiacrypt2010/6477178/6477178.pdf
 use rand_core::RngCore;
 use zero_crypto::behave::FftField;
 use zero_crypto::common::Vec;
+use core::iter;
 
 // a_n-1 , a_n-2, ... , a_0
 #[derive(Debug, Clone, PartialEq)]
@@ -76,6 +79,17 @@ impl<F: FftField> Polynomial<F> {
         tau.pow(n) - F::one()
     }
 
+    fn format_degree(mut self) -> Self {
+        while self
+            .0
+            .last()
+            .map_or(false, |c| c == &F::zero())
+        {
+            self.0.pop();
+        }
+        self
+    }
+
     // create witness for f(a)
     pub fn create_witness(self, at: F, s: F, domain: Vec<F>) -> Witness<F> {
         // p(x) - p(at) / x - at
@@ -95,6 +109,34 @@ impl<F: FftField> Polynomial<F> {
             q_eval,
             denominator,
         }
+    }
+}
+
+impl<F: FftField> Add for Polynomial<F> {
+    type Output = Polynomial<F>;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let zero = F::zero();
+        let (left, right) = if self.0.len() > rhs.0.len() {
+            (self.0.iter(), rhs.0.iter().chain(iter::repeat(&zero)))
+        } else {
+            (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
+        };
+        Self(left.zip(right).map(|(a,b)| *a + *b).collect()).format_degree()
+    }
+}
+
+impl<F: FftField> Sub for Polynomial<F> {
+    type Output = Polynomial<F>;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        let zero = F::zero();
+        let (left, right) = if self.0.len() > rhs.0.len() {
+            (self.0.iter(), rhs.0.iter().chain(iter::repeat(&zero)))
+        } else {
+            (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
+        };
+        Self(left.zip(right).map(|(a,b)| *a - *b).collect()).format_degree()
     }
 }
 
