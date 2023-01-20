@@ -84,6 +84,8 @@ macro_rules! fft_field_operation {
         }
 
         impl ParallelCmp for $field {}
+
+        impl RefOps for $field {}
     };
 }
 

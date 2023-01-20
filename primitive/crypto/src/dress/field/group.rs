@@ -162,7 +162,7 @@ macro_rules! group_operation {
         impl<'b> Sub<&'b $field> for $field {
             type Output = $field;
 
-            fn sub(self, rhs: &'b $field) -> Self {
+            fn sub(self, rhs: &'b $field) -> $field {
                 $field(sub(self.0, rhs.0, $p))
             }
         }
