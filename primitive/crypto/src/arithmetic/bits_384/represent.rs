@@ -1,5 +1,6 @@
 use crate::arithmetic::bits_384::limbs::*;
 use crate::arithmetic::utils::{Bits, Naf, Nafs};
+use crate::common::Vec;
 use rand_core::RngCore;
 
 pub const fn zero() -> [u64; 6] {
@@ -55,25 +56,33 @@ pub fn to_bits(val: [u64; 6]) -> Bits {
 }
 
 pub fn to_nafs(val: [u64; 6]) -> Nafs {
-    let mut index = 384;
-    let mut nafs: [Naf; 384] = [Naf::Zero; 384];
-    let mut carry = 0;
+    let mut index = 0;
+    let mut bits: [u8; 386] = [0; 386];
     for limb in val {
         for byte in limb.to_le_bytes().iter() {
             for i in 0..8 {
-                index -= 1;
-                let bit = (byte >> i & 1) as i8;
-                if bit == 0 {
-                    nafs[index] = (-carry).into();
-                    carry = 0
-                } else {
-                    nafs[index] = (bit - carry).into();
-                    carry = 1;
-                }
+                bits[index] = (byte >> i & 1) as u8;
+                index += 1;
             }
         }
     }
-    nafs.to_vec()
+    let mut carry = 0;
+    let mut nafs: Vec<Naf> = bits
+        .iter()
+        .map(|bit| {
+            let triple = bit * 3;
+            let bit_3 = (triple + carry) % 2;
+            carry = (triple + carry) / 2;
+            (bit_3 as i8 - *bit as i8).into()
+        })
+        .collect::<Vec<_>>()
+        .into_iter()
+        .rev()
+        .skip_while(|x| x == &Naf::Zero)
+        .collect::<Vec<_>>();
+    nafs.pop();
+    nafs.reverse();
+    nafs
 }
 
 pub fn random_limbs(
