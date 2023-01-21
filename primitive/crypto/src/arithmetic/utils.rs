@@ -21,4 +21,24 @@ pub const fn mac(a: u64, b: u64, c: u64, d: u64) -> (u64, u64) {
 
 pub type ProjectiveCoordinate<L> = (L, L, L);
 
+#[derive(Clone, Copy, Eq, PartialEq, Debug)]
+pub enum Naf {
+    Zero = 0,
+    Plus = 1,
+    Minus = 2,
+}
+
+impl From<i8> for Naf {
+    fn from(value: i8) -> Self {
+        match value {
+            0 => Naf::Zero,
+            1 => Naf::Plus,
+            -1 => Naf::Minus,
+            _ => unimplemented!(),
+        }
+    }
+}
+
 pub type Bits = Vec<u8>;
+
+pub type Nafs = Vec<Naf>;

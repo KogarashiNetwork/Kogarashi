@@ -41,6 +41,10 @@ macro_rules! prime_field_operation {
                 to_bits(self.montgomery_reduce())
             }
 
+            fn to_nafs(self) -> Nafs {
+                to_nafs(self.montgomery_reduce())
+            }
+
             fn double(self) -> Self {
                 Self(double(self.0, $p))
             }

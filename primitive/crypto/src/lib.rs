@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #![doc = include_str!("../README.md")]
-#![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(not(featusre = "std"), no_std)]
 
 pub mod arithmetic;
 pub mod behave;
