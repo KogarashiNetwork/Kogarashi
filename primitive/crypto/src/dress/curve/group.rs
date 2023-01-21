@@ -86,7 +86,7 @@ macro_rules! affine_group_operation {
             fn mul(self, rhs: <Self as Affine>::Scalar) -> Self::Output {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.to_projective();
-                for &naf in rhs.to_nafs().iter().rev() {
+                for &naf in rhs.to_nafs().iter() {
                     if naf == Naf::Plus {
                         res += acc;
                     } else if naf == Naf::Minus {
@@ -104,7 +104,7 @@ macro_rules! affine_group_operation {
             fn mul(self, rhs: &'b <Self as Affine>::Scalar) -> Self::Output {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.to_projective();
-                for &naf in rhs.to_nafs().iter().rev() {
+                for &naf in rhs.to_nafs().iter() {
                     if naf == Naf::Plus {
                         res += acc;
                     } else if naf == Naf::Minus {
@@ -202,7 +202,7 @@ macro_rules! projective_group_operation {
             fn mul(self, rhs: <Self as Group>::Scalar) -> Self {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.clone();
-                for &naf in rhs.to_nafs().iter().rev() {
+                for &naf in rhs.to_nafs().iter() {
                     if naf == Naf::Plus {
                         res += acc;
                     } else if naf == Naf::Minus {
@@ -220,7 +220,7 @@ macro_rules! projective_group_operation {
             fn mul(self, rhs: &'b <Self as Group>::Scalar) -> $projective {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.clone();
-                for &naf in rhs.to_nafs().iter().rev() {
+                for &naf in rhs.to_nafs().iter() {
                     if naf == Naf::Plus {
                         res += acc;
                     } else if naf == Naf::Minus {

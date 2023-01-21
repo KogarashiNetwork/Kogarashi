@@ -71,9 +71,13 @@ pub fn to_nafs(val: [u64; 4]) -> Nafs {
             }
         }
     }
-    nafs.into_iter()
+    let mut nafs = nafs
+        .into_iter()
         .skip_while(|x| x == &Naf::Zero)
-        .collect::<Vec<_>>()
+        .collect::<Vec<_>>();
+    nafs.pop();
+    nafs.reverse();
+    nafs
 }
 
 pub fn random_limbs(
