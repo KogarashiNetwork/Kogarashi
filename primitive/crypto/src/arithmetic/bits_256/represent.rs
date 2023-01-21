@@ -46,11 +46,11 @@ pub fn to_bits(val: [u64; 4]) -> Bits {
 }
 
 pub fn to_nafs(val: [u64; 4]) -> Nafs {
-    let mut index = 256;
-    let mut nafs: [Naf; 256] = [Naf::Zero; 256];
+    let mut index = 288;
+    let mut nafs: [Naf; 288] = [Naf::Zero; 288];
     let mut carry = 0;
     for limb in val {
-        for byte in limb.to_le_bytes().iter() {
+        for byte in limb.to_le_bytes().iter().chain([0].iter()) {
             for i in 0..8 {
                 index -= 1;
                 if (byte >> i & 1) == 0 {
