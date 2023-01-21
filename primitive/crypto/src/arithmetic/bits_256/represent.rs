@@ -1,5 +1,6 @@
 use crate::arithmetic::bits_256::limbs::*;
-use crate::arithmetic::utils::Bits;
+use crate::arithmetic::utils::{Bits, Naf, Nafs};
+use crate::common::Vec;
 use rand_core::RngCore;
 
 pub const fn zero() -> [u64; 4] {
@@ -42,6 +43,37 @@ pub fn to_bits(val: [u64; 4]) -> Bits {
         }
     }
     bits.to_vec()
+}
+
+pub fn to_nafs(val: [u64; 4]) -> Nafs {
+    let mut index = 256;
+    let mut nafs: [Naf; 256] = [Naf::Zero; 256];
+    let mut carry = 0;
+    for limb in val {
+        for byte in limb.to_le_bytes().iter() {
+            for i in 0..8 {
+                index -= 1;
+                if (byte >> i & 1) == 0 {
+                    if carry <= 1 {
+                        nafs[index] = carry.into();
+                        carry = 0
+                    } else {
+                        carry = 1
+                    }
+                } else {
+                    if carry == 0 {
+                        carry = 1;
+                    } else if carry == 1 {
+                        nafs[index] = Naf::Minus;
+                        carry = 2;
+                    }
+                }
+            }
+        }
+    }
+    nafs.into_iter()
+        .skip_while(|x| x == &Naf::Zero)
+        .collect::<Vec<_>>()
 }
 
 pub fn random_limbs(

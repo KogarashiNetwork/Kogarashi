@@ -9,7 +9,7 @@ use super::{
     algebra::Field,
     comp::{Basic, ParityCmp},
 };
-use crate::arithmetic::utils::Bits;
+use crate::arithmetic::utils::{Bits, Nafs};
 
 /// This is prime field trait
 pub trait PrimeField: Field + Basic + ParityCmp {
@@ -22,6 +22,8 @@ pub trait PrimeField: Field + Basic + ParityCmp {
     fn is_zero(self) -> bool;
 
     fn to_bits(self) -> Bits;
+
+    fn to_nafs(self) -> Nafs;
 
     fn double(self) -> Self;
 

@@ -86,10 +86,11 @@ macro_rules! affine_group_operation {
             fn mul(self, rhs: <Self as Affine>::Scalar) -> Self::Output {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.to_projective();
-                let bits: Vec<u8> = rhs.to_bits().into_iter().skip_while(|x| *x == 0).collect();
-                for &b in bits.iter().rev() {
-                    if b == 1 {
-                        res += acc.clone();
+                for &naf in rhs.to_nafs().iter().rev() {
+                    if naf == Naf::Plus {
+                        res += acc;
+                    } else if naf == Naf::Minus {
+                        res -= acc;
                     }
                     acc = acc.double();
                 }
@@ -103,10 +104,11 @@ macro_rules! affine_group_operation {
             fn mul(self, rhs: &'b <Self as Affine>::Scalar) -> Self::Output {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.to_projective();
-                let bits: Vec<u8> = rhs.to_bits().into_iter().skip_while(|x| *x == 0).collect();
-                for &b in bits.iter().rev() {
-                    if b == 1 {
-                        res += acc.clone();
+                for &naf in rhs.to_nafs().iter().rev() {
+                    if naf == Naf::Plus {
+                        res += acc;
+                    } else if naf == Naf::Minus {
+                        res -= acc;
                     }
                     acc = acc.double();
                 }
@@ -197,17 +199,14 @@ macro_rules! projective_group_operation {
         impl Mul<<Self as Group>::Scalar> for $projective {
             type Output = Self;
 
-            fn mul(self, scalar: <Self as Group>::Scalar) -> Self {
+            fn mul(self, rhs: <Self as Group>::Scalar) -> Self {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.clone();
-                let bits: Vec<u8> = scalar
-                    .to_bits()
-                    .into_iter()
-                    .skip_while(|x| *x == 0)
-                    .collect();
-                for &b in bits.iter().rev() {
-                    if b == 1 {
-                        res += acc.clone();
+                for &naf in rhs.to_nafs().iter().rev() {
+                    if naf == Naf::Plus {
+                        res += acc;
+                    } else if naf == Naf::Minus {
+                        res -= acc;
                     }
                     acc = acc.double();
                 }
@@ -221,10 +220,11 @@ macro_rules! projective_group_operation {
             fn mul(self, rhs: &'b <Self as Group>::Scalar) -> $projective {
                 let mut res = Self::Output::ADDITIVE_IDENTITY;
                 let mut acc = self.clone();
-                let bits: Vec<u8> = rhs.to_bits().into_iter().skip_while(|x| *x == 0).collect();
-                for &b in bits.iter().rev() {
-                    if b == 1 {
-                        res += acc.clone();
+                for &naf in rhs.to_nafs().iter().rev() {
+                    if naf == Naf::Plus {
+                        res += acc;
+                    } else if naf == Naf::Minus {
+                        res -= acc;
                     }
                     acc = acc.double();
                 }

@@ -44,6 +44,10 @@ macro_rules! prime_extension_field_operation {
                 unimplemented!()
             }
 
+            fn to_nafs(self) -> Nafs {
+                unimplemented!()
+            }
+
             // TODO should be optimized
             fn double(self) -> Self {
                 self + self
