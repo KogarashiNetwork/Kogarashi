@@ -46,37 +46,37 @@ pub fn to_bits(val: [u64; 4]) -> Bits {
 }
 
 pub fn to_nafs(val: [u64; 4]) -> Nafs {
-    let mut index = 288;
-    let mut nafs: [Naf; 288] = [Naf::Zero; 288];
-    let mut carry = 0;
+    let mut index = 260;
+    let mut bits: [u8; 260] = [0; 260];
     for limb in val {
-        for byte in limb.to_le_bytes().iter().chain([0].iter()) {
+        for byte in limb.to_le_bytes().iter() {
             for i in 0..8 {
                 index -= 1;
-                if (byte >> i & 1) == 0 {
-                    if carry <= 1 {
-                        nafs[index] = carry.into();
-                        carry = 0
-                    } else {
-                        carry = 1
-                    }
-                } else {
-                    if carry == 0 {
-                        carry = 1;
-                    } else if carry == 1 {
-                        nafs[index] = Naf::Minus;
-                        carry = 2;
-                    }
-                }
+                bits[index] = (byte >> i & 1) as u8;
             }
         }
     }
-    let mut nafs = nafs
-        .into_iter()
-        .skip_while(|x| x == &Naf::Zero)
-        .collect::<Vec<_>>();
-    nafs.pop();
-    nafs.reverse();
+    let mut carry = 0;
+    let bits_3: Vec<u8> = bits
+        .iter()
+        .rev()
+        .map(|single| {
+            let triple = single * 3;
+            let res = (triple + carry) % 2;
+            carry = (triple + carry) / 2;
+            res
+        })
+        .collect();
+    let nafs: Vec<Naf> = bits
+        .iter()
+        .rev()
+        .skip(1)
+        .zip(bits_3.iter().skip(1))
+        .map(|(bit, bit_3)| {
+            let naf = *bit_3 as i8 - *bit as i8;
+            naf.into()
+        })
+        .collect();
     nafs
 }
 
