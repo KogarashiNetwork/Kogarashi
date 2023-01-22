@@ -1,4 +1,4 @@
-use crate::arithmetic::{bits_256::to_bits, utils::*};
+use crate::arithmetic::{bits_256::*, utils::*};
 
 #[inline]
 pub const fn add(a: [u64; 4], b: [u64; 4], p: [u64; 4]) -> [u64; 4] {
@@ -27,7 +27,12 @@ pub const fn sub(a: [u64; 4], b: [u64; 4], p: [u64; 4]) -> [u64; 4] {
 
 #[inline]
 pub const fn double(a: [u64; 4], p: [u64; 4]) -> [u64; 4] {
-    add(a, a, p)
+    let (l0, c) = dbc(a[0], 0);
+    let (l1, c) = dbc(a[1], c);
+    let (l2, c) = dbc(a[2], c);
+    let (l3, _) = dbc(a[3], c);
+
+    sub([l0, l1, l2, l3], p, p)
 }
 
 #[inline]
@@ -57,7 +62,34 @@ pub const fn mul(a: [u64; 4], b: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
 
 #[inline]
 pub const fn square(a: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
-    mul(a, a, p, inv)
+    let a10 = a[1] as u128 * a[0] as u128;
+    let a20 = a[2] as u128 * a[0] as u128;
+    let a30 = a[3] as u128 * a[0] as u128;
+    let a13 = a[1] as u128 * a[3] as u128;
+    let a21 = a[2] as u128 * a[1] as u128;
+    let a23 = a[2] as u128 * a[3] as u128;
+
+    let (l0, c) = mulnc(a[0], a[0]);
+    let (l1, c) = addnc(a10, c);
+    let (l2, c) = addnc(a20, c);
+    let (l3, l4) = addnc(a30, c);
+
+    let (l1, c) = addnc(a10, l1);
+    let (l2, c) = macnc(l2, a20, c);
+    let (l3, c) = macnc(l3, a30, c);
+    let (l4, l5) = macnc(l4, a13, c);
+
+    let (l2, c) = mac(l2, a[1], a[1], 0);
+    let (l3, c) = macnc(l3, a21, c);
+    let (l4, c) = macnc(l4, a13, c);
+    let (l5, l6) = macnc(l5, a23, c);
+
+    let (l3, c) = addnc(a21, l3);
+    let (l4, c) = mac(l4, a[2], a[2], c);
+    let (l5, c) = macnc(l5, a23, c);
+    let (l6, l7) = mac(l6, a[3], a[3], c);
+
+    mont([l0, l1, l2, l3, l4, l5, l6, l7], p, inv)
 }
 
 #[inline]

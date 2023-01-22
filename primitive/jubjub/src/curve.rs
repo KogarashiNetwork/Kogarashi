@@ -40,6 +40,8 @@ impl ParityCmp for JubJubAffine {}
 impl Curve for JubJubAffine {
     type Range = Fr;
 
+    type Scalar = Fr;
+
     const PARAM_A: Fr = Fr::one();
 
     fn is_identity(self) -> bool {
@@ -57,19 +59,9 @@ impl Curve for JubJubAffine {
     fn get_y(&self) -> Self::Range {
         self.y
     }
-
-    fn set_x(&mut self, value: Self::Range) {
-        self.x = value
-    }
-
-    fn set_y(&mut self, value: Self::Range) {
-        self.y = value
-    }
 }
 
-impl Affine for JubJubAffine {
-    type Scalar = Fr;
-}
+impl Affine for JubJubAffine {}
 
 // below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
 // [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by

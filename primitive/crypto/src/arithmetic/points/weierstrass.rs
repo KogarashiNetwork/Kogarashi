@@ -1,7 +1,7 @@
-use crate::arithmetic::bits_256::represent::*;
-use crate::common::{Bits, Group, PrimeField, Projective};
+use crate::arithmetic::utils::Naf;
+use crate::common::{Curve, Group, PrimeField, Projective};
 
-/// The projective coordinate addition
+/// weierstrass projective coordinate addition
 pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
     if lhs.is_identity() {
         return rhs;
@@ -29,14 +29,14 @@ pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
     let w = s.square() * v - uu * (u1 + u2);
     let uuu = uu * u;
 
-    let mut res = <P as Default>::default();
-    res.set_x(u * w);
-    res.set_y(s * (u1 * uu - w) - s1 * uuu);
-    res.set_z(uuu * v);
-    res
+    let x = u * w;
+    let y = s * (u1 * uu - w) - s1 * uuu;
+    let z = uuu * v;
+
+    P::new(x, y, z)
 }
 
-/// The projective coordinate doubling
+/// weierstrass projective coordinate doubling
 pub fn double_point<P: Projective>(point: P) -> P {
     if point.is_identity() || point.get_y().is_zero() {
         <P as Group>::ADDITIVE_IDENTITY
@@ -47,24 +47,26 @@ pub fn double_point<P: Projective>(point: P) -> P {
         let v = (u * point.get_x() * point.get_y()).double();
         let w = t.square() - v.double();
         let uu = u.square();
-        let mut res = <P as Default>::default();
-        res.set_x(u * w);
-        res.set_y(t * (v - w) - (uu * point.get_y().square()).double());
-        res.set_z(uu * u);
-        res
+
+        let x = u * w;
+        let y = t * (v - w) - (uu * point.get_y().square()).double();
+        let z = uu * u;
+
+        P::new(x, y, z)
     }
 }
 
-pub fn scalar_point<P: Projective>(mut base: P, scalar: [u64; 4], mut identity: P) -> P {
-    let bits = to_bits(scalar)
-        .into_iter()
-        .skip_while(|&x| x == 0)
-        .collect::<Bits>();
-    for &bit in bits.iter().rev() {
-        if bit == 1 {
-            identity += base;
+/// weierstrass projective coordinate scalar
+pub fn scalar_point<P: Projective>(point: P, scalar: &<P as Curve>::Scalar) -> P {
+    let mut res = P::ADDITIVE_IDENTITY;
+    let mut acc = point;
+    for &naf in scalar.to_nafs().iter() {
+        if naf == Naf::Plus {
+            res += acc;
+        } else if naf == Naf::Minus {
+            res -= acc;
         }
-        base = double_point(base);
+        acc = acc.double();
     }
-    identity
+    res
 }

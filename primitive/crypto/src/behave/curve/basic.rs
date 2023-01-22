@@ -5,6 +5,9 @@ pub trait Curve: ParityCmp + Basic {
     // range field of curve
     type Range: PrimeField;
 
+    // scalar field of affine
+    type Scalar: PrimeField;
+
     // a param
     const PARAM_A: Self::Range;
 
@@ -19,19 +22,10 @@ pub trait Curve: ParityCmp + Basic {
 
     // get y coordinate
     fn get_y(&self) -> Self::Range;
-
-    // set x coordinate
-    fn set_x(&mut self, value: Self::Range);
-
-    // set y coordinate
-    fn set_y(&mut self, value: Self::Range);
 }
 
 /// elliptic curve rational point affine representation
-pub trait Affine: Curve {
-    // scalar field of affine
-    type Scalar: PrimeField;
-}
+pub trait Affine: Curve {}
 
 /// extend curve point representation
 /// projective, jacobian and so on

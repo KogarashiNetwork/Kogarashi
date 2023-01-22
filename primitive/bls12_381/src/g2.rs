@@ -6,7 +6,7 @@ use core::borrow::Borrow;
 use core::iter::Sum;
 use dusk_bytes::{Error as BytesError, Serializable};
 use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
-use zero_crypto::arithmetic::bits_384::*;
+use zero_crypto::arithmetic::weierstrass::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::{curve::*, pairing::bls12_g2_pairing};
 

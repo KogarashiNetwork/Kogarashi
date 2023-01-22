@@ -34,9 +34,8 @@ pub trait WeierstrassAffine:
 /// rational point projective representation
 /// projective representation check that a point is infinite by z coordinate
 pub trait Projective: CurveExtend {
+    fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self;
+
     // get z coordinate
     fn get_z(&self) -> Self::Range;
-
-    // set z coordinate
-    fn set_z(&mut self, value: Self::Range);
 }

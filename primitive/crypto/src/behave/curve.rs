@@ -4,5 +4,5 @@ mod edwards;
 mod weierstrass;
 
 pub use basic::{Affine, Curve, CurveExtend};
-pub use edwards::{TwistedEdwardsAffine, TwistedEdwardsCurve};
+pub use edwards::{Extended, TwistedEdwardsAffine, TwistedEdwardsCurve};
 pub use weierstrass::{Projective, WeierstrassAffine, WeierstrassCurve};
