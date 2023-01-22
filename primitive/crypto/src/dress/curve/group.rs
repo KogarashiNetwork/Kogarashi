@@ -80,39 +80,19 @@ macro_rules! affine_group_operation {
             }
         }
 
-        impl Mul<<Self as Affine>::Scalar> for $affine {
+        impl Mul<<Self as Curve>::Scalar> for $affine {
             type Output = $projective;
 
-            fn mul(self, rhs: <Self as Affine>::Scalar) -> Self::Output {
-                let mut res = Self::Output::ADDITIVE_IDENTITY;
-                let mut acc = self.to_projective();
-                for &naf in rhs.to_nafs().iter() {
-                    if naf == Naf::Plus {
-                        res += acc;
-                    } else if naf == Naf::Minus {
-                        res -= acc;
-                    }
-                    acc = acc.double();
-                }
-                res
+            fn mul(self, rhs: <Self as Curve>::Scalar) -> Self::Output {
+                scalar_point(self.into(), &rhs)
             }
         }
 
-        impl<'b> Mul<&'b <Self as Affine>::Scalar> for $affine {
+        impl<'b> Mul<&'b <Self as Curve>::Scalar> for $affine {
             type Output = $projective;
 
-            fn mul(self, rhs: &'b <Self as Affine>::Scalar) -> Self::Output {
-                let mut res = Self::Output::ADDITIVE_IDENTITY;
-                let mut acc = self.to_projective();
-                for &naf in rhs.to_nafs().iter() {
-                    if naf == Naf::Plus {
-                        res += acc;
-                    } else if naf == Naf::Minus {
-                        res -= acc;
-                    }
-                    acc = acc.double();
-                }
-                res
+            fn mul(self, rhs: &'b <Self as Curve>::Scalar) -> Self::Output {
+                scalar_point(self.into(), rhs)
             }
         }
     };
@@ -200,17 +180,7 @@ macro_rules! projective_group_operation {
             type Output = Self;
 
             fn mul(self, rhs: <Self as Group>::Scalar) -> Self {
-                let mut res = Self::Output::ADDITIVE_IDENTITY;
-                let mut acc = self.clone();
-                for &naf in rhs.to_nafs().iter() {
-                    if naf == Naf::Plus {
-                        res += acc;
-                    } else if naf == Naf::Minus {
-                        res -= acc;
-                    }
-                    acc = acc.double();
-                }
-                res
+                scalar_point(self, &rhs)
             }
         }
 
@@ -218,17 +188,7 @@ macro_rules! projective_group_operation {
             type Output = $projective;
 
             fn mul(self, rhs: &'b <Self as Group>::Scalar) -> $projective {
-                let mut res = Self::Output::ADDITIVE_IDENTITY;
-                let mut acc = self.clone();
-                for &naf in rhs.to_nafs().iter() {
-                    if naf == Naf::Plus {
-                        res += acc;
-                    } else if naf == Naf::Minus {
-                        res -= acc;
-                    }
-                    acc = acc.double();
-                }
-                res
+                scalar_point(self, rhs)
             }
         }
     };

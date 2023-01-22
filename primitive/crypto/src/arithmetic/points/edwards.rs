@@ -1,5 +1,6 @@
 use crate::common::Extended;
 
+/// twisted edwards coordinate addition
 pub fn add_point<P: Extended>(lhs: P, rhs: P) -> P {
     let a = lhs.get_x() + rhs.get_x();
     let b = lhs.get_y() + rhs.get_y();

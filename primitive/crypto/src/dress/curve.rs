@@ -22,6 +22,8 @@ macro_rules! curve_operation {
         impl Curve for $affine {
             type Range = $range;
 
+            type Scalar = $scalar;
+
             const PARAM_A: $range = $a;
 
             fn is_identity(self) -> bool {
@@ -51,6 +53,8 @@ macro_rules! curve_operation {
 
         impl Curve for $projective {
             type Range = $range;
+
+            type Scalar = $scalar;
 
             const PARAM_A: $range = $a;
 
@@ -105,9 +109,7 @@ macro_rules! curve_operation {
             }
         }
 
-        impl Affine for $affine {
-            type Scalar = $scalar;
-        }
+        impl Affine for $affine {}
 
         impl WeierstrassAffine for $affine {
             type Projective = $projective;
