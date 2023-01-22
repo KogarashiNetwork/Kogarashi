@@ -148,7 +148,7 @@
 <p>In this section, we describe the zero knowledge scheme features.</p>
 <h2 id="snarks-vs-starks-vs-bulletproofs"><a class="header" href="#snarks-vs-starks-vs-bulletproofs"><code>SNARKs</code> vs <code>STARKs</code> vs <code>Bulletproofs</code></a></h2>
 <p>We compare the three types of zero knowledge scheme <code>zk-SNARKs</code>, <code>zk-STARKs</code> and <code>Bulletproofs</code>. The <code>zk-SNARKs</code> is the most efficient. We can verify the proof with const or almost const time and generate proof process is also efficient. The proof size is also small. However, it's necessary to setup the parameters. We can save a lot of workload because of this but it would be the critical security issue. The <code>zk-STARKs</code> doesn't need to setup parameters and it has quantum tolerance. However, its proof size is far bigger than <code>zk-SNARKs</code> and the workload of verification process also far bigger than <code>zk-SNARKs</code>. The <code>Bulletproofs</code> doesn't need to setup parameters and its feature is in the middle between <code>zk-SNARKs</code> and <code>zk-STARKs</code> but it doesn't have quantum tolerance.</p>
-<h2 id="summerize"><a class="header" href="#summerize">Summerize</a></h2>
+<h2 id="summarize"><a class="header" href="#summarize">Summarize</a></h2>
 <p>To summerize the above comparison, it would be as following table.</p>
 <div class="table-wrapper"><table><thead><tr><th>Scheme</th><th>Trusted Setup</th><th>Prover Cost</th><th>Verifier Cost</th><th>Proof Size</th><th>Quantum Tolerance</th></tr></thead><tbody>
 <tr><td>zk-SNARKs</td><td>Necessary</td><td>Low</td><td>Low</td><td>Small</td><td>No</td></tr>

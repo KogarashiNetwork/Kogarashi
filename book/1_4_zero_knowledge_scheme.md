@@ -6,7 +6,7 @@ In this section, we describe the zero knowledge scheme features.
 
 We compare the three types of zero knowledge scheme `zk-SNARKs`, `zk-STARKs` and `Bulletproofs`. The `zk-SNARKs` is the most efficient. We can verify the proof with const or almost const time and generate proof process is also efficient. The proof size is also small. However, it's necessary to setup the parameters. We can save a lot of workload because of this but it would be the critical security issue. The `zk-STARKs` doesn't need to setup parameters and it has quantum tolerance. However, its proof size is far bigger than `zk-SNARKs` and the workload of verification process also far bigger than `zk-SNARKs`. The `Bulletproofs` doesn't need to setup parameters and its feature is in the middle between `zk-SNARKs` and `zk-STARKs` but it doesn't have quantum tolerance.
 
-## Summerize
+## Summarize
 
 To summerize the above comparison, it would be as following table.
 
