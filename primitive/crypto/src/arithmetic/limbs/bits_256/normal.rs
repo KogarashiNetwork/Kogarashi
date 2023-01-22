@@ -2,7 +2,7 @@ use crate::arithmetic::{bits_256::*, utils::*};
 
 #[inline]
 pub const fn add(a: [u64; 4], b: [u64; 4], p: [u64; 4]) -> [u64; 4] {
-    let (l0, c) = adc(a[0], b[0], 0);
+    let (l0, c) = addnc(a[0], b[0]);
     let (l1, c) = adc(a[1], b[1], c);
     let (l2, c) = adc(a[2], b[2], c);
     let (l3, _) = adc(a[3], b[3], c);
@@ -37,22 +37,22 @@ pub const fn double(a: [u64; 4], p: [u64; 4]) -> [u64; 4] {
 
 #[inline]
 pub const fn mul(a: [u64; 4], b: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
-    let (l0, c) = mac(0, a[0], b[0], 0);
-    let (l1, c) = mac(0, a[0], b[1], c);
-    let (l2, c) = mac(0, a[0], b[2], c);
-    let (l3, l4) = mac(0, a[0], b[3], c);
+    let (l0, c) = mulnc(a[0], b[0]);
+    let (l1, c) = muladd(a[0], b[1], c);
+    let (l2, c) = muladd(a[0], b[2], c);
+    let (l3, l4) = muladd(a[0], b[3], c);
 
-    let (l1, c) = mac(l1, a[1], b[0], 0);
+    let (l1, c) = muladd(a[1], b[0], l1);
     let (l2, c) = mac(l2, a[1], b[1], c);
     let (l3, c) = mac(l3, a[1], b[2], c);
     let (l4, l5) = mac(l4, a[1], b[3], c);
 
-    let (l2, c) = mac(l2, a[2], b[0], 0);
+    let (l2, c) = muladd(a[2], b[0], l2);
     let (l3, c) = mac(l3, a[2], b[1], c);
     let (l4, c) = mac(l4, a[2], b[2], c);
     let (l5, l6) = mac(l5, a[2], b[3], c);
 
-    let (l3, c) = mac(l3, a[3], b[0], 0);
+    let (l3, c) = muladd(a[3], b[0], l3);
     let (l4, c) = mac(l4, a[3], b[1], c);
     let (l5, c) = mac(l5, a[3], b[2], c);
     let (l6, l7) = mac(l6, a[3], b[3], c);
@@ -103,29 +103,29 @@ pub const fn neg(a: [u64; 4], p: [u64; 4]) -> [u64; 4] {
 pub const fn mont(a: [u64; 8], p: [u64; 4], inv: u64) -> [u64; 4] {
     let rhs = a[0].wrapping_mul(inv);
 
-    let (_, d) = mac(a[0], rhs, p[0], 0);
+    let (_, d) = muladd(rhs, p[0], a[0]);
     let (l1, d) = mac(a[1], rhs, p[1], d);
     let (l2, d) = mac(a[2], rhs, p[2], d);
     let (l3, d) = mac(a[3], rhs, p[3], d);
-    let (l4, e) = adc(a[4], 0, d);
+    let (l4, e) = addnc(a[4], d);
 
     let rhs = l1.wrapping_mul(inv);
 
-    let (_, d) = mac(l1, rhs, p[0], 0);
+    let (_, d) = muladd(rhs, p[0], l1);
     let (l2, d) = mac(l2, rhs, p[1], d);
     let (l3, d) = mac(l3, rhs, p[2], d);
     let (l4, d) = mac(l4, rhs, p[3], d);
     let (l5, e) = adc(a[5], e, d);
 
     let rhs = l2.wrapping_mul(inv);
-    let (_, d) = mac(l2, rhs, p[0], 0);
+    let (_, d) = muladd(rhs, p[0], l2);
     let (l3, d) = mac(l3, rhs, p[1], d);
     let (l4, d) = mac(l4, rhs, p[2], d);
     let (l5, d) = mac(l5, rhs, p[3], d);
     let (l6, e) = adc(a[6], e, d);
 
     let rhs = l3.wrapping_mul(inv);
-    let (_, d) = mac(l3, rhs, p[0], 0);
+    let (_, d) = muladd(rhs, p[0], l3);
     let (l4, d) = mac(l4, rhs, p[1], d);
     let (l5, d) = mac(l5, rhs, p[2], d);
     let (l6, d) = mac(l6, rhs, p[3], d);
