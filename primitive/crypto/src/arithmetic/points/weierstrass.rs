@@ -1,5 +1,4 @@
-use crate::arithmetic::bits_256::represent::*;
-use crate::common::{Bits, Group, PrimeField, Projective};
+use crate::common::{Group, PrimeField, Projective};
 
 /// The projective coordinate addition
 pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
@@ -37,6 +36,7 @@ pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
 }
 
 /// The projective coordinate doubling
+
 pub fn double_point<P: Projective>(point: P) -> P {
     if point.is_identity() || point.get_y().is_zero() {
         <P as Group>::ADDITIVE_IDENTITY
@@ -53,18 +53,4 @@ pub fn double_point<P: Projective>(point: P) -> P {
         res.set_z(uu * u);
         res
     }
-}
-
-pub fn scalar_point<P: Projective>(mut base: P, scalar: [u64; 4], mut identity: P) -> P {
-    let bits = to_bits(scalar)
-        .into_iter()
-        .skip_while(|&x| x == 0)
-        .collect::<Bits>();
-    for &bit in bits.iter().rev() {
-        if bit == 1 {
-            identity += base;
-        }
-        base = double_point(base);
-    }
-    identity
 }

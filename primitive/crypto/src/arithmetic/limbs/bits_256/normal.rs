@@ -1,4 +1,4 @@
-use crate::arithmetic::{bits_256::to_bits, utils::*};
+use crate::arithmetic::{bits_256::*, utils::*};
 
 #[inline]
 pub const fn add(a: [u64; 4], b: [u64; 4], p: [u64; 4]) -> [u64; 4] {
