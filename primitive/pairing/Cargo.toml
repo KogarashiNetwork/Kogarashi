@@ -17,5 +17,4 @@ zero-crypto = { path = "../crypto", default-features = false }
 zero-bls12-381 = { path = "../bls12_381", default-features = false }
 
 [dev-dependencies]
-rand_xorshift = { version = "0.3", default-features = false }
-rand = { version = "0.8", default-features = false }
+rand_core = { version="0.6", default-features = false }

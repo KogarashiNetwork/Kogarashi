@@ -27,22 +27,20 @@ mod tests {
     use crate::keypair::KeyPair;
     use crate::poly::Polynomial;
 
-    use proptest::prelude::*;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
+    use rand_core::OsRng;
     use zero_bls12_381::{Fr, G1Projective};
     use zero_crypto::common::*;
 
-    prop_compose! {
-        fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fr {
-            Fr::random(XorShiftRng::from_seed(bytes))
-        }
+    fn arb_fr() -> Fr {
+        Fr::random(OsRng)
     }
 
-    prop_compose! {
-        fn arb_poly(k: u32)(bytes in vec![[any::<u8>(); 16]; 1 << k as usize]) -> Polynomial<Fr> {
-            Polynomial((0..(1 << k)).map(|i| Fr::random(XorShiftRng::from_seed(bytes[i]))).collect::<Vec<Fr>>())
-        }
+    fn arb_poly(k: u32) -> Polynomial<Fr> {
+        Polynomial(
+            (0..(1 << k))
+                .map(|_| Fr::random(OsRng))
+                .collect::<Vec<Fr>>(),
+        )
     }
 
     fn evaluate(poly: &Polynomial<Fr>, at: Fr) -> G1Projective {
@@ -58,16 +56,15 @@ mod tests {
         acc
     }
 
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(3))]
-        #[test]
-        fn kzg_commit_test(r in arb_fr(), poly in arb_poly(5)) {
-            let k = 5;
-            let keypair = KeyPair::<KzgCommitment>::setup(k, r);
-            let g1_commitment = keypair.commit(&poly);
-            let g1_evaluation = evaluate(&poly, r);
+    #[test]
+    fn kzg_commit_test() {
+        let r = arb_fr();
+        let poly = arb_poly(5);
+        let k = 5;
+        let keypair = KeyPair::<KzgCommitment>::setup(k, r);
+        let g1_commitment = keypair.commit(&poly);
+        let g1_evaluation = evaluate(&poly, r);
 
-            assert_eq!(g1_commitment, g1_evaluation);
-        }
+        assert_eq!(g1_commitment, g1_evaluation);
     }
 }

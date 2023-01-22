@@ -4,10 +4,9 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
-    name: Production Environment Unit Test
+  coverage:
+    name: Coverage
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
         with:
@@ -15,10 +14,11 @@ jobs:
       - name: Update submodules
         id: update
         run: git submodule update --remote --recursive
-      - name: Test
-        uses: actions-rs/cargo@v1
+      - uses: actions-rs/toolchain@v1
+      - run: cargo install cargo-llvm-cov
+      - uses: actions-rs/cargo@v1
         with:
-          command: test
+          command: llvm-cov
           args: --release --all --all-features
 
   bench:
@@ -32,8 +32,6 @@ jobs:
       - name: Update submodules
         id: update
         run: git submodule update --remote --recursive
-      - uses: actions-rs/toolchain@v1
-      - run: rustup component add rustfmt
       - uses: actions-rs/cargo@v1
         with:
           command: bench
