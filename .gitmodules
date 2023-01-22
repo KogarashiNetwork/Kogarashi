@@ -1,3 +1,3 @@
 [submodule "primitive/plonk"]
 	path = primitive/plonk
-	url = git@github.com:zero-network/dusk-plonk.git
+	url = https://github.com/zero-network/dusk-plonk
