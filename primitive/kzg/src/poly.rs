@@ -153,22 +153,20 @@ impl<F: FftField> Witness<F> {
 #[cfg(test)]
 mod tests {
     use super::Polynomial;
-    use proptest::prelude::*;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
+    use rand_core::OsRng;
     use zero_bls12_381::Fr;
     use zero_crypto::behave::{Group, PrimeField};
 
-    prop_compose! {
-        fn arb_fr()(bytes in [any::<u8>(); 16]) -> Fr {
-            Fr::random(XorShiftRng::from_seed(bytes))
-        }
+    fn arb_fr() -> Fr {
+        Fr::random(OsRng)
     }
 
-    prop_compose! {
-        fn arb_poly(k: u32)(bytes in vec![[any::<u8>(); 16]; 1 << k as usize]) -> Polynomial<Fr> {
-            Polynomial((0..(1 << k)).map(|i| Fr::random(XorShiftRng::from_seed(bytes[i]))).collect::<Vec<Fr>>())
-        }
+    fn arb_poly(k: u32) -> Polynomial<Fr> {
+        Polynomial(
+            (0..(1 << k))
+                .map(|_| Fr::random(OsRng))
+                .collect::<Vec<Fr>>(),
+        )
     }
 
     fn naive_multiply<F: PrimeField>(a: Vec<F>, b: Vec<F>) -> Vec<F> {
@@ -181,33 +179,31 @@ mod tests {
         c
     }
 
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100))]
-        #[test]
-        fn polynomial_scalar(poly in arb_poly(10), at in arb_fr()) {
-            let scalared = poly.clone() * at;
-            let test = Polynomial(poly.0.into_iter().map(|coeff| coeff * at).collect());
-            assert_eq!(scalared, test);
-        }
+    #[test]
+    fn polynomial_scalar() {
+        let poly = arb_poly(10);
+        let at = arb_fr();
+        let scalared = poly.clone() * at;
+        let test = Polynomial(poly.0.into_iter().map(|coeff| coeff * at).collect());
+        assert_eq!(scalared, test);
     }
 
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100))]
-        #[test]
-        fn polynomial_division_test(at in arb_fr(), divisor in arb_poly(10)) {
-            // dividend = divisor * quotient
-            let factor_poly = vec![Fr::one(), -at];
+    #[test]
+    fn polynomial_division_test() {
+        let at = arb_fr();
+        let divisor = arb_poly(10);
+        // dividend = divisor * quotient
+        let factor_poly = vec![Fr::one(), -at];
 
-            // divisor * (x - at) = dividend
-            let poly_a = Polynomial(naive_multiply(divisor.0, factor_poly.clone()));
+        // divisor * (x - at) = dividend
+        let poly_a = Polynomial(naive_multiply(divisor.0, factor_poly.clone()));
 
-            // dividend / (x - at) = quotient
-            let quotient = poly_a.divide(&at);
+        // dividend / (x - at) = quotient
+        let quotient = poly_a.divide(&at);
 
-            // quotient * (x - at) = divident
-            let original = Polynomial(naive_multiply(quotient.0, factor_poly));
+        // quotient * (x - at) = divident
+        let original = Polynomial(naive_multiply(quotient.0, factor_poly));
 
-            assert_eq!(poly_a.0, original.0);
-        }
+        assert_eq!(poly_a.0, original.0);
     }
 }

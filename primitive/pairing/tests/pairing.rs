@@ -1,5 +1,4 @@
-use rand::SeedableRng;
-use rand_xorshift::XorShiftRng;
+use rand_core::OsRng;
 use zero_bls12_381::{Fq12, Fr, G1Affine, G2Affine, G2PairingAffine, Gt};
 use zero_crypto::behave::{Group, Pairing, PairingRange};
 use zero_pairing::TatePairing;
@@ -18,13 +17,9 @@ fn pairing_test() {
     let g1 = G1Affine::ADDITIVE_GENERATOR;
     let g2 = G2Affine::ADDITIVE_GENERATOR;
 
-    let mut rng = XorShiftRng::from_seed([
-        0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    ]);
-
     for _ in 0..10 {
-        let a = Fr::random(&mut rng);
-        let b = Fr::random(&mut rng);
+        let a = Fr::random(OsRng);
+        let b = Fr::random(OsRng);
         let c = a * b;
 
         let g = G1Affine::from(g1 * a);
@@ -46,21 +41,17 @@ fn final_exp_test() {
 
 #[test]
 fn multi_miller_loop_test() {
-    let mut rng = XorShiftRng::from_seed([
-        0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    ]);
-
     for _ in 0..5 {
         let a1 = G1Affine::ADDITIVE_GENERATOR;
         let b1 = G2Affine::ADDITIVE_GENERATOR;
-        let a2 = G1Affine::from(a1 * Fr::random(&mut rng));
-        let b2 = G2Affine::from(b1 * Fr::random(&mut rng));
-        let a3 = G1Affine::from(a1 * Fr::random(&mut rng));
-        let b3 = G2Affine::from(b1 * Fr::random(&mut rng));
-        let a4 = G1Affine::from(a1 * Fr::random(&mut rng));
-        let b4 = G2Affine::from(b1 * Fr::random(&mut rng));
-        let a5 = G1Affine::from(a1 * Fr::random(&mut rng));
-        let b5 = G2Affine::from(b1 * Fr::random(&mut rng));
+        let a2 = G1Affine::from(a1 * Fr::random(OsRng));
+        let b2 = G2Affine::from(b1 * Fr::random(OsRng));
+        let a3 = G1Affine::from(a1 * Fr::random(OsRng));
+        let b3 = G2Affine::from(b1 * Fr::random(OsRng));
+        let a4 = G1Affine::from(a1 * Fr::random(OsRng));
+        let b4 = G2Affine::from(b1 * Fr::random(OsRng));
+        let a5 = G1Affine::from(a1 * Fr::random(OsRng));
+        let b5 = G2Affine::from(b1 * Fr::random(OsRng));
 
         let b1_pairing = G2PairingAffine::from(b1);
         let b2_pairing = G2PairingAffine::from(b2);

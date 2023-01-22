@@ -3389,10 +3389,7 @@ name = "zero-kzg"
 version = "0.1.10"
 dependencies = [
  "parity-scale-codec",
- "proptest",
- "rand 0.8.5",
  "rand_core 0.6.4",
- "rand_xorshift",
  "rayon",
  "zero-bls12-381",
  "zero-crypto",
@@ -3428,8 +3425,7 @@ dependencies = [
 name = "zero-pairing"
 version = "0.1.10"
 dependencies = [
- "rand 0.8.5",
- "rand_xorshift",
+ "rand_core 0.6.4",
  "zero-bls12-381",
  "zero-crypto",
 ]

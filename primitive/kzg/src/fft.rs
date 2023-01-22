@@ -215,18 +215,15 @@ mod tests {
     use crate::poly::Polynomial;
 
     use super::Fft;
-    use proptest::prelude::*;
-    use proptest::std_facade::vec;
-    use rand::SeedableRng;
-    use rand_xorshift::XorShiftRng;
+    use rand_core::OsRng;
     use zero_bls12_381::Fr;
     use zero_crypto::behave::{Group, PrimeField};
     use zero_crypto::common::Vec;
 
-    prop_compose! {
-        fn arb_poly(k: u32)(bytes in vec![[any::<u8>(); 16]; 1 << k as usize]) -> Vec<Fr> {
-            (0..(1 << k)).map(|i| Fr::random(XorShiftRng::from_seed(bytes[i]))).collect::<Vec<Fr>>()
-        }
+    fn arb_poly(k: u32) -> Vec<Fr> {
+        (0..(1 << k))
+            .map(|_| Fr::random(OsRng))
+            .collect::<Vec<Fr>>()
     }
 
     fn naive_multiply<F: PrimeField>(a: Vec<F>, b: Vec<F>) -> Vec<F> {
@@ -250,44 +247,41 @@ mod tests {
         )
     }
 
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100))]
-        #[test]
-        fn fft_transformation_test(coeffs in arb_poly(10)) {
-            let mut poly_a = Polynomial(coeffs);
-            let poly_b = poly_a.clone();
-            let classic_fft = Fft::new(10);
+    #[test]
+    fn fft_transformation_test() {
+        let coeffs = arb_poly(10);
+        let mut poly_a = Polynomial(coeffs);
+        let poly_b = poly_a.clone();
+        let classic_fft = Fft::new(10);
 
-            classic_fft.dft(&mut poly_a);
-            classic_fft.idft(&mut poly_a);
+        classic_fft.dft(&mut poly_a);
+        classic_fft.idft(&mut poly_a);
 
-            assert_eq!(poly_a, poly_b)
-        }
+        assert_eq!(poly_a, poly_b)
     }
 
-    proptest! {
-        #![proptest_config(ProptestConfig::with_cases(100))]
-        #[test]
-        fn fft_multiplication_test(coeffs_a in arb_poly(4), coeffs_b in arb_poly(4)) {
-            let fft = Fft::new(5);
-            let poly_c = coeffs_a.clone();
-            let poly_d = coeffs_b.clone();
-            let mut poly_a = Polynomial(coeffs_a);
-            let mut poly_b = Polynomial(coeffs_b);
-            let poly_g = poly_a.clone();
-            let poly_h = poly_b.clone();
+    #[test]
+    fn fft_multiplication_test() {
+        let coeffs_a = arb_poly(4);
+        let coeffs_b = arb_poly(4);
+        let fft = Fft::new(5);
+        let poly_c = coeffs_a.clone();
+        let poly_d = coeffs_b.clone();
+        let mut poly_a = Polynomial(coeffs_a);
+        let mut poly_b = Polynomial(coeffs_b);
+        let poly_g = poly_a.clone();
+        let poly_h = poly_b.clone();
 
-            let poly_e = Polynomial(naive_multiply(poly_c, poly_d));
+        let poly_e = Polynomial(naive_multiply(poly_c, poly_d));
 
-            fft.dft(&mut poly_a);
-            fft.dft(&mut poly_b);
-            let mut poly_f = point_mutiply(poly_a, poly_b);
-            fft.idft(&mut poly_f);
+        fft.dft(&mut poly_a);
+        fft.dft(&mut poly_b);
+        let mut poly_f = point_mutiply(poly_a, poly_b);
+        fft.idft(&mut poly_f);
 
-            let poly_i = fft.poly_mul(poly_g, poly_h);
+        let poly_i = fft.poly_mul(poly_g, poly_h);
 
-            assert_eq!(poly_e, poly_f);
-            assert_eq!(poly_e, poly_i)
-        }
+        assert_eq!(poly_e, poly_f);
+        assert_eq!(poly_e, poly_i)
     }
 }
