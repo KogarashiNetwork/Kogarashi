@@ -16,8 +16,3 @@ readme = 'README.md'
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 rand_core = { version="0.6", default-features = false }
 sp-std = { version = '3.0.0', default-features = false }
-
-[dev-dependencies]
-rand = { version = "0.8", default-features = false }
-rand_xorshift = { version = "0.3", default-features = false }
-proptest = "1"
