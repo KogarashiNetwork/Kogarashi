@@ -28,9 +28,9 @@ fn circuit(c: &mut Criterion) {
     let bob_public_key = generator * bob_private_key;
     let alice_balance = 1500;
     let transfer_amount_b = 800;
-    let alice_after_balance = JubJubScalar::from(700 as u64);
-    let alice_original_randomness = JubJubScalar::from(789 as u64);
-    let randomness = JubJubScalar::from(123 as u64);
+    let alice_after_balance = JubJubScalar::from(700_u64);
+    let alice_original_randomness = JubJubScalar::from(789_u64);
+    let randomness = JubJubScalar::from(123_u64);
     let alice_encrypted_balance =
         EncryptedNumber::encrypt(alice_private_key, alice_balance, alice_original_randomness);
     let alice_transfer_amount =

@@ -4,7 +4,7 @@
 
 We describe the blockchain which supports privacy preserving transactions for both transfers and smart constract executions depending only on cryptgraphic hardness assumption. In this document, we describe how we realize privacy with only cryptgraphy instead `TEE`, `L2 solutions` and `trusted parties`, `optimistic assumptions`.
 
-As a part of our protocol, we combine some cryptgraphic toools. We would like to intruduce these tools and compare these with other alternative choices, and we finally describe how we implement the privacy preserving transactions with them.
+As a part of our protocol, we combine some cryptgraphic tools. We would like to intruduce these tools and compare these with other alternative choices, and we finally describe how we implement the privacy preserving transactions with them.
 
 ## Contents
 
