@@ -1,4 +1,4 @@
-use core::ops::{Add, Sub};
+use core::ops::{Add, Mul, Sub};
 
 use core::iter;
 use rand_core::RngCore;
@@ -135,6 +135,14 @@ impl<F: FftField> Sub for Polynomial<F> {
     }
 }
 
+impl<F: FftField> Mul<F> for Polynomial<F> {
+    type Output = Polynomial<F>;
+
+    fn mul(self, scalar: F) -> Polynomial<F> {
+        Self(self.0.into_iter().map(|coeff| coeff * &scalar).collect())
+    }
+}
+
 impl<F: FftField> Witness<F> {
     // verify witness
     pub fn verify_eval(self) -> bool {
@@ -171,6 +179,16 @@ mod tests {
             })
         });
         c
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(100))]
+        #[test]
+        fn polynomial_scalar(poly in arb_poly(10), at in arb_fr()) {
+            let scalared = poly.clone() * at;
+            let test = Polynomial(poly.0.into_iter().map(|coeff| coeff * at).collect());
+            assert_eq!(scalared, test);
+        }
     }
 
     proptest! {
