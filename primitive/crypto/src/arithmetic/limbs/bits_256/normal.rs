@@ -62,32 +62,30 @@ pub const fn mul(a: [u64; 4], b: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
 
 #[inline]
 pub const fn square(a: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
-    let a10 = a[1] as u128 * a[0] as u128;
-    let a20 = a[2] as u128 * a[0] as u128;
-    let a30 = a[3] as u128 * a[0] as u128;
-    let a13 = a[1] as u128 * a[3] as u128;
-    let a21 = a[2] as u128 * a[1] as u128;
-    let a23 = a[2] as u128 * a[3] as u128;
+    let (l1, c) = mulnc(a[1], a[0]);
+    let (l2, c) = muladd(a[2], a[0], c);
+    let (l3, c) = muladd(a[3], a[0], c);
+    let (l4, c) = muladd(a[1], a[3], c);
+    let (l5, l6) = muladd(a[2], a[3], c);
+    let (l3, c) = muladd(a[1], a[2], l3);
+    let (l4, c) = addnc(l4, c);
+    let (l5, _) = addnc(l5, c);
+
+    let (l1, c) = dbc(l1, 0);
+    let (l2, c) = dbc(l2, c);
+    let (l3, c) = dbc(l3, c);
+    let (l4, c) = dbc(l4, c);
+    let (l5, c) = dbc(l5, c);
+    let (l6, l7) = dbc(l6, c);
 
     let (l0, c) = mulnc(a[0], a[0]);
-    let (l1, c) = addnc(a10, c);
-    let (l2, c) = addnc(a20, c);
-    let (l3, l4) = addnc(a30, c);
-
-    let (l1, c) = addnc(a10, l1);
-    let (l2, c) = macnc(l2, a20, c);
-    let (l3, c) = macnc(l3, a30, c);
-    let (l4, l5) = macnc(l4, a13, c);
-
-    let (l2, c) = mac(l2, a[1], a[1], 0);
-    let (l3, c) = macnc(l3, a21, c);
-    let (l4, c) = macnc(l4, a13, c);
-    let (l5, l6) = macnc(l5, a23, c);
-
-    let (l3, c) = addnc(a21, l3);
+    let (l1, c) = addnc(l1, c);
+    let (l2, c) = mac(l2, a[1], a[1], c);
+    let (l3, c) = addnc(l3, c);
     let (l4, c) = mac(l4, a[2], a[2], c);
-    let (l5, c) = macnc(l5, a23, c);
-    let (l6, l7) = mac(l6, a[3], a[3], c);
+    let (l5, c) = addnc(l5, c);
+    let (l6, c) = mac(l6, a[3], a[3], c);
+    let (l7, _) = addnc(l7, c);
 
     mont([l0, l1, l2, l3, l4, l5, l6, l7], p, inv)
 }
