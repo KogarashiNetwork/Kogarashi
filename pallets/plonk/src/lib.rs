@@ -159,17 +159,15 @@ impl<T: Config> Plonk<T::AccountId> for Pallet<T> {
         mut rng: FullcodecRng,
     ) -> DispatchResultWithPostInfo {
         match Self::public_parameter() {
-            Some(_) => {
-                return Err(DispatchErrorWithPostInfo {
-                    post_info: PostDispatchInfo::from(()),
-                    error: DispatchError::Other("already setup"),
-                })
-            }
+            Some(_) => Err(DispatchErrorWithPostInfo {
+                post_info: PostDispatchInfo::from(()),
+                error: DispatchError::Other("already setup"),
+            }),
             None => {
                 let pp = PublicParameters::setup(1 << val, &mut rng).unwrap();
                 PublicParameter::<T>::put(&pp);
                 Event::<T>::TrustedSetup(pp);
-                return Ok(().into());
+                Ok(().into())
             }
         }
     }
@@ -186,21 +184,17 @@ impl<T: Config> Plonk<T::AccountId> for Pallet<T> {
                 let (_, verifier) = Compiler::compile::<T::CustomCircuit>(&pp, label)
                     .expect("failed to compile circuit");
                 match verifier.verify(&proof, &public_inputs) {
-                    Ok(_) => return Ok(().into()),
-                    Err(_) => {
-                        return Err(DispatchErrorWithPostInfo {
-                            post_info: PostDispatchInfo::from(()),
-                            error: DispatchError::Other("invalid proof"),
-                        })
-                    }
+                    Ok(_) => Ok(().into()),
+                    Err(_) => Err(DispatchErrorWithPostInfo {
+                        post_info: PostDispatchInfo::from(()),
+                        error: DispatchError::Other("invalid proof"),
+                    }),
                 }
             }
-            None => {
-                return Err(DispatchErrorWithPostInfo {
-                    post_info: PostDispatchInfo::from(()),
-                    error: DispatchError::Other("setup not yet"),
-                })
-            }
+            None => Err(DispatchErrorWithPostInfo {
+                post_info: PostDispatchInfo::from(()),
+                error: DispatchError::Other("setup not yet"),
+            }),
         }
     }
 }

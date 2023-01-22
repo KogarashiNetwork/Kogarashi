@@ -30,7 +30,7 @@ impl<F: FftField> Fft<F> {
 
         // precompute twiddle factors
         let g = (0..F::S - k).fold(F::ROOT_OF_UNITY, |acc, _| acc.square());
-        let twiddle_factors = (0..half_n as usize)
+        let twiddle_factors = (0..half_n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= g;
@@ -40,7 +40,7 @@ impl<F: FftField> Fft<F> {
 
         // precompute inverse twiddle factors
         let g_inv = g.invert().unwrap();
-        let inv_twiddle_factors = (0..half_n as usize)
+        let inv_twiddle_factors = (0..half_n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= g_inv;
@@ -50,7 +50,7 @@ impl<F: FftField> Fft<F> {
 
         // precompute cosets
         let mul_g = F::MULTIPLICATIVE_GENERATOR;
-        let cosets = (0..half_n as usize)
+        let cosets = (0..half_n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= mul_g;
@@ -60,7 +60,7 @@ impl<F: FftField> Fft<F> {
 
         // precompute inverse cosets
         let mul_g_inv = mul_g.invert().unwrap();
-        let inv_cosets = (0..n as usize)
+        let inv_cosets = (0..n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= mul_g_inv;
@@ -68,7 +68,7 @@ impl<F: FftField> Fft<F> {
             })
             .collect::<Vec<_>>();
 
-        let elements = (0..n as usize)
+        let elements = (0..n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= g;
@@ -79,7 +79,7 @@ impl<F: FftField> Fft<F> {
         let bit_reverse = (0..n as u64)
             .filter_map(|i| {
                 let r = i.reverse_bits() >> offset;
-                (i < r).then(|| (i as usize, r as usize))
+                (i < r).then_some((i as usize, r as usize))
             })
             .collect::<Vec<_>>();
 

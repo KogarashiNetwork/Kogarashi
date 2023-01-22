@@ -114,7 +114,7 @@ impl<T: Config> ConfidentialTransfer<T::AccountId> for Pallet<T> {
         transaction_params: ConfidentialTransferTransaction<Self::EncryptedBalance>,
     ) -> DispatchResultWithPostInfo {
         let public_inputs = transaction_params.clone().public_inputs();
-        let (sender_amount, recipient_amount) = transaction_params.clone().transaction_amount();
+        let (sender_amount, recipient_amount) = transaction_params.transaction_amount();
         T::Plonk::verify(who, proof, public_inputs.to_vec())?;
         T::EncryptedCurrency::transfer(who, dest, sender_amount, recipient_amount)?;
         Ok(().into())
