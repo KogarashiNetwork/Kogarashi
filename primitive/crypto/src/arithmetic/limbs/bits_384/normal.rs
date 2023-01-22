@@ -92,7 +92,65 @@ pub const fn mul(a: [u64; 6], b: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
 
 #[inline]
 pub const fn square(a: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
-    mul(a, a, p, inv)
+    let a10 = a[1] as u128 * a[0] as u128;
+    let a20 = a[2] as u128 * a[0] as u128;
+    let a30 = a[3] as u128 * a[0] as u128;
+    let a40 = a[4] as u128 * a[0] as u128;
+    let a50 = a[5] as u128 * a[0] as u128;
+    let a12 = a[1] as u128 * a[2] as u128;
+    let a13 = a[1] as u128 * a[3] as u128;
+    let a14 = a[1] as u128 * a[4] as u128;
+    let a15 = a[1] as u128 * a[5] as u128;
+    let a23 = a[2] as u128 * a[3] as u128;
+    let a24 = a[2] as u128 * a[4] as u128;
+    let a25 = a[2] as u128 * a[5] as u128;
+    let a34 = a[3] as u128 * a[4] as u128;
+    let a35 = a[3] as u128 * a[5] as u128;
+    let a45 = a[4] as u128 * a[5] as u128;
+
+    let (l0, c) = mulnc(a[0], a[0]);
+    let (l1, c) = addnc(a10, c);
+    let (l2, c) = addnc(a20, c);
+    let (l3, c) = addnc(a30, c);
+    let (l4, c) = addnc(a40, c);
+    let (l5, l6) = addnc(a50, c);
+
+    let (l1, c) = addnc(a10, l1);
+    let (l2, c) = macnc(l2, a20, c);
+    let (l3, c) = macnc(l3, a30, c);
+    let (l4, c) = macnc(l4, a40, c);
+    let (l5, c) = macnc(l5, a50, c);
+    let (l6, l7) = macnc(l6, a15, c);
+
+    let (l2, c) = mac(l2, a[1], a[1], 0);
+    let (l3, c) = macnc(l3, a12, c);
+    let (l4, c) = macnc(l4, a13, c);
+    let (l5, c) = macnc(l5, a14, c);
+    let (l6, c) = macnc(l6, a15, c);
+    let (l7, l8) = macnc(l7, a25, c);
+
+    let (l3, c) = addnc(a12, l3);
+    let (l4, c) = macnc(l4, a13, c);
+    let (l5, c) = macnc(l5, a14, c);
+    let (l6, c) = macnc(l6, a24, c);
+    let (l7, c) = macnc(l7, a25, c);
+    let (l8, l9) = macnc(l8, a35, c);
+
+    let (l4, c) = mac(l4, a[2], a[2], 0);
+    let (l5, c) = macnc(l5, a23, c);
+    let (l6, c) = macnc(l6, a24, c);
+    let (l7, c) = macnc(l7, a34, c);
+    let (l8, c) = macnc(l8, a35, c);
+    let (l9, l10) = macnc(l9, a45, c);
+
+    let (l5, c) = addnc(a23, l5);
+    let (l6, c) = mac(l6, a[3], a[3], c);
+    let (l7, c) = macnc(l7, a34, c);
+    let (l8, c) = mac(l8, a[4], a[4], c);
+    let (l9, c) = macnc(l9, a45, c);
+    let (l10, l11) = mac(l10, a[5], a[5], c);
+
+    mont([l0, l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11], p, inv)
 }
 
 #[inline]
