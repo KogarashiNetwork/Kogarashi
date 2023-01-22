@@ -54,8 +54,6 @@ jobs:
         - name: Update submodules
           id: update
           run: git submodule update --remote --recursive
-        - uses: actions-rs/toolchain@v1
-        - run: rustup component add rustfmt
         - uses: actions-rs/cargo@v1
           with:
             command: bench
