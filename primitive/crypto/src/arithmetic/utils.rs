@@ -19,6 +19,13 @@ pub const fn mac(a: u64, b: u64, c: u64, d: u64) -> (u64, u64) {
     (t as u64, (t >> 64) as u64)
 }
 
+#[inline(always)]
+pub const fn dbc(a: u64, b: u64) -> (u64, u64) {
+    let a = a as u128;
+    let t = (a << 1) + b as u128;
+    (t as u64, (t >> 64) as u64)
+}
+
 pub type ProjectiveCoordinate<L> = (L, L, L);
 
 #[derive(Clone, Copy, Eq, PartialEq, Debug)]

@@ -27,7 +27,12 @@ pub const fn sub(a: [u64; 4], b: [u64; 4], p: [u64; 4]) -> [u64; 4] {
 
 #[inline]
 pub const fn double(a: [u64; 4], p: [u64; 4]) -> [u64; 4] {
-    add(a, a, p)
+    let (l0, c) = dbc(a[0], 0);
+    let (l1, c) = dbc(a[1], c);
+    let (l2, c) = dbc(a[2], c);
+    let (l3, _) = dbc(a[3], c);
+
+    sub([l0, l1, l2, l3], p, p)
 }
 
 #[inline]
