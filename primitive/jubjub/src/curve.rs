@@ -57,14 +57,6 @@ impl Curve for JubJubAffine {
     fn get_y(&self) -> Self::Range {
         self.y
     }
-
-    fn set_x(&mut self, value: Self::Range) {
-        self.x = value
-    }
-
-    fn set_y(&mut self, value: Self::Range) {
-        self.y = value
-    }
 }
 
 impl Affine for JubJubAffine {

@@ -28,11 +28,11 @@ pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
     let w = s.square() * v - uu * (u1 + u2);
     let uuu = uu * u;
 
-    let mut res = <P as Default>::default();
-    res.set_x(u * w);
-    res.set_y(s * (u1 * uu - w) - s1 * uuu);
-    res.set_z(uuu * v);
-    res
+    let x = u * w;
+    let y = s * (u1 * uu - w) - s1 * uuu;
+    let z = uuu * v;
+
+    P::new(x, y, z)
 }
 
 /// The projective coordinate doubling
@@ -47,10 +47,11 @@ pub fn double_point<P: Projective>(point: P) -> P {
         let v = (u * point.get_x() * point.get_y()).double();
         let w = t.square() - v.double();
         let uu = u.square();
-        let mut res = <P as Default>::default();
-        res.set_x(u * w);
-        res.set_y(t * (v - w) - (uu * point.get_y().square()).double());
-        res.set_z(uu * u);
-        res
+
+        let x = u * w;
+        let y = t * (v - w) - (uu * point.get_y().square()).double();
+        let z = uu * u;
+
+        P::new(x, y, z)
     }
 }

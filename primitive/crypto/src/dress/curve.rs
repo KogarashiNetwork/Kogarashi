@@ -43,14 +43,6 @@ macro_rules! curve_operation {
             fn get_y(&self) -> Self::Range {
                 self.y
             }
-
-            fn set_x(&mut self, value: Self::Range) {
-                self.x = value;
-            }
-
-            fn set_y(&mut self, value: Self::Range) {
-                self.y = value;
-            }
         }
 
         impl WeierstrassCurve for $affine {
@@ -81,14 +73,6 @@ macro_rules! curve_operation {
 
             fn get_y(&self) -> Self::Range {
                 self.y
-            }
-
-            fn set_x(&mut self, value: Self::Range) {
-                self.x = value;
-            }
-
-            fn set_y(&mut self, value: Self::Range) {
-                self.y = value;
             }
         }
 
@@ -152,12 +136,12 @@ macro_rules! curve_operation {
         }
 
         impl Projective for $projective {
-            fn get_z(&self) -> Self::Range {
-                self.z
+            fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self {
+                Self { x, y, z }
             }
 
-            fn set_z(&mut self, value: Self::Range) {
-                self.z = value;
+            fn get_z(&self) -> Self::Range {
+                self.z
             }
         }
     };

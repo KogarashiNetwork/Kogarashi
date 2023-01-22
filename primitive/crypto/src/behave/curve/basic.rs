@@ -19,12 +19,6 @@ pub trait Curve: ParityCmp + Basic {
 
     // get y coordinate
     fn get_y(&self) -> Self::Range;
-
-    // set x coordinate
-    fn set_x(&mut self, value: Self::Range);
-
-    // set y coordinate
-    fn set_y(&mut self, value: Self::Range);
 }
 
 /// elliptic curve rational point affine representation
