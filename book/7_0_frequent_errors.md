@@ -6,6 +6,7 @@ The main errors happen during development of runtime pallet are followings.
 - `error[E0603]: module "group" is private`
 - `error[E0512]: cannot transmute between types of different sizes, or dependently-sized types`
 - `error[E0432]: unresolved import sp_core::to_substrate_wasm_fn_return_value`
+- `error: failed to parse manifest at failed to parse the version requirement '0.11 ' for dependency 'parking_lot'`
 
 Explaining causes and remedies.
 
@@ -73,4 +74,12 @@ default = ["std"]
 std = [
     "crate/std"
 ]
+```
+
+## `error: failed to parse manifest at failed to parse the version requirement '0.11 ' for dependency 'parking_lot'`
+This error happens the crate `parity-db` fails to find `parking_lot` version.
+
+
+```
+$ cargo update -p parity-db
 ```

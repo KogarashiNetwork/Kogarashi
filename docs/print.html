@@ -1397,6 +1397,7 @@ rand_core = {version=&quot;0.6&quot;, default-features = false }
 <li><code>error[E0603]: module &quot;group&quot; is private</code></li>
 <li><code>error[E0512]: cannot transmute between types of different sizes, or dependently-sized types</code></li>
 <li><code>error[E0432]: unresolved import sp_core::to_substrate_wasm_fn_return_value</code></li>
+<li><code>error: failed to parse manifest at failed to parse the version requirement '0.11 ' for dependency 'parking_lot'</code></li>
 </ul>
 <p>Explaining causes and remedies.</p>
 <h2 id="error-duplicate-lang-item-in-crate"><a class="header" href="#error-duplicate-lang-item-in-crate"><code>error: duplicate lang item in crate</code></a></h2>
@@ -1442,6 +1443,10 @@ default = [&quot;std&quot;]
 std = [
     &quot;crate/std&quot;
 ]
+</code></pre>
+<h2 id="error-failed-to-parse-manifest-at-failed-to-parse-the-version-requirement-011--for-dependency-parking_lot"><a class="header" href="#error-failed-to-parse-manifest-at-failed-to-parse-the-version-requirement-011--for-dependency-parking_lot"><code>error: failed to parse manifest at failed to parse the version requirement '0.11 ' for dependency 'parking_lot'</code></a></h2>
+<p>This error happens the crate <code>parity-db</code> fails to find <code>parking_lot</code> version.</p>
+<pre><code>$ cargo update -p parity-db
 </code></pre>
 
                     </main>
