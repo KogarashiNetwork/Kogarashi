@@ -117,11 +117,10 @@ macro_rules! limbs_test {
     };
 }
 
-type Bits256Limbs = [u64; 4];
-type Bits384Limbs = [u64; 6];
+use test_data::{Bits256Limbs, Bits384Limbs};
 
 limbs_test!(
-    jubjub_limbs_test,
+    jubjub_limbs_tests,
     bits_256,
     jubjub_field,
     Bits256Limbs,
