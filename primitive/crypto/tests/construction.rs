@@ -28,7 +28,8 @@ macro_rules! field_test_data {
 
 pub mod jubjub_curve {
     use super::*;
-    use zero_crypto::arithmetic::{bits_256::*, edwards::*};
+    use zero_crypto::arithmetic::bits_256::*;
+    use zero_crypto::arithmetic::edwards::*;
     use zero_crypto::common::*;
 
     #[derive(Clone, Copy, Decode, Encode)]
@@ -103,6 +104,13 @@ pub mod jubjub_curve {
         000000000000,
     ]);
 
+    const T: BlsScalar = BlsScalar::to_mont_form([
+        0xa79ca00515cf0172,
+        0x347eed85e11dd325,
+        0x247431ec84468aaa,
+        0x464c23a03263d422,
+    ]);
+
     impl BlsScalar {
         pub const fn to_mont_form(val: [u64; 4]) -> Self {
             Self(to_mont_form(
@@ -156,7 +164,8 @@ pub mod jubjub_curve {
         JubjubAffine,
         JubjubExtend,
         X,
-        Y
+        Y,
+        T
     );
 }
 pub const JUBJUB_MODULUS: [u64; 4] = [
