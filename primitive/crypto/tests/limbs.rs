@@ -1,13 +1,13 @@
-mod test_data;
+mod construction;
 
 macro_rules! limbs_test {
     ($test_name:ident, $test_bits:ident, $test_mod:ident, $limbs_type:ident, $one:expr, $two:expr) => {
         #[cfg(test)]
         mod $test_name {
             use super::*;
+            use construction::$test_mod::*;
             use paste::paste;
             use rand_core::OsRng;
-            use test_data::$test_mod::*;
             use zero_crypto::arithmetic::$test_bits::*;
 
             fn arb_field() -> $limbs_type {
@@ -117,7 +117,7 @@ macro_rules! limbs_test {
     };
 }
 
-use test_data::{Bits256Limbs, Bits384Limbs};
+use construction::{Bits256Limbs, Bits384Limbs};
 
 limbs_test!(
     jubjub_limbs_tests,
