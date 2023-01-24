@@ -16,7 +16,7 @@ readme = 'README.md'
 zero-crypto = { path = "../crypto", default-features = false }
 zero-bls12-381 = { path = "../bls12_381", default-features = false }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
-rand_core = { version="0.6", default-features = false }
+rand_core = { version="0.6.4", default-features = false }
 rayon = "1.5.1"
 
 [features]

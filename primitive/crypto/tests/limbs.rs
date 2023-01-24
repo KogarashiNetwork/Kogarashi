@@ -1,12 +1,12 @@
-mod bls12_381;
-mod jubjub;
+mod test_data;
 
 use rand_core::OsRng;
+use test_data::{bls12_381_field, jubjub_field};
 
 #[cfg(test)]
 mod jubjub_limbs_tests {
     use super::*;
-    use crate::jubjub::field::*;
+    use crate::jubjub_field::*;
     use zero_crypto::arithmetic::bits_256::*;
 
     fn arb_jubjub_fr() -> [u64; 4] {
@@ -105,7 +105,7 @@ mod jubjub_limbs_tests {
 #[cfg(test)]
 mod bls12_381_limbs_tests {
     use super::*;
-    use crate::bls12_381::field::*;
+    use crate::bls12_381_field::*;
     use zero_crypto::arithmetic::bits_384::*;
 
     fn arb_bls12_381_fp() -> [u64; 6] {

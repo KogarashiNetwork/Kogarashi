@@ -30,7 +30,7 @@ confidential_transfer = { path = "./pallets/confidential_transfer", default-feat
 [dev-dependencies]
 criterion = "0.4.0"
 rand = { version = "0.8", default-features = false }
-rand_core = { version="0.6", default-features = false }
+rand_core = { version="0.6.4", default-features = false }
 sp-io = { default-features = false, version = '3.0.0' }
 sp-core = { default-features = false, version = '3.0.0' }
 sp-runtime = { default-features = false, version = '3.0.0' }
