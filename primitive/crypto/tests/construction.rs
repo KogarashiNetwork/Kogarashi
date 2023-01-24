@@ -1,4 +1,4 @@
-use zero_crypto::dress::field::*;
+use zero_crypto::dress::{curve::edwards::*, field::*};
 
 macro_rules! field_test_data {
     ($test_data_name:ident, $test_bits:ident, $limbs_type:ident, $modulus:ident, $inv:ident, $r2:ident, $r3:ident) => {
@@ -28,7 +28,7 @@ macro_rules! field_test_data {
 
 pub mod jubjub_curve {
     use super::*;
-    use zero_crypto::arithmetic::bits_256::*;
+    use zero_crypto::arithmetic::{bits_256::*, edwards::*};
     use zero_crypto::common::*;
 
     #[derive(Clone, Copy, Decode, Encode)]
@@ -82,6 +82,27 @@ pub mod jubjub_curve {
         0x5bf3adda19e9b27b,
     ]);
 
+    pub const EDWARDS_D: BlsScalar = BlsScalar([
+        0x01065fd6d6343eb1,
+        0x292d7f6d37579d26,
+        0xf5fd9207e6bd7fd4,
+        0x2a9318e74bfa2b48,
+    ]);
+
+    const X: BlsScalar = BlsScalar::to_mont_form([
+        0x4df7b7ffec7beaca,
+        0x2e3ebb21fd6c54ed,
+        0xf1fbf02d0fd6cce6,
+        0x3fd2814c43ac65a6,
+    ]);
+
+    const Y: BlsScalar = BlsScalar::to_mont_form([
+        0x0000000000000012,
+        000000000000000000,
+        000000000000000000,
+        000000000000,
+    ]);
+
     impl BlsScalar {
         pub const fn to_mont_form(val: [u64; 4]) -> Self {
             Self(to_mont_form(
@@ -101,6 +122,20 @@ pub mod jubjub_curve {
         }
     }
 
+    #[derive(Clone, Copy, Debug, Encode, Decode)]
+    pub struct JubjubAffine {
+        x: BlsScalar,
+        y: BlsScalar,
+    }
+
+    #[derive(Clone, Copy, Debug, Encode, Decode)]
+    pub struct JubjubExtend {
+        x: BlsScalar,
+        y: BlsScalar,
+        t: BlsScalar,
+        z: BlsScalar,
+    }
+
     fft_field_operation!(
         BlsScalar,
         BLS_SCALAR_MODULUS,
@@ -112,6 +147,16 @@ pub mod jubjub_curve {
         BLS_SCALAR_R2,
         BLS_SCALAR_R3,
         S
+    );
+
+    twisted_edwards_curve_operation!(
+        BlsScalar,
+        BlsScalar,
+        EDWARDS_D,
+        JubjubAffine,
+        JubjubExtend,
+        X,
+        Y
     );
 }
 pub const JUBJUB_MODULUS: [u64; 4] = [
