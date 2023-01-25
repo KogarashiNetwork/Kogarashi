@@ -31,7 +31,9 @@ All users balances are encrypted by the `homomorphic encryption` by default and 
 
 ## Documentation
 
-We describe technical stuff and how to use libraries in [here](https://zero-network.github.io/zero/). You can also check with markdown [document](./book/SUMMARY.md).
+We describe technical stuff and how to use libraries in [here](https://zero-network.github.io/zero/).  
+You can also check with markdown [document](./book/SUMMARY.md).  
+Original grant proposal is [here](https://github.com/w3f/Grants-Program/blob/master/applications/zero-network.md).
 
 ## Test
 
@@ -39,24 +41,11 @@ We describe technical stuff and how to use libraries in [here](https://zero-netw
 $ git submodule update --init --recursive
 $ cargo test --release --all --all-features
 ```
-or
-```shell
-$ docker-compose up
-```
 
 ## Progress
 **We are in research and development phase and this is alpha quality software. Please use at your own risk**.
 
-We are supporting the confidential transactions for transfers and contracts executions. We are focusing on ensuring the `security assumption` and `privacy system` so after the research amd development phase, we are going to improve the performance by optimization of bytecode and libraries. We are also planning to support the `anonymous` and `rollup` transactions. Every cryptographic libraries are totally compatible with `Substrate` runtime.
-
-## Reference
-
-- [Polkadot](https://polkadot.network/)
-- [Substrate](https://substrate.io/)
-- [Plonk](https://eprint.iacr.org/2019/953.pdf)
-- [Lifted-ElGamal Enctyption](https://github.com/herumi/mcl/blob/master/misc/she/she.pdf)
-- [Zether](https://crypto.stanford.edu/~buenz/papers/zether.pdf)
-- [Zexe](https://eprint.iacr.org/2018/962.pdf)
+We are supporting the confidential transfers now and working on confidential contracts executions. We are also planning to support the `anonymous` and `rollup` transactions.
 
 ## License
 Copyright 2023-2024 The Invers INC.
