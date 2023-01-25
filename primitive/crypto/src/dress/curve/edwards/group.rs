@@ -132,7 +132,9 @@ macro_rules! twisted_edwards_extend_group_operation {
 
         impl PartialEq for $extend {
             fn eq(&self, other: &Self) -> bool {
-                self.x == other.x && self.y == other.y
+                let rhs = $affine::from(*self);
+                let lhs = $affine::from(*other);
+                rhs == lhs
             }
         }
 
