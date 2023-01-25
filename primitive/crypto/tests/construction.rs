@@ -2,6 +2,7 @@ use zero_crypto::dress::{curve::edwards::*, field::*};
 
 macro_rules! field_test_data {
     ($test_data_name:ident, $test_bits:ident, $limbs_type:ident, $modulus:ident, $inv:ident, $r2:ident, $r3:ident) => {
+        #[allow(dead_code)]
         pub mod $test_data_name {
             use super::*;
             use rand_core::RngCore;
