@@ -3343,6 +3343,7 @@ name = "zero-crypto"
 version = "0.1.10"
 dependencies = [
  "parity-scale-codec",
+ "paste",
  "rand_core 0.6.4",
  "sp-std",
 ]

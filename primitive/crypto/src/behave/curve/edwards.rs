@@ -27,9 +27,6 @@ pub trait TwistedEdwardsAffine:
 }
 
 pub trait Extended: TwistedEdwardsCurve + CurveExtend {
-    // twisted edwards curve d params
-    const D: Self::Range;
-
     fn new(x: Self::Range, y: Self::Range, t: Self::Range, z: Self::Range) -> Self;
 
     // get t coordinate

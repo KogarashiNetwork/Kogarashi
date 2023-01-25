@@ -7,6 +7,8 @@ The main errors happen during development of runtime pallet are followings.
 - `error[E0512]: cannot transmute between types of different sizes, or dependently-sized types`
 - `error[E0432]: unresolved import sp_core::to_substrate_wasm_fn_return_value`
 - `error: failed to parse manifest at failed to parse the version requirement '0.11 ' for dependency 'parking_lot'`
+- `error: could not compile 'node-template' Caused by: process didn't exit successfully:`
+- `error[E0432]: unresolved import 'rand_core::OsRng'`
 
 Explaining causes and remedies.
 
@@ -82,4 +84,17 @@ This error happens the crate `parity-db` fails to find `parking_lot` version.
 
 ```
 $ cargo update -p parity-db
+```
+
+## `error: could not compile 'node-template' Caused by: process didn't exit successfully:`
+This error happens because of nightly tool chain version difference.
+You need to select correct nightly tool chain version with following Polkadot release.
+https://github.com/paritytech/polkadot/releases
+
+## `error[E0432]: unresolved import 'rand_core::OsRng'`
+This error happens because there is no `OsRng` in `rand_core` root.
+
+```
+[dev-dependencies]
+rand_core = { version="0.6.4", features = ["getrandom"] }
 ```

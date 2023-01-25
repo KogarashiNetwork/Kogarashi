@@ -56,7 +56,7 @@ pub fn double_point<P: Projective>(point: P) -> P {
     }
 }
 
-/// weierstrass projective coordinate scalar
+/// coordinate scalar
 pub fn scalar_point<P: Projective>(point: P, scalar: &<P as Curve>::Scalar) -> P {
     let mut res = P::ADDITIVE_IDENTITY;
     let mut acc = point;
