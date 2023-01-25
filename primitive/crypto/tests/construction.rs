@@ -83,7 +83,7 @@ pub mod jubjub_curve {
         0x5bf3adda19e9b27b,
     ]);
 
-    pub const EDWARDS_D: BlsScalar = BlsScalar([
+    pub const EDWARDS_D: BlsScalar = BlsScalar::to_mont_form([
         0x01065fd6d6343eb1,
         0x292d7f6d37579d26,
         0xf5fd9207e6bd7fd4,
@@ -91,17 +91,17 @@ pub mod jubjub_curve {
     ]);
 
     const X: BlsScalar = BlsScalar::to_mont_form([
-        0x4df7b7ffec7beaca,
-        0x2e3ebb21fd6c54ed,
-        0xf1fbf02d0fd6cce6,
-        0x3fd2814c43ac65a6,
+        0xe4b3d35df1a7adfe,
+        0xcaf55d1b29bf81af,
+        0x8b0f03ddd60a8187,
+        0x62edcbb8bf3787c8,
     ]);
 
     const Y: BlsScalar = BlsScalar::to_mont_form([
-        0x0000000000000012,
-        000000000000000000,
-        000000000000000000,
-        000000000000,
+        0x000000000000000b,
+        0x0000000000000000,
+        0x0000000000000000,
+        0x0000000000000000,
     ]);
 
     const T: BlsScalar = BlsScalar::to_mont_form([
@@ -168,6 +168,7 @@ pub mod jubjub_curve {
         T
     );
 }
+
 pub const JUBJUB_MODULUS: [u64; 4] = [
     0xd0970e5ed6f72cb7,
     0xa6682093ccc81082,

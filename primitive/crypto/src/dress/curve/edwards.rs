@@ -28,11 +28,17 @@ macro_rules! twisted_edwards_curve_operation {
             const PARAM_A: $scalar = $scalar::one();
 
             fn is_identity(self) -> bool {
-                self.x == $scalar::zero() && self.y == $scalar::one()
+                self.x.is_zero() && self.y == $scalar::one()
             }
 
             fn is_on_curve(self) -> bool {
-                unimplemented!()
+                if self.x.is_zero() {
+                    true
+                } else {
+                    let xx = self.x.square();
+                    let yy = self.y.square();
+                    yy == $scalar::one() + Self::PARAM_D * xx * yy + xx
+                }
             }
 
             fn get_x(&self) -> Self::Range {
@@ -86,7 +92,12 @@ macro_rules! twisted_edwards_curve_operation {
             }
 
             fn is_on_curve(self) -> bool {
-                unimplemented!()
+                if self.z.is_zero() {
+                    true
+                } else {
+                    let affine = $affine::from(self);
+                    affine.is_on_curve()
+                }
             }
 
             fn get_x(&self) -> Self::Range {
