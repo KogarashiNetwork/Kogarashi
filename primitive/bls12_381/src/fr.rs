@@ -75,6 +75,20 @@ impl Fr {
             INV,
         )
     }
+
+    pub fn to_costomized_repr(self) -> Bits {
+        let mut index = 256;
+        let mut bits: [u8; 256] = [0; 256];
+        for limb in self.montgomery_reduce() {
+            for byte in limb.to_le_bytes().iter() {
+                for i in 0..8 {
+                    index -= 1;
+                    bits[index] = (byte >> i & 1) as u8;
+                }
+            }
+        }
+        bits.to_vec()
+    }
 }
 
 impl<'a, 'b> BitXor<&'b Fr> for &'a Fr {

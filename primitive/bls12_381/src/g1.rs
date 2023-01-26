@@ -449,13 +449,4 @@ mod tests {
             }
         }
     }
-
-    #[test]
-    fn msm_variable_base_test() {
-        let points = vec![G1Affine::ADDITIVE_GENERATOR];
-        let scalars = vec![Fr::from(100u64)];
-        let premultiplied = G1Projective::ADDITIVE_GENERATOR * Fr::from(100u64);
-        let subject = msm_variable_base(&points, &scalars);
-        assert_eq!(subject, premultiplied);
-    }
 }

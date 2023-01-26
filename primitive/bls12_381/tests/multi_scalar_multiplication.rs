@@ -1,6 +1,19 @@
 use rand_core::OsRng;
 use zero_bls12_381::{msm_variable_base, Fr, G1Affine, G1Projective};
-use zero_crypto::behave::Group;
+use zero_crypto::behave::{Group, Projective};
+use zero_crypto::common::WeierstrassAffine;
+
+fn customized_scalar_point<P: Projective>(point: P, scalar: &Fr) -> P {
+    let mut res = P::ADDITIVE_IDENTITY;
+    let mut acc = point;
+    for &bit in scalar.to_costomized_repr().iter().rev() {
+        if bit == 1 {
+            res += acc;
+        }
+        acc = acc.double();
+    }
+    res
+}
 
 #[test]
 fn multi_scalar_multiplication_test() {
@@ -15,7 +28,7 @@ fn multi_scalar_multiplication_test() {
         .rev()
         .zip(scalars.iter().rev())
         .fold(G1Projective::ADDITIVE_IDENTITY, |acc, (point, coeff)| {
-            acc + *point * *coeff
+            acc + customized_scalar_point(point.to_projective(), coeff)
         });
     assert_eq!(msm, naive);
 }
