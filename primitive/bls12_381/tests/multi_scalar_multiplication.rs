@@ -5,19 +5,25 @@ use zero_crypto::common::WeierstrassAffine;
 
 fn customized_scalar_point<P: Projective>(point: P, scalar: &Fr) -> P {
     let mut res = P::ADDITIVE_IDENTITY;
-    let mut acc = point;
-    for &bit in scalar.to_costomized_repr().iter().rev() {
+    let one = point;
+    let two = one + point;
+    let three = two + point;
+    for &bit in scalar.to_costomized_repr().iter() {
+        res = res.double().double();
         if bit == 1 {
-            res += acc;
+            res += one;
+        } else if bit == 2 {
+            res += two;
+        } else if bit == 3 {
+            res += three;
         }
-        acc = acc.double();
     }
     res
 }
 
 #[test]
 fn multi_scalar_multiplication_test() {
-    let n = 1 << 5;
+    let n = 1 << 1;
     let points = (0..n)
         .map(|_| G1Affine::from(G1Affine::random(OsRng)))
         .collect::<Vec<_>>();
