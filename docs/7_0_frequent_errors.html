@@ -153,6 +153,8 @@
 <li><code>error[E0512]: cannot transmute between types of different sizes, or dependently-sized types</code></li>
 <li><code>error[E0432]: unresolved import sp_core::to_substrate_wasm_fn_return_value</code></li>
 <li><code>error: failed to parse manifest at failed to parse the version requirement '0.11 ' for dependency 'parking_lot'</code></li>
+<li><code>error: could not compile 'node-template' Caused by: process didn't exit successfully:</code></li>
+<li><code>error[E0432]: unresolved import 'rand_core::OsRng'</code></li>
 </ul>
 <p>Explaining causes and remedies.</p>
 <h2 id="error-duplicate-lang-item-in-crate"><a class="header" href="#error-duplicate-lang-item-in-crate"><code>error: duplicate lang item in crate</code></a></h2>
@@ -202,6 +204,15 @@ std = [
 <h2 id="error-failed-to-parse-manifest-at-failed-to-parse-the-version-requirement-011--for-dependency-parking_lot"><a class="header" href="#error-failed-to-parse-manifest-at-failed-to-parse-the-version-requirement-011--for-dependency-parking_lot"><code>error: failed to parse manifest at failed to parse the version requirement '0.11 ' for dependency 'parking_lot'</code></a></h2>
 <p>This error happens the crate <code>parity-db</code> fails to find <code>parking_lot</code> version.</p>
 <pre><code>$ cargo update -p parity-db
+</code></pre>
+<h2 id="error-could-not-compile-node-template-caused-by-process-didnt-exit-successfully"><a class="header" href="#error-could-not-compile-node-template-caused-by-process-didnt-exit-successfully"><code>error: could not compile 'node-template' Caused by: process didn't exit successfully:</code></a></h2>
+<p>This error happens because of nightly tool chain version difference.
+You need to select correct nightly tool chain version with following Polkadot release.
+https://github.com/paritytech/polkadot/releases</p>
+<h2 id="errore0432-unresolved-import-rand_coreosrng"><a class="header" href="#errore0432-unresolved-import-rand_coreosrng"><code>error[E0432]: unresolved import 'rand_core::OsRng'</code></a></h2>
+<p>This error happens because there is no <code>OsRng</code> in <code>rand_core</code> root.</p>
+<pre><code>[dev-dependencies]
+rand_core = { version=&quot;0.6.4&quot;, features = [&quot;getrandom&quot;] }
 </code></pre>
 
                     </main>

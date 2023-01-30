@@ -1,4 +1,3 @@
-#[cfg(not(feature = "std"))]
 use sp_std::vec::Vec;
 
 #[inline(always)]

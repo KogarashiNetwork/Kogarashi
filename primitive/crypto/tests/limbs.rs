@@ -1,209 +1,137 @@
-mod bls12_381;
-mod jubjub;
+mod construction;
 
-use rand_core::OsRng;
+macro_rules! limbs_test {
+    ($test_name:ident, $test_bits:ident, $test_mod:ident, $limbs_type:ident, $one:expr, $two:expr) => {
+        #[cfg(test)]
+        mod $test_name {
+            use super::*;
+            use construction::$test_mod::*;
+            use paste::paste;
+            use rand_core::OsRng;
+            use zero_crypto::arithmetic::$test_bits::*;
 
-#[cfg(test)]
-mod jubjub_limbs_tests {
-    use super::*;
-    use crate::jubjub::field::*;
-    use zero_crypto::arithmetic::bits_256::*;
+            fn arb_field() -> $limbs_type {
+                random(OsRng)
+            }
 
-    fn arb_jubjub_fr() -> [u64; 4] {
-        random(OsRng)
-    }
+            paste! {
+                #[test]
+                fn [< $test_name _add_test >]() {
+                    let a = arb_field();
+                    let b = a;
+                    let c = a;
 
-    #[test]
-    fn jubjub_field_add_test() {
-        let a = arb_jubjub_fr();
-        let b = a;
-        let c = a;
+                    // a + a = a * 2
+                    let d = add(a, b, MODULUS);
+                    let e = double(c, MODULUS);
+                    assert_eq!(d, e);
+                }
+            }
 
-        // a + a = a * 2
-        let d = add(a, b, MODULUS);
-        let e = double(c, MODULUS);
-        assert_eq!(d, e);
-    }
+            paste! {
+                #[test]
+                fn [< $test_name _sub_test >]() {
+                    let a = arb_field();
+                    let b = a;
+                    let c = a;
+                    let d = a;
 
-    #[test]
-    fn jubjub_field_sub_test() {
-        let a = arb_jubjub_fr();
-        let b = a;
-        let c = a;
-        let d = a;
+                    // a - a = a * 2 - a * 2
+                    let e = sub(a, b, MODULUS);
 
-        // a - a = a * 2 - a * 2
-        let e = sub(a, b, MODULUS);
+                    let cc = double(c, MODULUS);
+                    let dd = double(d, MODULUS);
+                    let f = sub(cc, dd, MODULUS);
 
-        let cc = double(c, MODULUS);
-        let dd = double(d, MODULUS);
-        let f = sub(cc, dd, MODULUS);
+                    assert_eq!(e, f);
+                }
+            }
 
-        assert_eq!(e, f);
-    }
+            paste! {
+            #[test]
+                fn [< $test_name _mul_test >]() {
+                    let a = arb_field();
+                    let b = arb_field();
+                    let c = arb_field();
 
-    #[test]
-    fn jubjub_field_mul_test() {
-        let a = arb_jubjub_fr();
-        let b = arb_jubjub_fr();
-        let c = arb_jubjub_fr();
+                    // a * b + a * c
+                    let ab = mul(a, b, MODULUS, INV);
+                    let ac = mul(a, c, MODULUS, INV);
+                    let d = add(ab, ac, MODULUS);
 
-        // a * b + a * c
-        let ab = mul(a, b, MODULUS, INV);
-        let ac = mul(a, c, MODULUS, INV);
-        let d = add(ab, ac, MODULUS);
+                    // a * (b + c)
+                    let bc = add(b, c, MODULUS);
+                    let e = mul(a, bc, MODULUS, INV);
 
-        // a * (b + c)
-        let bc = add(b, c, MODULUS);
-        let e = mul(a, bc, MODULUS, INV);
+                    assert_eq!(d, e);
+                }
+            }
 
-        assert_eq!(d, e);
-    }
+            paste! {
+                #[test]
+                fn [< $test_name _square_test >]() {
+                    let a = arb_field();
+                    let b = arb_field();
 
-    #[test]
-    fn jubjub_field_square_test() {
-        let a = arb_jubjub_fr();
-        let b = arb_jubjub_fr();
+                    // (a * a) * (b * b)
+                    let aa = mul(a, a, MODULUS, INV);
+                    let bb = mul(b, b, MODULUS, INV);
+                    let c = mul(aa, bb, MODULUS, INV);
 
-        // (a * a) * (b * b)
-        let aa = mul(a, a, MODULUS, INV);
-        let bb = mul(b, b, MODULUS, INV);
-        let c = mul(aa, bb, MODULUS, INV);
+                    // a^2 * b^2
+                    let aa = square(a, MODULUS, INV);
+                    let bb = square(b, MODULUS, INV);
+                    let d = mul(aa, bb, MODULUS, INV);
 
-        // a^2 * b^2
-        let aa = square(a, MODULUS, INV);
-        let bb = square(b, MODULUS, INV);
-        let d = mul(aa, bb, MODULUS, INV);
+                    assert_eq!(c, d);
+                }
+            }
 
-        assert_eq!(c, d);
-    }
+            paste! {
+                #[test]
+                fn [< $test_name _invert_test >]() {
+                    let a = arb_field();
+                    let one = from_raw($one);
+                    let inv = invert(a, sub(zero(), $two, MODULUS), one, MODULUS, INV);
 
-    #[test]
-    fn jubjub_field_invert_test() {
-        let a = arb_jubjub_fr();
-        let one = from_raw([1, 0, 0, 0]);
-        let inv = invert(a, sub(zero(), [2, 0, 0, 0], MODULUS), one, MODULUS, INV);
+                    if let Some(x) = inv {
+                        let b = mul(a, x, MODULUS, INV);
+                        assert_eq!(b, one)
+                    }
+                }
+            }
 
-        if let Some(x) = inv {
-            let b = mul(a, x, MODULUS, INV);
-            assert_eq!(b, one)
+            paste! {
+                #[test]
+                fn [< $test_name _power_test >]() {
+                    let a = arb_field();
+                    let one = from_raw($one);
+                    let identity = pow(a, sub(zero(), $one, MODULUS), one, MODULUS, INV);
+                    let zero_power = pow(a, zero(), one, MODULUS, INV);
+
+                    assert_eq!(one, identity);
+                    assert_eq!(one, zero_power);
+                }
+            }
         }
-    }
-
-    #[test]
-    fn jubjub_field_power_test() {
-        let a = arb_jubjub_fr();
-        let one = from_raw([1, 0, 0, 0]);
-        let identity = pow(a, sub(zero(), [1, 0, 0, 0], MODULUS), one, MODULUS, INV);
-        let zero_power = pow(a, [0, 0, 0, 0], one, MODULUS, INV);
-
-        assert_eq!(one, identity);
-        assert_eq!(one, zero_power);
-    }
+    };
 }
 
-#[cfg(test)]
-mod bls12_381_limbs_tests {
-    use super::*;
-    use crate::bls12_381::field::*;
-    use zero_crypto::arithmetic::bits_384::*;
+use construction::{Bits256Limbs, Bits384Limbs};
 
-    fn arb_bls12_381_fp() -> [u64; 6] {
-        random(OsRng)
-    }
-
-    #[test]
-    fn bls12_381_field_add_test() {
-        let a = arb_bls12_381_fp();
-        let b = a;
-        let c = a;
-
-        // a + a = a * 2
-        let d = add(a, b, MODULUS);
-        let e = double(c, MODULUS);
-        assert_eq!(d, e);
-    }
-
-    #[test]
-    fn bls12_381_field_sub_test() {
-        let a = arb_bls12_381_fp();
-        let b = a;
-        let c = a;
-        let d = a;
-
-        // a - a = a * 2 - a * 2
-        let e = sub(a, b, MODULUS);
-
-        let cc = double(c, MODULUS);
-        let dd = double(d, MODULUS);
-        let f = sub(cc, dd, MODULUS);
-
-        assert_eq!(e, f);
-    }
-
-    #[test]
-    fn bls12_381_field_mul_test() {
-        let a = arb_bls12_381_fp();
-        let b = arb_bls12_381_fp();
-        let c = arb_bls12_381_fp();
-
-        // a * b + a * c
-        let ab = mul(a, b, MODULUS, INV);
-        let ac = mul(a, c, MODULUS, INV);
-        let d = add(ab, ac, MODULUS);
-
-        // a * (b + c)
-        let bc = add(b, c, MODULUS);
-        let e = mul(a, bc, MODULUS, INV);
-
-        assert_eq!(d, e);
-    }
-
-    #[test]
-    fn bls12_381_field_square_test() {
-        let a = arb_bls12_381_fp();
-        let b = arb_bls12_381_fp();
-
-        // (a * a) * (b * b)
-        let aa = mul(a, a, MODULUS, INV);
-        let bb = mul(b, b, MODULUS, INV);
-        let c = mul(aa, bb, MODULUS, INV);
-
-        // a^2 * b^2
-        let aa = square(a, MODULUS, INV);
-        let bb = square(b, MODULUS, INV);
-        let d = mul(aa, bb, MODULUS, INV);
-
-        assert_eq!(c, d);
-    }
-
-    #[test]
-    fn bls12_381_field_invert_test() {
-        let a = arb_bls12_381_fp();
-        let one = from_raw([1, 0, 0, 0, 0, 0]);
-        let little_fermat = sub(MODULUS, [2, 0, 0, 0, 0, 0], MODULUS);
-        let inv = invert(a, little_fermat, one, MODULUS, INV);
-
-        if let Some(x) = inv {
-            let b = mul(a, x, MODULUS, INV);
-            assert_eq!(b, one)
-        }
-    }
-
-    #[test]
-    fn bls12_381_field_power_test() {
-        let a = arb_bls12_381_fp();
-        let one = from_raw([1, 0, 0, 0, 0, 0]);
-        let identity = pow(
-            a,
-            sub(zero(), [1, 0, 0, 0, 0, 0], MODULUS),
-            one,
-            MODULUS,
-            INV,
-        );
-        let zero_power = pow(a, [0, 0, 0, 0, 0, 0], one, MODULUS, INV);
-
-        assert_eq!(one, identity);
-        assert_eq!(one, zero_power);
-    }
-}
+limbs_test!(
+    jubjub_limbs_tests,
+    bits_256,
+    jubjub_field,
+    Bits256Limbs,
+    [1, 0, 0, 0],
+    [2, 0, 0, 0]
+);
+limbs_test!(
+    bls12_381_limbs_tests,
+    bits_384,
+    bls12_381_field,
+    Bits384Limbs,
+    [1, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0]
+);

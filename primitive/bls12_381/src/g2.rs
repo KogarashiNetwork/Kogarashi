@@ -8,7 +8,7 @@ use dusk_bytes::{Error as BytesError, Serializable};
 use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zero_crypto::arithmetic::weierstrass::*;
 use zero_crypto::common::*;
-use zero_crypto::dress::{curve::*, pairing::bls12_g2_pairing};
+use zero_crypto::dress::{curve::weierstrass::*, pairing::bls12_g2_pairing};
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
@@ -43,7 +43,7 @@ impl PartialEq for G2PairingAffine {
     }
 }
 
-curve_operation!(
+weierstrass_curve_operation!(
     Fr,
     Fq2,
     G2_PARAM_A,

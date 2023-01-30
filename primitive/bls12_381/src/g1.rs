@@ -8,7 +8,7 @@ use dusk_bytes::{Error as BytesError, Serializable};
 use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zero_crypto::arithmetic::weierstrass::*;
 use zero_crypto::common::*;
-use zero_crypto::dress::curve::*;
+use zero_crypto::dress::curve::weierstrass::*;
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
@@ -26,7 +26,7 @@ pub struct G1Affine {
     is_infinity: bool,
 }
 
-curve_operation!(
+weierstrass_curve_operation!(
     Fr,
     Fq,
     G1_PARAM_A,
