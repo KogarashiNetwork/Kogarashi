@@ -3385,6 +3385,7 @@ dependencies = [
  "rayon",
  "zero-bls12-381",
  "zero-crypto",
+ "zero-pairing",
 ]
 
 [[package]]

@@ -21,7 +21,6 @@ mod keypair;
 mod poly;
 mod witness;
 
-pub use commitment::KzgCommitment;
 pub use fft::Fft;
 pub use keypair::KeyPair;
 pub use poly::Polynomial;

@@ -2,10 +2,8 @@
 
 use core::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
 
-use super::{
-    curve::{Affine, Projective},
-    field::PrimeField,
-};
+use super::field::PrimeField;
+use super::{Affine, Projective};
 
 use super::{algebra::Field, comp::ParallelCmp};
 

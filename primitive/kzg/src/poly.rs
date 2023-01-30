@@ -59,18 +59,19 @@ impl<F: FftField> Polynomial<F> {
     // no remainder polynomial division with at
     // f(x) - f(at) / x - at
     pub fn divide(&self, at: &F) -> Self {
-        Self(
-            self.0
-                .iter()
-                .skip(1)
-                .scan(self.0[0], |w, coeff| {
-                    let tmp = *w;
-                    *w *= at;
-                    *w += *coeff;
-                    Some(tmp)
-                })
-                .collect::<Vec<_>>(),
-        )
+        let mut coeff = self
+            .0
+            .iter()
+            .rev()
+            .scan(F::zero(), |w, coeff| {
+                let tmp = *w + coeff;
+                *w = tmp * at;
+                Some(tmp)
+            })
+            .collect::<Vec<_>>();
+        coeff.pop();
+        coeff.reverse();
+        Self(coeff)
     }
 
     /// σ^n - 1

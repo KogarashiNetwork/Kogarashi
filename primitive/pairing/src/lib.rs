@@ -16,10 +16,13 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use zero_bls12_381::params::{BLS_X, BLS_X_IS_NEGATIVE};
-use zero_bls12_381::{Fq12, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective, Gt};
+use zero_bls12_381::{
+    Fq12, Fr, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective, Gt,
+};
 use zero_crypto::common::{Curve, G2Pairing, Pairing, PairingRange, PrimeField, Vec};
 
 // tate pairing with miller algorithm
+#[derive(Debug)]
 pub struct TatePairing;
 
 impl Pairing for TatePairing {
@@ -30,6 +33,7 @@ impl Pairing for TatePairing {
     type G2PairngRepr = G2PairingAffine;
     type PairingRange = Fq12;
     type Gt = Gt;
+    type ScalarField = Fr;
     const X: u64 = BLS_X;
     const X_IS_NEGATIVE: bool = BLS_X_IS_NEGATIVE;
 
