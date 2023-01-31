@@ -194,7 +194,7 @@ mod tests {
         let at = arb_fr();
         let divisor = arb_poly(10);
         // dividend = divisor * quotient
-        let factor_poly = vec![Fr::one(), -at];
+        let factor_poly = vec![-at, Fr::one()];
 
         // divisor * (x - at) = dividend
         let poly_a = Polynomial(naive_multiply(divisor.0, factor_poly.clone()));
