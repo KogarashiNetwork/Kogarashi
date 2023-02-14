@@ -819,6 +819,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "dsa"
+version = "0.1.0"
+
+[[package]]
 name = "dusk-bytes"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
