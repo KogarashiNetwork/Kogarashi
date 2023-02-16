@@ -1,3 +1,5 @@
+use crate::Fp;
+use serde::{Deserialize, Serialize};
 use zero_bls12_381::Fr;
 use zero_crypto::arithmetic::edwards::*;
 use zero_crypto::common::*;
@@ -31,13 +33,13 @@ const T: Fr = Fr::to_mont_form([
     0x464c23a03263d422,
 ]);
 
-#[derive(Clone, Copy, Debug, Encode, Decode)]
+#[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
 pub struct JubjubAffine {
     x: Fr,
     y: Fr,
 }
 
-#[derive(Clone, Copy, Debug, Encode, Decode)]
+#[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
 pub struct JubjubExtend {
     x: Fr,
     y: Fr,
@@ -53,4 +55,42 @@ mod tests {
     use super::*;
 
     curve_test!(bls12_381, Fr, JubjubAffine, JubjubExtend, 100);
+}
+
+impl Mul<Fp> for JubjubExtend {
+    type Output = JubjubExtend;
+
+    #[inline]
+    fn mul(self, rhs: Fp) -> JubjubExtend {
+        let mut res = JubjubExtend::ADDITIVE_IDENTITY;
+        let mut acc = self;
+        for &naf in rhs.to_nafs().iter() {
+            if naf == Naf::Plus {
+                res += acc;
+            } else if naf == Naf::Minus {
+                res -= acc;
+            }
+            acc = acc.double();
+        }
+        res
+    }
+}
+
+impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtend {
+    type Output = JubjubExtend;
+
+    #[inline]
+    fn mul(self, rhs: &'b Fp) -> JubjubExtend {
+        let mut res = JubjubExtend::ADDITIVE_IDENTITY;
+        let mut acc = self.clone();
+        for &naf in rhs.to_nafs().iter() {
+            if naf == Naf::Plus {
+                res += acc;
+            } else if naf == Naf::Minus {
+                res -= acc;
+            }
+            acc = acc.double();
+        }
+        res
+    }
 }
