@@ -66,7 +66,7 @@ macro_rules! prime_field_operation {
 
 #[macro_export]
 macro_rules! fft_field_operation {
-    ($field:ident, $p:ident, $g:ident, $mul_g:ident, $i:ident, $u:ident, $r:ident, $r2:ident, $r3:ident, $s:ident) => {
+    ($field:ident, $p:ident, $g:ident, $mul_g:ident, $i:ident, $u:ident, $edwards_d:ident, $r:ident, $r2:ident, $r3:ident, $s:ident) => {
         prime_field_operation!($field, $p, $g, $i, $r, $r2, $r3);
 
         impl FftField for $field {
@@ -76,8 +76,60 @@ macro_rules! fft_field_operation {
 
             const MULTIPLICATIVE_GENERATOR: Self = $mul_g;
 
+            const EDWARDS_D: Self = $edwards_d;
+
             fn pow(self, val: u64) -> Self {
                 Self(pow(self.0, [val, 0, 0, 0], $r, $p, $i))
+            }
+
+            fn pow_of_2(by: u64) -> Self {
+                let two = Self::from(2u64);
+                let mut res = Self::one();
+                for i in (0..64).rev() {
+                    res = res.square();
+                    let mut tmp = res;
+                    tmp *= two;
+                    res.conditional_assign(&tmp, (((by >> i) & 0x1) as u8).into());
+                }
+                res
+            }
+
+            fn from_bytes_wide(bytes: &[u8; 64]) -> Self {
+                Self(from_u512(
+                    [
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[0..8]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[8..16]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[16..24]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[24..32]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[32..40]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[40..48]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[48..56]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[56..64]).unwrap()),
+                    ],
+                    $r2,
+                    $r3,
+                    $p,
+                    $i,
+                ))
+            }
+
+            fn reduce(&self) -> Self {
+                Self(mont(
+                    [self.0[0], self.0[1], self.0[2], self.0[3], 0, 0, 0, 0],
+                    $p,
+                    $i,
+                ))
+            }
+        }
+
+        impl subtle::ConditionallySelectable for $field {
+            fn conditional_select(a: &Self, b: &Self, choice: subtle::Choice) -> Self {
+                $field([
+                    u64::conditional_select(&a.0[0], &b.0[0], choice),
+                    u64::conditional_select(&a.0[1], &b.0[1], choice),
+                    u64::conditional_select(&a.0[2], &b.0[2], choice),
+                    u64::conditional_select(&a.0[3], &b.0[3], choice),
+                ])
             }
         }
 

@@ -3342,10 +3342,12 @@ dependencies = [
 name = "zero-crypto"
 version = "0.1.10"
 dependencies = [
+ "dusk-bytes",
  "parity-scale-codec",
  "paste",
  "rand_core 0.6.4",
  "sp-std",
+ "subtle 2.4.1",
 ]
 
 [[package]]

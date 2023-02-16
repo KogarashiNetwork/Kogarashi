@@ -15,11 +15,14 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
+mod commitment;
 mod fft;
 mod keypair;
 mod poly;
+mod util;
 mod witness;
 
+pub use commitment::Commitment;
 pub use fft::Fft;
 pub use keypair::KeyPair;
 pub use poly::Polynomial;

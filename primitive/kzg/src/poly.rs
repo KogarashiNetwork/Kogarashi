@@ -1,12 +1,12 @@
-use core::ops::{Add, Mul, Sub};
+use core::ops::{Add, Deref, DerefMut, Mul, Sub};
 
-use core::iter;
+use core::iter::{self, Sum};
 use rand_core::RngCore;
 use zero_crypto::behave::FftField;
 use zero_crypto::common::Vec;
 
 // a_n-1 , a_n-2, ... , a_0
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Polynomial<F>(pub Vec<F>);
 
 pub struct Witness<F> {
@@ -14,6 +14,33 @@ pub struct Witness<F> {
     a_eval: F,
     q_eval: F,
     denominator: F,
+}
+
+impl<F> Deref for Polynomial<F> {
+    type Target = [F];
+
+    fn deref(&self) -> &[F] {
+        &self.0
+    }
+}
+
+impl<F> DerefMut for Polynomial<F> {
+    fn deref_mut(&mut self) -> &mut [F] {
+        &mut self.0
+    }
+}
+
+impl<F: FftField> Sum for Polynomial<F> {
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = Self>,
+    {
+        let sum: Polynomial<F> = iter.fold(Polynomial::default(), |mut res, val| {
+            res = res + val;
+            res
+        });
+        sum
+    }
 }
 
 impl<F: FftField> Polynomial<F> {
@@ -84,6 +111,12 @@ impl<F: FftField> Polynomial<F> {
             self.0.pop();
         }
         self
+    }
+
+    /// Returns the degree of the [`Polynomial`].
+    pub fn degree(&self) -> usize {
+        assert!(self.0.last().map_or(false, |coeff| coeff != &F::zero()));
+        self.0.len() - 1
     }
 
     // create witness for f(a)

@@ -152,6 +152,7 @@ pub mod jubjub_curve {
         BLS_SCALAR_MULTIPLICATIVE_GENERATOR,
         BLS_SCALAR_INV,
         ROOT_OF_UNITY,
+        EDWARDS_D,
         BLS_SCALAR_R,
         BLS_SCALAR_R2,
         BLS_SCALAR_R3,

@@ -22,7 +22,7 @@ use zero_bls12_381::{
 use zero_crypto::common::{Curve, G2Pairing, Pairing, PairingRange, PrimeField, Vec};
 
 // tate pairing with miller algorithm
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TatePairing;
 
 impl Pairing for TatePairing {

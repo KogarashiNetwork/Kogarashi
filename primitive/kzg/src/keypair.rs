@@ -1,4 +1,6 @@
+use crate::commitment::Commitment;
 use crate::poly::Polynomial;
+use crate::util;
 use crate::witness::Witness;
 use zero_crypto::behave::*;
 use zero_crypto::common::Vec;
@@ -28,17 +30,40 @@ impl<P: Pairing> KeyPair<P> {
     }
 
     // commit polynomial to g1 projective group
-    pub fn commit(&self, poly: &Polynomial<P::ScalarField>) -> P::G1Projective {
+    pub fn commit(&self, poly: &Polynomial<P::ScalarField>) -> Commitment<P> {
         assert!(poly.0.len() <= self.g1.len());
         let diff = self.g1.len() - poly.0.len();
 
-        poly.0
-            .iter()
-            .rev()
-            .zip(self.g1.iter().rev().skip(diff))
-            .fold(P::G1Projective::ADDITIVE_IDENTITY, |acc, (coeff, base)| {
-                acc + P::G1Projective::from(*base) * *coeff
-            })
+        Commitment(P::G1Affine::from(
+            poly.0
+                .iter()
+                .rev()
+                .zip(self.g1.iter().rev().skip(diff))
+                .fold(P::G1Projective::ADDITIVE_IDENTITY, |acc, (coeff, base)| {
+                    acc + P::G1Projective::from(*base) * *coeff
+                }),
+        ))
+    }
+
+    pub fn commit_key(&self) -> &Vec<P::G1Affine> {
+        &self.g1
+    }
+
+    pub fn opening_key(&self) -> P::G2Affine {
+        self.g2
+    }
+
+    pub fn max_degree(&self) -> u64 {
+        self.k
+    }
+
+    pub fn trim(&mut self, mut truncated_degree: usize) {
+        assert_ne!(truncated_degree, 0);
+        assert!((truncated_degree as u64) < self.k);
+        if truncated_degree == 1 {
+            truncated_degree += 1
+        };
+        self.g1.resize(truncated_degree, P::G1Affine::default());
     }
 
     // create witness for f(a)
@@ -62,10 +87,33 @@ impl<P: Pairing> KeyPair<P> {
         );
 
         Witness {
-            c_eval: P::G1Affine::from(s_eval - a_eval),
-            q_eval: P::G1Affine::from(q_eval),
+            c_eval: P::G1Affine::from(P::G1Projective::from(s_eval.0) - a_eval),
+            q_eval: q_eval.0,
             denominator: P::G2PairngRepr::from(-denominator),
             h: P::G2PairngRepr::from(P::G2Affine::from(P::G2Projective::ADDITIVE_GENERATOR)),
         }
+    }
+
+    /// Computes a single witness for multiple polynomials at the same point,
+    /// by taking a random linear combination of the individual
+    /// witnesses. We apply the same optimization mentioned in when
+    /// computing each witness; removing f(z).
+    pub fn compute_aggregate_witness(
+        &self,
+        polynomials: &[Polynomial<P::ScalarField>],
+        point: &P::ScalarField,
+        v_challenge: &P::ScalarField,
+    ) -> Polynomial<P::ScalarField> {
+        let powers = util::powers_of::<P>(&v_challenge, polynomials.len() - 1);
+
+        assert_eq!(powers.len(), polynomials.len());
+
+        let numerator: Polynomial<P::ScalarField> = polynomials
+            .iter()
+            .zip(powers.iter())
+            .map(|(poly, v_challenge)| poly.clone() * *v_challenge)
+            .sum();
+
+        numerator.divide(point)
     }
 }

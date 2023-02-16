@@ -1,7 +1,10 @@
 use core::{
     fmt::Debug,
-    ops::{Mul, Neg},
+    iter::{Product, Sum},
+    ops::{Add, Mul, Neg},
 };
+
+use dusk_bytes::Serializable;
 
 use super::{
     algebra::Field,
@@ -47,27 +50,39 @@ pub trait G2Pairing: Projective {
 }
 
 /// pairing abstraction
-pub trait Pairing {
+pub trait Pairing: Send + Sync + Clone + Debug + PartialEq {
     // g1 group affine point
-    type G1Affine: Affine + From<Self::G1Projective>;
+    type G1Affine: Affine
+        + From<Self::G1Projective>
+        + Mul<Self::ScalarField, Output = Self::G1Projective>
+        + Add<Self::G1Projective, Output = Self::G1Projective>
+        + Serializable<48>
+        + PartialEq
+        + Eq
+        + Sync
+        + Send;
     // g2 group affine point
-    type G2Affine: Affine + From<Self::G2Projective> + Neg<Output = Self::G2Affine>;
+    type G2Affine: Affine + From<Self::G2Projective> + Neg<Output = Self::G2Affine> + PartialEq + Eq;
     // g1 group projective point
     type G1Projective: Projective
         + From<Self::G1Affine>
-        + Mul<Self::ScalarField, Output = Self::G1Projective>;
+        + Mul<Self::ScalarField, Output = Self::G1Projective>
+        + Add<Self::G1Affine, Output = Self::G1Projective>
+        + Sum
+        + Send
+        + Sync;
     // g2 group projective point
     type G2Projective: Projective
         + From<Self::G2Affine>
         + Mul<Self::ScalarField, Output = Self::G2Projective>
         + G2Pairing;
     // g2 pairing representation
-    type G2PairngRepr: From<Self::G2Affine> + ParityCmp + Debug;
+    type G2PairngRepr: From<Self::G2Affine> + ParityCmp + Debug + PartialEq;
     // range of pairing function
     type PairingRange: PairingRange;
     type Gt: Group;
     // Used for commitment
-    type ScalarField: FftField;
+    type ScalarField: FftField + Serializable<32> + Sum + Product;
 
     const X: u64;
     const X_IS_NEGATIVE: bool;

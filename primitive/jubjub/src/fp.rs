@@ -58,6 +58,13 @@ const ROOT_OF_UNITY: Fp = Fp([
     0x4d6b87b1da259e2,
 ]);
 
+const EDWARDS_D_FP: Fp = Fp::to_mont_form([
+    0x01065fd6d6343eb1,
+    0x292d7f6d37579d26,
+    0xf5fd9207e6bd7fd4,
+    0x2a9318e74bfa2b48,
+]);
+
 fft_field_operation!(
     Fp,
     MODULUS,
@@ -65,6 +72,7 @@ fft_field_operation!(
     MULTIPLICATIVE_GENERATOR,
     INV,
     ROOT_OF_UNITY,
+    EDWARDS_D_FP,
     R,
     R2,
     R3,
@@ -321,16 +329,5 @@ impl Serializable<32> for Fp {
         tmp *= Self(R2);
 
         Ok(tmp)
-    }
-}
-
-impl ConditionallySelectable for Fp {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        Fp([
-            u64::conditional_select(&a.0[0], &b.0[0], choice),
-            u64::conditional_select(&a.0[1], &b.0[1], choice),
-            u64::conditional_select(&a.0[2], &b.0[2], choice),
-            u64::conditional_select(&a.0[3], &b.0[3], choice),
-        ])
     }
 }
