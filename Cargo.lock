@@ -830,6 +830,7 @@ version = "0.1.0"
 dependencies = [
  "bitcoin_hashes",
  "secp256k1 0.26.0",
+ "zero-jubjub",
 ]
 
 [[package]]

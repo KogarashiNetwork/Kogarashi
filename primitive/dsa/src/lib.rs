@@ -1,3 +1,7 @@
+mod dsa;
+mod ecdsa;
+mod keys;
+
 #[cfg(test)]
 mod tests {
     use bitcoin_hashes::{sha256, Hash};
