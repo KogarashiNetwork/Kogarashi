@@ -64,7 +64,7 @@ impl Config for TestRuntime {
 #[cfg(test)]
 mod plonk_test {
     use super::*;
-    use crate::types::JubJubScalar;
+    use crate::types::JubjubScalar;
     use rand::SeedableRng;
     use zero_crypto::behave::Group;
     use zero_plonk::prelude::Compiler;
@@ -96,7 +96,7 @@ mod plonk_test {
     #[test]
     fn default_test() {
         let rng = get_rng();
-        let a = JubJubScalar::random(rng.clone());
+        let a = JubjubScalar::random(rng.clone());
         let label = b"demo";
 
         new_test_ext().execute_with(|| {

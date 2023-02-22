@@ -1,7 +1,7 @@
 use zero_bls12_381::Fr as BlsScalar;
-use zero_crypto::common::{Decode, Encode, Group};
+use zero_crypto::common::{Curve, Decode, Encode, Group};
 use zero_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
-use zero_jubjub::{Fp as JubJubScalar, JubJubAffine, GENERATOR_EXTENDED};
+use zero_jubjub::{Fp as JubJubScalar, JubjubAffine};
 use zero_plonk::prelude::*;
 
 pub const BALANCE_BITS: usize = 16;
@@ -9,11 +9,11 @@ pub const CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH: usize = 8;
 
 /// Confidential transfer circuit
 pub struct ConfidentialTransferCircuit {
-    sender_public_key: JubJubAffine,
-    recipient_public_key: JubJubAffine,
+    sender_public_key: JubjubAffine,
+    recipient_public_key: JubjubAffine,
     sender_encrypted_balance: EncryptedNumber,
     sender_encrypted_transfer_amount: EncryptedNumber,
-    recipient_encrypted_transfer_amount: JubJubAffine,
+    recipient_encrypted_transfer_amount: JubjubAffine,
     sender_private_key: JubJubScalar,
     transfer_amount: JubJubScalar,
     sender_after_balance: JubJubScalar,
@@ -25,11 +25,11 @@ impl ConfidentialTransferCircuit {
     /// Init confidential tranfer circuit
     #[allow(dead_code)]
     pub fn new(
-        sender_public_key: JubJubAffine,
-        recipient_public_key: JubJubAffine,
+        sender_public_key: JubjubAffine,
+        recipient_public_key: JubjubAffine,
         sender_encrypted_balance: EncryptedNumber,
         sender_encrypted_transfer_amount: EncryptedNumber,
-        recipient_encrypted_transfer_amount: JubJubAffine,
+        recipient_encrypted_transfer_amount: JubjubAffine,
         sender_private_key: JubJubScalar,
         transfer_amount: JubJubScalar,
         sender_after_balance: JubJubScalar,
@@ -53,11 +53,11 @@ impl ConfidentialTransferCircuit {
 impl Default for ConfidentialTransferCircuit {
     fn default() -> Self {
         Self {
-            sender_public_key: JubJubAffine::identity(),
-            recipient_public_key: JubJubAffine::identity(),
+            sender_public_key: JubjubAffine::ADDITIVE_IDENTITY,
+            recipient_public_key: JubjubAffine::ADDITIVE_IDENTITY,
             sender_encrypted_balance: EncryptedNumber::default(),
             sender_encrypted_transfer_amount: EncryptedNumber::default(),
-            recipient_encrypted_transfer_amount: JubJubAffine::identity(),
+            recipient_encrypted_transfer_amount: JubjubAffine::ADDITIVE_IDENTITY,
             sender_private_key: JubJubScalar::ADDITIVE_IDENTITY,
             transfer_amount: JubJubScalar::ADDITIVE_IDENTITY,
             sender_after_balance: JubJubScalar::ADDITIVE_IDENTITY,
@@ -89,7 +89,7 @@ impl Circuit for ConfidentialTransferCircuit {
 
         // Alice left encrypted transfer check
         let g_pow_balance =
-            composer.component_mul_generator(transfer_amount, GENERATOR_EXTENDED)?;
+            composer.component_mul_generator(transfer_amount, JubjubExtend::ADDITIVE_GENERATOR)?;
         let alice_pk_powered_by_randomness =
             composer.component_mul_point(randomness, sender_public_key);
         let s_alice_transfer =
@@ -105,12 +105,13 @@ impl Circuit for ConfidentialTransferCircuit {
             .assert_equal_public_point(s_bob_transfer, self.recipient_encrypted_transfer_amount);
 
         // Alice right encrypted transfer check
-        let g_pow_randomness = composer.component_mul_generator(randomness, GENERATOR_EXTENDED)?;
+        let g_pow_randomness =
+            composer.component_mul_generator(randomness, JubjubExtend::ADDITIVE_GENERATOR)?;
         composer.assert_equal_public_point(g_pow_randomness, alice_s_transfer_amount);
 
         // Alice after balance check
-        let g_pow_after_balance =
-            composer.component_mul_generator(sender_after_balance, GENERATOR_EXTENDED)?;
+        let g_pow_after_balance = composer
+            .component_mul_generator(sender_after_balance, JubjubExtend::ADDITIVE_GENERATOR)?;
         let alice_t_transfer_neg =
             composer.component_mul_point(neg, alice_t_encrypted_transfer_amount);
         let alice_s_transfer_neg =
@@ -126,8 +127,8 @@ impl Circuit for ConfidentialTransferCircuit {
         composer.assert_equal_point(s_after_balance, x);
 
         // Public key calculation check
-        let calculated_pk =
-            composer.component_mul_generator(sender_private_key, GENERATOR_EXTENDED)?;
+        let calculated_pk = composer
+            .component_mul_generator(sender_private_key, JubjubExtend::ADDITIVE_GENERATOR)?;
         composer.assert_equal_public_point(calculated_pk, self.sender_public_key);
 
         // Transfer amount and ramaining balance range check
@@ -142,25 +143,25 @@ impl Circuit for ConfidentialTransferCircuit {
 #[derive(Clone, Debug, Decode, Encode, Eq, PartialEq)]
 pub struct ConfidentialTransferTransaction<E: ConfidentialTransferPublicInputs> {
     /// sender public key
-    pub sender_public_key: JubJubAffine,
+    pub sender_public_key: JubjubAffine,
     /// recipient public key
-    pub recipient_public_key: JubJubAffine,
+    pub recipient_public_key: JubjubAffine,
     /// encrypted transfer amount by sender
     pub sender_encrypted_transfer_amount: E,
     /// encrypted transfer amount by recipient
-    pub recipient_encrypted_transfer_amount: JubJubAffine,
+    pub recipient_encrypted_transfer_amount: JubjubAffine,
     /// the other encrypted transfer amount by recipient
-    pub recipient_encrypted_transfer_amount_other: JubJubAffine,
+    pub recipient_encrypted_transfer_amount_other: JubjubAffine,
 }
 
 impl<E: ConfidentialTransferPublicInputs> ConfidentialTransferTransaction<E> {
     /// init confidential transfer transaction
     pub fn new(
-        sender_public_key: JubJubAffine,
-        recipient_public_key: JubJubAffine,
+        sender_public_key: JubjubAffine,
+        recipient_public_key: JubjubAffine,
         sender_encrypted_transfer_amount: E,
-        recipient_encrypted_transfer_amount: JubJubAffine,
-        recipient_encrypted_transfer_amount_other: JubJubAffine,
+        recipient_encrypted_transfer_amount: JubjubAffine,
+        recipient_encrypted_transfer_amount_other: JubjubAffine,
     ) -> Self {
         Self {
             sender_public_key,

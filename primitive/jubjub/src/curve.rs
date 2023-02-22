@@ -13,30 +13,38 @@ pub const EDWARDS_D: Fr = Fr::to_mont_form([
 ]);
 
 const X: Fr = Fr::to_mont_form([
-    0xe4b3d35df1a7adfe,
-    0xcaf55d1b29bf81af,
-    0x8b0f03ddd60a8187,
-    0x62edcbb8bf3787c8,
+    0x4df7b7ffec7beaca,
+    0x2e3ebb21fd6c54ed,
+    0xf1fbf02d0fd6cce6,
+    0x3fd2814c43ac65a6,
 ]);
 
 const Y: Fr = Fr::to_mont_form([
-    0x000000000000000b,
-    0x0000000000000000,
-    0x0000000000000000,
-    0x0000000000000000,
+    0x0000000000000012,
+    000000000000000000,
+    000000000000000000,
+    000000000000000000,
 ]);
 
 const T: Fr = Fr::to_mont_form([
-    0xa79ca00515cf0172,
-    0x347eed85e11dd325,
-    0x247431ec84468aaa,
-    0x464c23a03263d422,
+    0x07b6af007a0b6822b,
+    0x04ebe6448d1acbcb8,
+    0x036ae4ae2c669cfff,
+    0x0697235704b95be33,
 ]);
 
 #[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
 pub struct JubjubAffine {
     x: Fr,
     y: Fr,
+}
+
+impl JubjubAffine {
+    /// Constructs an JubJubAffine given `x` and `y` without checking
+    /// that the point is on the curve.
+    pub const fn from_raw_unchecked(x: Fr, y: Fr) -> JubjubAffine {
+        JubjubAffine { x, y }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
@@ -47,6 +55,21 @@ pub struct JubjubExtend {
     z: Fr,
 }
 
+impl JubjubExtend {
+    /// This takes a mutable slice of `JubJubExtended`s and "normalizes" them using
+    /// only a single inversion for the entire batch. This normalization results in
+    /// all of the points having a Z-coordinate of one. Further, an iterator is
+    /// returned which can be used to obtain `JubJubAffine`s for each element in the
+    /// slice.
+    ///
+    /// This costs 5 multiplications per element, and a field inversion.
+    pub fn batch_normalize<'a>(
+        y: &'a mut [JubjubExtend],
+    ) -> impl Iterator<Item = JubjubAffine> + 'a {
+        y.iter().map(|p| JubjubAffine::from(*p))
+    }
+}
+
 twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtend, X, Y, T);
 
 #[cfg(test)]
@@ -54,7 +77,7 @@ mod tests {
     #[allow(unused_imports)]
     use super::*;
 
-    curve_test!(bls12_381, Fr, JubjubAffine, JubjubExtend, 100);
+    curve_test!(jubjub, Fr, JubjubAffine, JubjubExtend, 100);
 }
 
 impl Mul<Fp> for JubjubExtend {

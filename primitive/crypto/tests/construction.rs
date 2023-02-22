@@ -92,24 +92,24 @@ pub mod jubjub_curve {
     ]);
 
     const X: BlsScalar = BlsScalar::to_mont_form([
-        0xe4b3d35df1a7adfe,
-        0xcaf55d1b29bf81af,
-        0x8b0f03ddd60a8187,
-        0x62edcbb8bf3787c8,
+        0x4df7b7ffec7beaca,
+        0x2e3ebb21fd6c54ed,
+        0xf1fbf02d0fd6cce6,
+        0x3fd2814c43ac65a6,
     ]);
 
     const Y: BlsScalar = BlsScalar::to_mont_form([
-        0x000000000000000b,
-        0x0000000000000000,
-        0x0000000000000000,
-        0x0000000000000000,
+        0x0000000000000012,
+        000000000000000000,
+        000000000000000000,
+        000000000000000000,
     ]);
 
     const T: BlsScalar = BlsScalar::to_mont_form([
-        0xa79ca00515cf0172,
-        0x347eed85e11dd325,
-        0x247431ec84468aaa,
-        0x464c23a03263d422,
+        0x07b6af007a0b6822b,
+        0x04ebe6448d1acbcb8,
+        0x036ae4ae2c669cfff,
+        0x0697235704b95be33,
     ]);
 
     impl BlsScalar {

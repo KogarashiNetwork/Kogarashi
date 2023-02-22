@@ -2,7 +2,7 @@
 
 use pallet::*;
 use pallet_plonk::{BlsScalar, Circuit, Fr, FullcodecRng, Proof};
-use zero_jubjub::{Fp as JubJubScalar, JubJubAffine, GENERATOR_EXTENDED};
+use zero_jubjub::{Fp as JubJubScalar, JubjubAffine, JubjubExtend};
 use zero_plonk::{composer::Composer, prelude::*};
 
 use frame_support::{assert_ok, construct_runtime, parameter_types};
@@ -113,7 +113,7 @@ pub struct TestCircuit {
     pub c: BlsScalar,
     pub d: BlsScalar,
     pub e: JubJubScalar,
-    pub f: JubJubAffine,
+    pub f: JubjubAffine,
 }
 
 impl Circuit for TestCircuit {
@@ -144,7 +144,8 @@ impl Circuit for TestCircuit {
         composer.append_gate(constraint);
 
         let e = composer.append_witness(self.e);
-        let scalar_mul_result = composer.component_mul_generator(e, GENERATOR_EXTENDED)?;
+        let scalar_mul_result =
+            composer.component_mul_generator(e, JubjubExtend::ADDITIVE_GENERATOR)?;
         composer.assert_equal_public_point(scalar_mul_result, self.f);
         Ok(())
     }
@@ -229,7 +230,7 @@ fn main() {
         c: BlsScalar::from(25u64),
         d: BlsScalar::from(100u64),
         e: JubJubScalar::from(2u64),
-        f: JubJubAffine::from(GENERATOR_EXTENDED * JubJubScalar::from(2u64)),
+        f: JubjubAffine::from(JubjubExtend::ADDITIVE_GENERATOR * JubJubScalar::from(2u64)),
     };
 
     new_test_ext().execute_with(|| {

@@ -57,22 +57,22 @@ impl system::Config for Test {
 use zero_plonk::prelude::{Error as CircuitError, *};
 
 pub struct DummyCircuit {
-    a: JubJubScalar,
-    b: JubJubExtended,
+    a: JubjubScalar,
+    b: JubjubExtend,
 }
 
 impl DummyCircuit {
-    pub fn new(a: JubJubScalar) -> Self {
+    pub fn new(a: JubjubScalar) -> Self {
         Self {
             a,
-            b: zero_jubjub::GENERATOR_EXTENDED * &a,
+            b: JubjubExtend::ADDITIVE_GENERATOR * a,
         }
     }
 }
 
 impl Default for DummyCircuit {
     fn default() -> Self {
-        Self::new(JubJubScalar::from(7u64))
+        Self::new(JubjubScalar::from(7u64))
     }
 }
 
@@ -84,7 +84,7 @@ impl Circuit for DummyCircuit {
         let w_a = composer.append_witness(self.a);
         let w_b = composer.append_point(self.b);
 
-        let w_x = composer.component_mul_generator(w_a, zero_jubjub::GENERATOR_EXTENDED)?;
+        let w_x = composer.component_mul_generator(w_a, JubjubExtend::ADDITIVE_GENERATOR)?;
 
         composer.assert_equal_point(w_b, w_x);
 
