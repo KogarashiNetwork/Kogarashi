@@ -88,11 +88,11 @@ macro_rules! affine_group_operation {
             }
         }
 
-        impl<'b> Mul<&'b <Self as Curve>::Scalar> for $affine {
+        impl<'a, 'b> Mul<&'b <Self as Curve>::Scalar> for $affine {
             type Output = $projective;
 
             fn mul(self, rhs: &'b <Self as Curve>::Scalar) -> Self::Output {
-                scalar_point(self.into(), rhs)
+                scalar_point(self.into(), &rhs)
             }
         }
     };
@@ -176,19 +176,19 @@ macro_rules! projective_group_operation {
             }
         }
 
-        impl Mul<<Self as Group>::Scalar> for $projective {
-            type Output = Self;
+        impl Mul<<Self as Curve>::Scalar> for $projective {
+            type Output = $projective;
 
-            fn mul(self, rhs: <Self as Group>::Scalar) -> Self {
+            fn mul(self, rhs: <Self as Curve>::Scalar) -> Self::Output {
                 scalar_point(self, &rhs)
             }
         }
 
-        impl<'b> Mul<&'b <Self as Group>::Scalar> for $projective {
+        impl<'a, 'b> Mul<&'b <Self as Curve>::Scalar> for $projective {
             type Output = $projective;
 
-            fn mul(self, rhs: &'b <Self as Group>::Scalar) -> $projective {
-                scalar_point(self, rhs)
+            fn mul(self, rhs: &'b <Self as Curve>::Scalar) -> Self::Output {
+                scalar_point(self, &rhs)
             }
         }
     };
