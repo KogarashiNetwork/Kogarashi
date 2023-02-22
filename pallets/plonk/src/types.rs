@@ -1,9 +1,8 @@
 use codec::{Decode, Encode};
 pub use rand_xorshift::XorShiftRng as FullcodecRng;
 pub use zero_bls12_381::Fr;
-pub use zero_jubjub::GENERATOR_EXTENDED;
 pub use zero_plonk::prelude::{
-    BlsScalar, Circuit, Constraint, Error as PlonkError, JubJubAffine, JubJubScalar, Proof,
+    BlsScalar, Circuit, Constraint, Error as PlonkError, JubjubAffine, JubjubScalar, Proof,
     PublicParameters,
 };
 

@@ -48,7 +48,7 @@ pub fn to_bits(val: [u64; 6]) -> Bits {
         for byte in limb.to_le_bytes().iter() {
             for i in 0..8 {
                 index -= 1;
-                bits[index] = (byte >> i & 1) as u8;
+                bits[index] = byte >> i & 1;
             }
         }
     }
@@ -61,7 +61,7 @@ pub fn to_nafs(val: [u64; 6]) -> Nafs {
     for limb in val {
         for byte in limb.to_le_bytes().iter() {
             for i in 0..8 {
-                bits[index] = (byte >> i & 1) as u8;
+                bits[index] = byte >> i & 1;
                 index += 1;
             }
         }

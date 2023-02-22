@@ -21,48 +21,48 @@ use core::ops::{Add, Sub};
 use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
-use zero_jubjub::{Fp, JubJubAffine, JubJubExtended, GENERATOR_EXTENDED};
+use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
 
 /// Number encrypted by ElGamal encryption
 #[derive(Debug, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
 pub struct EncryptedNumber {
-    s: JubJubAffine,
-    t: JubJubAffine,
+    s: JubjubAffine,
+    t: JubjubAffine,
 }
 
 impl Default for EncryptedNumber {
     fn default() -> Self {
         Self {
-            s: JubJubAffine::identity(),
-            t: JubJubAffine::identity(),
+            s: JubjubAffine::ADDITIVE_IDENTITY,
+            t: JubjubAffine::ADDITIVE_IDENTITY,
         }
     }
 }
 
 impl EncryptedNumber {
     /// Init encrypted number
-    pub fn new(s: JubJubAffine, t: JubJubAffine) -> Self {
+    pub fn new(s: JubjubAffine, t: JubjubAffine) -> Self {
         Self { s, t }
     }
 
     /// Enctypt number by private key
     pub fn encrypt(private_key: Fp, value: u32, random: Fp) -> Self {
-        let g = GENERATOR_EXTENDED;
+        let g = JubjubExtend::ADDITIVE_GENERATOR;
         let public_key = g * private_key;
         let left = g * Fp::from(value as u64) + public_key * random;
         EncryptedNumber {
-            s: JubJubAffine::from(left),
-            t: JubJubAffine::from(g * random),
+            s: JubjubAffine::from(left),
+            t: JubjubAffine::from(g * random),
         }
     }
 
     /// Decrypt encrypted number by brute force
     pub fn decrypt(&self, private_key: Fp) -> Option<u32> {
-        let g = GENERATOR_EXTENDED;
+        let g = JubjubExtend::ADDITIVE_GENERATOR;
         let decrypted_message =
-            JubJubExtended::from(self.s) - (JubJubExtended::from(self.t) * private_key);
+            JubjubExtend::from(self.s) - (JubjubExtend::from(self.t) * private_key);
 
-        let mut acc = JubJubExtended::identity();
+        let mut acc = JubjubExtend::ADDITIVE_IDENTITY;
         for i in 0..150000 {
             if acc == decrypted_message {
                 return Some(i);
@@ -73,7 +73,7 @@ impl EncryptedNumber {
     }
 
     /// Get left and right affine point
-    pub fn get_coordinate(self) -> (JubJubAffine, JubJubAffine) {
+    pub fn get_coordinate(self) -> (JubjubAffine, JubjubAffine) {
         (self.s, self.t)
     }
 }
@@ -83,8 +83,8 @@ impl Add for EncryptedNumber {
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
         Self {
-            s: JubJubAffine::from(JubJubExtended::from(self.s) + JubJubExtended::from(rhs.s)),
-            t: JubJubAffine::from(JubJubExtended::from(self.t) + JubJubExtended::from(rhs.t)),
+            s: JubjubAffine::from(JubjubExtend::from(self.s) + JubjubExtend::from(rhs.s)),
+            t: JubjubAffine::from(JubjubExtend::from(self.t) + JubjubExtend::from(rhs.t)),
         }
     }
 }
@@ -95,8 +95,8 @@ impl Sub for EncryptedNumber {
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         Self {
-            s: JubJubAffine::from(JubJubExtended::from(self.s) - JubJubExtended::from(rhs.s)),
-            t: JubJubAffine::from(JubJubExtended::from(self.t) - JubJubExtended::from(rhs.t)),
+            s: JubjubAffine::from(JubjubExtend::from(self.s) - JubjubExtend::from(rhs.s)),
+            t: JubjubAffine::from(JubjubExtend::from(self.t) - JubjubExtend::from(rhs.t)),
         }
     }
 }
@@ -105,8 +105,8 @@ impl CheckedAdd for EncryptedNumber {
     #[inline]
     fn checked_add(&self, rhs: &Self) -> Option<Self> {
         Some(Self {
-            s: JubJubAffine::from(JubJubExtended::from(self.s) + JubJubExtended::from(rhs.s)),
-            t: JubJubAffine::from(JubJubExtended::from(self.t) + JubJubExtended::from(rhs.t)),
+            s: JubjubAffine::from(JubjubExtend::from(self.s) + JubjubExtend::from(rhs.s)),
+            t: JubjubAffine::from(JubjubExtend::from(self.t) + JubjubExtend::from(rhs.t)),
         })
     }
 }
@@ -115,8 +115,8 @@ impl CheckedSub for EncryptedNumber {
     #[inline]
     fn checked_sub(&self, rhs: &Self) -> Option<Self> {
         Some(Self {
-            s: JubJubAffine::from(JubJubExtended::from(self.s) - JubJubExtended::from(rhs.s)),
-            t: JubJubAffine::from(JubJubExtended::from(self.t) - JubJubExtended::from(rhs.t)),
+            s: JubjubAffine::from(JubjubExtend::from(self.s) - JubjubExtend::from(rhs.s)),
+            t: JubjubAffine::from(JubjubExtend::from(self.t) - JubjubExtend::from(rhs.t)),
         })
     }
 }
@@ -124,18 +124,18 @@ impl CheckedSub for EncryptedNumber {
 /// interface for circuit public inputs
 pub trait ConfidentialTransferPublicInputs {
     /// init transfer amount public
-    fn init(s: JubJubAffine, t: JubJubAffine) -> Self;
+    fn init(s: JubjubAffine, t: JubjubAffine) -> Self;
 
     /// get s and t cypher text
-    fn get(self) -> (JubJubAffine, JubJubAffine);
+    fn get(self) -> (JubjubAffine, JubjubAffine);
 }
 
 impl ConfidentialTransferPublicInputs for EncryptedNumber {
-    fn init(s: JubJubAffine, t: JubJubAffine) -> Self {
+    fn init(s: JubjubAffine, t: JubjubAffine) -> Self {
         Self::new(s, t)
     }
 
-    fn get(self) -> (JubJubAffine, JubJubAffine) {
+    fn get(self) -> (JubjubAffine, JubjubAffine) {
         self.get_coordinate()
     }
 }

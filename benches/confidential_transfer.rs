@@ -21,30 +21,30 @@ fn circuit(c: &mut Criterion) {
     let pp = PublicParameters::setup(n, &mut rng).expect("failed to create pp");
     let (prover, verifier) = Compiler::compile::<ConfidentialTransferCircuit>(&pp, label)
         .expect("failed to compile circuit");
-    let generator = GENERATOR_EXTENDED;
-    let alice_private_key = JubJubScalar::random(&mut rng);
-    let bob_private_key = JubJubScalar::random(&mut rng);
+    let generator = JubjubExtend::ADDITIVE_GENERATOR;
+    let alice_private_key = JubjubScalar::random(&mut rng);
+    let bob_private_key = JubjubScalar::random(&mut rng);
     let alice_public_key = generator * alice_private_key;
     let bob_public_key = generator * bob_private_key;
     let alice_balance = 1500;
     let transfer_amount_b = 800;
-    let alice_after_balance = JubJubScalar::from(700_u64);
-    let alice_original_randomness = JubJubScalar::from(789_u64);
-    let randomness = JubJubScalar::from(123_u64);
+    let alice_after_balance = JubjubScalar::from(700_u64);
+    let alice_original_randomness = JubjubScalar::from(789_u64);
+    let randomness = JubjubScalar::from(123_u64);
     let alice_encrypted_balance =
         EncryptedNumber::encrypt(alice_private_key, alice_balance, alice_original_randomness);
     let alice_transfer_amount =
         EncryptedNumber::encrypt(alice_private_key, transfer_amount_b, randomness);
-    let transfer_amount_scalar = JubJubScalar::from(transfer_amount_b as u64);
+    let transfer_amount_scalar = JubjubScalar::from(transfer_amount_b as u64);
     let bob_left_encrypted_transfer_amount =
         (generator * transfer_amount_scalar) + (bob_public_key * randomness);
 
     let circuit = ConfidentialTransferCircuit::new(
-        JubJubAffine::from(alice_public_key),
-        JubJubAffine::from(bob_public_key),
+        JubjubAffine::from(alice_public_key),
+        JubjubAffine::from(bob_public_key),
         alice_encrypted_balance,
         alice_transfer_amount,
-        JubJubAffine::from(bob_left_encrypted_transfer_amount),
+        JubjubAffine::from(bob_left_encrypted_transfer_amount),
         alice_private_key,
         transfer_amount_scalar,
         alice_after_balance,
