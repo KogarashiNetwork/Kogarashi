@@ -829,7 +829,7 @@ name = "dsa"
 version = "0.1.0"
 dependencies = [
  "bitcoin_hashes",
- "secp256k1 0.26.0",
+ "secp256k1",
  "zero-jubjub",
 ]
 
@@ -889,6 +889,18 @@ checksum = "c9b0705efd4599c15a38151f4721f7bc388306f61084d3bfd50bd07fbca5cb60"
 
 [[package]]
 name = "ed25519"
+version = "0.1.0"
+dependencies = [
+ "parity-scale-codec",
+ "paste",
+ "proptest",
+ "rand_core 0.6.4",
+ "serde",
+ "zero-crypto",
+]
+
+[[package]]
+name = "ed25519"
 version = "1.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "91cff35c70bba8a626e3185d8cd48cc11b5437e1a5bcd15b9b5fa3c64b6dfee7"
@@ -903,7 +915,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c762bae6dcaf24c4c84667b8579785430908723d5c889f469d76a41d59cc7a9d"
 dependencies = [
  "curve25519-dalek 3.2.1",
- "ed25519",
+ "ed25519 1.5.3",
  "rand 0.7.3",
  "serde",
  "sha2 0.9.9",
@@ -2341,18 +2353,6 @@ name = "scratch"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ddccb15bcce173023b3fedd9436f882a0739b8dfb45e4f6b6002bee5929f61b2"
-
-[[package]]
-name = "secp256k1"
-version = "0.1.0"
-dependencies = [
- "parity-scale-codec",
- "paste",
- "proptest",
- "rand_core 0.6.4",
- "serde",
- "zero-crypto",
-]
 
 [[package]]
 name = "secp256k1"
