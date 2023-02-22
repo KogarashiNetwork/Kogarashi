@@ -57,11 +57,30 @@ impl Fp {
 
 prime_field_operation!(Fp, MODULUS, GENERATOR, INV, R, R2, R3);
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//     use paste::paste;
-//     use rand_core::OsRng;
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use paste::paste;
+    use rand_core::OsRng;
 
-//     field_test!(fp_field, Fp, 1);
-// }
+    #[test]
+    fn mul_test() {
+        let a = Fp::to_mont_form([u64::MAX, u64::MAX, 1, 1]);
+        let b = Fp::to_mont_form([1, u64::MAX, u64::MAX, 1]);
+        let c = Fp::to_mont_form([1, u64::MAX, 1, 1]);
+
+        // a * b + a * c
+        let ab = a * b;
+        println!("{:?}", ab);
+        let ac = a * c;
+        println!("{:?}", ac);
+        let d = ab + ac;
+        println!("{:?}", d);
+
+        // a * (b + c)
+        let bc = b + c;
+        let e = a * bc;
+
+        assert_eq!(d, e);
+    }
+}
