@@ -43,6 +43,8 @@ frame-support = { default-features = false, version = '3.0.0' }
 members = [
     "primitive/bls12_381",
     "primitive/crypto",
+    "primitive/dsa",
+    "primitive/ed25519",
     "primitive/elgamal",
     "primitive/jubjub",
     "primitive/kzg",
