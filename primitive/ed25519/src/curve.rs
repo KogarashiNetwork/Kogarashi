@@ -12,24 +12,24 @@ const EDWARDS_D: Fp = Fp::to_mont_form([
 ]);
 
 const X: Fp = Fp::to_mont_form([
-    0x0000000000000009,
-    0x0000000000000000,
-    0x0000000000000000,
-    0x0000000000000000,
+    0xc9562d608f25d51a,
+    0x692cc7609525a7b2,
+    0xc0a4e231fdd6dc5c,
+    0x216936d3cd6e53fe,
 ]);
 
 const Y: Fp = Fp::to_mont_form([
-    0xa81b1ae2a7ef57d6,
-    0x580ba29ce48e9f34,
-    0x0000000000000004,
-    0x0000000000000000,
+    0x6666666666666658,
+    0x6666666666666666,
+    0x6666666666666666,
+    0x6666666666666666,
 ]);
 
 const T: Fp = Fp::to_mont_form([
-    0xe8f3f1f7e76a1686,
-    0x1868b784090398d9,
-    0x0000000000000027,
-    0x0000000000000000,
+    0x6dde8ab3a5b7dda3,
+    0x20f09f80775152f5,
+    0x66ea4e8e64abe37d,
+    0x67875f0fd78b7665,
 ]);
 
 #[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
