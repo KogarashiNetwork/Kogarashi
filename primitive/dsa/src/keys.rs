@@ -1,13 +1,13 @@
-use zero_jubjub::{Fp, JubJubAffine, GENERATOR_EXTENDED};
+use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
 
 struct KeyPair {
     private_key: Fp,
-    pub public_key: JubJubAffine,
+    pub public_key: JubjubAffine,
 }
 
 impl KeyPair {
     fn new(private_key: Fp) -> Self {
-        let public_key = JubJubAffine::from(GENERATOR_EXTENDED * private_key);
+        let public_key = JubjubAffine::from(JubjubExtend::ADDITIVE_GENERATOR * private_key);
 
         Self {
             private_key,
