@@ -1,0 +1,9 @@
+[package]
+name = "schnorr-signature"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+zero-crypto = { path = "../crypto" }
+zero-ed25519 = { path = "../ed25519" }
+sha2 = { version = "0.10", default-features = false }
