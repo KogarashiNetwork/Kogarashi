@@ -1,14 +1,14 @@
-# Zero Network
+# Kogarashi Network
 [![Merged Check](https://github.com/zero-network/zero/actions/workflows/merged.yml/badge.svg)](https://github.com/zero-network/zero/actions/workflows/merged.yml) [![Repository](https://img.shields.io/badge/github-zero-blueviolet?logo=github)](https://github.com/zero-network/zero) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE)  
 
-The `Zero Network` is a public blockchain capable of confidential transfers and confidential smart contracts. These functionalities rely on only the **cryptographic hardness assumption** instead `L2 technologies`, `TEE` and `centralized security assumption`.
+The `Kogarashi Network` is a public blockchain capable of confidential transfers and confidential smart contracts. These functionalities rely on only the **cryptographic hardness assumption** instead `L2 technologies`, `TEE` and `centralized security assumption`.
 
 <div align="center">
     <img width="250" alt="architecture" src="https://user-images.githubusercontent.com/39494661/163749008-3ad6fa47-9771-419b-98de-7a85cedaa2c7.jpg">
 </div>
 
 ## Abstract
-All public blockchains information as in users balances are literally public and can be seen by someone whoever want, so the privacy is a missing piece of blockchain. `Zero Network` hides all transactions information by cryptographic scheme mainly **ElGamal Encryption** and **Plonk**. The cryptographic schemes are following.
+All public blockchains information as in users balances are literally public and can be seen by someone whoever want, so the privacy is a missing piece of blockchain. `Kogarashi Network` hides all transactions information by cryptographic scheme mainly **ElGamal Encryption** and **Plonk**. The cryptographic schemes are following.
 
 |Lib|Description||
 |---|---|---|

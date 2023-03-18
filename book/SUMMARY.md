@@ -1,8 +1,8 @@
-# Zero Network
+# Kogarashi Network
 
 ## Component
 
-- [Zero Network](0_0_zero_network.md)
+- [Kogarashi Network](0_0_zero_network.md)
 - [Overview](1_0_overview.md)
     - [What is Privacy](1_1_what_is_privacy.md)
     - [Hide Transfer Amount](1_2_hide_transfer_amount.md)

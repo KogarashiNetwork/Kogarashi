@@ -4,7 +4,7 @@ authors = [
     'KiriosK<KiriosK@yandex.ru>'
 ]
 name = "zero-network"
-description = 'Zero network privacy-preserving blockchain'
+description = 'Kogarashi Network privacy-preserving blockchain'
 version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"

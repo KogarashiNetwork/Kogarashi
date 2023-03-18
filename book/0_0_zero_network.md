@@ -1,4 +1,4 @@
-# Zero Network: Privacy Preserving Transactions Blockchain based on Substrate
+# Kogarashi Network: Privacy Preserving Transactions Blockchain based on Substrate
 
 ## Abstract
 
@@ -10,7 +10,7 @@ As a part of our protocol, we combine some cryptgraphic tools. We would like to 
 
 Firstly we describe the problems we face to when we realize the privacy preserving blockchain, the difinition of privacy and how we address the problems in [Overview](1_0_overview.md). Finally, we describe the concrete constraints that the proof of transactions should satisfy in [Transaction Constraints](2_0_transaction_constraints.md). Addtionally, we add related research in [Related Tools](5_0_related_tools.md).
 
-- [Zero Network](0_0_zero_network.md)
+- [Kogarashi Network](0_0_zero_network.md)
 - [Overview](1_0_overview.md)
     - [What is Privacy](1_1_what_is_privacy.md)
     - [Hide Transfer Amount](1_2_hide_transfer_amount.md)

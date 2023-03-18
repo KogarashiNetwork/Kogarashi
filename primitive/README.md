@@ -1,5 +1,5 @@
 # Primitive
-The `Zero Network` consist of cryptographic primitives which are compatible with `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec). Followings are short summary of primitives.
+The `Kogarashi Network` consist of cryptographic primitives which are compatible with `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec). Followings are short summary of primitives.
 
 - [zero-crypto](../book/3_6_crypto.md) [![crates.io badge](https://img.shields.io/crates/v/zero-crypto.svg)](https://crates.io/crates/zero-crypto)
 
