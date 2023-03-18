@@ -60,6 +60,28 @@ impl From<u64> for Fp {
     }
 }
 
+impl SignatureRepr for Fp {
+    fn encode_for_sig(self) -> [u8; 32] {
+        let mut result = [0; 32];
+        for (i, limb) in self.0.iter().enumerate() {
+            for j in 0..8 {
+                result[i * 8 + j] = ((limb >> (j * 8)) & u8::MAX as u64) as u8;
+            }
+        }
+        result
+    }
+
+    fn decode_for_sig(raw: [u8; 32]) -> Self {
+        let mut limbs = [0; 4];
+        raw.chunks(8).enumerate().for_each(|(i, limb)| {
+            for (j, num) in limb.iter().enumerate() {
+                limbs[i] += (num << (j * 8)) as u64;
+            }
+        });
+        Self(limbs)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

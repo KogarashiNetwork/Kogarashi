@@ -50,7 +50,7 @@ members = [
     "primitive/kzg",
     "primitive/pairing",
     "primitive/plonk",
-    "primitive/schnorr-signature",
+    "primitive/schnorr_signature",
     "pallets/confidential_transfer",
     "pallets/encrypted_balance",
     "pallets/plonk"

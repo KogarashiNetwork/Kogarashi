@@ -46,6 +46,22 @@ pub struct Ed25519Extend {
     z: Fp,
 }
 
+impl SignatureRepr for Ed25519Affine {
+    fn encode_for_sig(self) -> [u8; 32] {
+        let mut y = self.y.encode_for_sig();
+        let x = self.x.encode_for_sig();
+        y[31] = x[0];
+        y
+    }
+
+    fn decode_for_sig(mut raw: [u8; 32]) -> Self {
+        let x_bytes = raw[31];
+        raw[31] = 0;
+        let y_bytes = raw;
+        let y = Fp::decode_for_sig(y_bytes);
+    }
+}
+
 twisted_edwards_curve_operation!(Fp, Fp, EDWARDS_D, Ed25519Affine, Ed25519Extend, X, Y, T);
 
 #[cfg(test)]
