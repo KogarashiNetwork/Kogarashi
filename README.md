@@ -1,14 +1,15 @@
 # Kogarashi Network
 [![Merged Check](https://github.com/zero-network/zero/actions/workflows/merged.yml/badge.svg)](https://github.com/zero-network/zero/actions/workflows/merged.yml) [![Repository](https://img.shields.io/badge/github-zero-blueviolet?logo=github)](https://github.com/zero-network/zero) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE)  
 
-The `Kogarashi Network` is a public blockchain capable of confidential transfers and confidential smart contracts. These functionalities rely on only the **cryptographic hardness assumption** instead `L2 technologies`, `TEE` and `centralized security assumption`.
-
 <div align="center">
-    <img width="250" alt="architecture" src="https://user-images.githubusercontent.com/39494661/163749008-3ad6fa47-9771-419b-98de-7a85cedaa2c7.jpg">
+    <img alt="architecture" src="https://user-images.githubusercontent.com/39494661/226280918-6cfc0d63-6f66-4166-a4a0-92a99005802a.png">
 </div>
 
-## Abstract
-All public blockchains information as in users balances are literally public and can be seen by someone whoever want, so the privacy is a missing piece of blockchain. `Kogarashi Network` hides all transactions information by cryptographic scheme mainly **ElGamal Encryption** and **Plonk**. The cryptographic schemes are following.
+The `Kogarashi Network` is a public blockchain capable of privacy transfers and smart contracts. These functionalities rely on only the **cryptographic hardness assumption** instead `L2 technologies`, `TEE` and `centralized security assumption`. All public blockchains information as in users balances are literally public and the privacy is a missing piece of blockchain. `Kogarashi Network` hides all transactions information by cryptographic scheme mainly **ElGamal Encryption** and **Plonk**. The cryptographic schemes are following.
+
+## Library
+
+All users balances are encrypted by the `homomorphic encryption` by default and all transactions executions are proved by the `non-interactive zero knowledge proof`. The blockchain runtime is optimized its structure and execution environment for improving encryption scheme. This blockchain supports the privacy and simplicity of use at the same time. Users balances are encrypted as default and transactions are verified by zero knowledge proof on chain.
 
 |Lib|Description||
 |---|---|---|
@@ -20,14 +21,6 @@ All public blockchains information as in users balances are literally public and
 |pallet-plonk|Plonk implementation for confidential transfer.|$gen(d) \rightarrow srs,\ com(f, srs) \rightarrow commitment,\ V_{PC} \rightarrow acc\ or\ rej$|
 |pallet-encrypted-balance|Additive homomorphic encrypted balance implementation by ElGamal.|$get(address) \rightarrow (g^{r + r'}, g^{a + c} * b^{r + r'})$|
 |confidential_transfer|Confidential transfer pallet implementation coupling plonk and ElGamal.|$C = g^{b^\star}y^r \land \hat C = g^{b^\star} \hat y^r \land D = g^r \land C_L/C = g^{b'}(C_R/D)^{sk} \land y = g^{sk} \land b^\star \in [0, MAX] \land b' \in [0,MAX] $|
-
-All users balances are encrypted by the `homomorphic encryption` by default and all transactions executions are proved by the `non-interactive zero knowledge proof`. The blockchain runtime is optimized its structure and execution environment for improving encryption scheme. This blockchain supports the privacy and simplicity of use at the same time. Users balances are encrypted as default and transactions are verified by zero knowledge proof on chain. The following functionalities will be available.
-
-- **Confidential Transfers**
-- **Confidential Smart Contracts**
-- **Anonymous Transfers**
-- **Anonymous Smart Contract**
-- **Rollup Transactions**
 
 ## Documentation
 
