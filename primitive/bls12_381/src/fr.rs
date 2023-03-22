@@ -8,7 +8,6 @@ use zero_crypto::arithmetic::utils::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
-use crate::EDWARDS_D;
 
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fr(pub [u64; 4]);
@@ -148,7 +147,6 @@ fft_field_operation!(
     MULTIPLICATIVE_GENERATOR,
     INV,
     ROOT_OF_UNITY,
-    EDWARDS_D,
     R,
     R2,
     R3,
@@ -182,7 +180,7 @@ pub const TWO_ADACITY: u32 = 32;
 impl Fr {
     pub fn divn(&mut self, mut n: u32) {
         if n >= 256 {
-            *self = Self::from(0);
+            *self = Self::from(0 as u64);
             return;
         }
 

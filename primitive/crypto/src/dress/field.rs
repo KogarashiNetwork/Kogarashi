@@ -66,7 +66,7 @@ macro_rules! prime_field_operation {
 
 #[macro_export]
 macro_rules! fft_field_operation {
-    ($field:ident, $p:ident, $g:ident, $mul_g:ident, $i:ident, $u:ident, $edwards_d:ident, $r:ident, $r2:ident, $r3:ident, $s:ident) => {
+    ($field:ident, $p:ident, $g:ident, $mul_g:ident, $i:ident, $u:ident, $r:ident, $r2:ident, $r3:ident, $s:ident) => {
         prime_field_operation!($field, $p, $g, $i, $r, $r2, $r3);
 
         impl FftField for $field {
@@ -75,8 +75,6 @@ macro_rules! fft_field_operation {
             const ROOT_OF_UNITY: Self = $u;
 
             const MULTIPLICATIVE_GENERATOR: Self = $mul_g;
-
-            const EDWARDS_D: Self = $edwards_d;
 
             fn pow(self, val: u64) -> Self {
                 Self(pow(self.0, [val, 0, 0, 0], $r, $p, $i))
@@ -92,6 +90,31 @@ macro_rules! fft_field_operation {
                     res.conditional_assign(&tmp, (((by >> i) & 0x1) as u8).into());
                 }
                 res
+            }
+
+            fn divn(&mut self, mut n: u32) {
+                if n >= 256 {
+                    *self = Self::from(0u64);
+                    return;
+                }
+
+                while n >= 64 {
+                    let mut t = 0;
+                    for i in self.0.iter_mut().rev() {
+                        core::mem::swap(&mut t, i);
+                    }
+                    n -= 64;
+                }
+
+                if n > 0 {
+                    let mut t = 0;
+                    for i in self.0.iter_mut().rev() {
+                        let t2 = *i << (64 - n);
+                        *i >>= n;
+                        *i |= t;
+                        t = t2;
+                    }
+                }
             }
 
             fn from_bytes_wide(bytes: &[u8; 64]) -> Self {
@@ -120,6 +143,28 @@ macro_rules! fft_field_operation {
                     $i,
                 ))
             }
+
+            fn is_even(&self) -> bool {
+                self.0[0] % 2 == 0
+            }
+
+            fn mod_2_pow_k(&self, k: u8) -> u8 {
+                (self.0[0] & ((1 << k) - 1)) as u8
+            }
+            fn mod_by_window(&self, c: usize) -> u64 {
+                self.0[0] % (1 << c)
+            }
+
+            fn mods_2_pow_k(&self, w: u8) -> i8 {
+                assert!(w < 32u8);
+                let modulus = self.mod_2_pow_k(w) as i8;
+                let two_pow_w_minus_one = 1i8 << (w - 1);
+
+                match modulus >= two_pow_w_minus_one {
+                    false => modulus,
+                    true => modulus - ((1u8 << w) as i8),
+                }
+            }
         }
 
         impl subtle::ConditionallySelectable for $field {
@@ -136,6 +181,12 @@ macro_rules! fft_field_operation {
         impl From<u64> for $field {
             fn from(val: u64) -> $field {
                 $field(from_u64(val, $r2, $p, $i))
+            }
+        }
+
+        impl From<[u64; 4]> for $field {
+            fn from(val: [u64; 4]) -> $field {
+                $field(val)
             }
         }
 

@@ -58,13 +58,6 @@ const ROOT_OF_UNITY: Fp = Fp([
     0x4d6b87b1da259e2,
 ]);
 
-const EDWARDS_D_FP: Fp = Fp::to_mont_form([
-    0x01065fd6d6343eb1,
-    0x292d7f6d37579d26,
-    0xf5fd9207e6bd7fd4,
-    0x2a9318e74bfa2b48,
-]);
-
 fft_field_operation!(
     Fp,
     MODULUS,
@@ -72,7 +65,6 @@ fft_field_operation!(
     MULTIPLICATIVE_GENERATOR,
     INV,
     ROOT_OF_UNITY,
-    EDWARDS_D_FP,
     R,
     R2,
     R3,
@@ -157,6 +149,32 @@ impl Fp {
     }
 }
 
+pub fn compute_windowed_naf<F: FftField>(scalar: F, width: u8) -> [i8; 256] {
+    let mut k = scalar.reduce();
+    let mut i = 0;
+    let one = F::one().reduce();
+    let mut res = [0i8; 256];
+
+    while k >= one {
+        if !k.is_even() {
+            let ki = k.mods_2_pow_k(width);
+            res[i] = ki;
+            let k_ = match (ki >= 0, ki < 0) {
+                (true, false) => F::from([ki.abs() as u64, 0u64, 0u64, 0u64]),
+                (false, true) => -F::from([ki.abs() as u64, 0u64, 0u64, 0u64]),
+                (_, _) => unreachable!(),
+            };
+            k = k - k_;
+        } else {
+            res[i] = 0i8;
+        };
+
+        k.divn(1u32);
+        i += 1;
+    }
+    res
+}
+
 impl Fp {
     /// Reduces bit representation of numbers, such that
     /// they can be evaluated in terms of the least significant bit.
@@ -194,56 +212,6 @@ impl Fp {
             false => modulus,
             true => modulus - ((1u8 << w) as i8),
         }
-    }
-
-    /// SHR impl
-    #[inline]
-    pub fn divn(&mut self, mut n: u32) {
-        if n >= 256 {
-            *self = Self::from(0u64);
-            return;
-        }
-
-        while n >= 64 {
-            let mut t = 0;
-            for i in self.0.iter_mut().rev() {
-                core::mem::swap(&mut t, i);
-            }
-            n -= 64;
-        }
-
-        if n > 0 {
-            let mut t = 0;
-            for i in self.0.iter_mut().rev() {
-                let t2 = *i << (64 - n);
-                *i >>= n;
-                *i |= t;
-                t = t2;
-            }
-        }
-    }
-
-    /// Computes the windowed-non-adjacent for a
-    /// given an element in the JubJub Scalar field.
-    pub fn compute_windowed_naf(&self, width: u8) -> [i8; 256] {
-        let mut k = self.reduce();
-        let mut i = 0;
-        let one = Fp::one().reduce();
-        let mut res = [0i8; 256];
-
-        while k >= one {
-            if !k.is_even() {
-                let ki = k.mods_2_pow_k(width);
-                res[i] = ki;
-                k = k - Fp::from(ki);
-            } else {
-                res[i] = 0i8;
-            };
-
-            k.divn(1u32);
-            i += 1;
-        }
-        res
     }
 }
 

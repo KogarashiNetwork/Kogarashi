@@ -31,18 +31,27 @@ pub trait RefOps:
 
 /// This is fft field
 /// This is used for fft and has roots of unity
-pub trait FftField: PrimeField + ParallelCmp + From<u64> + RefOps {
+pub trait FftField: PrimeField + ParallelCmp + From<u64> + From<[u64; 4]> + RefOps {
     // factor power of two
     const S: usize;
     // 2^s th root of unity
     const ROOT_OF_UNITY: Self;
     // multiplicative generator
     const MULTIPLICATIVE_GENERATOR: Self;
-    const EDWARDS_D: Self;
+
+    fn is_even(&self) -> bool;
 
     fn pow(self, val: u64) -> Self;
 
     fn pow_of_2(by: u64) -> Self;
+
+    fn divn(&mut self, n: u32);
+
+    fn mod_2_pow_k(&self, k: u8) -> u8;
+
+    fn mods_2_pow_k(&self, w: u8) -> i8;
+
+    fn mod_by_window(&self, c: usize) -> u64;
 
     fn from_bytes_wide(bytes: &[u8; 64]) -> Self;
 

@@ -3424,6 +3424,7 @@ dependencies = [
  "rand_core 0.6.4",
  "zero-bls12-381",
  "zero-crypto",
+ "zero-jubjub",
 ]
 
 [[package]]

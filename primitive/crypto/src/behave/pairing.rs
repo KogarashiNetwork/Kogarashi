@@ -10,7 +10,8 @@ use super::{
     algebra::Field,
     comp::{Basic, ParityCmp},
     curve::Affine,
-    FftField, Group, Projective,
+    Curve, CurveExtend, Extended, FftField, Group, Projective, TwistedEdwardsAffine,
+    TwistedEdwardsCurve,
 };
 
 /// extension field
@@ -23,7 +24,7 @@ pub trait PairingRange: ExtensionField {
     type G1Affine: Affine;
     type G2Coeff: ParityCmp;
     type QuadraticField: ExtensionField;
-    type Gt: Group;
+    type Gt: Group + Debug;
 
     fn mul_by_014(
         self,
@@ -50,7 +51,7 @@ pub trait G2Pairing: Projective {
 }
 
 /// pairing abstraction
-pub trait Pairing: Send + Sync + Clone + Debug + PartialEq {
+pub trait Pairing: Send + Sync + Clone + Debug + PartialEq + Default {
     // g1 group affine point
     type G1Affine: Affine
         + From<Self::G1Projective>
@@ -76,13 +77,38 @@ pub trait Pairing: Send + Sync + Clone + Debug + PartialEq {
         + From<Self::G2Affine>
         + Mul<Self::ScalarField, Output = Self::G2Projective>
         + G2Pairing;
+    // Jubjub affine point
+    type JubjubAffine: Affine
+        + Curve
+        + TwistedEdwardsAffine
+        + TwistedEdwardsCurve
+        + From<Self::JubjubExtend>;
+    // + From<<Self::JubjubExtend as CurveExtend>::Affine>;
+    // Jubjub extend point
+    type JubjubExtend: Curve
+        + CurveExtend
+        + Extended
+        + TwistedEdwardsCurve
+        + Into<Self::JubjubAffine>
+        + From<Self::JubjubAffine>;
+
     // g2 pairing representation
-    type G2PairngRepr: From<Self::G2Affine> + ParityCmp + Debug + PartialEq;
+    type G2PairngRepr: From<Self::G2Affine> + ParityCmp + Debug + PartialEq + Clone;
     // range of pairing function
-    type PairingRange: PairingRange;
-    type Gt: Group;
+    type PairingRange: PairingRange + Debug;
+    type Gt: Group + Debug;
     // Used for commitment
-    type ScalarField: FftField + Serializable<32> + Sum + Product;
+    type ScalarField: FftField
+        + Serializable<32>
+        + Sum
+        + Product
+        + From<<Self::JubjubExtend as Curve>::Range>
+        + From<<Self::JubjubAffine as Curve>::Range>
+        + Into<<Self::JubjubExtend as Curve>::Range>
+        + Into<<Self::JubjubAffine as Curve>::Range>
+        + From<<<Self::JubjubAffine as TwistedEdwardsAffine>::CurveExtend as Curve>::Range>
+        + From<<<Self::JubjubExtend as CurveExtend>::Affine as Curve>::Range>;
+    type JubjubScalar: FftField + Serializable<32> + Into<Self::ScalarField>;
 
     const X: u64;
     const X_IS_NEGATIVE: bool;
