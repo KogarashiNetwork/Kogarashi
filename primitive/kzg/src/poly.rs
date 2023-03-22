@@ -1,12 +1,12 @@
-use core::ops::{Add, Mul, Sub};
+use core::ops::{Add, Deref, DerefMut, Mul, Sub};
 
-use core::iter;
+use core::iter::{self, Sum};
 use rand_core::RngCore;
 use zero_crypto::behave::FftField;
 use zero_crypto::common::Vec;
 
 // a_n-1 , a_n-2, ... , a_0
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Polynomial<F>(pub Vec<F>);
 
 pub struct Witness<F> {
@@ -16,9 +16,58 @@ pub struct Witness<F> {
     denominator: F,
 }
 
+impl<F> Deref for Polynomial<F> {
+    type Target = [F];
+
+    fn deref(&self) -> &[F] {
+        &self.0
+    }
+}
+
+impl<F> DerefMut for Polynomial<F> {
+    fn deref_mut(&mut self) -> &mut [F] {
+        &mut self.0
+    }
+}
+
+impl<F: FftField> Sum for Polynomial<F> {
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = Self>,
+    {
+        let sum: Polynomial<F> = iter.fold(Polynomial::default(), |mut res, val| {
+            res = &res + &val;
+            res
+        });
+        sum
+    }
+}
+
 impl<F: FftField> Polynomial<F> {
     pub fn new(coeffs: Vec<F>) -> Self {
         Self(coeffs)
+    }
+
+    /// Constructs a new polynomial from a list of coefficients.
+    ///
+    /// # Panics
+    /// When the length of the coeffs is zero.
+    pub fn from_coefficients_vec(coeffs: Vec<F>) -> Self {
+        let mut result = Self(coeffs);
+        // While there are zeros at the end of the coefficient vector, pop them
+        // off.
+        result.truncate_leading_zeros();
+        // Check that either the coefficients vec is empty or that the last
+        // coeff is non-zero.
+        assert!(result.0.last().map_or(true, |coeff| coeff != &F::zero()));
+
+        result
+    }
+
+    fn truncate_leading_zeros(&mut self) {
+        while self.0.last().map_or(false, |c| c == &F::zero()) {
+            self.0.pop();
+        }
     }
 
     // polynomial evaluation domain
@@ -59,18 +108,19 @@ impl<F: FftField> Polynomial<F> {
     // no remainder polynomial division with at
     // f(x) - f(at) / x - at
     pub fn divide(&self, at: &F) -> Self {
-        Self(
-            self.0
-                .iter()
-                .skip(1)
-                .scan(self.0[0], |w, coeff| {
-                    let tmp = *w;
-                    *w *= at;
-                    *w += *coeff;
-                    Some(tmp)
-                })
-                .collect::<Vec<_>>(),
-        )
+        let mut coeffs = self
+            .0
+            .iter()
+            .rev()
+            .scan(F::zero(), |w, coeff| {
+                let tmp = *w + coeff;
+                *w = tmp * at;
+                Some(tmp)
+            })
+            .collect::<Vec<_>>();
+        coeffs.pop();
+        coeffs.reverse();
+        Self(coeffs)
     }
 
     /// σ^n - 1
@@ -83,6 +133,19 @@ impl<F: FftField> Polynomial<F> {
             self.0.pop();
         }
         self
+    }
+
+    /// Returns the degree of the [`Polynomial`].
+    pub fn degree(&self) -> usize {
+        if self.is_zero() {
+            return 0;
+        }
+        assert!(self.0.last().map_or(false, |coeff| coeff != &F::zero()));
+        self.0.len() - 1
+    }
+
+    pub(crate) fn is_zero(&self) -> bool {
+        self.0.is_empty() || self.0.iter().all(|coeff| coeff == &F::zero())
     }
 
     // create witness for f(a)
@@ -121,6 +184,20 @@ impl<F: FftField> Add for Polynomial<F> {
     }
 }
 
+impl<'a, 'b, F: FftField> Add<&'a Polynomial<F>> for &'b Polynomial<F> {
+    type Output = Polynomial<F>;
+
+    fn add(self, rhs: &'a Polynomial<F>) -> Self::Output {
+        let zero = F::zero();
+        let (left, right) = if self.0.len() > rhs.0.len() {
+            (self.0.iter(), rhs.0.iter().chain(iter::repeat(&zero)))
+        } else {
+            (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
+        };
+        Polynomial(left.zip(right).map(|(a, b)| *a + *b).collect()).format_degree()
+    }
+}
+
 impl<F: FftField> Sub for Polynomial<F> {
     type Output = Polynomial<F>;
 
@@ -135,11 +212,11 @@ impl<F: FftField> Sub for Polynomial<F> {
     }
 }
 
-impl<F: FftField> Mul<F> for Polynomial<F> {
+impl<'a, 'b, F: FftField> Mul<&'a F> for &'b Polynomial<F> {
     type Output = Polynomial<F>;
 
-    fn mul(self, scalar: F) -> Polynomial<F> {
-        Self(self.0.into_iter().map(|coeff| coeff * &scalar).collect())
+    fn mul(self, scalar: &'a F) -> Polynomial<F> {
+        Polynomial(self.0.iter().map(|coeff| *coeff * scalar).collect())
     }
 }
 
@@ -183,7 +260,7 @@ mod tests {
     fn polynomial_scalar() {
         let poly = arb_poly(10);
         let at = arb_fr();
-        let scalared = poly.clone() * at;
+        let scalared = &poly * &at;
         let test = Polynomial(poly.0.into_iter().map(|coeff| coeff * at).collect());
         assert_eq!(scalared, test);
     }
@@ -193,7 +270,7 @@ mod tests {
         let at = arb_fr();
         let divisor = arb_poly(10);
         // dividend = divisor * quotient
-        let factor_poly = vec![Fr::one(), -at];
+        let factor_poly = vec![-at, Fr::one()];
 
         // divisor * (x - at) = dividend
         let poly_a = Polynomial(naive_multiply(divisor.0, factor_poly.clone()));

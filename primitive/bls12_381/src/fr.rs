@@ -177,48 +177,9 @@ mod tests {
 pub const TWO_ADACITY: u32 = 32;
 
 impl Fr {
-    fn from_u512(limbs: [u64; 8]) -> Fr {
-        // We reduce an arbitrary 512-bit number by decomposing it into two 256-bit digits
-        // with the higher bits multiplied by 2^256. Thus, we perform two reductions
-        //
-        // 1. the lower bits are multiplied by R^2, as normal
-        // 2. the upper bits are multiplied by R^2 * 2^256 = R^3
-        //
-        // and computing their sum in the field. It remains to see that arbitrary 256-bit
-        // numbers can be placed into Montgomery form safely using the reduction. The
-        // reduction works so long as the product is less than R=2^256 multiplied by
-        // the modulus. This holds because for any `c` smaller than the modulus, we have
-        // that (2^256 - 1)*c is an acceptable product for the reduction. Therefore, the
-        // reduction always works so long as `c` is in the field; in this case it is either the
-        // constant `R2` or `R3`.
-        let d0 = Fr([limbs[0], limbs[1], limbs[2], limbs[3]]);
-        let d1 = Fr([limbs[4], limbs[5], limbs[6], limbs[7]]);
-        // Convert to Montgomery form
-        d0 * Self(R2) + d1 * Self(R3)
-    }
-
-    /// Converts a 512-bit little endian integer into
-    /// a `Scalar` by reducing by the modulus.
-    pub fn from_bytes_wide(bytes: &[u8; 64]) -> Fr {
-        Fr::from_u512([
-            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[0..8]).unwrap()),
-            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[8..16]).unwrap()),
-            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[16..24]).unwrap()),
-            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[24..32]).unwrap()),
-            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[32..40]).unwrap()),
-            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[40..48]).unwrap()),
-            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[48..56]).unwrap()),
-            u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[56..64]).unwrap()),
-        ])
-    }
-
-    pub fn reduce(&self) -> Fr {
-        Self(self.montgomery_reduce())
-    }
-
     pub fn divn(&mut self, mut n: u32) {
         if n >= 256 {
-            *self = Self::from(0);
+            *self = Self::from(0 as u64);
             return;
         }
 
@@ -278,20 +239,6 @@ impl Fr {
             (&sqrt * &sqrt).ct_eq(self), /* Only return Some if it's the
                                           * square root. */
         )
-    }
-
-    /// Computes `2^X` where X is a `u64` without the need to generate
-    /// an array in the stack as `pow` & `pow_vartime` require.
-    pub fn pow_of_2(by: u64) -> Self {
-        let two = Self::from(2u64);
-        let mut res = Self::one();
-        for i in (0..64).rev() {
-            res = res.square();
-            let mut tmp = res;
-            tmp *= two;
-            res.conditional_assign(&tmp, (((by >> i) & 0x1) as u8).into());
-        }
-        res
     }
 }
 
@@ -371,17 +318,6 @@ impl Serializable<32> for Fr {
         s *= Self(R2);
 
         Ok(s)
-    }
-}
-
-impl ConditionallySelectable for Fr {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        Fr([
-            u64::conditional_select(&a.0[0], &b.0[0], choice),
-            u64::conditional_select(&a.0[1], &b.0[1], choice),
-            u64::conditional_select(&a.0[2], &b.0[2], choice),
-            u64::conditional_select(&a.0[3], &b.0[3], choice),
-        ])
     }
 }
 

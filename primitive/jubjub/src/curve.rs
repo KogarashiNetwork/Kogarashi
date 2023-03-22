@@ -55,21 +55,6 @@ pub struct JubjubExtend {
     z: Fr,
 }
 
-impl JubjubExtend {
-    /// This takes a mutable slice of `JubJubExtended`s and "normalizes" them using
-    /// only a single inversion for the entire batch. This normalization results in
-    /// all of the points having a Z-coordinate of one. Further, an iterator is
-    /// returned which can be used to obtain `JubJubAffine`s for each element in the
-    /// slice.
-    ///
-    /// This costs 5 multiplications per element, and a field inversion.
-    pub fn batch_normalize<'a>(
-        y: &'a mut [JubjubExtend],
-    ) -> impl Iterator<Item = JubjubAffine> + 'a {
-        y.iter().map(|p| JubjubAffine::from(*p))
-    }
-}
-
 twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtend, X, Y, T);
 
 #[cfg(test)]

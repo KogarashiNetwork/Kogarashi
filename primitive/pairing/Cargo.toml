@@ -15,6 +15,7 @@ readme = 'README.md'
 [dependencies]
 zero-crypto = { path = "../crypto", default-features = false }
 zero-bls12-381 = { path = "../bls12_381", default-features = false }
+zero-jubjub = { path = "../jubjub", default-features = false }
 
 [dev-dependencies]
 rand_core = { version="0.6.4", features = ["getrandom"] }

@@ -19,10 +19,12 @@ mod commitment;
 mod fft;
 mod keypair;
 mod poly;
+mod util;
 mod witness;
 
-pub use commitment::KzgCommitment;
+pub use commitment::Commitment;
 pub use fft::Fft;
+pub use keypair::Error as KzgError;
 pub use keypair::KeyPair;
 pub use poly::Polynomial;
 pub use witness::Witness;

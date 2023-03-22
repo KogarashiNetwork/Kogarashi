@@ -70,6 +70,9 @@ macro_rules! twisted_edwards_curve_operation {
                     z: Self::Range::one(),
                 }
             }
+            fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self {
+                Self { x, y }
+            }
         }
 
         impl From<$extend> for $affine {
@@ -141,6 +144,12 @@ macro_rules! twisted_edwards_curve_operation {
 
             fn get_z(&self) -> Self::Range {
                 self.z
+            }
+
+            fn batch_normalize<'a>(
+                y: &'a mut [$extend],
+            ) -> Box<dyn Iterator<Item = Self::Affine> + 'a> {
+                Box::new(y.iter().map(|p| Self::Affine::from(*p)))
             }
         }
 
