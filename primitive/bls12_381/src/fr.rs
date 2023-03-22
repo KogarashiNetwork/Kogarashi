@@ -8,7 +8,6 @@ use zero_crypto::arithmetic::utils::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
-
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fr(pub [u64; 4]);
 
