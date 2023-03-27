@@ -24,7 +24,7 @@ use zero_crypto::common::{Curve, G2Pairing, Group, Pairing, PairingRange, PrimeF
 use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
 
 // tate pairing with miller algorithm
-#[derive(Debug, Clone, PartialEq, Default, Encode, Decode)]
+#[derive(Debug, Clone, Eq, PartialEq, Default, Encode, Decode)]
 pub struct TatePairing;
 
 impl Pairing for TatePairing {
