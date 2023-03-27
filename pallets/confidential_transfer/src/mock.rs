@@ -14,6 +14,7 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
+use zero_pairing::TatePairing;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;
@@ -63,11 +64,13 @@ impl frame_system::Config for TestRuntime {
 }
 
 impl pallet_plonk::Config for TestRuntime {
+    type P = TatePairing;
     type CustomCircuit = ConfidentialTransferCircuit;
     type Event = Event;
 }
 
 impl pallet_encrypted_balance::Config for TestRuntime {
+    type P = TatePairing;
     type EncryptedBalance = EncryptedNumber;
     type Event = Event;
     type AccountStore = StorageMapShim<
@@ -122,7 +125,7 @@ pub(crate) fn new_test_ext() -> sp_io::TestExternalities {
 
 pub(crate) fn generate_confidential_transfer_params() -> (
     ConfidentialTransferCircuit,
-    ConfidentialTransferTransaction<EncryptedNumber>,
+    ConfidentialTransferTransaction<EncryptedNumber, TatePairing>,
 ) {
     let alice_public_key = JubjubExtend::ADDITIVE_GENERATOR * ALICE_PRIVATE_KEY;
     let bob_public_key = JubjubExtend::ADDITIVE_GENERATOR * BOB_PRIVATE_KEY;

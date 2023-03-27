@@ -1,8 +1,10 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use pallet::*;
-use pallet_plonk::{BlsScalar, Circuit, Fr, FullcodecRng, Proof};
+use pallet_plonk::{BlsScalar, Circuit, FullcodecRng, Proof};
+use zero_crypto::common::Pairing;
 use zero_jubjub::{Fp as JubJubScalar, JubjubAffine, JubjubExtend};
+use zero_pairing::TatePairing;
 use zero_plonk::{composer::Composer, prelude::*};
 
 use frame_support::{assert_ok, construct_runtime, parameter_types};
@@ -68,8 +70,8 @@ pub mod pallet {
         pub fn set_thing_1(
             origin: OriginFor<T>,
             val: u32,
-            proof: Proof,
-            public_inputs: Vec<Fr>,
+            proof: Proof<T::P>,
+            public_inputs: Vec<<T::P as Pairing>::ScalarField>,
         ) -> DispatchResultWithPostInfo {
             // Define the proof verification
             pallet_plonk::Pallet::<T>::verify(origin, proof, public_inputs)?;
@@ -116,10 +118,10 @@ pub struct TestCircuit {
     pub f: JubjubAffine,
 }
 
-impl Circuit for TestCircuit {
+impl Circuit<TatePairing> for TestCircuit {
     fn circuit<C>(&self, composer: &mut C) -> Result<(), Error>
     where
-        C: Composer,
+        C: Composer<TatePairing>,
     {
         let a = composer.append_witness(self.a);
         let b = composer.append_witness(self.b);
@@ -199,6 +201,7 @@ impl frame_system::Config for TestRuntime {
 }
 
 impl pallet_plonk::Config for TestRuntime {
+    type P = TatePairing;
     type CustomCircuit = TestCircuit;
     type Event = Event;
 }
@@ -237,9 +240,9 @@ fn main() {
         assert_eq!(SumStorage::get_sum(), 0);
         assert_ok!(Plonk::trusted_setup(Origin::signed(1), 12, rng.clone()));
 
-        let pp = Plonk::public_parameter().unwrap();
-        let (prover, _) =
-            Compiler::compile::<TestCircuit>(&pp, label).expect("failed to compile circuit");
+        let mut pp = Plonk::keypair().unwrap();
+        let (prover, _) = Compiler::compile::<TestCircuit, TatePairing>(&mut pp, label)
+            .expect("failed to compile circuit");
 
         let (proof, public_inputs) = prover
             .prove(&mut rng, &test_circuit)

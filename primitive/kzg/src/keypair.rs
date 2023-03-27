@@ -2,6 +2,7 @@ use crate::commitment::Commitment;
 use crate::poly::Polynomial;
 use crate::util;
 use crate::witness::Witness;
+use parity_scale_codec::{Decode, Encode};
 use zero_crypto::behave::*;
 use zero_crypto::common::*;
 use zero_pairing::msm_variable_base;

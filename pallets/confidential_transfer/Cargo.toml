@@ -18,6 +18,7 @@ sp-runtime = { version = "3.0.0", default-features = false }
 
 # primitive
 zero-plonk = { path = "../../primitive/plonk", default-features = false }
+zero-pairing = { path = "../../primitive/pairing", default-features = false }
 zero-jubjub = { path = "../../primitive/jubjub", default-features = false }
 zero-crypto = { path = "../../primitive/crypto", default-features = false }
 zero-bls12-381 = { path = "../../primitive/bls12_381", default-features = false }

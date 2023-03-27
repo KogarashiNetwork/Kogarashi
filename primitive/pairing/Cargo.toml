@@ -16,6 +16,7 @@ readme = 'README.md'
 zero-crypto = { path = "../crypto", default-features = false }
 zero-bls12-381 = { path = "../bls12_381", default-features = false }
 zero-jubjub = { path = "../jubjub", default-features = false }
+parity-scale-codec = { version = "2.1.0", default-features = false, features = ["derive"] }
 
 [dev-dependencies]
 rand_core = { version="0.6.4", features = ["getrandom"] }

@@ -21,7 +21,9 @@ use core::ops::{Add, Sub};
 use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
+use zero_crypto::common::Pairing;
 use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
+use zero_pairing::TatePairing;
 
 /// Number encrypted by ElGamal encryption
 #[derive(Debug, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
@@ -122,15 +124,15 @@ impl CheckedSub for EncryptedNumber {
 }
 
 /// interface for circuit public inputs
-pub trait ConfidentialTransferPublicInputs {
+pub trait ConfidentialTransferPublicInputs<P: Pairing> {
     /// init transfer amount public
-    fn init(s: JubjubAffine, t: JubjubAffine) -> Self;
+    fn init(s: P::JubjubAffine, t: P::JubjubAffine) -> Self;
 
     /// get s and t cypher text
-    fn get(self) -> (JubjubAffine, JubjubAffine);
+    fn get(self) -> (P::JubjubAffine, P::JubjubAffine);
 }
 
-impl ConfidentialTransferPublicInputs for EncryptedNumber {
+impl ConfidentialTransferPublicInputs<TatePairing> for EncryptedNumber {
     fn init(s: JubjubAffine, t: JubjubAffine) -> Self {
         Self::new(s, t)
     }
