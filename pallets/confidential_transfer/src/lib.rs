@@ -27,7 +27,7 @@ mod mock;
 mod circuit;
 mod traits;
 
-pub use circuit::{ConfidentialTransferCircuit, ConfidentialTransferTransaction};
+pub use circuit::ConfidentialTransferTransaction;
 pub use traits::ConfidentialTransfer;
 
 use frame_support::pallet_prelude::*;
@@ -45,7 +45,7 @@ pub mod pallet {
     pub trait Config:
         frame_system::Config + pallet_plonk::Config + pallet_encrypted_balance::Config
     {
-        type Plonk: Plonk<Self::AccountId>;
+        type Plonk: Plonk<Self::AccountId, <Self as pallet_encrypted_balance::Config>::P>;
         type EncryptedCurrency: EncryptedCurrency<Self::AccountId, Self::EncryptedBalance>;
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
     }
@@ -76,12 +76,15 @@ pub mod pallet {
         pub fn confidential_transfer(
             origin: OriginFor<T>,
             dest: <T::Lookup as StaticLookup>::Source,
-            proof: Proof,
-            transaction_params: ConfidentialTransferTransaction<T::EncryptedBalance>,
+            proof: Proof<<T as pallet_encrypted_balance::Config>::P>,
+            transaction_params: ConfidentialTransferTransaction<
+                <T as pallet_encrypted_balance::Config>::EncryptedBalance,
+                <T as pallet_encrypted_balance::Config>::P,
+            >,
         ) -> DispatchResultWithPostInfo {
             let transactor = ensure_signed(origin)?;
             let dest = T::Lookup::lookup(dest)?;
-            <Self as ConfidentialTransfer<_>>::confidential_transfer(
+            <Self as ConfidentialTransfer<_, <T as pallet_encrypted_balance::Config>::P>>::confidential_transfer(
                 &transactor,
                 &dest,
                 proof,
@@ -92,7 +95,9 @@ pub mod pallet {
     }
 }
 
-impl<T: Config> ConfidentialTransfer<T::AccountId> for Pallet<T> {
+impl<T: Config> ConfidentialTransfer<T::AccountId, <T as pallet_encrypted_balance::Config>::P>
+    for Pallet<T>
+{
     type EncryptedBalance = T::EncryptedBalance;
 
     fn total_balance(who: &T::AccountId) -> Self::EncryptedBalance {
@@ -110,8 +115,11 @@ impl<T: Config> ConfidentialTransfer<T::AccountId> for Pallet<T> {
     fn confidential_transfer(
         who: &T::AccountId,
         dest: &T::AccountId,
-        proof: pallet_plonk::Proof,
-        transaction_params: ConfidentialTransferTransaction<Self::EncryptedBalance>,
+        proof: pallet_plonk::Proof<<T as pallet_encrypted_balance::Config>::P>,
+        transaction_params: ConfidentialTransferTransaction<
+            Self::EncryptedBalance,
+            <T as pallet_encrypted_balance::Config>::P,
+        >,
     ) -> DispatchResultWithPostInfo {
         let public_inputs = transaction_params.clone().public_inputs();
         let (sender_amount, recipient_amount) = transaction_params.transaction_amount();

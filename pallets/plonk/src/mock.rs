@@ -54,8 +54,10 @@ impl system::Config for Test {
     type SS58Prefix = SS58Prefix;
 }
 
+use zero_pairing::TatePairing;
 use zero_plonk::prelude::{Error as CircuitError, *};
 
+#[derive(Debug)]
 pub struct DummyCircuit {
     a: JubjubScalar,
     b: JubjubExtend,
@@ -76,10 +78,10 @@ impl Default for DummyCircuit {
     }
 }
 
-impl Circuit for DummyCircuit {
+impl Circuit<TatePairing> for DummyCircuit {
     fn circuit<C>(&self, composer: &mut C) -> Result<(), CircuitError>
     where
-        C: Composer,
+        C: Composer<TatePairing>,
     {
         let w_a = composer.append_witness(self.a);
         let w_b = composer.append_point(self.b);
@@ -93,6 +95,7 @@ impl Circuit for DummyCircuit {
 }
 
 impl plonk_pallet::Config for Test {
+    type P = TatePairing;
     type Event = Event;
     type CustomCircuit = DummyCircuit;
 }

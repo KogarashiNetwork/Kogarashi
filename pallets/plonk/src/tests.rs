@@ -10,6 +10,7 @@ use sp_runtime::{
     traits::{BlakeTwo256, IdentityLookup},
     DispatchError,
 };
+use zero_pairing::TatePairing;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;
@@ -57,6 +58,7 @@ impl frame_system::Config for TestRuntime {
 }
 
 impl Config for TestRuntime {
+    type P = TatePairing;
     type CustomCircuit = DummyCircuit;
     type Event = Event;
 }
@@ -67,6 +69,7 @@ mod plonk_test {
     use crate::types::JubjubScalar;
     use rand::SeedableRng;
     use zero_crypto::behave::Group;
+    use zero_pairing::TatePairing;
     use zero_plonk::prelude::Compiler;
 
     fn get_rng() -> FullcodecRng {
@@ -103,10 +106,10 @@ mod plonk_test {
             assert_ok!(Plonk::trusted_setup(Origin::signed(1), 12, rng));
 
             let mut rng = get_rng();
-            let pp = Plonk::public_parameter().unwrap();
+            let mut pp = Plonk::keypair().unwrap();
 
-            let (prover, verifier) =
-                Compiler::compile::<DummyCircuit>(&pp, label).expect("failed to compile circuit");
+            let (prover, verifier) = Compiler::compile::<DummyCircuit, TatePairing>(&mut pp, label)
+                .expect("failed to compile circuit");
 
             let (proof, public_inputs) = prover
                 .prove(&mut rng, &DummyCircuit::new(a))

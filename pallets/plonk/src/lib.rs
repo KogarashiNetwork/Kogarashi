@@ -70,32 +70,37 @@ pub use types::*;
 use frame_support::dispatch::{DispatchErrorWithPostInfo, PostDispatchInfo};
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
-use zero_crypto::common::Vec;
+use zero_crypto::behave::Group;
+use zero_crypto::common::{Pairing, Vec};
+use zero_kzg::KeyPair;
 use zero_plonk::prelude::Compiler;
 
 #[frame_support::pallet]
 pub mod pallet {
+    use zero_crypto::common::Pairing;
+
     use super::*;
 
     #[pallet::config]
     pub trait Config: frame_system::Config {
+        type P: Pairing;
         /// The circuit customized by developer
-        type CustomCircuit: Circuit;
+        type CustomCircuit: Circuit<Self::P>;
 
         /// The overarching event type
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
     }
 
     #[pallet::storage]
-    #[pallet::getter(fn public_parameter)]
+    #[pallet::getter(fn keypair)]
     /// The setup parameter referred to as SRS
-    pub type PublicParameter<T: Config> = StorageValue<_, PublicParameters>;
+    pub type Keypair<T: Config> = StorageValue<_, KeyPair<T::P>>;
 
     #[pallet::event]
     #[pallet::metadata(u32 = "Metadata")]
     pub enum Event<T: Config> {
         /// The event called when setup parameter
-        TrustedSetup(PublicParameters),
+        TrustedSetup(KeyPair<T::P>),
     }
 
     #[pallet::error]
@@ -123,7 +128,7 @@ pub mod pallet {
             rng: FullcodecRng,
         ) -> DispatchResultWithPostInfo {
             let transactor = ensure_signed(origin)?;
-            <Self as Plonk<_>>::trusted_setup(&transactor, val, rng)?;
+            <Self as Plonk<_, T::P>>::trusted_setup(&transactor, val, rng)?;
             Ok(().into())
         }
 
@@ -131,11 +136,11 @@ pub mod pallet {
         #[pallet::weight(10_000)]
         pub fn verify(
             origin: OriginFor<T>,
-            proof: Proof,
-            public_inputs: Vec<Fr>,
+            proof: Proof<T::P>,
+            public_inputs: Vec<<T::P as Pairing>::ScalarField>,
         ) -> DispatchResultWithPostInfo {
             let transactor = ensure_signed(origin)?;
-            <Self as Plonk<_>>::verify(&transactor, proof, public_inputs)?;
+            <Self as Plonk<_, T::P>>::verify(&transactor, proof, public_inputs)?;
             Ok(().into())
         }
     }
@@ -143,12 +148,12 @@ pub mod pallet {
 
 impl<T: Config> Pallet<T> {
     /// The RPC method to get public parameters
-    pub fn get_public_parameters() -> Option<PublicParameters> {
-        PublicParameter::<T>::get()
+    pub fn get_keypair() -> Option<KeyPair<T::P>> {
+        Keypair::<T>::get()
     }
 }
 
-impl<T: Config> Plonk<T::AccountId> for Pallet<T> {
+impl<T: Config> Plonk<T::AccountId, T::P> for Pallet<T> {
     /// The circuit customized by developer
     type CustomCircuit = T::CustomCircuit;
 
@@ -158,14 +163,17 @@ impl<T: Config> Plonk<T::AccountId> for Pallet<T> {
         val: u32,
         mut rng: FullcodecRng,
     ) -> DispatchResultWithPostInfo {
-        match Self::public_parameter() {
+        match Self::keypair() {
             Some(_) => Err(DispatchErrorWithPostInfo {
                 post_info: PostDispatchInfo::from(()),
                 error: DispatchError::Other("already setup"),
             }),
             None => {
-                let pp = PublicParameters::setup(1 << val, &mut rng).unwrap();
-                PublicParameter::<T>::put(&pp);
+                let pp = KeyPair::<T::P>::setup(
+                    val as u64,
+                    <T::P as Pairing>::ScalarField::random(&mut rng),
+                );
+                Keypair::<T>::put(&pp);
                 Event::<T>::TrustedSetup(pp);
                 Ok(().into())
             }
@@ -175,13 +183,13 @@ impl<T: Config> Plonk<T::AccountId> for Pallet<T> {
     /// The API method to verify the proof validity
     fn verify(
         _who: &T::AccountId,
-        proof: Proof,
-        public_inputs: Vec<Fr>,
+        proof: Proof<T::P>,
+        public_inputs: Vec<<T::P as Pairing>::ScalarField>,
     ) -> DispatchResultWithPostInfo {
-        match Self::public_parameter() {
-            Some(pp) => {
+        match Self::keypair() {
+            Some(mut pp) => {
                 let label = b"verify";
-                let (_, verifier) = Compiler::compile::<T::CustomCircuit>(&pp, label)
+                let (_, verifier) = Compiler::compile::<T::CustomCircuit, T::P>(&mut pp, label)
                     .expect("failed to compile circuit");
                 match verifier.verify(&proof, &public_inputs) {
                     Ok(_) => Ok(().into()),

@@ -10,6 +10,7 @@ mod plonk_test {
 
     use frame_support::assert_ok;
     use pallet_plonk::FullcodecRng;
+    use zero_pairing::TatePairing;
     use zero_plonk::prelude::Compiler;
 
     use ark_std::{end_timer, start_timer};
@@ -49,9 +50,10 @@ mod plonk_test {
             assert_ok!(result);
 
             // proof generation
-            let pp = Plonk::public_parameter().unwrap();
-            let prover = Compiler::compile::<ConfidentialTransferCircuit>(&pp, label)
-                .expect("failed to compile circuit");
+            let mut pp = Plonk::keypair().unwrap();
+            let prover =
+                Compiler::compile::<ConfidentialTransferCircuit, TatePairing>(&mut pp, label)
+                    .expect("failed to compile circuit");
 
             let proof_generation = start_timer!(|| "proof generation");
             let proof = prover

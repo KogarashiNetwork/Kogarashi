@@ -1,13 +1,14 @@
-use zero_bls12_381::Fr as BlsScalar;
-use zero_crypto::common::{Curve, Decode, Encode, Group};
+use zero_crypto::common::{Curve, Decode, Encode, Group, Pairing, TwistedEdwardsAffine};
 use zero_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
 use zero_jubjub::{Fp as JubJubScalar, JubjubAffine};
+use zero_pairing::TatePairing;
 use zero_plonk::prelude::*;
 
 pub const BALANCE_BITS: usize = 16;
 pub const CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH: usize = 8;
 
 /// Confidential transfer circuit
+#[derive(Debug, PartialEq)]
 pub struct ConfidentialTransferCircuit {
     sender_public_key: JubjubAffine,
     recipient_public_key: JubjubAffine,
@@ -67,10 +68,10 @@ impl Default for ConfidentialTransferCircuit {
     }
 }
 
-impl Circuit for ConfidentialTransferCircuit {
+impl Circuit<TatePairing> for ConfidentialTransferCircuit {
     fn circuit<C>(&self, composer: &mut C) -> Result<(), Error>
     where
-        C: Composer,
+        C: Composer<TatePairing>,
     {
         let (alice_t_balance, alice_s_balance) = self.sender_encrypted_balance.get();
         let (alice_t_transfer_amount, alice_s_transfer_amount) =
@@ -141,27 +142,27 @@ impl Circuit for ConfidentialTransferCircuit {
 
 /// confidential transfer transaction input
 #[derive(Clone, Debug, Decode, Encode, Eq, PartialEq)]
-pub struct ConfidentialTransferTransaction<E: ConfidentialTransferPublicInputs> {
+pub struct ConfidentialTransferTransaction<E: ConfidentialTransferPublicInputs<P>, P: Pairing> {
     /// sender public key
-    pub sender_public_key: JubjubAffine,
+    pub sender_public_key: P::JubjubAffine,
     /// recipient public key
-    pub recipient_public_key: JubjubAffine,
+    pub recipient_public_key: P::JubjubAffine,
     /// encrypted transfer amount by sender
     pub sender_encrypted_transfer_amount: E,
     /// encrypted transfer amount by recipient
-    pub recipient_encrypted_transfer_amount: JubjubAffine,
+    pub recipient_encrypted_transfer_amount: P::JubjubAffine,
     /// the other encrypted transfer amount by recipient
-    pub recipient_encrypted_transfer_amount_other: JubjubAffine,
+    pub recipient_encrypted_transfer_amount_other: P::JubjubAffine,
 }
 
-impl<E: ConfidentialTransferPublicInputs> ConfidentialTransferTransaction<E> {
+impl<E: ConfidentialTransferPublicInputs<P>, P: Pairing> ConfidentialTransferTransaction<E, P> {
     /// init confidential transfer transaction
     pub fn new(
-        sender_public_key: JubjubAffine,
-        recipient_public_key: JubjubAffine,
+        sender_public_key: P::JubjubAffine,
+        recipient_public_key: P::JubjubAffine,
         sender_encrypted_transfer_amount: E,
-        recipient_encrypted_transfer_amount: JubjubAffine,
-        recipient_encrypted_transfer_amount_other: JubjubAffine,
+        recipient_encrypted_transfer_amount: P::JubjubAffine,
+        recipient_encrypted_transfer_amount_other: P::JubjubAffine,
     ) -> Self {
         Self {
             sender_public_key,
@@ -173,8 +174,8 @@ impl<E: ConfidentialTransferPublicInputs> ConfidentialTransferTransaction<E> {
     }
 
     /// output public inputs for confidential transfer transaction
-    pub fn public_inputs(self) -> [BlsScalar; CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH] {
-        let mut public_inputs = [BlsScalar::zero(); CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH];
+    pub fn public_inputs(self) -> [P::ScalarField; CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH] {
+        let mut public_inputs = [P::ScalarField::zero(); CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH];
         let (sender_t, sender_s) = self.sender_encrypted_transfer_amount.get();
         for (i, public_point) in [
             sender_t,
@@ -186,8 +187,8 @@ impl<E: ConfidentialTransferPublicInputs> ConfidentialTransferTransaction<E> {
         .enumerate()
         {
             let (x, y) = (-public_point.get_x(), -public_point.get_y());
-            public_inputs[i * 2] = x;
-            public_inputs[i * 2 + 1] = y;
+            public_inputs[i * 2] = x.into();
+            public_inputs[i * 2 + 1] = y.into();
         }
         public_inputs
     }

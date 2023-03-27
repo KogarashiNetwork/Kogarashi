@@ -23,9 +23,9 @@ zero-pairing = { path = "./primitive/pairing", default-features = false }
 zero-plonk = { path = "./primitive/plonk", default-features = false }
 
 # pallet
-# pallet-plonk = { path = "./pallets/plonk", default-features = false }
-# pallet-encrypted-balance = { path = "./pallets/encrypted_balance", default-features = false }
-# confidential_transfer = { path = "./pallets/confidential_transfer", default-features = false }
+pallet-plonk = { path = "./pallets/plonk", default-features = false }
+pallet-encrypted-balance = { path = "./pallets/encrypted_balance", default-features = false }
+confidential_transfer = { path = "./pallets/confidential_transfer", default-features = false }
 
 [dev-dependencies]
 criterion = "0.4.0"
@@ -50,9 +50,9 @@ members = [
     "primitive/kzg",
     "primitive/pairing",
     "primitive/plonk",
-    # "pallets/confidential_transfer",
-    # "pallets/encrypted_balance",
-    # "pallets/plonk"
+    "pallets/confidential_transfer",
+    "pallets/encrypted_balance",
+    "pallets/plonk"
 ]
 
 [profile.release]
@@ -73,19 +73,10 @@ codegen-units = 1
 [features]
 default = ["std"]
 std = [
-    'codec/std',
-    'frame-support/std',
-	'frame-system/std',
-    'zero-plonk/std',
-    'sp-core/std',
-    'sp-io/std',
-    'sp-runtime/std',
+    'confidential_transfer/std',
+    'pallet-plonk/std',
+    'pallet-encrypted-balance/std',
 ]
-# std = [
-#     'confidential_transfer/std',
-#     'pallet-plonk/std',
-#     'pallet-encrypted-balance/std',
-# ]
 
 # [[bench]]
 # name = "confidential_transfer"

@@ -1,6 +1,7 @@
+use parity_scale_codec::{Decode, Encode};
 use zero_crypto::common::Pairing;
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy, Default)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Default, Decode, Encode)]
 pub struct Commitment<P: Pairing>(pub P::G1Affine);
 
 impl<P: Pairing> Commitment<P> {

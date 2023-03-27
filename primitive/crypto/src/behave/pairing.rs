@@ -5,6 +5,7 @@ use core::{
 };
 
 use dusk_bytes::Serializable;
+use parity_scale_codec::{Decode, Encode};
 
 use super::{
     algebra::Field,
@@ -51,7 +52,7 @@ pub trait G2Pairing: Projective {
 }
 
 /// pairing abstraction
-pub trait Pairing: Send + Sync + Clone + Debug + PartialEq + Default {
+pub trait Pairing: Send + Sync + Clone + Debug + PartialEq + Default + Encode + Decode {
     // g1 group affine point
     type G1Affine: Affine
         + From<Self::G1Projective>
@@ -61,9 +62,17 @@ pub trait Pairing: Send + Sync + Clone + Debug + PartialEq + Default {
         + PartialEq
         + Eq
         + Sync
-        + Send;
+        + Send
+        + Encode
+        + Decode;
     // g2 group affine point
-    type G2Affine: Affine + From<Self::G2Projective> + Neg<Output = Self::G2Affine> + PartialEq + Eq;
+    type G2Affine: Affine
+        + From<Self::G2Projective>
+        + Neg<Output = Self::G2Affine>
+        + PartialEq
+        + Eq
+        + Encode
+        + Decode;
     // g1 group projective point
     type G1Projective: Projective
         + From<Self::G1Affine>
@@ -107,7 +116,9 @@ pub trait Pairing: Send + Sync + Clone + Debug + PartialEq + Default {
         + Into<<Self::JubjubExtend as Curve>::Range>
         + Into<<Self::JubjubAffine as Curve>::Range>
         + From<<<Self::JubjubAffine as TwistedEdwardsAffine>::CurveExtend as Curve>::Range>
-        + From<<<Self::JubjubExtend as CurveExtend>::Affine as Curve>::Range>;
+        + From<<<Self::JubjubExtend as CurveExtend>::Affine as Curve>::Range>
+        + Encode
+        + Decode;
     type JubjubScalar: FftField + Serializable<32> + Into<Self::ScalarField>;
 
     const X: u64;
