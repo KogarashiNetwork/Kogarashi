@@ -16,6 +16,7 @@ use sp_runtime::{
 use zero_crypto::behave::Group;
 use zero_elgamal::EncryptedNumber;
 use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
+use zero_pairing::TatePairing;
 use zero_plonk::prelude::Compiler;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
@@ -66,11 +67,13 @@ impl frame_system::Config for TestRuntime {
 }
 
 impl pallet_plonk::Config for TestRuntime {
+    type P = TatePairing;
     type CustomCircuit = ConfidentialTransferCircuit;
     type Event = Event;
 }
 
 impl pallet_encrypted_balance::Config for TestRuntime {
+    type P = TatePairing;
     type EncryptedBalance = EncryptedNumber;
     type Event = Event;
     type AccountStore = StorageMapShim<
@@ -199,7 +202,7 @@ fn main() {
         assert_ok!(result);
 
         // proof generation
-        let pp = Plonk::public_parameter().unwrap();
+        let mut pp = Plonk::keypair().unwrap();
         let alice_public_key = JubjubExtend::ADDITIVE_GENERATOR * alice_private_key;
         let bob_public_key = JubjubExtend::ADDITIVE_GENERATOR * bob_private_key;
         let transfer_amount_scalar = Fp::from(transfer_amount as u64);
@@ -232,7 +235,7 @@ fn main() {
             alice_after_balance_scalar,
             transfer_randomness,
         );
-        let prover = Compiler::compile::<ConfidentialTransferCircuit>(&pp, label)
+        let prover = Compiler::compile::<ConfidentialTransferCircuit, TatePairing>(&mut pp, label)
             .expect("failed to compile circuit");
         let proof = prover
             .0

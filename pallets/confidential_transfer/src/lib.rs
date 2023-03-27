@@ -27,7 +27,7 @@ mod mock;
 mod circuit;
 mod traits;
 
-pub use circuit::ConfidentialTransferTransaction;
+pub use circuit::{ConfidentialTransferCircuit, ConfidentialTransferTransaction};
 pub use traits::ConfidentialTransfer;
 
 use frame_support::pallet_prelude::*;

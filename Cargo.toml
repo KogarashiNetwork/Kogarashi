@@ -78,9 +78,9 @@ std = [
     'pallet-encrypted-balance/std',
 ]
 
-# [[bench]]
-# name = "confidential_transfer"
-# harness = false
+[[bench]]
+name = "confidential_transfer"
+harness = false
 
 [[bench]]
 name = "pairing"
