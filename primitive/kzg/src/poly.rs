@@ -48,6 +48,14 @@ impl<F: FftField> Polynomial<F> {
         Self(coeffs)
     }
 
+    pub fn rand<R: RngCore>(d: usize, mut rng: &mut R) -> Self {
+        let mut random_coeffs = Vec::with_capacity(d + 1);
+        for _ in 0..=d {
+            random_coeffs.push(F::random(&mut rng));
+        }
+        Self::from_coefficients_vec(random_coeffs)
+    }
+
     /// Constructs a new polynomial from a list of coefficients.
     ///
     /// # Panics
