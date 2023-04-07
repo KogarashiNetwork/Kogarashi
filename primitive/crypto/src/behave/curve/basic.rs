@@ -1,18 +1,18 @@
-use crate::behave::{Basic, Group, ParityCmp, PrimeField};
+use crate::{
+    behave::{Basic, ParityCmp, PrimeField},
+    common::CurveGroup,
+};
 use core::ops::{Add, AddAssign, Sub, SubAssign};
 
-pub trait Curve: ParityCmp + Basic {
+pub trait Curve: CurveGroup + ParityCmp + Basic {
     // range field of curve
     type Range: PrimeField;
 
     // scalar field of affine
-    type Scalar: PrimeField;
+    // type Scalar: PrimeField;
 
     // a param
     const PARAM_A: Self::Range;
-
-    // check that point is on curve
-    fn is_identity(self) -> bool;
 
     // check that point is on curve
     fn is_on_curve(self) -> bool;
@@ -31,7 +31,6 @@ pub trait Affine: Curve {}
 /// projective, jacobian and so on
 pub trait CurveExtend:
     Curve
-    + Group
     + AddAssign<Self::Affine>
     + Add<Self::Affine, Output = Self>
     + SubAssign<Self::Affine>
@@ -40,7 +39,6 @@ pub trait CurveExtend:
     + From<Self::Affine>
 {
     // affine coordinate representation
-    type Affine: Affine;
 
     // doubling this point
     fn double(self) -> Self;

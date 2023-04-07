@@ -23,13 +23,7 @@ macro_rules! twisted_edwards_curve_operation {
         impl Curve for $affine {
             type Range = $scalar;
 
-            type Scalar = $scalar;
-
             const PARAM_A: $scalar = $scalar::one();
-
-            fn is_identity(self) -> bool {
-                self.x.is_zero() && self.y == $scalar::one()
-            }
 
             fn is_on_curve(self) -> bool {
                 if self.x.is_zero() {
@@ -56,14 +50,14 @@ macro_rules! twisted_edwards_curve_operation {
         }
 
         impl TwistedEdwardsAffine for $affine {
-            type CurveExtend = $extend;
+            type Extend = $extend;
 
-            fn double(self) -> Self::CurveExtend {
+            fn double(self) -> Self::Extend {
                 double_point(self.to_extend())
             }
 
-            fn to_extend(self) -> Self::CurveExtend {
-                Self::CurveExtend {
+            fn to_extend(self) -> Self::Extend {
+                Self::Extend {
                     x: self.x,
                     y: self.y,
                     t: self.x * self.y,
@@ -86,13 +80,7 @@ macro_rules! twisted_edwards_curve_operation {
         impl Curve for $extend {
             type Range = $scalar;
 
-            type Scalar = $scalar;
-
             const PARAM_A: $scalar = $scalar::one();
-
-            fn is_identity(self) -> bool {
-                self.x == $scalar::zero() && self.y == $scalar::one()
-            }
 
             fn is_on_curve(self) -> bool {
                 if self.z.is_zero() {
@@ -118,8 +106,6 @@ macro_rules! twisted_edwards_curve_operation {
         }
 
         impl CurveExtend for $extend {
-            type Affine = $affine;
-
             fn double(self) -> Self {
                 double_point(self)
             }

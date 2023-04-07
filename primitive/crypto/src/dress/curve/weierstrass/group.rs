@@ -1,6 +1,7 @@
 #[macro_export]
 macro_rules! affine_group_operation {
     ($affine:ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident) => {
+        curve_arithmetic_extension!($affine, $scalar);
         impl PartialEq for $affine {
             fn eq(&self, other: &Self) -> bool {
                 if self.is_identity() || other.is_identity() {
@@ -11,26 +12,26 @@ macro_rules! affine_group_operation {
             }
         }
 
-        impl Eq for $affine {}
+        impl CurveGroup for $affine {
+            type Affine = $affine;
+            type Projective = $projective;
+            type Scalar = $scalar;
 
-        impl Default for $affine {
-            fn default() -> Self {
-                Self::ADDITIVE_IDENTITY
-            }
-        }
-
-        impl $affine {
-            pub const ADDITIVE_GENERATOR: Self = Self {
+            const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
                 y: $y,
                 is_infinity: false,
             };
 
-            pub const ADDITIVE_IDENTITY: Self = Self {
+            const ADDITIVE_IDENTITY: Self = Self {
                 x: $range::zero(),
                 y: $range::one(),
                 is_infinity: true,
             };
+
+            fn is_identity(self) -> bool {
+                self.is_infinity
+            }
 
             fn zero() -> Self {
                 Self::ADDITIVE_IDENTITY
@@ -47,7 +48,7 @@ macro_rules! affine_group_operation {
                 }
             }
 
-            pub fn random(rand: impl RngCore) -> $projective {
+            fn random(rand: impl RngCore) -> $projective {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
             }
         }
@@ -80,18 +81,18 @@ macro_rules! affine_group_operation {
             }
         }
 
-        impl Mul<<Self as Curve>::Scalar> for $affine {
+        impl Mul<<Self as CurveGroup>::Scalar> for $affine {
             type Output = $projective;
 
-            fn mul(self, rhs: <Self as Curve>::Scalar) -> Self::Output {
+            fn mul(self, rhs: <Self as CurveGroup>::Scalar) -> Self::Output {
                 scalar_point(self.into(), &rhs)
             }
         }
 
-        impl<'a, 'b> Mul<&'b <Self as Curve>::Scalar> for $affine {
+        impl<'a, 'b> Mul<&'b <Self as CurveGroup>::Scalar> for $affine {
             type Output = $projective;
 
-            fn mul(self, rhs: &'b <Self as Curve>::Scalar) -> Self::Output {
+            fn mul(self, rhs: &'b <Self as CurveGroup>::Scalar) -> Self::Output {
                 scalar_point(self.into(), &rhs)
             }
         }
@@ -100,10 +101,12 @@ macro_rules! affine_group_operation {
 
 #[macro_export]
 macro_rules! projective_group_operation {
-    ($projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident) => {
+    ($affine: ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident) => {
         curve_arithmetic_extension!($projective, $scalar);
 
-        impl Group for $projective {
+        impl CurveGroup for $projective {
+            type Affine = $affine;
+            type Projective = $projective;
             type Scalar = $scalar;
 
             const ADDITIVE_GENERATOR: Self = Self {
@@ -117,6 +120,10 @@ macro_rules! projective_group_operation {
                 y: $range::one(),
                 z: $range::zero(),
             };
+
+            fn is_identity(self) -> bool {
+                self.z == $range::zero()
+            }
 
             fn zero() -> Self {
                 Self::ADDITIVE_IDENTITY
@@ -176,18 +183,18 @@ macro_rules! projective_group_operation {
             }
         }
 
-        impl Mul<<Self as Curve>::Scalar> for $projective {
+        impl Mul<<Self as CurveGroup>::Scalar> for $projective {
             type Output = $projective;
 
-            fn mul(self, rhs: <Self as Curve>::Scalar) -> Self::Output {
+            fn mul(self, rhs: <Self as CurveGroup>::Scalar) -> Self::Output {
                 scalar_point(self, &rhs)
             }
         }
 
-        impl<'a, 'b> Mul<&'b <Self as Curve>::Scalar> for $projective {
+        impl<'a, 'b> Mul<&'b <Self as CurveGroup>::Scalar> for $projective {
             type Output = $projective;
 
-            fn mul(self, rhs: &'b <Self as Curve>::Scalar) -> Self::Output {
+            fn mul(self, rhs: &'b <Self as CurveGroup>::Scalar) -> Self::Output {
                 scalar_point(self, &rhs)
             }
         }
@@ -207,7 +214,7 @@ macro_rules! curve_arithmetic_extension {
 
         impl AddAssign for $curve {
             fn add_assign(&mut self, rhs: $curve) {
-                *self = *self + rhs;
+                *self = (*self + rhs).into();
             }
         }
 
@@ -243,7 +250,7 @@ macro_rules! curve_arithmetic_extension {
 
         impl SubAssign for $curve {
             fn sub_assign(&mut self, rhs: $curve) {
-                *self = *self - rhs;
+                *self = (*self - rhs).into();
             }
         }
 
@@ -277,9 +284,9 @@ macro_rules! curve_arithmetic_extension {
             }
         }
 
-        impl MulAssign<<Self as Group>::Scalar> for $curve {
-            fn mul_assign(&mut self, rhs: <Self as Group>::Scalar) {
-                *self = *self * rhs;
+        impl MulAssign<<Self as CurveGroup>::Scalar> for $curve {
+            fn mul_assign(&mut self, rhs: <Self as CurveGroup>::Scalar) {
+                *self = (*self * rhs).into();
             }
         }
     };

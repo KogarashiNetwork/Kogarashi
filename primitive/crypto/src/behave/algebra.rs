@@ -2,6 +2,8 @@
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use rand_core::RngCore;
 
+use super::{Curve, CurveExtend, PrimeField};
+
 /// group trait which supports additive and scalar arithmetic
 /// additive and scalar arithmetic hold associative and distributive property
 /// any element has its inverse and these is the identity in group
@@ -37,6 +39,44 @@ pub trait Group:
 
     // get randome element
     fn random(rand: impl RngCore) -> Self;
+}
+
+pub trait CurveGroup:
+    PartialEq
+    + Eq
+    + Add<Self, Output = Self::Projective>
+    + AddAssign
+    + Neg<Output = Self>
+    + Sub<Self, Output = Self::Projective>
+    + SubAssign
+    + Mul<Self::Scalar, Output = Self::Projective>
+    + MulAssign<Self::Scalar>
+    + Sized
+{
+    // scalar domain
+    type Affine: Curve;
+    type Projective: CurveExtend;
+    type Scalar: PrimeField;
+
+    // generator of group
+    const ADDITIVE_GENERATOR: Self;
+    // additive identity of group
+    // a * e = a for any a
+    const ADDITIVE_IDENTITY: Self;
+
+    // return zero element
+    fn zero() -> Self;
+
+    // check that point is on curve
+    fn is_identity(self) -> bool;
+
+    // get inverse of group element
+    fn invert(self) -> Option<Self>
+    where
+        Self: Sized;
+
+    // get randome element
+    fn random(rand: impl RngCore) -> Self::Projective;
 }
 
 /// ring trait which supports additive and multiplicative arithmetics

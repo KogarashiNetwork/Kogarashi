@@ -1,5 +1,5 @@
 use crate::arithmetic::utils::Naf;
-use crate::common::{Curve, Extended, PrimeField};
+use crate::common::{CurveGroup, Extended, PrimeField};
 
 /// twisted edwards coordinate addition
 /// 10M + 4A + 3B
@@ -42,7 +42,7 @@ pub fn double_point<P: Extended>(lhs: P) -> P {
 }
 
 /// coordinate scalar
-pub fn scalar_point<P: Extended>(point: P, scalar: &<P as Curve>::Scalar) -> P {
+pub fn scalar_point<P: Extended>(point: P, scalar: &<P as CurveGroup>::Scalar) -> P {
     let mut res = P::ADDITIVE_IDENTITY;
     let mut acc = point;
     for &naf in scalar.to_nafs().iter() {

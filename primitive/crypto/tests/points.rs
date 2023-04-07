@@ -7,7 +7,7 @@ mod twisted_edwards_points_tests {
     use rand_core::OsRng;
     use zero_crypto::{
         arithmetic::edwards::{add_point, double_point},
-        common::Curve,
+        common::{Curve, CurveGroup},
     };
 
     #[test]

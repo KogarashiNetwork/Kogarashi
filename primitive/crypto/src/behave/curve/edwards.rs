@@ -2,7 +2,6 @@ extern crate alloc;
 use alloc::boxed::Box;
 
 use crate::behave::{Affine, Curve, CurveExtend};
-use core::ops::{Add, Mul, Sub};
 
 pub trait TwistedEdwardsCurve: Curve {
     // d param
@@ -12,21 +11,21 @@ pub trait TwistedEdwardsCurve: Curve {
 pub trait TwistedEdwardsAffine:
     Affine
     + TwistedEdwardsCurve
-    + Add<Self::CurveExtend, Output = Self::CurveExtend>
-    + Sub<Self::CurveExtend, Output = Self::CurveExtend>
-    + Add<Self, Output = Self::CurveExtend>
-    + Sub<Self, Output = Self::CurveExtend>
-    + Mul<Self::Scalar, Output = Self::CurveExtend>
-    + Into<Self::CurveExtend>
-    + From<Self::CurveExtend>
+    // + Add<Self::Extend, Output = Self::Extend>
+    // + Sub<Self::Extend, Output = Self::Extend>
+    // + Add<Self, Output = Self::Extend>
+    // + Sub<Self, Output = Self::Extend>
+    // + Mul<<Self as CurveGroup>::Scalar, Output = Self::Extend>
+    + Into<Self::Extend>
+    + From<Self::Extend>
 {
-    type CurveExtend: CurveExtend;
+    type Extend: CurveExtend;
 
     // doubling this point
-    fn double(self) -> Self::CurveExtend;
+    fn double(self) -> Self::Extend;
 
     // convert affine to projective representation
-    fn to_extend(self) -> Self::CurveExtend;
+    fn to_extend(self) -> Self::Extend;
 
     fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self;
 }

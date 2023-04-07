@@ -21,7 +21,7 @@ use core::ops::{Add, Sub};
 use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
-use zero_crypto::common::Pairing;
+use zero_crypto::common::{CurveGroup, Pairing};
 use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
 use zero_pairing::TatePairing;
 

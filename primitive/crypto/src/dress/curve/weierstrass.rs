@@ -11,7 +11,7 @@ macro_rules! weierstrass_curve_operation {
         use zero_crypto::common::*;
 
         affine_group_operation!($affine, $projective, $range, $scalar, $x, $y);
-        projective_group_operation!($projective, $range, $scalar, $x, $y);
+        projective_group_operation!($affine, $projective, $range, $scalar, $x, $y);
         mixed_curve_operation!($affine, $projective);
 
         impl ParityCmp for $affine {}
@@ -22,13 +22,7 @@ macro_rules! weierstrass_curve_operation {
         impl Curve for $affine {
             type Range = $range;
 
-            type Scalar = $scalar;
-
             const PARAM_A: $range = $a;
-
-            fn is_identity(self) -> bool {
-                self.is_infinity
-            }
 
             fn is_on_curve(self) -> bool {
                 if self.is_infinity {
@@ -54,13 +48,7 @@ macro_rules! weierstrass_curve_operation {
         impl Curve for $projective {
             type Range = $range;
 
-            type Scalar = $scalar;
-
             const PARAM_A: $range = $a;
-
-            fn is_identity(self) -> bool {
-                self.z == Self::Range::zero()
-            }
 
             fn is_on_curve(self) -> bool {
                 if self.is_identity() {
@@ -85,8 +73,6 @@ macro_rules! weierstrass_curve_operation {
         }
 
         impl CurveExtend for $projective {
-            type Affine = $affine;
-
             fn double(self) -> Self {
                 double_point(self)
             }
@@ -114,15 +100,15 @@ macro_rules! weierstrass_curve_operation {
         impl WeierstrassAffine for $affine {
             type Projective = $projective;
 
-            fn double(self) -> Self::Projective {
+            fn double(self) -> $projective {
                 double_point(self.to_projective())
             }
 
-            fn to_projective(self) -> Self::Projective {
+            fn to_projective(self) -> $projective {
                 if self.is_identity() {
-                    Self::Projective::ADDITIVE_IDENTITY
+                    $projective::ADDITIVE_IDENTITY
                 } else {
-                    Self::Projective {
+                    $projective {
                         x: self.x,
                         y: self.y,
                         z: Self::Range::one(),

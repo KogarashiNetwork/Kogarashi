@@ -1,4 +1,4 @@
-use zero_crypto::common::{Curve, Decode, Encode, Group, Pairing};
+use zero_crypto::common::{Curve, CurveGroup, Decode, Encode, Group, Pairing};
 use zero_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
 use zero_jubjub::{Fp as JubJubScalar, JubjubAffine};
 use zero_pairing::TatePairing;
