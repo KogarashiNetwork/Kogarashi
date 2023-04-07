@@ -25,6 +25,7 @@ pub struct ConfidentialTransferCircuit {
 impl ConfidentialTransferCircuit {
     /// Init confidential tranfer circuit
     #[allow(dead_code)]
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         sender_public_key: JubjubAffine,
         recipient_public_key: JubjubAffine,

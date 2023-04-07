@@ -167,7 +167,7 @@ fn classic_fft_arithmetic<F: FftField>(
     coeffs: &mut [F],
     n: usize,
     twiddle_chunk: usize,
-    twiddles: &Vec<F>,
+    twiddles: &[F],
 ) {
     if n == 2 {
         let t = coeffs[1];
@@ -189,7 +189,7 @@ fn butterfly_arithmetic<F: FftField>(
     left: &mut [F],
     right: &mut [F],
     twiddle_chunk: usize,
-    twiddles: &Vec<F>,
+    twiddles: &[F],
 ) {
     // case when twiddle factor is one
     let t = right[0];
