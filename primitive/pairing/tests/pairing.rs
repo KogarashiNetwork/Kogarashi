@@ -1,6 +1,9 @@
 use rand_core::OsRng;
 use zero_bls12_381::{Fq12, Fr, G1Affine, G2Affine, G2PairingAffine, Gt};
-use zero_crypto::behave::{Group, Pairing, PairingRange};
+use zero_crypto::{
+    behave::{Group, Pairing, PairingRange},
+    common::CurveGroup,
+};
 use zero_pairing::TatePairing;
 
 #[test]

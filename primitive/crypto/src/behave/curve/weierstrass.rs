@@ -1,5 +1,4 @@
 use crate::behave::{Affine, Curve, CurveExtend};
-use core::ops::{Add, Mul, Sub};
 
 /// elliptic curve rational points group
 /// rational points group behaves as abelian group
@@ -13,22 +12,22 @@ pub trait WeierstrassCurve: Curve {
 pub trait WeierstrassAffine:
     Affine
     + WeierstrassCurve
-    + Add<Self::Projective, Output = Self::Projective>
-    + Sub<Self::Projective, Output = Self::Projective>
-    + Add<Self, Output = Self::Projective>
-    + Sub<Self, Output = Self::Projective>
-    + Mul<Self::Scalar, Output = Self::Projective>
-    + Into<Self::Projective>
-    + From<Self::Projective>
+    // + Add<<Self as WeierstrassAffine>::Projective, Output = <Self as WeierstrassAffine>::Projective>
+    // + Sub<<Self as WeierstrassAffine>::Projective, Output = <Self as WeierstrassAffine>::Projective>
+    // + Add<Self, Output = <Self as WeierstrassAffine>::Projective>
+    // + Sub<Self, Output = <Self as WeierstrassAffine>::Projective>
+    // + Mul<<Self as CurveGroup>::Scalar, Output = <Self as WeierstrassAffine>::Projective>
+    + Into<<Self as WeierstrassAffine>::Projective>
+    + From<<Self as WeierstrassAffine>::Projective>
 {
     // projective coordinate representation
     type Projective: Projective;
 
     // doubling this point
-    fn double(self) -> Self::Projective;
+    fn double(self) -> <Self as WeierstrassAffine>::Projective; // Try to move it up
 
     // convert affine to projective representation
-    fn to_projective(self) -> Self::Projective;
+    fn to_projective(self) -> <Self as WeierstrassAffine>::Projective;
 }
 
 /// rational point projective representation

@@ -1,4 +1,4 @@
-use zero_crypto::common::{Curve, Decode, Encode, Group, Pairing};
+use zero_crypto::common::{Curve, CurveGroup, Decode, Encode, Group, Pairing};
 use zero_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
 use zero_jubjub::{Fp as JubJubScalar, JubjubAffine};
 use zero_pairing::TatePairing;
@@ -25,6 +25,7 @@ pub struct ConfidentialTransferCircuit {
 impl ConfidentialTransferCircuit {
     /// Init confidential tranfer circuit
     #[allow(dead_code)]
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         sender_public_key: JubjubAffine,
         recipient_public_key: JubjubAffine,

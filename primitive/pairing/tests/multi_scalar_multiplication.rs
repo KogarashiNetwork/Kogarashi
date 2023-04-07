@@ -1,10 +1,10 @@
 use rand_core::OsRng;
 use zero_bls12_381::{Fr, G1Affine, G1Projective};
 use zero_crypto::behave::{Group, Projective};
-use zero_crypto::common::WeierstrassAffine;
+use zero_crypto::common::{CurveGroup, WeierstrassAffine};
 use zero_pairing::{msm_variable_base, TatePairing};
 
-fn customized_scalar_point<P: Projective>(point: P, scalar: &Fr) -> P {
+fn customized_scalar_point<P: Projective + CurveGroup<Projective = P>>(point: P, scalar: &Fr) -> P {
     let mut res = P::ADDITIVE_IDENTITY;
     let one = point;
     let two = one + point;

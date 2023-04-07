@@ -11,7 +11,7 @@ use super::{
     algebra::Field,
     comp::{Basic, ParityCmp},
     curve::Affine,
-    Curve, CurveExtend, Extended, FftField, Group, Projective, TwistedEdwardsAffine,
+    Curve, CurveExtend, CurveGroup, Extended, FftField, Group, Projective, TwistedEdwardsAffine,
     TwistedEdwardsCurve,
 };
 
@@ -58,6 +58,7 @@ pub trait Pairing:
     // g1 group affine point
     type G1Affine: Affine
         + From<Self::G1Projective>
+        + From<<Self::G1Projective as CurveGroup>::Projective>
         + Mul<Self::ScalarField, Output = Self::G1Projective>
         + Add<Self::G1Projective, Output = Self::G1Projective>
         + Serializable<48>
@@ -70,6 +71,7 @@ pub trait Pairing:
     // g2 group affine point
     type G2Affine: Affine
         + From<Self::G2Projective>
+        + From<<Self::G2Projective as CurveGroup>::Projective>
         + Neg<Output = Self::G2Affine>
         + PartialEq
         + Eq
@@ -78,6 +80,8 @@ pub trait Pairing:
     // g1 group projective point
     type G1Projective: Projective
         + From<Self::G1Affine>
+        + From<<Self::G1Projective as CurveGroup>::Projective>
+        + From<<Self::G1Affine as CurveGroup>::Projective>
         + Mul<Self::ScalarField, Output = Self::G1Projective>
         + Add<Self::G1Affine, Output = Self::G1Projective>
         + Sum
@@ -93,17 +97,16 @@ pub trait Pairing:
         + PartialEq
         + Eq;
     // Jubjub affine point
-    type JubjubAffine: Affine
-        + Curve
-        + TwistedEdwardsAffine
-        + TwistedEdwardsCurve
+    type JubjubAffine: TwistedEdwardsAffine
         + From<Self::JubjubExtend>
+        + From<<Self::JubjubExtend as CurveGroup>::Projective>
+        + From<<Self::JubjubAffine as CurveGroup>::Projective>
+        + From<<<Self::JubjubAffine as CurveGroup>::Projective as CurveGroup>::Affine>
         + PartialEq
         + Eq;
     // + From<<Self::JubjubExtend as CurveExtend>::Affine>;
     // Jubjub extend point
-    type JubjubExtend: Curve
-        + CurveExtend
+    type JubjubExtend: CurveExtend
         + Extended
         + TwistedEdwardsCurve
         + Into<Self::JubjubAffine>
@@ -125,8 +128,9 @@ pub trait Pairing:
         + From<<Self::JubjubAffine as Curve>::Range>
         + Into<<Self::JubjubExtend as Curve>::Range>
         + Into<<Self::JubjubAffine as Curve>::Range>
-        + From<<<Self::JubjubAffine as TwistedEdwardsAffine>::CurveExtend as Curve>::Range>
-        + From<<<Self::JubjubExtend as CurveExtend>::Affine as Curve>::Range>
+        + From<<<Self::JubjubAffine as TwistedEdwardsAffine>::Extend as Curve>::Range>
+        + From<<<Self::JubjubAffine as CurveGroup>::Affine as Curve>::Range>
+        + From<<<Self::JubjubExtend as CurveGroup>::Affine as Curve>::Range>
         + Encode
         + Decode
         + Eq

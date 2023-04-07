@@ -20,7 +20,7 @@ use zero_bls12_381::{
     Fq12, Fr, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective, Gt,
 };
 use zero_crypto::common::*;
-use zero_crypto::common::{Curve, G2Pairing, Group, Pairing, PairingRange, PrimeField, Ring, Vec};
+use zero_crypto::common::{G2Pairing, Group, Pairing, PairingRange, PrimeField, Ring, Vec};
 use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
 
 // tate pairing with miller algorithm
@@ -182,7 +182,7 @@ pub fn msm_variable_base<P: Pairing>(
 
             let mut running_sum = P::G1Projective::ADDITIVE_IDENTITY;
             for b in buckets.into_iter().rev() {
-                running_sum = running_sum + b;
+                running_sum += b;
                 res += running_sum;
             }
 
@@ -193,7 +193,7 @@ pub fn msm_variable_base<P: Pairing>(
     // We store the sum for the lowest window.
     let lowest = *window_sums.first().unwrap();
     // We're traversing windows from high to low.
-    window_sums[1..]
+    let x = window_sums[1..]
         .iter()
         .rev()
         .fold(zero, |mut total, sum_i| {
@@ -203,7 +203,9 @@ pub fn msm_variable_base<P: Pairing>(
             }
             total
         })
-        + lowest
+        + lowest;
+
+    P::G1Projective::from(x)
 }
 
 fn ln_without_floats(a: usize) -> usize {

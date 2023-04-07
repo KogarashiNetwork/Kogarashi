@@ -2,7 +2,7 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rand::rngs::OsRng;
 use zero_bls12_381::{Fq12, Fr, G2PairingAffine};
 use zero_bls12_381::{G1Affine, G2Affine};
-use zero_crypto::common::{Group, Pairing, PairingRange};
+use zero_crypto::common::{CurveGroup, Group, Pairing, PairingRange};
 use zero_pairing::TatePairing;
 
 fn pairing(c: &mut Criterion) {
