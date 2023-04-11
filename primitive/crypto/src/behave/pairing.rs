@@ -1,7 +1,7 @@
 use core::{
     fmt::Debug,
     iter::{Product, Sum},
-    ops::{Add, Mul, Neg},
+    ops::Add,
 };
 
 use dusk_bytes::Serializable;
@@ -11,7 +11,7 @@ use super::{
     algebra::Field,
     comp::{Basic, ParityCmp},
     curve::Affine,
-    Curve, CurveExtend, CurveGroup, Extended, FftField, Group, Projective, TwistedEdwardsAffine,
+    Curve, CurveExtend, Extended, FftField, Group, Projective, TwistedEdwardsAffine,
     TwistedEdwardsCurve,
 };
 
@@ -56,10 +56,8 @@ pub trait Pairing:
     Send + Sync + Clone + Debug + Eq + PartialEq + Default + Encode + Decode
 {
     // g1 group affine point
-    type G1Affine: Affine
+    type G1Affine: Affine<Affine = Self::G1Affine, Projective = Self::G1Projective, Scalar = Self::ScalarField>
         + From<Self::G1Projective>
-        + From<<Self::G1Projective as CurveGroup>::Projective>
-        + Mul<Self::ScalarField, Output = Self::G1Projective>
         + Add<Self::G1Projective, Output = Self::G1Projective>
         + Serializable<48>
         + PartialEq
@@ -69,48 +67,48 @@ pub trait Pairing:
         + Encode
         + Decode;
     // g2 group affine point
-    type G2Affine: Affine
+    type G2Affine: Affine<Affine = Self::G2Affine, Projective = Self::G2Projective, Scalar = Self::ScalarField>
         + From<Self::G2Projective>
-        + From<<Self::G2Projective as CurveGroup>::Projective>
-        + Neg<Output = Self::G2Affine>
         + PartialEq
         + Eq
         + Encode
         + Decode;
     // g1 group projective point
-    type G1Projective: Projective
-        + From<Self::G1Affine>
-        + From<<Self::G1Projective as CurveGroup>::Projective>
-        + From<<Self::G1Affine as CurveGroup>::Projective>
-        + Mul<Self::ScalarField, Output = Self::G1Projective>
-        + Add<Self::G1Affine, Output = Self::G1Projective>
+    type G1Projective: Projective<
+            Affine = Self::G1Affine,
+            Projective = Self::G1Projective,
+            Scalar = Self::ScalarField,
+        > + From<Self::G1Affine>
         + Sum
         + Send
         + Sync
         + PartialEq
         + Eq;
     // g2 group projective point
-    type G2Projective: Projective
-        + From<Self::G2Affine>
-        + Mul<Self::ScalarField, Output = Self::G2Projective>
+    type G2Projective: Projective<
+            Affine = Self::G2Affine,
+            Projective = Self::G2Projective,
+            Scalar = Self::ScalarField,
+        > + From<Self::G2Affine>
         + G2Pairing
         + PartialEq
         + Eq;
     // Jubjub affine point
-    type JubjubAffine: TwistedEdwardsAffine
-        + From<Self::JubjubExtend>
-        + From<<Self::JubjubExtend as CurveGroup>::Projective>
-        + From<<Self::JubjubAffine as CurveGroup>::Projective>
-        + From<<<Self::JubjubAffine as CurveGroup>::Projective as CurveGroup>::Affine>
-        + PartialEq
+    type JubjubAffine: TwistedEdwardsAffine<
+            Extend = Self::JubjubExtend,
+            Affine = Self::JubjubAffine,
+            Projective = Self::JubjubExtend,
+            Scalar = Self::ScalarField,
+        > + PartialEq
         + Eq;
-    // + From<<Self::JubjubExtend as CurveExtend>::Affine>;
+
     // Jubjub extend point
-    type JubjubExtend: CurveExtend
-        + Extended
+    type JubjubExtend: CurveExtend<
+            Affine = Self::JubjubAffine,
+            Projective = Self::JubjubExtend,
+            Scalar = Self::ScalarField,
+        > + Extended
         + TwistedEdwardsCurve
-        + Into<Self::JubjubAffine>
-        + From<Self::JubjubAffine>
         + PartialEq
         + Eq;
 
@@ -128,9 +126,6 @@ pub trait Pairing:
         + From<<Self::JubjubAffine as Curve>::Range>
         + Into<<Self::JubjubExtend as Curve>::Range>
         + Into<<Self::JubjubAffine as Curve>::Range>
-        + From<<<Self::JubjubAffine as TwistedEdwardsAffine>::Extend as Curve>::Range>
-        + From<<<Self::JubjubAffine as CurveGroup>::Affine as Curve>::Range>
-        + From<<<Self::JubjubExtend as CurveGroup>::Affine as Curve>::Range>
         + Encode
         + Decode
         + Eq

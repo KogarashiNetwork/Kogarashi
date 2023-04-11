@@ -8,9 +8,6 @@ pub trait Curve: CurveGroup + ParityCmp + Basic {
     // range field of curve
     type Range: PrimeField;
 
-    // scalar field of affine
-    // type Scalar: PrimeField;
-
     // a param
     const PARAM_A: Self::Range;
 

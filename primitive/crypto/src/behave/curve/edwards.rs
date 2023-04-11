@@ -9,15 +9,7 @@ pub trait TwistedEdwardsCurve: Curve {
 }
 
 pub trait TwistedEdwardsAffine:
-    Affine
-    + TwistedEdwardsCurve
-    // + Add<Self::Extend, Output = Self::Extend>
-    // + Sub<Self::Extend, Output = Self::Extend>
-    // + Add<Self, Output = Self::Extend>
-    // + Sub<Self, Output = Self::Extend>
-    // + Mul<<Self as CurveGroup>::Scalar, Output = Self::Extend>
-    + Into<Self::Extend>
-    + From<Self::Extend>
+    Affine + TwistedEdwardsCurve + Into<Self::Extend> + From<Self::Extend>
 {
     type Extend: CurveExtend;
 

@@ -12,11 +12,6 @@ pub trait WeierstrassCurve: Curve {
 pub trait WeierstrassAffine:
     Affine
     + WeierstrassCurve
-    // + Add<<Self as WeierstrassAffine>::Projective, Output = <Self as WeierstrassAffine>::Projective>
-    // + Sub<<Self as WeierstrassAffine>::Projective, Output = <Self as WeierstrassAffine>::Projective>
-    // + Add<Self, Output = <Self as WeierstrassAffine>::Projective>
-    // + Sub<Self, Output = <Self as WeierstrassAffine>::Projective>
-    // + Mul<<Self as CurveGroup>::Scalar, Output = <Self as WeierstrassAffine>::Projective>
     + Into<<Self as WeierstrassAffine>::Projective>
     + From<<Self as WeierstrassAffine>::Projective>
 {

@@ -205,7 +205,7 @@ pub fn msm_variable_base<P: Pairing>(
         })
         + lowest;
 
-    P::G1Projective::from(x)
+    x
 }
 
 fn ln_without_floats(a: usize) -> usize {
