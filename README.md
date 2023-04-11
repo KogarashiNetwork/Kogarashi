@@ -2,7 +2,7 @@
 [![Merged Check](https://github.com/zero-network/zero/actions/workflows/merged.yml/badge.svg)](https://github.com/zero-network/zero/actions/workflows/merged.yml) [![Repository](https://img.shields.io/badge/github-zero-blueviolet?logo=github)](https://github.com/zero-network/zero) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE)  
 
 <div align="center">
-    <img alt="architecture" src="https://user-images.githubusercontent.com/39494661/226280918-6cfc0d63-6f66-4166-a4a0-92a99005802a.png">
+    <img alt="image" src="https://user-images.githubusercontent.com/39494661/231044282-e3f6f4a1-347c-4eb9-b5ca-04c5da4b3d08.png">
 </div>
 
 The `Kogarashi Network` is a public blockchain capable of privacy transfers and smart contracts. These functionalities rely on only the **cryptographic hardness assumption** instead `L2 technologies`, `TEE` and `centralized security assumption`. All public blockchains information as in users balances are literally public and the privacy is a missing piece of blockchain. `Kogarashi Network` hides all transactions information by cryptographic scheme mainly **ElGamal Encryption** and **Plonk**. The cryptographic schemes are following.
