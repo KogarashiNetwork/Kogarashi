@@ -139,6 +139,8 @@ macro_rules! twisted_edwards_curve_operation {
             }
         }
 
+        // impl RefOps for $extend {}
+
         impl From<$affine> for $extend {
             fn from(p: $affine) -> $extend {
                 p.to_extend()

@@ -2,7 +2,7 @@
 
 use pallet::*;
 use pallet_plonk::{BlsScalar, Circuit, FullcodecRng, Proof};
-use zero_crypto::common::Pairing;
+use zero_crypto::common::{CurveGroup, Pairing};
 use zero_jubjub::{Fp as JubJubScalar, JubjubAffine, JubjubExtend};
 use zero_pairing::TatePairing;
 use zero_plonk::{composer::Composer, prelude::*};

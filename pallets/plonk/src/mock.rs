@@ -54,6 +54,7 @@ impl system::Config for Test {
     type SS58Prefix = SS58Prefix;
 }
 
+use zero_crypto::common::CurveGroup;
 use zero_pairing::TatePairing;
 use zero_plonk::prelude::{Error as CircuitError, *};
 

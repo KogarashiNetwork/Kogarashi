@@ -89,6 +89,8 @@ macro_rules! weierstrass_curve_operation {
             }
         }
 
+        // impl RefOps for $projective {}
+
         impl From<$affine> for $projective {
             fn from(a: $affine) -> $projective {
                 a.to_projective()

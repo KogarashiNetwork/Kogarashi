@@ -4,6 +4,7 @@ use crate::{
     pallet::Config,
 };
 use pallet_encrypted_balance::{Account, AccountData};
+use zero_crypto::common::CurveGroup;
 use zero_elgamal::EncryptedNumber;
 use zero_jubjub::{Fp as JubJubScalar, JubjubAffine, JubjubExtend};
 

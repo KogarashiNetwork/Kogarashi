@@ -1,3 +1,4 @@
+use zero_crypto::common::CurveGroup;
 use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
 
 struct KeyPair {

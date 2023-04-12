@@ -1,7 +1,7 @@
 use criterion::black_box;
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand::rngs::OsRng;
-use zero_crypto::common::{CurveExtend, Group};
+use zero_crypto::common::{CurveExtend, CurveGroup, Group};
 use zero_jubjub::Fp;
 use zero_jubjub::JubjubExtend;
 

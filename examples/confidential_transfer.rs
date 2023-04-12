@@ -14,6 +14,7 @@ use sp_runtime::{
     traits::{BlakeTwo256, IdentityLookup},
 };
 use zero_crypto::behave::Group;
+use zero_crypto::common::CurveGroup;
 use zero_elgamal::EncryptedNumber;
 use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
 use zero_pairing::TatePairing;

@@ -2,7 +2,7 @@ use confidential_transfer::ConfidentialTransferCircuit;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
-use zero_crypto::common::Group;
+use zero_crypto::common::{CurveGroup, Group};
 use zero_elgamal::EncryptedNumber;
 use zero_jubjub::*;
 use zero_kzg::KeyPair;

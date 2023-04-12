@@ -143,42 +143,6 @@ macro_rules! twisted_edwards_extend_group_operation {
             }
         }
 
-        impl $extend {
-            pub const ADDITIVE_GENERATOR: Self = Self {
-                x: $x,
-                y: $y,
-                t: $t,
-                z: $range::one(),
-            };
-
-            pub const ADDITIVE_IDENTITY: Self = Self {
-                x: $range::zero(),
-                y: $range::one(),
-                t: $range::zero(),
-                z: $range::one(),
-            };
-
-            fn zero() -> Self {
-                Self::ADDITIVE_IDENTITY
-            }
-
-            fn invert(self) -> Option<Self> {
-                match self.x.is_zero() {
-                    true => None,
-                    false => Some(Self {
-                        x: -self.x,
-                        y: self.y,
-                        t: -self.t,
-                        z: self.z,
-                    }),
-                }
-            }
-
-            pub fn random(rand: impl RngCore) -> $extend {
-                Self::ADDITIVE_GENERATOR * $scalar::random(rand)
-            }
-        }
-
         impl Add for $extend {
             type Output = $extend;
 
