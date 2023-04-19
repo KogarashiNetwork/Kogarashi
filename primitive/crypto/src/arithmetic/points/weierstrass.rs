@@ -66,7 +66,7 @@ pub fn scalar_point<P: Projective>(point: P, scalar: &<P as CurveGroup>::Scalar)
         } else if naf == Naf::Minus {
             res -= acc;
         }
-        acc = acc.double();
+        acc = Into::<P>::into(acc.double());
     }
     res
 }

@@ -3,7 +3,7 @@
 use pallet::*;
 use pallet_plonk::{BlsScalar, Circuit, FullcodecRng, Proof};
 use zero_crypto::common::{CurveGroup, Pairing};
-use zero_jubjub::{Fp as JubJubScalar, JubjubAffine, JubjubExtend};
+use zero_jubjub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
 use zero_pairing::TatePairing;
 use zero_plonk::{composer::Composer, prelude::*};
 
@@ -147,7 +147,7 @@ impl Circuit<TatePairing> for TestCircuit {
 
         let e = composer.append_witness(self.e);
         let scalar_mul_result =
-            composer.component_mul_generator(e, JubjubExtend::ADDITIVE_GENERATOR)?;
+            composer.component_mul_generator(e, JubjubExtended::ADDITIVE_GENERATOR)?;
         composer.assert_equal_public_point(scalar_mul_result, self.f);
         Ok(())
     }
@@ -233,7 +233,7 @@ fn main() {
         c: BlsScalar::from(25u64),
         d: BlsScalar::from(100u64),
         e: JubJubScalar::from(2u64),
-        f: JubjubAffine::from(JubjubExtend::ADDITIVE_GENERATOR * JubJubScalar::from(2u64)),
+        f: JubjubAffine::from(JubjubExtended::ADDITIVE_GENERATOR * JubJubScalar::from(2u64)),
     };
 
     new_test_ext().execute_with(|| {

@@ -1,8 +1,6 @@
 #[macro_export]
 macro_rules! group_operation {
     ($field:ident, $p:ident, $g:ident, $r:ident, $r2:ident, $r3:ident, $inv:ident) => {
-        group_arithmetic_extension!($field);
-
         impl Group for $field {
             type Scalar = $field;
 
@@ -193,9 +191,4 @@ macro_rules! group_operation {
     };
 }
 
-#[macro_export]
-macro_rules! group_arithmetic_extension {
-    ($field:ident) => {};
-}
-
-pub use {group_arithmetic_extension, group_operation};
+pub use group_operation;

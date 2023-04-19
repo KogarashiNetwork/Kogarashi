@@ -21,7 +21,7 @@ use zero_bls12_381::{
 };
 use zero_crypto::common::*;
 use zero_crypto::common::{G2Pairing, Group, Pairing, PairingRange, PrimeField, Ring, Vec};
-use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
+use zero_jubjub::{Fp, JubjubAffine, JubjubExtended};
 
 // tate pairing with miller algorithm
 #[derive(Debug, Clone, Eq, PartialEq, Default, Encode, Decode)]
@@ -33,7 +33,7 @@ impl Pairing for TatePairing {
     type G1Projective = G1Projective;
     type G2Projective = G2Projective;
     type JubjubAffine = JubjubAffine;
-    type JubjubExtend = JubjubExtend;
+    type JubjubExtended = JubjubExtended;
     type G2PairngRepr = G2PairingAffine;
     type PairingRange = Fq12;
     type Gt = Gt;

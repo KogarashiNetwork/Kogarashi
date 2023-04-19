@@ -10,7 +10,7 @@ macro_rules! twisted_edwards_affine_group_operation {
 
         impl CurveGroup for $affine {
             type Affine = $affine;
-            type Projective = $extend;
+            type Extended = $extend;
             type Scalar = $scalar;
 
             const ADDITIVE_GENERATOR: Self = Self { x: $x, y: $y };
@@ -47,7 +47,7 @@ macro_rules! twisted_edwards_affine_group_operation {
             type Output = $extend;
 
             fn add(self, rhs: $affine) -> Self::Output {
-                $extend::from(add_point(self.to_extend(), rhs.to_extend()))
+                $extend::from(add_point(self.to_extended(), rhs.to_extended()))
             }
         }
 
@@ -66,7 +66,7 @@ macro_rules! twisted_edwards_affine_group_operation {
             type Output = $extend;
 
             fn sub(self, rhs: $affine) -> Self::Output {
-                $extend::from(add_point(self.to_extend(), rhs.neg().to_extend()))
+                $extend::from(add_point(self.to_extended(), rhs.neg().to_extended()))
             }
         }
 
@@ -74,7 +74,7 @@ macro_rules! twisted_edwards_affine_group_operation {
             type Output = $extend;
 
             fn mul(self, rhs: <Self as CurveGroup>::Scalar) -> Self::Output {
-                scalar_point(self.to_extend(), &rhs)
+                scalar_point(self.to_extended(), &rhs)
             }
         }
 
@@ -82,7 +82,7 @@ macro_rules! twisted_edwards_affine_group_operation {
             type Output = $extend;
 
             fn mul(self, rhs: &'b <Self as CurveGroup>::Scalar) -> Self::Output {
-                scalar_point(self.to_extend(), rhs)
+                scalar_point(self.to_extended(), rhs)
             }
         }
     };
@@ -95,7 +95,7 @@ macro_rules! twisted_edwards_extend_group_operation {
 
         impl CurveGroup for $extend {
             type Affine = $affine;
-            type Projective = $extend;
+            type Extended = $extend;
             type Scalar = $scalar;
 
             const ADDITIVE_GENERATOR: Self = Self {

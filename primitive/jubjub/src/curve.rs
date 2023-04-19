@@ -48,29 +48,29 @@ impl JubjubAffine {
 }
 
 #[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
-pub struct JubjubExtend {
+pub struct JubjubExtended {
     x: Fr,
     y: Fr,
     t: Fr,
     z: Fr,
 }
 
-twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtend, X, Y, T);
+twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtended, X, Y, T);
 
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use super::*;
 
-    curve_test!(jubjub, Fr, JubjubAffine, JubjubExtend, 100);
+    curve_test!(jubjub, Fr, JubjubAffine, JubjubExtended, 100);
 }
 
-impl Mul<Fp> for JubjubExtend {
-    type Output = JubjubExtend;
+impl Mul<Fp> for JubjubExtended {
+    type Output = JubjubExtended;
 
     #[inline]
-    fn mul(self, rhs: Fp) -> JubjubExtend {
-        let mut res = JubjubExtend::ADDITIVE_IDENTITY;
+    fn mul(self, rhs: Fp) -> JubjubExtended {
+        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
         let mut acc = self;
         for &naf in rhs.to_nafs().iter() {
             if naf == Naf::Plus {
@@ -84,12 +84,12 @@ impl Mul<Fp> for JubjubExtend {
     }
 }
 
-impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtend {
-    type Output = JubjubExtend;
+impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtended {
+    type Output = JubjubExtended;
 
     #[inline]
-    fn mul(self, rhs: &'b Fp) -> JubjubExtend {
-        let mut res = JubjubExtend::ADDITIVE_IDENTITY;
+    fn mul(self, rhs: &'b Fp) -> JubjubExtended {
+        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
         let mut acc = self.clone();
         for &naf in rhs.to_nafs().iter() {
             if naf == Naf::Plus {

@@ -19,14 +19,19 @@ pub trait Curve: CurveGroup + ParityCmp + Basic {
 
     // get y coordinate
     fn get_y(&self) -> Self::Range;
+
+    // doubling this point
+    fn double(self) -> <Self as CurveGroup>::Extended;
 }
 
 /// elliptic curve rational point affine representation
-pub trait Affine: Curve {}
+pub trait Affine: Curve {
+    fn to_extended(self) -> <Self as CurveGroup>::Extended;
+}
 
 /// extend curve point representation
 /// projective, jacobian and so on
-pub trait CurveExtend:
+pub trait CurveExtended:
     Curve
     // + RefOps
     + AddAssign<Self::Affine>
@@ -38,9 +43,9 @@ pub trait CurveExtend:
 {
     // affine coordinate representation
 
-    // doubling this point
-    fn double(self) -> Self;
+    // get z coordinate
+    fn get_z(&self) -> Self::Range;
 
     // convert projective to affine representation
-    fn to_affine(self) -> Self::Affine;
+    fn to_affine(self) -> <Self as CurveGroup>::Affine;
 }

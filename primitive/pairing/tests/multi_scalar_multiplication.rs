@@ -1,10 +1,10 @@
 use rand_core::OsRng;
 use zero_bls12_381::{Fr, G1Affine, G1Projective};
 use zero_crypto::behave::{Group, Projective};
-use zero_crypto::common::{CurveGroup, WeierstrassAffine};
+use zero_crypto::common::{Affine, CurveGroup};
 use zero_pairing::{msm_variable_base, TatePairing};
 
-fn customized_scalar_point<P: Projective + CurveGroup<Projective = P>>(point: P, scalar: &Fr) -> P {
+fn customized_scalar_point<P: Projective<Extended = P>>(point: P, scalar: &Fr) -> P {
     let mut res = P::ADDITIVE_IDENTITY;
     let one = point;
     let two = one + point;
@@ -35,7 +35,7 @@ fn multi_scalar_multiplication_test() {
         .rev()
         .zip(scalars.iter().rev())
         .fold(G1Projective::ADDITIVE_IDENTITY, |acc, (point, coeff)| {
-            acc + customized_scalar_point(point.to_projective(), coeff)
+            acc + customized_scalar_point(point.to_extended(), coeff)
         });
     assert_eq!(msm, naive);
 }

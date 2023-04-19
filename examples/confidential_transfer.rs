@@ -16,7 +16,7 @@ use sp_runtime::{
 use zero_crypto::behave::Group;
 use zero_crypto::common::CurveGroup;
 use zero_elgamal::EncryptedNumber;
-use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
+use zero_jubjub::{Fp, JubjubAffine, JubjubExtended};
 use zero_pairing::TatePairing;
 use zero_plonk::prelude::Compiler;
 
@@ -204,8 +204,8 @@ fn main() {
 
         // proof generation
         let mut pp = Plonk::keypair().unwrap();
-        let alice_public_key = JubjubExtend::ADDITIVE_GENERATOR * alice_private_key;
-        let bob_public_key = JubjubExtend::ADDITIVE_GENERATOR * bob_private_key;
+        let alice_public_key = JubjubExtended::ADDITIVE_GENERATOR * alice_private_key;
+        let bob_public_key = JubjubExtended::ADDITIVE_GENERATOR * bob_private_key;
         let transfer_amount_scalar = Fp::from(transfer_amount as u64);
         let alice_after_balance_scalar = Fp::from(alice_after_balance as u64);
 
@@ -216,14 +216,14 @@ fn main() {
             transfer_amount.into(),
             transfer_randomness,
         );
-        let bob_encrypted_transfer_amount = (JubjubExtend::ADDITIVE_GENERATOR
+        let bob_encrypted_transfer_amount = (JubjubExtended::ADDITIVE_GENERATOR
             * transfer_amount_scalar)
             + (bob_public_key * transfer_randomness);
         let alice_public_key = JubjubAffine::from(alice_public_key);
         let bob_public_key = JubjubAffine::from(bob_public_key);
         let bob_encrypted_transfer_amount = JubjubAffine::from(bob_encrypted_transfer_amount);
         let bob_encrypted_transfer_amount_other =
-            (JubjubExtend::ADDITIVE_GENERATOR * transfer_randomness).into();
+            (JubjubExtended::ADDITIVE_GENERATOR * transfer_randomness).into();
 
         let confidential_transfer_circuit = ConfidentialTransferCircuit::new(
             alice_public_key,

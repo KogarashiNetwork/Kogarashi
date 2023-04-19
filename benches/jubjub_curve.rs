@@ -1,15 +1,15 @@
 use criterion::black_box;
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand::rngs::OsRng;
-use zero_crypto::common::{CurveExtend, CurveGroup, Group};
+use zero_crypto::common::{Curve, CurveGroup, Group};
 use zero_jubjub::Fp;
-use zero_jubjub::JubjubExtend;
+use zero_jubjub::JubjubExtended;
 
 fn bench_jubjub_extended(c: &mut Criterion) {
     let mut group = c.benchmark_group("jubjub_extended");
 
-    let p1 = JubjubExtend::random(OsRng);
-    let p2 = JubjubExtend::random(OsRng);
+    let p1 = JubjubExtended::random(OsRng);
+    let p2 = JubjubExtended::random(OsRng);
     let k = Fp::random(OsRng);
 
     group.bench_function("add", |b| {

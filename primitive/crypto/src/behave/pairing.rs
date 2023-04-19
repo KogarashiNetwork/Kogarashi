@@ -11,8 +11,8 @@ use super::{
     algebra::Field,
     comp::{Basic, ParityCmp},
     curve::Affine,
-    Curve, CurveExtend, Extended, FftField, Group, Projective, TwistedEdwardsAffine,
-    TwistedEdwardsCurve,
+    Curve, CurveExtended, FftField, Group, Projective, TwistedEdwardsAffine, TwistedEdwardsCurve,
+    TwistedEdwardsExtended, WeierstrassAffine,
 };
 
 /// extension field
@@ -56,8 +56,11 @@ pub trait Pairing:
     Send + Sync + Clone + Debug + Eq + PartialEq + Default + Encode + Decode
 {
     // g1 group affine point
-    type G1Affine: Affine<Affine = Self::G1Affine, Projective = Self::G1Projective, Scalar = Self::ScalarField>
-        + From<Self::G1Projective>
+    type G1Affine: WeierstrassAffine<
+            Affine = Self::G1Affine,
+            Extended = Self::G1Projective,
+            Scalar = Self::ScalarField,
+        > + From<Self::G1Projective>
         + Add<Self::G1Projective, Output = Self::G1Projective>
         + Serializable<48>
         + PartialEq
@@ -67,8 +70,11 @@ pub trait Pairing:
         + Encode
         + Decode;
     // g2 group affine point
-    type G2Affine: Affine<Affine = Self::G2Affine, Projective = Self::G2Projective, Scalar = Self::ScalarField>
-        + From<Self::G2Projective>
+    type G2Affine: WeierstrassAffine<
+            Affine = Self::G2Affine,
+            Extended = Self::G2Projective,
+            Scalar = Self::ScalarField,
+        > + From<Self::G2Projective>
         + PartialEq
         + Eq
         + Encode
@@ -76,7 +82,7 @@ pub trait Pairing:
     // g1 group projective point
     type G1Projective: Projective<
             Affine = Self::G1Affine,
-            Projective = Self::G1Projective,
+            Extended = Self::G1Projective,
             Scalar = Self::ScalarField,
         > + From<Self::G1Affine>
         + Sum
@@ -87,7 +93,7 @@ pub trait Pairing:
     // g2 group projective point
     type G2Projective: Projective<
             Affine = Self::G2Affine,
-            Projective = Self::G2Projective,
+            Extended = Self::G2Projective,
             Scalar = Self::ScalarField,
         > + From<Self::G2Affine>
         + G2Pairing
@@ -95,19 +101,18 @@ pub trait Pairing:
         + Eq;
     // Jubjub affine point
     type JubjubAffine: TwistedEdwardsAffine<
-            Extend = Self::JubjubExtend,
             Affine = Self::JubjubAffine,
-            Projective = Self::JubjubExtend,
+            Extended = Self::JubjubExtended,
             Scalar = Self::ScalarField,
         > + PartialEq
         + Eq;
 
     // Jubjub extend point
-    type JubjubExtend: CurveExtend<
+    type JubjubExtended: CurveExtended<
             Affine = Self::JubjubAffine,
-            Projective = Self::JubjubExtend,
+            Extended = Self::JubjubExtended,
             Scalar = Self::ScalarField,
-        > + Extended
+        > + TwistedEdwardsExtended
         + TwistedEdwardsCurve
         + PartialEq
         + Eq;
@@ -122,9 +127,9 @@ pub trait Pairing:
         + Serializable<32>
         + Sum
         + Product
-        + From<<Self::JubjubExtend as Curve>::Range>
+        + From<<Self::JubjubExtended as Curve>::Range>
         + From<<Self::JubjubAffine as Curve>::Range>
-        + Into<<Self::JubjubExtend as Curve>::Range>
+        + Into<<Self::JubjubExtended as Curve>::Range>
         + Into<<Self::JubjubAffine as Curve>::Range>
         + Encode
         + Decode

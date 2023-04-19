@@ -61,14 +61,14 @@ use zero_plonk::prelude::{Error as CircuitError, *};
 #[derive(Debug)]
 pub struct DummyCircuit {
     a: JubjubScalar,
-    b: JubjubExtend,
+    b: JubjubExtended,
 }
 
 impl DummyCircuit {
     pub fn new(a: JubjubScalar) -> Self {
         Self {
             a,
-            b: JubjubExtend::ADDITIVE_GENERATOR * a,
+            b: JubjubExtended::ADDITIVE_GENERATOR * a,
         }
     }
 }
@@ -87,7 +87,7 @@ impl Circuit<TatePairing> for DummyCircuit {
         let w_a = composer.append_witness(self.a);
         let w_b = composer.append_point(self.b);
 
-        let w_x = composer.component_mul_generator(w_a, JubjubExtend::ADDITIVE_GENERATOR)?;
+        let w_x = composer.component_mul_generator(w_a, JubjubExtended::ADDITIVE_GENERATOR)?;
 
         composer.assert_equal_point(w_b, w_x);
 

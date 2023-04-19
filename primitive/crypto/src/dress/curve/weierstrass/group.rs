@@ -14,7 +14,7 @@ macro_rules! affine_group_operation {
 
         impl CurveGroup for $affine {
             type Affine = $affine;
-            type Projective = $projective;
+            type Extended = $projective;
             type Scalar = $scalar;
 
             const ADDITIVE_GENERATOR: Self = Self {
@@ -57,7 +57,7 @@ macro_rules! affine_group_operation {
             type Output = $projective;
 
             fn add(self, rhs: $affine) -> Self::Output {
-                $projective::from(add_point(self.to_projective(), rhs.to_projective()))
+                $projective::from(add_point(self.to_extended(), rhs.to_extended()))
             }
         }
 
@@ -77,7 +77,7 @@ macro_rules! affine_group_operation {
             type Output = $projective;
 
             fn sub(self, rhs: $affine) -> Self::Output {
-                $projective::from(add_point(self.to_projective(), rhs.neg().to_projective()))
+                $projective::from(add_point(self.to_extended(), rhs.neg().to_extended()))
             }
         }
 
@@ -106,7 +106,7 @@ macro_rules! projective_group_operation {
 
         impl CurveGroup for $projective {
             type Affine = $affine;
-            type Projective = $projective;
+            type Extended = $projective;
             type Scalar = $scalar;
 
             const ADDITIVE_GENERATOR: Self = Self {

@@ -2,7 +2,7 @@
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use rand_core::RngCore;
 
-use super::{Curve, CurveExtend, PrimeField};
+use super::{Curve, CurveExtended, PrimeField};
 
 /// group trait which supports additive and scalar arithmetic
 /// additive and scalar arithmetic hold associative and distributive property
@@ -44,18 +44,18 @@ pub trait Group:
 pub trait CurveGroup:
     PartialEq
     + Eq
-    + Add<Self, Output = Self::Projective>
+    + Add<Self, Output = Self::Extended>
     + AddAssign
     + Neg<Output = Self>
-    + Sub<Self, Output = Self::Projective>
+    + Sub<Self, Output = Self::Extended>
     + SubAssign
-    + Mul<Self::Scalar, Output = Self::Projective>
+    + Mul<Self::Scalar, Output = Self::Extended>
     + MulAssign<Self::Scalar>
     + Sized
 {
     // scalar domain
     type Affine: Curve;
-    type Projective: CurveExtend;
+    type Extended: CurveExtended;
     type Scalar: PrimeField;
 
     // generator of group
@@ -76,7 +76,7 @@ pub trait CurveGroup:
         Self: Sized;
 
     // get randome element
-    fn random(rand: impl RngCore) -> Self::Projective;
+    fn random(rand: impl RngCore) -> Self::Extended;
 }
 
 /// ring trait which supports additive and multiplicative arithmetics

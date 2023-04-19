@@ -24,7 +24,7 @@ fn circuit(c: &mut Criterion) {
     let (prover, verifier) =
         Compiler::compile::<ConfidentialTransferCircuit, TatePairing>(&mut pp, label)
             .expect("failed to compile circuit");
-    let generator = JubjubExtend::ADDITIVE_GENERATOR;
+    let generator = JubjubExtended::ADDITIVE_GENERATOR;
     let alice_private_key = JubjubScalar::random(&mut rng);
     let bob_private_key = JubjubScalar::random(&mut rng);
     let alice_public_key = generator * alice_private_key;
