@@ -97,8 +97,6 @@ macro_rules! weierstrass_curve_operation {
             }
         }
 
-        // impl RefOps for $projective {}
-
         impl From<$affine> for $projective {
             fn from(a: $affine) -> $projective {
                 a.to_extended()
@@ -176,8 +174,20 @@ macro_rules! mixed_curve_operation {
             }
         }
 
+        impl<'a> AddAssign<&'a $affine> for $projective {
+            fn add_assign(&mut self, rhs: &'a $affine) {
+                *self = add_point(*self, rhs.to_extended())
+            }
+        }
+
         impl SubAssign<$affine> for $projective {
             fn sub_assign(&mut self, rhs: $affine) {
+                *self = add_point(*self, -rhs.to_extended())
+            }
+        }
+
+        impl<'a> SubAssign<&'a $affine> for $projective {
+            fn sub_assign(&mut self, rhs: &'a $affine) {
                 *self = add_point(*self, -rhs.to_extended())
             }
         }

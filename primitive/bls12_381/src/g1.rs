@@ -349,4 +349,59 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn bls_operations() {
+        let aff1 = G1Affine::random(OsRng).to_affine();
+        let aff2 = G1Affine::random(OsRng).to_affine();
+        let mut ext1 = G1Projective::random(OsRng);
+        let ext2 = G1Projective::random(OsRng);
+        let scalar = Fr::from(42);
+
+        let _ = aff1 + aff2;
+        let _ = &aff1 + &aff2;
+        let _ = &aff1 + aff2;
+        let _ = aff1 + &aff2;
+
+        let _ = ext1 + ext2;
+        let _ = &ext1 + &ext2;
+        let _ = &ext1 + ext2;
+        let _ = ext1 + &ext2;
+        ext1 += ext2;
+        ext1 += &ext2;
+        ext1 += aff2;
+        ext1 += &aff2;
+
+        let _ = aff1 - aff2;
+        let _ = &aff1 - &aff2;
+        let _ = &aff1 - aff2;
+        let _ = aff1 - &aff2;
+
+        let _ = ext1 - ext2;
+        let _ = &ext1 - &ext2;
+        let _ = &ext1 - ext2;
+        let _ = ext1 - &ext2;
+        ext1 -= ext2;
+        ext1 -= &ext2;
+        ext1 -= aff2;
+        ext1 -= &aff2;
+
+        let _ = aff1 * scalar;
+        let _ = aff1 * &scalar;
+        let _ = &aff1 * scalar;
+        let _ = &aff1 * &scalar;
+        let _ = scalar * aff1;
+        let _ = &scalar * &aff1;
+        let _ = scalar * &aff1;
+        let _ = &scalar * aff1;
+
+        let _ = ext1 * scalar;
+        let _ = ext1 * &scalar;
+        let _ = &ext1 * scalar;
+        let _ = &ext1 * &scalar;
+        let _ = scalar * ext1;
+        let _ = &scalar * &ext1;
+        let _ = scalar * &ext1;
+        let _ = &scalar * ext1;
+    }
 }

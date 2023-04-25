@@ -102,3 +102,67 @@ impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtended {
         res
     }
 }
+
+#[cfg(test)]
+mod test {
+    use rand_core::OsRng;
+    use zero_bls12_381::Fr;
+    use zero_crypto::common::{CurveExtended, CurveGroup};
+
+    use crate::{JubjubAffine, JubjubExtended};
+
+    #[test]
+    fn edwards_operations() {
+        let aff1 = JubjubAffine::random(OsRng).to_affine();
+        let aff2 = JubjubAffine::random(OsRng).to_affine();
+        let mut ext1 = JubjubExtended::random(OsRng);
+        let ext2 = JubjubExtended::random(OsRng);
+        let scalar = Fr::from(42);
+
+        let _ = aff1 + aff2;
+        let _ = &aff1 + &aff2;
+        let _ = &aff1 + aff2;
+        let _ = aff1 + &aff2;
+
+        let _ = ext1 + ext2;
+        let _ = &ext1 + &ext2;
+        let _ = &ext1 + ext2;
+        let _ = ext1 + &ext2;
+        ext1 += ext2;
+        ext1 += &ext2;
+        ext1 += aff2;
+        ext1 += &aff2;
+
+        let _ = aff1 - aff2;
+        let _ = &aff1 - &aff2;
+        let _ = &aff1 - aff2;
+        let _ = aff1 - &aff2;
+
+        let _ = ext1 - ext2;
+        let _ = &ext1 - &ext2;
+        let _ = &ext1 - ext2;
+        let _ = ext1 - &ext2;
+        ext1 -= ext2;
+        ext1 -= &ext2;
+        ext1 -= aff2;
+        ext1 -= &aff2;
+
+        let _ = aff1 * scalar;
+        let _ = aff1 * &scalar;
+        let _ = &aff1 * scalar;
+        let _ = &aff1 * &scalar;
+        let _ = scalar * aff1;
+        let _ = &scalar * &aff1;
+        let _ = scalar * &aff1;
+        let _ = &scalar * aff1;
+
+        let _ = ext1 * scalar;
+        let _ = ext1 * &scalar;
+        let _ = &ext1 * scalar;
+        let _ = &ext1 * &scalar;
+        let _ = scalar * ext1;
+        let _ = &scalar * &ext1;
+        let _ = scalar * &ext1;
+        let _ = &scalar * ext1;
+    }
+}

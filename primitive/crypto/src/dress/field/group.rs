@@ -85,7 +85,7 @@ macro_rules! group_operation {
             }
         }
 
-        impl Mul<<Self as Group>::Scalar> for $field {
+        impl Mul<$field> for $field {
             type Output = Self;
 
             fn mul(self, rhs: $field) -> Self {
@@ -173,8 +173,8 @@ macro_rules! group_operation {
             }
         }
 
-        impl MulAssign<<Self as Group>::Scalar> for $field {
-            fn mul_assign(&mut self, rhs: <Self as Group>::Scalar) {
+        impl MulAssign<$field> for $field {
+            fn mul_assign(&mut self, rhs: $field) {
                 *self = *self * rhs;
             }
         }

@@ -1,10 +1,7 @@
-use rand_core::OsRng;
 use zero_crypto::{
     common::{CurveExtended, CurveGroup},
     dress::{curve::edwards::*, field::*},
 };
-
-use self::jubjub_curve::{JubjubAffine, JubjubExtended};
 
 macro_rules! field_test_data {
     ($test_data_name:ident, $test_bits:ident, $limbs_type:ident, $modulus:ident, $inv:ident, $r2:ident, $r3:ident) => {
@@ -250,22 +247,3 @@ field_test_data!(
     BLS12_381_R2,
     BLS12_381_R3
 );
-
-#[test]
-#[ignore]
-fn edwards_operations() {
-    let aff1 = JubjubAffine::random(OsRng).to_affine();
-    let aff2 = JubjubAffine::random(OsRng).to_affine();
-    let ext1 = JubjubExtended::random(OsRng);
-    let ext2 = JubjubExtended::random(OsRng);
-
-    // let _ = &aff1 + &aff2;
-    // let _ = &aff1 + aff2;
-    // let _ = aff1 + &aff2;
-    // let _ = aff1 + aff2;
-
-    // let _ = &aff1 + &aff2;
-    // let _ = &aff1 + aff2;
-    // let _ = aff1 + &aff2;
-    // let _ = aff1 + aff2;
-}
