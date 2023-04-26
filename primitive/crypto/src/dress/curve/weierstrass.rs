@@ -24,6 +24,10 @@ macro_rules! weierstrass_curve_operation {
 
             const PARAM_A: $range = $a;
 
+            fn double(self) -> $projective {
+                double_point(self.to_extended())
+            }
+
             fn is_on_curve(self) -> bool {
                 if self.is_infinity {
                     true
@@ -50,6 +54,10 @@ macro_rules! weierstrass_curve_operation {
 
             const PARAM_A: $range = $a;
 
+            fn double(self) -> Self {
+                double_point(self)
+            }
+
             fn is_on_curve(self) -> bool {
                 if self.is_identity() {
                     true
@@ -72,11 +80,7 @@ macro_rules! weierstrass_curve_operation {
             const PARAM_B: $range = $b;
         }
 
-        impl CurveExtend for $projective {
-            fn double(self) -> Self {
-                double_point(self)
-            }
-
+        impl CurveExtended for $projective {
             fn to_affine(self) -> Self::Affine {
                 match self.z.invert() {
                     Some(z_inv) => Self::Affine {
@@ -87,24 +91,20 @@ macro_rules! weierstrass_curve_operation {
                     None => Self::Affine::ADDITIVE_IDENTITY,
                 }
             }
+
+            fn get_z(&self) -> Self::Range {
+                self.z
+            }
         }
 
         impl From<$affine> for $projective {
             fn from(a: $affine) -> $projective {
-                a.to_projective()
+                a.to_extended()
             }
         }
 
-        impl Affine for $affine {}
-
-        impl WeierstrassAffine for $affine {
-            type Projective = $projective;
-
-            fn double(self) -> $projective {
-                double_point(self.to_projective())
-            }
-
-            fn to_projective(self) -> $projective {
+        impl Affine for $affine {
+            fn to_extended(self) -> $projective {
                 if self.is_identity() {
                     $projective::ADDITIVE_IDENTITY
                 } else {
@@ -117,6 +117,8 @@ macro_rules! weierstrass_curve_operation {
             }
         }
 
+        impl WeierstrassAffine for $affine {}
+
         impl From<$projective> for $affine {
             fn from(p: $projective) -> $affine {
                 p.to_affine()
@@ -126,10 +128,6 @@ macro_rules! weierstrass_curve_operation {
         impl Projective for $projective {
             fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self {
                 Self { x, y, z }
-            }
-
-            fn get_z(&self) -> Self::Range {
-                self.z
             }
         }
     };
@@ -142,7 +140,7 @@ macro_rules! mixed_curve_operation {
             type Output = $projective;
 
             fn add(self, rhs: $projective) -> $projective {
-                add_point(self.to_projective(), rhs)
+                add_point(self.to_extended(), rhs)
             }
         }
 
@@ -150,7 +148,7 @@ macro_rules! mixed_curve_operation {
             type Output = $projective;
 
             fn sub(self, rhs: $projective) -> $projective {
-                add_point(self.to_projective(), -rhs)
+                add_point(self.to_extended(), -rhs)
             }
         }
 
@@ -158,7 +156,7 @@ macro_rules! mixed_curve_operation {
             type Output = $projective;
 
             fn add(self, rhs: $affine) -> $projective {
-                add_point(self, rhs.to_projective())
+                add_point(self, rhs.to_extended())
             }
         }
 
@@ -166,19 +164,31 @@ macro_rules! mixed_curve_operation {
             type Output = $projective;
 
             fn sub(self, rhs: $affine) -> $projective {
-                add_point(self, -rhs.to_projective())
+                add_point(self, -rhs.to_extended())
             }
         }
 
         impl AddAssign<$affine> for $projective {
             fn add_assign(&mut self, rhs: $affine) {
-                *self = add_point(*self, rhs.to_projective())
+                *self = add_point(*self, rhs.to_extended())
+            }
+        }
+
+        impl<'a> AddAssign<&'a $affine> for $projective {
+            fn add_assign(&mut self, rhs: &'a $affine) {
+                *self = add_point(*self, rhs.to_extended())
             }
         }
 
         impl SubAssign<$affine> for $projective {
             fn sub_assign(&mut self, rhs: $affine) {
-                *self = add_point(*self, -rhs.to_projective())
+                *self = add_point(*self, -rhs.to_extended())
+            }
+        }
+
+        impl<'a> SubAssign<&'a $affine> for $projective {
+            fn sub_assign(&mut self, rhs: &'a $affine) {
+                *self = add_point(*self, -rhs.to_extended())
             }
         }
     };

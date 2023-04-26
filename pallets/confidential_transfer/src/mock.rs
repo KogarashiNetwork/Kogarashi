@@ -4,8 +4,9 @@ use crate::{
     pallet::Config,
 };
 use pallet_encrypted_balance::{Account, AccountData};
+use zero_crypto::common::CurveGroup;
 use zero_elgamal::EncryptedNumber;
-use zero_jubjub::{Fp as JubJubScalar, JubjubAffine, JubjubExtend};
+use zero_jubjub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
 
 use frame_support::traits::StorageMapShim;
 use frame_support::{construct_runtime, parameter_types};
@@ -127,8 +128,8 @@ pub(crate) fn generate_confidential_transfer_params() -> (
     ConfidentialTransferCircuit,
     ConfidentialTransferTransaction<EncryptedNumber, TatePairing>,
 ) {
-    let alice_public_key = JubjubExtend::ADDITIVE_GENERATOR * ALICE_PRIVATE_KEY;
-    let bob_public_key = JubjubExtend::ADDITIVE_GENERATOR * BOB_PRIVATE_KEY;
+    let alice_public_key = JubjubExtended::ADDITIVE_GENERATOR * ALICE_PRIVATE_KEY;
+    let bob_public_key = JubjubExtended::ADDITIVE_GENERATOR * BOB_PRIVATE_KEY;
     let transfer_amount = JubJubScalar::from(TRANSFER_AMOUNT as u64);
     let alice_after_balance = JubJubScalar::from(ALICE_AFTER_BALANCE as u64);
 
@@ -136,13 +137,13 @@ pub(crate) fn generate_confidential_transfer_params() -> (
         EncryptedNumber::encrypt(ALICE_PRIVATE_KEY, ALICE_BALANCE, ALICE_RANDOMNESS);
     let alice_transfer_amount =
         EncryptedNumber::encrypt(ALICE_PRIVATE_KEY, TRANSFER_AMOUNT, TRANFER_RANDOMNESS);
-    let bob_encrypted_transfer_amount = (JubjubExtend::ADDITIVE_GENERATOR * transfer_amount)
+    let bob_encrypted_transfer_amount = (JubjubExtended::ADDITIVE_GENERATOR * transfer_amount)
         + (bob_public_key * TRANFER_RANDOMNESS);
     let alice_public_key = JubjubAffine::from(alice_public_key);
     let bob_public_key = JubjubAffine::from(bob_public_key);
     let bob_encrypted_transfer_amount = JubjubAffine::from(bob_encrypted_transfer_amount);
     let bob_encrypted_transfer_amount_other =
-        (JubjubExtend::ADDITIVE_GENERATOR * TRANFER_RANDOMNESS).into();
+        (JubjubExtended::ADDITIVE_GENERATOR * TRANFER_RANDOMNESS).into();
 
     (
         ConfidentialTransferCircuit::new(

@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! twisted_edwards_affine_group_operation {
-    ($affine:ident, $extend:ident, $range:ident, $scalar:ident, $x:ident, $y:ident) => {
-        twisted_edwards_curve_arithmetic_extension!($affine, $scalar);
+    ($affine:ident, $extended:ident, $range:ident, $scalar:ident, $x:ident, $y:ident) => {
+        twisted_edwards_curve_arithmetic_extension!($affine, $scalar, $extended);
         impl PartialEq for $affine {
             fn eq(&self, other: &Self) -> bool {
                 self.x == other.x && self.y == other.y
@@ -10,7 +10,7 @@ macro_rules! twisted_edwards_affine_group_operation {
 
         impl CurveGroup for $affine {
             type Affine = $affine;
-            type Projective = $extend;
+            type Extended = $extended;
             type Scalar = $scalar;
 
             const ADDITIVE_GENERATOR: Self = Self { x: $x, y: $y };
@@ -38,16 +38,16 @@ macro_rules! twisted_edwards_affine_group_operation {
                 }
             }
 
-            fn random(rand: impl RngCore) -> $extend {
+            fn random(rand: impl RngCore) -> $extended {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
             }
         }
 
         impl Add for $affine {
-            type Output = $extend;
+            type Output = $extended;
 
             fn add(self, rhs: $affine) -> Self::Output {
-                $extend::from(add_point(self.to_extend(), rhs.to_extend()))
+                $extended::from(add_point(self.to_extended(), rhs.to_extended()))
             }
         }
 
@@ -63,26 +63,26 @@ macro_rules! twisted_edwards_affine_group_operation {
         }
 
         impl Sub for $affine {
-            type Output = $extend;
+            type Output = $extended;
 
             fn sub(self, rhs: $affine) -> Self::Output {
-                $extend::from(add_point(self.to_extend(), rhs.neg().to_extend()))
+                $extended::from(add_point(self.to_extended(), rhs.neg().to_extended()))
             }
         }
 
-        impl Mul<<Self as CurveGroup>::Scalar> for $affine {
-            type Output = $extend;
+        impl Mul<$scalar> for $affine {
+            type Output = $extended;
 
-            fn mul(self, rhs: <Self as CurveGroup>::Scalar) -> Self::Output {
-                scalar_point(self.to_extend(), &rhs)
+            fn mul(self, rhs: $scalar) -> Self::Output {
+                scalar_point(self.to_extended(), &rhs)
             }
         }
 
-        impl<'b> Mul<&'b <Self as CurveGroup>::Scalar> for $affine {
-            type Output = $extend;
+        impl Mul<$affine> for $scalar {
+            type Output = $extended;
 
-            fn mul(self, rhs: &'b <Self as CurveGroup>::Scalar) -> Self::Output {
-                scalar_point(self.to_extend(), rhs)
+            fn mul(self, rhs: $affine) -> Self::Output {
+                scalar_point(rhs.to_extended(), &self)
             }
         }
     };
@@ -90,12 +90,12 @@ macro_rules! twisted_edwards_affine_group_operation {
 
 #[macro_export]
 macro_rules! twisted_edwards_extend_group_operation {
-    ($affine:ident, $extend:ident, $range:ident, $scalar:ident, $x:ident, $y:ident, $t:ident) => {
-        twisted_edwards_curve_arithmetic_extension!($extend, $scalar);
+    ($affine:ident, $extended:ident, $range:ident, $scalar:ident, $x:ident, $y:ident, $t:ident) => {
+        twisted_edwards_curve_arithmetic_extension!($extended, $scalar, $extended);
 
-        impl CurveGroup for $extend {
+        impl CurveGroup for $extended {
             type Affine = $affine;
-            type Projective = $extend;
+            type Extended = $extended;
             type Scalar = $scalar;
 
             const ADDITIVE_GENERATOR: Self = Self {
@@ -137,57 +137,21 @@ macro_rules! twisted_edwards_extend_group_operation {
             }
         }
 
-        impl PartialEq for $extend {
+        impl PartialEq for $extended {
             fn eq(&self, other: &Self) -> bool {
                 self.x * other.z == other.x * self.z && self.y * &other.z == other.y * self.z
             }
         }
 
-        impl $extend {
-            pub const ADDITIVE_GENERATOR: Self = Self {
-                x: $x,
-                y: $y,
-                t: $t,
-                z: $range::one(),
-            };
+        impl Add for $extended {
+            type Output = $extended;
 
-            pub const ADDITIVE_IDENTITY: Self = Self {
-                x: $range::zero(),
-                y: $range::one(),
-                t: $range::zero(),
-                z: $range::one(),
-            };
-
-            fn zero() -> Self {
-                Self::ADDITIVE_IDENTITY
-            }
-
-            fn invert(self) -> Option<Self> {
-                match self.x.is_zero() {
-                    true => None,
-                    false => Some(Self {
-                        x: -self.x,
-                        y: self.y,
-                        t: -self.t,
-                        z: self.z,
-                    }),
-                }
-            }
-
-            pub fn random(rand: impl RngCore) -> $extend {
-                Self::ADDITIVE_GENERATOR * $scalar::random(rand)
+            fn add(self, rhs: $extended) -> Self::Output {
+                $extended::from(add_point(self, rhs))
             }
         }
 
-        impl Add for $extend {
-            type Output = $extend;
-
-            fn add(self, rhs: $extend) -> Self::Output {
-                $extend::from(add_point(self, rhs))
-            }
-        }
-
-        impl Neg for $extend {
+        impl Neg for $extended {
             type Output = Self;
 
             fn neg(self) -> Self {
@@ -200,27 +164,27 @@ macro_rules! twisted_edwards_extend_group_operation {
             }
         }
 
-        impl Sub for $extend {
-            type Output = $extend;
+        impl Sub for $extended {
+            type Output = $extended;
 
-            fn sub(self, rhs: $extend) -> Self::Output {
-                $extend::from(add_point(self, rhs.neg()))
+            fn sub(self, rhs: $extended) -> Self::Output {
+                $extended::from(add_point(self, rhs.neg()))
             }
         }
 
-        impl Mul<<Self as CurveGroup>::Scalar> for $extend {
-            type Output = $extend;
+        impl Mul<$scalar> for $extended {
+            type Output = $extended;
 
-            fn mul(self, rhs: <Self as CurveGroup>::Scalar) -> Self::Output {
+            fn mul(self, rhs: $scalar) -> Self::Output {
                 scalar_point(self, &rhs)
             }
         }
 
-        impl<'b> Mul<&'b <Self as CurveGroup>::Scalar> for $extend {
-            type Output = $extend;
+        impl Mul<$extended> for $scalar {
+            type Output = $extended;
 
-            fn mul(self, rhs: &'b <Self as CurveGroup>::Scalar) -> Self::Output {
-                scalar_point(self, rhs)
+            fn mul(self, rhs: $extended) -> Self::Output {
+                scalar_point(rhs, &self)
             }
         }
     };
@@ -228,7 +192,7 @@ macro_rules! twisted_edwards_extend_group_operation {
 
 #[macro_export]
 macro_rules! twisted_edwards_curve_arithmetic_extension {
-    ($curve:ident, $scalar:ident) => {
+    ($curve:ident, $scalar:ident, $extended:ident) => {
         impl Eq for $curve {}
 
         impl Default for $curve {
@@ -245,31 +209,31 @@ macro_rules! twisted_edwards_curve_arithmetic_extension {
 
         impl<'b> AddAssign<&'b $curve> for $curve {
             fn add_assign(&mut self, rhs: &'b $curve) {
-                *self = &*self + rhs;
+                *self += *rhs;
             }
         }
 
         impl<'a, 'b> Add<&'b $curve> for &'a $curve {
-            type Output = $curve;
+            type Output = $extended;
 
-            fn add(self, rhs: &'b $curve) -> $curve {
-                self + rhs
+            fn add(self, rhs: &'b $curve) -> $extended {
+                *self + *rhs
             }
         }
 
         impl<'b> Add<&'b $curve> for $curve {
-            type Output = $curve;
+            type Output = $extended;
 
-            fn add(self, rhs: &'b $curve) -> Self {
+            fn add(self, rhs: &'b $curve) -> $extended {
                 &self + rhs
             }
         }
 
         impl<'a> Add<$curve> for &'a $curve {
-            type Output = $curve;
+            type Output = $extended;
 
-            fn add(self, rhs: $curve) -> $curve {
-                self + rhs
+            fn add(self, rhs: $curve) -> $extended {
+                self + &rhs
             }
         }
 
@@ -281,36 +245,84 @@ macro_rules! twisted_edwards_curve_arithmetic_extension {
 
         impl<'b> SubAssign<&'b $curve> for $curve {
             fn sub_assign(&mut self, rhs: &'b $curve) {
-                *self = &*self - rhs;
+                *self -= *rhs;
             }
         }
 
         impl<'a, 'b> Sub<&'b $curve> for &'a $curve {
-            type Output = $curve;
+            type Output = $extended;
 
-            fn sub(self, rhs: &'b $curve) -> $curve {
-                self - rhs
+            fn sub(self, rhs: &'b $curve) -> $extended {
+                *self - *rhs
             }
         }
 
         impl<'b> Sub<&'b $curve> for $curve {
-            type Output = $curve;
+            type Output = $extended;
 
-            fn sub(self, rhs: &'b $curve) -> Self {
-                self - rhs
+            fn sub(self, rhs: &'b $curve) -> $extended {
+                &self - rhs
             }
         }
 
         impl<'a> Sub<$curve> for &'a $curve {
-            type Output = $curve;
+            type Output = $extended;
 
-            fn sub(self, rhs: $curve) -> $curve {
-                self - rhs
+            fn sub(self, rhs: $curve) -> $extended {
+                self - &rhs
             }
         }
 
-        impl MulAssign<<Self as CurveGroup>::Scalar> for $curve {
-            fn mul_assign(&mut self, rhs: <Self as CurveGroup>::Scalar) {
+        impl<'a> Mul<&'a $scalar> for $curve {
+            type Output = $extended;
+
+            fn mul(self, rhs: &'a $scalar) -> Self::Output {
+                self * *rhs
+            }
+        }
+
+        impl<'a> Mul<$scalar> for &'a $curve {
+            type Output = $extended;
+
+            fn mul(self, rhs: $scalar) -> Self::Output {
+                *self * rhs
+            }
+        }
+
+        impl<'a, 'b> Mul<&'a $scalar> for &'b $curve {
+            type Output = $extended;
+
+            fn mul(self, rhs: &'a $scalar) -> Self::Output {
+                *self * *rhs
+            }
+        }
+
+        impl<'a> Mul<&'a $curve> for $scalar {
+            type Output = $extended;
+
+            fn mul(self, rhs: &'a $curve) -> Self::Output {
+                self * *rhs
+            }
+        }
+
+        impl<'a> Mul<$curve> for &'a $scalar {
+            type Output = $extended;
+
+            fn mul(self, rhs: $curve) -> Self::Output {
+                *self * rhs
+            }
+        }
+
+        impl<'a, 'b> Mul<&'a $curve> for &'b $scalar {
+            type Output = $extended;
+
+            fn mul(self, rhs: &'a $curve) -> Self::Output {
+                *self * *rhs
+            }
+        }
+
+        impl MulAssign<$scalar> for $curve {
+            fn mul_assign(&mut self, rhs: $scalar) {
                 *self = (*self * rhs).into();
             }
         }

@@ -1,4 +1,7 @@
-use zero_crypto::dress::{curve::edwards::*, field::*};
+use zero_crypto::{
+    common::{CurveExtended, CurveGroup},
+    dress::{curve::edwards::*, field::*},
+};
 
 macro_rules! field_test_data {
     ($test_data_name:ident, $test_bits:ident, $limbs_type:ident, $modulus:ident, $inv:ident, $r2:ident, $r3:ident) => {
@@ -138,7 +141,7 @@ pub mod jubjub_curve {
     }
 
     #[derive(Clone, Copy, Debug, Encode, Decode)]
-    pub struct JubjubExtend {
+    pub struct JubjubExtended {
         x: BlsScalar,
         y: BlsScalar,
         t: BlsScalar,
@@ -163,7 +166,7 @@ pub mod jubjub_curve {
         BlsScalar,
         EDWARDS_D,
         JubjubAffine,
-        JubjubExtend,
+        JubjubExtended,
         X,
         Y,
         T

@@ -22,7 +22,7 @@ use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use zero_crypto::common::{CurveGroup, Pairing};
-use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
+use zero_jubjub::{Fp, JubjubAffine, JubjubExtended};
 use zero_pairing::TatePairing;
 
 /// Number encrypted by ElGamal encryption
@@ -49,7 +49,7 @@ impl EncryptedNumber {
 
     /// Enctypt number by private key
     pub fn encrypt(private_key: Fp, value: u32, random: Fp) -> Self {
-        let g = JubjubExtend::ADDITIVE_GENERATOR;
+        let g = JubjubExtended::ADDITIVE_GENERATOR;
         let public_key = g * private_key;
         let left = g * Fp::from(value as u64) + public_key * random;
         EncryptedNumber {
@@ -60,11 +60,11 @@ impl EncryptedNumber {
 
     /// Decrypt encrypted number by brute force
     pub fn decrypt(&self, private_key: Fp) -> Option<u32> {
-        let g = JubjubExtend::ADDITIVE_GENERATOR;
+        let g = JubjubExtended::ADDITIVE_GENERATOR;
         let decrypted_message =
-            JubjubExtend::from(self.s) - (JubjubExtend::from(self.t) * private_key);
+            JubjubExtended::from(self.s) - (JubjubExtended::from(self.t) * private_key);
 
-        let mut acc = JubjubExtend::ADDITIVE_IDENTITY;
+        let mut acc = JubjubExtended::ADDITIVE_IDENTITY;
         for i in 0..150000 {
             if acc == decrypted_message {
                 return Some(i);
@@ -85,8 +85,8 @@ impl Add for EncryptedNumber {
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
         Self {
-            s: JubjubAffine::from(JubjubExtend::from(self.s) + JubjubExtend::from(rhs.s)),
-            t: JubjubAffine::from(JubjubExtend::from(self.t) + JubjubExtend::from(rhs.t)),
+            s: JubjubAffine::from(JubjubExtended::from(self.s) + JubjubExtended::from(rhs.s)),
+            t: JubjubAffine::from(JubjubExtended::from(self.t) + JubjubExtended::from(rhs.t)),
         }
     }
 }
@@ -97,8 +97,8 @@ impl Sub for EncryptedNumber {
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         Self {
-            s: JubjubAffine::from(JubjubExtend::from(self.s) - JubjubExtend::from(rhs.s)),
-            t: JubjubAffine::from(JubjubExtend::from(self.t) - JubjubExtend::from(rhs.t)),
+            s: JubjubAffine::from(JubjubExtended::from(self.s) - JubjubExtended::from(rhs.s)),
+            t: JubjubAffine::from(JubjubExtended::from(self.t) - JubjubExtended::from(rhs.t)),
         }
     }
 }
@@ -107,8 +107,8 @@ impl CheckedAdd for EncryptedNumber {
     #[inline]
     fn checked_add(&self, rhs: &Self) -> Option<Self> {
         Some(Self {
-            s: JubjubAffine::from(JubjubExtend::from(self.s) + JubjubExtend::from(rhs.s)),
-            t: JubjubAffine::from(JubjubExtend::from(self.t) + JubjubExtend::from(rhs.t)),
+            s: JubjubAffine::from(JubjubExtended::from(self.s) + JubjubExtended::from(rhs.s)),
+            t: JubjubAffine::from(JubjubExtended::from(self.t) + JubjubExtended::from(rhs.t)),
         })
     }
 }
@@ -117,8 +117,8 @@ impl CheckedSub for EncryptedNumber {
     #[inline]
     fn checked_sub(&self, rhs: &Self) -> Option<Self> {
         Some(Self {
-            s: JubjubAffine::from(JubjubExtend::from(self.s) - JubjubExtend::from(rhs.s)),
-            t: JubjubAffine::from(JubjubExtend::from(self.t) - JubjubExtend::from(rhs.t)),
+            s: JubjubAffine::from(JubjubExtended::from(self.s) - JubjubExtended::from(rhs.s)),
+            t: JubjubAffine::from(JubjubExtended::from(self.t) - JubjubExtended::from(rhs.t)),
         })
     }
 }

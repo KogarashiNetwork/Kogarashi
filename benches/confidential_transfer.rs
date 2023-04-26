@@ -2,7 +2,7 @@ use confidential_transfer::ConfidentialTransferCircuit;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
-use zero_crypto::common::Group;
+use zero_crypto::common::{CurveGroup, Group};
 use zero_elgamal::EncryptedNumber;
 use zero_jubjub::*;
 use zero_kzg::KeyPair;
@@ -24,7 +24,7 @@ fn circuit(c: &mut Criterion) {
     let (prover, verifier) =
         Compiler::compile::<ConfidentialTransferCircuit, TatePairing>(&mut pp, label)
             .expect("failed to compile circuit");
-    let generator = JubjubExtend::ADDITIVE_GENERATOR;
+    let generator = JubjubExtended::ADDITIVE_GENERATOR;
     let alice_private_key = JubjubScalar::random(&mut rng);
     let bob_private_key = JubjubScalar::random(&mut rng);
     let alice_public_key = generator * alice_private_key;

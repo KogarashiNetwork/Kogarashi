@@ -831,6 +831,7 @@ version = "0.1.0"
 dependencies = [
  "bitcoin_hashes",
  "secp256k1",
+ "zero-crypto",
  "zero-jubjub",
 ]
 

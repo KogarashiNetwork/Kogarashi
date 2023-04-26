@@ -90,8 +90,8 @@ impl Circuit<TatePairing> for ConfidentialTransferCircuit {
         let neg = composer.append_witness(-JubJubScalar::one());
 
         // Alice left encrypted transfer check
-        let g_pow_balance =
-            composer.component_mul_generator(transfer_amount, JubjubExtend::ADDITIVE_GENERATOR)?;
+        let g_pow_balance = composer
+            .component_mul_generator(transfer_amount, JubjubExtended::ADDITIVE_GENERATOR)?;
         let alice_pk_powered_by_randomness =
             composer.component_mul_point(randomness, sender_public_key);
         let s_alice_transfer =
@@ -108,12 +108,12 @@ impl Circuit<TatePairing> for ConfidentialTransferCircuit {
 
         // Alice right encrypted transfer check
         let g_pow_randomness =
-            composer.component_mul_generator(randomness, JubjubExtend::ADDITIVE_GENERATOR)?;
+            composer.component_mul_generator(randomness, JubjubExtended::ADDITIVE_GENERATOR)?;
         composer.assert_equal_public_point(g_pow_randomness, alice_s_transfer_amount);
 
         // Alice after balance check
         let g_pow_after_balance = composer
-            .component_mul_generator(sender_after_balance, JubjubExtend::ADDITIVE_GENERATOR)?;
+            .component_mul_generator(sender_after_balance, JubjubExtended::ADDITIVE_GENERATOR)?;
         let alice_t_transfer_neg =
             composer.component_mul_point(neg, alice_t_encrypted_transfer_amount);
         let alice_s_transfer_neg =
@@ -130,7 +130,7 @@ impl Circuit<TatePairing> for ConfidentialTransferCircuit {
 
         // Public key calculation check
         let calculated_pk = composer
-            .component_mul_generator(sender_private_key, JubjubExtend::ADDITIVE_GENERATOR)?;
+            .component_mul_generator(sender_private_key, JubjubExtended::ADDITIVE_GENERATOR)?;
         composer.assert_equal_public_point(calculated_pk, self.sender_public_key);
 
         // Transfer amount and ramaining balance range check
