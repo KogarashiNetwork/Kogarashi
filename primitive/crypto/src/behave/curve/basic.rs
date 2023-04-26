@@ -33,7 +33,6 @@ pub trait Affine: Curve {
 /// projective, jacobian and so on
 pub trait CurveExtended:
     Curve
-    // + RefOps
     + AddAssign<Self::Affine>
     + Add<Self::Affine, Output = Self>
     + SubAssign<Self::Affine>

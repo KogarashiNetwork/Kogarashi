@@ -89,59 +89,11 @@ macro_rules! affine_group_operation {
             }
         }
 
-        impl<'a> Mul<&'a $scalar> for $affine {
-            type Output = $projective;
-
-            fn mul(self, rhs: &'a $scalar) -> Self::Output {
-                scalar_point(self.to_extended(), &rhs)
-            }
-        }
-
-        impl<'a> Mul<$scalar> for &'a $affine {
-            type Output = $projective;
-
-            fn mul(self, rhs: $scalar) -> Self::Output {
-                scalar_point(self.to_extended(), &rhs)
-            }
-        }
-
-        impl<'a, 'b> Mul<&'a $scalar> for &'b $affine {
-            type Output = $projective;
-
-            fn mul(self, rhs: &'a $scalar) -> Self::Output {
-                scalar_point(self.to_extended(), &rhs)
-            }
-        }
-
         impl Mul<$affine> for $scalar {
             type Output = $projective;
 
             fn mul(self, rhs: $affine) -> Self::Output {
                 scalar_point(rhs.to_extended(), &self)
-            }
-        }
-
-        impl<'a> Mul<&'a $affine> for $scalar {
-            type Output = $projective;
-
-            fn mul(self, rhs: &'a $affine) -> Self::Output {
-                scalar_point(rhs.to_extended(), &self)
-            }
-        }
-
-        impl<'a> Mul<$affine> for &'a $scalar {
-            type Output = $projective;
-
-            fn mul(self, rhs: $affine) -> Self::Output {
-                scalar_point(rhs.to_extended(), self)
-            }
-        }
-
-        impl<'a, 'b> Mul<&'a $affine> for &'b $scalar {
-            type Output = $projective;
-
-            fn mul(self, rhs: &'a $affine) -> Self::Output {
-                scalar_point(rhs.to_extended(), self)
             }
         }
     };
@@ -239,59 +191,11 @@ macro_rules! projective_group_operation {
             }
         }
 
-        impl<'a> Mul<&'a $scalar> for $projective {
-            type Output = $projective;
-
-            fn mul(self, rhs: &'a $scalar) -> Self::Output {
-                scalar_point(self, &rhs)
-            }
-        }
-
-        impl<'a> Mul<$scalar> for &'a $projective {
-            type Output = $projective;
-
-            fn mul(self, rhs: $scalar) -> Self::Output {
-                scalar_point(*self, &rhs)
-            }
-        }
-
-        impl<'a, 'b> Mul<&'a $scalar> for &'b $projective {
-            type Output = $projective;
-
-            fn mul(self, rhs: &'a $scalar) -> Self::Output {
-                scalar_point(*self, &rhs)
-            }
-        }
-
         impl Mul<$projective> for $scalar {
             type Output = $projective;
 
             fn mul(self, rhs: $projective) -> Self::Output {
                 scalar_point(rhs, &self)
-            }
-        }
-
-        impl<'a> Mul<&'a $projective> for $scalar {
-            type Output = $projective;
-
-            fn mul(self, rhs: &'a $projective) -> Self::Output {
-                scalar_point(*rhs, &self)
-            }
-        }
-
-        impl<'a> Mul<$projective> for &'a $scalar {
-            type Output = $projective;
-
-            fn mul(self, rhs: $projective) -> Self::Output {
-                scalar_point(rhs, self)
-            }
-        }
-
-        impl<'a, 'b> Mul<&'a $projective> for &'b $scalar {
-            type Output = $projective;
-
-            fn mul(self, rhs: &'a $projective) -> Self::Output {
-                scalar_point(*rhs, self)
             }
         }
     };
@@ -316,7 +220,7 @@ macro_rules! curve_arithmetic_extension {
 
         impl<'b> AddAssign<&'b $curve> for $curve {
             fn add_assign(&mut self, rhs: &'b $curve) {
-                *self = (&*self + rhs).into();
+                *self += *rhs;
             }
         }
 
@@ -352,7 +256,7 @@ macro_rules! curve_arithmetic_extension {
 
         impl<'b> SubAssign<&'b $curve> for $curve {
             fn sub_assign(&mut self, rhs: &'b $curve) {
-                *self = (&*self - rhs).into();
+                *self -= *rhs;
             }
         }
 
@@ -377,6 +281,54 @@ macro_rules! curve_arithmetic_extension {
 
             fn sub(self, rhs: $curve) -> $projective {
                 self - &rhs
+            }
+        }
+
+        impl<'a> Mul<&'a $scalar> for $curve {
+            type Output = $projective;
+
+            fn mul(self, rhs: &'a $scalar) -> Self::Output {
+                self * *rhs
+            }
+        }
+
+        impl<'a> Mul<$scalar> for &'a $curve {
+            type Output = $projective;
+
+            fn mul(self, rhs: $scalar) -> Self::Output {
+                *self * rhs
+            }
+        }
+
+        impl<'a, 'b> Mul<&'a $scalar> for &'b $curve {
+            type Output = $projective;
+
+            fn mul(self, rhs: &'a $scalar) -> Self::Output {
+                *self * *rhs
+            }
+        }
+
+        impl<'a> Mul<&'a $curve> for $scalar {
+            type Output = $projective;
+
+            fn mul(self, rhs: &'a $curve) -> Self::Output {
+                self * *rhs
+            }
+        }
+
+        impl<'a> Mul<$curve> for &'a $scalar {
+            type Output = $projective;
+
+            fn mul(self, rhs: $curve) -> Self::Output {
+                *self * rhs
+            }
+        }
+
+        impl<'a, 'b> Mul<&'a $curve> for &'b $scalar {
+            type Output = $projective;
+
+            fn mul(self, rhs: &'a $curve) -> Self::Output {
+                *self * *rhs
             }
         }
 
