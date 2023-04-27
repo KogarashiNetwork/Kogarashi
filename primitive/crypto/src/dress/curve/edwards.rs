@@ -1,9 +1,6 @@
 mod group;
 
-pub use group::{
-    twisted_edwards_affine_group_operation, twisted_edwards_curve_arithmetic_extension,
-    twisted_edwards_extend_group_operation,
-};
+pub use group::*;
 
 #[macro_export]
 macro_rules! twisted_edwards_curve_operation {
@@ -13,7 +10,7 @@ macro_rules! twisted_edwards_curve_operation {
 
         twisted_edwards_affine_group_operation!($affine, $extended, $range, $scalar, $x, $y);
         twisted_edwards_extend_group_operation!($affine, $extended, $range, $scalar, $x, $y, $t);
-        twisted_edwards_mixed_curve_operation!($affine, $extended);
+        mixed_curve_operations!($affine, $extended);
 
         impl ParityCmp for $affine {}
         impl ParityCmp for $extended {}
@@ -53,18 +50,6 @@ macro_rules! twisted_edwards_curve_operation {
             const PARAM_D: $range = $d;
         }
 
-        impl TwistedEdwardsAffine for $affine {
-            fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self {
-                Self { x, y }
-            }
-        }
-
-        impl From<$extended> for $affine {
-            fn from(p: $extended) -> $affine {
-                p.to_affine()
-            }
-        }
-
         impl Affine for $affine {
             fn to_extended(self) -> Self::Extended {
                 Self::Extended {
@@ -73,6 +58,12 @@ macro_rules! twisted_edwards_curve_operation {
                     t: self.x * self.y,
                     z: Self::Range::one(),
                 }
+            }
+        }
+
+        impl TwistedEdwardsAffine for $affine {
+            fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self {
+                Self { x, y }
             }
         }
 
@@ -138,6 +129,12 @@ macro_rules! twisted_edwards_curve_operation {
             }
         }
 
+        impl From<$extended> for $affine {
+            fn from(p: $extended) -> $affine {
+                p.to_affine()
+            }
+        }
+
         impl From<$affine> for $extended {
             fn from(p: $affine) -> $extended {
                 p.to_extended()
@@ -146,65 +143,4 @@ macro_rules! twisted_edwards_curve_operation {
     };
 }
 
-#[macro_export]
-macro_rules! twisted_edwards_mixed_curve_operation {
-    ($affine:ident, $extended:ident) => {
-        impl Add<$extended> for $affine {
-            type Output = $extended;
-
-            fn add(self, rhs: $extended) -> $extended {
-                add_point(self.to_extended(), rhs)
-            }
-        }
-
-        impl Sub<$extended> for $affine {
-            type Output = $extended;
-
-            fn sub(self, rhs: $extended) -> $extended {
-                add_point(self.to_extended(), -rhs)
-            }
-        }
-
-        impl Add<$affine> for $extended {
-            type Output = $extended;
-
-            fn add(self, rhs: $affine) -> $extended {
-                add_point(self, rhs.to_extended())
-            }
-        }
-
-        impl Sub<$affine> for $extended {
-            type Output = $extended;
-
-            fn sub(self, rhs: $affine) -> $extended {
-                add_point(self, -rhs.to_extended())
-            }
-        }
-
-        impl AddAssign<$affine> for $extended {
-            fn add_assign(&mut self, rhs: $affine) {
-                *self = add_point(*self, rhs.to_extended())
-            }
-        }
-
-        impl<'a> AddAssign<&'a $affine> for $extended {
-            fn add_assign(&mut self, rhs: &'a $affine) {
-                *self = add_point(*self, rhs.to_extended())
-            }
-        }
-
-        impl SubAssign<$affine> for $extended {
-            fn sub_assign(&mut self, rhs: $affine) {
-                *self = add_point(*self, -rhs.to_extended())
-            }
-        }
-
-        impl<'a> SubAssign<&'a $affine> for $extended {
-            fn sub_assign(&mut self, rhs: &'a $affine) {
-                *self = add_point(*self, -rhs.to_extended())
-            }
-        }
-    };
-}
-
-pub use {twisted_edwards_curve_operation, twisted_edwards_mixed_curve_operation};
+pub use twisted_edwards_curve_operation;

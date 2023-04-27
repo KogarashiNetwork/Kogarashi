@@ -104,6 +104,16 @@ macro_rules! projective_group_operation {
     ($affine: ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident) => {
         curve_arithmetic_extension!($projective, $scalar, $projective);
 
+        impl PartialEq for $projective {
+            fn eq(&self, other: &Self) -> bool {
+                if self.is_identity() || other.is_identity() {
+                    self.is_identity() && other.is_identity()
+                } else {
+                    self.x * other.z == other.x * self.z && self.y * other.z == other.y * self.z
+                }
+            }
+        }
+
         impl CurveGroup for $projective {
             type Affine = $affine;
             type Extended = $projective;
@@ -142,16 +152,6 @@ macro_rules! projective_group_operation {
 
             fn random(rand: impl RngCore) -> Self {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
-            }
-        }
-
-        impl PartialEq for $projective {
-            fn eq(&self, other: &Self) -> bool {
-                if self.is_identity() || other.is_identity() {
-                    self.is_identity() && other.is_identity()
-                } else {
-                    self.x * other.z == other.x * self.z && self.y * other.z == other.y * self.z
-                }
             }
         }
 
@@ -198,146 +198,37 @@ macro_rules! projective_group_operation {
                 scalar_point(rhs, &self)
             }
         }
-    };
-}
 
-#[macro_export]
-macro_rules! curve_arithmetic_extension {
-    ($curve:ident, $scalar:ident, $projective:ident) => {
-        impl Eq for $curve {}
-
-        impl Default for $curve {
-            fn default() -> Self {
-                Self::ADDITIVE_IDENTITY
-            }
-        }
-
-        impl AddAssign for $curve {
-            fn add_assign(&mut self, rhs: $curve) {
+        impl AddAssign for $projective {
+            fn add_assign(&mut self, rhs: $projective) {
                 *self = (*self + rhs).into();
             }
         }
 
-        impl<'b> AddAssign<&'b $curve> for $curve {
-            fn add_assign(&mut self, rhs: &'b $curve) {
+        impl<'b> AddAssign<&'b $projective> for $projective {
+            fn add_assign(&mut self, rhs: &'b $projective) {
                 *self += *rhs;
             }
         }
 
-        impl<'a, 'b> Add<&'b $curve> for &'a $curve {
-            type Output = $projective;
-
-            fn add(self, rhs: &'b $curve) -> $projective {
-                *self + *rhs
+        impl SubAssign for $projective {
+            fn sub_assign(&mut self, rhs: $projective) {
+                *self = *self - rhs;
             }
         }
 
-        impl<'b> Add<&'b $curve> for $curve {
-            type Output = $projective;
-
-            fn add(self, rhs: &'b $curve) -> $projective {
-                &self + rhs
-            }
-        }
-
-        impl<'a> Add<$curve> for &'a $curve {
-            type Output = $projective;
-
-            fn add(self, rhs: $curve) -> $projective {
-                self + &rhs
-            }
-        }
-
-        impl SubAssign for $curve {
-            fn sub_assign(&mut self, rhs: $curve) {
-                *self = (*self - rhs).into();
-            }
-        }
-
-        impl<'b> SubAssign<&'b $curve> for $curve {
-            fn sub_assign(&mut self, rhs: &'b $curve) {
+        impl<'b> SubAssign<&'b $projective> for $projective {
+            fn sub_assign(&mut self, rhs: &'b $projective) {
                 *self -= *rhs;
             }
         }
 
-        impl<'a, 'b> Sub<&'b $curve> for &'a $curve {
-            type Output = $projective;
-
-            fn sub(self, rhs: &'b $curve) -> $projective {
-                *self - *rhs
-            }
-        }
-
-        impl<'b> Sub<&'b $curve> for $curve {
-            type Output = $projective;
-
-            fn sub(self, rhs: &'b $curve) -> $projective {
-                &self - rhs
-            }
-        }
-
-        impl<'a> Sub<$curve> for &'a $curve {
-            type Output = $projective;
-
-            fn sub(self, rhs: $curve) -> $projective {
-                self - &rhs
-            }
-        }
-
-        impl<'a> Mul<&'a $scalar> for $curve {
-            type Output = $projective;
-
-            fn mul(self, rhs: &'a $scalar) -> Self::Output {
-                self * *rhs
-            }
-        }
-
-        impl<'a> Mul<$scalar> for &'a $curve {
-            type Output = $projective;
-
-            fn mul(self, rhs: $scalar) -> Self::Output {
-                *self * rhs
-            }
-        }
-
-        impl<'a, 'b> Mul<&'a $scalar> for &'b $curve {
-            type Output = $projective;
-
-            fn mul(self, rhs: &'a $scalar) -> Self::Output {
-                *self * *rhs
-            }
-        }
-
-        impl<'a> Mul<&'a $curve> for $scalar {
-            type Output = $projective;
-
-            fn mul(self, rhs: &'a $curve) -> Self::Output {
-                self * *rhs
-            }
-        }
-
-        impl<'a> Mul<$curve> for &'a $scalar {
-            type Output = $projective;
-
-            fn mul(self, rhs: $curve) -> Self::Output {
-                *self * rhs
-            }
-        }
-
-        impl<'a, 'b> Mul<&'a $curve> for &'b $scalar {
-            type Output = $projective;
-
-            fn mul(self, rhs: &'a $curve) -> Self::Output {
-                *self * *rhs
-            }
-        }
-
-        impl MulAssign<$scalar> for $curve {
+        impl MulAssign<$scalar> for $projective {
             fn mul_assign(&mut self, rhs: $scalar) {
-                *self = (*self * rhs).into();
+                *self = *self * rhs;
             }
         }
     };
 }
 
-pub use {affine_group_operation, curve_arithmetic_extension, projective_group_operation};
+pub use {affine_group_operation, projective_group_operation};

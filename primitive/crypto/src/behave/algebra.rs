@@ -45,12 +45,12 @@ pub trait CurveGroup:
     PartialEq
     + Eq
     + Add<Self, Output = Self::Extended>
-    + AddAssign
+    // + AddAssign
     + Neg<Output = Self>
     + Sub<Self, Output = Self::Extended>
-    + SubAssign
+    // + SubAssign
     + Mul<Self::Scalar, Output = Self::Extended>
-    + MulAssign<Self::Scalar>
+    // + MulAssign<Self::Scalar>
     + Sized
 {
     // scalar domain
