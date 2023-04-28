@@ -48,6 +48,7 @@ impl<F: FftField> Polynomial<F> {
         Self(coeffs)
     }
 
+    #[allow(clippy::needless_borrow)]
     pub fn rand<R: RngCore>(d: usize, mut rng: &mut R) -> Self {
         let mut random_coeffs = Vec::with_capacity(d + 1);
         for _ in 0..=d {

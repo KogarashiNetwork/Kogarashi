@@ -29,7 +29,7 @@ macro_rules! affine_group_operation {
                 is_infinity: true,
             };
 
-            fn is_identity(self) -> bool {
+            fn is_identity(&self) -> bool {
                 self.is_infinity
             }
 
@@ -87,7 +87,7 @@ macro_rules! projective_group_operation {
                 z: $range::zero(),
             };
 
-            fn is_identity(self) -> bool {
+            fn is_identity(&self) -> bool {
                 self.z == $range::zero()
             }
 

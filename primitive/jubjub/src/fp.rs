@@ -159,11 +159,11 @@ pub fn compute_windowed_naf<F: FftField>(scalar: F, width: u8) -> [i8; 256] {
             let ki = k.mods_2_pow_k(width);
             res[i] = ki;
             let k_ = match (ki >= 0, ki < 0) {
-                (true, false) => F::from([ki.abs() as u64, 0u64, 0u64, 0u64]),
-                (false, true) => -F::from([ki.abs() as u64, 0u64, 0u64, 0u64]),
+                (true, false) => F::from([ki.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
+                (false, true) => -F::from([ki.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
                 (_, _) => unreachable!(),
             };
-            k = k - k_;
+            k -= k_;
         } else {
             res[i] = 0i8;
         };
@@ -217,8 +217,8 @@ impl Fp {
 impl From<i8> for Fp {
     fn from(val: i8) -> Fp {
         match (val >= 0, val < 0) {
-            (true, false) => Fp([val.abs() as u64, 0u64, 0u64, 0u64]),
-            (false, true) => -Fp([val.abs() as u64, 0u64, 0u64, 0u64]),
+            (true, false) => Fp([val.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
+            (false, true) => -Fp([val.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
             (_, _) => unreachable!(),
         }
     }

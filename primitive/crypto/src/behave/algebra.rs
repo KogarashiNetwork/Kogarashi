@@ -74,7 +74,7 @@ pub trait CurveGroup:
     fn zero() -> Self;
 
     // check that point is on curve
-    fn is_identity(self) -> bool;
+    fn is_identity(&self) -> bool;
 
     // get inverse of group element
     fn invert(self) -> Option<Self>

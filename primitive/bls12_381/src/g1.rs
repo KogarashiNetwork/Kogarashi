@@ -74,7 +74,7 @@ impl Add for G1Affine {
     type Output = G1Projective;
 
     fn add(self, rhs: G1Affine) -> Self::Output {
-        G1Projective::from(add_point(self.to_extended(), rhs.to_extended()))
+        add_point(self.to_extended(), rhs.to_extended())
     }
 }
 
@@ -94,7 +94,7 @@ impl Sub for G1Affine {
     type Output = G1Projective;
 
     fn sub(self, rhs: G1Affine) -> Self::Output {
-        G1Projective::from(add_point(self.to_extended(), rhs.neg().to_extended()))
+        add_point(self.to_extended(), rhs.neg().to_extended())
     }
 }
 
@@ -151,7 +151,7 @@ fn endomorphism(p: &G1Affine) -> G1Affine {
     // Endomorphism of the points on the curve.
     // endomorphism_p(x,y) = (BETA * x, y)
     // where BETA is a non-trivial cubic root of unity in Fq.
-    let mut res = p.clone();
+    let mut res = *p;
     res.x *= BETA;
     res
 }
@@ -159,7 +159,7 @@ fn endomorphism(p: &G1Affine) -> G1Affine {
 impl G1Affine {
     pub const RAW_SIZE: usize = 97;
 
-    pub unsafe fn from_slice_unchecked(bytes: &[u8]) -> Self {
+    pub fn from_slice_unchecked(bytes: &[u8]) -> Self {
         let mut x = [0u64; 6];
         let mut y = [0u64; 6];
         let mut z = [0u8; 8];
@@ -439,6 +439,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::op_ref)]
     fn bls_operations() {
         let aff1 = G1Affine::random(OsRng).to_affine();
         let aff2 = G1Affine::random(OsRng).to_affine();

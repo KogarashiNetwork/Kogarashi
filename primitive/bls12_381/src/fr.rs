@@ -83,7 +83,7 @@ impl Fr {
             for byte in limb.to_le_bytes().iter() {
                 for i in 0..4 {
                     index -= 1;
-                    bits[index] = ((byte >> (i * 2)) & 3) as u8;
+                    bits[index] = (byte >> (i * 2)) & 3;
                 }
             }
         }
@@ -179,7 +179,7 @@ pub const TWO_ADACITY: u32 = 32;
 impl Fr {
     pub fn divn(&mut self, mut n: u32) {
         if n >= 256 {
-            *self = Self::from(0 as u64);
+            *self = Self::from(0_u64);
             return;
         }
 
@@ -236,8 +236,8 @@ impl Fr {
 
         CtOption::new(
             sqrt,
-            (&sqrt * &sqrt).ct_eq(self), /* Only return Some if it's the
-                                          * square root. */
+            (sqrt * sqrt).ct_eq(self), /* Only return Some if it's the
+                                        * square root. */
         )
     }
 }

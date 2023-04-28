@@ -42,7 +42,7 @@ impl Add for Ed25519Affine {
     type Output = Ed25519Extend;
 
     fn add(self, rhs: Ed25519Affine) -> Self::Output {
-        Ed25519Extend::from(add_point(self.to_extended(), rhs.to_extended()))
+        add_point(self.to_extended(), rhs.to_extended())
     }
 }
 
@@ -61,7 +61,7 @@ impl Sub for Ed25519Affine {
     type Output = Ed25519Extend;
 
     fn sub(self, rhs: Ed25519Affine) -> Self::Output {
-        Ed25519Extend::from(add_point(self.to_extended(), rhs.neg().to_extended()))
+        add_point(self.to_extended(), rhs.neg().to_extended())
     }
 }
 
@@ -93,7 +93,7 @@ impl Add for Ed25519Extend {
     type Output = Ed25519Extend;
 
     fn add(self, rhs: Ed25519Extend) -> Self::Output {
-        Ed25519Extend::from(add_point(self, rhs))
+        add_point(self, rhs)
     }
 }
 
@@ -114,7 +114,7 @@ impl Sub for Ed25519Extend {
     type Output = Ed25519Extend;
 
     fn sub(self, rhs: Ed25519Extend) -> Self::Output {
-        Ed25519Extend::from(add_point(self, rhs.neg()))
+        add_point(self, rhs.neg())
     }
 }
 

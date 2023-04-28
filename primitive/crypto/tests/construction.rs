@@ -1,3 +1,6 @@
+#![allow(clippy::suspicious_arithmetic_impl)]
+#![allow(clippy::suspicious_op_assign_impl)]
+
 use zero_crypto::{
     common::{CurveExtended, CurveGroup},
     dress::{curve::edwards::*, field::*},
@@ -144,7 +147,7 @@ pub mod jubjub_curve {
         type Output = JubjubExtended;
 
         fn add(self, rhs: JubjubAffine) -> Self::Output {
-            JubjubExtended::from(add_point(self.to_extended(), rhs.to_extended()))
+            add_point(self.to_extended(), rhs.to_extended())
         }
     }
 
@@ -163,7 +166,7 @@ pub mod jubjub_curve {
         type Output = JubjubExtended;
 
         fn sub(self, rhs: JubjubAffine) -> Self::Output {
-            JubjubExtended::from(add_point(self.to_extended(), rhs.neg().to_extended()))
+            add_point(self.to_extended(), rhs.neg().to_extended())
         }
     }
 
@@ -195,7 +198,7 @@ pub mod jubjub_curve {
         type Output = JubjubExtended;
 
         fn add(self, rhs: JubjubExtended) -> Self::Output {
-            JubjubExtended::from(add_point(self, rhs))
+            add_point(self, rhs)
         }
     }
 
@@ -216,7 +219,7 @@ pub mod jubjub_curve {
         type Output = JubjubExtended;
 
         fn sub(self, rhs: JubjubExtended) -> Self::Output {
-            JubjubExtended::from(add_point(self, rhs.neg()))
+            add_point(self, rhs.neg())
         }
     }
 

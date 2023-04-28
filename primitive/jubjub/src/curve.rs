@@ -43,7 +43,7 @@ impl Add for JubjubAffine {
     type Output = JubjubExtended;
 
     fn add(self, rhs: JubjubAffine) -> Self::Output {
-        JubjubExtended::from(add_point(self.to_extended(), rhs.to_extended()))
+        add_point(self.to_extended(), rhs.to_extended())
     }
 }
 
@@ -62,7 +62,7 @@ impl Sub for JubjubAffine {
     type Output = JubjubExtended;
 
     fn sub(self, rhs: JubjubAffine) -> Self::Output {
-        JubjubExtended::from(add_point(self.to_extended(), rhs.neg().to_extended()))
+        add_point(self.to_extended(), rhs.neg().to_extended())
     }
 }
 
@@ -102,7 +102,7 @@ impl Add for JubjubExtended {
     type Output = JubjubExtended;
 
     fn add(self, rhs: JubjubExtended) -> Self::Output {
-        JubjubExtended::from(add_point(self, rhs))
+        add_point(self, rhs)
     }
 }
 
@@ -123,7 +123,7 @@ impl Sub for JubjubExtended {
     type Output = JubjubExtended;
 
     fn sub(self, rhs: JubjubExtended) -> Self::Output {
-        JubjubExtended::from(add_point(self, rhs.neg()))
+        add_point(self, rhs.neg())
     }
 }
 
@@ -178,7 +178,7 @@ impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtended {
     #[inline]
     fn mul(self, rhs: &'b Fp) -> JubjubExtended {
         let mut res = JubjubExtended::ADDITIVE_IDENTITY;
-        let mut acc = self.clone();
+        let mut acc = *self;
         for &naf in rhs.to_nafs().iter() {
             if naf == Naf::Plus {
                 res += acc;
@@ -200,6 +200,7 @@ mod test {
     use crate::{JubjubAffine, JubjubExtended};
 
     #[test]
+    #[allow(clippy::op_ref)]
     fn edwards_operations() {
         let aff1 = JubjubAffine::random(OsRng).to_affine();
         let aff2 = JubjubAffine::random(OsRng).to_affine();

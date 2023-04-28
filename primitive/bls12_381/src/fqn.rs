@@ -124,7 +124,7 @@ impl Fq2 {
             // we're just trying to get the square of an element of the subfield
             // Fp. This is given by x0 * u, since u = sqrt(-1). Since the element
             // x0 = a + bu has b = 0, the solution is therefore au.
-            CtOption::new(Fq2([-x0.0[1], x0.0[0]]), alpha.ct_eq(&(&Fq2::one()).neg()))
+            CtOption::new(Fq2([-x0.0[1], x0.0[0]]), alpha.ct_eq(&Fq2::one().neg()))
                 // Otherwise, the correct solution is (1 + alpha)^((q - 1) // 2) * x0
                 .or_else(|| {
                     CtOption::new(

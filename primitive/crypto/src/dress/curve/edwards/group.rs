@@ -20,8 +20,8 @@ macro_rules! twisted_edwards_affine_group_operation {
                 y: $range::one(),
             };
 
-            fn is_identity(self) -> bool {
-                self == Self::ADDITIVE_IDENTITY
+            fn is_identity(&self) -> bool {
+                self == &Self::ADDITIVE_IDENTITY
             }
 
             fn zero() -> Self {
@@ -75,7 +75,7 @@ macro_rules! twisted_edwards_extend_group_operation {
                 z: $range::one(),
             };
 
-            fn is_identity(self) -> bool {
+            fn is_identity(&self) -> bool {
                 self.x == $range::zero() && self.y == $range::one()
             }
 
