@@ -18,12 +18,100 @@ pub struct G1Projective {
     pub(crate) z: Fq,
 }
 
+impl Add for G1Projective {
+    type Output = Self;
+
+    fn add(self, rhs: G1Projective) -> Self {
+        add_point(self, rhs)
+    }
+}
+
+impl Neg for G1Projective {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            z: self.z,
+        }
+    }
+}
+
+impl Sub for G1Projective {
+    type Output = Self;
+
+    fn sub(self, rhs: G1Projective) -> Self {
+        add_point(self, -rhs)
+    }
+}
+
+impl Mul<Fr> for G1Projective {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self, &rhs)
+    }
+}
+
+impl Mul<G1Projective> for Fr {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: G1Projective) -> Self::Output {
+        scalar_point(rhs, &self)
+    }
+}
+
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct G1Affine {
     pub(crate) x: Fq,
     pub(crate) y: Fq,
     is_infinity: bool,
+}
+
+impl Add for G1Affine {
+    type Output = G1Projective;
+
+    fn add(self, rhs: G1Affine) -> Self::Output {
+        G1Projective::from(add_point(self.to_extended(), rhs.to_extended()))
+    }
+}
+
+impl Neg for G1Affine {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            is_infinity: self.is_infinity,
+        }
+    }
+}
+
+impl Sub for G1Affine {
+    type Output = G1Projective;
+
+    fn sub(self, rhs: G1Affine) -> Self::Output {
+        G1Projective::from(add_point(self.to_extended(), rhs.neg().to_extended()))
+    }
+}
+
+impl Mul<Fr> for G1Affine {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self.to_extended(), &rhs)
+    }
+}
+
+impl Mul<G1Affine> for Fr {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: G1Affine) -> Self::Output {
+        scalar_point(rhs.to_extended(), &self)
+    }
 }
 
 weierstrass_curve_operation!(

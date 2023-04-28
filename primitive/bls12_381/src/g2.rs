@@ -18,12 +18,100 @@ pub struct G2Projective {
     pub(crate) z: Fq2,
 }
 
+impl Add for G2Projective {
+    type Output = Self;
+
+    fn add(self, rhs: G2Projective) -> Self {
+        add_point(self, rhs)
+    }
+}
+
+impl Neg for G2Projective {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            z: self.z,
+        }
+    }
+}
+
+impl Sub for G2Projective {
+    type Output = Self;
+
+    fn sub(self, rhs: G2Projective) -> Self {
+        add_point(self, -rhs)
+    }
+}
+
+impl Mul<Fr> for G2Projective {
+    type Output = G2Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self, &rhs)
+    }
+}
+
+impl Mul<G2Projective> for Fr {
+    type Output = G2Projective;
+
+    fn mul(self, rhs: G2Projective) -> Self::Output {
+        scalar_point(rhs, &self)
+    }
+}
+
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct G2Affine {
     x: Fq2,
     y: Fq2,
     is_infinity: bool,
+}
+
+impl Add for G2Affine {
+    type Output = G2Projective;
+
+    fn add(self, rhs: G2Affine) -> Self::Output {
+        G2Projective::from(add_point(self.to_extended(), rhs.to_extended()))
+    }
+}
+
+impl Neg for G2Affine {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            is_infinity: self.is_infinity,
+        }
+    }
+}
+
+impl Sub for G2Affine {
+    type Output = G2Projective;
+
+    fn sub(self, rhs: G2Affine) -> Self::Output {
+        G2Projective::from(add_point(self.to_extended(), rhs.neg().to_extended()))
+    }
+}
+
+impl Mul<Fr> for G2Affine {
+    type Output = G2Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self.to_extended(), &rhs)
+    }
+}
+
+impl Mul<G2Affine> for Fr {
+    type Output = G2Projective;
+
+    fn mul(self, rhs: G2Affine) -> Self::Output {
+        scalar_point(rhs.to_extended(), &self)
+    }
 }
 
 /// The coefficient for pairing affine format

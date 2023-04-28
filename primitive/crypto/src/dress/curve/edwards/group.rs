@@ -42,49 +42,6 @@ macro_rules! twisted_edwards_affine_group_operation {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
             }
         }
-
-        impl Add for $affine {
-            type Output = $extended;
-
-            fn add(self, rhs: $affine) -> Self::Output {
-                $extended::from(add_point(self.to_extended(), rhs.to_extended()))
-            }
-        }
-
-        impl Neg for $affine {
-            type Output = Self;
-
-            fn neg(self) -> Self {
-                Self {
-                    x: -self.x,
-                    y: self.y,
-                }
-            }
-        }
-
-        impl Sub for $affine {
-            type Output = $extended;
-
-            fn sub(self, rhs: $affine) -> Self::Output {
-                $extended::from(add_point(self.to_extended(), rhs.neg().to_extended()))
-            }
-        }
-
-        impl Mul<$scalar> for $affine {
-            type Output = $extended;
-
-            fn mul(self, rhs: $scalar) -> Self::Output {
-                scalar_point(self.to_extended(), &rhs)
-            }
-        }
-
-        impl Mul<$affine> for $scalar {
-            type Output = $extended;
-
-            fn mul(self, rhs: $affine) -> Self::Output {
-                scalar_point(rhs.to_extended(), &self)
-            }
-        }
     };
 }
 
@@ -143,50 +100,6 @@ macro_rules! twisted_edwards_extend_group_operation {
             }
         }
 
-        impl Add for $extended {
-            type Output = $extended;
-
-            fn add(self, rhs: $extended) -> Self::Output {
-                $extended::from(add_point(self, rhs))
-            }
-        }
-
-        impl Neg for $extended {
-            type Output = Self;
-
-            fn neg(self) -> Self {
-                Self {
-                    x: -self.x,
-                    y: self.y,
-                    t: -self.t,
-                    z: self.z,
-                }
-            }
-        }
-
-        impl Sub for $extended {
-            type Output = $extended;
-
-            fn sub(self, rhs: $extended) -> Self::Output {
-                $extended::from(add_point(self, rhs.neg()))
-            }
-        }
-
-        impl Mul<$scalar> for $extended {
-            type Output = $extended;
-
-            fn mul(self, rhs: $scalar) -> Self::Output {
-                scalar_point(self, &rhs)
-            }
-        }
-
-        impl Mul<$extended> for $scalar {
-            type Output = $extended;
-
-            fn mul(self, rhs: $extended) -> Self::Output {
-                scalar_point(rhs, &self)
-            }
-        }
         impl AddAssign for $extended {
             fn add_assign(&mut self, rhs: $extended) {
                 *self = *self + rhs;

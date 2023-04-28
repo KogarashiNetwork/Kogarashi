@@ -140,6 +140,49 @@ pub mod jubjub_curve {
         y: BlsScalar,
     }
 
+    impl Add for JubjubAffine {
+        type Output = JubjubExtended;
+
+        fn add(self, rhs: JubjubAffine) -> Self::Output {
+            JubjubExtended::from(add_point(self.to_extended(), rhs.to_extended()))
+        }
+    }
+
+    impl Neg for JubjubAffine {
+        type Output = Self;
+
+        fn neg(self) -> Self {
+            Self {
+                x: -self.x,
+                y: self.y,
+            }
+        }
+    }
+
+    impl Sub for JubjubAffine {
+        type Output = JubjubExtended;
+
+        fn sub(self, rhs: JubjubAffine) -> Self::Output {
+            JubjubExtended::from(add_point(self.to_extended(), rhs.neg().to_extended()))
+        }
+    }
+
+    impl Mul<BlsScalar> for JubjubAffine {
+        type Output = JubjubExtended;
+
+        fn mul(self, rhs: BlsScalar) -> Self::Output {
+            scalar_point(self.to_extended(), &rhs)
+        }
+    }
+
+    impl Mul<JubjubAffine> for BlsScalar {
+        type Output = JubjubExtended;
+
+        fn mul(self, rhs: JubjubAffine) -> Self::Output {
+            scalar_point(rhs.to_extended(), &self)
+        }
+    }
+
     #[derive(Clone, Copy, Debug, Encode, Decode)]
     pub struct JubjubExtended {
         x: BlsScalar,
@@ -148,6 +191,50 @@ pub mod jubjub_curve {
         z: BlsScalar,
     }
 
+    impl Add for JubjubExtended {
+        type Output = JubjubExtended;
+
+        fn add(self, rhs: JubjubExtended) -> Self::Output {
+            JubjubExtended::from(add_point(self, rhs))
+        }
+    }
+
+    impl Neg for JubjubExtended {
+        type Output = Self;
+
+        fn neg(self) -> Self {
+            Self {
+                x: -self.x,
+                y: self.y,
+                t: -self.t,
+                z: self.z,
+            }
+        }
+    }
+
+    impl Sub for JubjubExtended {
+        type Output = JubjubExtended;
+
+        fn sub(self, rhs: JubjubExtended) -> Self::Output {
+            JubjubExtended::from(add_point(self, rhs.neg()))
+        }
+    }
+
+    impl Mul<BlsScalar> for JubjubExtended {
+        type Output = JubjubExtended;
+
+        fn mul(self, rhs: BlsScalar) -> Self::Output {
+            scalar_point(self, &rhs)
+        }
+    }
+
+    impl Mul<JubjubExtended> for BlsScalar {
+        type Output = JubjubExtended;
+
+        fn mul(self, rhs: JubjubExtended) -> Self::Output {
+            scalar_point(rhs, &self)
+        }
+    }
     fft_field_operation!(
         BlsScalar,
         BLS_SCALAR_MODULUS,

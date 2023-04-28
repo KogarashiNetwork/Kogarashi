@@ -52,50 +52,6 @@ macro_rules! affine_group_operation {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
             }
         }
-
-        impl Add for $affine {
-            type Output = $projective;
-
-            fn add(self, rhs: $affine) -> Self::Output {
-                $projective::from(add_point(self.to_extended(), rhs.to_extended()))
-            }
-        }
-
-        impl Neg for $affine {
-            type Output = Self;
-
-            fn neg(self) -> Self {
-                Self {
-                    x: self.x,
-                    y: -self.y,
-                    is_infinity: self.is_infinity,
-                }
-            }
-        }
-
-        impl Sub for $affine {
-            type Output = $projective;
-
-            fn sub(self, rhs: $affine) -> Self::Output {
-                $projective::from(add_point(self.to_extended(), rhs.neg().to_extended()))
-            }
-        }
-
-        impl Mul<$scalar> for $affine {
-            type Output = $projective;
-
-            fn mul(self, rhs: $scalar) -> Self::Output {
-                scalar_point(self.to_extended(), &rhs)
-            }
-        }
-
-        impl Mul<$affine> for $scalar {
-            type Output = $projective;
-
-            fn mul(self, rhs: $affine) -> Self::Output {
-                scalar_point(rhs.to_extended(), &self)
-            }
-        }
     };
 }
 
@@ -155,53 +111,9 @@ macro_rules! projective_group_operation {
             }
         }
 
-        impl Add for $projective {
-            type Output = Self;
-
-            fn add(self, rhs: $projective) -> Self {
-                add_point(self, rhs)
-            }
-        }
-
-        impl Neg for $projective {
-            type Output = Self;
-
-            fn neg(self) -> Self {
-                Self {
-                    x: self.x,
-                    y: -self.y,
-                    z: self.z,
-                }
-            }
-        }
-
-        impl Sub for $projective {
-            type Output = Self;
-
-            fn sub(self, rhs: $projective) -> Self {
-                add_point(self, -rhs)
-            }
-        }
-
-        impl Mul<$scalar> for $projective {
-            type Output = $projective;
-
-            fn mul(self, rhs: $scalar) -> Self::Output {
-                scalar_point(self, &rhs)
-            }
-        }
-
-        impl Mul<$projective> for $scalar {
-            type Output = $projective;
-
-            fn mul(self, rhs: $projective) -> Self::Output {
-                scalar_point(rhs, &self)
-            }
-        }
-
         impl AddAssign for $projective {
             fn add_assign(&mut self, rhs: $projective) {
-                *self = (*self + rhs).into();
+                *self = *self + rhs;
             }
         }
 
