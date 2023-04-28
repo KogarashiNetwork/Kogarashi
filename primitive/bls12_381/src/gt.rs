@@ -60,7 +60,7 @@ impl Mul<Fr> for Gt {
 
     fn mul(self, other: Fr) -> Self::Output {
         let mut res = Self::Output::ADDITIVE_IDENTITY;
-        let mut acc = self.clone();
+        let mut acc = self;
         let bits: Vec<u8> = other
             .to_bits()
             .into_iter()
@@ -68,7 +68,7 @@ impl Mul<Fr> for Gt {
             .collect();
         for &bit in bits.iter().rev() {
             if bit == 1 {
-                res += acc.clone();
+                res += acc;
             }
             acc = acc.double();
         }

@@ -18,12 +18,100 @@ pub struct G1Projective {
     pub(crate) z: Fq,
 }
 
+impl Add for G1Projective {
+    type Output = Self;
+
+    fn add(self, rhs: G1Projective) -> Self {
+        add_point(self, rhs)
+    }
+}
+
+impl Neg for G1Projective {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            z: self.z,
+        }
+    }
+}
+
+impl Sub for G1Projective {
+    type Output = Self;
+
+    fn sub(self, rhs: G1Projective) -> Self {
+        add_point(self, -rhs)
+    }
+}
+
+impl Mul<Fr> for G1Projective {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self, &rhs)
+    }
+}
+
+impl Mul<G1Projective> for Fr {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: G1Projective) -> Self::Output {
+        scalar_point(rhs, &self)
+    }
+}
+
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct G1Affine {
     pub(crate) x: Fq,
     pub(crate) y: Fq,
     is_infinity: bool,
+}
+
+impl Add for G1Affine {
+    type Output = G1Projective;
+
+    fn add(self, rhs: G1Affine) -> Self::Output {
+        add_point(self.to_extended(), rhs.to_extended())
+    }
+}
+
+impl Neg for G1Affine {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            is_infinity: self.is_infinity,
+        }
+    }
+}
+
+impl Sub for G1Affine {
+    type Output = G1Projective;
+
+    fn sub(self, rhs: G1Affine) -> Self::Output {
+        add_point(self.to_extended(), rhs.neg().to_extended())
+    }
+}
+
+impl Mul<Fr> for G1Affine {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self.to_extended(), &rhs)
+    }
+}
+
+impl Mul<G1Affine> for Fr {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: G1Affine) -> Self::Output {
+        scalar_point(rhs.to_extended(), &self)
+    }
 }
 
 weierstrass_curve_operation!(
@@ -63,7 +151,7 @@ fn endomorphism(p: &G1Affine) -> G1Affine {
     // Endomorphism of the points on the curve.
     // endomorphism_p(x,y) = (BETA * x, y)
     // where BETA is a non-trivial cubic root of unity in Fq.
-    let mut res = p.clone();
+    let mut res = *p;
     res.x *= BETA;
     res
 }
@@ -71,7 +159,7 @@ fn endomorphism(p: &G1Affine) -> G1Affine {
 impl G1Affine {
     pub const RAW_SIZE: usize = 97;
 
-    pub unsafe fn from_slice_unchecked(bytes: &[u8]) -> Self {
+    pub fn from_slice_unchecked(bytes: &[u8]) -> Self {
         let mut x = [0u64; 6];
         let mut y = [0u64; 6];
         let mut z = [0u8; 8];
@@ -351,6 +439,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::op_ref)]
     fn bls_operations() {
         let aff1 = G1Affine::random(OsRng).to_affine();
         let aff2 = G1Affine::random(OsRng).to_affine();
@@ -362,6 +451,15 @@ mod tests {
         let _ = &aff1 + &aff2;
         let _ = &aff1 + aff2;
         let _ = aff1 + &aff2;
+
+        let _ = aff1 + ext1;
+        let _ = &aff1 + &ext1;
+        let _ = &aff1 + ext1;
+        let _ = aff1 + &ext1;
+        let _ = ext1 + aff1;
+        let _ = &ext1 + &aff1;
+        let _ = &ext1 + aff1;
+        let _ = ext1 + &aff1;
 
         let _ = ext1 + ext2;
         let _ = &ext1 + &ext2;
@@ -376,6 +474,15 @@ mod tests {
         let _ = &aff1 - &aff2;
         let _ = &aff1 - aff2;
         let _ = aff1 - &aff2;
+
+        let _ = aff1 - ext1;
+        let _ = &aff1 - &ext1;
+        let _ = &aff1 - ext1;
+        let _ = aff1 - &ext1;
+        let _ = ext1 - aff1;
+        let _ = &ext1 - &aff1;
+        let _ = &ext1 - aff1;
+        let _ = ext1 - &aff1;
 
         let _ = ext1 - ext2;
         let _ = &ext1 - &ext2;
@@ -403,5 +510,7 @@ mod tests {
         let _ = &scalar * &ext1;
         let _ = scalar * &ext1;
         let _ = &scalar * ext1;
+        ext1 *= scalar;
+        ext1 *= &scalar;
     }
 }

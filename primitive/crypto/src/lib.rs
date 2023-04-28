@@ -15,6 +15,8 @@
 
 #![doc = include_str!("../README.md")]
 #![cfg_attr(not(featusre = "std"), no_std)]
+#![allow(clippy::suspicious_arithmetic_impl)]
+#![allow(clippy::suspicious_op_assign_impl)]
 
 pub mod arithmetic;
 pub mod behave;

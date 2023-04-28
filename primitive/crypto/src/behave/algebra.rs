@@ -45,12 +45,18 @@ pub trait CurveGroup:
     PartialEq
     + Eq
     + Add<Self, Output = Self::Extended>
-    + AddAssign
-    + Neg<Output = Self>
+    + for<'a> Add<&'a Self, Output = Self::Extended>
+    + for<'b> Add<&'b Self, Output = Self::Extended>
+    + for<'a, 'b> Add<&'b Self, Output = Self::Extended>
     + Sub<Self, Output = Self::Extended>
-    + SubAssign
+    + for<'a> Sub<&'a Self, Output = Self::Extended>
+    + for<'b> Sub<&'b Self, Output = Self::Extended>
+    + for<'a, 'b> Sub<&'b Self, Output = Self::Extended>
+    + Neg<Output = Self>
     + Mul<Self::Scalar, Output = Self::Extended>
-    + MulAssign<Self::Scalar>
+    + for<'a> Mul<&'a Self::Scalar, Output = Self::Extended>
+    + for<'b> Mul<&'b Self::Scalar, Output = Self::Extended>
+    + for<'a, 'b> Mul<&'b Self::Scalar, Output = Self::Extended>
     + Sized
 {
     // scalar domain
@@ -68,7 +74,7 @@ pub trait CurveGroup:
     fn zero() -> Self;
 
     // check that point is on curve
-    fn is_identity(self) -> bool;
+    fn is_identity(&self) -> bool;
 
     // get inverse of group element
     fn invert(self) -> Option<Self>

@@ -39,6 +39,49 @@ pub struct JubjubAffine {
     y: Fr,
 }
 
+impl Add for JubjubAffine {
+    type Output = JubjubExtended;
+
+    fn add(self, rhs: JubjubAffine) -> Self::Output {
+        add_point(self.to_extended(), rhs.to_extended())
+    }
+}
+
+impl Neg for JubjubAffine {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: -self.x,
+            y: self.y,
+        }
+    }
+}
+
+impl Sub for JubjubAffine {
+    type Output = JubjubExtended;
+
+    fn sub(self, rhs: JubjubAffine) -> Self::Output {
+        add_point(self.to_extended(), rhs.neg().to_extended())
+    }
+}
+
+impl Mul<Fr> for JubjubAffine {
+    type Output = JubjubExtended;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self.to_extended(), &rhs)
+    }
+}
+
+impl Mul<JubjubAffine> for Fr {
+    type Output = JubjubExtended;
+
+    fn mul(self, rhs: JubjubAffine) -> Self::Output {
+        scalar_point(rhs.to_extended(), &self)
+    }
+}
+
 impl JubjubAffine {
     /// Constructs an JubJubAffine given `x` and `y` without checking
     /// that the point is on the curve.
@@ -53,6 +96,51 @@ pub struct JubjubExtended {
     y: Fr,
     t: Fr,
     z: Fr,
+}
+
+impl Add for JubjubExtended {
+    type Output = JubjubExtended;
+
+    fn add(self, rhs: JubjubExtended) -> Self::Output {
+        add_point(self, rhs)
+    }
+}
+
+impl Neg for JubjubExtended {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: -self.x,
+            y: self.y,
+            t: -self.t,
+            z: self.z,
+        }
+    }
+}
+
+impl Sub for JubjubExtended {
+    type Output = JubjubExtended;
+
+    fn sub(self, rhs: JubjubExtended) -> Self::Output {
+        add_point(self, rhs.neg())
+    }
+}
+
+impl Mul<Fr> for JubjubExtended {
+    type Output = JubjubExtended;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self, &rhs)
+    }
+}
+
+impl Mul<JubjubExtended> for Fr {
+    type Output = JubjubExtended;
+
+    fn mul(self, rhs: JubjubExtended) -> Self::Output {
+        scalar_point(rhs, &self)
+    }
 }
 
 twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtended, X, Y, T);
@@ -90,7 +178,7 @@ impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtended {
     #[inline]
     fn mul(self, rhs: &'b Fp) -> JubjubExtended {
         let mut res = JubjubExtended::ADDITIVE_IDENTITY;
-        let mut acc = self.clone();
+        let mut acc = *self;
         for &naf in rhs.to_nafs().iter() {
             if naf == Naf::Plus {
                 res += acc;
@@ -112,6 +200,7 @@ mod test {
     use crate::{JubjubAffine, JubjubExtended};
 
     #[test]
+    #[allow(clippy::op_ref)]
     fn edwards_operations() {
         let aff1 = JubjubAffine::random(OsRng).to_affine();
         let aff2 = JubjubAffine::random(OsRng).to_affine();
@@ -123,6 +212,15 @@ mod test {
         let _ = &aff1 + &aff2;
         let _ = &aff1 + aff2;
         let _ = aff1 + &aff2;
+
+        let _ = aff1 + ext1;
+        let _ = &aff1 + &ext1;
+        let _ = &aff1 + ext1;
+        let _ = aff1 + &ext1;
+        let _ = ext1 + aff1;
+        let _ = &ext1 + &aff1;
+        let _ = &ext1 + aff1;
+        let _ = ext1 + &aff1;
 
         let _ = ext1 + ext2;
         let _ = &ext1 + &ext2;
@@ -137,6 +235,15 @@ mod test {
         let _ = &aff1 - &aff2;
         let _ = &aff1 - aff2;
         let _ = aff1 - &aff2;
+
+        let _ = aff1 - ext1;
+        let _ = &aff1 - &ext1;
+        let _ = &aff1 - ext1;
+        let _ = aff1 - &ext1;
+        let _ = ext1 - aff1;
+        let _ = &ext1 - &aff1;
+        let _ = &ext1 - aff1;
+        let _ = ext1 - &aff1;
 
         let _ = ext1 - ext2;
         let _ = &ext1 - &ext2;
@@ -164,5 +271,7 @@ mod test {
         let _ = &scalar * &ext1;
         let _ = scalar * &ext1;
         let _ = &scalar * ext1;
+        ext1 *= scalar;
+        ext1 *= &scalar;
     }
 }

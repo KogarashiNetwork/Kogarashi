@@ -2,7 +2,7 @@ use crate::{
     behave::{Basic, ParityCmp, PrimeField},
     common::CurveGroup,
 };
-use core::ops::{Add, AddAssign, Sub, SubAssign};
+use core::ops::{Add, AddAssign, MulAssign, Sub, SubAssign};
 
 pub trait Curve: CurveGroup + ParityCmp + Basic {
     // range field of curve
@@ -33,10 +33,22 @@ pub trait Affine: Curve {
 /// projective, jacobian and so on
 pub trait CurveExtended:
     Curve
+    + AddAssign
     + AddAssign<Self::Affine>
+    + for<'a> AddAssign<&'a Self::Affine>
     + Add<Self::Affine, Output = Self>
+    + for<'a> Add<&'a Self::Affine, Output = Self>
+    + for<'b> Add<&'b Self::Affine, Output = Self>
+    + for<'a, 'b> Add<&'b Self::Affine, Output = Self>
+    + SubAssign
     + SubAssign<Self::Affine>
+    + for<'a> SubAssign<&'a Self::Affine>
     + Sub<Self::Affine, Output = Self>
+    + for<'a> Sub<&'a Self::Affine, Output = Self>
+    + for<'b> Sub<&'b Self::Affine, Output = Self>
+    + for<'a, 'b> Sub<&'b Self::Affine, Output = Self>
+    + MulAssign<Self::Scalar>
+    + for<'a> MulAssign<&'a Self::Scalar>
     + Into<Self::Affine>
     + From<Self::Affine>
 {
