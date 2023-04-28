@@ -228,6 +228,12 @@ macro_rules! projective_group_operation {
                 *self = *self * rhs;
             }
         }
+
+        impl<'b> MulAssign<&'b $scalar> for $projective {
+            fn mul_assign(&mut self, rhs: &'b $scalar) {
+                *self *= *rhs;
+            }
+        }
     };
 }
 

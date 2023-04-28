@@ -216,6 +216,12 @@ macro_rules! twisted_edwards_extend_group_operation {
                 *self = *self * rhs;
             }
         }
+
+        impl<'b> MulAssign<&'b $scalar> for $extended {
+            fn mul_assign(&mut self, rhs: &'b $scalar) {
+                *self *= *rhs;
+            }
+        }
     };
 }
 

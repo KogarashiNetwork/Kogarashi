@@ -124,6 +124,15 @@ mod test {
         let _ = &aff1 + aff2;
         let _ = aff1 + &aff2;
 
+        let _ = aff1 + ext1;
+        let _ = &aff1 + &ext1;
+        let _ = &aff1 + ext1;
+        let _ = aff1 + &ext1;
+        let _ = ext1 + aff1;
+        let _ = &ext1 + &aff1;
+        let _ = &ext1 + aff1;
+        let _ = ext1 + &aff1;
+
         let _ = ext1 + ext2;
         let _ = &ext1 + &ext2;
         let _ = &ext1 + ext2;
@@ -137,6 +146,15 @@ mod test {
         let _ = &aff1 - &aff2;
         let _ = &aff1 - aff2;
         let _ = aff1 - &aff2;
+
+        let _ = aff1 - ext1;
+        let _ = &aff1 - &ext1;
+        let _ = &aff1 - ext1;
+        let _ = aff1 - &ext1;
+        let _ = ext1 - aff1;
+        let _ = &ext1 - &aff1;
+        let _ = &ext1 - aff1;
+        let _ = ext1 - &aff1;
 
         let _ = ext1 - ext2;
         let _ = &ext1 - &ext2;
@@ -164,5 +182,7 @@ mod test {
         let _ = &scalar * &ext1;
         let _ = scalar * &ext1;
         let _ = &scalar * ext1;
+        ext1 *= scalar;
+        ext1 *= &scalar;
     }
 }
