@@ -17,11 +17,23 @@ jobs:
       - name: Update submodules
         id: update
         run: git submodule update --remote --recursive
-      - name: Set up Rust
-        uses: ATiltedTree/setup-rust@v1
+      - uses: actions-rs/toolchain@v1
         with:
-          rust-version: nightly
-      - name: Build and test with coverage
-        run: |
-          cargo test --release --workspace
-          grcov ./target/debug/ -s . -t lcov --llvm --branch --ignore-not-existing -o lcov.info
+          toolchain: nightly-2022-11-14
+
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --all-features --workspace --no-fail-fast
+        env:
+          CARGO_INCREMENTAL: '0'
+          RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
+          RUSTDOCFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
+      - uses: actions-rs/grcov@v0.1
+        with:
+          branch: true
+          llvm: true
+          ignore-not-existing: true
+          output-type: lcov
+          output-path: ./lcov.info
