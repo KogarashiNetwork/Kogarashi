@@ -1,0 +1,22 @@
+name: Code Climate Test Coverage
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - test-coverage
+
+jobs:
+  codeclimate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Rust
+        uses: actions/setup-rust@v1
+        with:
+          rust-version: nightly
+      - name: Build and test with coverage
+        run: |
+          cargo test --release --workspace
+          grcov ./target/debug/ -s . -t lcov --llvm --branch --ignore-not-existing -o lcov.info
