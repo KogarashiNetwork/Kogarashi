@@ -4,25 +4,6 @@ on:
     branches: [ master, develop ]
 
 jobs:
-  test:
-    if: github.event.pull_request.draft == false
-    name: Unit Test
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Update submodules
-        id: update
-        run: git submodule update --remote --recursive
-      - uses: actions-rs/toolchain@v1
-      - name: Test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --release --all --all-features
-
   format:
     if: github.event.pull_request.draft == false
     name: Code Format Check
@@ -75,4 +56,4 @@ jobs:
         - uses: actions-rs/cargo@v1
           with:
             command: clippy
-            args: --all --all-features
+            args: --workspace --all-features

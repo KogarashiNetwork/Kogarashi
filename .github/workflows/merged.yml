@@ -4,23 +4,6 @@ on:
     branches: [ master ]
 
 jobs:
-  coverage:
-    name: Coverage
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Update submodules
-        id: update
-        run: git submodule update --remote --recursive
-      - uses: actions-rs/toolchain@v1
-      - run: cargo install cargo-llvm-cov
-      - uses: actions-rs/cargo@v1
-        with:
-          command: llvm-cov
-          args: --release --all --all-features
-
   bench:
     name: Benchmark
     runs-on: ubuntu-latest
