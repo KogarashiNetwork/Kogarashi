@@ -24,20 +24,17 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all-features --release --workspace --no-fail-fast
+          args: --all-features --workspace --no-fail-fast
         env:
           CARGO_INCREMENTAL: '0'
           RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
           RUSTDOCFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
-      - uses: actions-rs/grcov@v0.1
+      - id: coverage
+        uses: actions-rs/grcov@v0.1
         with:
-          branch: true
-          llvm: true
-          ignore-not-existing: true
-          output-type: lcov
-          output-path: ./lcov.info
+          config: configs/grcov.yml
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: lcov.info
+          files: ${{ steps.coverage.outputs.report }}
