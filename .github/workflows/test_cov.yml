@@ -1,11 +1,11 @@
-name: Code Climate Test Coverage
+name: Test Coverage
 
 on:
   pull_request:
+    branches: [ master, develop ]
   push:
     branches:
-      - main
-      - test-coverage
+      - master
 
 jobs:
   codeclimate:
@@ -21,10 +21,11 @@ jobs:
         with:
           toolchain: nightly-2022-11-14
           override: true
+      - name: Test
       - uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all-features --workspace --no-fail-fast
+          args: --release --all-features --workspace --no-fail-fast
         env:
           CARGO_INCREMENTAL: '0'
           RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'

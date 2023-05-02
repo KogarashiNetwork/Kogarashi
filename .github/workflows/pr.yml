@@ -17,11 +17,6 @@ jobs:
         id: update
         run: git submodule update --remote --recursive
       - uses: actions-rs/toolchain@v1
-      - name: Test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --release --all --all-features
 
   format:
     if: github.event.pull_request.draft == false
@@ -75,4 +70,4 @@ jobs:
         - uses: actions-rs/cargo@v1
           with:
             command: clippy
-            args: --all --all-features
+            args: --workspace --all-features
