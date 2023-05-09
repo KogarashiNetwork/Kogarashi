@@ -22,7 +22,7 @@ jobs:
         uses: actions-rs/tarpaulin@v0.1
         with:
           version: '0.22.0'
-          args: '--release --all-features --no-fail-fast'
+          args: '--release --all-features --workspace --no-fail-fast'
           out-type: 'Lcov'
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
