@@ -31,6 +31,7 @@ jobs:
         env:
           RUSTFLAGS: "-Cdebuginfo=2 --cfg=tarpaulin -Cdebug-assertions=off -Cinstrument-coverage -Clink-dead-code"
           TARPAULIN_TRACE: llvm
+          RUST_LOG: "cargo_tarpaulin::process_handling=debug"
         uses: actions-rs/cargo@v1
         with:
           command: tarpaulin
