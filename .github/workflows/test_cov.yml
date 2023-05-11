@@ -35,7 +35,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: tarpaulin
-          args: '--release --all-features --workspace --no-fail-fast --out Lcov'
+          args: '--release --all-features --workspace --no-fail-fast --config configs/tarpaulin.toml --out Lcov'
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
