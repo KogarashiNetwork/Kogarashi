@@ -18,24 +18,6 @@ jobs:
         id: update
         run: git submodule update --remote --recursive
       - uses: actions-rs/toolchain@v1
-      # - uses: actions-rs/cargo@v1
-      #   with:
-      #     command: install
-      #     args: cargo-tarpaulin
-      # - name: Check version
-      #   uses: actions-rs/cargo@v1
-      #   with:
-      #     command: tarpaulin
-      #     args: '--version'
-      # - name: Run cargo-tarpaulin
-      #   env:
-      #     RUSTFLAGS: "-Cdebuginfo=2 --cfg=tarpaulin -Cdebug-assertions=off -Cinstrument-coverage -Clink-dead-code"
-      #     TARPAULIN_TRACE: llvm
-      #     RUST_LOG: "cargo_tarpaulin::process_handling=debug"
-      #   uses: actions-rs/cargo@v1
-      #   with:
-      #     command: tarpaulin
-      #     args: '--release --all-features --workspace --no-fail-fast --engine Llvm --out Lcov'
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         with:
