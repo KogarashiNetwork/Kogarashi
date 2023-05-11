@@ -1,4 +1,0 @@
-[cov]
-engine = "Llvm"
-follow-exec = true
-skip-clean = true
