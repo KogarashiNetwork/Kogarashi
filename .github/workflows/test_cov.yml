@@ -18,24 +18,13 @@ jobs:
         id: update
         run: git submodule update --remote --recursive
       - uses: actions-rs/toolchain@v1
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
         with:
-          toolchain: nightly-2022-11-14
-          override: true
-      - name: Test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --release --all-features --workspace --no-fail-fast
-        env:
-          CARGO_INCREMENTAL: '0'
-          RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
-          RUSTDOCFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
-      - id: coverage
-        uses: actions-rs/grcov@v0.1
-        with:
-          config: configs/grcov.yml
+          version: '0.22.0'
+          args: '--release --all-features --workspace --no-fail-fast --engine Llvm --out Lcov'
+          out-type: 'Lcov'
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{ steps.coverage.outputs.report }}

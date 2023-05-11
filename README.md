@@ -1,5 +1,5 @@
-# Kogarashi Network
-[![Merged Check](https://github.com/zero-network/zero/actions/workflows/merged.yml/badge.svg)](https://github.com/zero-network/zero/actions/workflows/merged.yml) [![Repository](https://img.shields.io/badge/github-zero-blueviolet?logo=github)](https://github.com/zero-network/zero) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE) [![codecov](https://codecov.io/gh/KogarashiNetwork/Kogarashi/branch/master/graph/badge.svg?token=QDWPAPMKLT)](https://codecov.io/gh/KogarashiNetwork/Kogarashi)
+# Kogarashi Network [![Discord](https://dcbadge.vercel.app/api/server/BYJuZB9e?style=social&compact=true)](https://discord.gg/BYJuZB9e)
+[![Merged Check](https://github.com/KogarashiNetwork/Kogarashi/actions/workflows/merged.yml/badge.svg)](https://github.com/KogarashiNetwork/Kogarashi/actions/workflows/merged.yml) [![crates.io badge](https://img.shields.io/crates/v/zero-network.svg)](https://crates.io/crates/zero-network) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE) [![codecov](https://codecov.io/gh/KogarashiNetwork/Kogarashi/branch/master/graph/badge.svg?token=QDWPAPMKLT)](https://codecov.io/gh/KogarashiNetwork/Kogarashi) [![dependency status](https://deps.rs/crate/zero-network/0.1.10/status.svg)](https://deps.rs/crate/zero-network/0.1.10) 
 
 <div align="center">
     <img alt="image" src="https://user-images.githubusercontent.com/39494661/231044282-e3f6f4a1-347c-4eb9-b5ca-04c5da4b3d08.png">
