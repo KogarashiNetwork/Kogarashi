@@ -17,15 +17,11 @@ pub(crate) mod builder;
 pub(crate) mod circuit;
 pub(crate) mod compiler;
 pub(crate) mod polynomial;
-pub(crate) mod prover;
-pub(crate) mod verifier;
 
 pub use builder::Builder;
 pub use circuit::Circuit;
 pub use compiler::Compiler;
 pub use polynomial::Polynomial;
-pub use prover::Prover;
-pub use verifier::Verifier;
 
 pub trait Composer<P: Pairing>: Sized + Index<Witness, Output = P::ScalarField> {
     /// Zero representation inside the constraint system.

@@ -40,10 +40,10 @@ impl Compiler {
         P: Pairing,
     {
         let max_size = (keypair.commit_key().len() - 1) >> 1;
-        let mut prover = Builder::initialized(max_size);
+        let mut builder = Builder::initialized(max_size);
 
-        circuit.circuit(&mut prover)?;
+        circuit.circuit(&mut builder)?;
 
-        Ok(prover)
+        Ok(builder)
     }
 }
