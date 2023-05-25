@@ -52,7 +52,8 @@ members = [
     "primitive/plonk",
     "pallets/confidential_transfer",
     "pallets/encrypted_balance",
-    "pallets/plonk"
+    "pallets/plonk",
+    "primitive/r1cs"
 ]
 
 [profile.release]
