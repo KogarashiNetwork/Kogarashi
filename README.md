@@ -1,4 +1,4 @@
-# Kogarashi Network [![Discord](https://dcbadge.vercel.app/api/server/BYJuZB9e?style=social&compact=true)](https://discord.gg/BYJuZB9e)
+# Kogarashi Network [![Discord](https://dcbadge.vercel.app/api/server/BYJuZB9e?style=social&compact=true)](https://discord.gg/g3q7tsHKTd)
 [![Merged Check](https://github.com/KogarashiNetwork/Kogarashi/actions/workflows/merged.yml/badge.svg)](https://github.com/KogarashiNetwork/Kogarashi/actions/workflows/merged.yml) [![crates.io badge](https://img.shields.io/crates/v/zero-network.svg)](https://crates.io/crates/zero-network) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE) [![codecov](https://codecov.io/gh/KogarashiNetwork/Kogarashi/branch/master/graph/badge.svg?token=QDWPAPMKLT)](https://codecov.io/gh/KogarashiNetwork/Kogarashi) [![dependency status](https://deps.rs/crate/zero-network/0.1.10/status.svg)](https://deps.rs/crate/zero-network/0.1.10) 
 
 <div align="center">
