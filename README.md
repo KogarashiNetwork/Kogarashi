@@ -1,8 +1,8 @@
-# Kogarashi Network [![Discord](https://dcbadge.vercel.app/api/server/BYJuZB9e?style=social&compact=true)](https://discord.gg/g3q7tsHKTd)
+# Kogarashi Network [![Discord](https://dcbadge.vercel.app/api/server/g3q7tsHKTd?style=social&compact=true)](https://discord.gg/g3q7tsHKTd)
 [![Merged Check](https://github.com/KogarashiNetwork/Kogarashi/actions/workflows/merged.yml/badge.svg)](https://github.com/KogarashiNetwork/Kogarashi/actions/workflows/merged.yml) [![crates.io badge](https://img.shields.io/crates/v/zero-network.svg)](https://crates.io/crates/zero-network) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE) [![codecov](https://codecov.io/gh/KogarashiNetwork/Kogarashi/branch/master/graph/badge.svg?token=QDWPAPMKLT)](https://codecov.io/gh/KogarashiNetwork/Kogarashi) [![dependency status](https://deps.rs/crate/zero-network/0.1.10/status.svg)](https://deps.rs/crate/zero-network/0.1.10) 
 
 <div align="center">
-    <img alt="image" src="https://user-images.githubusercontent.com/39494661/231044282-e3f6f4a1-347c-4eb9-b5ca-04c5da4b3d08.png">
+    <img alt="image" src="https://github.com/KogarashiNetwork/tls_notary/assets/39494661/dafe9630-78bd-4a5b-a15c-d15f5a83cb18">
 </div>
 
 The `Kogarashi Network` is a public blockchain capable of privacy transfers and smart contracts. These functionalities rely on only the **cryptographic hardness assumption** instead `L2 technologies`, `TEE` and `centralized security assumption`. All public blockchains information as in users balances are literally public and the privacy is a missing piece of blockchain. `Kogarashi Network` hides all transactions information by cryptographic scheme mainly **ElGamal Encryption** and **Plonk**. The cryptographic schemes are following.
