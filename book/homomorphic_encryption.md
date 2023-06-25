@@ -5,7 +5,7 @@ In previous two sections, we enable to check whether `computation` was done corr
 - [QAP](3_1_qap.md)
 $$ L(x) * R(x) - O(x) = Z(x) * T(x) $$
 
-- [Polynomial Commitment](3_2_polynomial_commitment.md)
+- [Polynomial Commitment](polynomial_commitment.md)
 $$ L(x) + R(x) * X^{d+1} + O(x) * X^{2d+1} = F(x) $$
 $$ F(x) = k_0 + k_1X + k_2X^2 + ... + k_{3d}X^{3d} $$
 $$ (\acute a_0,...,\acute a_{3d}, \acute b_0,...,\acute b_{3d}) = (a_0 * k_0,...,a_{3d} * k_{3d}, b_0 * k_0,...,b_{3d} * k_{3d}) $$

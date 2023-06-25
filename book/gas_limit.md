@@ -16,4 +16,4 @@ When we verify the zero knowledge proof, the verify costs depend on efficiency o
 
 ## Zero Knowledge Friendly
 
-The data structure is the trade off between security and workload. We use the account base data structure because the gas limit is the main bottleneck. We describe the solutions for the security problems when we use the `account base` data structure in [Attack Protection](1_6_attack_protection.md) section. We are going to support Wasm because it's high performance and we can optimize the workload on blockchain. We don't have a plan to support EVM now so our blockchain doesn't have compatible with Ethereum contracts.
+The data structure is the trade off between security and workload. We use the account base data structure because the gas limit is the main bottleneck. We are going to support Wasm because it's high performance and we can optimize the workload on blockchain. We don't have a plan to support EVM now so our blockchain doesn't have compatible with Ethereum contracts.

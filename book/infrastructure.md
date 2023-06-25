@@ -8,16 +8,16 @@ To achieve general purpose privacy preserving transactions, there are mainly fiv
 
 The introduction contents are following.
 
-1. [What is Privacy](3_1_what_is_privacy.md)
-2. [Hide Transfer Amount](3_2_hide_transfer_amount.md)
-3. [Gas Limit](3_3_gas_limit.md)
-4. [Zero Knowledge Scheme](3_4_zero_knowledge_scheme.md)
-5. [Transaction Constraints](3_5_transaction_constraints.md)
+1. [What is Privacy](what_is_privacy.md)
+2. [Hide Transfer Amount](hide_transfer_amount.md)
+3. [Gas Limit](gas_limit.md)
+4. [Zero Knowledge Scheme](zero_knowledge_scheme.md)
+5. [Transaction Constraints](transaction_constraints.md)
 
-**What is Privacy**: We define what privacy is before we discuss the protocol.  
-**Hide Transfer Amount**: We describe how to hide the transaction values.  
-**Gas Limit**: We describe how to save the workload avoid to exceed the gas limit.  
-**Zero Knowledge Scheme**: We compare the zero knowledge scheme and describe which is suitable for privacy preserving transactions.  
-**Transaction Constraints**: We describe how user generates the transaction proof.
+- **What is Privacy**: We define what privacy is before we discuss the protocol.
+- **Hide Transfer Amount**: We describe how to hide the transaction values.
+- **Gas Limit**: We describe how to save the workload avoid to exceed the gas limit.
+- **Zero Knowledge Scheme**: We compare the zero knowledge scheme and describe which is suitable for privacy preserving transactions.
+- **Transaction Constraints**: We describe how user generates the transaction proof.
 
 These sections are work in progress and we are going to add the experiment result.

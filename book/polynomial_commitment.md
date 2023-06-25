@@ -1,6 +1,6 @@
 # Polynomial Commitment
 
-In previous [section](3_1_qap.md), we enable to check whether `computation` was done correctly by the knowledge of polynomial which can be devided by minimal polynomial `Z(x)` as following.
+In previous [section](qap.md), we enable to check whether `computation` was done correctly by the knowledge of polynomial which can be devided by minimal polynomial `Z(x)` as following.
 
 $$ L(x) * R(x) - O(x) = Z(x) * T(x) $$
 

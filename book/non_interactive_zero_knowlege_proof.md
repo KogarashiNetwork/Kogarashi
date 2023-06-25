@@ -10,14 +10,14 @@ The `SNARKs` converts the computation problems into the polynomial equations. We
 
 The `SNARKs` has three steps.
 
-1. [QAP](4_3_1_qap.md)
+1. [QAP](qap.md)
 
 Converting computation which we want to prove without revealing additional information into polynomial equations. In [`Pinocchio Protocol`](https://eprint.iacr.org/2013/279.pdf), we need to generate polynonial equations for each computation. The polynomial equations are decided for corresponding computation.
 
-2. [Polynomail Commitment](4_3_2_polynomial_commitment.md)
+2. [Polynomail Commitment](polynomial_commitment.md)
 
 Hiding the secret as polynomial coefficients, opening with evaluating that polynomials at point, and we can prove the computation was done correctly.
 
-3. [Homomorphic Encryption](4_3_3_homomorphic_encryption.md)
+3. [Homomorphic Encryption](homomorphic_encryption.md)
 
 The polynomial coefficients are encrypted to keep the secret so we need perform evaluation with remaining encrypted. The `Homomorphic Encryption` can perform the multiple time addition and one time multiplication for encrypted number using elliptic curve and pairing.

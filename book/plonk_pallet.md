@@ -218,4 +218,4 @@ fn main() {
 }
 
 ```
-With above tests, we can confirm that your pallet is coupling with `plonk-pallet` and these functions work correctly. You can check the `plonk-pallet` example [here](https://github.com/KogarashiNetwork/Kogarashi/pallet_plonk.rs). Happy hacking!
+With above tests, we can confirm that your pallet is coupling with `plonk-pallet` and these functions work correctly. You can check the `plonk-pallet` example [here](https://github.com/KogarashiNetwork/Kogarashi/blob/master/pallets/plonk/src/tests.rs). Happy hacking!

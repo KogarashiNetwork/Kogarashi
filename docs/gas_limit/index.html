@@ -796,7 +796,7 @@
 <h2 id="evm-vs-wasm">EVM vs Wasm</h2>
 <p>When we verify the zero knowledge proof, the verify costs depend on efficiency of VM environment. If we perform the verify calculation efficiency, we would save the gas cost. When the Ethereum was launched, it's not designed for perform the zero knowledge functions so we have limitation of optimization once the blockchain is deployed. The Wasm is more efficient and we can customize and create new bytecodes. We have a lot of ways to optimize.</p>
 <h2 id="zero-knowledge-friendly">Zero Knowledge Friendly</h2>
-<p>The data structure is the trade off between security and workload. We use the account base data structure because the gas limit is the main bottleneck. We describe the solutions for the security problems when we use the <code>account base</code> data structure in <a href="1_6_attack_protection.md">Attack Protection</a> section. We are going to support Wasm because it's high performance and we can optimize the workload on blockchain. We don't have a plan to support EVM now so our blockchain doesn't have compatible with Ethereum contracts.</p>
+<p>The data structure is the trade off between security and workload. We use the account base data structure because the gas limit is the main bottleneck. We are going to support Wasm because it's high performance and we can optimize the workload on blockchain. We don't have a plan to support EVM now so our blockchain doesn't have compatible with Ethereum contracts.</p>
 
 
 

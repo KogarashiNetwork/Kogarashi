@@ -2,8 +2,7 @@
 
 In this section, we describe the concrete constraints for the transactions.
 
-- [Confidential Transfer](./2_1_confidential_transfer.md)
-- [Confidential Smart Contract](./2_2_confidential_smart_contract.md)
+- [Confidential Transfer](./confidential_transfer_constraints.md)
 
 ## Abstract
 

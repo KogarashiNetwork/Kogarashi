@@ -4,9 +4,9 @@ In this section, we describe how we hide the transfer amount.
 
 ## Homomorphic Encryption vs Commitment
 
-We have two options to hide the transfer amount homomorphic encryption and commitment. The homomorphic encryption allows us to calculate the encrypted number. To combine the homomorphic encryption and zero knowledge proof, we can calculate the encrypted number without decrypting and check whether the calculation was done correctly by zero knowledge proof. And the other option is commitment. The commitment uses the one-way function for example hash function. It hides the original value. The user provides the part of original value and check whether original value satisfies the condition. We describe the famous commitment in [Pedersen Commitment](3_2_pedersen_commitment.md) section.
+We have two options to hide the transfer amount homomorphic encryption and commitment. The homomorphic encryption allows us to calculate the encrypted number. To combine the homomorphic encryption and zero knowledge proof, we can calculate the encrypted number without decrypting and check whether the calculation was done correctly by zero knowledge proof. And the other option is commitment. The commitment uses the one-way function for example hash function. It hides the original value. The user provides the part of original value and check whether original value satisfies the condition. We describe the famous commitment in [Pedersen Commitment](pedersen_commitment.md) section.
 
-If we use the commitment scheme, we need to generate the randomness for each transaction and prove the validity with it. It's hard for users to deal every randomness and also we support the contract execution so it's not practical to generate randomness for each value. If we use the homomorphic encryption, we can realize it simpler way. We are going to describe how we hide the transfer amount and prove whether that value satisfies the condition in [Transaction Constraints](1_5_transaction_constraints.md) section.
+If we use the commitment scheme, we need to generate the randomness for each transaction and prove the validity with it. It's hard for users to deal every randomness and also we support the contract execution so it's not practical to generate randomness for each value. If we use the homomorphic encryption, we can realize it simpler way. We are going to describe how we hide the transfer amount and prove whether that value satisfies the condition in [Transaction Constraints](transaction_constraints.md) section.
 
 ## Scheme
 
@@ -26,4 +26,4 @@ The commitment can hide the number and prove that the value satisfies the condit
 
 $$ Hash(3, 100) + Hash(7, 200) - Hash(10, 300) = 0 $$
 
-The transfer amount user wants send and the amount after transfer is equal to current balance when it's added. The hashed value is called commitment. We describe this more detail with example in [Pedersen Commitment](3_2_pedersen_commitment.md) section.
+The transfer amount user wants send and the amount after transfer is equal to current balance when it's added. The hashed value is called commitment. We describe this more detail with example in [Pedersen Commitment](pedersen_commitment.md) section.
