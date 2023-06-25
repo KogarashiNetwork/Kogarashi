@@ -9,22 +9,24 @@
       
       
       
+        <link rel="prev" href="../non_interactive_zero_knowlege_proof/">
       
-        <link rel="next" href="infrastructure/">
       
-      <link rel="icon" href="assets/images/favicon.png">
+        <link rel="next" href="../polynomial_commitment/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.14">
     
     
       
-        <title>Kogarashi Network</title>
+        <title>QAP - Kogarashi Network</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.113286f1.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.113286f1.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.a0c5b2b5.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -40,7 +42,7 @@
       
     
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -65,7 +67,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#introduction" class="md-skip">
+        <a href="#qap-quadratic-arithmetic-programs" class="md-skip">
           Skip to content
         </a>
       
@@ -79,7 +81,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="Kogarashi Network" class="md-header__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
+    <a href=".." title="Kogarashi Network" class="md-header__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -98,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction
+              QAP
             
           </span>
         </div>
@@ -165,7 +167,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="Kogarashi Network" class="md-nav__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
+    <a href=".." title="Kogarashi Network" class="md-nav__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -182,66 +184,11 @@
 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Introduction
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
         Introduction
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#functionality" class="md-nav__link">
-    Functionality
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#benefit" class="md-nav__link">
-    Benefit
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#future" class="md-nav__link">
-    Future
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -281,7 +228,7 @@
   
   
     <li class="md-nav__item">
-      <a href="infrastructure/" class="md-nav__link">
+      <a href="../infrastructure/" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -295,7 +242,7 @@
   
   
     <li class="md-nav__item">
-      <a href="what_is_privacy/" class="md-nav__link">
+      <a href="../what_is_privacy/" class="md-nav__link">
         What is privacy?
       </a>
     </li>
@@ -309,7 +256,7 @@
   
   
     <li class="md-nav__item">
-      <a href="hide_transfer_amount/" class="md-nav__link">
+      <a href="../hide_transfer_amount/" class="md-nav__link">
         Hide Transfer Amount
       </a>
     </li>
@@ -323,7 +270,7 @@
   
   
     <li class="md-nav__item">
-      <a href="gas_limit/" class="md-nav__link">
+      <a href="../gas_limit/" class="md-nav__link">
         Gas Limit
       </a>
     </li>
@@ -337,7 +284,7 @@
   
   
     <li class="md-nav__item">
-      <a href="zero_knowledge_scheme/" class="md-nav__link">
+      <a href="../zero_knowledge_scheme/" class="md-nav__link">
         Zero Knowledge Scheme
       </a>
     </li>
@@ -386,7 +333,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorial/" class="md-nav__link">
+      <a href="../tutorial/" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -400,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="plonk_pallet/" class="md-nav__link">
+      <a href="../plonk_pallet/" class="md-nav__link">
         Plonk
       </a>
     </li>
@@ -414,7 +361,7 @@
   
   
     <li class="md-nav__item">
-      <a href="confidential_transfer/" class="md-nav__link">
+      <a href="../confidential_transfer/" class="md-nav__link">
         Confidential Transfer
       </a>
     </li>
@@ -463,7 +410,7 @@
   
   
     <li class="md-nav__item">
-      <a href="contraints.md" class="md-nav__link">
+      <a href="../contraints.md" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -477,7 +424,7 @@
   
   
     <li class="md-nav__item">
-      <a href="confidential_transfer/" class="md-nav__link">
+      <a href="../confidential_transfer/" class="md-nav__link">
         Confidential Transfer Constraints
       </a>
     </li>
@@ -497,14 +444,16 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
       
       
       
@@ -513,7 +462,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
           Technical
@@ -526,7 +475,7 @@
   
   
     <li class="md-nav__item">
-      <a href="technical/" class="md-nav__link">
+      <a href="../technical/" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -540,7 +489,7 @@
   
   
     <li class="md-nav__item">
-      <a href="stealth_address/" class="md-nav__link">
+      <a href="../stealth_address/" class="md-nav__link">
         Stealth Address
       </a>
     </li>
@@ -554,7 +503,7 @@
   
   
     <li class="md-nav__item">
-      <a href="pedersen_commitment/" class="md-nav__link">
+      <a href="../pedersen_commitment/" class="md-nav__link">
         Pedersen Commitment
       </a>
     </li>
@@ -566,14 +515,16 @@
               
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" checked>
       
       
       
@@ -582,7 +533,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_5_4">
           <span class="md-nav__icon md-icon"></span>
           Zero Knowledge Proof
@@ -595,7 +546,7 @@
   
   
     <li class="md-nav__item">
-      <a href="non_interactive_zero_knowlege_proof/" class="md-nav__link">
+      <a href="../non_interactive_zero_knowlege_proof/" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -607,11 +558,107 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="qap/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          QAP
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         QAP
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#abstract" class="md-nav__link">
+    Abstract
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    Details
+  </a>
+  
+    <nav class="md-nav" aria-label="Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flattening" class="md-nav__link">
+    Flattening
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#r1cs" class="md-nav__link">
+    R1Cs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qap" class="md-nav__link">
+    QAP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proof" class="md-nav__link">
+    Proof
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    Verification
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next" class="md-nav__link">
+    Next
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -623,7 +670,7 @@
   
   
     <li class="md-nav__item">
-      <a href="polynomial_commitment/" class="md-nav__link">
+      <a href="../polynomial_commitment/" class="md-nav__link">
         Polynomial Commitment
       </a>
     </li>
@@ -637,7 +684,7 @@
   
   
     <li class="md-nav__item">
-      <a href="homomorphic_encryption/" class="md-nav__link">
+      <a href="../homomorphic_encryption/" class="md-nav__link">
         Homomorphic Encryption
       </a>
     </li>
@@ -693,7 +740,7 @@
   
   
     <li class="md-nav__item">
-      <a href="frequent_errors/" class="md-nav__link">
+      <a href="../frequent_errors/" class="md-nav__link">
         Frequent Errors
       </a>
     </li>
@@ -734,23 +781,64 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#functionality" class="md-nav__link">
-    Functionality
+  <a href="#abstract" class="md-nav__link">
+    Abstract
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#benefit" class="md-nav__link">
-    Benefit
+  <a href="#details" class="md-nav__link">
+    Details
+  </a>
+  
+    <nav class="md-nav" aria-label="Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flattening" class="md-nav__link">
+    Flattening
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#future" class="md-nav__link">
-    Future
+        
+          <li class="md-nav__item">
+  <a href="#r1cs" class="md-nav__link">
+    R1Cs
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qap" class="md-nav__link">
+    QAP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proof" class="md-nav__link">
+    Proof
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    Verification
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next" class="md-nav__link">
+    Next
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -769,24 +857,126 @@
                   
 
 
-<h1 id="introduction">Introduction</h1>
-<p><strong>Dapp Platform with Trustless Off-Chain Access</strong></p>
-<p>Our passion is to connect <strong>transparency</strong> of a decentralized system and <strong>convenience</strong> of a centralized system. Kogarashi Network is a Dapp platform that allows trustless and low-cost interaction with the Internet. Dapp providers can build decentralized services closer to the real world by putting Internet data into smart contracts. Trustless Oracle extension allow smart contracts to deal with a variety of type and property of data ever before.</p>
-<h2 id="functionality">Functionality</h2>
-<p>Kogarashi Network provides a Dapp development environment capable of access to Internet data and using it for smart contracts. Dapp providers decide which information resource is used and how to process response data. The smart contract can verify the following things.</p>
+<h1 id="qap-quadratic-arithmetic-programs">QAP (Quadratic Arithmetic Programs)</h1>
+<h2 id="abstract">Abstract</h2>
+<p>The <code>QAP</code> is the technology which converts <code>computation</code> to <code>polynomial groups</code>. With this, we can check whether the <code>computation</code> was executed correctly just factor the polynomial without execute <code>computation</code> again.</p>
+<h2 id="details">Details</h2>
+<p>Let's take a look at details. I give a example. Let's prove that following computation was executed correctly.</p>
+<p>$$a^2 \cdot b^2 = c.$$</p>
+<p>Assume that <code>c</code> is public input. <code>a</code> and <code>b</code> are private input. Prove that knowledge of <code>a</code> and <code>b</code> satisfying above equation.</p>
+<h3 id="flattening">Flattening</h3>
+<p>First of all, let's disassemble the <code>computation</code> to minimum form using multicative.</p>
+<p>$$ 1: a * a = a^2 $$
+$$ 2: b * b = b^2 $$
+$$ 3: a^2 * b^2 = c $$</p>
+<p>Now the computation was disassembled to three gate.</p>
+<h3 id="r1cs">R1Cs</h3>
+<p>As described, we have three multicative computation and want to check whether each steps are executed correctly to set constraint. Before that, we permute above characters as following.</p>
+<p>$$ [a, a^2, b, b^2, c] -&gt; [v, w, x, y, z] $$</p>
+<p>And now, our computation can be expressed as following table. Left, Right and Output.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Gate</th>
+<th align="left">L</th>
+<th align="left">R</th>
+<th align="left">O</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">1</td>
+<td align="left">v</td>
+<td align="left">v</td>
+<td align="left">w</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">x</td>
+<td align="left">x</td>
+<td align="left">y</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">y</td>
+<td align="left">w</td>
+<td align="left">z</td>
+</tr>
+</tbody>
+</table>
+<h3 id="qap">QAP</h3>
+<p>Let's express above table as polynomail groups. As example, express <code>v</code> polynomial on <code>L</code> column. <code>x</code> cordinate is <code>Gate</code> number and <code>y</code> cordinate is if that variable is used, it's going to be 1 and oserwise 0. In <code>L</code> column, <code>v</code> is only used <code>Gate</code> 1 so express as <code>(1, 1) (2, 0) (3, 0)</code>. Find polynomial using <a href="https://math.iitm.ac.in/public_html/sryedida/caimna/interpolation/lagrange.html"><code>Lagrange interpolation formula</code></a> for each variables.</p>
+<p><em>L column polynomial</em></p>
+<table>
+<thead>
+<tr>
+<th align="left">Variable</th>
+<th align="left">Cordinate</th>
+<th align="left">Polynomial</th>
+<th align="left">Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">v</td>
+<td align="left">(1, 1) (2, 0) (3, 0)</td>
+<td align="left">$$ \frac{x^2}{2} - \frac{5x}{2} + 3 \ $$</td>
+<td align="left">Lv</td>
+</tr>
+<tr>
+<td align="left">w</td>
+<td align="left">(1, 0) (2, 0) (3, 0)</td>
+<td align="left">0</td>
+<td align="left">Lw</td>
+</tr>
+<tr>
+<td align="left">x</td>
+<td align="left">(1, 0) (2, 1) (3, 0)</td>
+<td align="left">$$ -x^2 + 4x - 3 $$</td>
+<td align="left">Lx</td>
+</tr>
+<tr>
+<td align="left">y</td>
+<td align="left">(1, 0) (2, 0) (3, 1)</td>
+<td align="left">$$ \frac{x^2}{2} - \frac{3x}{2} + 1 \ $$</td>
+<td align="left">Ly</td>
+</tr>
+<tr>
+<td align="left">z</td>
+<td align="left">(1, 0) (2, 0) (3, 0)</td>
+<td align="left">0</td>
+<td align="left">Lz</td>
+</tr>
+</tbody>
+</table>
+<p>Above polynomial expresses the gate that variable uses. When we pass gate number to polynomial <code>v</code> $$ \frac{x^2}{2} - \frac{5x}{2} + 3 \ $$, we can know which gate the <code>v</code> is used. For example, we pass <code>1</code> to polynomial <code>v</code>, it returns <code>1</code> so the variable <code>v</code> is used on gate <code>1</code> but it returns <code>0</code> when we pass <code>2</code> and <code>3</code> so it's not used on these gate. When we add all polynomial <code>Lv + Lw + Lx + Ly + Lz = L(x)</code>, it returns <code>1</code> when we pass <code>1</code>, <code>2</code> and <code>3</code>. We do the same operation for each column and get polynomials as well.</p>
 <ul>
-<li>Internet data is fetched from the valid data resource</li>
-<li>Data is processed correctly</li>
+<li>L(x)<br />
+<code>Lv + Lw + Lx + Ly + Lz</code>  </li>
+<li>R(x)<br />
+<code>Rv + Rw + Rx + Ry + Rz</code>  </li>
+<li>O(x)<br />
+<code>Ov + Ow + Ox + Oy + Oz</code>  </li>
 </ul>
-<h2 id="benefit">Benefit</h2>
-<p>Existing off-chain Oracle service uses majority decision to verify the data thus Dapp providers need to pay expensive costs to ensure the reliability. It's a trade-off relationship between cost and reliability. However, Kogarashi Network uses protocol verification instead. It can realize cheap costs and reliability.</p>
-<p>Kogarashi Network also supports the Oracle function as a built-in development environment. Dapp providers don't need to connect the Dapp platform and Oracle service. These features realize a seamless development process.</p>
-<ul>
-<li><strong>Development</strong>: Connection between the Dapp platform and Oracle service is unnecessary</li>
-<li><strong>Operation</strong>: Getting data cost is cheap</li>
-</ul>
-<h2 id="future">Future</h2>
-<p>Blockchain realized a global transparent trading system. Kogarashi Network extends the type and property of data used on smart contracts. Traditional blockchain use cases are limited in the <strong>financial</strong> area but Kogarashi Network realizes <strong>non-financial</strong> area use cases and Dapp services are closer to people's everyday life.</p>
+<p>We can intruduce above polynomials when we decide the <code>computation</code>.</p>
+<h3 id="proof">Proof</h3>
+<p>From now on, we are going to prove the state ment. In here, we use <code>a = 2</code>, <code>b = 3</code> and <code>c = 36</code>. We can get actual value as following.</p>
+<p>$$ [v, w, x, y, z] -&gt; [2, 4, 3, 9, 36] $$</p>
+<p>And we multiply above variables by for each polynomial. For example, <code>L(x)</code> is following.</p>
+<p>$$ L(x) = v * Lv + w * Lw + x * Lx + y * Ly + z * Lz $$</p>
+<p>When we pass the <code>1</code> to <code>L(x)</code>, we can get <code>v</code> because only <code>Lv</code> returns <code>1</code> and others return <code>0</code>. <code>R(x)</code> as well and <code>O(x)</code> returns <code>w</code> so following equation holds.</p>
+<p>$$ L(1) * R(1) - O(1) = v * v - w = 2 * 2 - 4 = 0 $$</p>
+<p>It corresponds the table we saw in <code>R1Cs</code> and above also holds the case <code>x = 2</code> and <code>x = 3</code>. When we want to prove the statement, we are going to make above polynomial with secret <code>[v, w, x, y, z] -&gt; [2, 4, 3, 9, 36]</code> so polynomial would be integrated as one as following.</p>
+<p>$$ L(x) = 2 * Lv + 4 * Lw + 3 * Lx + 9 * Ly + 36 * Lz $$
+$$ R(x) = 2 * Rv + 4 * Rw + 3 * Rx + 9 * Ry + 36 * Rz $$
+$$ O(x) = 2 * Ov + 4 * Ow + 3 * Ox + 9 * Oy + 36 * Oz $$
+$$ L(x) * R(x) - O(x) = P(x) $$</p>
+<p>We make the <code>P(x)</code> to prove the statement.</p>
+<h3 id="verification">Verification</h3>
+<p>We can know whether <code>computation</code> was executed correctly to devide <code>P(x)</code> with <code>(x - 1) * (x - 2) * (x - 3)</code>. If it's devided as following prover knows the secret <code>a</code> and <code>b</code> leading <code>c</code>.</p>
+<p>$$ P(x) = (x - 1) * (x - 2) * (x - 3) * T(x) $$</p>
+<h3 id="next">Next</h3>
+<p>In this section, we understood how to convert <code>computation</code> to <code>polynomial groups</code> but there are some possibility that <code>P(x)</code> was made without using secret. In addition to this, we can know the secret to factor the polynomial. Zk SNARKs addresses the former problem with <code>Polynomial Commitment</code> and latter problem with <code>homomorphic encryption</code>.</p>
 
 
 
@@ -824,10 +1014,10 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": ".", "features": [], "search": "assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
       
     
   </body>
