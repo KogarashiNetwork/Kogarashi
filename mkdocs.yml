@@ -3,5 +3,29 @@ theme:
   name: material
 nav:
   - Introduction: index.md
+  - Infrastructure:
+    - 'Abstract': infrastructure.md
+    - What is privacy?: what_is_privacy.md
+    - Hide Transfer Amount: hide_transfer_amount.md
+    - Gas Limit: gas_limit.md
+    - Zero Knowledge Scheme: zero_knowledge_scheme.md
+  - Tutorial:
+    - 'Abstract': tutorial.md
+    - Plonk: plonk_pallet.md
+    - Confidential Transfer: confidential_transfer.md
+  - Constraints:
+    - 'Abstract': contraints.md
+    - Confidential Transfer Constraints: confidential_transfer.md
+  - Technical:
+    - 'Abstract': technical.md
+    - Stealth Address: stealth_address.md
+    - Pedersen Commitment: pedersen_commitment.md
+    - Zero Knowledge Proof:
+      - 'Abstract': non_interactive_zero_knowlege_proof.md
+      - QAP: qap.md
+      - Polynomial Commitment: polynomial_commitment.md
+      - Homomorphic Encryption: homomorphic_encryption.md
+  - Help:
+    - Frequent Errors: frequent_errors.md
 site_dir: docs
 docs_dir: book
