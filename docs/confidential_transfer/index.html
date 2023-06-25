@@ -1,0 +1,1013 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="./">
+      
+      
+        <link rel="next" href="../technical/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.14">
+    
+    
+      
+        <title>Confidential Transfer Constraints - Kogarashi Network</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.113286f1.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.a0c5b2b5.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#confidential_transfer" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Kogarashi Network" class="md-header__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Kogarashi Network
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Confidential Transfer Constraints
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Kogarashi Network" class="md-nav__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Kogarashi Network
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          Infrastructure
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Infrastructure
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../infrastructure/" class="md-nav__link">
+        Abstract
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../what_is_privacy/" class="md-nav__link">
+        What is privacy?
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hide_transfer_amount/" class="md-nav__link">
+        Hide Transfer Amount
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gas_limit/" class="md-nav__link">
+        Gas Limit
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../zero_knowledge_scheme/" class="md-nav__link">
+        Zero Knowledge Scheme
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          Tutorial
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Tutorial
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/" class="md-nav__link">
+        Abstract
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plonk_pallet/" class="md-nav__link">
+        Plonk
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./" class="md-nav__link">
+        Confidential Transfer
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          Constraints
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Constraints
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contraints.md" class="md-nav__link">
+        Abstract
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Confidential Transfer Constraints
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Confidential Transfer Constraints
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-define-the-confidential_transfer-as-depencencies" class="md-nav__link">
+    1. Define the confidential_transfer as depencencies
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-generate-test-data-used-for-confidential_transfer" class="md-nav__link">
+    2. Generate test data used for confidential_transfer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-test-funcitonalities" class="md-nav__link">
+    3. Test funcitonalities
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          Technical
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Technical
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../technical/" class="md-nav__link">
+        Abstract
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stealth_address/" class="md-nav__link">
+        Stealth Address
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pedersen_commitment/" class="md-nav__link">
+        Pedersen Commitment
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_4" id="__nav_5_4_label" tabindex="0">
+          Zero Knowledge Proof
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_4">
+          <span class="md-nav__icon md-icon"></span>
+          Zero Knowledge Proof
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../non_interactive_zero_knowlege_proof/" class="md-nav__link">
+        Abstract
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qap/" class="md-nav__link">
+        QAP
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../polynomial_commitment/" class="md-nav__link">
+        Polynomial Commitment
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../homomorphic_encryption/" class="md-nav__link">
+        Homomorphic Encryption
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          Help
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Help
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frequent_errors/" class="md-nav__link">
+        Frequent Errors
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-define-the-confidential_transfer-as-depencencies" class="md-nav__link">
+    1. Define the confidential_transfer as depencencies
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-generate-test-data-used-for-confidential_transfer" class="md-nav__link">
+    2. Generate test data used for confidential_transfer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-test-funcitonalities" class="md-nav__link">
+    3. Test funcitonalities
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="confidential_transfer">confidential_transfer</h1>
+<p>In this tutorial, we are going to generate test data and test its functionalities. We assume that you already unserstand what <a href="./">Confidential Transfer</a> is.</p>
+<p>The steps are following.</p>
+<ol>
+<li>Define the <code>confidential_transfer</code> as depencencies</li>
+<li>Generate test data used for <code>confidential_transfer</code></li>
+<li>Test funcitonalities</li>
+</ol>
+<h2 id="1-define-the-confidential_transfer-as-depencencies">1. Define the confidential_transfer as depencencies</h2>
+<p>First of all, you need to define the <code>confidential_transfer</code>.</p>
+<ul>
+<li><your-pallet>/Cargo.toml</li>
+</ul>
+<pre><code class="language-toml">confidential_transfer = { git = &quot;https://github.com/KogarashiNetwork/Kogarashi&quot;, branch = &quot;master&quot;, default-features = false }
+pallet_encrypted_balance = { git = &quot;https://github.com/KogarashiNetwork/Kogarashi&quot;, branch = &quot;master&quot;, default-features = false }
+pallet_plonk = { git = &quot;https://github.com/KogarashiNetwork/Kogarashi&quot;, branch = &quot;master&quot;, default-features = false }
+zero_elgamal = { git = &quot;https://github.com/KogarashiNetwork/Kogarashi&quot;, branch = &quot;master&quot;, default-features = false }
+zero_bls12_381 = { git = &quot;https://github.com/KogarashiNetwork/Kogarashi&quot;, branch = &quot;master&quot;, default-features = false }
+rand_core = {version=&quot;0.6&quot;, default-features = false }
+</code></pre>
+<p>The <code>confidential_transfer</code> depends on <code>rand_core</code> so please import it.</p>
+<h2 id="2-generate-test-data-used-for-confidential_transfer">2. Generate test data used for <code>confidential_transfer</code></h2>
+<p>Secondly, we would like like to setup the Alice and Bob account on testing runtime. Define the <code>new_test_ext</code> for genesis config and reflect the testing data for runtime storage.</p>
+<pre><code class="language-rust">fn new_test_ext(
+    alice_address: u64,
+    alice_private_key: Fp,
+    alice_balance: u32,
+    alice_radomness: Fp,
+    bob_private_key: Fp,
+    bob_address: u64,
+    bob_balance: u32,
+    bob_radomness: Fp,
+) -&gt; sp_io::TestExternalities {
+    let alice_balance = EncryptedNumber::encrypt(alice_private_key, alice_balance, alice_radomness);
+    let bob_balance = EncryptedNumber::encrypt(bob_private_key, bob_balance, bob_radomness);
+
+    let mut t = frame_system::GenesisConfig::default()
+        .build_storage::&lt;TestRuntime&gt;()
+        .unwrap();
+    pallet_encrypted_balance::GenesisConfig::&lt;TestRuntime&gt; {
+        balances: vec![(alice_address, alice_balance), (bob_address, bob_balance)],
+    }
+    .assimilate_storage(&amp;mut t)
+    .unwrap();
+
+    let mut ext = sp_io::TestExternalities::new(t);
+    ext.execute_with(|| System::set_block_number(1));
+    ext
+}
+</code></pre>
+<p>Thirdly, we define <code>generate_default_test_data</code> to generate parameters used for <code>confidential_transfer</code>.</p>
+<pre><code class="language-rust">fn generate_default_test_data() -&gt; (u64, Fp, u16, Fp, Fp, u64, u16, Fp, u16, u16, u16) {
+    let mut rng = rand::thread_rng();
+
+    let alice_address = rng.gen::&lt;u64&gt;();
+    let alice_private_key = Fp::random(OsRng);
+    let alice_balance = rng.gen::&lt;u16&gt;();
+    let alice_radomness = Fp::random(OsRng);
+    let bob_private_key = Fp::random(OsRng);
+    let bob_address = rng.gen::&lt;u64&gt;();
+    let bob_balance = rng.gen::&lt;u16&gt;();
+    let bob_radomness = Fp::random(OsRng);
+    let transfer_amount = rng.gen_range(0..alice_balance);
+    let alice_after_balance = alice_balance - transfer_amount;
+    let bob_after_balance = bob_balance + transfer_amount;
+
+    (
+        alice_address,
+        alice_private_key,
+        alice_balance,
+        alice_radomness,
+        bob_private_key,
+        bob_address,
+        bob_balance,
+        bob_radomness,
+        transfer_amount,
+        alice_after_balance,
+        bob_after_balance,
+    )
+}
+</code></pre>
+<h2 id="3-test-funcitonalities">3. Test funcitonalities</h2>
+<p>Finally, we combine previous sections together and test functionalities.</p>
+<pre><code class="language-rust">fn main() {
+    let k = 14;
+    let label = b&quot;verify&quot;;
+    let mut rng = get_rng();
+    let (
+        alice_address,
+        alice_private_key,
+        alice_balance,
+        alice_radomness,
+        bob_private_key,
+        bob_address,
+        bob_balance,
+        bob_radomness,
+        transfer_amount,
+        alice_after_balance,
+        bob_after_balance,
+        transfer_randomness,
+    ) = generate_default_test_data();
+    new_test_ext(
+        alice_address,
+        alice_private_key,
+        alice_balance,
+        alice_radomness,
+        bob_private_key,
+        bob_address,
+        bob_balance,
+        bob_radomness,
+    )
+    .execute_with(|| {
+        // default balance decryption check
+        let alice_encrypted_balance = ConfidentialTransfer::total_balance(&amp;alice_address);
+        let alice_raw_balance = alice_encrypted_balance.decrypt(alice_private_key);
+        let bob_encrypted_balance = ConfidentialTransfer::total_balance(&amp;bob_address);
+        let bob_raw_balance = bob_encrypted_balance.decrypt(bob_private_key);
+
+        assert_eq!(alice_raw_balance.unwrap() as u16, alice_balance);
+        assert_eq!(bob_raw_balance.unwrap() as u16, bob_balance);
+
+        // trusted setup check
+        let result =
+            ConfidentialTransfer::trusted_setup(Origin::signed(alice_address), k, rng.clone());
+        assert_ok!(result);
+
+        // proof generation
+        let pp = Plonk::public_parameter().unwrap();
+        let alice_public_key = GENERATOR_EXTENDED * alice_private_key;
+        let bob_public_key = GENERATOR_EXTENDED * bob_private_key;
+        let transfer_amount_scalar = Fp::from(transfer_amount as u64);
+        let alice_after_balance_scalar = Fp::from(alice_after_balance as u64);
+
+        let alice_balance =
+            EncryptedNumber::encrypt(alice_private_key, alice_balance.into(), alice_radomness);
+        let alice_transfer_amount = EncryptedNumber::encrypt(
+            alice_private_key,
+            transfer_amount.into(),
+            transfer_randomness,
+        );
+        let bob_encrypted_transfer_amount =
+            (GENERATOR_EXTENDED * transfer_amount_scalar) + (bob_public_key * transfer_randomness);
+        let alice_public_key = JubJubAffine::from(alice_public_key);
+        let bob_public_key = JubJubAffine::from(bob_public_key);
+        let bob_encrypted_transfer_amount = JubJubAffine::from(bob_encrypted_transfer_amount);
+        let bob_encrypted_transfer_amount_other = (GENERATOR_EXTENDED * transfer_randomness).into();
+
+        let confidential_transfer_circuit = ConfidentialTransferCircuit::new(
+            alice_public_key,
+            bob_public_key,
+            alice_balance,
+            alice_transfer_amount,
+            bob_encrypted_transfer_amount,
+            alice_private_key,
+            transfer_amount_scalar,
+            alice_after_balance_scalar,
+            transfer_randomness,
+        );
+        let prover = Compiler::compile::&lt;ConfidentialTransferCircuit&gt;(&amp;pp, label)
+            .expect(&quot;failed to compile circuit&quot;);
+        let proof = prover
+            .0
+            .prove(&amp;mut rng, &amp;confidential_transfer_circuit)
+            .expect(&quot;failed to prove&quot;);
+
+        // confidential transfer check
+        let transaction_params = ConfidentialTransferTransaction::new(
+            alice_public_key,
+            bob_public_key,
+            alice_transfer_amount,
+            bob_encrypted_transfer_amount,
+            bob_encrypted_transfer_amount_other,
+        );
+        let result = ConfidentialTransfer::confidential_transfer(
+            Origin::signed(alice_address),
+            bob_address,
+            proof.0,
+            transaction_params,
+        );
+        assert_ok!(result);
+
+        // balance transition check
+        let alice_balance = ConfidentialTransfer::total_balance(&amp;alice_address);
+        let alice_raw_balance = alice_balance.decrypt(alice_private_key);
+        let bob_balance = ConfidentialTransfer::total_balance(&amp;bob_address);
+        let bob_raw_balance = bob_balance.decrypt(bob_private_key);
+
+        assert_eq!(alice_raw_balance.unwrap() as u16, alice_after_balance);
+        assert_eq!(bob_raw_balance.unwrap() as u16, bob_after_balance);
+    })
+}
+</code></pre>
+<p>With above tests, we can confirm that confidential transfer works correctly. You can check the <code>confidential_transfer</code> example <a href="https://github.com/KogarashiNetwork/Kogarashi/confidential_transfer.rs">here</a>. Happy hacking!</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      
+    
+  </body>
+</html>

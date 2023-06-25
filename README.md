@@ -24,9 +24,19 @@ All users balances are encrypted by the `homomorphic encryption` by default and 
 
 ## Documentation
 
-We describe technical stuff and how to use libraries in [here](https://zero-network.github.io/zero/).  
-You can also check with markdown [document](./book/SUMMARY.md).  
-Original grant proposal is [here](https://github.com/w3f/Grants-Program/blob/master/applications/zero-network.md).
+We describe technical stuff and how to use libraries in [here](https://kogarashinetwork.github.io/Kogarashi/).
+
+### Dev
+
+```
+$ mkdocs serve
+```
+
+### Build
+
+```
+$ mkdocs build
+```
 
 ## Test
 
