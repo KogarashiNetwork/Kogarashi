@@ -1,0 +1,7 @@
+site_name: Kogarashi Network
+theme:
+  name: material
+nav:
+  - Introduction: index.md
+site_dir: docs
+docs_dir: book
