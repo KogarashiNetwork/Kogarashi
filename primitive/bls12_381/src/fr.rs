@@ -8,9 +8,6 @@ use zero_crypto::arithmetic::utils::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
-#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
-pub struct Fr(pub [u64; 4]);
-
 const MODULUS: [u64; 4] = [
     0xffffffff00000001,
     0x53bda402fffe5bfe,
@@ -63,6 +60,13 @@ pub const ROOT_OF_UNITY: Fr = Fr([
     0x5bf3adda19e9b27b,
 ]);
 
+#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
+pub struct Fr(pub [u64; 4]);
+
+impl DigitalSig for Fr {
+    const LENGTH: usize = 32;
+}
+
 impl Fr {
     pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
@@ -90,6 +94,18 @@ impl Fr {
         bits.into_iter()
             .skip_while(|w_bit| w_bit == &0)
             .collect::<Vec<_>>()
+    }
+
+    pub fn as_bytes(self) -> [u8; Self::LENGTH] {
+        let tmp = self.montgomery_reduce();
+
+        let mut res = [0; Self::SIZE];
+        res[0..8].copy_from_slice(&tmp[0].to_le_bytes());
+        res[8..16].copy_from_slice(&tmp[1].to_le_bytes());
+        res[16..24].copy_from_slice(&tmp[2].to_le_bytes());
+        res[24..32].copy_from_slice(&tmp[3].to_le_bytes());
+
+        res
     }
 }
 

@@ -39,11 +39,21 @@ pub struct JubjubAffine {
     y: Fr,
 }
 
+impl DigitalSig for JubjubAffine {
+    const LENGTH: usize = 32;
+}
+
 impl JubjubAffine {
-    /// Constructs an JubJubAffine given `x` and `y` without checking
-    /// that the point is on the curve.
     pub const fn from_raw_unchecked(x: Fr, y: Fr) -> JubjubAffine {
         JubjubAffine { x, y }
+    }
+
+    fn as_bytes(self) -> [u8; Self::LENGTH] {
+        let mut tmp = self.x.as_bytes();
+        let u = self.y.as_bytes();
+        tmp[31] |= u[0] << 7;
+
+        tmp
     }
 }
 
@@ -56,18 +66,23 @@ pub struct JubjubExtend {
 }
 
 impl JubjubExtend {
-    /// This takes a mutable slice of `JubJubExtended`s and "normalizes" them using
-    /// only a single inversion for the entire batch. This normalization results in
-    /// all of the points having a Z-coordinate of one. Further, an iterator is
-    /// returned which can be used to obtain `JubJubAffine`s for each element in the
-    /// slice.
-    ///
-    /// This costs 5 multiplications per element, and a field inversion.
     pub fn batch_normalize<'a>(
         y: &'a mut [JubjubExtend],
     ) -> impl Iterator<Item = JubjubAffine> + 'a {
         y.iter().map(|p| JubjubAffine::from(*p))
     }
+
+    pub(crate) fn as_bytes(self) -> [u8; Self::LENGTH] {
+        let mut tmp = self.x.as_bytes();
+        let u = self.y.as_bytes();
+        tmp[31] |= u[0] << 7;
+
+        tmp
+    }
+}
+
+impl DigitalSig for JubjubExtend {
+    const LENGTH: usize = 32;
 }
 
 twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtend, X, Y, T);

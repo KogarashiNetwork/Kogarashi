@@ -19,6 +19,7 @@
 mod curve;
 mod error;
 mod fp;
+mod redsa;
 
 pub use curve::*;
 pub use fp::Fp;

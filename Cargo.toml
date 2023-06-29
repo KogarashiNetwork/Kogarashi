@@ -44,13 +44,11 @@ members = [
     "primitive/bls12_381",
     "primitive/crypto",
     "primitive/dsa",
-    "primitive/ed25519",
     "primitive/elgamal",
     "primitive/jubjub",
     "primitive/kzg",
     "primitive/pairing",
     "primitive/plonk",
-    "primitive/schnorr_signature",
     "pallets/confidential_transfer",
     "pallets/encrypted_balance",
     "pallets/plonk"

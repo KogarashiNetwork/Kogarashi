@@ -7,9 +7,6 @@ use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
-#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
-pub struct Fp(pub(crate) [u64; 4]);
-
 const MODULUS: [u64; 4] = [
     0xd0970e5ed6f72cb7,
     0xa6682093ccc81082,
@@ -56,6 +53,9 @@ const ROOT_OF_UNITY: Fp = Fp([
     0x7342261215ac260b,
     0x4d6b87b1da259e2,
 ]);
+
+#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
+pub struct Fp(pub(crate) [u64; 4]);
 
 fft_field_operation!(
     Fp,
