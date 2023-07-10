@@ -46,6 +46,7 @@ members = [
     "primitive/dsa",
     "primitive/elgamal",
     "primitive/jubjub",
+    "primitive/keyring",
     "primitive/kzg",
     "primitive/pairing",
     "primitive/plonk",
