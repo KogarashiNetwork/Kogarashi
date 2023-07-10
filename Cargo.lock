@@ -1461,6 +1461,10 @@ dependencies = [
 [[package]]
 name = "keyring"
 version = "0.1.0"
+dependencies = [
+ "strum",
+ "zero-jubjub",
+]
 
 [[package]]
 name = "lazy_static"
@@ -3444,9 +3448,9 @@ dependencies = [
  "proptest",
  "rand_core 0.6.4",
  "serde",
+ "sp-core",
  "sp-runtime-interface",
  "sp-std",
- "strum",
  "subtle 2.4.1",
  "zero-bls12-381",
  "zero-crypto",
