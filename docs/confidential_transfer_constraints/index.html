@@ -9,6 +9,10 @@
       
       
       
+        <link rel="prev" href="../confidential_transfer/">
+      
+      
+        <link rel="next" href="../technical/">
       
       <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.14">
@@ -377,14 +381,16 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
       
       
       
@@ -393,7 +399,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           Constraints
@@ -418,11 +424,66 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../confidential_transfer/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Confidential Transfer Constraints
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Confidential Transfer Constraints
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#transaction-requirement" class="md-nav__link">
+    Transaction Requirement
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transfer-scheme" class="md-nav__link">
+    Transfer Scheme
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transaction-speed" class="md-nav__link">
+    Transaction Speed
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -784,9 +845,11 @@
 </tbody>
 </table>
 <p>We perform this transfer scheme on <code>jubjub</code> curve and the constraints are following.</p>
-<p>$$
-enc_{left} = g^tpk^r\ \land enc_{right} = g^r\ \land enc_t' = (g^{b'}pk'^r)\ \land \ enc_{left}/ enc_{balleft} = g^{b'} (enc_{right}/enc_{balright})^{sk}\ \land t \in [0,Max]\ \land b \in [0,Max]
-$$</p>
+<p>
+<script type="math/tex; mode=display">
+enc_{left} = g^tpk^r\ \land enc_{right} = g^r\ \land enc_t' = (g^{b'}pk'^r)\ \land \\ enc_{left}/ enc_{balleft} = g^{b'} (enc_{right}/enc_{balright})^{sk}\ \land t \in [0,Max]\ \land b \in [0,Max]
+</script>
+</p>
 <p>Users generate proof and attach it with transaction.</p>
 <h2 id="transaction-speed">Transaction Speed</h2>
 <p>In my local PC, it takes about 5 seconds to generate proof and 78 milli-seconds to be verified.</p>
@@ -831,6 +894,8 @@ $$</p>
     
     
       <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       
     
   </body>

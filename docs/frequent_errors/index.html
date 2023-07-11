@@ -422,7 +422,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../confidential_transfer/" class="md-nav__link">
+      <a href="../confidential_transfer_constraints/" class="md-nav__link">
         Confidential Transfer Constraints
       </a>
     </li>
@@ -857,15 +857,17 @@
 <h2 id="error-duplicate-lang-item-in-crate"><strong>error: duplicate lang item in crate</strong></h2>
 <p>This error happens when we use different version crate but same crate on one crate.
 The error says the dependencies duplication so we can query the crate name as following.</p>
-<pre><code>$ cargo tree -e features -i {crate}
-</code></pre>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>tree<span class="w"> </span>-e<span class="w"> </span>features<span class="w"> </span>-i<span class="w"> </span><span class="o">{</span>crate<span class="o">}</span>
+</code></pre></div>
+
 <p>If we find the duplication of crate that we use same crate different version multiple times, we should align the version.</p>
 <h2 id="error-the-wasm32-unknown-unknown-target-is-not-supported-by-default-you-may-need-to-enable-the-js-feature"><strong>error: the wasm32-unknown-unknown target is not supported by default, you may need to enable the "js" feature</strong></h2>
 <p>This error happens <code>getrandom</code> crate dependency on <code>std</code>.<br />
 We need to disable <code>std</code> feature of <code>getrandom</code>.  </p>
 <p>Firstly, checking which libraries depend on <code>getrandom</code> depending on <code>std</code> to execute following command.</p>
-<pre><code>$ cargo tree -e features
-</code></pre>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>tree<span class="w"> </span>-e<span class="w"> </span>features
+</code></pre></div>
+
 <p><code>cargo tree</code> command displays the dependencies tree.<br />
 The libraries with <code>(*)</code> doesn't depend on <code>std</code> but if there is <code>getrandom</code> not marked as <code>(*)</code>, it would cause error.</p>
 <p>Secondly, independing from <code>std</code> library by followings.</p>
@@ -875,42 +877,47 @@ The libraries with <code>(*)</code> doesn't depend on <code>std</code> but if th
 </ul>
 <p>And run <code>cargo tree</code> and check whether <code>getrandom</code> is marked as <code>(*)</code></p>
 <p>You can also use <code>cargo nono check</code> to check dependency on <code>std</code>.</p>
-<pre><code>$ cargo nono check
-</code></pre>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>nono<span class="w"> </span>check
+</code></pre></div>
+
 <h2 id="errore0603-module-group-is-private"><strong>error[E0603]: module "group" is private</strong></h2>
 <p>This error happens <code>syn</code> crate because its interface was change.
 We need to indicate exact version of <code>syn</code> as using expected behavior.</p>
-<pre><code>$ cargo update -p syn --precise 1.0.96
-</code></pre>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>update<span class="w"> </span>-p<span class="w"> </span>syn<span class="w"> </span>--precise<span class="w"> </span><span class="m">1</span>.0.96
+</code></pre></div>
+
 <h2 id="errore0512-cannot-transmute-between-types-of-different-sizes-or-dependently-sized-types"><strong>error[E0512]: cannot transmute between types of different sizes, or dependently-sized types</strong></h2>
 <p>This error happens on <a href="https://github.com/paritytech/substrate/blob/master/primitives/runtime-interface/src/impls.rs#L44"><code>runtime-interface</code></a> and both macro available when <code>#[cfg(all(not(feature = "std"), not(feature = "disable_target_static_assertions")))]</code> so we need to specify <code>std</code> as following.</p>
-<pre><code class="language-toml">[features]
-default = [&quot;std&quot;]
-std = [
-    &quot;crate/std&quot;
-]
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">[features]</span>
+<span class="n">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;std&quot;</span><span class="p">]</span>
+<span class="n">std</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s">&quot;crate/std&quot;</span>
+<span class="p">]</span>
+</code></pre></div>
+
 <h2 id="errore0432-unresolved-import-sp_coreto_substrate_wasm_fn_return_value"><strong>error[E0432]: unresolved import sp_core::to_substrate_wasm_fn_return_value</strong></h2>
 <p>This error happens the crate which has <code>sp_api</code> dependency. And to clarify every crate which imported as <code>default-features = false</code> is described as <code>crate/std</code> in <code>[features]</code>.</p>
-<pre><code class="language-toml">[features]
-default = [&quot;std&quot;]
-std = [
-    &quot;crate/std&quot;
-]
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">[features]</span>
+<span class="n">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;std&quot;</span><span class="p">]</span>
+<span class="n">std</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s">&quot;crate/std&quot;</span>
+<span class="p">]</span>
+</code></pre></div>
+
 <h2 id="error-failed-to-parse-manifest-at-failed-to-parse-the-version-requirement-011-for-dependency-parking_lot"><strong>error: failed to parse manifest at failed to parse the version requirement '0.11 ' for dependency 'parking_lot'</strong></h2>
 <p>This error happens the crate <code>parity-db</code> fails to find <code>parking_lot</code> version.</p>
-<pre><code>$ cargo update -p parity-db
-</code></pre>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>update<span class="w"> </span>-p<span class="w"> </span>parity-db
+</code></pre></div>
+
 <h2 id="error-could-not-compile-node-template-caused-by-process-didnt-exit-successfully"><strong>error: could not compile 'node-template' Caused by: process didn't exit successfully:</strong></h2>
 <p>This error happens because of nightly tool chain version difference.
 You need to select correct nightly tool chain version with following Polkadot release.
 https://github.com/paritytech/polkadot/releases</p>
 <h2 id="errore0432-unresolved-import-rand_coreosrng"><strong>error[E0432]: unresolved import 'rand_core::OsRng'</strong></h2>
 <p>This error happens because there is no <code>OsRng</code> in <code>rand_core</code> root.</p>
-<pre><code>[dev-dependencies]
-rand_core = { version=&quot;0.6.4&quot;, features = [&quot;getrandom&quot;] }
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">[dev-dependencies]</span>
+<span class="na">rand_core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{ version=&quot;0.6.4&quot;, features = [&quot;getrandom&quot;] }</span>
+</code></pre></div>
 
 
 
@@ -952,6 +959,8 @@ rand_core = { version=&quot;0.6.4&quot;, features = [&quot;getrandom&quot;] }
     
     
       <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       
     
   </body>

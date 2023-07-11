@@ -424,7 +424,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../confidential_transfer/" class="md-nav__link">
+      <a href="../confidential_transfer_constraints/" class="md-nav__link">
         Confidential Transfer Constraints
       </a>
     </li>
@@ -794,14 +794,16 @@
 <ul>
 <li>
 <p><a href="3_1_qap.md">QAP</a>
-$$ L(x) * R(x) - O(x) = Z(x) * T(x) $$</p>
+<script type="math/tex; mode=display"> L(x) * R(x) - O(x) = Z(x) * T(x) </script>
+</p>
 </li>
 <li>
 <p><a href="../polynomial_commitment/">Polynomial Commitment</a>
-$$ L(x) + R(x) * X^{d+1} + O(x) * X^{2d+1} = F(x) $$
-$$ F(x) = k_0 + k_1X + k_2X^2 + ... + k_{3d}X^{3d} $$
-$$ (\acute a_0,...,\acute a_{3d}, \acute b_0,...,\acute b_{3d}) = (a_0 * k_0,...,a_{3d} * k_{3d}, b_0 * k_0,...,b_{3d} * k_{3d}) $$
-$$ (\acute a_0,...,\acute a_{3d}) = α(\acute b_0,...,\acute b_{3d}) $$</p>
+<script type="math/tex; mode=display"> L(x) + R(x) * X^{d+1} + O(x) * X^{2d+1} = F(x) </script>
+<script type="math/tex; mode=display"> F(x) = k_0 + k_1X + k_2X^2 + ... + k_{3d}X^{3d} </script>
+<script type="math/tex; mode=display"> (\acute a_0,...,\acute a_{3d}, \acute b_0,...,\acute b_{3d}) = (a_0 * k_0,...,a_{3d} * k_{3d}, b_0 * k_0,...,b_{3d} * k_{3d}) </script>
+<script type="math/tex; mode=display"> (\acute a_0,...,\acute a_{3d}) = α(\acute b_0,...,\acute b_{3d}) </script>
+</p>
 </li>
 </ul>
 <p>Lastly, we would like to send these information with zero knowledge. To do so, we are going to use <code>Homomorphic Encryption</code>.</p>
@@ -811,12 +813,18 @@ $$ (\acute a_0,...,\acute a_{3d}) = α(\acute b_0,...,\acute b_{3d}) $$</p>
 <p>Specifically, if the encryption supports <code>additive</code> and <code>multiplicative</code>, we would call it <code>Full Homomorphic Encryption</code> but it takes so much cost to calculate or ciphertext is too big to transfer through the internet. In this case, we deal the encryption which supports multiple additive and one time multiplicative. We realize these with <code>elliptic curve</code> and <code>pairing</code>.</p>
 <h2 id="elliptic-curve">Elliptic Curve</h2>
 <p>The <code>elliptic curve</code> is the equation look like following.</p>
-<p>$$ y^2 = x^3 + ax + b $$</p>
+<p>
+<script type="math/tex; mode=display"> y^2 = x^3 + ax + b </script>
+</p>
 <h2 id="pairing">Pairing</h2>
 <p>The <code>pairing</code> is the mapping which takes two elliptic curve points and map to the element of finitie field as following.</p>
-<p>$$ f: G * G -&gt; F_p $$</p>
+<p>
+<script type="math/tex; mode=display"> f: G * G -> F_p </script>
+</p>
 <p>There are some types of pairing functions but it's complicated so describing the relationship with simple model. Let's denote the two generators of elliptic as <code>G1</code>, <code>G2</code> and, each scalar as <code>a</code>, <code>b</code> and generator of finite field as <code>g</code>. We can express the relactionship between these two elliptic curve points and finite field element as following.</p>
-<p>$$ f: aG1 * bG2 -&gt; g^{ab} $$</p>
+<p>
+<script type="math/tex; mode=display"> f: aG1 * bG2 -> g^{ab} </script>
+</p>
 
 
 
@@ -858,6 +866,8 @@ $$ (\acute a_0,...,\acute a_{3d}) = α(\acute b_0,...,\acute b_{3d}) $$</p>
     
     
       <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       
     
   </body>

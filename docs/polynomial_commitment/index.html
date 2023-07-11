@@ -424,7 +424,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../confidential_transfer/" class="md-nav__link">
+      <a href="../confidential_transfer_constraints/" class="md-nav__link">
         Confidential Transfer Constraints
       </a>
     </li>
@@ -805,7 +805,9 @@
 
 <h1 id="polynomial-commitment">Polynomial Commitment</h1>
 <p>In previous <a href="../qap/">section</a>, we enable to check whether <code>computation</code> was done correctly by the knowledge of polynomial which can be devided by minimal polynomial <code>Z(x)</code> as following.</p>
-<p>$$ L(x) * R(x) - O(x) = Z(x) * T(x) $$</p>
+<p>
+<script type="math/tex; mode=display"> L(x) * R(x) - O(x) = Z(x) * T(x) </script>
+</p>
 <p>However, we can create equation easily because <code>Z(x)</code> is public information. Then we need to verify whether <code>L(x), R(x), O(x)</code> are created by using valid input. To do so, we are going to use <code>Polynomial Commitment</code>.</p>
 <h2 id="abstract">Abstract</h2>
 <p>The <code>Polynomial Commitment</code> check whether the prover know polynomials <code>L(x), R(x), O(x)</code> and these comes from valid input.</p>
@@ -813,18 +815,24 @@
 <p>To know polynomials <code>L(x), R(x), O(x)</code> means having knowledge of coefficients of them.</p>
 <h2 id="combination">Combination</h2>
 <p>First of all, we combine these polynomials to one in order to make check process easier. Let's say degree of polynomials <code>L(x), R(x), O(x)</code> as <code>d</code>, we can combine them into one as following and let combined polynomial as <code>F(x)</code>.</p>
-<p>$$ L(x) + R(x) * X^{d+1} + O(x) * X^{2d+1} = F(x) $$</p>
+<p>
+<script type="math/tex; mode=display"> L(x) + R(x) * X^{d+1} + O(x) * X^{2d+1} = F(x) </script>
+</p>
 <p>In polynomial <code>F(x)</code>, the coefficients of <code>0~d</code> degree expresses <code>L(x)</code> coefficients, <code>d+1~2d</code> is <code>R(x)</code> and <code>2d+1~3d</code> is <code>O(x)</code> as well. The polynomial <code>F(x)</code> degree is <code>3d</code> and when we denote coefficients as k, it would be following.</p>
-<p>$$ F(x) = k_0 + k_1X + k_2X^2 + ... + k_{3d}X^{3d} $$</p>
+<p>
+<script type="math/tex; mode=display"> F(x) = k_0 + k_1X + k_2X^2 + ... + k_{3d}X^{3d} </script>
+</p>
 <h2 id="verification">Verification</h2>
 <p>The verification processes are following.</p>
 <ol>
 <li>Bob choses random <code>α, (a_0,...,a_{3d}) ∈ F</code> and compute <code>(b_0,...,b_{3d}) = α(a_0,...,a_{3d})</code>.</li>
 <li>Bob sends Alice to <code>(a_0,...,a_{3d})</code> and <code>(b_0,...,b_{3d})</code>.</li>
 <li>Alice computes following.
-$$ (\acute a_0,...,\acute a_{3d}, \acute b_0,...,\acute b_{3d}) = (a_0 * k_0,...,a_{3d} * k_{3d}, b_0 * k_0,...,b_{3d} * k_{3d}) $$</li>
+<script type="math/tex; mode=display"> (\acute a_0,...,\acute a_{3d}, \acute b_0,...,\acute b_{3d}) = (a_0 * k_0,...,a_{3d} * k_{3d}, b_0 * k_0,...,b_{3d} * k_{3d}) </script>
+</li>
 <li>Bob checks following.
-$$ (\acute a_0,...,\acute a_{3d}) = α(\acute b_0,...,\acute b_{3d}) $$</li>
+<script type="math/tex; mode=display"> (\acute a_0,...,\acute a_{3d}) = α(\acute b_0,...,\acute b_{3d}) </script>
+</li>
 </ol>
 <p>If Alice don't know the coefficients, she couldn't do step <code>3</code>. With using this step, we can know that the prover know polynomials <code>L(x), R(x), O(x)</code> and these comes from valid input.</p>
 <h2 id="next">Next</h2>
@@ -870,6 +878,8 @@ $$ (\acute a_0,...,\acute a_{3d}) = α(\acute b_0,...,\acute b_{3d}) $$</li>
     
     
       <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       
     
   </body>

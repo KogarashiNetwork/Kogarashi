@@ -424,7 +424,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../confidential_transfer/" class="md-nav__link">
+      <a href="../confidential_transfer_constraints/" class="md-nav__link">
         Confidential Transfer Constraints
       </a>
     </li>
@@ -862,17 +862,23 @@
 <p>The <code>QAP</code> is the technology which converts <code>computation</code> to <code>polynomial groups</code>. With this, we can check whether the <code>computation</code> was executed correctly just factor the polynomial without execute <code>computation</code> again.</p>
 <h2 id="details">Details</h2>
 <p>Let's take a look at details. I give a example. Let's prove that following computation was executed correctly.</p>
-<p>$$a^2 \cdot b^2 = c.$$</p>
+<p>
+<script type="math/tex; mode=display">a^2 \cdot b^2 = c.</script>
+</p>
 <p>Assume that <code>c</code> is public input. <code>a</code> and <code>b</code> are private input. Prove that knowledge of <code>a</code> and <code>b</code> satisfying above equation.</p>
 <h3 id="flattening">Flattening</h3>
 <p>First of all, let's disassemble the <code>computation</code> to minimum form using multicative.</p>
-<p>$$ 1: a * a = a^2 $$
-$$ 2: b * b = b^2 $$
-$$ 3: a^2 * b^2 = c $$</p>
+<p>
+<script type="math/tex; mode=display"> 1: a * a = a^2 </script>
+<script type="math/tex; mode=display"> 2: b * b = b^2 </script>
+<script type="math/tex; mode=display"> 3: a^2 * b^2 = c </script>
+</p>
 <p>Now the computation was disassembled to three gate.</p>
 <h3 id="r1cs">R1Cs</h3>
 <p>As described, we have three multicative computation and want to check whether each steps are executed correctly to set constraint. Before that, we permute above characters as following.</p>
-<p>$$ [a, a^2, b, b^2, c] -&gt; [v, w, x, y, z] $$</p>
+<p>
+<script type="math/tex; mode=display"> [a, a^2, b, b^2, c] -> [v, w, x, y, z] </script>
+</p>
 <p>And now, our computation can be expressed as following table. Left, Right and Output.</p>
 <table>
 <thead>
@@ -920,7 +926,9 @@ $$ 3: a^2 * b^2 = c $$</p>
 <tr>
 <td align="left">v</td>
 <td align="left">(1, 1) (2, 0) (3, 0)</td>
-<td align="left">$$ \frac{x^2}{2} - \frac{5x}{2} + 3 \ $$</td>
+<td align="left">
+<script type="math/tex; mode=display"> \frac{x^2}{2} - \frac{5x}{2} + 3 \\ </script>
+</td>
 <td align="left">Lv</td>
 </tr>
 <tr>
@@ -932,13 +940,17 @@ $$ 3: a^2 * b^2 = c $$</p>
 <tr>
 <td align="left">x</td>
 <td align="left">(1, 0) (2, 1) (3, 0)</td>
-<td align="left">$$ -x^2 + 4x - 3 $$</td>
+<td align="left">
+<script type="math/tex; mode=display"> -x^2 + 4x - 3 </script>
+</td>
 <td align="left">Lx</td>
 </tr>
 <tr>
 <td align="left">y</td>
 <td align="left">(1, 0) (2, 0) (3, 1)</td>
-<td align="left">$$ \frac{x^2}{2} - \frac{3x}{2} + 1 \ $$</td>
+<td align="left">
+<script type="math/tex; mode=display"> \frac{x^2}{2} - \frac{3x}{2} + 1 \\ </script>
+</td>
 <td align="left">Ly</td>
 </tr>
 <tr>
@@ -949,7 +961,7 @@ $$ 3: a^2 * b^2 = c $$</p>
 </tr>
 </tbody>
 </table>
-<p>Above polynomial expresses the gate that variable uses. When we pass gate number to polynomial <code>v</code> $$ \frac{x^2}{2} - \frac{5x}{2} + 3 \ $$, we can know which gate the <code>v</code> is used. For example, we pass <code>1</code> to polynomial <code>v</code>, it returns <code>1</code> so the variable <code>v</code> is used on gate <code>1</code> but it returns <code>0</code> when we pass <code>2</code> and <code>3</code> so it's not used on these gate. When we add all polynomial <code>Lv + Lw + Lx + Ly + Lz = L(x)</code>, it returns <code>1</code> when we pass <code>1</code>, <code>2</code> and <code>3</code>. We do the same operation for each column and get polynomials as well.</p>
+<p>Above polynomial expresses the gate that variable uses. When we pass gate number to polynomial <code>v</code> <script type="math/tex; mode=display"> \frac{x^2}{2} - \frac{5x}{2} + 3 \\ </script>, we can know which gate the <code>v</code> is used. For example, we pass <code>1</code> to polynomial <code>v</code>, it returns <code>1</code> so the variable <code>v</code> is used on gate <code>1</code> but it returns <code>0</code> when we pass <code>2</code> and <code>3</code> so it's not used on these gate. When we add all polynomial <code>Lv + Lw + Lx + Ly + Lz = L(x)</code>, it returns <code>1</code> when we pass <code>1</code>, <code>2</code> and <code>3</code>. We do the same operation for each column and get polynomials as well.</p>
 <ul>
 <li>L(x)<br />
 <code>Lv + Lw + Lx + Ly + Lz</code>  </li>
@@ -961,20 +973,30 @@ $$ 3: a^2 * b^2 = c $$</p>
 <p>We can intruduce above polynomials when we decide the <code>computation</code>.</p>
 <h3 id="proof">Proof</h3>
 <p>From now on, we are going to prove the state ment. In here, we use <code>a = 2</code>, <code>b = 3</code> and <code>c = 36</code>. We can get actual value as following.</p>
-<p>$$ [v, w, x, y, z] -&gt; [2, 4, 3, 9, 36] $$</p>
+<p>
+<script type="math/tex; mode=display"> [v, w, x, y, z] -> [2, 4, 3, 9, 36] </script>
+</p>
 <p>And we multiply above variables by for each polynomial. For example, <code>L(x)</code> is following.</p>
-<p>$$ L(x) = v * Lv + w * Lw + x * Lx + y * Ly + z * Lz $$</p>
+<p>
+<script type="math/tex; mode=display"> L(x) = v * Lv + w * Lw + x * Lx + y * Ly + z * Lz </script>
+</p>
 <p>When we pass the <code>1</code> to <code>L(x)</code>, we can get <code>v</code> because only <code>Lv</code> returns <code>1</code> and others return <code>0</code>. <code>R(x)</code> as well and <code>O(x)</code> returns <code>w</code> so following equation holds.</p>
-<p>$$ L(1) * R(1) - O(1) = v * v - w = 2 * 2 - 4 = 0 $$</p>
+<p>
+<script type="math/tex; mode=display"> L(1) * R(1) - O(1) = v * v - w = 2 * 2 - 4 = 0 </script>
+</p>
 <p>It corresponds the table we saw in <code>R1Cs</code> and above also holds the case <code>x = 2</code> and <code>x = 3</code>. When we want to prove the statement, we are going to make above polynomial with secret <code>[v, w, x, y, z] -&gt; [2, 4, 3, 9, 36]</code> so polynomial would be integrated as one as following.</p>
-<p>$$ L(x) = 2 * Lv + 4 * Lw + 3 * Lx + 9 * Ly + 36 * Lz $$
-$$ R(x) = 2 * Rv + 4 * Rw + 3 * Rx + 9 * Ry + 36 * Rz $$
-$$ O(x) = 2 * Ov + 4 * Ow + 3 * Ox + 9 * Oy + 36 * Oz $$
-$$ L(x) * R(x) - O(x) = P(x) $$</p>
+<p>
+<script type="math/tex; mode=display"> L(x) = 2 * Lv + 4 * Lw + 3 * Lx + 9 * Ly + 36 * Lz </script>
+<script type="math/tex; mode=display"> R(x) = 2 * Rv + 4 * Rw + 3 * Rx + 9 * Ry + 36 * Rz </script>
+<script type="math/tex; mode=display"> O(x) = 2 * Ov + 4 * Ow + 3 * Ox + 9 * Oy + 36 * Oz </script>
+<script type="math/tex; mode=display"> L(x) * R(x) - O(x) = P(x) </script>
+</p>
 <p>We make the <code>P(x)</code> to prove the statement.</p>
 <h3 id="verification">Verification</h3>
 <p>We can know whether <code>computation</code> was executed correctly to devide <code>P(x)</code> with <code>(x - 1) * (x - 2) * (x - 3)</code>. If it's devided as following prover knows the secret <code>a</code> and <code>b</code> leading <code>c</code>.</p>
-<p>$$ P(x) = (x - 1) * (x - 2) * (x - 3) * T(x) $$</p>
+<p>
+<script type="math/tex; mode=display"> P(x) = (x - 1) * (x - 2) * (x - 3) * T(x) </script>
+</p>
 <h3 id="next">Next</h3>
 <p>In this section, we understood how to convert <code>computation</code> to <code>polynomial groups</code> but there are some possibility that <code>P(x)</code> was made without using secret. In addition to this, we can know the secret to factor the polynomial. Zk SNARKs addresses the former problem with <code>Polynomial Commitment</code> and latter problem with <code>homomorphic encryption</code>.</p>
 
@@ -1018,6 +1040,8 @@ $$ L(x) * R(x) - O(x) = P(x) $$</p>
     
     
       <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       
     
   </body>

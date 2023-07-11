@@ -424,7 +424,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../confidential_transfer/" class="md-nav__link">
+      <a href="../confidential_transfer_constraints/" class="md-nav__link">
         Confidential Transfer Constraints
       </a>
     </li>
@@ -848,7 +848,9 @@
 </table>
 <h2 id="generates-recipient-stealth-address">Generates Recipient <code>Stealth Address</code></h2>
 <p>Secondly, Alice generates the Bob <strong>recipient</strong> address as referred to the <code>Stealth Address</code>. Alice selects the random number <code>r</code> and calculate the <code>Stealth Address</code> with Bob public keys such that following.</p>
-<p>$$ P = H(r*A) * G + B $$</p>
+<p>
+<script type="math/tex; mode=display"> P = H(r*A) * G + B </script>
+</p>
 <p>No one can link P address with <code>A</code> and <code>B</code> because it's concealed by elliptic curve arithmetic. Alice publish the <code>P</code> and <code>R</code> calculated as <code>R = rG</code>.</p>
 <table>
 <thead>
@@ -924,6 +926,8 @@
     
     
       <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       
     
   </body>

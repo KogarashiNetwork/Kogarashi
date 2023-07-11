@@ -15,7 +15,7 @@ nav:
     - Confidential Transfer: confidential_transfer.md
   - Constraints:
     - 'Abstract': contraints.md
-    - Confidential Transfer Constraints: confidential_transfer.md
+    - Confidential Transfer Constraints: confidential_transfer_constraints.md
   - Technical:
     - 'Abstract': technical.md
     - Stealth Address: stealth_address.md
@@ -29,3 +29,9 @@ nav:
     - Frequent Errors: frequent_errors.md
 site_dir: docs
 docs_dir: book
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+
+markdown_extensions:
+  - mdx_math
+  - codehilite

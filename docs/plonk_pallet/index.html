@@ -495,7 +495,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../confidential_transfer/" class="md-nav__link">
+      <a href="../confidential_transfer_constraints/" class="md-nav__link">
         Confidential Transfer Constraints
       </a>
     </li>
@@ -816,68 +816,71 @@
 <ul>
 <li><your-pallet>/Cargo.toml</li>
 </ul>
-<pre><code class="language-toml">[dependencies]
-pallet-plonk = { git = &quot;https://github.com/KogarashiNetwork/Kogarashi&quot;, branch = &quot;master&quot;, default-features = false }
-zero-jubjub = { git = &quot;https://github.com/KogarashiNetwork/Kogarashi&quot;, branch = &quot;master&quot;, default-features = false }
-zero-plonk = { git = &quot;https://github.com/KogarashiNetwork/Kogarashi&quot;, branch = &quot;master&quot;, default-features = false }
-rand_core = {version=&quot;0.6&quot;, default-features = false }
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">[dependencies]</span>
+<span class="n">pallet-plonk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">git</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;https://github.com/KogarashiNetwork/Kogarashi&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;master&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">default-features</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">false</span><span class="w"> </span><span class="p">}</span>
+<span class="n">zero-jubjub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">git</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;https://github.com/KogarashiNetwork/Kogarashi&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;master&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">default-features</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">false</span><span class="w"> </span><span class="p">}</span>
+<span class="n">zero-plonk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">git</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;https://github.com/KogarashiNetwork/Kogarashi&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;master&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">default-features</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">false</span><span class="w"> </span><span class="p">}</span>
+<span class="n">rand_core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">version</span><span class="o">=</span><span class="s">&quot;0.6&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">default-features</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">false</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
 <p>The <code>plonk-pallet</code> depends on <code>rand_core</code> so please import it.</p>
 <h2 id="2-couple-the-plonk-pallet-to-your-own-pallet">2. Couple the plonk-pallet to your own pallet</h2>
 <p>The next, the <code>plonk-pallet</code> need to be coupled with your pallet. Please couple the pallet <code>Config</code> as following.</p>
 <ul>
 <li><your-pallet>/src/main.rs</li>
 </ul>
-<pre><code class="language-rs">#[frame_support::pallet]
-pub mod pallet {
-    use frame_support::pallet_prelude::*;
-    use frame_system::pallet_prelude::*;
-    pub use plonk_pallet::{FullcodecRng, Proof, PublicInputValue, Transcript, VerifierData};
+<div class="codehilite"><pre><span></span><code><span class="cp">#[frame_support::pallet]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">mod</span> <span class="nn">pallet</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="n">frame_support</span>::<span class="n">pallet_prelude</span>::<span class="o">*</span><span class="p">;</span>
+<span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="n">frame_system</span>::<span class="n">pallet_prelude</span>::<span class="o">*</span><span class="p">;</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">use</span><span class="w"> </span><span class="n">plonk_pallet</span>::<span class="p">{</span><span class="n">FullcodecRng</span><span class="p">,</span><span class="w"> </span><span class="n">Proof</span><span class="p">,</span><span class="w"> </span><span class="n">PublicInputValue</span><span class="p">,</span><span class="w"> </span><span class="n">Transcript</span><span class="p">,</span><span class="w"> </span><span class="n">VerifierData</span><span class="p">};</span>
 
-    /// Coupling configuration trait with plonk_pallet.
-    #[pallet::config]
-    pub trait Config: frame_system::Config + plonk_pallet::Config {
-        /// The overarching event type.
-        type Event: From&lt;Event&lt;Self&gt;&gt; + IsType&lt;&lt;Self as frame_system::Config&gt;::Event&gt;;
-    }
-</code></pre>
+<span class="w">    </span><span class="sd">/// Coupling configuration trait with plonk_pallet.</span>
+<span class="w">    </span><span class="cp">#[pallet::config]</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">Config</span>: <span class="nc">frame_system</span>::<span class="n">Config</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">plonk_pallet</span>::<span class="n">Config</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="sd">/// The overarching event type.</span>
+<span class="w">        </span><span class="k">type</span> <span class="nc">Event</span>: <span class="nb">From</span><span class="o">&lt;</span><span class="n">Event</span><span class="o">&lt;</span><span class="bp">Self</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">IsType</span><span class="o">&lt;&lt;</span><span class="bp">Self</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">frame_system</span>::<span class="n">Config</span><span class="o">&gt;</span>::<span class="n">Event</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+
 <p>With this step, you can use the <code>plonk-pallet</code> in your pallet through <code>Module</code>.</p>
 <h2 id="3-define-the-plonk-pallet-functions-on-your-pallet">3. Define the plonk-pallet functions on your pallet</h2>
 <p>The next, let's define the <code>plonk-pallet</code> function on your pallet. We are going to define the <code>trusted_setup</code> function which generates the public parameters refered as to <code>srs</code> and the <code>verify</code> function which verified the proof. In this tutorial, we use <a href="https://github.com/JoshOrndorff/recipes/blob/master/pallets/sum-storage/src/main.rs">sum-storage</a> pallet as example and add the <code>verify</code> function before set <code>Thing1</code> storage value on <code>set_thing_1</code>. If the <code>verify</code> is success, the <code>set_thing_1</code> can set <code>Thing1</code> value.</p>
 <ul>
 <li><your-pallet>/src/main.rs</li>
 </ul>
-<pre><code class="language-rust">    // The module's dispatchable functions.
-    #[pallet::call]
-    impl&lt;T: Config&gt; Pallet&lt;T&gt; {
-        // Coupled trusted setup
-        #[pallet::weight(10_000)]
-        pub fn trusted_setup(
-            origin: OriginFor&lt;T&gt;,
-            val: u32,
-            rng: FullcodecRng,
-        ) -&gt; DispatchResultWithPostInfo {
-            pallet_plonk::Pallet::&lt;T&gt;::trusted_setup(origin, val, rng)?;
-            Ok(().into())
-        }
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="c1">// The module&#39;s dispatchable functions.</span>
+<span class="w">    </span><span class="cp">#[pallet::call]</span>
+<span class="w">    </span><span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span>: <span class="nc">Config</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Pallet</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Coupled trusted setup</span>
+<span class="w">        </span><span class="cp">#[pallet::weight(10_000)]</span>
+<span class="w">        </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">trusted_setup</span><span class="p">(</span>
+<span class="w">            </span><span class="n">origin</span>: <span class="nc">OriginFor</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">            </span><span class="n">val</span>: <span class="kt">u32</span><span class="p">,</span>
+<span class="w">            </span><span class="n">rng</span>: <span class="nc">FullcodecRng</span><span class="p">,</span>
+<span class="w">        </span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">DispatchResultWithPostInfo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">pallet_plonk</span>::<span class="n">Pallet</span>::<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span>::<span class="n">trusted_setup</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">rng</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">            </span><span class="nb">Ok</span><span class="p">(().</span><span class="n">into</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
 
-        /// Sets the first simple storage value
-        #[pallet::weight(10_000)]
-        pub fn set_thing_1(
-            origin: OriginFor&lt;T&gt;,
-            val: u32,
-            proof: Proof,
-            public_inputs: Vec&lt;Fr&gt;,
-        ) -&gt; DispatchResultWithPostInfo {
-            // Define the proof verification
-            pallet_plonk::Pallet::&lt;T&gt;::verify(origin, proof, public_inputs)?;
+<span class="w">        </span><span class="sd">/// Sets the first simple storage value</span>
+<span class="w">        </span><span class="cp">#[pallet::weight(10_000)]</span>
+<span class="w">        </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">set_thing_1</span><span class="p">(</span>
+<span class="w">            </span><span class="n">origin</span>: <span class="nc">OriginFor</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">            </span><span class="n">val</span>: <span class="kt">u32</span><span class="p">,</span>
+<span class="w">            </span><span class="n">proof</span>: <span class="nc">Proof</span><span class="p">,</span>
+<span class="w">            </span><span class="n">public_inputs</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">Fr</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">        </span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">DispatchResultWithPostInfo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Define the proof verification</span>
+<span class="w">            </span><span class="n">pallet_plonk</span>::<span class="n">Pallet</span>::<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span>::<span class="n">verify</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span><span class="w"> </span><span class="n">proof</span><span class="p">,</span><span class="w"> </span><span class="n">public_inputs</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
 
-            Thing1::&lt;T&gt;::put(val);
+<span class="w">            </span><span class="n">Thing1</span>::<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span>::<span class="n">put</span><span class="p">(</span><span class="n">val</span><span class="p">);</span>
 
-            Self::deposit_event(Event::ValueSet(1, val));
-            Ok(().into())
-        }
-</code></pre>
+<span class="w">            </span><span class="bp">Self</span>::<span class="n">deposit_event</span><span class="p">(</span><span class="n">Event</span>::<span class="n">ValueSet</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">));</span>
+<span class="w">            </span><span class="nb">Ok</span><span class="p">(().</span><span class="n">into</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+</code></pre></div>
+
 <p>With this step, we can check whether the proof is valid before setting the <code>Thing1</code> value and only if the proof is valid, the value is set.</p>
 <h2 id="4-import-the-coupling-pallet-to-testruntime-and-define-your-circuit">4. Import the coupling pallet to TestRuntime and define your Circuit</h2>
 <p>We already imported the <code>plonk-pallet</code> functions so we are going to import it to <code>TestRumtime</code> and define your customized <code>Circuit</code>.</p>
@@ -885,131 +888,133 @@ pub mod pallet {
 <ul>
 <li>runtime/src/main.rs</li>
 </ul>
-<pre><code class="language-rust">use crate::{self as sum_storage, Config};
+<div class="codehilite"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="k">crate</span>::<span class="p">{</span><span class="bp">self</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">sum_storage</span><span class="p">,</span><span class="w"> </span><span class="n">Config</span><span class="p">};</span>
 
-use frame_support::dispatch::{DispatchError, DispatchErrorWithPostInfo, PostDispatchInfo};
-use frame_support::{assert_ok, construct_runtime, parameter_types};
+<span class="k">use</span><span class="w"> </span><span class="n">frame_support</span>::<span class="n">dispatch</span>::<span class="p">{</span><span class="n">DispatchError</span><span class="p">,</span><span class="w"> </span><span class="n">DispatchErrorWithPostInfo</span><span class="p">,</span><span class="w"> </span><span class="n">PostDispatchInfo</span><span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">frame_support</span>::<span class="p">{</span><span class="n">assert_ok</span><span class="p">,</span><span class="w"> </span><span class="n">construct_runtime</span><span class="p">,</span><span class="w"> </span><span class="n">parameter_types</span><span class="p">};</span>
 
-// Import `plonk_pallet` and dependency
-pub use plonk_pallet::*;
-use rand_core::SeedableRng;
+<span class="c1">// Import `plonk_pallet` and dependency</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">use</span><span class="w"> </span><span class="n">plonk_pallet</span>::<span class="o">*</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">rand_core</span>::<span class="n">SeedableRng</span><span class="p">;</span>
 
---- snip ---
+<span class="o">---</span><span class="w"> </span><span class="n">snip</span><span class="w"> </span><span class="o">---</span>
 
-construct_runtime!(
-    pub enum TestRuntime where
-        Block = Block,
-        NodeBlock = Block,
-        UncheckedExtrinsic = UncheckedExtrinsic,
-    {
-        System: frame_system::{Module, Call, Config, Storage, Event&lt;T&gt;},
-        // Define the `plonk_pallet` in `contruct_runtime`
-        Plonk: plonk_pallet::{Module, Call, Storage, Event&lt;T&gt;},
-        {YourPallet}: {your_pallet}::{Module, Call, Storage, Event&lt;T&gt;},
-    }
-);
-</code></pre>
+<span class="n">construct_runtime</span><span class="o">!</span><span class="p">(</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">enum</span> <span class="nc">TestRuntime</span><span class="w"> </span><span class="k">where</span>
+<span class="w">        </span><span class="n">Block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Block</span><span class="p">,</span>
+<span class="w">        </span><span class="n">NodeBlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Block</span><span class="p">,</span>
+<span class="w">        </span><span class="n">UncheckedExtrinsic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UncheckedExtrinsic</span><span class="p">,</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span>: <span class="nc">frame_system</span>::<span class="p">{</span><span class="n">Module</span><span class="p">,</span><span class="w"> </span><span class="n">Call</span><span class="p">,</span><span class="w"> </span><span class="n">Config</span><span class="p">,</span><span class="w"> </span><span class="n">Storage</span><span class="p">,</span><span class="w"> </span><span class="n">Event</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">},</span>
+<span class="w">        </span><span class="c1">// Define the `plonk_pallet` in `contruct_runtime`</span>
+<span class="w">        </span><span class="n">Plonk</span>: <span class="nc">plonk_pallet</span>::<span class="p">{</span><span class="n">Module</span><span class="p">,</span><span class="w"> </span><span class="n">Call</span><span class="p">,</span><span class="w"> </span><span class="n">Storage</span><span class="p">,</span><span class="w"> </span><span class="n">Event</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="n">YourPallet</span><span class="p">}</span>: <span class="p">{</span><span class="n">your_pallet</span><span class="p">}</span>::<span class="p">{</span><span class="n">Module</span><span class="p">,</span><span class="w"> </span><span class="n">Call</span><span class="p">,</span><span class="w"> </span><span class="n">Storage</span><span class="p">,</span><span class="w"> </span><span class="n">Event</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">},</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">);</span>
+</code></pre></div>
+
 <p>As the final step of runtime configuration, we define the zk-SNARKs circuit and extend the <code>TestRuntime</code> config with it. You can replace <code>TestCircuit</code> with your own circuit.</p>
 <ul>
 <li>runtime/src/main.rs</li>
 </ul>
-<pre><code class="language-rust">// Implement a circuit that checks:
-// 1) a + b = c where C is a PI
-// 2) a &lt;= 2^6
-// 3) b &lt;= 2^5
-// 4) a * b = d where D is a PI
-// 5) JubJub::GENERATOR * e(JubJubScalar) = f where F is a Public Input
+<div class="codehilite"><pre><span></span><code><span class="c1">// Implement a circuit that checks:</span>
+<span class="c1">// 1) a + b = c where C is a PI</span>
+<span class="c1">// 2) a &lt;= 2^6</span>
+<span class="c1">// 3) b &lt;= 2^5</span>
+<span class="c1">// 4) a * b = d where D is a PI</span>
+<span class="c1">// 5) JubJub::GENERATOR * e(JubJubScalar) = f where F is a Public Input</span>
 
-#[derive(Debug, Default)]
-pub struct TestCircuit {
-    pub a: BlsScalar,
-    pub b: BlsScalar,
-    pub c: BlsScalar,
-    pub d: BlsScalar,
-    pub e: JubJubScalar,
-    pub f: JubJubAffine,
-}
+<span class="cp">#[derive(Debug, Default)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">TestCircuit</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">a</span>: <span class="nc">BlsScalar</span><span class="p">,</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">b</span>: <span class="nc">BlsScalar</span><span class="p">,</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">c</span>: <span class="nc">BlsScalar</span><span class="p">,</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">d</span>: <span class="nc">BlsScalar</span><span class="p">,</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">e</span>: <span class="nc">JubJubScalar</span><span class="p">,</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">f</span>: <span class="nc">JubJubAffine</span><span class="p">,</span>
+<span class="p">}</span>
 
-impl Circuit for TestCircuit {
-    fn circuit&lt;C&gt;(&amp;self, composer: &amp;mut C) -&gt; Result&lt;(), Error&gt;
-    where
-        C: Composer,
-    {
-        let a = composer.append_witness(self.a);
-        let b = composer.append_witness(self.b);
+<span class="k">impl</span><span class="w"> </span><span class="n">Circuit</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">TestCircuit</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">circuit</span><span class="o">&lt;</span><span class="n">C</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">composer</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">C</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="n">Error</span><span class="o">&gt;</span>
+<span class="w">    </span><span class="k">where</span>
+<span class="w">        </span><span class="n">C</span>: <span class="nc">Composer</span><span class="p">,</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">composer</span><span class="p">.</span><span class="n">append_witness</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">a</span><span class="p">);</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">composer</span><span class="p">.</span><span class="n">append_witness</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">b</span><span class="p">);</span>
 
-        // Make first constraint a + b = c
-        let constraint = Constraint::new().left(1).right(1).public(-self.c).a(a).b(b);
+<span class="w">        </span><span class="c1">// Make first constraint a + b = c</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">constraint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Constraint</span>::<span class="n">new</span><span class="p">().</span><span class="n">left</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">right</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">public</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="p">.</span><span class="n">c</span><span class="p">).</span><span class="n">a</span><span class="p">(</span><span class="n">a</span><span class="p">).</span><span class="n">b</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
 
-        composer.append_gate(constraint);
+<span class="w">        </span><span class="n">composer</span><span class="p">.</span><span class="n">append_gate</span><span class="p">(</span><span class="n">constraint</span><span class="p">);</span>
 
-        // Check that a and b are in range
-        composer.component_range(a, 1 &lt;&lt; 6);
-        composer.component_range(b, 1 &lt;&lt; 5);
+<span class="w">        </span><span class="c1">// Check that a and b are in range</span>
+<span class="w">        </span><span class="n">composer</span><span class="p">.</span><span class="n">component_range</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">);</span>
+<span class="w">        </span><span class="n">composer</span><span class="p">.</span><span class="n">component_range</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span>
 
-        // Make second constraint a * b = d
-        let constraint = Constraint::new()
-            .mult(1)
-            .output(1)
-            .public(-self.d)
-            .a(a)
-            .b(b);
+<span class="w">        </span><span class="c1">// Make second constraint a * b = d</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">constraint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Constraint</span>::<span class="n">new</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="n">mult</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="n">output</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="n">public</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="p">.</span><span class="n">d</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="n">a</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="n">b</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
 
-        composer.append_gate(constraint);
+<span class="w">        </span><span class="n">composer</span><span class="p">.</span><span class="n">append_gate</span><span class="p">(</span><span class="n">constraint</span><span class="p">);</span>
 
-        let e = composer.append_witness(self.e);
-        let scalar_mul_result = composer.component_mul_generator(e, GENERATOR_EXTENDED)?;
-        composer.assert_equal_public_point(scalar_mul_result, self.f);
-        Ok(())
-    }
-}
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">composer</span><span class="p">.</span><span class="n">append_witness</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">scalar_mul_result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">composer</span><span class="p">.</span><span class="n">component_mul_generator</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="w"> </span><span class="n">GENERATOR_EXTENDED</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">        </span><span class="n">composer</span><span class="p">.</span><span class="n">assert_equal_public_point</span><span class="p">(</span><span class="n">scalar_mul_result</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">f</span><span class="p">);</span>
+<span class="w">        </span><span class="nb">Ok</span><span class="p">(())</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
-impl plonk_pallet::Config for TestRuntime {
-    type CustomCircuit = TestCircuit;
-    type Event = Event;
-}
-</code></pre>
+<span class="k">impl</span><span class="w"> </span><span class="n">plonk_pallet</span>::<span class="n">Config</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">TestRuntime</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span> <span class="nc">CustomCircuit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TestCircuit</span><span class="p">;</span>
+<span class="w">    </span><span class="k">type</span> <span class="nc">Event</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Event</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
 <p>With this step, we finish to setup the plonk runtime environment.</p>
 <h2 id="5-test-whether-the-functions-work-correctly">5. Test whether the functions work correctly</h2>
 <p>The plonk functions is available on your pallet so we are going to test them as following tests.</p>
 <ul>
 <li><your-pallet>/src/main.rs</li>
 </ul>
-<pre><code class="language-rust">fn main() {
-    let mut rng = get_rng();
-    let label = b&quot;verify&quot;;
-    let test_circuit = TestCircuit {
-        a: BlsScalar::from(20u64),
-        b: BlsScalar::from(5u64),
-        c: BlsScalar::from(25u64),
-        d: BlsScalar::from(100u64),
-        e: JubJubScalar::from(2u64),
-        f: JubJubAffine::from(GENERATOR_EXTENDED * JubJubScalar::from(2u64)),
-    };
+<div class="codehilite"><pre><span></span><code><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">rng</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_rng</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">b&quot;verify&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">test_circuit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TestCircuit</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">a</span>: <span class="nc">BlsScalar</span>::<span class="n">from</span><span class="p">(</span><span class="mi">20</span><span class="k">u64</span><span class="p">),</span>
+<span class="w">        </span><span class="n">b</span>: <span class="nc">BlsScalar</span>::<span class="n">from</span><span class="p">(</span><span class="mi">5</span><span class="k">u64</span><span class="p">),</span>
+<span class="w">        </span><span class="n">c</span>: <span class="nc">BlsScalar</span>::<span class="n">from</span><span class="p">(</span><span class="mi">25</span><span class="k">u64</span><span class="p">),</span>
+<span class="w">        </span><span class="n">d</span>: <span class="nc">BlsScalar</span>::<span class="n">from</span><span class="p">(</span><span class="mi">100</span><span class="k">u64</span><span class="p">),</span>
+<span class="w">        </span><span class="n">e</span>: <span class="nc">JubJubScalar</span>::<span class="n">from</span><span class="p">(</span><span class="mi">2</span><span class="k">u64</span><span class="p">),</span>
+<span class="w">        </span><span class="n">f</span>: <span class="nc">JubJubAffine</span>::<span class="n">from</span><span class="p">(</span><span class="n">GENERATOR_EXTENDED</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">JubJubScalar</span>::<span class="n">from</span><span class="p">(</span><span class="mi">2</span><span class="k">u64</span><span class="p">)),</span>
+<span class="w">    </span><span class="p">};</span>
 
-    new_test_ext().execute_with(|| {
-        assert_eq!(SumStorage::get_sum(), 0);
-        assert_ok!(Plonk::trusted_setup(Origin::signed(1), 12, rng.clone()));
+<span class="w">    </span><span class="n">new_test_ext</span><span class="p">().</span><span class="n">execute_with</span><span class="p">(</span><span class="o">||</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">SumStorage</span>::<span class="n">get_sum</span><span class="p">(),</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">        </span><span class="n">assert_ok</span><span class="o">!</span><span class="p">(</span><span class="n">Plonk</span>::<span class="n">trusted_setup</span><span class="p">(</span><span class="n">Origin</span>::<span class="n">signed</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="n">rng</span><span class="p">.</span><span class="n">clone</span><span class="p">()));</span>
 
-        let pp = Plonk::public_parameter().unwrap();
-        let (prover, _) =
-            Compiler::compile::&lt;TestCircuit&gt;(&amp;pp, label).expect(&quot;failed to compile circuit&quot;);
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">pp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Plonk</span>::<span class="n">public_parameter</span><span class="p">().</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">prover</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="p">)</span><span class="w"> </span><span class="o">=</span>
+<span class="w">            </span><span class="n">Compiler</span>::<span class="n">compile</span>::<span class="o">&lt;</span><span class="n">TestCircuit</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pp</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="p">).</span><span class="n">expect</span><span class="p">(</span><span class="s">&quot;failed to compile circuit&quot;</span><span class="p">);</span>
 
-        let (proof, public_inputs) = prover
-            .prove(&amp;mut rng, &amp;test_circuit)
-            .expect(&quot;failed to prove&quot;);
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">proof</span><span class="p">,</span><span class="w"> </span><span class="n">public_inputs</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prover</span>
+<span class="w">            </span><span class="p">.</span><span class="n">prove</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">rng</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">test_circuit</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="n">expect</span><span class="p">(</span><span class="s">&quot;failed to prove&quot;</span><span class="p">);</span>
 
-        assert_ok!(SumStorage::set_thing_1(
-            Origin::signed(1),
-            42,
-            proof,
-            public_inputs
-        ));
-        assert_eq!(SumStorage::get_sum(), 42);
-    })
-}
+<span class="w">        </span><span class="n">assert_ok</span><span class="o">!</span><span class="p">(</span><span class="n">SumStorage</span>::<span class="n">set_thing_1</span><span class="p">(</span>
+<span class="w">            </span><span class="n">Origin</span>::<span class="n">signed</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+<span class="w">            </span><span class="mi">42</span><span class="p">,</span>
+<span class="w">            </span><span class="n">proof</span><span class="p">,</span>
+<span class="w">            </span><span class="n">public_inputs</span>
+<span class="w">        </span><span class="p">));</span>
+<span class="w">        </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">SumStorage</span>::<span class="n">get_sum</span><span class="p">(),</span><span class="w"> </span><span class="mi">42</span><span class="p">);</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div>
 
-</code></pre>
 <p>With above tests, we can confirm that your pallet is coupling with <code>plonk-pallet</code> and these functions work correctly. You can check the <code>plonk-pallet</code> example <a href="https://github.com/KogarashiNetwork/Kogarashi/blob/master/pallets/plonk/src/tests.rs">here</a>. Happy hacking!</p>
 
 
@@ -1052,6 +1057,8 @@ impl plonk_pallet::Config for TestRuntime {
     
     
       <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       
     
   </body>

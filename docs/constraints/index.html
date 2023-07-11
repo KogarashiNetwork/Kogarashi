@@ -420,7 +420,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../confidential_transfer/" class="md-nav__link">
+      <a href="../confidential_transfer_constraints/" class="md-nav__link">
         Confidential Transfer Constraints
       </a>
     </li>
@@ -852,12 +852,16 @@
 </table>
 <h3 id="setup">Setup</h3>
 <p>Setup the paramaters used for generate and verify proof.</p>
-<p>$$ g ∈ G $$
-$$ setup(d, s) = [g, [s] g, [s^2] g, ... , [s^{d-1}] g] = (pk, vk) $$</p>
+<p>
+<script type="math/tex; mode=display"> g ∈ G </script>
+<script type="math/tex; mode=display"> setup(d, s) = [g, [s] g, [s^2] g, ... , [s^{d-1}] g] = (pk, vk) </script>
+</p>
 <h3 id="key-pair">Key Pair</h3>
 <p>Generate the key pair for sign the transaction.</p>
-<p>$$ x ∈ F $$
-$$ y = g^x $$</p>
+<p>
+<script type="math/tex; mode=display"> x ∈ F </script>
+<script type="math/tex; mode=display"> y = g^x </script>
+</p>
 <h2 id="common-transaction-constraints">Common Transaction Constraints</h2>
 <p>Every transaction has common object items and this <code>Common Transaction Constraints</code> checks these condition.
 The transaction object items are following.</p>
@@ -925,12 +929,18 @@ We use following function to generate proof and signature.</p>
 </table>
 <h3 id="encrypt-variables">Encrypt Variables</h3>
 <p>First of all, the number should be encrypted by ElGamal.</p>
-<p>$$ enc(x, value, gasLimit, gasPrice, nonce) = value_{enc}, gasLimit_{enc}, gasPrice_{enc}, nonce_{enc} $$</p>
+<p>
+<script type="math/tex; mode=display"> enc(x, value, gasLimit, gasPrice, nonce) = value_{enc}, gasLimit_{enc}, gasPrice_{enc}, nonce_{enc} </script>
+</p>
 <h3 id="generate-proof-and-signature">Generate Proof and Signature</h3>
 <p>Generate the proof with proving key and prove that this common params satisfy the statement.</p>
-<p>$$ π = Prove(pk, statement_{common_constraint}[value_{enc}, gasLimit_{enc}, gasPrice_{enc}, nonce_{enc}]) $$</p>
+<p>
+<script type="math/tex; mode=display"> π = Prove(pk, statement_{common_constraint}[value_{enc}, gasLimit_{enc}, gasPrice_{enc}, nonce_{enc}]) </script>
+</p>
 <p>Generate the signature with private key and prevent front-running attack.</p>
-<p>$$ σ = Sign(x, value_{enc}, gasLimit_{enc}, gasPrice_{enc}, nonce_{enc}, π) $$</p>
+<p>
+<script type="math/tex; mode=display"> σ = Sign(x, value_{enc}, gasLimit_{enc}, gasPrice_{enc}, nonce_{enc}, π) </script>
+</p>
 <h2 id="confidential-smart-contract">Confidential Smart Contract</h2>
 <p>This <code>Confidential Transfer Constraints</code> checks that the users smart constract execution is valid. The condition that users proof needs to satisfy is different for each contracts so it's provided by Dapp owner as the same with that the Ethererum Dapp owner provides the ABI of smart contract. When the developers finish implementing the smart contract, the smart contract is compiled and output the Wasm binary and constraints metadata. The constraints metadata is the polynomials expressing the smart contract constraints. The users need the metadata, their secret key and <code>srs</code> when they generate the proof.</p>
 
@@ -974,6 +984,8 @@ We use following function to generate proof and signature.</p>
     
     
       <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       
     
   </body>
