@@ -228,7 +228,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d6d530bdd2d52966a6d03b7a964add7ae1a288d25214066fd4b600f0f796400"
 dependencies = [
  "arrayvec 0.4.12",
- "constant_time_eq",
+ "constant_time_eq 0.1.5",
 ]
 
 [[package]]
@@ -240,7 +240,18 @@ dependencies = [
  "arrayref",
  "arrayvec 0.4.12",
  "byteorder",
- "constant_time_eq",
+ "constant_time_eq 0.1.5",
+]
+
+[[package]]
+name = "blake2b_simd"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c2f0dc9a68c6317d884f97cc36cf5a3d20ba14ce404227df55e1af708ab04bc"
+dependencies = [
+ "arrayref",
+ "arrayvec 0.7.2",
+ "constant_time_eq 0.2.6",
 ]
 
 [[package]]
@@ -338,7 +349,7 @@ checksum = "f41036ad19cc023afdf392da2f7a9c40773c75df7506b58c2b09df0b285bc97e"
 dependencies = [
  "arbitrary",
  "array-init",
- "blake2b_simd",
+ "blake2b_simd 0.3.1",
  "cfg-if",
  "dusk-varint",
  "lazy_static",
@@ -497,6 +508,12 @@ name = "constant_time_eq"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
+
+[[package]]
+name = "constant_time_eq"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21a53c0a4d288377e7415b53dcfc3c04da5cdc2cc95c8d5ac178b58f0b861ad6"
 
 [[package]]
 name = "convert_case"
@@ -3442,6 +3459,7 @@ dependencies = [
 name = "zero-jubjub"
 version = "0.1.10"
 dependencies = [
+ "blake2b_simd 1.0.1",
  "dusk-bytes",
  "parity-scale-codec",
  "paste",
