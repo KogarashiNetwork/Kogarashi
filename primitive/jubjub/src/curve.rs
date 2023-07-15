@@ -48,9 +48,9 @@ impl JubjubAffine {
         JubjubAffine { x, y }
     }
 
-    fn as_bytes(self) -> [u8; Self::LENGTH] {
-        let mut tmp = self.x.as_bytes();
-        let u = self.y.as_bytes();
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
+        let mut tmp = self.x.to_bytes();
+        let u = self.y.to_bytes();
         tmp[31] |= u[0] << 7;
 
         tmp
@@ -72,9 +72,9 @@ impl JubjubExtend {
         y.iter().map(|p| JubjubAffine::from(*p))
     }
 
-    pub(crate) fn as_bytes(self) -> [u8; Self::LENGTH] {
-        let mut tmp = self.x.as_bytes();
-        let u = self.y.as_bytes();
+    pub(crate) fn to_bytes(self) -> [u8; Self::LENGTH] {
+        let mut tmp = self.x.to_bytes();
+        let u = self.y.to_bytes();
         tmp[31] |= u[0] << 7;
 
         tmp

@@ -1,7 +1,6 @@
 use crate::curve::JubjubExtend;
 use crate::fp::Fp;
 
-use dusk_bytes::Serializable;
 use zero_bls12_381::Fr;
 use zero_crypto::behave::DigitalSig;
 
@@ -32,8 +31,16 @@ impl PublicKey {
         PublicKey(raw)
     }
 
-    pub fn as_bytes(self) -> [u8; Self::LENGTH] {
-        self.0.as_bytes()
+    pub fn to_bytes(self) -> [u8; Self::LENGTH] {
+        self.0.to_bytes()
+    }
+
+    pub fn validate(m: &[u8], sig: Signature) -> bool {
+        let c = hash_to_scalar(&sig.s, m);
+        let s = match Fr::from_bytes(sig.e) {
+            Some(s) => s,
+            None => return false,
+        };
     }
 }
 
@@ -45,7 +52,7 @@ impl SecretKey {
         let mut t = [0u8; 80];
         rand.fill_bytes(&mut t[..]);
         let r = hash_to_scalar(&t, m);
-        let R = (JubjubExtend::ADDITIVE_GENERATOR * r).as_bytes();
+        let R = (JubjubExtend::ADDITIVE_GENERATOR * r).to_bytes();
         let S = r + hash_to_scalar(&R, m);
         Signature::new(R, S.to_bytes())
     }

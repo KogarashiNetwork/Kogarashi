@@ -250,13 +250,13 @@ impl From<i8> for Fp {
 
 impl From<Fp> for Fr {
     fn from(scalar: Fp) -> Fr {
-        let bls_scalar = Fr::from_bytes(&scalar.to_bytes());
+        let bls_scalar = Fr::from_bytes(scalar.to_bytes());
 
         // The order of a JubJub's Scalar field is shorter than a BLS Scalar,
         // so convert any jubjub scalar to a BLS' Scalar should always be
         // safe.
         assert!(
-            bls_scalar.is_ok(),
+            bls_scalar.is_some(),
             "Failed to convert a Scalar from JubJub to BLS"
         );
 
