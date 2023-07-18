@@ -20,6 +20,11 @@ parity-scale-codec = { version = "2", default-features = false, features = ["der
 dusk-bytes = { version = "0.1" }
 subtle = { version = "2.0", default-features = false }
 
+[dev-dependencies]
+zero-jubjub = { path = '../jubjub' }
+zero-bls12-381 = { path = '../bls12_381' }
+serde = { version = "1.0.102", default-features = false, features = ["derive"] }
+
 [[test]]
 name = "arithmetics"
 path = "tests/limbs.rs"

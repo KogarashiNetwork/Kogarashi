@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use zero_bls12_381::Fr;
 use zero_crypto::arithmetic::edwards::*;
 use zero_crypto::common::*;
-use zero_crypto::*;
+use zero_crypto::dress::curve::edwards::*;
 
 pub const EDWARDS_D: Fr = Fr::to_mont_form([
     0x01065fd6d6343eb1,
@@ -149,6 +149,7 @@ twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtended
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+    use zero_crypto::dress::curve::weierstrass::*;
 
     curve_test!(jubjub, Fr, JubjubAffine, JubjubExtended, 100);
 }
