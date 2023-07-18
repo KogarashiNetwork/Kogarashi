@@ -5,8 +5,9 @@ This crate provides basic cryptographic implementation as in `Field`, `Curve` an
 ### Field
 The following `Fr` support four basic operation.
 
-```ignore
+```rust
 use zero_crypto::common::*;
+use zero_crypto::behave::*;
 use zero_crypto::dress::field::*;
 use zero_crypto::arithmetic::bits_256::*;
 use serde::{Deserialize, Serialize};
@@ -20,6 +21,9 @@ const MODULUS: [u64; 4] = [
     0x3339d80809a1d805,
     0x73eda753299d7d48,
 ];
+
+/// Generator of the Scalar field
+pub const MULTIPLICATIVE_GENERATOR: Fr = Fr([7, 0, 0, 0]);
 
 const GENERATOR: [u64; 4] = [
     0x0000000efffffff1,
@@ -64,10 +68,6 @@ pub const ROOT_OF_UNITY: Fr = Fr([
 ]);
 
 impl Fr {
-    pub const fn to_mont_form(val: [u64; 4]) -> Self {
-        Self(to_mont_form(val, R2, MODULUS, INV))
-    }
-
     pub(crate) const fn montgomery_reduce(self) -> [u64; 4] {
         mont(
             [self.0[0], self.0[1], self.0[2], self.0[3], 0, 0, 0, 0],
@@ -77,7 +77,18 @@ impl Fr {
     }
 }
 
-fft_field_operation!(Fr, MODULUS, GENERATOR, INV, ROOT_OF_UNITY, R, R2, R3, S);
+fft_field_operation!(
+    Fr,
+    MODULUS,
+    GENERATOR,
+    MULTIPLICATIVE_GENERATOR,
+    INV,
+    ROOT_OF_UNITY,
+    R,
+    R2,
+    R3,
+    S
+);
 
 #[cfg(test)]
 mod tests {
@@ -92,44 +103,159 @@ mod tests {
 ### Curve
 The following `G1Affine` and `G1Projective` supports point arithmetic.
 
-```ignore
-use crate::fq::Fq;
-use crate::fr::Fr;
-use zero_crypto::arithmetic::bits_384::*;
+```rust
+use zero_jubjub::Fp;
+use serde::{Deserialize, Serialize};
+use zero_bls12_381::Fr;
+use zero_crypto::arithmetic::edwards::*;
 use zero_crypto::common::*;
-use zero_crypto::dress::curve::*;
+use zero_crypto::dress::curve::edwards::*;
 
-/// The projective form of coordinate
-#[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct G1Projective {
-    pub(crate) x: Fq,
-    pub(crate) y: Fq,
-    pub(crate) z: Fq,
+pub const EDWARDS_D: Fr = Fr::to_mont_form([
+    0x01065fd6d6343eb1,
+    0x292d7f6d37579d26,
+    0xf5fd9207e6bd7fd4,
+    0x2a9318e74bfa2b48,
+]);
+
+const X: Fr = Fr::to_mont_form([
+    0x4df7b7ffec7beaca,
+    0x2e3ebb21fd6c54ed,
+    0xf1fbf02d0fd6cce6,
+    0x3fd2814c43ac65a6,
+]);
+
+const Y: Fr = Fr::to_mont_form([
+    0x0000000000000012,
+    000000000000000000,
+    000000000000000000,
+    000000000000000000,
+]);
+
+const T: Fr = Fr::to_mont_form([
+    0x07b6af007a0b6822b,
+    0x04ebe6448d1acbcb8,
+    0x036ae4ae2c669cfff,
+    0x0697235704b95be33,
+]);
+
+#[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
+pub struct JubjubAffine {
+    x: Fr,
+    y: Fr,
 }
 
-/// The projective form of coordinate
-#[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct G1Affine {
-    pub(crate) x: Fq,
-    pub(crate) y: Fq,
-    is_infinity: bool,
+impl Add for JubjubAffine {
+    type Output = JubjubExtended;
+
+    fn add(self, rhs: JubjubAffine) -> Self::Output {
+        add_point(self.to_extended(), rhs.to_extended())
+    }
 }
 
-curve_operation!(
-    Fr,
-    Fq,
-    G1_PARAM_A,
-    G1_PARAM_B,
-    G1Affine,
-    G1Projective,
-    G1_GENERATOR_X,
-    G1_GENERATOR_Y
-);
+impl Neg for JubjubAffine {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: -self.x,
+            y: self.y,
+        }
+    }
+}
+
+impl Sub for JubjubAffine {
+    type Output = JubjubExtended;
+
+    fn sub(self, rhs: JubjubAffine) -> Self::Output {
+        add_point(self.to_extended(), rhs.neg().to_extended())
+    }
+}
+
+impl Mul<Fr> for JubjubAffine {
+    type Output = JubjubExtended;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self.to_extended(), &rhs)
+    }
+}
+
+impl Mul<JubjubAffine> for Fr {
+    type Output = JubjubExtended;
+
+    fn mul(self, rhs: JubjubAffine) -> Self::Output {
+        scalar_point(rhs.to_extended(), &self)
+    }
+}
+
+impl JubjubAffine {
+    /// Constructs an JubJubAffine given `x` and `y` without checking
+    /// that the point is on the curve.
+    pub const fn from_raw_unchecked(x: Fr, y: Fr) -> JubjubAffine {
+        JubjubAffine { x, y }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
+pub struct JubjubExtended {
+    x: Fr,
+    y: Fr,
+    t: Fr,
+    z: Fr,
+}
+
+impl Add for JubjubExtended {
+    type Output = JubjubExtended;
+
+    fn add(self, rhs: JubjubExtended) -> Self::Output {
+        add_point(self, rhs)
+    }
+}
+
+impl Neg for JubjubExtended {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: -self.x,
+            y: self.y,
+            t: -self.t,
+            z: self.z,
+        }
+    }
+}
+
+impl Sub for JubjubExtended {
+    type Output = JubjubExtended;
+
+    fn sub(self, rhs: JubjubExtended) -> Self::Output {
+        add_point(self, rhs.neg())
+    }
+}
+
+impl Mul<Fr> for JubjubExtended {
+    type Output = JubjubExtended;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self, &rhs)
+    }
+}
+
+impl Mul<JubjubExtended> for Fr {
+    type Output = JubjubExtended;
+
+    fn mul(self, rhs: JubjubExtended) -> Self::Output {
+        scalar_point(rhs, &self)
+    }
+}
+
+twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtended, X, Y, T);
 
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+    use zero_crypto::dress::curve::weierstrass::*;
 
     curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);
 }

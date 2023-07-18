@@ -3417,8 +3417,11 @@ dependencies = [
  "parity-scale-codec",
  "paste",
  "rand_core 0.6.4",
+ "serde",
  "sp-std",
  "subtle 2.4.1",
+ "zero-bls12-381",
+ "zero-jubjub",
 ]
 
 [[package]]
