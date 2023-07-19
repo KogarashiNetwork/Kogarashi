@@ -15,6 +15,8 @@
 
 #![doc = include_str!("../README.md")]
 #![cfg_attr(not(feature = "std"), no_std)]
+#![allow(clippy::suspicious_arithmetic_impl)]
+#![allow(clippy::suspicious_op_assign_impl)]
 
 mod curve;
 mod error;
@@ -22,4 +24,5 @@ mod fp;
 pub mod redsa;
 
 pub use curve::*;
+pub use fp::compute_windowed_naf;
 pub use fp::Fp;

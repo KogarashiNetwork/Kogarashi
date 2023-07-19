@@ -1,1 +1,0 @@
-# Confidential Smart Contract

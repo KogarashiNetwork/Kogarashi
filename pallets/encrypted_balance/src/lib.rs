@@ -173,10 +173,12 @@ pub mod pallet {
     use super::*;
     use frame_support::pallet_prelude::*;
     use frame_system::pallet_prelude::*;
+    use zero_crypto::common::Pairing;
     use zero_elgamal::ConfidentialTransferPublicInputs;
 
     #[pallet::config]
     pub trait Config<I: 'static = ()>: frame_system::Config {
+        type P: Pairing;
         /// The balance of an account.
         type EncryptedBalance: Parameter
             + CheckedAdd
@@ -186,7 +188,7 @@ pub mod pallet {
             + Copy
             + MaybeSerializeDeserialize
             + Debug
-            + ConfidentialTransferPublicInputs;
+            + ConfidentialTransferPublicInputs<Self::P>;
 
         /// The overarching event type.
         type Event: From<Event<Self, I>> + IsType<<Self as frame_system::Config>::Event>;

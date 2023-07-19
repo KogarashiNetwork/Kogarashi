@@ -1,16 +1,25 @@
-use zero_crypto::behave::Commitment;
+use zero_crypto::common::{Group, Pairing, PairingRange};
 
 // witness for polynomial commitment
 #[allow(dead_code)]
-pub struct Witness<C: Commitment> {
-    pub(crate) s_eval: C::G1Affine,
-    pub(crate) a_eval: C::G1Affine,
-    pub(crate) q_eval: C::G1Affine,
-    pub(crate) denominator: C::G2Affine,
+#[derive(Debug)]
+pub struct Witness<P: Pairing> {
+    // Original commitment, C = p(s)
+    pub c_eval: P::G1Affine,
+    // Quotient commitment, C = q(s)
+    pub q_eval: P::G1Affine,
+    // (s - a)_g2
+    pub(crate) denominator: P::G2PairngRepr,
+    // H
+    pub(crate) h: P::G2PairngRepr,
 }
 
-impl<C: Commitment> Witness<C> {
+impl<P: Pairing> Witness<P> {
     pub fn verify(self) -> bool {
-        false
+        let pairing =
+            P::multi_miller_loop(&[(self.c_eval, self.h), (self.q_eval, self.denominator)])
+                .final_exp();
+
+        pairing == <<P as Pairing>::PairingRange as PairingRange>::Gt::ADDITIVE_IDENTITY
     }
 }

@@ -1,8 +1,6 @@
 #[macro_export]
 macro_rules! group_operation {
     ($field:ident, $p:ident, $g:ident, $r:ident, $r2:ident, $r3:ident, $inv:ident) => {
-        group_arithmetic_extension!($field);
-
         impl Group for $field {
             type Scalar = $field;
 
@@ -87,7 +85,7 @@ macro_rules! group_operation {
             }
         }
 
-        impl Mul<<Self as Group>::Scalar> for $field {
+        impl Mul<$field> for $field {
             type Output = Self;
 
             fn mul(self, rhs: $field) -> Self {
@@ -175,8 +173,8 @@ macro_rules! group_operation {
             }
         }
 
-        impl MulAssign<<Self as Group>::Scalar> for $field {
-            fn mul_assign(&mut self, rhs: <Self as Group>::Scalar) {
+        impl MulAssign<$field> for $field {
+            fn mul_assign(&mut self, rhs: $field) {
                 *self = *self * rhs;
             }
         }
@@ -193,9 +191,4 @@ macro_rules! group_operation {
     };
 }
 
-#[macro_export]
-macro_rules! group_arithmetic_extension {
-    ($field:ident) => {};
-}
-
-pub use {group_arithmetic_extension, group_operation};
+pub use group_operation;

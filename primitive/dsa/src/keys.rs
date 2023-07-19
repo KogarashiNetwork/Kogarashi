@@ -1,4 +1,5 @@
-use zero_jubjub::{Fp, JubjubAffine, JubjubExtend};
+use zero_crypto::common::CurveGroup;
+use zero_jubjub::{Fp, JubjubAffine, JubjubExtended};
 
 struct KeyPair {
     private_key: Fp,
@@ -7,7 +8,7 @@ struct KeyPair {
 
 impl KeyPair {
     fn new(private_key: Fp) -> Self {
-        let public_key = JubjubAffine::from(JubjubExtend::ADDITIVE_GENERATOR * private_key);
+        let public_key = JubjubAffine::from(JubjubExtended::ADDITIVE_GENERATOR * private_key);
 
         Self {
             private_key,

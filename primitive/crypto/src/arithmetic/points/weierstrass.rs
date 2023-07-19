@@ -1,5 +1,5 @@
 use crate::arithmetic::utils::Naf;
-use crate::common::{Curve, Group, PrimeField, Projective};
+use crate::common::{CurveGroup, PrimeField, Projective};
 
 /// weierstrass projective coordinate addition
 pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
@@ -18,7 +18,7 @@ pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
         if s1 == s2 {
             return double_point(lhs);
         } else {
-            return <P as Group>::ADDITIVE_IDENTITY;
+            return <P as CurveGroup>::ADDITIVE_IDENTITY;
         }
     }
 
@@ -39,7 +39,7 @@ pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
 /// weierstrass projective coordinate doubling
 pub fn double_point<P: Projective>(point: P) -> P {
     if point.is_identity() || point.get_y().is_zero() {
-        <P as Group>::ADDITIVE_IDENTITY
+        <P as CurveGroup>::ADDITIVE_IDENTITY
     } else {
         let xx = point.get_x().square();
         let t = xx.double() + xx;
@@ -57,7 +57,7 @@ pub fn double_point<P: Projective>(point: P) -> P {
 }
 
 /// coordinate scalar
-pub fn scalar_point<P: Projective>(point: P, scalar: &<P as Curve>::Scalar) -> P {
+pub fn scalar_point<P: Projective>(point: P, scalar: &<P as CurveGroup>::Scalar) -> P {
     let mut res = P::ADDITIVE_IDENTITY;
     let mut acc = point;
     for &naf in scalar.to_nafs().iter() {
@@ -66,7 +66,7 @@ pub fn scalar_point<P: Projective>(point: P, scalar: &<P as Curve>::Scalar) -> P
         } else if naf == Naf::Minus {
             res -= acc;
         }
-        acc = acc.double();
+        acc = Into::<P>::into(acc.double());
     }
     res
 }

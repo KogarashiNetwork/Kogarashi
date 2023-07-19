@@ -1,4 +1,10 @@
-use zero_crypto::dress::{curve::edwards::*, field::*};
+#![allow(clippy::suspicious_arithmetic_impl)]
+#![allow(clippy::suspicious_op_assign_impl)]
+
+use zero_crypto::{
+    common::{CurveExtended, CurveGroup},
+    dress::{curve::edwards::*, field::*},
+};
 
 macro_rules! field_test_data {
     ($test_data_name:ident, $test_bits:ident, $limbs_type:ident, $modulus:ident, $inv:ident, $r2:ident, $r3:ident) => {
@@ -137,14 +143,101 @@ pub mod jubjub_curve {
         y: BlsScalar,
     }
 
+    impl Add for JubjubAffine {
+        type Output = JubjubExtended;
+
+        fn add(self, rhs: JubjubAffine) -> Self::Output {
+            add_point(self.to_extended(), rhs.to_extended())
+        }
+    }
+
+    impl Neg for JubjubAffine {
+        type Output = Self;
+
+        fn neg(self) -> Self {
+            Self {
+                x: -self.x,
+                y: self.y,
+            }
+        }
+    }
+
+    impl Sub for JubjubAffine {
+        type Output = JubjubExtended;
+
+        fn sub(self, rhs: JubjubAffine) -> Self::Output {
+            add_point(self.to_extended(), rhs.neg().to_extended())
+        }
+    }
+
+    impl Mul<BlsScalar> for JubjubAffine {
+        type Output = JubjubExtended;
+
+        fn mul(self, rhs: BlsScalar) -> Self::Output {
+            scalar_point(self.to_extended(), &rhs)
+        }
+    }
+
+    impl Mul<JubjubAffine> for BlsScalar {
+        type Output = JubjubExtended;
+
+        fn mul(self, rhs: JubjubAffine) -> Self::Output {
+            scalar_point(rhs.to_extended(), &self)
+        }
+    }
+
     #[derive(Clone, Copy, Debug, Encode, Decode)]
-    pub struct JubjubExtend {
+    pub struct JubjubExtended {
         x: BlsScalar,
         y: BlsScalar,
         t: BlsScalar,
         z: BlsScalar,
     }
 
+    impl Add for JubjubExtended {
+        type Output = JubjubExtended;
+
+        fn add(self, rhs: JubjubExtended) -> Self::Output {
+            add_point(self, rhs)
+        }
+    }
+
+    impl Neg for JubjubExtended {
+        type Output = Self;
+
+        fn neg(self) -> Self {
+            Self {
+                x: -self.x,
+                y: self.y,
+                t: -self.t,
+                z: self.z,
+            }
+        }
+    }
+
+    impl Sub for JubjubExtended {
+        type Output = JubjubExtended;
+
+        fn sub(self, rhs: JubjubExtended) -> Self::Output {
+            add_point(self, rhs.neg())
+        }
+    }
+
+    impl Mul<BlsScalar> for JubjubExtended {
+        type Output = JubjubExtended;
+
+        fn mul(self, rhs: BlsScalar) -> Self::Output {
+            scalar_point(self, &rhs)
+        }
+    }
+
+    impl Mul<JubjubExtended> for BlsScalar {
+        type Output = JubjubExtended;
+
+        fn mul(self, rhs: JubjubExtended) -> Self::Output {
+            scalar_point(rhs, &self)
+        }
+    }
     fft_field_operation!(
         BlsScalar,
         BLS_SCALAR_MODULUS,
@@ -163,7 +256,7 @@ pub mod jubjub_curve {
         BlsScalar,
         EDWARDS_D,
         JubjubAffine,
-        JubjubExtend,
+        JubjubExtended,
         X,
         Y,
         T

@@ -2,9 +2,11 @@ use confidential_transfer::ConfidentialTransferCircuit;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
-use zero_crypto::common::Group;
+use zero_crypto::common::{CurveGroup, Group};
 use zero_elgamal::EncryptedNumber;
 use zero_jubjub::*;
+use zero_kzg::KeyPair;
+use zero_pairing::TatePairing;
 use zero_plonk::prelude::*;
 
 #[allow(unused_must_use)]
@@ -12,16 +14,17 @@ fn circuit(c: &mut Criterion) {
     let mut group = c.benchmark_group("circuit");
 
     let mut rng = StdRng::seed_from_u64(8349u64);
-    let n = 1 << 14;
+    let n = 14;
     let label = b"bench";
     group.bench_function("setup", |b| {
-        b.iter(|| PublicParameters::setup(n, &mut rng).expect("failed to create pp"));
+        b.iter(|| KeyPair::<TatePairing>::setup(n, BlsScalar::random(&mut rng)));
     });
 
-    let pp = PublicParameters::setup(n, &mut rng).expect("failed to create pp");
-    let (prover, verifier) = Compiler::compile::<ConfidentialTransferCircuit>(&pp, label)
-        .expect("failed to compile circuit");
-    let generator = JubjubExtend::ADDITIVE_GENERATOR;
+    let mut pp = KeyPair::<TatePairing>::setup(n, BlsScalar::random(&mut rng));
+    let (prover, verifier) =
+        Compiler::compile::<ConfidentialTransferCircuit, TatePairing>(&mut pp, label)
+            .expect("failed to compile circuit");
+    let generator = JubjubExtended::ADDITIVE_GENERATOR;
     let alice_private_key = JubjubScalar::random(&mut rng);
     let bob_private_key = JubjubScalar::random(&mut rng);
     let alice_public_key = generator * alice_private_key;

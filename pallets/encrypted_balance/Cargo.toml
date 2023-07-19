@@ -7,8 +7,8 @@ name = "pallet-encrypted-balance"
 version = "0.2.3"
 edition = "2021"
 license = "Apache-2.0"
-homepage = 'https://github.com/zero-network/zero/'
-repository = 'https://github.com/zero-network/zero/'
+homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
+repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
 readme = 'README.md'
 
 [package.metadata.docs.rs]
@@ -24,6 +24,8 @@ frame-support = { version = "3.0.0", default-features = false }
 frame-system = { version = "3.0.0", default-features = false }
 zero-elgamal = { path = '../../primitive/elgamal', default-features = false }
 zero-jubjub = { path = '../../primitive/jubjub', default-features = false }
+zero-pairing = { path = '../../primitive/pairing', default-features = false }
+zero-crypto = { path = "../../primitive/crypto", default-features = false }
 
 [dev-dependencies]
 sp-io = { version = "3.0.0", default-features = false }

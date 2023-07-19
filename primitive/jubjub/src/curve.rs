@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use zero_bls12_381::Fr;
 use zero_crypto::arithmetic::edwards::*;
 use zero_crypto::common::*;
-use zero_crypto::*;
+use zero_crypto::dress::curve::edwards::*;
 
 pub const EDWARDS_D: Fr = Fr::to_mont_form([
     0x01065fd6d6343eb1,
@@ -43,6 +43,49 @@ impl DigitalSig for JubjubAffine {
     const LENGTH: usize = 32;
 }
 
+impl Add for JubjubAffine {
+    type Output = JubjubExtended;
+
+    fn add(self, rhs: JubjubAffine) -> Self::Output {
+        add_point(self.to_extended(), rhs.to_extended())
+    }
+}
+
+impl Neg for JubjubAffine {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: -self.x,
+            y: self.y,
+        }
+    }
+}
+
+impl Sub for JubjubAffine {
+    type Output = JubjubExtended;
+
+    fn sub(self, rhs: JubjubAffine) -> Self::Output {
+        add_point(self.to_extended(), rhs.neg().to_extended())
+    }
+}
+
+impl Mul<Fr> for JubjubAffine {
+    type Output = JubjubExtended;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self.to_extended(), &rhs)
+    }
+}
+
+impl Mul<JubjubAffine> for Fr {
+    type Output = JubjubExtended;
+
+    fn mul(self, rhs: JubjubAffine) -> Self::Output {
+        scalar_point(rhs.to_extended(), &self)
+    }
+}
+
 impl JubjubAffine {
     pub const fn from_raw_unchecked(x: Fr, y: Fr) -> JubjubAffine {
         JubjubAffine { x, y }
@@ -58,20 +101,43 @@ impl JubjubAffine {
 }
 
 #[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
-pub struct JubjubExtend {
+pub struct JubjubExtended {
     x: Fr,
     y: Fr,
     t: Fr,
     z: Fr,
 }
 
-impl JubjubExtend {
+impl JubjubExtended {
     pub fn batch_normalize<'a>(
-        y: &'a mut [JubjubExtend],
+        y: &'a mut [JubjubExtended],
     ) -> impl Iterator<Item = JubjubAffine> + 'a {
         y.iter().map(|p| JubjubAffine::from(*p))
     }
+}
 
+impl Add for JubjubExtended {
+    type Output = JubjubExtended;
+
+    fn add(self, rhs: JubjubExtended) -> Self::Output {
+        add_point(self, rhs)
+    }
+}
+
+impl Neg for JubjubExtended {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: -self.x,
+            y: self.y,
+            t: -self.t,
+            z: self.z,
+        }
+    }
+}
+
+impl JubjubExtended {
     pub(crate) fn to_bytes(self) -> [u8; Self::LENGTH] {
         let mut tmp = self.x.to_bytes();
         let u = self.y.to_bytes();
@@ -81,26 +147,51 @@ impl JubjubExtend {
     }
 }
 
-impl DigitalSig for JubjubExtend {
+impl DigitalSig for JubjubExtended {
     const LENGTH: usize = 32;
 }
 
-twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtend, X, Y, T);
+impl Sub for JubjubExtended {
+    type Output = JubjubExtended;
+
+    fn sub(self, rhs: JubjubExtended) -> Self::Output {
+        add_point(self, rhs.neg())
+    }
+}
+
+impl Mul<Fr> for JubjubExtended {
+    type Output = JubjubExtended;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self, &rhs)
+    }
+}
+
+impl Mul<JubjubExtended> for Fr {
+    type Output = JubjubExtended;
+
+    fn mul(self, rhs: JubjubExtended) -> Self::Output {
+        scalar_point(rhs, &self)
+    }
+}
+
+twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtended, X, Y, T);
 
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+    use zero_crypto::dress::curve::weierstrass::*;
 
-    curve_test!(jubjub, Fr, JubjubAffine, JubjubExtend, 100);
+    curve_test!(jubjub, Fr, JubjubAffine, JubjubExtended, 100);
 }
 
-impl Mul<Fp> for JubjubExtend {
-    type Output = JubjubExtend;
+impl Mul<Fp> for JubjubExtended {
+    type Output = JubjubExtended;
 
     #[inline]
-    fn mul(self, rhs: Fp) -> JubjubExtend {
-        let mut res = JubjubExtend::ADDITIVE_IDENTITY;
+    fn mul(self, rhs: Fp) -> JubjubExtended {
+        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
         let mut acc = self;
         for &naf in rhs.to_nafs().iter() {
             if naf == Naf::Plus {
@@ -114,13 +205,13 @@ impl Mul<Fp> for JubjubExtend {
     }
 }
 
-impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtend {
-    type Output = JubjubExtend;
+impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtended {
+    type Output = JubjubExtended;
 
     #[inline]
-    fn mul(self, rhs: &'b Fp) -> JubjubExtend {
-        let mut res = JubjubExtend::ADDITIVE_IDENTITY;
-        let mut acc = self.clone();
+    fn mul(self, rhs: &'b Fp) -> JubjubExtended {
+        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
+        let mut acc = *self;
         for &naf in rhs.to_nafs().iter() {
             if naf == Naf::Plus {
                 res += acc;
@@ -130,5 +221,90 @@ impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtend {
             acc = acc.double();
         }
         res
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use rand_core::OsRng;
+    use zero_bls12_381::Fr;
+    use zero_crypto::common::{CurveExtended, CurveGroup};
+
+    use crate::{JubjubAffine, JubjubExtended};
+
+    #[test]
+    #[allow(clippy::op_ref)]
+    fn edwards_operations() {
+        let aff1 = JubjubAffine::random(OsRng).to_affine();
+        let aff2 = JubjubAffine::random(OsRng).to_affine();
+        let mut ext1 = JubjubExtended::random(OsRng);
+        let ext2 = JubjubExtended::random(OsRng);
+        let scalar = Fr::from(42);
+
+        let _ = aff1 + aff2;
+        let _ = &aff1 + &aff2;
+        let _ = &aff1 + aff2;
+        let _ = aff1 + &aff2;
+
+        let _ = aff1 + ext1;
+        let _ = &aff1 + &ext1;
+        let _ = &aff1 + ext1;
+        let _ = aff1 + &ext1;
+        let _ = ext1 + aff1;
+        let _ = &ext1 + &aff1;
+        let _ = &ext1 + aff1;
+        let _ = ext1 + &aff1;
+
+        let _ = ext1 + ext2;
+        let _ = &ext1 + &ext2;
+        let _ = &ext1 + ext2;
+        let _ = ext1 + &ext2;
+        ext1 += ext2;
+        ext1 += &ext2;
+        ext1 += aff2;
+        ext1 += &aff2;
+
+        let _ = aff1 - aff2;
+        let _ = &aff1 - &aff2;
+        let _ = &aff1 - aff2;
+        let _ = aff1 - &aff2;
+
+        let _ = aff1 - ext1;
+        let _ = &aff1 - &ext1;
+        let _ = &aff1 - ext1;
+        let _ = aff1 - &ext1;
+        let _ = ext1 - aff1;
+        let _ = &ext1 - &aff1;
+        let _ = &ext1 - aff1;
+        let _ = ext1 - &aff1;
+
+        let _ = ext1 - ext2;
+        let _ = &ext1 - &ext2;
+        let _ = &ext1 - ext2;
+        let _ = ext1 - &ext2;
+        ext1 -= ext2;
+        ext1 -= &ext2;
+        ext1 -= aff2;
+        ext1 -= &aff2;
+
+        let _ = aff1 * scalar;
+        let _ = aff1 * &scalar;
+        let _ = &aff1 * scalar;
+        let _ = &aff1 * &scalar;
+        let _ = scalar * aff1;
+        let _ = &scalar * &aff1;
+        let _ = scalar * &aff1;
+        let _ = &scalar * aff1;
+
+        let _ = ext1 * scalar;
+        let _ = ext1 * &scalar;
+        let _ = &ext1 * scalar;
+        let _ = &ext1 * &scalar;
+        let _ = scalar * ext1;
+        let _ = &scalar * &ext1;
+        let _ = scalar * &ext1;
+        let _ = &scalar * ext1;
+        ext1 *= scalar;
+        ext1 *= &scalar;
     }
 }

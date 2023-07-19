@@ -1,0 +1,30 @@
+name: Test Coverage
+
+on:
+  pull_request:
+    branches: [ master, develop ]
+  push:
+    branches:
+      - master
+
+jobs:
+  testcov:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Update submodules
+        id: update
+        run: git submodule update --remote --recursive
+      - uses: actions-rs/toolchain@v1
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          version: '0.22.0'
+          args: '--release --all-features --workspace --no-fail-fast --engine Llvm --out Lcov'
+          out-type: 'Lcov'
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

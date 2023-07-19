@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 mod dsa;
 mod ecdsa;
 mod keys;

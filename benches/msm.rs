@@ -1,9 +1,10 @@
 use criterion::{black_box, BenchmarkId};
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand::rngs::OsRng;
+use zero_bls12_381::Fr;
 use zero_bls12_381::G1Affine;
-use zero_bls12_381::{msm_variable_base, Fr};
-use zero_crypto::common::Group;
+use zero_crypto::common::{CurveGroup, Group};
+use zero_pairing::{msm_variable_base, TatePairing};
 
 fn msm(c: &mut Criterion) {
     let mut group = c.benchmark_group("msm");
@@ -14,7 +15,12 @@ fn msm(c: &mut Criterion) {
 
         // 8-18 points
         group.bench_function(BenchmarkId::new("msm_based", i), |b| {
-            b.iter(|| black_box(msm_variable_base(black_box(&p), black_box(&k))));
+            b.iter(|| {
+                black_box(msm_variable_base::<TatePairing>(
+                    black_box(&p),
+                    black_box(&k),
+                ))
+            });
         });
     }
 }

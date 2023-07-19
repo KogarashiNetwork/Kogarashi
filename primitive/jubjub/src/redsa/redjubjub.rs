@@ -1,8 +1,8 @@
-use crate::curve::JubjubExtend;
+use crate::curve::JubjubExtended;
 use crate::fp::Fp;
 
 use zero_bls12_381::Fr;
-use zero_crypto::behave::DigitalSig;
+use zero_crypto::behave::{CurveGroup, DigitalSig};
 
 use blake2b_simd::Params;
 use rand_core::RngCore;
@@ -20,14 +20,14 @@ impl Signature {
 }
 
 #[derive(Clone)]
-pub struct PublicKey(JubjubExtend);
+pub struct PublicKey(JubjubExtended);
 
 impl DigitalSig for PublicKey {
     const LENGTH: usize = 32;
 }
 
 impl PublicKey {
-    pub fn new(raw: JubjubExtend) -> Self {
+    pub fn new(raw: JubjubExtended) -> Self {
         PublicKey(raw)
     }
 
@@ -52,7 +52,7 @@ impl SecretKey {
         let mut t = [0u8; 80];
         rand.fill_bytes(&mut t[..]);
         let r = hash_to_scalar(&t, m);
-        let R = (JubjubExtend::ADDITIVE_GENERATOR * r).to_bytes();
+        let R = (JubjubExtended::ADDITIVE_GENERATOR * r).to_bytes();
         let S = r + hash_to_scalar(&R, m);
         Signature::new(R, S.to_bytes())
     }

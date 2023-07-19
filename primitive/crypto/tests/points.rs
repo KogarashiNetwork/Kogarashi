@@ -3,11 +3,11 @@ mod construction;
 #[cfg(test)]
 mod twisted_edwards_points_tests {
     use super::*;
-    use construction::jubjub_curve::{BlsScalar, JubjubAffine, JubjubExtend};
+    use construction::jubjub_curve::{BlsScalar, JubjubAffine, JubjubExtended};
     use rand_core::OsRng;
     use zero_crypto::{
         arithmetic::edwards::{add_point, double_point},
-        common::Curve,
+        common::{Curve, CurveGroup},
     };
 
     #[test]
@@ -27,9 +27,9 @@ mod twisted_edwards_points_tests {
 
     #[test]
     fn is_on_curve_extended() {
-        let g = JubjubExtend::ADDITIVE_GENERATOR;
-        let e = JubjubExtend::ADDITIVE_IDENTITY;
-        let a = JubjubExtend::random(OsRng);
+        let g = JubjubExtended::ADDITIVE_GENERATOR;
+        let e = JubjubExtended::ADDITIVE_IDENTITY;
+        let a = JubjubExtended::random(OsRng);
         let b = a + g;
         let c = b + e;
 

@@ -5,6 +5,7 @@ use frame_support::parameter_types;
 use sp_core::H256;
 use sp_runtime::{testing::Header, traits::IdentityLookup};
 use zero_elgamal::EncryptedNumber;
+use zero_pairing::TatePairing;
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 
@@ -51,6 +52,7 @@ impl frame_system::Config for Test {
 }
 
 impl Config for Test {
+    type P = TatePairing;
     type EncryptedBalance = EncryptedNumber;
     type Event = Event;
     type AccountStore = frame_system::Pallet<Test>;

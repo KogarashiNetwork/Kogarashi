@@ -3,6 +3,6 @@ mod basic;
 mod edwards;
 mod weierstrass;
 
-pub use basic::{Affine, Curve, CurveExtend};
-pub use edwards::{Extended, TwistedEdwardsAffine, TwistedEdwardsCurve};
+pub use basic::{Affine, Curve, CurveExtended};
+pub use edwards::{TwistedEdwardsAffine, TwistedEdwardsCurve, TwistedEdwardsExtended};
 pub use weierstrass::{Projective, WeierstrassAffine, WeierstrassCurve};

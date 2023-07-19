@@ -8,14 +8,15 @@ description = 'lifted elgamal encryption implementation'
 version = "0.1.10"
 edition = "2021"
 license = "Apache-2.0"
-homepage = 'https://github.com/zero-network/zero/'
-repository = 'https://github.com/zero-network/zero/'
+homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
+repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
 readme = 'README.md'
 
 [dependencies]
 parity-scale-codec = { version = "2.1.0", default-features = false, features = ["derive"] }
 zero-jubjub = { path = "../jubjub", default-features = false }
 zero-crypto = { path = "../crypto", default-features = false }
+zero-pairing = { path = "../pairing", default-features = false }
 serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 num-traits = { version = "0.2.15", default-features = false }
 

@@ -2,7 +2,7 @@
 authors = ['NoCtrlZ<shinsaku.ashizawa@artree.co.jp>']
 multilingual = false
 src = "book"
-title = "Zero Network Documentation"
+title = "Kogarashi Network Documentation"
 
 [build]
 build-dir = "docs"

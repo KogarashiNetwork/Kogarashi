@@ -3,7 +3,6 @@ pub use rand_xorshift::XorShiftRng as FullcodecRng;
 pub use zero_bls12_381::Fr;
 pub use zero_plonk::prelude::{
     BlsScalar, Circuit, Constraint, Error as PlonkError, JubjubAffine, JubjubScalar, Proof,
-    PublicParameters,
 };
 
 /// The struct for Merlin transcript and used for proof verify

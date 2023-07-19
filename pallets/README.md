@@ -1,5 +1,5 @@
 # Pallet
-The `Zero Network` supports privacy-preserving transactions. These functionalities are powered by `pallets`. Followings are short summary of pallets.
+The `Kogarashi Network` supports privacy-preserving transactions. These functionalities are powered by `pallets`. Followings are short summary of pallets.
 
 - [pallet-plonk](../book/4_1_plonk.md) [![crates.io badge](https://img.shields.io/crates/v/plonk-pallet.svg)](https://crates.io/crates/plonk-pallet)
 
