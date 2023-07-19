@@ -151,25 +151,32 @@ impl TraitPair for Pair {
     /// Generate new secure (random) key pair and provide the recovery phrase.
     ///
     /// You can recover the same key later with `from_phrase`.
-    fn generate_with_phrase(password: Option<&str>) -> (Pair, String, Seed) {}
+    fn generate_with_phrase(password: Option<&str>) -> (Pair, String, Seed) {
+        todo!()
+    }
 
     /// Generate key pair from given recovery phrase and password.
     fn from_phrase(
         phrase: &str,
         password: Option<&str>,
     ) -> Result<(Pair, Seed), SecretStringError> {
+        todo!()
     }
 
     /// Make a new key pair from secret seed material.
     ///
     /// You should never need to use this; generate(), generate_with_phrase
-    fn from_seed(seed: &Seed) -> Pair {}
+    fn from_seed(seed: &Seed) -> Pair {
+        todo!()
+    }
 
     /// Make a new key pair from secret seed material. The slice must be 32 bytes long or it
     /// will return `None`.
     ///
     /// You should never need to use this; generate(), generate_with_phrase
-    fn from_seed_slice(seed_slice: &[u8]) -> Result<Pair, SecretStringError> {}
+    fn from_seed_slice(seed_slice: &[u8]) -> Result<Pair, SecretStringError> {
+        todo!()
+    }
 
     /// Derive a child key from a series of given junctions.
     fn derive<Iter: Iterator<Item = DeriveJunction>>(
@@ -177,25 +184,36 @@ impl TraitPair for Pair {
         path: Iter,
         _seed: Option<Seed>,
     ) -> Result<(Pair, Option<Seed>), DeriveError> {
+        todo!()
     }
 
     /// Get the public key.
-    fn public(&self) -> Public {}
+    fn public(&self) -> Public {
+        todo!()
+    }
 
     /// Sign a message.
-    fn sign(&self, message: &[u8]) -> Signature {}
+    fn sign(&self, message: &[u8]) -> Signature {
+        todo!()
+    }
 
     /// Verify a signature on a message. Returns true if the signature is good.
-    fn verify<M: AsRef<[u8]>>(sig: &Self::Signature, message: M, pubkey: &Self::Public) -> bool {}
+    fn verify<M: AsRef<[u8]>>(sig: &Self::Signature, message: M, pubkey: &Self::Public) -> bool {
+        todo!()
+    }
 
     /// Verify a signature on a message. Returns true if the signature is good.
     ///
     /// This doesn't use the type system to ensure that `sig` and `pubkey` are the correct
     /// size. Use it only if you're coming from byte buffers and need the speed.
-    fn verify_weak<P: AsRef<[u8]>, M: AsRef<[u8]>>(sig: &[u8], message: M, pubkey: P) -> bool {}
+    fn verify_weak<P: AsRef<[u8]>, M: AsRef<[u8]>>(sig: &[u8], message: M, pubkey: P) -> bool {
+        todo!()
+    }
 
     /// Return a vec filled with raw data.
-    fn to_raw_vec(&self) -> Vec<u8> {}
+    fn to_raw_vec(&self) -> Vec<u8> {
+        todo!()
+    }
 }
 
 impl CryptoType for Public {

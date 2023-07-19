@@ -41,6 +41,7 @@ impl PublicKey {
             Some(s) => s,
             None => return false,
         };
+        todo!()
     }
 }
 
@@ -65,7 +66,6 @@ fn hash_to_scalar(a: &[u8], b: &[u8]) -> Fr {
         .to_state()
         .update(a)
         .update(b)
-        .finalize()
-        .as_ref();
-    Fr::from_hash(ret)
+        .finalize();
+    Fr::from_hash(ret.as_ref())
 }

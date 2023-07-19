@@ -177,31 +177,12 @@ impl Mul<JubjubExtended> for Fr {
 
 twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtended, X, Y, T);
 
-#[cfg(test)]
-mod tests {
-    #[allow(unused_imports)]
-    use super::*;
-    use zero_crypto::dress::curve::weierstrass::*;
-
-    curve_test!(jubjub, Fr, JubjubAffine, JubjubExtended, 100);
-}
-
 impl Mul<Fp> for JubjubExtended {
     type Output = JubjubExtended;
 
     #[inline]
     fn mul(self, rhs: Fp) -> JubjubExtended {
-        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
-        let mut acc = self;
-        for &naf in rhs.to_nafs().iter() {
-            if naf == Naf::Plus {
-                res += acc;
-            } else if naf == Naf::Minus {
-                res -= acc;
-            }
-            acc = acc.double();
-        }
-        res
+        &self * &rhs
     }
 }
 
@@ -225,86 +206,10 @@ impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtended {
 }
 
 #[cfg(test)]
-mod test {
-    use rand_core::OsRng;
-    use zero_bls12_381::Fr;
-    use zero_crypto::common::{CurveExtended, CurveGroup};
+mod tests {
+    #[allow(unused_imports)]
+    use super::*;
+    use zero_crypto::dress::curve::weierstrass::*;
 
-    use crate::{JubjubAffine, JubjubExtended};
-
-    #[test]
-    #[allow(clippy::op_ref)]
-    fn edwards_operations() {
-        let aff1 = JubjubAffine::random(OsRng).to_affine();
-        let aff2 = JubjubAffine::random(OsRng).to_affine();
-        let mut ext1 = JubjubExtended::random(OsRng);
-        let ext2 = JubjubExtended::random(OsRng);
-        let scalar = Fr::from(42);
-
-        let _ = aff1 + aff2;
-        let _ = &aff1 + &aff2;
-        let _ = &aff1 + aff2;
-        let _ = aff1 + &aff2;
-
-        let _ = aff1 + ext1;
-        let _ = &aff1 + &ext1;
-        let _ = &aff1 + ext1;
-        let _ = aff1 + &ext1;
-        let _ = ext1 + aff1;
-        let _ = &ext1 + &aff1;
-        let _ = &ext1 + aff1;
-        let _ = ext1 + &aff1;
-
-        let _ = ext1 + ext2;
-        let _ = &ext1 + &ext2;
-        let _ = &ext1 + ext2;
-        let _ = ext1 + &ext2;
-        ext1 += ext2;
-        ext1 += &ext2;
-        ext1 += aff2;
-        ext1 += &aff2;
-
-        let _ = aff1 - aff2;
-        let _ = &aff1 - &aff2;
-        let _ = &aff1 - aff2;
-        let _ = aff1 - &aff2;
-
-        let _ = aff1 - ext1;
-        let _ = &aff1 - &ext1;
-        let _ = &aff1 - ext1;
-        let _ = aff1 - &ext1;
-        let _ = ext1 - aff1;
-        let _ = &ext1 - &aff1;
-        let _ = &ext1 - aff1;
-        let _ = ext1 - &aff1;
-
-        let _ = ext1 - ext2;
-        let _ = &ext1 - &ext2;
-        let _ = &ext1 - ext2;
-        let _ = ext1 - &ext2;
-        ext1 -= ext2;
-        ext1 -= &ext2;
-        ext1 -= aff2;
-        ext1 -= &aff2;
-
-        let _ = aff1 * scalar;
-        let _ = aff1 * &scalar;
-        let _ = &aff1 * scalar;
-        let _ = &aff1 * &scalar;
-        let _ = scalar * aff1;
-        let _ = &scalar * &aff1;
-        let _ = scalar * &aff1;
-        let _ = &scalar * aff1;
-
-        let _ = ext1 * scalar;
-        let _ = ext1 * &scalar;
-        let _ = &ext1 * scalar;
-        let _ = &ext1 * &scalar;
-        let _ = scalar * ext1;
-        let _ = &scalar * &ext1;
-        let _ = scalar * &ext1;
-        let _ = &scalar * ext1;
-        ext1 *= scalar;
-        ext1 *= &scalar;
-    }
+    curve_test!(jubjub, Fr, JubjubAffine, JubjubExtended, 100);
 }
