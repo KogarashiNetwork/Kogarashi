@@ -58,6 +58,8 @@ pub const ROOT_OF_UNITY: Fr = Fr([
     0x5bf3adda19e9b27b,
 ]);
 
+pub const TWO_ADACITY: u32 = 32;
+
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fr(pub [u64; 4]);
 
@@ -140,6 +142,64 @@ impl Fr {
         ]);
         d0 * Fr(R2) + d1 * Fr(R3)
     }
+
+    pub fn is_odd(self) -> bool {
+        (self.0[0] % 2) != 0
+    }
+
+    pub fn divn(&mut self, mut n: u32) {
+        if n >= 256 {
+            *self = Self::from(0_u64);
+            return;
+        }
+
+        while n >= 64 {
+            let mut t = 0;
+            for i in self.0.iter_mut().rev() {
+                core::mem::swap(&mut t, i);
+            }
+            n -= 64;
+        }
+
+        if n > 0 {
+            let mut t = 0;
+            for i in self.0.iter_mut().rev() {
+                let t2 = *i << (64 - n);
+                *i >>= n;
+                *i |= t;
+                t = t2;
+            }
+        }
+    }
+
+    pub fn pow_vartime(&self, by: &[u64; 4]) -> Self {
+        let mut res = Self::one();
+        for e in by.iter().rev() {
+            for i in (0..64).rev() {
+                res = res.square();
+
+                if ((*e >> i) & 1) == 1 {
+                    res.mul_assign(*self);
+                }
+            }
+        }
+        res
+    }
+
+    pub fn sqrt(&self) -> Option<Self> {
+        let sqrt = self.pow_vartime(&[
+            0xb425c397b5bdcb2e,
+            0x299a0824f3320420,
+            0x4199cec0404d0ec0,
+            0x039f6d3a994cebea,
+        ]);
+
+        if sqrt.square() == *self {
+            Some(sqrt)
+        } else {
+            None
+        }
+    }
 }
 
 impl<'a, 'b> BitXor<&'b Fr> for &'a Fr {
@@ -200,65 +260,6 @@ fft_field_operation!(
     R3,
     S
 );
-
-/// Two adacity
-pub const TWO_ADACITY: u32 = 32;
-
-impl Fr {
-    pub fn divn(&mut self, mut n: u32) {
-        if n >= 256 {
-            *self = Self::from(0_u64);
-            return;
-        }
-
-        while n >= 64 {
-            let mut t = 0;
-            for i in self.0.iter_mut().rev() {
-                core::mem::swap(&mut t, i);
-            }
-            n -= 64;
-        }
-
-        if n > 0 {
-            let mut t = 0;
-            for i in self.0.iter_mut().rev() {
-                let t2 = *i << (64 - n);
-                *i >>= n;
-                *i |= t;
-                t = t2;
-            }
-        }
-    }
-
-    pub fn pow_vartime(&self, by: &[u64; 4]) -> Self {
-        let mut res = Self::one();
-        for e in by.iter().rev() {
-            for i in (0..64).rev() {
-                res = res.square();
-
-                if ((*e >> i) & 1) == 1 {
-                    res.mul_assign(*self);
-                }
-            }
-        }
-        res
-    }
-
-    pub fn sqrt(&self) -> Option<Self> {
-        let sqrt = self.pow_vartime(&[
-            0xb425c397b5bdcb2e,
-            0x299a0824f3320420,
-            0x4199cec0404d0ec0,
-            0x039f6d3a994cebea,
-        ]);
-
-        if sqrt.square() == *self {
-            Some(sqrt)
-        } else {
-            None
-        }
-    }
-}
 
 impl<T> Product<T> for Fr
 where

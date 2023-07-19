@@ -51,7 +51,7 @@ impl SigUtils for JubjubAffine {
     }
 
     fn from_bytes(mut bytes: [u8; Self::LENGTH]) -> Option<Self> {
-        let sign = bytes[31] >> 7;
+        let sign = (bytes[31] >> 7) == 1;
         bytes[31] &= 0b01111111;
         match Fr::from_bytes(bytes) {
             Some(y) => {
@@ -63,7 +63,12 @@ impl SigUtils for JubjubAffine {
                         let y2 = y2 * inv;
 
                         match y2.sqrt() {
-                            Some(x) => Some(Self { x, y }),
+                            Some(mut x) => {
+                                if x.is_odd() != sign {
+                                    x = -x;
+                                }
+                                Some(Self { x, y })
+                            }
                             None => None,
                         }
                     }
