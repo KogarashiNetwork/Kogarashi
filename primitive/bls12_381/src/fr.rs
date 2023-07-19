@@ -8,9 +8,6 @@ use zero_crypto::arithmetic::utils::*;
 use zero_crypto::common::*;
 use zero_crypto::dress::field::*;
 
-#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
-pub struct Fr(pub [u64; 4]);
-
 const MODULUS: [u64; 4] = [
     0xffffffff00000001,
     0x53bda402fffe5bfe,
@@ -63,6 +60,13 @@ pub const ROOT_OF_UNITY: Fr = Fr([
     0x5bf3adda19e9b27b,
 ]);
 
+#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
+pub struct Fr(pub [u64; 4]);
+
+impl DigitalSig for Fr {
+    const LENGTH: usize = 32;
+}
+
 impl Fr {
     pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
@@ -90,6 +94,53 @@ impl Fr {
         bits.into_iter()
             .skip_while(|w_bit| w_bit == &0)
             .collect::<Vec<_>>()
+    }
+
+    pub fn to_bytes(self) -> [u8; Self::LENGTH] {
+        let tmp = self.montgomery_reduce();
+
+        let mut res = [0; Self::SIZE];
+        res[0..8].copy_from_slice(&tmp[0].to_le_bytes());
+        res[8..16].copy_from_slice(&tmp[1].to_le_bytes());
+        res[16..24].copy_from_slice(&tmp[2].to_le_bytes());
+        res[24..32].copy_from_slice(&tmp[3].to_le_bytes());
+
+        res
+    }
+
+    pub fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+        let l0 = u64::from_le_bytes(bytes[0..8].try_into().unwrap());
+        let l1 = u64::from_le_bytes(bytes[8..16].try_into().unwrap());
+        let l2 = u64::from_le_bytes(bytes[16..24].try_into().unwrap());
+        let l3 = u64::from_le_bytes(bytes[24..32].try_into().unwrap());
+
+        let (_, borrow) = sbb(l0, MODULUS[0], 0);
+        let (_, borrow) = sbb(l1, MODULUS[1], borrow);
+        let (_, borrow) = sbb(l2, MODULUS[2], borrow);
+        let (_, borrow) = sbb(l3, MODULUS[3], borrow);
+
+        if borrow & 1 == 1 {
+            Some(Self([l0, l1, l2, l3]) * Self(R2))
+        } else {
+            None
+        }
+    }
+
+    pub fn from_hash(hash: &[u8]) -> Self {
+        assert_eq!(hash.len(), 64);
+        let d0 = Fr([
+            u64::from_le_bytes(hash[0..8].try_into().unwrap()),
+            u64::from_le_bytes(hash[8..16].try_into().unwrap()),
+            u64::from_le_bytes(hash[16..24].try_into().unwrap()),
+            u64::from_le_bytes(hash[24..32].try_into().unwrap()),
+        ]);
+        let d1 = Fr([
+            u64::from_le_bytes(hash[32..40].try_into().unwrap()),
+            u64::from_le_bytes(hash[40..48].try_into().unwrap()),
+            u64::from_le_bytes(hash[48..56].try_into().unwrap()),
+            u64::from_le_bytes(hash[56..64].try_into().unwrap()),
+        ]);
+        d0 * Fr(R2) + d1 * Fr(R3)
     }
 }
 
