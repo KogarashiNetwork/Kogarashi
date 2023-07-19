@@ -1,8 +1,6 @@
 use core::borrow::Borrow;
 use core::iter::{Product, Sum};
-use dusk_bytes::{Error as BytesError, Serializable};
 use serde::{Deserialize, Serialize};
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::arithmetic::utils::*;
 use zero_crypto::common::*;
@@ -63,8 +61,38 @@ pub const ROOT_OF_UNITY: Fr = Fr([
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fr(pub [u64; 4]);
 
-impl DigitalSig for Fr {
+impl SigUtils for Fr {
     const LENGTH: usize = 32;
+
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
+        let tmp = self.montgomery_reduce();
+
+        let mut res = [0; Self::LENGTH];
+        res[0..8].copy_from_slice(&tmp[0].to_le_bytes());
+        res[8..16].copy_from_slice(&tmp[1].to_le_bytes());
+        res[16..24].copy_from_slice(&tmp[2].to_le_bytes());
+        res[24..32].copy_from_slice(&tmp[3].to_le_bytes());
+
+        res
+    }
+
+    fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+        let l0 = u64::from_le_bytes(bytes[0..8].try_into().unwrap());
+        let l1 = u64::from_le_bytes(bytes[8..16].try_into().unwrap());
+        let l2 = u64::from_le_bytes(bytes[16..24].try_into().unwrap());
+        let l3 = u64::from_le_bytes(bytes[24..32].try_into().unwrap());
+
+        let (_, borrow) = sbb(l0, MODULUS[0], 0);
+        let (_, borrow) = sbb(l1, MODULUS[1], borrow);
+        let (_, borrow) = sbb(l2, MODULUS[2], borrow);
+        let (_, borrow) = sbb(l3, MODULUS[3], borrow);
+
+        if borrow & 1 == 1 {
+            Some(Self([l0, l1, l2, l3]) * Self(R2))
+        } else {
+            None
+        }
+    }
 }
 
 impl Fr {
@@ -94,36 +122,6 @@ impl Fr {
         bits.into_iter()
             .skip_while(|w_bit| w_bit == &0)
             .collect::<Vec<_>>()
-    }
-
-    pub fn to_bytes(self) -> [u8; Self::LENGTH] {
-        let tmp = self.montgomery_reduce();
-
-        let mut res = [0; Self::SIZE];
-        res[0..8].copy_from_slice(&tmp[0].to_le_bytes());
-        res[8..16].copy_from_slice(&tmp[1].to_le_bytes());
-        res[16..24].copy_from_slice(&tmp[2].to_le_bytes());
-        res[24..32].copy_from_slice(&tmp[3].to_le_bytes());
-
-        res
-    }
-
-    pub fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
-        let l0 = u64::from_le_bytes(bytes[0..8].try_into().unwrap());
-        let l1 = u64::from_le_bytes(bytes[8..16].try_into().unwrap());
-        let l2 = u64::from_le_bytes(bytes[16..24].try_into().unwrap());
-        let l3 = u64::from_le_bytes(bytes[24..32].try_into().unwrap());
-
-        let (_, borrow) = sbb(l0, MODULUS[0], 0);
-        let (_, borrow) = sbb(l1, MODULUS[1], borrow);
-        let (_, borrow) = sbb(l2, MODULUS[2], borrow);
-        let (_, borrow) = sbb(l3, MODULUS[3], borrow);
-
-        if borrow & 1 == 1 {
-            Some(Self([l0, l1, l2, l3]) * Self(R2))
-        } else {
-            None
-        }
     }
 
     pub fn from_hash(hash: &[u8]) -> Self {
@@ -203,27 +201,6 @@ fft_field_operation!(
     S
 );
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use paste::paste;
-    use rand_core::OsRng;
-
-    field_test!(bls12_381_scalar, Fr, 1000);
-
-    #[test]
-    fn test_root_of_unity() {
-        let s = Fr::S;
-        let mut root_of_unity = Fr::ROOT_OF_UNITY;
-        (0..s).for_each(|_| root_of_unity.square_assign());
-        assert_eq!(root_of_unity, Fr::one())
-    }
-}
-
-// below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
-// [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
-// Dusk-Network team and, @str4d and @ebfull
-
 /// Two adacity
 pub const TWO_ADACITY: u32 = 32;
 
@@ -253,12 +230,6 @@ impl Fr {
         }
     }
 
-    /// Exponentiates `self` by `by`, where `by` is a
-    /// little-endian order integer exponent.
-    ///
-    /// **This operation is variable time with respect
-    /// to the exponent.** If the exponent is fixed,
-    /// this operation is effectively constant time.
     pub fn pow_vartime(&self, by: &[u64; 4]) -> Self {
         let mut res = Self::one();
         for e in by.iter().rev() {
@@ -273,11 +244,7 @@ impl Fr {
         res
     }
 
-    /// Computes the square root of this element, if it exists.
-    pub fn sqrt(&self) -> CtOption<Self> {
-        // Because r = 3 (mod 4)
-        // sqrt can be done with only one exponentiation,
-        // via the computation of  self^((r + 1) // 4) (mod r)
+    pub fn sqrt(&self) -> Option<Self> {
         let sqrt = self.pow_vartime(&[
             0xb425c397b5bdcb2e,
             0x299a0824f3320420,
@@ -285,11 +252,11 @@ impl Fr {
             0x039f6d3a994cebea,
         ]);
 
-        CtOption::new(
-            sqrt,
-            (sqrt * sqrt).ct_eq(self), /* Only return Some if it's the
-                                        * square root. */
-        )
+        if sqrt.square() == *self {
+            Some(sqrt)
+        } else {
+            None
+        }
     }
 }
 
@@ -317,63 +284,19 @@ where
     }
 }
 
-impl Serializable<32> for Fr {
-    type Error = BytesError;
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use paste::paste;
+    use rand_core::OsRng;
 
-    /// Converts an element of `Fr` into a byte representation in
-    /// little-endian byte order.
-    fn to_bytes(&self) -> [u8; Self::SIZE] {
-        // Turn into canonical form by computing
-        // (a.R) / R = a
-        let tmp = self.montgomery_reduce();
+    field_test!(bls12_381_scalar, Fr, 1000);
 
-        let mut res = [0; Self::SIZE];
-        res[0..8].copy_from_slice(&tmp[0].to_le_bytes());
-        res[8..16].copy_from_slice(&tmp[1].to_le_bytes());
-        res[16..24].copy_from_slice(&tmp[2].to_le_bytes());
-        res[24..32].copy_from_slice(&tmp[3].to_le_bytes());
-
-        res
-    }
-
-    /// Attempts to convert a little-endian byte representation of
-    /// a scalar into a `Fr`, failing if the input is not canonical.
-    fn from_bytes(buf: &[u8; Self::SIZE]) -> Result<Self, Self::Error> {
-        let mut s = [0u64; 4];
-
-        s.iter_mut()
-            .zip(buf.chunks_exact(8))
-            .try_for_each(|(s, b)| {
-                <[u8; 8]>::try_from(b)
-                    .map(|b| *s = u64::from_le_bytes(b))
-                    .map_err(|_| BytesError::InvalidData)
-            })?;
-
-        // Try to subtract the modulus
-        let (_, borrow) = sbb(s[0], MODULUS[0], 0);
-        let (_, borrow) = sbb(s[1], MODULUS[1], borrow);
-        let (_, borrow) = sbb(s[2], MODULUS[2], borrow);
-        let (_, borrow) = sbb(s[3], MODULUS[3], borrow);
-
-        // If the element is smaller than MODULUS then the
-        // subtraction will underflow, producing a borrow value
-        // of 0xffff...ffff. Otherwise, it'll be zero.
-        if (borrow as u8) & 1 != 1 {
-            return Err(BytesError::InvalidData);
-        }
-
-        let mut s = Fr(s);
-
-        // Convert to Montgomery form by computing
-        // (a.R^0 * R^2) / R = a.R
-        s *= Self(R2);
-
-        Ok(s)
-    }
-}
-
-impl ConstantTimeEq for Fr {
-    fn ct_eq(&self, other: &Self) -> Choice {
-        self.0.ct_eq(&other.0)
+    #[test]
+    fn test_root_of_unity() {
+        let s = Fr::S;
+        let mut root_of_unity = Fr::ROOT_OF_UNITY;
+        (0..s).for_each(|_| root_of_unity.square_assign());
+        assert_eq!(root_of_unity, Fr::one())
     }
 }

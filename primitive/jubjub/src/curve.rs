@@ -39,8 +39,46 @@ pub struct JubjubAffine {
     y: Fr,
 }
 
-impl DigitalSig for JubjubAffine {
+impl SigUtils for JubjubAffine {
     const LENGTH: usize = 32;
+
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
+        let mut tmp = self.x.to_bytes();
+        let u = self.y.to_bytes();
+        tmp[31] |= u[0] << 7;
+
+        tmp
+    }
+
+    fn from_bytes(mut bytes: [u8; Self::LENGTH]) -> Option<Self> {
+        let sign = bytes[31] >> 7;
+        bytes[31] &= 0b01111111;
+        match Fr::from_bytes(bytes) {
+            Some(y) => {
+                let y2 = y.square();
+                let yd = y2 * EDWARDS_D + Fr::one();
+                let y2 = y2 - Fr::one();
+                match yd.invert() {
+                    Some(inv) => {
+                        let y2 = y2 * inv;
+
+                        match y2.sqrt() {
+                            Some(x) => Some(Self { x, y }),
+                            None => None,
+                        }
+                    }
+                    None => None,
+                }
+            }
+            None => None,
+        }
+    }
+}
+
+impl JubjubAffine {
+    pub const fn from_raw_unchecked(x: Fr, y: Fr) -> JubjubAffine {
+        JubjubAffine { x, y }
+    }
 }
 
 impl Add for JubjubAffine {
@@ -86,20 +124,6 @@ impl Mul<JubjubAffine> for Fr {
     }
 }
 
-impl JubjubAffine {
-    pub const fn from_raw_unchecked(x: Fr, y: Fr) -> JubjubAffine {
-        JubjubAffine { x, y }
-    }
-
-    fn to_bytes(self) -> [u8; Self::LENGTH] {
-        let mut tmp = self.x.to_bytes();
-        let u = self.y.to_bytes();
-        tmp[31] |= u[0] << 7;
-
-        tmp
-    }
-}
-
 #[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
 pub struct JubjubExtended {
     x: Fr,
@@ -137,18 +161,19 @@ impl Neg for JubjubExtended {
     }
 }
 
-impl JubjubExtended {
-    pub(crate) fn to_bytes(self) -> [u8; Self::LENGTH] {
-        let mut tmp = self.x.to_bytes();
-        let u = self.y.to_bytes();
-        tmp[31] |= u[0] << 7;
-
-        tmp
-    }
-}
-
-impl DigitalSig for JubjubExtended {
+impl SigUtils for JubjubExtended {
     const LENGTH: usize = 32;
+
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
+        self.to_affine().to_bytes()
+    }
+
+    fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+        match JubjubAffine::from_bytes(bytes) {
+            Some(point) => Some(point.to_extended()),
+            None => None,
+        }
+    }
 }
 
 impl Sub for JubjubExtended {

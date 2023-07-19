@@ -11,6 +11,7 @@ use super::{
     algebra::Field,
     comp::{Basic, ParityCmp},
     curve::Affine,
+    sign::SigUtils,
     Curve, CurveExtended, FftField, Group, Projective, TwistedEdwardsAffine, TwistedEdwardsCurve,
     TwistedEdwardsExtended, WeierstrassAffine,
 };
@@ -124,7 +125,6 @@ pub trait Pairing:
     type Gt: Group + Debug + Eq + PartialEq;
     // Used for commitment
     type ScalarField: FftField
-        + Serializable<32>
         + Sum
         + Product
         + From<<Self::JubjubExtended as Curve>::Range>
@@ -134,7 +134,8 @@ pub trait Pairing:
         + Encode
         + Decode
         + Eq
-        + PartialEq;
+        + PartialEq
+        + SigUtils;
     type JubjubScalar: FftField + Serializable<32> + Into<Self::ScalarField> + Eq + PartialEq;
 
     const X: u64;
