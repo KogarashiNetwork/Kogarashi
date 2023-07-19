@@ -5,7 +5,14 @@
     <img alt="image" src="https://github.com/KogarashiNetwork/Kogarashi/assets/39494661/5a40d34b-8501-4fe4-a59e-2d097bde154d">
 </div>
 
-The `Kogarashi Network` is a public blockchain capable of privacy transfers and smart contracts. These functionalities rely on only the **cryptographic hardness assumption** instead `L2 technologies`, `TEE` and `centralized security assumption`. All public blockchains information as in users balances are literally public and the privacy is a missing piece of blockchain. `Kogarashi Network` hides all transactions information by cryptographic scheme mainly **ElGamal Encryption** and **Plonk**. The cryptographic schemes are following.
+Our mission is to ralize a **virtual nation** providing **economic inclusion**. Bringing Internet and IoT data to blockchain allows Dapp to issue legally bound NFT by e-sign, manage physical assets, and trade digital infra. Just a smartphone will be citizenship for this virtual nation.
+
+We supports following functionalities.
+
+1. Auditable Privacy Preserving Transfers
+2. Zk Rollups Transfer Scaling
+3. Trustless Single Node Off-Chain Oracle
+4. IoT TEE Device Remote Attestation
 
 ## Test
 
@@ -52,13 +59,6 @@ $ mkdocs serve
 $ mkdocs build
 ```
 
-## Test
-
-```shell
-$ git submodule update --init --recursive
-$ cargo test --release --all --all-features
-```
-
 ## Progress
 **We are in research and development phase and this is alpha quality software. Please use at your own risk**.
 
@@ -67,3 +67,7 @@ Copyright 2023-2024 The Invers INC.
 
 This software is under the `Apache License`.
 You can check more detail [here](./LICENSE).
+
+## Follow Us
+
+[Website](https://kogarashi-network.com/) | [Twitter](https://twitter.com/KogarashiCrypto) | [Discord](https://discord.gg/g3q7tsHKTd) | [Github](https://github.com/KogarashiNetwork) | [Documentation](https://kogarashinetwork.github.io/Kogarashi/)
