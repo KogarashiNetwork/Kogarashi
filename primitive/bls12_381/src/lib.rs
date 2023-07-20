@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #![doc = include_str!("../README.md")]
-// #![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
 #![allow(clippy::suspicious_arithmetic_impl)]
 #![allow(clippy::suspicious_op_assign_impl)]
 #![allow(dead_code)]

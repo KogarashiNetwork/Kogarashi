@@ -39,9 +39,7 @@ pub struct JubjubAffine {
     y: Fr,
 }
 
-impl SigUtils for JubjubAffine {
-    const LENGTH: usize = 32;
-
+impl SigUtils<32> for JubjubAffine {
     fn to_bytes(self) -> [u8; Self::LENGTH] {
         let mut tmp = self.y.to_bytes();
         let x = self.x.to_bytes();
@@ -167,9 +165,7 @@ impl Neg for JubjubExtended {
     }
 }
 
-impl SigUtils for JubjubExtended {
-    const LENGTH: usize = 32;
-
+impl SigUtils<32> for JubjubExtended {
     fn to_bytes(self) -> [u8; Self::LENGTH] {
         self.to_affine().to_bytes()
     }

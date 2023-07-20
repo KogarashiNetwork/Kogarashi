@@ -55,9 +55,7 @@ const ROOT_OF_UNITY: Fp = Fp([
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fp(pub(crate) [u64; 4]);
 
-impl SigUtils for Fp {
-    const LENGTH: usize = 32;
-
+impl SigUtils<32> for Fp {
     fn to_bytes(self) -> [u8; Self::LENGTH] {
         let tmp = self.montgomery_reduce();
 

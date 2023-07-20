@@ -22,9 +22,7 @@ impl Signature {
 #[derive(Clone)]
 pub struct PublicKey(JubjubExtended);
 
-impl SigUtils for PublicKey {
-    const LENGTH: usize = 32;
-
+impl SigUtils<32> for PublicKey {
     fn to_bytes(self) -> [u8; Self::LENGTH] {
         self.0.to_bytes()
     }

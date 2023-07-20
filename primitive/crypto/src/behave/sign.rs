@@ -1,7 +1,7 @@
-pub trait SigUtils: Sized {
-    const LENGTH: usize;
+pub trait SigUtils<const L: usize>: Sized {
+    const LENGTH: usize = L;
 
-    fn to_bytes(self) -> [u8; 32];
+    fn to_bytes(self) -> [u8; L];
 
-    fn from_bytes(bytes: [u8; 32]) -> Option<Self>;
+    fn from_bytes(bytes: [u8; L]) -> Option<Self>;
 }

@@ -135,8 +135,8 @@ pub trait Pairing:
         + Decode
         + Eq
         + PartialEq
-        + SigUtils;
-    type JubjubScalar: FftField + Into<Self::ScalarField> + Eq + PartialEq + SigUtils;
+        + SigUtils<32>;
+    type JubjubScalar: FftField + Into<Self::ScalarField> + Eq + PartialEq + SigUtils<32>;
 
     const X: u64;
     const X_IS_NEGATIVE: bool;

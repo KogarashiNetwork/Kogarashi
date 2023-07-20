@@ -63,9 +63,7 @@ pub const TWO_ADACITY: u32 = 32;
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fr(pub [u64; 4]);
 
-impl SigUtils for Fr {
-    const LENGTH: usize = 32;
-
+impl SigUtils<32> for Fr {
     fn to_bytes(self) -> [u8; Self::LENGTH] {
         let tmp = self.montgomery_reduce();
 
