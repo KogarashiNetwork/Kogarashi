@@ -1,7 +1,5 @@
 use crate::error::Error;
-use dusk_bytes::Serializable;
 use serde::{Deserialize, Serialize};
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq};
 use zero_bls12_381::Fr;
 use zero_crypto::arithmetic::bits_256::*;
 use zero_crypto::common::*;
@@ -57,40 +55,35 @@ const ROOT_OF_UNITY: Fp = Fp([
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fp(pub(crate) [u64; 4]);
 
-fft_field_operation!(
-    Fp,
-    MODULUS,
-    GENERATOR,
-    MULTIPLICATIVE_GENERATOR,
-    INV,
-    ROOT_OF_UNITY,
-    R,
-    R2,
-    R3,
-    S
-);
+impl SigUtils<32> for Fp {
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
+        let tmp = self.montgomery_reduce();
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use paste::paste;
-    use rand_core::OsRng;
+        let mut res = [0; Self::LENGTH];
+        res[0..8].copy_from_slice(&tmp[0].to_le_bytes());
+        res[8..16].copy_from_slice(&tmp[1].to_le_bytes());
+        res[16..24].copy_from_slice(&tmp[2].to_le_bytes());
+        res[24..32].copy_from_slice(&tmp[3].to_le_bytes());
 
-    field_test!(fp_field, Fp, 1000);
+        res
+    }
 
-    #[test]
-    fn test_from_hex() {
-        let a = Fp::from_hex("0x64774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab")
-            .unwrap();
-        assert_eq!(
-            a,
-            Fp([
-                0x4ddc8f91e171cd75,
-                0x9b925835a7d203fb,
-                0x0cdb538ead47e463,
-                0x01a19f85f00d79b8,
-            ])
-        )
+    fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+        let l0 = u64::from_le_bytes(bytes[0..8].try_into().unwrap());
+        let l1 = u64::from_le_bytes(bytes[8..16].try_into().unwrap());
+        let l2 = u64::from_le_bytes(bytes[16..24].try_into().unwrap());
+        let l3 = u64::from_le_bytes(bytes[24..32].try_into().unwrap());
+
+        let (_, borrow) = sbb(l0, MODULUS[0], 0);
+        let (_, borrow) = sbb(l1, MODULUS[1], borrow);
+        let (_, borrow) = sbb(l2, MODULUS[2], borrow);
+        let (_, borrow) = sbb(l3, MODULUS[3], borrow);
+
+        if borrow & 1 == 1 {
+            Some(Self([l0, l1, l2, l3]) * Self(R2))
+        } else {
+            None
+        }
     }
 }
 
@@ -146,7 +139,28 @@ impl Fp {
         }
         Ok(res)
     }
+
+    pub fn reduce(&self) -> Self {
+        Self(self.montgomery_reduce())
+    }
+
+    pub fn is_even(&self) -> bool {
+        self.0[0] % 2 == 0
+    }
 }
+
+fft_field_operation!(
+    Fp,
+    MODULUS,
+    GENERATOR,
+    MULTIPLICATIVE_GENERATOR,
+    INV,
+    ROOT_OF_UNITY,
+    R,
+    R2,
+    R3,
+    S
+);
 
 pub fn compute_windowed_naf<F: FftField>(scalar: F, width: u8) -> [i8; 256] {
     let mut k = scalar.reduce();
@@ -175,23 +189,12 @@ pub fn compute_windowed_naf<F: FftField>(scalar: F, width: u8) -> [i8; 256] {
 }
 
 impl Fp {
-    /// Reduces bit representation of numbers, such that
-    /// they can be evaluated in terms of the least significant bit.
-    pub fn reduce(&self) -> Self {
-        Self(self.montgomery_reduce())
-    }
-
-    /// Evaluate if a `Scalar, from Fr` is even or not.
-    pub fn is_even(&self) -> bool {
-        self.0[0] % 2 == 0
-    }
-
     /// Compute the result from `Scalar (mod 2^k)`.
     ///
     /// # Panics
     ///
     /// If the given k is > 32 (5 bits) as the value gets
-    /// greater than the limb.  
+    /// greater than the limb.
     pub fn mod_2_pow_k(&self, k: u8) -> u8 {
         (self.0[0] & ((1 << k) - 1)) as u8
     }
@@ -201,7 +204,7 @@ impl Fp {
     /// # Panics
     ///
     /// If the given `k > 32 (5 bits)` || `k == 0` as the value gets
-    /// greater than the limb.   
+    /// greater than the limb.
     pub fn mods_2_pow_k(&self, w: u8) -> i8 {
         assert!(w < 32u8);
         let modulus = self.mod_2_pow_k(w) as i8;
@@ -240,61 +243,26 @@ impl From<Fp> for Fr {
     }
 }
 
-impl ConstantTimeEq for Fp {
-    fn ct_eq(&self, other: &Self) -> Choice {
-        self.0.ct_eq(&other.0)
-    }
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use paste::paste;
+    use rand_core::OsRng;
 
-impl Serializable<32> for Fp {
-    type Error = Error;
+    field_test!(fp_field, Fp, 1000);
 
-    /// Converts an element of `Self` into a byte representation in
-    /// little-endian byte order.
-    fn to_bytes(&self) -> [u8; Self::SIZE] {
-        // Turn into canonical form by computing
-        // (a.R) / R = a
-        let tmp = self.montgomery_reduce();
-
-        let mut res = [0; Self::SIZE];
-        res[0..8].copy_from_slice(&tmp[0].to_le_bytes());
-        res[8..16].copy_from_slice(&tmp[1].to_le_bytes());
-        res[16..24].copy_from_slice(&tmp[2].to_le_bytes());
-        res[24..32].copy_from_slice(&tmp[3].to_le_bytes());
-
-        res
-    }
-
-    /// Attempts to convert a little-endian byte representation of
-    /// a field element into an element of `Self`, failing if the input
-    /// is not canonical (is not smaller than r).
-    fn from_bytes(bytes: &[u8; Self::SIZE]) -> Result<Self, Self::Error> {
-        let mut tmp = Self([0, 0, 0, 0]);
-
-        tmp.0[0] = u64::from_le_bytes(bytes[0..8].try_into().unwrap());
-        tmp.0[1] = u64::from_le_bytes(bytes[8..16].try_into().unwrap());
-        tmp.0[2] = u64::from_le_bytes(bytes[16..24].try_into().unwrap());
-        tmp.0[3] = u64::from_le_bytes(bytes[24..32].try_into().unwrap());
-
-        // Try to subtract the modulus
-        let (_, borrow) = sbb(tmp.0[0], MODULUS[0], 0);
-        let (_, borrow) = sbb(tmp.0[1], MODULUS[1], borrow);
-        let (_, borrow) = sbb(tmp.0[2], MODULUS[2], borrow);
-        let (_, borrow) = sbb(tmp.0[3], MODULUS[3], borrow);
-
-        // If the element is smaller than MODULUS then the
-        // subtraction will underflow, producing a borrow value
-        // of 0xffff...ffff. Otherwise, it'll be zero.
-        let is_some = (borrow as u8) & 1;
-
-        if is_some == 0 {
-            return Err(Error::BytesInvalid);
-        }
-
-        // Convert to Montgomery form by computing
-        // (a.R^0 * R^2) / R = a.R
-        tmp *= Self(R2);
-
-        Ok(tmp)
+    #[test]
+    fn test_from_hex() {
+        let a = Fp::from_hex("0x64774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab")
+            .unwrap();
+        assert_eq!(
+            a,
+            Fp([
+                0x4ddc8f91e171cd75,
+                0x9b925835a7d203fb,
+                0x0cdb538ead47e463,
+                0x01a19f85f00d79b8,
+            ])
+        )
     }
 }

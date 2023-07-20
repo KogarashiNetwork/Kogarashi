@@ -1,5 +1,6 @@
 mod redjubjub;
 
+use parity_scale_codec::alloc::string::String;
 use parity_scale_codec::{Decode, Encode};
 use redjubjub::{PublicKey, SecretKey};
 use sp_core::crypto::{

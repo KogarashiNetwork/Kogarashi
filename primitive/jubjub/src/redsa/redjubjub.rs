@@ -2,7 +2,7 @@ use crate::curve::JubjubExtended;
 use crate::fp::Fp;
 
 use zero_bls12_381::Fr;
-use zero_crypto::behave::{CurveGroup, DigitalSig};
+use zero_crypto::behave::{CurveGroup, PrimeField, SigUtils};
 
 use blake2b_simd::Params;
 use rand_core::RngCore;
@@ -22,17 +22,22 @@ impl Signature {
 #[derive(Clone)]
 pub struct PublicKey(JubjubExtended);
 
-impl DigitalSig for PublicKey {
-    const LENGTH: usize = 32;
+impl SigUtils<32> for PublicKey {
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
+        self.0.to_bytes()
+    }
+
+    fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+        match JubjubExtended::from_bytes(bytes) {
+            Some(point) => Some(Self(point)),
+            None => None,
+        }
+    }
 }
 
 impl PublicKey {
     pub fn new(raw: JubjubExtended) -> Self {
         PublicKey(raw)
-    }
-
-    pub fn to_bytes(self) -> [u8; Self::LENGTH] {
-        self.0.to_bytes()
     }
 
     pub fn validate(m: &[u8], sig: Signature) -> bool {
@@ -41,6 +46,7 @@ impl PublicKey {
             Some(s) => s,
             None => return false,
         };
+        let cofactor = Fr::one().double().double().double();
         todo!()
     }
 }
