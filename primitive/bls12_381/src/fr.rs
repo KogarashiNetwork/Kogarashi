@@ -354,4 +354,14 @@ mod tests {
 
         assert_eq!(49, none_count);
     }
+
+    #[test]
+    fn test_serde() {
+        for _ in 0..100000 {
+            let s = Fr::random(OsRng);
+            let bytes = s.to_bytes();
+            let s_prime = Fr::from_bytes(bytes).unwrap();
+            assert_eq!(s, s_prime);
+        }
+    }
 }
