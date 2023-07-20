@@ -187,17 +187,45 @@ impl Fr {
     }
 
     pub fn sqrt(&self) -> Option<Self> {
-        let sqrt = self.pow_vartime(&[
-            0xb425c397b5bdcb2e,
-            0x299a0824f3320420,
-            0x4199cec0404d0ec0,
-            0x039f6d3a994cebea,
+        let w = self.pow_vartime(&[
+            0x7fff2dff7fffffff,
+            0x04d0ec02a9ded201,
+            0x94cebea4199cec04,
+            0x39f6d3a9,
         ]);
 
-        let root = sqrt * sqrt;
+        let mut v = Self::S;
+        let mut x = w * self;
+        let mut b = x * w;
+        let mut z = Self::ROOT_OF_UNITY;
 
-        if root == *self {
-            Some(sqrt)
+        for max_v in (1..=Self::S).rev() {
+            let mut k = 1;
+            let mut b2k = b.square();
+            let mut j_less_than_v = true;
+
+            for j in 2..max_v {
+                j_less_than_v &= !(j == v);
+                if b2k == Self::one() {
+                    if j_less_than_v {
+                        z.square_assign()
+                    };
+                } else {
+                    b2k = b2k.square();
+                    k = j;
+                };
+            }
+
+            if !(b == Self::one()) {
+                x.mul_assign(z)
+            };
+            z.square_assign();
+            b *= z;
+            v = k;
+        }
+
+        if &x.square() == self {
+            Some(x)
         } else {
             None
         }
@@ -305,11 +333,25 @@ mod tests {
 
     #[test]
     fn test_sqrt() {
-        let s = Fr::random(OsRng);
-        let sqrt = s.sqrt();
-        match sqrt {
-            Some(x) => assert_eq!(s, x.square()),
-            None => assert!(false),
+        let mut square = Fr([
+            0x46cd85a5f273077e,
+            0x1d30c47dd68fc735,
+            0x77f656f60beca0eb,
+            0x494aa01bdf32468d,
+        ]);
+
+        let mut none_count = 0;
+
+        for _ in 0..100 {
+            let square_root = square.sqrt();
+            if bool::from(square_root.is_none()) {
+                none_count += 1;
+            } else {
+                assert_eq!(square_root.unwrap() * square_root.unwrap(), square);
+            }
+            square -= Fr::one();
         }
+
+        assert_eq!(49, none_count);
     }
 }
