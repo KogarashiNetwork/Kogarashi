@@ -144,7 +144,8 @@ impl Fr {
     }
 
     pub fn is_odd(self) -> bool {
-        (self.0[0] % 2) != 0
+        let raw = self.montgomery_reduce();
+        (raw[0] % 2) != 0
     }
 
     pub fn divn(&mut self, mut n: u32) {
