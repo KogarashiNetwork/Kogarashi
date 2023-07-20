@@ -242,4 +242,14 @@ mod tests {
     use zero_crypto::dress::curve::weierstrass::*;
 
     curve_test!(jubjub, Fr, JubjubAffine, JubjubExtended, 100);
+
+    #[test]
+    fn serde_test() {
+        let s = Fr::random(OsRng);
+        let point = s * JubjubAffine::ADDITIVE_GENERATOR;
+        let bytes = point.to_bytes();
+        let point_p = JubjubAffine::from_bytes(bytes).unwrap();
+
+        assert_eq!(point.to_affine(), point_p)
+    }
 }

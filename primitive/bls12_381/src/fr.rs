@@ -194,7 +194,9 @@ impl Fr {
             0x039f6d3a994cebea,
         ]);
 
-        if sqrt.square() == *self {
+        let root = sqrt * sqrt;
+
+        if root == *self {
             Some(sqrt)
         } else {
             None
@@ -299,5 +301,15 @@ mod tests {
         let mut root_of_unity = Fr::ROOT_OF_UNITY;
         (0..s).for_each(|_| root_of_unity.square_assign());
         assert_eq!(root_of_unity, Fr::one())
+    }
+
+    #[test]
+    fn test_sqrt() {
+        let s = Fr::random(OsRng);
+        let sqrt = s.sqrt();
+        match sqrt {
+            Some(x) => assert_eq!(s, x.square()),
+            None => assert!(false),
+        }
     }
 }

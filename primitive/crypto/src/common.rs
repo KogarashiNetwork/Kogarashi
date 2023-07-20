@@ -15,4 +15,3 @@ pub use parity_scale_codec::alloc::vec;
 pub use parity_scale_codec::{Decode, Encode};
 pub use rand_core::RngCore;
 pub use sp_std::vec::Vec;
-pub use subtle::ConditionallySelectable;
