@@ -1,5 +1,4 @@
-use crate::curve::JubjubExtended;
-use crate::fp::Fp;
+use crate::{curve::JubjubExtended, JubjubAffine};
 
 use zero_bls12_381::Fr;
 use zero_crypto::behave::{CurveGroup, PrimeField, SigUtils};
@@ -9,13 +8,13 @@ use rand_core::RngCore;
 
 #[derive(Clone)]
 pub struct Signature {
+    r: [u8; 32],
     s: [u8; 32],
-    e: [u8; 32],
 }
 
 impl Signature {
-    fn new(s: [u8; 32], e: [u8; 32]) -> Self {
-        Self { s, e }
+    fn new(r: [u8; 32], s: [u8; 32]) -> Self {
+        Self { r, s }
     }
 }
 
@@ -40,14 +39,26 @@ impl PublicKey {
         PublicKey(raw)
     }
 
+    #[allow(non_snake_case)]
     pub fn validate(self, m: &[u8], sig: Signature) -> bool {
-        let c = hash_to_scalar(&sig.s, m);
-        let s = match Fr::from_bytes(sig.e) {
-            Some(s) => s,
+        // c = H(R||m)
+        let c = hash_to_scalar(&sig.r, m);
+        println!("{:?}", c);
+
+        let R = match JubjubAffine::from_bytes(sig.r) {
+            Some(R) => R,
             None => return false,
         };
-        let cofactor = Fr::one().double().double().double();
-        todo!()
+        let S = match Fr::from_bytes(sig.s) {
+            Some(S) => S,
+            None => return false,
+        };
+
+        // rejubjub cofactor
+        let h_G = Fr::one().double().double().double();
+
+        // h_G(-S * P_G + R + c * vk)
+        (h_G * (-S * JubjubExtended::ADDITIVE_GENERATOR + R + c * self.0)).is_identity()
     }
 }
 
@@ -55,12 +66,21 @@ impl PublicKey {
 pub struct SecretKey(Fr);
 
 impl SecretKey {
+    #[allow(non_snake_case)]
     pub fn sign(self, m: &[u8], mut rand: impl RngCore) -> Signature {
-        let mut t = [0u8; 80];
-        rand.fill_bytes(&mut t[..]);
-        let r = hash_to_scalar(&t, m);
+        // T uniformly at random
+        let mut T = [0u8; 80];
+        rand.fill_bytes(&mut T[..]);
+
+        // r = H(T||M)
+        let r = hash_to_scalar(&T, m);
+
+        // R = r * P_G
         let R = (JubjubExtended::ADDITIVE_GENERATOR * r).to_bytes();
+
+        // S = r + H(R||m)
         let S = r + hash_to_scalar(&R, m);
+
         Signature::new(R, S.to_bytes())
     }
 
