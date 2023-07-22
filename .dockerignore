@@ -1,6 +1,6 @@
 .github
+benches
 book
-chain
-client
 docs
+example
 target
