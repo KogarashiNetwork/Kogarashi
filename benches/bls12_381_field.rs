@@ -3,7 +3,7 @@ use criterion::{criterion_group, criterion_main, Criterion};
 use rand::rngs::OsRng;
 use rand::Rng;
 use zero_bls12_381::{Fq, Fq12, Fq2, Fq6, Fr};
-use zero_crypto::common::{FftField, Group, PrimeField};
+use zkstd::common::{FftField, Group, PrimeField};
 
 fn bench_bls12_381_fr(c: &mut Criterion) {
     let mut group = c.benchmark_group("bls12_381_fr");

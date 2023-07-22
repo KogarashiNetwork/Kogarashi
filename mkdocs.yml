@@ -14,7 +14,7 @@ nav:
     - Plonk: plonk_pallet.md
     - Confidential Transfer: confidential_transfer.md
   - Constraints:
-    - 'Abstract': contraints.md
+    - 'Abstract': constraints.md
     - Confidential Transfer Constraints: confidential_transfer_constraints.md
   - Technical:
     - 'Abstract': technical.md

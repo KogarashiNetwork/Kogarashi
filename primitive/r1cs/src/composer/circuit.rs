@@ -6,7 +6,7 @@
 
 use core::fmt::Debug;
 
-use zero_crypto::common::Pairing;
+use zkstd::common::Pairing;
 
 use crate::error::Error;
 

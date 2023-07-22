@@ -1,10 +1,10 @@
 use rand_core::OsRng;
 use zero_bls12_381::{Fq12, Fr, G1Affine, G2Affine, G2PairingAffine, Gt};
-use zero_crypto::{
+use zero_pairing::TatePairing;
+use zkstd::{
     behave::{Group, Pairing, PairingRange},
     common::CurveGroup,
 };
-use zero_pairing::TatePairing;
 
 #[test]
 fn generator_pairing_test() {

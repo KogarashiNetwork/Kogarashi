@@ -1,7 +1,7 @@
 #![allow(clippy::suspicious_arithmetic_impl)]
 #![allow(clippy::suspicious_op_assign_impl)]
 
-use zero_crypto::{
+use zkstd::{
     common::{CurveExtended, CurveGroup},
     dress::{curve::edwards::*, field::*},
 };
@@ -12,7 +12,7 @@ macro_rules! field_test_data {
         pub mod $test_data_name {
             use super::*;
             use rand_core::RngCore;
-            use zero_crypto::arithmetic::$test_bits::*;
+            use zkstd::arithmetic::$test_bits::*;
 
             pub const MODULUS: $limbs_type = $modulus;
 
@@ -35,9 +35,9 @@ macro_rules! field_test_data {
 
 pub mod jubjub_curve {
     use super::*;
-    use zero_crypto::arithmetic::bits_256::*;
-    use zero_crypto::arithmetic::edwards::*;
-    use zero_crypto::common::*;
+    use zkstd::arithmetic::bits_256::*;
+    use zkstd::arithmetic::edwards::*;
+    use zkstd::common::*;
 
     #[derive(Clone, Copy, Decode, Encode)]
     pub struct BlsScalar(pub Bits256Limbs);

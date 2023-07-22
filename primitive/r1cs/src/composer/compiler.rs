@@ -4,8 +4,8 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-use zero_crypto::common::Pairing;
 use zero_kzg::KeyPair;
+use zkstd::common::Pairing;
 
 use super::{Builder, Circuit, Composer};
 use crate::error::Error;

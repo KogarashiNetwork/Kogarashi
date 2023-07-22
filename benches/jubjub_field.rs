@@ -2,8 +2,8 @@ use criterion::black_box;
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand::rngs::OsRng;
 use rand::Rng;
-use zero_crypto::common::{FftField, Group, PrimeField};
 use zero_jubjub::Fp;
+use zkstd::common::{FftField, Group, PrimeField};
 
 fn bench_fp(c: &mut Criterion) {
     let mut group = c.benchmark_group("jubjub_fp");

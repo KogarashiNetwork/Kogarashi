@@ -1,10 +1,10 @@
 use core::borrow::Borrow;
 use core::iter::{Product, Sum};
 use serde::{Deserialize, Serialize};
-use zero_crypto::arithmetic::bits_256::*;
-use zero_crypto::arithmetic::utils::*;
-use zero_crypto::common::*;
-use zero_crypto::dress::field::*;
+use zkstd::arithmetic::bits_256::*;
+use zkstd::arithmetic::utils::*;
+use zkstd::common::*;
+use zkstd::dress::field::*;
 
 const MODULUS: [u64; 4] = [
     0xffffffff00000001,

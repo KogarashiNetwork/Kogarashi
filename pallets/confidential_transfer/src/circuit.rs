@@ -1,8 +1,8 @@
-use zero_crypto::common::{Curve, CurveGroup, Decode, Encode, Group, Pairing};
 use zero_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
 use zero_jubjub::{Fp as JubJubScalar, JubjubAffine};
 use zero_pairing::TatePairing;
 use zero_plonk::prelude::*;
+use zkstd::common::{Curve, CurveGroup, Decode, Encode, Group, Pairing};
 
 pub const BALANCE_BITS: usize = 16;
 pub const CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH: usize = 8;

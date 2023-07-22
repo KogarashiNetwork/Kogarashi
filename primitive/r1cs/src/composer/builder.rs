@@ -5,7 +5,7 @@
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
 use hashbrown::HashMap;
-use zero_crypto::common::Pairing;
+use zkstd::common::Pairing;
 
 use crate::{
     constraint_system::{Constraint, Selector, WiredWitness, Witness},

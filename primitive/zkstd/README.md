@@ -1,5 +1,5 @@
-# Crypto
-[![crates.io badge](https://img.shields.io/crates/v/zero-crypto.svg)](https://crates.io/crates/zero-crypto) [![Documentation](https://docs.rs/zero-crypto/badge.svg)](https://docs.rs/zero-crypto)  
+# ZkStd
+[![crates.io badge](https://img.shields.io/crates/v/zkstd.svg)](https://crates.io/crates/zkstd) [![Documentation](https://docs.rs/zkstd/badge.svg)](https://docs.rs/zkstd)  
 This crate provides basic cryptographic implementation as in `Field`, `Curve` and `Pairing`, `Fft`, `Kzg`, and also supports fully `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec).
 
 ## Design
@@ -22,10 +22,10 @@ We divide arithmetic operation and interface. Arithmetic operation is concrete l
 The following `Fr` support four basic operation.
 
 ```rust
-use zero_crypto::common::*;
-use zero_crypto::behave::*;
-use zero_crypto::dress::field::*;
-use zero_crypto::arithmetic::bits_256::*;
+use zkstd::common::*;
+use zkstd::behave::*;
+use zkstd::dress::field::*;
+use zkstd::arithmetic::bits_256::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
@@ -123,9 +123,9 @@ The following `G1Affine` and `G1Projective` supports point arithmetic.
 use zero_jubjub::Fp;
 use serde::{Deserialize, Serialize};
 use zero_bls12_381::Fr;
-use zero_crypto::arithmetic::edwards::*;
-use zero_crypto::common::*;
-use zero_crypto::dress::curve::edwards::*;
+use zkstd::arithmetic::edwards::*;
+use zkstd::common::*;
+use zkstd::dress::curve::edwards::*;
 
 pub const EDWARDS_D: Fr = Fr::to_mont_form([
     0x01065fd6d6343eb1,
@@ -271,7 +271,7 @@ twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtended
 mod tests {
     #[allow(unused_imports)]
     use super::*;
-    use zero_crypto::dress::curve::weierstrass::*;
+    use zkstd::dress::curve::weierstrass::*;
 
     curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);
 }

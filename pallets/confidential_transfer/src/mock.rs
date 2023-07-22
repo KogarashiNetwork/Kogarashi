@@ -4,9 +4,9 @@ use crate::{
     pallet::Config,
 };
 use pallet_encrypted_balance::{Account, AccountData};
-use zero_crypto::common::CurveGroup;
 use zero_elgamal::EncryptedNumber;
 use zero_jubjub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
+use zkstd::common::CurveGroup;
 
 use frame_support::traits::StorageMapShim;
 use frame_support::{construct_runtime, parameter_types};

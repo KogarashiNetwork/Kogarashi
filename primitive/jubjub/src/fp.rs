@@ -1,9 +1,9 @@
 use crate::error::Error;
 use serde::{Deserialize, Serialize};
 use zero_bls12_381::Fr;
-use zero_crypto::arithmetic::bits_256::*;
-use zero_crypto::common::*;
-use zero_crypto::dress::field::*;
+use zkstd::arithmetic::bits_256::*;
+use zkstd::common::*;
+use zkstd::dress::field::*;
 
 const MODULUS: [u64; 4] = [
     0xd0970e5ed6f72cb7,

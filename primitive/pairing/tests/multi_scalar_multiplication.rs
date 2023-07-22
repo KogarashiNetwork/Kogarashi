@@ -1,8 +1,8 @@
 use rand_core::OsRng;
 use zero_bls12_381::{Fr, G1Affine, G1Projective};
-use zero_crypto::behave::{Group, Projective};
-use zero_crypto::common::{Affine, CurveGroup};
 use zero_pairing::{msm_variable_base, TatePairing};
+use zkstd::behave::{Group, Projective};
+use zkstd::common::{Affine, CurveGroup};
 
 fn customized_scalar_point<P: Projective<Extended = P>>(point: P, scalar: &Fr) -> P {
     let mut res = P::ADDITIVE_IDENTITY;

@@ -2,7 +2,7 @@
 
 In previous two sections, we enable to check whether `computation` was done correctly through polynomials equation and these polynomials are generated with valid process with following equations.
 
-- [QAP](3_1_qap.md)
+- [QAP](qap.md)
 $$ L(x) * R(x) - O(x) = Z(x) * T(x) $$
 
 - [Polynomial Commitment](polynomial_commitment.md)

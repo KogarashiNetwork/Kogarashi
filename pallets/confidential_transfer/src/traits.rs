@@ -2,8 +2,8 @@ use crate::circuit::ConfidentialTransferTransaction;
 use frame_support::pallet_prelude::DispatchResultWithPostInfo;
 use pallet_plonk::FullcodecRng;
 use pallet_plonk::Proof;
-use zero_crypto::common::Pairing;
 use zero_elgamal::ConfidentialTransferPublicInputs;
+use zkstd::common::Pairing;
 
 /// Confidential transfer by coupling encrypted currency and plonk
 pub trait ConfidentialTransfer<AccountId, P: Pairing> {

@@ -1,9 +1,9 @@
 use criterion::black_box;
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand::rngs::OsRng;
-use zero_crypto::common::{Curve, CurveGroup, Group};
 use zero_jubjub::Fp;
 use zero_jubjub::JubjubExtended;
+use zkstd::common::{Curve, CurveGroup, Group};
 
 fn bench_jubjub_extended(c: &mut Criterion) {
     let mut group = c.benchmark_group("jubjub_extended");

@@ -3,8 +3,8 @@ use criterion::{criterion_group, criterion_main, Criterion};
 use rand::rngs::OsRng;
 use zero_bls12_381::Fr;
 use zero_bls12_381::G1Affine;
-use zero_crypto::common::{CurveGroup, Group};
 use zero_pairing::{msm_variable_base, TatePairing};
+use zkstd::common::{CurveGroup, Group};
 
 fn msm(c: &mut Criterion) {
     let mut group = c.benchmark_group("msm");

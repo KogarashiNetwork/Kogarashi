@@ -188,8 +188,8 @@ macro_rules! fft_field_operation {
 #[macro_export]
 macro_rules! field_operation {
     ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
-        use zero_crypto::behave::*;
-        use zero_crypto::common::*;
+        use zkstd::behave::*;
+        use zkstd::common::*;
 
         ring_operation!($field, $p, $g, $e, $r2, $r3, $inv);
 

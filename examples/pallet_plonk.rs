@@ -2,10 +2,10 @@
 
 use pallet::*;
 use pallet_plonk::{BlsScalar, Circuit, FullcodecRng, Proof};
-use zero_crypto::common::{CurveGroup, Pairing};
 use zero_jubjub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
 use zero_pairing::TatePairing;
 use zero_plonk::{composer::Composer, prelude::*};
+use zkstd::common::{CurveGroup, Pairing};
 
 use frame_support::{assert_ok, construct_runtime, parameter_types};
 use sp_core::H256;

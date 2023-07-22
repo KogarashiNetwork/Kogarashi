@@ -1,5 +1,5 @@
 use crate::{Fq12, Fr};
-use zero_crypto::common::*;
+use zkstd::common::*;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Gt(pub Fq12);

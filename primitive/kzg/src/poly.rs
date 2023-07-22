@@ -2,8 +2,8 @@ use core::ops::{Add, Deref, DerefMut, Mul, Sub};
 
 use core::iter::{self, Sum};
 use rand_core::RngCore;
-use zero_crypto::behave::FftField;
-use zero_crypto::common::Vec;
+use zkstd::behave::FftField;
+use zkstd::common::Vec;
 
 // a_n-1 , a_n-2, ... , a_0
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -241,7 +241,7 @@ mod tests {
     use super::Polynomial;
     use rand_core::OsRng;
     use zero_bls12_381::Fr;
-    use zero_crypto::behave::{Group, PrimeField};
+    use zkstd::behave::{Group, PrimeField};
 
     fn arb_fr() -> Fr {
         Fr::random(OsRng)

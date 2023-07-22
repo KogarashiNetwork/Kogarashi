@@ -19,9 +19,9 @@ use zero_bls12_381::params::{BLS_X, BLS_X_IS_NEGATIVE};
 use zero_bls12_381::{
     Fq12, Fr, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective, Gt,
 };
-use zero_crypto::common::*;
-use zero_crypto::common::{G2Pairing, Group, Pairing, PairingRange, PrimeField, Ring, Vec};
 use zero_jubjub::{Fp, JubjubAffine, JubjubExtended};
+use zkstd::common::*;
+use zkstd::common::{G2Pairing, Group, Pairing, PairingRange, PrimeField, Ring, Vec};
 
 // tate pairing with miller algorithm
 #[derive(Debug, Clone, Eq, PartialEq, Default, Encode, Decode)]

@@ -1,8 +1,8 @@
 use rand_core::RngCore;
 use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
-use zero_crypto::arithmetic::bits_384::*;
-use zero_crypto::common::*;
-use zero_crypto::dress::field::*;
+use zkstd::arithmetic::bits_384::*;
+use zkstd::common::*;
+use zkstd::dress::field::*;
 
 #[derive(Clone, Copy, Decode, Encode)]
 pub struct Fq(pub(crate) [u64; 6]);
