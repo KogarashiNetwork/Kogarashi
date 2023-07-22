@@ -1,0 +1,17 @@
+name: Node Test
+on:
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  node:
+        if: contains(github.event.pull_request.labels.*.name, 'node')
+        name: Node Test
+        runs-on: ubuntu-latest
+        steps:
+        - name: checkout pushed commit
+          uses: actions/checkout@v2
+          with:
+            ref: ${{ github.event.pull_request.head.sha }}
+        - name: Run docker compose
+          run: docker-compose up
