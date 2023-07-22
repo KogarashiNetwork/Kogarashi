@@ -1,9 +1,9 @@
 version: '3'
 services:
-  test:
-    build: .
-    container_name: test
+  node:
+    build: node
+    container_name: node
     tty: true
     stdin_open: true
     volumes:
-      - .:/app
+      - ./node:/app

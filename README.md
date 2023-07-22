@@ -14,13 +14,6 @@ We supports following functionalities.
 3. Trustless Single Node Off-Chain Oracle
 4. IoT TEE Device Remote Attestation
 
-## Test
-
-```shell
-$ git submodule update --init --recursive
-$ cargo test --all --release
-```
-
 ## Library
 
 All users balances are encrypted by the `homomorphic encryption` by default and all transactions executions are proved by the `non-interactive zero knowledge proof`. The blockchain runtime is optimized its structure and execution environment for improving encryption scheme. This blockchain supports the privacy and simplicity of use at the same time. Users balances are encrypted as default and transactions are verified by zero knowledge proof on chain.
@@ -43,6 +36,29 @@ All users balances are encrypted by the `homomorphic encryption` by default and 
 | [pallet-encrypted-balance](./master/pallets/encrypted_balance)|-|$get(address) \rightarrow (g^{r + r'}, g^{a + c} * b^{r + r'})$|
 | [confidential_transfer](./master/pallets/confidential_transfer) | [Confidential Transfer Tutorial](https://kogarashinetwork.github.io/Kogarashi/confidential_transfer/) |$C = g^{b^\star}y^r \land \hat C = g^{b^\star} \hat y^r \land D = g^r \land C_L/C = g^{b'}(C_R/D)^{sk} \land y = g^{sk} \land b^\star \in [0, MAX] \land b' \in [0,MAX] $|
 
+## Setup Node
+
+```shell
+$ rustup override set nightly-2022-11-14
+$ rustup target add wasm32-unknown-unknown
+$ cd node
+$ cargo build
+$ ./target/debug/node-template --dev
+```
+
+or
+
+```
+$ docker-compose up
+```
+
+## Test
+
+```shell
+$ git submodule update --init --recursive
+$ cargo test --all --release
+```
+
 ## Documentation
 
 We describe technical stuff and how to use libraries in [here](https://kogarashinetwork.github.io/Kogarashi/).
@@ -59,7 +75,8 @@ $ mkdocs serve
 $ mkdocs build
 ```
 
-## Progress
+## Status
+
 **We are in research and development phase and this is alpha quality software. Please use at your own risk**.
 
 ## License
