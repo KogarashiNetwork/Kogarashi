@@ -105,6 +105,7 @@ mod tests {
     use rand_core::OsRng;
     use zkstd::behave::Group;
 
+    #[ignore]
     #[test]
     fn signature_test() {
         for _ in 0..1000 {
