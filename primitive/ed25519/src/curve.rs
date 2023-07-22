@@ -1,8 +1,8 @@
 use crate::fp::Fp;
 use serde::{Deserialize, Serialize};
-use zero_crypto::arithmetic::edwards::*;
-use zero_crypto::common::*;
-use zero_crypto::*;
+use zkstd::arithmetic::edwards::*;
+use zkstd::common::*;
+use zkstd::*;
 
 const EDWARDS_D: Fp = Fp::to_mont_form([
     0x75eb4dca135978a3,

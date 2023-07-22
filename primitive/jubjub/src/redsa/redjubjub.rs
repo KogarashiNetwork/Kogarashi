@@ -1,7 +1,7 @@
 use crate::{curve::JubjubExtended, JubjubAffine};
 
 use zero_bls12_381::Fr;
-use zero_crypto::behave::{CurveGroup, PrimeField, SigUtils};
+use zkstd::behave::{CurveGroup, PrimeField, SigUtils};
 
 use blake2b_simd::Params;
 use rand_core::RngCore;
@@ -43,7 +43,6 @@ impl PublicKey {
     pub fn validate(self, m: &[u8], sig: Signature) -> bool {
         // c = H(R||m)
         let c = hash_to_scalar(&sig.r, m);
-        println!("{:?}", c);
 
         let R = match JubjubAffine::from_bytes(sig.r) {
             Some(R) => R,
@@ -104,7 +103,7 @@ fn hash_to_scalar(a: &[u8], b: &[u8]) -> Fr {
 mod tests {
     use super::*;
     use rand_core::OsRng;
-    use zero_crypto::behave::Group;
+    use zkstd::behave::Group;
 
     #[test]
     fn signature_test() {

@@ -1,6 +1,6 @@
 use crate::poly::Polynomial;
 use rayon::join;
-use zero_crypto::common::{FftField, Vec};
+use zkstd::common::{FftField, Vec};
 
 // fft structure
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -217,8 +217,8 @@ mod tests {
     use super::Fft;
     use rand_core::OsRng;
     use zero_bls12_381::Fr;
-    use zero_crypto::behave::{Group, PrimeField};
-    use zero_crypto::common::Vec;
+    use zkstd::behave::{Group, PrimeField};
+    use zkstd::common::Vec;
 
     fn arb_poly(k: u32) -> Vec<Fr> {
         (0..(1 << k))

@@ -2,12 +2,12 @@ use confidential_transfer::ConfidentialTransferCircuit;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
-use zero_crypto::common::{CurveGroup, Group};
 use zero_elgamal::EncryptedNumber;
 use zero_jubjub::*;
 use zero_kzg::KeyPair;
 use zero_pairing::TatePairing;
 use zero_plonk::prelude::*;
+use zkstd::common::{CurveGroup, Group};
 
 #[allow(unused_must_use)]
 fn circuit(c: &mut Criterion) {

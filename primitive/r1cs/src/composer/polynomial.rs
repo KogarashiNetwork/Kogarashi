@@ -4,7 +4,7 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-use zero_crypto::common::Pairing;
+use zkstd::common::Pairing;
 
 use crate::constraint_system::Witness;
 

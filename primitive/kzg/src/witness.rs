@@ -1,4 +1,4 @@
-use zero_crypto::common::{Group, Pairing, PairingRange};
+use zkstd::common::{Group, Pairing, PairingRange};
 
 // witness for polynomial commitment
 #[allow(dead_code)]

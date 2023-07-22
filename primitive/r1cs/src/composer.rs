@@ -6,7 +6,7 @@
 
 use core::ops::Index;
 
-use zero_crypto::{
+use zkstd::{
     behave::{Curve, Ring},
     common::Pairing,
 };

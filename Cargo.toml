@@ -15,7 +15,7 @@ readme = 'README.md'
 [dependencies]
 # primitive
 zero-bls12-381 = { path = "./primitive/bls12_381", default-features = false }
-zero-crypto = { path = "./primitive/crypto", default-features = false }
+zkstd = { path = "./primitive/zkstd", default-features = false }
 zero-elgamal = { path = "./primitive/elgamal", default-features = false }
 zero-jubjub = { path = "./primitive/jubjub", default-features = false }
 zero-kzg = { path = "./primitive/kzg", default-features = false }
@@ -42,8 +42,6 @@ frame-support = { default-features = false, version = '3.0.0' }
 [workspace]
 members = [
     "primitive/bls12_381",
-    "primitive/crypto",
-    "primitive/dsa",
     "primitive/elgamal",
     "primitive/jubjub",
     "primitive/keyring",
@@ -53,7 +51,8 @@ members = [
     "pallets/confidential_transfer",
     "pallets/encrypted_balance",
     "pallets/plonk",
-    "primitive/r1cs"
+    "primitive/r1cs",
+    "primitive/zkstd"
 ]
 
 [profile.release]

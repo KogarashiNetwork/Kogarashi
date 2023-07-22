@@ -70,14 +70,14 @@ pub use types::*;
 use frame_support::dispatch::{DispatchErrorWithPostInfo, PostDispatchInfo};
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
-use zero_crypto::behave::Group;
-use zero_crypto::common::{Pairing, Vec};
 use zero_kzg::KeyPair;
 use zero_plonk::prelude::Compiler;
+use zkstd::behave::Group;
+use zkstd::common::{Pairing, Vec};
 
 #[frame_support::pallet]
 pub mod pallet {
-    use zero_crypto::common::Pairing;
+    use zkstd::common::Pairing;
 
     use super::*;
 

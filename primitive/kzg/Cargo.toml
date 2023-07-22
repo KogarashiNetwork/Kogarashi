@@ -13,7 +13,7 @@ repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
 readme = 'README.md'
 
 [dependencies]
-zero-crypto = { path = "../crypto", default-features = false }
+zkstd = { path = "../zkstd", default-features = false }
 zero-pairing = { path = "../pairing", default-features = false }
 zero-bls12-381 = { path = "../bls12_381", default-features = false }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }

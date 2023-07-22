@@ -7,8 +7,8 @@ pub use test::*;
 #[macro_export]
 macro_rules! weierstrass_curve_operation {
     ($scalar:ident, $range:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $x:ident, $y:ident) => {
-        use zero_crypto::behave::*;
-        use zero_crypto::common::*;
+        use zkstd::behave::*;
+        use zkstd::common::*;
 
         affine_group_operation!($affine, $projective, $range, $scalar, $x, $y);
         projective_group_operation!($affine, $projective, $range, $scalar, $x, $y);

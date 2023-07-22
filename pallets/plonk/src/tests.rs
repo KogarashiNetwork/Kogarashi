@@ -68,9 +68,9 @@ mod plonk_test {
     use super::*;
     use crate::types::JubjubScalar;
     use rand::SeedableRng;
-    use zero_crypto::behave::Group;
     use zero_pairing::TatePairing;
     use zero_plonk::prelude::Compiler;
+    use zkstd::behave::Group;
 
     fn get_rng() -> FullcodecRng {
         FullcodecRng::from_seed([

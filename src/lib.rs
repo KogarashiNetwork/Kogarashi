@@ -9,8 +9,6 @@
 #[allow(unused_imports)]
 use zero_bls12_381::*;
 #[allow(unused_imports)]
-use zero_crypto::*;
-#[allow(unused_imports)]
 use zero_elgamal::*;
 #[allow(unused_imports)]
 use zero_jubjub::*;
@@ -20,3 +18,5 @@ use zero_kzg::*;
 use zero_pairing::*;
 #[allow(unused_imports)]
 use zero_plonk::*;
+#[allow(unused_imports)]
+use zkstd::*;

@@ -1,6 +1,6 @@
 use crate::types::*;
 use frame_support::pallet_prelude::DispatchResultWithPostInfo;
-use zero_crypto::common::{Pairing, Vec};
+use zkstd::common::{Pairing, Vec};
 
 /// Abstraction over a plonk zk-SNARKs system
 pub trait Plonk<AccountId, P: Pairing> {

@@ -5,7 +5,7 @@ mod twisted_edwards_points_tests {
     use super::*;
     use construction::jubjub_curve::{BlsScalar, JubjubAffine, JubjubExtended};
     use rand_core::OsRng;
-    use zero_crypto::{
+    use zkstd::{
         arithmetic::edwards::{add_point, double_point},
         common::{Curve, CurveGroup},
     };

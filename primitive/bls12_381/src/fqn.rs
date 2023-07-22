@@ -7,8 +7,8 @@ use crate::params::{
     FROBENIUS_COEFF_FQ6_C2,
 };
 use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
-use zero_crypto::dress::extension_field::*;
-use zero_crypto::dress::pairing::{bls12_range_field_pairing, peculiar_extension_field_operation};
+use zkstd::dress::extension_field::*;
+use zkstd::dress::pairing::{bls12_range_field_pairing, peculiar_extension_field_operation};
 
 // sextic twist of Fp12
 // degree 2 extension field
@@ -168,7 +168,7 @@ mod tests {
     use super::*;
     use paste::paste;
     use rand_core::OsRng;
-    use zero_crypto::dress::field::field_test;
+    use zkstd::dress::field::field_test;
 
     field_test!(fq2_field, Fq2, 1000);
     field_test!(fq6_field, Fq6, 500);

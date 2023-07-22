@@ -21,9 +21,9 @@ use core::ops::{Add, Sub};
 use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
-use zero_crypto::common::{CurveGroup, Pairing};
 use zero_jubjub::{Fp, JubjubAffine, JubjubExtended};
 use zero_pairing::TatePairing;
+use zkstd::common::{CurveGroup, Pairing};
 
 /// Number encrypted by ElGamal encryption
 #[derive(Debug, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
@@ -146,8 +146,8 @@ impl ConfidentialTransferPublicInputs<TatePairing> for EncryptedNumber {
 mod tests {
     use rand::{thread_rng, Rng};
     use rand_core::OsRng;
-    use zero_crypto::behave::*;
     use zero_jubjub::Fp;
+    use zkstd::behave::*;
 
     use crate::EncryptedNumber;
 

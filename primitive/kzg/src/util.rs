@@ -1,6 +1,6 @@
-use zero_crypto::behave::Ring;
-use zero_crypto::common::Pairing;
-use zero_crypto::common::Vec;
+use zkstd::behave::Ring;
+use zkstd::common::Pairing;
+use zkstd::common::Vec;
 
 pub(crate) fn powers_of<P: Pairing>(
     scalar: &P::ScalarField,

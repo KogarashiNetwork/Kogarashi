@@ -8,7 +8,7 @@ macro_rules! limbs_test {
             use construction::$test_mod::*;
             use paste::paste;
             use rand_core::OsRng;
-            use zero_crypto::arithmetic::$test_bits::*;
+            use zkstd::arithmetic::$test_bits::*;
 
             fn arb_field() -> $limbs_type {
                 random(OsRng)

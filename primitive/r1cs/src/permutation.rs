@@ -9,7 +9,7 @@ use crate::constraint_system::{WireData, Witness};
 use core::marker::PhantomData;
 use hashbrown::HashMap;
 
-use zero_crypto::behave::*;
+use zkstd::behave::*;
 
 /// Permutation provides the necessary state information and functions
 /// to create the permutation polynomial. In the literature, Z(X) is the

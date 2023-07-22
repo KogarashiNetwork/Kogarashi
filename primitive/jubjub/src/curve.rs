@@ -1,9 +1,9 @@
 use crate::Fp;
 use serde::{Deserialize, Serialize};
 use zero_bls12_381::Fr;
-use zero_crypto::arithmetic::edwards::*;
-use zero_crypto::common::*;
-use zero_crypto::dress::curve::edwards::*;
+use zkstd::arithmetic::edwards::*;
+use zkstd::common::*;
+use zkstd::dress::curve::edwards::*;
 
 pub const EDWARDS_D: Fr = Fr::to_mont_form([
     0x01065fd6d6343eb1,
@@ -236,7 +236,7 @@ impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtended {
 mod tests {
     #[allow(unused_imports)]
     use super::*;
-    use zero_crypto::dress::curve::weierstrass::*;
+    use zkstd::dress::curve::weierstrass::*;
 
     curve_test!(jubjub, Fr, JubjubAffine, JubjubExtended, 100);
 

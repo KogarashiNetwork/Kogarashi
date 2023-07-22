@@ -13,12 +13,12 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zero_crypto::behave::Group;
-use zero_crypto::common::CurveGroup;
 use zero_elgamal::EncryptedNumber;
 use zero_jubjub::{Fp, JubjubAffine, JubjubExtended};
 use zero_pairing::TatePairing;
 use zero_plonk::prelude::Compiler;
+use zkstd::behave::Group;
+use zkstd::common::CurveGroup;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;
