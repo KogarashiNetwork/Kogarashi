@@ -5,7 +5,7 @@ use crate::params::*;
 use core::borrow::Borrow;
 use core::iter::Sum;
 use dusk_bytes::{Error as BytesError, Serializable};
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
+use subtle::{Choice, ConditionallySelectable, ConstantTimeEq};
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
 use zkstd::dress::{curve::weierstrass::*, pairing::bls12_g2_pairing};
@@ -208,9 +208,9 @@ impl Serializable<96> for G2Affine {
         // by the y-coordinate recovery procedure in from_compressed_unchecked().
 
         // Obtain the three flags from the start of the byte sequence
-        let compression_flag_set = Choice::from((buf[0] >> 7) & 1);
-        let infinity_flag_set = Choice::from((buf[0] >> 6) & 1);
-        let sort_flag_set = Choice::from((buf[0] >> 5) & 1);
+        let compression_flag_set = (buf[0] >> 7) & 1 == 1;
+        let infinity_flag_set = (buf[0] >> 6) & 1 == 1;
+        let sort_flag_set = (buf[0] >> 5) & 1 == 1;
 
         // Attempt to obtain the x-coordinate
         let xc1 = {
@@ -220,13 +220,13 @@ impl Serializable<96> for G2Affine {
             // Mask away the flag bits
             tmp[0] &= 0b0001_1111;
 
-            Fq::from_bytes(&tmp)
+            Fq::from_bytes(tmp)
         };
         let xc0 = {
             let mut tmp = [0; 48];
             tmp.copy_from_slice(&buf[48..96]);
 
-            Fq::from_bytes(&tmp)
+            Fq::from_bytes(tmp)
         };
 
         let x: Option<Self> = xc1
@@ -240,34 +240,34 @@ impl Serializable<96> for G2Affine {
                     // Otherwise, return a recovered point (assuming the correct
                     // y-coordinate can be found) so long as the infinity flag
                     // was not set.
-                    CtOption::new(
-                        G2Affine::ADDITIVE_IDENTITY,
-                        infinity_flag_set & // Infinity flag should be set
+                    if infinity_flag_set & // Infinity flag should be set
                     compression_flag_set & // Compression flag should be set
                     (!sort_flag_set) & // Sort flag should not be set
-                    Choice::from(x.is_zero() as u8), // The x-coordinate should be zero
-                    )
-                    .or_else(|| {
+                    x.is_zero()
+                    {
+                        Some(G2Affine::ADDITIVE_IDENTITY)
+                    } else {
                         // Recover a y-coordinate given x by y = sqrt(x^3 + 4)
                         ((x.square() * x) + B).sqrt().and_then(|y| {
                             // Switch to the correct y-coordinate if necessary.
                             let y = Fq2::conditional_select(
                                 &y,
                                 &-y,
-                                y.lexicographically_largest() ^ sort_flag_set,
+                                y.lexicographically_largest() ^ (sort_flag_set as u8).into(),
                             );
-
-                            CtOption::new(
-                                G2Affine {
+                            if (!infinity_flag_set) & // Infinity flag should not be set
+                            compression_flag_set
+                            {
+                                Some(G2Affine {
                                     x,
                                     y,
                                     is_infinity: infinity_flag_set.into(),
-                                },
-                                (!infinity_flag_set) & // Infinity flag should not be set
-                            compression_flag_set, // Compression flag should be set
-                            )
+                                })
+                            } else {
+                                None
+                            }
                         })
-                    })
+                    }
                 })
             })
             .into();

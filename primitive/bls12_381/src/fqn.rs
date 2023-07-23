@@ -6,7 +6,7 @@ use crate::params::{
     BLS_X, FROBENIUS_COEFF_FQ12_C1, FROBENIUS_COEFF_FQ2_C1, FROBENIUS_COEFF_FQ6_C1,
     FROBENIUS_COEFF_FQ6_C2,
 };
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
+use subtle::{Choice, ConditionallySelectable, ConstantTimeEq};
 use zkstd::dress::extension_field::*;
 use zkstd::dress::pairing::{bls12_range_field_pairing, peculiar_extension_field_operation};
 
@@ -99,11 +99,13 @@ impl Fq2 {
             | (Choice::from(self.0[1].is_zero() as u8) & self.0[0].lexicographically_largest())
     }
 
-    pub fn sqrt(&self) -> CtOption<Self> {
+    pub fn sqrt(&self) -> Option<Self> {
         // Algorithm 9, https://eprint.iacr.org/2012/685.pdf
         // with constant time modifications.
 
-        CtOption::new(Fq2::zero(), Choice::from(self.is_zero() as u8)).or_else(|| {
+        if self.is_zero() {
+            Some(Fq2::zero())
+        } else {
             // a1 = self^((p - 3) / 4)
             let a1 = self.pow_vartime(&[
                 0xee7fbfffffffeaaa,
@@ -124,25 +126,28 @@ impl Fq2 {
             // we're just trying to get the square of an element of the subfield
             // Fp. This is given by x0 * u, since u = sqrt(-1). Since the element
             // x0 = a + bu has b = 0, the solution is therefore au.
-            CtOption::new(Fq2([-x0.0[1], x0.0[0]]), alpha.ct_eq(&Fq2::one().neg()))
-                // Otherwise, the correct solution is (1 + alpha)^((q - 1) // 2) * x0
-                .or_else(|| {
-                    CtOption::new(
-                        (alpha + Fq2::one()).pow_vartime(&[
-                            0xdcff7fffffffd555,
-                            0xf55ffff58a9ffff,
-                            0xb39869507b587b12,
-                            0xb23ba5c279c2895f,
-                            0x258dd3db21a5d66b,
-                            0xd0088f51cbff34d,
-                        ]) * x0,
-                        Choice::from(1),
-                    )
-                })
-                // Only return the result if it's really the square root (and so
-                // self is actually quadratic nonresidue)
-                .and_then(|sqrt| CtOption::new(sqrt, sqrt.square().ct_eq(self)))
-        })
+            (if alpha == Fq2::one().neg() {
+                Some(Fq2([-x0.0[1], x0.0[0]]))
+            } else {
+                Some(
+                    (alpha + Fq2::one()).pow_vartime(&[
+                        0xdcff7fffffffd555,
+                        0xf55ffff58a9ffff,
+                        0xb39869507b587b12,
+                        0xb23ba5c279c2895f,
+                        0x258dd3db21a5d66b,
+                        0xd0088f51cbff34d,
+                    ]) * x0,
+                )
+            })
+            .and_then(|sqrt| {
+                if sqrt.square() == *self {
+                    Some(sqrt)
+                } else {
+                    None
+                }
+            })
+        }
     }
 
     /// Although this is labeled "vartime", it is only

@@ -165,6 +165,29 @@ impl Fp {
     }
 }
 
+impl From<i8> for Fp {
+    fn from(val: i8) -> Fp {
+        match (val >= 0, val < 0) {
+            (true, false) => Fp([val.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
+            (false, true) => -Fp([val.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
+            (_, _) => unreachable!(),
+        }
+    }
+}
+
+impl From<Fp> for Fr {
+    fn from(scalar: Fp) -> Fr {
+        let bls_scalar = Fr::from_bytes(scalar.to_bytes());
+
+        assert!(
+            bls_scalar.is_some(),
+            "Failed to convert a Scalar from JubJub to BLS"
+        );
+
+        bls_scalar.unwrap()
+    }
+}
+
 fft_field_operation!(
     Fp,
     MODULUS,
@@ -230,32 +253,6 @@ impl Fp {
             false => modulus,
             true => modulus - ((1u8 << w) as i8),
         }
-    }
-}
-
-impl From<i8> for Fp {
-    fn from(val: i8) -> Fp {
-        match (val >= 0, val < 0) {
-            (true, false) => Fp([val.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
-            (false, true) => -Fp([val.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
-            (_, _) => unreachable!(),
-        }
-    }
-}
-
-impl From<Fp> for Fr {
-    fn from(scalar: Fp) -> Fr {
-        let bls_scalar = Fr::from_bytes(scalar.to_bytes());
-
-        // The order of a JubJub's Scalar field is shorter than a BLS Scalar,
-        // so convert any jubjub scalar to a BLS' Scalar should always be
-        // safe.
-        assert!(
-            bls_scalar.is_some(),
-            "Failed to convert a Scalar from JubJub to BLS"
-        );
-
-        bls_scalar.unwrap()
     }
 }
 
