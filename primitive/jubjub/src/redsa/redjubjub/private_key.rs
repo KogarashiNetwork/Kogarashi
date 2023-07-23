@@ -13,7 +13,7 @@ pub struct SecretKey(pub(crate) Fp);
 
 impl SecretKey {
     #[allow(non_snake_case)]
-    pub fn sign(self, m: &[u8], mut rand: impl RngCore) -> Signature {
+    pub fn sign(&self, m: &[u8], mut rand: impl RngCore) -> Signature {
         // T uniformly at random
         let mut T = [0u8; 80];
         rand.fill_bytes(&mut T[..]);
@@ -25,8 +25,8 @@ impl SecretKey {
         // R = r * P_G
         let R = (SAPLING_BASE_POINT * r).to_bytes();
 
-        // S = r + H(R||m)
-        let S = (r + hash_to_scalar(&R, &pk.to_bytes(), m)).to_bytes();
+        // S = r + H(R||m) * sk
+        let S = (r + hash_to_scalar(&R, &pk.to_bytes(), m) * self.0).to_bytes();
 
         Signature::new(R, S)
     }

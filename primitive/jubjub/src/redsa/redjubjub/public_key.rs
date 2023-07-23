@@ -1,11 +1,12 @@
+use super::constant::{SAPLING_BASE_POINT, SAPLING_REDJUBJUB_COFACTOR};
 use super::hash::hash_to_scalar;
 use super::signature::Signature;
 use crate::{curve::JubjubExtended, JubjubAffine};
 
 use zero_bls12_381::Fr;
-use zkstd::behave::{CurveGroup, PrimeField, SigUtils};
+use zkstd::behave::{CurveGroup, SigUtils};
 
-#[derive(Clone)]
+#[derive(Clone, Copy, Debug)]
 pub struct PublicKey(pub(crate) JubjubExtended);
 
 impl SigUtils<32> for PublicKey {
@@ -28,8 +29,8 @@ impl PublicKey {
 
     #[allow(non_snake_case)]
     pub fn validate(self, m: &[u8], sig: Signature) -> bool {
-        // c = H(R||m)
-        let c = hash_to_scalar(&sig.r, m);
+        // c = H(R||vk||m)
+        let c = hash_to_scalar(&sig.r, &self.to_bytes(), m);
 
         let R = match JubjubAffine::from_bytes(sig.r) {
             Some(R) => R,
@@ -40,10 +41,7 @@ impl PublicKey {
             None => return false,
         };
 
-        // rejubjub cofactor
-        let h_G = Fr::one().double().double().double();
-
         // h_G(-S * P_G + R + c * vk)
-        (h_G * (-S * JubjubExtended::ADDITIVE_GENERATOR + R + c * self.0)).is_identity()
+        (SAPLING_REDJUBJUB_COFACTOR * (-(SAPLING_BASE_POINT * S) + self.0 * c + R)).is_identity()
     }
 }
