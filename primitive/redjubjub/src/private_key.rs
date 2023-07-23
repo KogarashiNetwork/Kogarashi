@@ -1,11 +1,10 @@
-use crate::fp::Fp;
-
 use super::constant::SAPLING_BASE_POINT;
 use super::hash::hash_to_scalar;
 use super::public_key::PublicKey;
 use super::signature::Signature;
 
 use rand_core::RngCore;
+use zero_jubjub::Fp;
 use zkstd::behave::SigUtils;
 
 #[derive(Clone, Debug)]

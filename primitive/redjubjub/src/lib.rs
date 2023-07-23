@@ -1,14 +1,23 @@
-pub mod redjubjub;
+#![cfg_attr(not(feature = "std"), no_std)]
+
+mod constant;
+mod hash;
+mod keyring;
+mod private_key;
+mod public_key;
+mod signature;
+
+pub use private_key::SecretKey;
+pub use public_key::PublicKey;
 
 use parity_scale_codec::alloc::string::String;
 use parity_scale_codec::{Decode, Encode};
-use redjubjub::{PublicKey, SecretKey};
 use sp_core::crypto::{
     CryptoType, CryptoTypeId, CryptoTypePublicPair, Derive, DeriveJunction, Pair as TraitPair,
     Public as TraitPublic, SecretStringError, UncheckedFrom,
 };
 use sp_runtime_interface::pass_by::PassByInner;
-use sp_std::{cmp::Ordering, vec::Vec};
+use sp_std::vec::Vec;
 
 /// An identifier used to match public keys against redsa keys
 pub const CRYPTO_ID: CryptoTypeId = CryptoTypeId(*b"reds");
@@ -27,6 +36,24 @@ impl Signature {
         let mut r = [0u8; 64];
         r.copy_from_slice(data);
         Signature(r)
+    }
+}
+
+#[derive(Clone, Encode, Decode, PassByInner, PartialEq, Eq, Hash)]
+pub struct Public(pub [u8; 32]);
+
+impl Public {
+    /// A new instance from the given 33-byte `data`.
+    ///
+    /// NOTE: No checking goes on to ensure this is a real public key. Only use it if
+    /// you are certain that the array actually is a pubkey. GIGO!
+    pub fn from_raw(data: [u8; 32]) -> Self {
+        Self(data)
+    }
+
+    /// Return a slice filled with raw data.
+    pub fn as_array_ref(&self) -> &[u8; 32] {
+        self.as_ref()
     }
 }
 
@@ -58,40 +85,17 @@ impl AsMut<[u8]> for Signature {
     }
 }
 
-#[derive(Clone, Encode, Decode, PassByInner)]
-pub struct Public(pub [u8; 32]);
-
-impl sp_std::hash::Hash for Public {
-    fn hash<H: sp_std::hash::Hasher>(&self, state: &mut H) {
-        self.as_ref().hash(state);
-    }
-}
-
-impl PartialOrd for Public {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for Public {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.as_ref().cmp(&other.as_ref())
-    }
-}
-
-impl PartialEq for Public {
-    fn eq(&self, other: &Self) -> bool {
-        self.as_ref() == other.as_ref()
-    }
-}
-
-impl Eq for Public {}
-
 impl Derive for Public {}
 
 impl Default for Public {
     fn default() -> Self {
         Public([0u8; 32])
+    }
+}
+
+impl AsRef<[u8; 32]> for Public {
+    fn as_ref(&self) -> &[u8; 32] {
+        &self.0
     }
 }
 
@@ -227,4 +231,26 @@ impl CryptoType for Signature {
 
 impl CryptoType for Pair {
     type Pair = Pair;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::private_key::SecretKey;
+    use rand_core::OsRng;
+    use zero_jubjub::Fp;
+    use zkstd::behave::Group;
+
+    #[test]
+    fn signature_test() {
+        for _ in 0..1000 {
+            let msg = b"test";
+            let randomness = OsRng;
+            let priv_key = SecretKey(Fp::random(OsRng));
+            let sig = priv_key.sign(msg, randomness);
+
+            let pub_key = priv_key.to_public_key();
+
+            assert!(pub_key.validate(msg, sig))
+        }
+    }
 }

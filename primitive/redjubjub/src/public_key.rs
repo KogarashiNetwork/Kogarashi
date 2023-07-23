@@ -1,9 +1,9 @@
 use super::constant::{SAPLING_BASE_POINT, SAPLING_REDJUBJUB_COFACTOR};
 use super::hash::hash_to_scalar;
 use super::signature::Signature;
-use crate::{curve::JubjubExtended, JubjubAffine};
 
 use zero_bls12_381::Fr;
+use zero_jubjub::{JubjubAffine, JubjubExtended};
 use zkstd::behave::{CurveGroup, SigUtils};
 
 #[derive(Clone, Copy, Debug)]

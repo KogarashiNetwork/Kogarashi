@@ -1,4 +1,4 @@
-use crate::fp::Fp;
+use zero_jubjub::Fp;
 
 use super::constant::SAPLING_PERSONAL;
 

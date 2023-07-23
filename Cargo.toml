@@ -44,7 +44,6 @@ members = [
     "primitive/bls12_381",
     "primitive/elgamal",
     "primitive/jubjub",
-    "primitive/keyring",
     "primitive/kzg",
     "primitive/pairing",
     "primitive/plonk",
@@ -52,6 +51,7 @@ members = [
     "pallets/encrypted_balance",
     "pallets/plonk",
     "primitive/r1cs",
+    "primitive/redjubjub",
     "primitive/zkstd"
 ]
 
