@@ -128,6 +128,62 @@ impl Mul<JubjubAffine> for Fr {
     }
 }
 
+impl Mul<JubjubAffine> for Fp {
+    type Output = JubjubExtended;
+
+    #[inline]
+    fn mul(self, rhs: JubjubAffine) -> JubjubExtended {
+        &self * &rhs
+    }
+}
+
+impl<'a, 'b> Mul<&'b JubjubAffine> for &'a Fp {
+    type Output = JubjubExtended;
+
+    #[inline]
+    fn mul(self, rhs: &'b JubjubAffine) -> JubjubExtended {
+        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
+        let mut acc = rhs.to_extended();
+        for &naf in self.to_nafs().iter() {
+            if naf == Naf::Plus {
+                res += acc;
+            } else if naf == Naf::Minus {
+                res -= acc;
+            }
+            acc = acc.double();
+        }
+        res
+    }
+}
+
+impl Mul<Fp> for JubjubAffine {
+    type Output = JubjubExtended;
+
+    #[inline]
+    fn mul(self, rhs: Fp) -> JubjubExtended {
+        &self * &rhs
+    }
+}
+
+impl<'a, 'b> Mul<&'b Fp> for &'a JubjubAffine {
+    type Output = JubjubExtended;
+
+    #[inline]
+    fn mul(self, rhs: &'b Fp) -> JubjubExtended {
+        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
+        let mut acc = self.to_extended();
+        for &naf in rhs.to_nafs().iter() {
+            if naf == Naf::Plus {
+                res += acc;
+            } else if naf == Naf::Minus {
+                res -= acc;
+            }
+            acc = acc.double();
+        }
+        res
+    }
+}
+
 #[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
 pub struct JubjubExtended {
     x: Fr,
@@ -203,6 +259,34 @@ impl Mul<JubjubExtended> for Fr {
 }
 
 twisted_edwards_curve_operation!(Fr, Fr, EDWARDS_D, JubjubAffine, JubjubExtended, X, Y, T);
+
+impl Mul<JubjubExtended> for Fp {
+    type Output = JubjubExtended;
+
+    #[inline]
+    fn mul(self, rhs: JubjubExtended) -> JubjubExtended {
+        &self * &rhs
+    }
+}
+
+impl<'a, 'b> Mul<&'b JubjubExtended> for &'a Fp {
+    type Output = JubjubExtended;
+
+    #[inline]
+    fn mul(self, rhs: &'b JubjubExtended) -> JubjubExtended {
+        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
+        let mut acc = *rhs;
+        for &naf in self.to_nafs().iter() {
+            if naf == Naf::Plus {
+                res += acc;
+            } else if naf == Naf::Minus {
+                res -= acc;
+            }
+            acc = acc.double();
+        }
+        res
+    }
+}
 
 impl Mul<Fp> for JubjubExtended {
     type Output = JubjubExtended;

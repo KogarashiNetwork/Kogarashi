@@ -76,7 +76,7 @@ macro_rules! twisted_edwards_extend_group_operation {
             };
 
             fn is_identity(&self) -> bool {
-                self.x == $range::zero() && self.y == $range::one()
+                (self.x == $range::zero()) & (self.y == self.z)
             }
 
             fn zero() -> Self {

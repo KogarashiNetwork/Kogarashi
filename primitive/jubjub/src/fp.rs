@@ -147,6 +147,22 @@ impl Fp {
     pub fn is_even(&self) -> bool {
         self.0[0] % 2 == 0
     }
+
+    pub fn from_hash(hash: &[u8; 64]) -> Self {
+        let d0 = Fp([
+            u64::from_le_bytes(hash[0..8].try_into().unwrap()),
+            u64::from_le_bytes(hash[8..16].try_into().unwrap()),
+            u64::from_le_bytes(hash[16..24].try_into().unwrap()),
+            u64::from_le_bytes(hash[24..32].try_into().unwrap()),
+        ]);
+        let d1 = Fp([
+            u64::from_le_bytes(hash[32..40].try_into().unwrap()),
+            u64::from_le_bytes(hash[40..48].try_into().unwrap()),
+            u64::from_le_bytes(hash[48..56].try_into().unwrap()),
+            u64::from_le_bytes(hash[56..64].try_into().unwrap()),
+        ]);
+        d0 * Fp(R2) + d1 * Fp(R3)
+    }
 }
 
 fft_field_operation!(
