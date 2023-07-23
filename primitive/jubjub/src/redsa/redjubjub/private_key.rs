@@ -23,7 +23,7 @@ impl SecretKey {
         let r = hash_to_scalar(&T, &pk.to_bytes(), m);
 
         // R = r * P_G
-        let R = (SAPLING_BASE_POINT * r).to_bytes();
+        let R = (r * SAPLING_BASE_POINT).to_bytes();
 
         // S = r + H(R||m) * sk
         let S = (r + hash_to_scalar(&R, &pk.to_bytes(), m) * self.0).to_bytes();

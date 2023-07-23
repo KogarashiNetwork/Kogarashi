@@ -42,6 +42,6 @@ impl PublicKey {
         };
 
         // h_G(-S * P_G + R + c * vk)
-        (SAPLING_REDJUBJUB_COFACTOR * (-(SAPLING_BASE_POINT * S) + self.0 * c + R)).is_identity()
+        (SAPLING_REDJUBJUB_COFACTOR * (-(S * SAPLING_BASE_POINT) + R + c * self.0)).is_identity()
     }
 }
