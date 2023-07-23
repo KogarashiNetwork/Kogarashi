@@ -124,7 +124,7 @@ impl Mul<JubjubAffine> for Fr {
     type Output = JubjubExtended;
 
     fn mul(self, rhs: JubjubAffine) -> Self::Output {
-        scalar_point(rhs.to_extended(), &self)
+        rhs * self
     }
 }
 
@@ -142,17 +142,7 @@ impl<'a, 'b> Mul<&'b JubjubAffine> for &'a Fp {
 
     #[inline]
     fn mul(self, rhs: &'b JubjubAffine) -> JubjubExtended {
-        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
-        let mut acc = rhs.to_extended();
-        for &naf in self.to_nafs().iter() {
-            if naf == Naf::Plus {
-                res += acc;
-            } else if naf == Naf::Minus {
-                res -= acc;
-            }
-            acc = acc.double();
-        }
-        res
+        rhs * self
     }
 }
 
@@ -190,14 +180,6 @@ pub struct JubjubExtended {
     y: Fr,
     t: Fr,
     z: Fr,
-}
-
-impl JubjubExtended {
-    pub fn batch_normalize<'a>(
-        y: &'a mut [JubjubExtended],
-    ) -> impl Iterator<Item = JubjubAffine> + 'a {
-        y.iter().map(|p| JubjubAffine::from(*p))
-    }
 }
 
 impl Add for JubjubExtended {
@@ -254,7 +236,7 @@ impl Mul<JubjubExtended> for Fr {
     type Output = JubjubExtended;
 
     fn mul(self, rhs: JubjubExtended) -> Self::Output {
-        scalar_point(rhs, &self)
+        rhs * self
     }
 }
 
@@ -274,17 +256,7 @@ impl<'a, 'b> Mul<&'b JubjubExtended> for &'a Fp {
 
     #[inline]
     fn mul(self, rhs: &'b JubjubExtended) -> JubjubExtended {
-        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
-        let mut acc = *rhs;
-        for &naf in self.to_nafs().iter() {
-            if naf == Naf::Plus {
-                res += acc;
-            } else if naf == Naf::Minus {
-                res -= acc;
-            }
-            acc = acc.double();
-        }
-        res
+        rhs * self
     }
 }
 

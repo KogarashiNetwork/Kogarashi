@@ -4,7 +4,6 @@ use core::{
     ops::Add,
 };
 
-use dusk_bytes::Serializable;
 use parity_scale_codec::{Decode, Encode};
 
 use super::{
@@ -63,7 +62,7 @@ pub trait Pairing:
             Scalar = Self::ScalarField,
         > + From<Self::G1Projective>
         + Add<Self::G1Projective, Output = Self::G1Projective>
-        + Serializable<48>
+        + SigUtils<48>
         + PartialEq
         + Eq
         + Sync

@@ -4,130 +4,9 @@ use crate::params::{
 use crate::{Fq, Fr};
 use core::borrow::Borrow;
 use core::iter::Sum;
-use dusk_bytes::{Error as BytesError, Serializable};
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
 use zkstd::dress::curve::weierstrass::*;
-
-/// The projective form of coordinate
-#[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct G1Projective {
-    pub(crate) x: Fq,
-    pub(crate) y: Fq,
-    pub(crate) z: Fq,
-}
-
-impl Add for G1Projective {
-    type Output = Self;
-
-    fn add(self, rhs: G1Projective) -> Self {
-        add_point(self, rhs)
-    }
-}
-
-impl Neg for G1Projective {
-    type Output = Self;
-
-    fn neg(self) -> Self {
-        Self {
-            x: self.x,
-            y: -self.y,
-            z: self.z,
-        }
-    }
-}
-
-impl Sub for G1Projective {
-    type Output = Self;
-
-    fn sub(self, rhs: G1Projective) -> Self {
-        add_point(self, -rhs)
-    }
-}
-
-impl Mul<Fr> for G1Projective {
-    type Output = G1Projective;
-
-    fn mul(self, rhs: Fr) -> Self::Output {
-        scalar_point(self, &rhs)
-    }
-}
-
-impl Mul<G1Projective> for Fr {
-    type Output = G1Projective;
-
-    fn mul(self, rhs: G1Projective) -> Self::Output {
-        scalar_point(rhs, &self)
-    }
-}
-
-/// The projective form of coordinate
-#[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct G1Affine {
-    pub(crate) x: Fq,
-    pub(crate) y: Fq,
-    is_infinity: bool,
-}
-
-impl Add for G1Affine {
-    type Output = G1Projective;
-
-    fn add(self, rhs: G1Affine) -> Self::Output {
-        add_point(self.to_extended(), rhs.to_extended())
-    }
-}
-
-impl Neg for G1Affine {
-    type Output = Self;
-
-    fn neg(self) -> Self {
-        Self {
-            x: self.x,
-            y: -self.y,
-            is_infinity: self.is_infinity,
-        }
-    }
-}
-
-impl Sub for G1Affine {
-    type Output = G1Projective;
-
-    fn sub(self, rhs: G1Affine) -> Self::Output {
-        add_point(self.to_extended(), rhs.neg().to_extended())
-    }
-}
-
-impl Mul<Fr> for G1Affine {
-    type Output = G1Projective;
-
-    fn mul(self, rhs: Fr) -> Self::Output {
-        scalar_point(self.to_extended(), &rhs)
-    }
-}
-
-impl Mul<G1Affine> for Fr {
-    type Output = G1Projective;
-
-    fn mul(self, rhs: G1Affine) -> Self::Output {
-        scalar_point(rhs.to_extended(), &self)
-    }
-}
-
-weierstrass_curve_operation!(
-    Fr,
-    Fq,
-    G1_PARAM_A,
-    G1_PARAM_B,
-    G1Affine,
-    G1Projective,
-    G1_GENERATOR_X,
-    G1_GENERATOR_Y
-);
-
-// below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
-// [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
-// Dusk-Network team and, @str4d and @ebfull
 
 pub const BETA: Fq = Fq([
     0x30f1361b798a64e8,
@@ -146,6 +25,108 @@ const B: Fq = Fq([
     0x8ec9733bbf78ab2f,
     0x9d645513d83de7e,
 ]);
+
+/// The projective form of coordinate
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct G1Affine {
+    pub(crate) x: Fq,
+    pub(crate) y: Fq,
+    is_infinity: bool,
+}
+
+impl SigUtils<48> for G1Affine {
+    /// Serializes this element into compressed form. See [`notes::serialization`](crate::notes::serialization)
+    /// for details about how group elements are serialized.
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
+        // Strictly speaking, self.x is zero already when self.infinity is true, but
+        // to guard against implementation mistakes we do not assume this.
+        let mut res = (if self.is_infinity { Fq::zero() } else { self.x }).to_bytes();
+
+        // This point is in compressed form, so we set the most significant bit.
+        res[0] |= 1u8 << 7;
+
+        // Is this point at infinity? If so, set the second-most significant bit.
+        res[0] |= if self.is_infinity { 1u8 << 6 } else { 0u8 };
+
+        // Is the y-coordinate the lexicographically largest of the two associated with the
+        // x-coordinate? If so, set the third-most significant bit so long as this is not
+        // the point at infinity.
+        res[0] |= if !self.is_infinity & self.y.lexicographically_largest() {
+            1u8 << 5
+        } else {
+            0u8
+        };
+
+        res
+    }
+
+    /// Attempts to deserialize a compressed element. See [`notes::serialization`](crate::notes::serialization)
+    /// for details about how group elements are serialized.
+    fn from_bytes(buf: [u8; Self::LENGTH]) -> Option<Self> {
+        // We already know the point is on the curve because this is established
+        // by the y-coordinate recovery procedure in from_compressed_unchecked().
+
+        let compression_flag_set = (buf[0] >> 7) & 1 == 1;
+        let infinity_flag_set = (buf[0] >> 6) & 1 == 1;
+        let sort_flag_set = (buf[0] >> 5) & 1 == 1;
+
+        // Attempt to obtain the x-coordinate
+        let x = {
+            let mut tmp = [0; Self::LENGTH];
+            tmp.copy_from_slice(&buf[..Self::LENGTH]);
+
+            // Mask away the flag bits
+            tmp[0] &= 0b0001_1111;
+
+            Fq::from_bytes(tmp)
+        };
+
+        x.and_then(|x| {
+            // If the infinity flag is set, return the value assuming
+            // the x-coordinate is zero and the sort bit is not set.
+            //
+            // Otherwise, return a recovered point (assuming the correct
+            // y-coordinate can be found) so long as the infinity flag
+            // was not set.
+
+            if infinity_flag_set & // Infinity flag should be set
+                compression_flag_set & // Compression flag should be set
+                    (!sort_flag_set) & // Sort flag should not be set
+                    x.is_zero()
+            {
+                Some(G1Affine::ADDITIVE_IDENTITY)
+            } else {
+                ((x.square() * x) + B).sqrt().and_then(|y| {
+                    // Switch to the correct y-coordinate if necessary.
+                    let y = if y.lexicographically_largest() ^ sort_flag_set {
+                        -y
+                    } else {
+                        y
+                    };
+                    if (!infinity_flag_set) & // Infinity flag should not be set
+                            compression_flag_set
+                    {
+                        Some(G1Affine {
+                            x,
+                            y,
+                            is_infinity: infinity_flag_set.into(),
+                        })
+                    } else {
+                        None
+                    }
+                })
+            }
+        })
+        .and_then(|p| {
+            if p.is_torsion_free().into() {
+                Some(p)
+            } else {
+                None
+            }
+        })
+        .into()
+    }
+}
 
 fn endomorphism(p: &G1Affine) -> G1Affine {
     // Endomorphism of the points on the curve.
@@ -200,7 +181,7 @@ impl G1Affine {
         bytes
     }
 
-    pub fn is_torsion_free(&self) -> Choice {
+    pub fn is_torsion_free(&self) -> bool {
         // Algorithm from Section 6 of https://eprint.iacr.org/2021/1130
         // Updated proof of correctness in https://eprint.iacr.org/2022/352
         //
@@ -208,8 +189,60 @@ impl G1Affine {
 
         let minus_x_squared_times_p = G1Projective::from(*self).mul_by_x().mul_by_x().neg();
         let endomorphism_p = endomorphism(self);
-        minus_x_squared_times_p.ct_eq(&G1Projective::from(endomorphism_p))
+        minus_x_squared_times_p == G1Projective::from(endomorphism_p)
     }
+}
+
+impl Add for G1Affine {
+    type Output = G1Projective;
+
+    fn add(self, rhs: G1Affine) -> Self::Output {
+        add_point(self.to_extended(), rhs.to_extended())
+    }
+}
+
+impl Neg for G1Affine {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            is_infinity: self.is_infinity,
+        }
+    }
+}
+
+impl Sub for G1Affine {
+    type Output = G1Projective;
+
+    fn sub(self, rhs: G1Affine) -> Self::Output {
+        add_point(self.to_extended(), rhs.neg().to_extended())
+    }
+}
+
+impl Mul<Fr> for G1Affine {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self.to_extended(), &rhs)
+    }
+}
+
+impl Mul<G1Affine> for Fr {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: G1Affine) -> Self::Output {
+        scalar_point(rhs.to_extended(), &self)
+    }
+}
+
+/// The projective form of coordinate
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct G1Projective {
+    pub(crate) x: Fq,
+    pub(crate) y: Fq,
+    pub(crate) z: Fq,
 }
 
 impl G1Projective {
@@ -245,98 +278,47 @@ impl G1Projective {
     }
 }
 
-impl Serializable<48> for G1Affine {
-    type Error = BytesError;
+impl Add for G1Projective {
+    type Output = Self;
 
-    /// Serializes this element into compressed form. See [`notes::serialization`](crate::notes::serialization)
-    /// for details about how group elements are serialized.
-    fn to_bytes(&self) -> [u8; Self::SIZE] {
-        // Strictly speaking, self.x is zero already when self.infinity is true, but
-        // to guard against implementation mistakes we do not assume this.
-        let mut res = Fq::conditional_select(&self.x, &Fq::zero(), (self.is_infinity as u8).into())
-            .to_bytes();
-
-        // This point is in compressed form, so we set the most significant bit.
-        res[0] |= 1u8 << 7;
-
-        // Is this point at infinity? If so, set the second-most significant bit.
-        res[0] |= u8::conditional_select(&0u8, &(1u8 << 6), (self.is_infinity as u8).into());
-
-        // Is the y-coordinate the lexicographically largest of the two associated with the
-        // x-coordinate? If so, set the third-most significant bit so long as this is not
-        // the point at infinity.
-        res[0] |= u8::conditional_select(
-            &0u8,
-            &(1u8 << 5),
-            (!Choice::from(self.is_infinity as u8)) & self.y.lexicographically_largest(),
-        );
-
-        res
+    fn add(self, rhs: G1Projective) -> Self {
+        add_point(self, rhs)
     }
+}
 
-    /// Attempts to deserialize a compressed element. See [`notes::serialization`](crate::notes::serialization)
-    /// for details about how group elements are serialized.
-    fn from_bytes(buf: &[u8; Self::SIZE]) -> Result<Self, Self::Error> {
-        // We already know the point is on the curve because this is established
-        // by the y-coordinate recovery procedure in from_compressed_unchecked().
+impl Neg for G1Projective {
+    type Output = Self;
 
-        let compression_flag_set = Choice::from((buf[0] >> 7) & 1);
-        let infinity_flag_set = Choice::from((buf[0] >> 6) & 1);
-        let sort_flag_set = Choice::from((buf[0] >> 5) & 1);
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            z: self.z,
+        }
+    }
+}
 
-        // Attempt to obtain the x-coordinate
-        let x = {
-            let mut tmp = [0; Self::SIZE];
-            tmp.copy_from_slice(&buf[..Self::SIZE]);
+impl Sub for G1Projective {
+    type Output = Self;
 
-            // Mask away the flag bits
-            tmp[0] &= 0b0001_1111;
+    fn sub(self, rhs: G1Projective) -> Self {
+        add_point(self, -rhs)
+    }
+}
 
-            Fq::from_bytes(&tmp)
-        };
+impl Mul<Fr> for G1Projective {
+    type Output = G1Projective;
 
-        let x: Option<Self> = x
-            .and_then(|x| {
-                // If the infinity flag is set, return the value assuming
-                // the x-coordinate is zero and the sort bit is not set.
-                //
-                // Otherwise, return a recovered point (assuming the correct
-                // y-coordinate can be found) so long as the infinity flag
-                // was not set.
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self, &rhs)
+    }
+}
 
-                CtOption::new(
-                    G1Affine::ADDITIVE_IDENTITY,
-                    infinity_flag_set & // Infinity flag should be set
-                compression_flag_set & // Compression flag should be set
-                (!sort_flag_set) & // Sort flag should not be set
-                (x.is_zero() as u8).into(), // The x-coordinate should be zero
-                )
-                .or_else(|| {
-                    // Recover a y-coordinate given x by y = sqrt(x^3 + 4)
-                    ((x.square() * x) + B).sqrt().and_then(|y| {
-                        // Switch to the correct y-coordinate if necessary.
-                        let y = Fq::conditional_select(
-                            &y,
-                            &-y,
-                            y.lexicographically_largest() ^ sort_flag_set,
-                        );
+impl Mul<G1Projective> for Fr {
+    type Output = G1Projective;
 
-                        CtOption::new(
-                            G1Affine {
-                                x,
-                                y,
-                                is_infinity: infinity_flag_set.into(),
-                            },
-                            (!infinity_flag_set) & // Infinity flag should not be set
-                        compression_flag_set, // Compression flag should be set
-                        )
-                    })
-                })
-            })
-            .and_then(|p| CtOption::new(p, p.is_torsion_free()))
-            .into();
-
-        x.ok_or(BytesError::InvalidData)
+    fn mul(self, rhs: G1Projective) -> Self::Output {
+        scalar_point(rhs, &self)
     }
 }
 
@@ -352,45 +334,16 @@ where
     }
 }
 
-impl ConditionallySelectable for G1Affine {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        G1Affine {
-            x: Fq::conditional_select(&a.x, &b.x, choice),
-            y: Fq::conditional_select(&a.y, &b.y, choice),
-            is_infinity: ConditionallySelectable::conditional_select(
-                &Choice::from(a.is_infinity as u8),
-                &Choice::from(b.is_infinity as u8),
-                choice,
-            )
-            .into(),
-        }
-    }
-}
-
-impl ConstantTimeEq for G1Projective {
-    fn ct_eq(&self, other: &Self) -> Choice {
-        // Is (xz^2, yz^3, z) equal to (x'z'^2, yz'^3, z') when converted to affine?
-
-        let self_is_zero = Choice::from(self.is_identity() as u8);
-        let other_is_zero = Choice::from(other.is_identity() as u8);
-
-        let is_same = self.x * other.z == other.x * self.z && self.y * other.z == other.y * self.z;
-
-        (self_is_zero & other_is_zero) // Both point at infinity
-            | Choice::from(is_same as u8)
-        // Neither point at infinity, coordinates are the same
-    }
-}
-
-impl ConditionallySelectable for G1Projective {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        G1Projective {
-            x: Fq::conditional_select(&a.x, &b.x, choice),
-            y: Fq::conditional_select(&a.y, &b.y, choice),
-            z: Fq::conditional_select(&a.z, &b.z, choice),
-        }
-    }
-}
+weierstrass_curve_operation!(
+    Fr,
+    Fq,
+    G1_PARAM_A,
+    G1_PARAM_B,
+    G1Affine,
+    G1Projective,
+    G1_GENERATOR_X,
+    G1_GENERATOR_Y
+);
 
 #[cfg(test)]
 mod tests {

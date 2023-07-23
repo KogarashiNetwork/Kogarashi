@@ -6,7 +6,6 @@ use crate::params::{
     BLS_X, FROBENIUS_COEFF_FQ12_C1, FROBENIUS_COEFF_FQ2_C1, FROBENIUS_COEFF_FQ6_C1,
     FROBENIUS_COEFF_FQ6_C2,
 };
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zkstd::dress::extension_field::*;
 use zkstd::dress::pairing::{bls12_range_field_pairing, peculiar_extension_field_operation};
 
@@ -34,61 +33,11 @@ bls12_range_field_pairing!(
     BLS_X_IS_NEGATIVE
 );
 
-// non common extension operation
-peculiar_extension_field_operation!(
-    Fq2,
-    Fq6,
-    Fq12,
-    FROBENIUS_COEFF_FQ2_C1,
-    FROBENIUS_COEFF_FQ6_C1,
-    FROBENIUS_COEFF_FQ6_C2,
-    FROBENIUS_COEFF_FQ12_C1,
-    BLS_X_IS_NEGATIVE
-);
-
-// below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
-// [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
-// Dusk-Network team and, @str4d and @ebfull
-
-impl ConditionallySelectable for Fq2 {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        Fq2([
-            Fq::conditional_select(&a.0[0], &b.0[0], choice),
-            Fq::conditional_select(&a.0[1], &b.0[1], choice),
-        ])
-    }
-}
-
-impl ConditionallySelectable for Fq6 {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        Fq6([
-            Fq2::conditional_select(&a.0[0], &b.0[0], choice),
-            Fq2::conditional_select(&a.0[1], &b.0[1], choice),
-            Fq2::conditional_select(&a.0[2], &b.0[2], choice),
-        ])
-    }
-}
-
-impl ConditionallySelectable for Fq12 {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        Fq12([
-            Fq6::conditional_select(&a.0[0], &b.0[0], choice),
-            Fq6::conditional_select(&a.0[1], &b.0[1], choice),
-        ])
-    }
-}
-
-impl ConstantTimeEq for Fq2 {
-    fn ct_eq(&self, other: &Self) -> Choice {
-        self.0[0].ct_eq(&other.0[0]) & self.0[1].ct_eq(&other.0[1])
-    }
-}
-
 impl Fq2 {
     /// Returns whether or not this element is strictly lexicographically
     /// larger than its negation.
     #[inline]
-    pub fn lexicographically_largest(&self) -> Choice {
+    pub fn lexicographically_largest(&self) -> bool {
         // If this element's c1 coefficient is lexicographically largest
         // then it is lexicographically largest. Otherwise, in the event
         // the c1 coefficient is zero and the c0 coefficient is
@@ -96,14 +45,16 @@ impl Fq2 {
         // largest.
 
         self.0[1].lexicographically_largest()
-            | (Choice::from(self.0[1].is_zero() as u8) & self.0[0].lexicographically_largest())
+            | self.0[1].is_zero() & self.0[0].lexicographically_largest()
     }
 
-    pub fn sqrt(&self) -> CtOption<Self> {
+    pub fn sqrt(&self) -> Option<Self> {
         // Algorithm 9, https://eprint.iacr.org/2012/685.pdf
         // with constant time modifications.
 
-        CtOption::new(Fq2::zero(), Choice::from(self.is_zero() as u8)).or_else(|| {
+        if self.is_zero() {
+            Some(Fq2::zero())
+        } else {
             // a1 = self^((p - 3) / 4)
             let a1 = self.pow_vartime(&[
                 0xee7fbfffffffeaaa,
@@ -124,25 +75,28 @@ impl Fq2 {
             // we're just trying to get the square of an element of the subfield
             // Fp. This is given by x0 * u, since u = sqrt(-1). Since the element
             // x0 = a + bu has b = 0, the solution is therefore au.
-            CtOption::new(Fq2([-x0.0[1], x0.0[0]]), alpha.ct_eq(&Fq2::one().neg()))
-                // Otherwise, the correct solution is (1 + alpha)^((q - 1) // 2) * x0
-                .or_else(|| {
-                    CtOption::new(
-                        (alpha + Fq2::one()).pow_vartime(&[
-                            0xdcff7fffffffd555,
-                            0xf55ffff58a9ffff,
-                            0xb39869507b587b12,
-                            0xb23ba5c279c2895f,
-                            0x258dd3db21a5d66b,
-                            0xd0088f51cbff34d,
-                        ]) * x0,
-                        Choice::from(1),
-                    )
-                })
-                // Only return the result if it's really the square root (and so
-                // self is actually quadratic nonresidue)
-                .and_then(|sqrt| CtOption::new(sqrt, sqrt.square().ct_eq(self)))
-        })
+            (if alpha == Fq2::one().neg() {
+                Some(Fq2([-x0.0[1], x0.0[0]]))
+            } else {
+                Some(
+                    (alpha + Fq2::one()).pow_vartime(&[
+                        0xdcff7fffffffd555,
+                        0xf55ffff58a9ffff,
+                        0xb39869507b587b12,
+                        0xb23ba5c279c2895f,
+                        0x258dd3db21a5d66b,
+                        0xd0088f51cbff34d,
+                    ]) * x0,
+                )
+            })
+            .and_then(|sqrt| {
+                if sqrt.square() == *self {
+                    Some(sqrt)
+                } else {
+                    None
+                }
+            })
+        }
     }
 
     /// Although this is labeled "vartime", it is only
@@ -162,6 +116,18 @@ impl Fq2 {
         res
     }
 }
+
+// non common extension operation
+peculiar_extension_field_operation!(
+    Fq2,
+    Fq6,
+    Fq12,
+    FROBENIUS_COEFF_FQ2_C1,
+    FROBENIUS_COEFF_FQ6_C1,
+    FROBENIUS_COEFF_FQ6_C2,
+    FROBENIUS_COEFF_FQ12_C1,
+    BLS_X_IS_NEGATIVE
+);
 
 #[cfg(test)]
 mod tests {

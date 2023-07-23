@@ -1,5 +1,5 @@
-use crate::curve::JubjubAffine;
 use zero_bls12_381::Fr;
+use zero_jubjub::JubjubAffine;
 
 pub(crate) const SAPLING_PERSONAL: &'static [u8; 16] = b"Zcash_RedJubjubH";
 

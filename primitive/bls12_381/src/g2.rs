@@ -4,63 +4,28 @@ use crate::fr::Fr;
 use crate::params::*;
 use core::borrow::Borrow;
 use core::iter::Sum;
-use dusk_bytes::{Error as BytesError, Serializable};
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
 use zkstd::dress::{curve::weierstrass::*, pairing::bls12_g2_pairing};
 
-/// The projective form of coordinate
-#[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct G2Projective {
-    pub(crate) x: Fq2,
-    pub(crate) y: Fq2,
-    pub(crate) z: Fq2,
-}
-
-impl Add for G2Projective {
-    type Output = Self;
-
-    fn add(self, rhs: G2Projective) -> Self {
-        add_point(self, rhs)
-    }
-}
-
-impl Neg for G2Projective {
-    type Output = Self;
-
-    fn neg(self) -> Self {
-        Self {
-            x: self.x,
-            y: -self.y,
-            z: self.z,
-        }
-    }
-}
-
-impl Sub for G2Projective {
-    type Output = Self;
-
-    fn sub(self, rhs: G2Projective) -> Self {
-        add_point(self, -rhs)
-    }
-}
-
-impl Mul<Fr> for G2Projective {
-    type Output = G2Projective;
-
-    fn mul(self, rhs: Fr) -> Self::Output {
-        scalar_point(self, &rhs)
-    }
-}
-
-impl Mul<G2Projective> for Fr {
-    type Output = G2Projective;
-
-    fn mul(self, rhs: G2Projective) -> Self::Output {
-        scalar_point(rhs, &self)
-    }
-}
+const B: Fq2 = Fq2([
+    Fq([
+        0xaa270000000cfff3,
+        0x53cc0032fc34000a,
+        0x478fe97a6b0a807f,
+        0xb1d37ebee6ba24d7,
+        0x8ec9733bbf78ab2f,
+        0x9d645513d83de7e,
+    ]),
+    Fq([
+        0xaa270000000cfff3,
+        0x53cc0032fc34000a,
+        0x478fe97a6b0a807f,
+        0xb1d37ebee6ba24d7,
+        0x8ec9733bbf78ab2f,
+        0x9d645513d83de7e,
+    ]),
+]);
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
@@ -68,6 +33,20 @@ pub struct G2Affine {
     x: Fq2,
     y: Fq2,
     is_infinity: bool,
+}
+
+impl G2Affine {
+    /// Returns true if this point is free of an $h$-torsion component, and so it
+    /// exists within the $q$-order subgroup $\mathbb{G}_2$. This should always return true
+    /// unless an "unchecked" API was used.
+    pub fn is_torsion_free(&self) -> bool {
+        // Algorithm from Section 4 of https://eprint.iacr.org/2021/1130
+        // Updated proof of correctness in https://eprint.iacr.org/2022/352
+        //
+        // Check that psi(P) == [x] P
+        let p = G2Projective::from(*self);
+        p.psi() == p.mul_by_x()
+    }
 }
 
 impl Add for G2Affine {
@@ -114,71 +93,25 @@ impl Mul<G2Affine> for Fr {
     }
 }
 
-/// The coefficient for pairing affine format
-#[derive(Debug, Clone, PartialEq, Eq, Copy, Decode, Encode)]
-pub struct PairingCoeff(pub(crate) Fq2, pub(crate) Fq2, pub(crate) Fq2);
-
-/// The pairing format coordinate
-#[derive(Debug, Clone, Eq, Decode, Encode)]
-pub struct G2PairingAffine {
-    pub coeffs: Vec<PairingCoeff>,
-    is_infinity: bool,
+/// The projective form of coordinate
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct G2Projective {
+    pub(crate) x: Fq2,
+    pub(crate) y: Fq2,
+    pub(crate) z: Fq2,
 }
 
-impl PartialEq for G2PairingAffine {
-    fn eq(&self, other: &Self) -> bool {
-        self.coeffs == other.coeffs && self.is_infinity == other.is_infinity
-    }
-}
-
-weierstrass_curve_operation!(
-    Fr,
-    Fq2,
-    G2_PARAM_A,
-    G2_PARAM_B,
-    G2Affine,
-    G2Projective,
-    G2_GENERATOR_X,
-    G2_GENERATOR_Y
-);
-bls12_g2_pairing!(G2Projective, G2Affine, PairingCoeff, G2PairingAffine, Fq12);
-
-// below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
-// [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
-// Dusk-Network team and, @str4d and @ebfull
-
-const B: Fq2 = Fq2([
-    Fq([
-        0xaa270000000cfff3,
-        0x53cc0032fc34000a,
-        0x478fe97a6b0a807f,
-        0xb1d37ebee6ba24d7,
-        0x8ec9733bbf78ab2f,
-        0x9d645513d83de7e,
-    ]),
-    Fq([
-        0xaa270000000cfff3,
-        0x53cc0032fc34000a,
-        0x478fe97a6b0a807f,
-        0xb1d37ebee6ba24d7,
-        0x8ec9733bbf78ab2f,
-        0x9d645513d83de7e,
-    ]),
-]);
-
-impl Serializable<96> for G2Affine {
-    type Error = BytesError;
-
+impl SigUtils<96> for G2Affine {
     /// Serializes this element into compressed form. See [`notes::serialization`](crate::notes::serialization)
     /// for details about how group elements are serialized.
-    fn to_bytes(&self) -> [u8; Self::SIZE] {
-        let infinity = Choice::from(self.is_infinity as u8);
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
+        let infinity = self.is_infinity;
 
         // Strictly speaking, self.x is zero already when self.infinity is true, but
         // to guard against implementation mistakes we do not assume this.
-        let x = Fq2::conditional_select(&self.x, &Fq2::zero(), infinity);
+        let x = if infinity { Fq2::zero() } else { self.x };
 
-        let mut res = [0; Self::SIZE];
+        let mut res = [0; Self::LENGTH];
 
         res[0..48].copy_from_slice(&x.0[1].to_bytes()[..]);
         res[48..96].copy_from_slice(&x.0[0].to_bytes()[..]);
@@ -187,30 +120,30 @@ impl Serializable<96> for G2Affine {
         res[0] |= 1u8 << 7;
 
         // Is this point at infinity? If so, set the second-most significant bit.
-        res[0] |= u8::conditional_select(&0u8, &(1u8 << 6), infinity);
+        res[0] |= if infinity { 1u8 << 6 } else { 0u8 };
 
         // Is the y-coordinate the lexicographically largest of the two associated with the
         // x-coordinate? If so, set the third-most significant bit so long as this is not
         // the point at infinity.
-        res[0] |= u8::conditional_select(
-            &0u8,
-            &(1u8 << 5),
-            (!infinity) & self.y.lexicographically_largest(),
-        );
+        res[0] |= if (!infinity) & self.y.lexicographically_largest() {
+            1u8 << 5
+        } else {
+            0u8
+        };
 
         res
     }
 
     /// Attempts to deserialize a compressed element. See [`notes::serialization`](crate::notes::serialization)
     /// for details about how group elements are serialized.
-    fn from_bytes(buf: &[u8; Self::SIZE]) -> Result<Self, Self::Error> {
+    fn from_bytes(buf: [u8; Self::LENGTH]) -> Option<Self> {
         // We already know the point is on the curve because this is established
         // by the y-coordinate recovery procedure in from_compressed_unchecked().
 
         // Obtain the three flags from the start of the byte sequence
-        let compression_flag_set = Choice::from((buf[0] >> 7) & 1);
-        let infinity_flag_set = Choice::from((buf[0] >> 6) & 1);
-        let sort_flag_set = Choice::from((buf[0] >> 5) & 1);
+        let compression_flag_set = (buf[0] >> 7) & 1 == 1;
+        let infinity_flag_set = (buf[0] >> 6) & 1 == 1;
+        let sort_flag_set = (buf[0] >> 5) & 1 == 1;
 
         // Attempt to obtain the x-coordinate
         let xc1 = {
@@ -220,13 +153,13 @@ impl Serializable<96> for G2Affine {
             // Mask away the flag bits
             tmp[0] &= 0b0001_1111;
 
-            Fq::from_bytes(&tmp)
+            Fq::from_bytes(tmp)
         };
         let xc0 = {
             let mut tmp = [0; 48];
             tmp.copy_from_slice(&buf[48..96]);
 
-            Fq::from_bytes(&tmp)
+            Fq::from_bytes(tmp)
         };
 
         let x: Option<Self> = xc1
@@ -240,56 +173,42 @@ impl Serializable<96> for G2Affine {
                     // Otherwise, return a recovered point (assuming the correct
                     // y-coordinate can be found) so long as the infinity flag
                     // was not set.
-                    CtOption::new(
-                        G2Affine::ADDITIVE_IDENTITY,
-                        infinity_flag_set & // Infinity flag should be set
+                    if infinity_flag_set & // Infinity flag should be set
                     compression_flag_set & // Compression flag should be set
                     (!sort_flag_set) & // Sort flag should not be set
-                    Choice::from(x.is_zero() as u8), // The x-coordinate should be zero
-                    )
-                    .or_else(|| {
+                    x.is_zero()
+                    {
+                        Some(G2Affine::ADDITIVE_IDENTITY)
+                    } else {
                         // Recover a y-coordinate given x by y = sqrt(x^3 + 4)
                         ((x.square() * x) + B).sqrt().and_then(|y| {
                             // Switch to the correct y-coordinate if necessary.
-                            let y = Fq2::conditional_select(
-                                &y,
-                                &-y,
-                                y.lexicographically_largest() ^ sort_flag_set,
-                            );
-
-                            CtOption::new(
-                                G2Affine {
+                            let y = if y.lexicographically_largest() ^ sort_flag_set {
+                                -y
+                            } else {
+                                y
+                            };
+                            if (!infinity_flag_set) & // Infinity flag should not be set
+                            compression_flag_set
+                            {
+                                Some(G2Affine {
                                     x,
                                     y,
                                     is_infinity: infinity_flag_set.into(),
-                                },
-                                (!infinity_flag_set) & // Infinity flag should not be set
-                            compression_flag_set, // Compression flag should be set
-                            )
+                                })
+                            } else {
+                                None
+                            }
                         })
-                    })
+                    }
                 })
             })
             .into();
 
         match x {
-            Some(x) if x.is_torsion_free().unwrap_u8() == 1 => Ok(x),
-            _ => Err(BytesError::InvalidData),
+            Some(x) if x.is_torsion_free() => Some(x),
+            _ => None,
         }
-    }
-}
-
-impl G2Affine {
-    /// Returns true if this point is free of an $h$-torsion component, and so it
-    /// exists within the $q$-order subgroup $\mathbb{G}_2$. This should always return true
-    /// unless an "unchecked" API was used.
-    pub fn is_torsion_free(&self) -> Choice {
-        // Algorithm from Section 4 of https://eprint.iacr.org/2021/1130
-        // Updated proof of correctness in https://eprint.iacr.org/2022/352
-        //
-        // Check that psi(P) == [x] P
-        let p = G2Projective::from(*self);
-        p.psi().ct_eq(&p.mul_by_x())
     }
 }
 
@@ -357,43 +276,64 @@ impl G2Projective {
     }
 }
 
-impl ConstantTimeEq for G2Projective {
-    fn ct_eq(&self, other: &Self) -> Choice {
-        // Is (xz^2, yz^3, z) equal to (x'z'^2, yz'^3, z') when converted to affine?
+impl Add for G2Projective {
+    type Output = Self;
 
-        let self_is_zero = Choice::from(self.is_identity() as u8);
-        let other_is_zero = Choice::from(other.is_identity() as u8);
-
-        let is_same = self.x * other.z == other.x * self.z && self.y * other.z == other.y * self.z;
-
-        (self_is_zero & other_is_zero) // Both point at infinity
-            | Choice::from(is_same as u8)
-        // Neither point at infinity, coordinates are the same
+    fn add(self, rhs: G2Projective) -> Self {
+        add_point(self, rhs)
     }
 }
 
-impl ConditionallySelectable for G2Affine {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        G2Affine {
-            x: Fq2::conditional_select(&a.x, &b.x, choice),
-            y: Fq2::conditional_select(&a.y, &b.y, choice),
-            is_infinity: ConditionallySelectable::conditional_select(
-                &Choice::from(a.is_infinity as u8),
-                &Choice::from(b.is_infinity as u8),
-                choice,
-            )
-            .into(),
+impl Neg for G2Projective {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            z: self.z,
         }
     }
 }
 
-impl ConditionallySelectable for G2Projective {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        G2Projective {
-            x: Fq2::conditional_select(&a.x, &b.x, choice),
-            y: Fq2::conditional_select(&a.y, &b.y, choice),
-            z: Fq2::conditional_select(&a.z, &b.z, choice),
-        }
+impl Sub for G2Projective {
+    type Output = Self;
+
+    fn sub(self, rhs: G2Projective) -> Self {
+        add_point(self, -rhs)
+    }
+}
+
+impl Mul<Fr> for G2Projective {
+    type Output = G2Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self, &rhs)
+    }
+}
+
+impl Mul<G2Projective> for Fr {
+    type Output = G2Projective;
+
+    fn mul(self, rhs: G2Projective) -> Self::Output {
+        scalar_point(rhs, &self)
+    }
+}
+
+/// The coefficient for pairing affine format
+#[derive(Debug, Clone, PartialEq, Eq, Copy, Decode, Encode)]
+pub struct PairingCoeff(pub(crate) Fq2, pub(crate) Fq2, pub(crate) Fq2);
+
+/// The pairing format coordinate
+#[derive(Debug, Clone, Eq, Decode, Encode)]
+pub struct G2PairingAffine {
+    pub coeffs: Vec<PairingCoeff>,
+    is_infinity: bool,
+}
+
+impl PartialEq for G2PairingAffine {
+    fn eq(&self, other: &Self) -> bool {
+        self.coeffs == other.coeffs && self.is_infinity == other.is_infinity
     }
 }
 
@@ -408,6 +348,18 @@ where
         iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + item.borrow())
     }
 }
+
+weierstrass_curve_operation!(
+    Fr,
+    Fq2,
+    G2_PARAM_A,
+    G2_PARAM_B,
+    G2Affine,
+    G2Projective,
+    G2_GENERATOR_X,
+    G2_GENERATOR_Y
+);
+bls12_g2_pairing!(G2Projective, G2Affine, PairingCoeff, G2PairingAffine, Fq12);
 
 #[cfg(test)]
 mod tests {

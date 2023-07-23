@@ -17,8 +17,6 @@ serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 zkstd = { path = "../zkstd" }
 rand_core = { version="0.6.4", default-features = false }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
-dusk-bytes = { version = "0.1" }
-subtle = { version = "2.0", default-features = false }
 
 [dev-dependencies]
 paste = "1.0.11"

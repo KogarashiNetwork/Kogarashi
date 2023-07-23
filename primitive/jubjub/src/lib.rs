@@ -21,7 +21,6 @@
 mod curve;
 mod error;
 mod fp;
-pub mod redsa;
 
 pub use curve::*;
 pub use fp::compute_windowed_naf;
