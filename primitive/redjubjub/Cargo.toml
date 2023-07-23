@@ -9,9 +9,13 @@ sp-core = { version = "3.0.0", default-features = false }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 sp-runtime = { version = "3.0.0", default-features = false }
 sp-runtime-interface = { version = "3.0.0", default-features = false }
+substrate-bip39 = { version = "0.4.2", default-features = false }
+tiny-bip39 = { version = "0.8", default-features = false }
+
 strum = { version = "0.20.0", features = ["derive"] }
 lazy_static = { version = "1.4.0", default-features = false }
 blake2b_simd = { version = "1", default-features = false }
+blake2-rfc = { version = "0.2.18", default-features = false }
 rand_core = { version="0.6.4", default-features = false }
 zero-jubjub = { path = "../jubjub" }
 zero-bls12-381 = { path = "../bls12_381" }

@@ -10,7 +10,26 @@ use zkstd::behave::SigUtils;
 #[derive(Clone, Debug)]
 pub struct SecretKey(pub(crate) Fp);
 
+impl SigUtils<32> for SecretKey {
+    fn from_bytes(bytes: [u8; 32]) -> Option<Self> {
+        match Fp::from_bytes(bytes) {
+            Some(x) => Some(SecretKey(x)),
+            None => None,
+        }
+    }
+
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
+        self.0.to_bytes()
+    }
+}
+
 impl SecretKey {
+    pub fn from_raw_bytes(bytes: &[u8]) -> Option<Self> {
+        assert_eq!(bytes.len(), Self::LENGTH);
+        let bytes: [u8; Self::LENGTH] = bytes[..32].try_into().unwrap();
+        Self::from_bytes(bytes)
+    }
+
     #[allow(non_snake_case)]
     pub fn sign(&self, m: &[u8], mut rand: impl RngCore) -> Signature {
         // T uniformly at random

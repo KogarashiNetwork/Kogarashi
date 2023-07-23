@@ -27,6 +27,12 @@ impl PublicKey {
         PublicKey(raw)
     }
 
+    pub fn from_raw_bytes(bytes: &[u8]) -> Option<Self> {
+        assert_eq!(bytes.len(), Self::LENGTH);
+        let bytes: [u8; Self::LENGTH] = bytes[..32].try_into().unwrap();
+        Self::from_bytes(bytes)
+    }
+
     #[allow(non_snake_case)]
     pub fn validate(self, m: &[u8], sig: Signature) -> bool {
         // c = H(R||vk||m)

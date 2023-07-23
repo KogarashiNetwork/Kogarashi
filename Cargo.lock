@@ -2202,6 +2202,7 @@ dependencies = [
 name = "redjubjub"
 version = "0.1.0"
 dependencies = [
+ "blake2-rfc",
  "blake2b_simd 1.0.1",
  "lazy_static",
  "parity-scale-codec",
@@ -2211,6 +2212,8 @@ dependencies = [
  "sp-runtime-interface",
  "sp-std",
  "strum",
+ "substrate-bip39",
+ "tiny-bip39",
  "zero-bls12-381",
  "zero-jubjub",
  "zkstd",
