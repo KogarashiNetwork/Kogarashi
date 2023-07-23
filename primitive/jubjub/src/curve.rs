@@ -128,6 +128,34 @@ impl Mul<JubjubAffine> for Fr {
     }
 }
 
+impl Mul<Fp> for JubjubAffine {
+    type Output = JubjubExtended;
+
+    #[inline]
+    fn mul(self, rhs: Fp) -> JubjubExtended {
+        &self * &rhs
+    }
+}
+
+impl<'a, 'b> Mul<&'b Fp> for &'a JubjubAffine {
+    type Output = JubjubExtended;
+
+    #[inline]
+    fn mul(self, rhs: &'b Fp) -> JubjubExtended {
+        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
+        let mut acc = self.to_extended();
+        for &naf in rhs.to_nafs().iter() {
+            if naf == Naf::Plus {
+                res += acc;
+            } else if naf == Naf::Minus {
+                res -= acc;
+            }
+            acc = acc.double();
+        }
+        res
+    }
+}
+
 #[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
 pub struct JubjubExtended {
     x: Fr,

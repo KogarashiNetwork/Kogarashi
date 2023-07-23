@@ -1,8 +1,15 @@
-use blake2b_simd::{Params, State};
-use zero_bls12_381::Fr;
+use crate::fp::Fp;
 
-pub(crate) fn hash_to_scalar(a: &[u8], b: &[u8]) -> Fr {
-    SaplingHash::default().update(a).update(b).finalize()
+use super::constant::SAPLING_PERSONAL;
+
+use blake2b_simd::{Params, State};
+
+pub(crate) fn hash_to_scalar(a: &[u8], b: &[u8], c: &[u8]) -> Fp {
+    SaplingHash::default()
+        .update(a)
+        .update(b)
+        .update(c)
+        .finalize()
 }
 
 struct SaplingHash(State);
@@ -11,7 +18,7 @@ impl Default for SaplingHash {
     fn default() -> Self {
         let state = Params::new()
             .hash_length(64)
-            .personal(b"FROST_RedJubjubM")
+            .personal(SAPLING_PERSONAL)
             .to_state();
 
         Self(state)
@@ -24,8 +31,8 @@ impl SaplingHash {
         self
     }
 
-    pub(crate) fn finalize(&self) -> Fr {
+    pub(crate) fn finalize(&self) -> Fp {
         let digest = self.0.finalize();
-        Fr::from_hash(digest.as_ref())
+        Fp::from_hash(digest.as_array())
     }
 }

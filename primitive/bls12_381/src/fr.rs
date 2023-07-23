@@ -124,23 +124,6 @@ impl Fr {
             .collect::<Vec<_>>()
     }
 
-    pub fn from_hash(hash: &[u8]) -> Self {
-        assert_eq!(hash.len(), 64);
-        let d0 = Fr([
-            u64::from_le_bytes(hash[0..8].try_into().unwrap()),
-            u64::from_le_bytes(hash[8..16].try_into().unwrap()),
-            u64::from_le_bytes(hash[16..24].try_into().unwrap()),
-            u64::from_le_bytes(hash[24..32].try_into().unwrap()),
-        ]);
-        let d1 = Fr([
-            u64::from_le_bytes(hash[32..40].try_into().unwrap()),
-            u64::from_le_bytes(hash[40..48].try_into().unwrap()),
-            u64::from_le_bytes(hash[48..56].try_into().unwrap()),
-            u64::from_le_bytes(hash[56..64].try_into().unwrap()),
-        ]);
-        d0 * Fr(R2) + d1 * Fr(R3)
-    }
-
     pub fn is_odd(self) -> bool {
         let raw = self.montgomery_reduce();
         (raw[0] % 2) != 0

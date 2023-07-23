@@ -21,4 +21,5 @@ jobs:
         run: git submodule update --remote --recursive
       - uses: actions-rs/cargo@v1
         with:
-          command: test --release -all --all-features
+          command: test
+          args: --release -all --all-features
