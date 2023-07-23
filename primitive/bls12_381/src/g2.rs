@@ -4,7 +4,6 @@ use crate::fr::Fr;
 use crate::params::*;
 use core::borrow::Borrow;
 use core::iter::Sum;
-use dusk_bytes::{Error as BytesError, Serializable};
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
 use zkstd::dress::{curve::weierstrass::*, pairing::bls12_g2_pairing};
@@ -30,62 +29,24 @@ const B: Fq2 = Fq2([
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct G2Projective {
-    pub(crate) x: Fq2,
-    pub(crate) y: Fq2,
-    pub(crate) z: Fq2,
-}
-
-impl Add for G2Projective {
-    type Output = Self;
-
-    fn add(self, rhs: G2Projective) -> Self {
-        add_point(self, rhs)
-    }
-}
-
-impl Neg for G2Projective {
-    type Output = Self;
-
-    fn neg(self) -> Self {
-        Self {
-            x: self.x,
-            y: -self.y,
-            z: self.z,
-        }
-    }
-}
-
-impl Sub for G2Projective {
-    type Output = Self;
-
-    fn sub(self, rhs: G2Projective) -> Self {
-        add_point(self, -rhs)
-    }
-}
-
-impl Mul<Fr> for G2Projective {
-    type Output = G2Projective;
-
-    fn mul(self, rhs: Fr) -> Self::Output {
-        scalar_point(self, &rhs)
-    }
-}
-
-impl Mul<G2Projective> for Fr {
-    type Output = G2Projective;
-
-    fn mul(self, rhs: G2Projective) -> Self::Output {
-        scalar_point(rhs, &self)
-    }
-}
-
-/// The projective form of coordinate
-#[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct G2Affine {
     x: Fq2,
     y: Fq2,
     is_infinity: bool,
+}
+
+impl G2Affine {
+    /// Returns true if this point is free of an $h$-torsion component, and so it
+    /// exists within the $q$-order subgroup $\mathbb{G}_2$. This should always return true
+    /// unless an "unchecked" API was used.
+    pub fn is_torsion_free(&self) -> bool {
+        // Algorithm from Section 4 of https://eprint.iacr.org/2021/1130
+        // Updated proof of correctness in https://eprint.iacr.org/2022/352
+        //
+        // Check that psi(P) == [x] P
+        let p = G2Projective::from(*self);
+        p.psi() == p.mul_by_x()
+    }
 }
 
 impl Add for G2Affine {
@@ -132,64 +93,25 @@ impl Mul<G2Affine> for Fr {
     }
 }
 
-/// The coefficient for pairing affine format
-#[derive(Debug, Clone, PartialEq, Eq, Copy, Decode, Encode)]
-pub struct PairingCoeff(pub(crate) Fq2, pub(crate) Fq2, pub(crate) Fq2);
-
-/// The pairing format coordinate
-#[derive(Debug, Clone, Eq, Decode, Encode)]
-pub struct G2PairingAffine {
-    pub coeffs: Vec<PairingCoeff>,
-    is_infinity: bool,
+/// The projective form of coordinate
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct G2Projective {
+    pub(crate) x: Fq2,
+    pub(crate) y: Fq2,
+    pub(crate) z: Fq2,
 }
 
-impl PartialEq for G2PairingAffine {
-    fn eq(&self, other: &Self) -> bool {
-        self.coeffs == other.coeffs && self.is_infinity == other.is_infinity
-    }
-}
-
-impl<T> Sum<T> for G2Projective
-where
-    T: Borrow<G2Projective>,
-{
-    fn sum<I>(iter: I) -> Self
-    where
-        I: Iterator<Item = T>,
-    {
-        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + item.borrow())
-    }
-}
-
-weierstrass_curve_operation!(
-    Fr,
-    Fq2,
-    G2_PARAM_A,
-    G2_PARAM_B,
-    G2Affine,
-    G2Projective,
-    G2_GENERATOR_X,
-    G2_GENERATOR_Y
-);
-bls12_g2_pairing!(G2Projective, G2Affine, PairingCoeff, G2PairingAffine, Fq12);
-
-// below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
-// [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
-// Dusk-Network team and, @str4d and @ebfull
-
-impl Serializable<96> for G2Affine {
-    type Error = BytesError;
-
+impl SigUtils<96> for G2Affine {
     /// Serializes this element into compressed form. See [`notes::serialization`](crate::notes::serialization)
     /// for details about how group elements are serialized.
-    fn to_bytes(&self) -> [u8; Self::SIZE] {
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
         let infinity = self.is_infinity;
 
         // Strictly speaking, self.x is zero already when self.infinity is true, but
         // to guard against implementation mistakes we do not assume this.
         let x = if infinity { Fq2::zero() } else { self.x };
 
-        let mut res = [0; Self::SIZE];
+        let mut res = [0; Self::LENGTH];
 
         res[0..48].copy_from_slice(&x.0[1].to_bytes()[..]);
         res[48..96].copy_from_slice(&x.0[0].to_bytes()[..]);
@@ -214,7 +136,7 @@ impl Serializable<96> for G2Affine {
 
     /// Attempts to deserialize a compressed element. See [`notes::serialization`](crate::notes::serialization)
     /// for details about how group elements are serialized.
-    fn from_bytes(buf: &[u8; Self::SIZE]) -> Result<Self, Self::Error> {
+    fn from_bytes(buf: [u8; Self::LENGTH]) -> Option<Self> {
         // We already know the point is on the curve because this is established
         // by the y-coordinate recovery procedure in from_compressed_unchecked().
 
@@ -284,23 +206,9 @@ impl Serializable<96> for G2Affine {
             .into();
 
         match x {
-            Some(x) if x.is_torsion_free() => Ok(x),
-            _ => Err(BytesError::InvalidData),
+            Some(x) if x.is_torsion_free() => Some(x),
+            _ => None,
         }
-    }
-}
-
-impl G2Affine {
-    /// Returns true if this point is free of an $h$-torsion component, and so it
-    /// exists within the $q$-order subgroup $\mathbb{G}_2$. This should always return true
-    /// unless an "unchecked" API was used.
-    pub fn is_torsion_free(&self) -> bool {
-        // Algorithm from Section 4 of https://eprint.iacr.org/2021/1130
-        // Updated proof of correctness in https://eprint.iacr.org/2022/352
-        //
-        // Check that psi(P) == [x] P
-        let p = G2Projective::from(*self);
-        p.psi() == p.mul_by_x()
     }
 }
 
@@ -367,6 +275,91 @@ impl G2Projective {
         }
     }
 }
+
+impl Add for G2Projective {
+    type Output = Self;
+
+    fn add(self, rhs: G2Projective) -> Self {
+        add_point(self, rhs)
+    }
+}
+
+impl Neg for G2Projective {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            z: self.z,
+        }
+    }
+}
+
+impl Sub for G2Projective {
+    type Output = Self;
+
+    fn sub(self, rhs: G2Projective) -> Self {
+        add_point(self, -rhs)
+    }
+}
+
+impl Mul<Fr> for G2Projective {
+    type Output = G2Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self, &rhs)
+    }
+}
+
+impl Mul<G2Projective> for Fr {
+    type Output = G2Projective;
+
+    fn mul(self, rhs: G2Projective) -> Self::Output {
+        scalar_point(rhs, &self)
+    }
+}
+
+/// The coefficient for pairing affine format
+#[derive(Debug, Clone, PartialEq, Eq, Copy, Decode, Encode)]
+pub struct PairingCoeff(pub(crate) Fq2, pub(crate) Fq2, pub(crate) Fq2);
+
+/// The pairing format coordinate
+#[derive(Debug, Clone, Eq, Decode, Encode)]
+pub struct G2PairingAffine {
+    pub coeffs: Vec<PairingCoeff>,
+    is_infinity: bool,
+}
+
+impl PartialEq for G2PairingAffine {
+    fn eq(&self, other: &Self) -> bool {
+        self.coeffs == other.coeffs && self.is_infinity == other.is_infinity
+    }
+}
+
+impl<T> Sum<T> for G2Projective
+where
+    T: Borrow<G2Projective>,
+{
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + item.borrow())
+    }
+}
+
+weierstrass_curve_operation!(
+    Fr,
+    Fq2,
+    G2_PARAM_A,
+    G2_PARAM_B,
+    G2Affine,
+    G2Projective,
+    G2_GENERATOR_X,
+    G2_GENERATOR_Y
+);
+bls12_g2_pairing!(G2Projective, G2Affine, PairingCoeff, G2PairingAffine, Fq12);
 
 #[cfg(test)]
 mod tests {

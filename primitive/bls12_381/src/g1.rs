@@ -4,7 +4,6 @@ use crate::params::{
 use crate::{Fq, Fr};
 use core::borrow::Borrow;
 use core::iter::Sum;
-use dusk_bytes::{Error as BytesError, Serializable};
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
 use zkstd::dress::curve::weierstrass::*;
@@ -29,134 +28,105 @@ const B: Fq = Fq([
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct G1Projective {
-    pub(crate) x: Fq,
-    pub(crate) y: Fq,
-    pub(crate) z: Fq,
-}
-
-impl Add for G1Projective {
-    type Output = Self;
-
-    fn add(self, rhs: G1Projective) -> Self {
-        add_point(self, rhs)
-    }
-}
-
-impl Neg for G1Projective {
-    type Output = Self;
-
-    fn neg(self) -> Self {
-        Self {
-            x: self.x,
-            y: -self.y,
-            z: self.z,
-        }
-    }
-}
-
-impl Sub for G1Projective {
-    type Output = Self;
-
-    fn sub(self, rhs: G1Projective) -> Self {
-        add_point(self, -rhs)
-    }
-}
-
-impl Mul<Fr> for G1Projective {
-    type Output = G1Projective;
-
-    fn mul(self, rhs: Fr) -> Self::Output {
-        scalar_point(self, &rhs)
-    }
-}
-
-impl Mul<G1Projective> for Fr {
-    type Output = G1Projective;
-
-    fn mul(self, rhs: G1Projective) -> Self::Output {
-        scalar_point(rhs, &self)
-    }
-}
-
-/// The projective form of coordinate
-#[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct G1Affine {
     pub(crate) x: Fq,
     pub(crate) y: Fq,
     is_infinity: bool,
 }
 
-impl Add for G1Affine {
-    type Output = G1Projective;
+impl SigUtils<48> for G1Affine {
+    /// Serializes this element into compressed form. See [`notes::serialization`](crate::notes::serialization)
+    /// for details about how group elements are serialized.
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
+        // Strictly speaking, self.x is zero already when self.infinity is true, but
+        // to guard against implementation mistakes we do not assume this.
+        let mut res = (if self.is_infinity { Fq::zero() } else { self.x }).to_bytes();
 
-    fn add(self, rhs: G1Affine) -> Self::Output {
-        add_point(self.to_extended(), rhs.to_extended())
+        // This point is in compressed form, so we set the most significant bit.
+        res[0] |= 1u8 << 7;
+
+        // Is this point at infinity? If so, set the second-most significant bit.
+        res[0] |= if self.is_infinity { 1u8 << 6 } else { 0u8 };
+
+        // Is the y-coordinate the lexicographically largest of the two associated with the
+        // x-coordinate? If so, set the third-most significant bit so long as this is not
+        // the point at infinity.
+        res[0] |= if !self.is_infinity & self.y.lexicographically_largest() {
+            1u8 << 5
+        } else {
+            0u8
+        };
+
+        res
+    }
+
+    /// Attempts to deserialize a compressed element. See [`notes::serialization`](crate::notes::serialization)
+    /// for details about how group elements are serialized.
+    fn from_bytes(buf: [u8; Self::LENGTH]) -> Option<Self> {
+        // We already know the point is on the curve because this is established
+        // by the y-coordinate recovery procedure in from_compressed_unchecked().
+
+        let compression_flag_set = (buf[0] >> 7) & 1 == 1;
+        let infinity_flag_set = (buf[0] >> 6) & 1 == 1;
+        let sort_flag_set = (buf[0] >> 5) & 1 == 1;
+
+        // Attempt to obtain the x-coordinate
+        let x = {
+            let mut tmp = [0; Self::LENGTH];
+            tmp.copy_from_slice(&buf[..Self::LENGTH]);
+
+            // Mask away the flag bits
+            tmp[0] &= 0b0001_1111;
+
+            Fq::from_bytes(tmp)
+        };
+
+        x.and_then(|x| {
+            // If the infinity flag is set, return the value assuming
+            // the x-coordinate is zero and the sort bit is not set.
+            //
+            // Otherwise, return a recovered point (assuming the correct
+            // y-coordinate can be found) so long as the infinity flag
+            // was not set.
+
+            if infinity_flag_set & // Infinity flag should be set
+                compression_flag_set & // Compression flag should be set
+                    (!sort_flag_set) & // Sort flag should not be set
+                    x.is_zero()
+            {
+                Some(G1Affine::ADDITIVE_IDENTITY)
+            } else {
+                ((x.square() * x) + B).sqrt().and_then(|y| {
+                    // Switch to the correct y-coordinate if necessary.
+                    let y = if y.lexicographically_largest() ^ sort_flag_set {
+                        -y
+                    } else {
+                        y
+                    };
+                    if (!infinity_flag_set) & // Infinity flag should not be set
+                            compression_flag_set
+                    {
+                        Some(G1Affine {
+                            x,
+                            y,
+                            is_infinity: infinity_flag_set.into(),
+                        })
+                    } else {
+                        None
+                    }
+                })
+            }
+        })
+        .and_then(|p| {
+            if p.is_torsion_free().into() {
+                Some(p)
+            } else {
+                None
+            }
+        })
+        .into()
     }
 }
-
-impl Neg for G1Affine {
-    type Output = Self;
-
-    fn neg(self) -> Self {
-        Self {
-            x: self.x,
-            y: -self.y,
-            is_infinity: self.is_infinity,
-        }
-    }
-}
-
-impl Sub for G1Affine {
-    type Output = G1Projective;
-
-    fn sub(self, rhs: G1Affine) -> Self::Output {
-        add_point(self.to_extended(), rhs.neg().to_extended())
-    }
-}
-
-impl Mul<Fr> for G1Affine {
-    type Output = G1Projective;
-
-    fn mul(self, rhs: Fr) -> Self::Output {
-        scalar_point(self.to_extended(), &rhs)
-    }
-}
-
-impl Mul<G1Affine> for Fr {
-    type Output = G1Projective;
-
-    fn mul(self, rhs: G1Affine) -> Self::Output {
-        scalar_point(rhs.to_extended(), &self)
-    }
-}
-
-impl<T> Sum<T> for G1Projective
-where
-    T: Borrow<G1Projective>,
-{
-    fn sum<I>(iter: I) -> Self
-    where
-        I: Iterator<Item = T>,
-    {
-        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + *item.borrow())
-    }
-}
-
-weierstrass_curve_operation!(
-    Fr,
-    Fq,
-    G1_PARAM_A,
-    G1_PARAM_B,
-    G1Affine,
-    G1Projective,
-    G1_GENERATOR_X,
-    G1_GENERATOR_Y
-);
-
-// below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
-// [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
-// Dusk-Network team and, @str4d and @ebfull
 
 fn endomorphism(p: &G1Affine) -> G1Affine {
     // Endomorphism of the points on the curve.
@@ -223,6 +193,58 @@ impl G1Affine {
     }
 }
 
+impl Add for G1Affine {
+    type Output = G1Projective;
+
+    fn add(self, rhs: G1Affine) -> Self::Output {
+        add_point(self.to_extended(), rhs.to_extended())
+    }
+}
+
+impl Neg for G1Affine {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            is_infinity: self.is_infinity,
+        }
+    }
+}
+
+impl Sub for G1Affine {
+    type Output = G1Projective;
+
+    fn sub(self, rhs: G1Affine) -> Self::Output {
+        add_point(self.to_extended(), rhs.neg().to_extended())
+    }
+}
+
+impl Mul<Fr> for G1Affine {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self.to_extended(), &rhs)
+    }
+}
+
+impl Mul<G1Affine> for Fr {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: G1Affine) -> Self::Output {
+        scalar_point(rhs.to_extended(), &self)
+    }
+}
+
+/// The projective form of coordinate
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct G1Projective {
+    pub(crate) x: Fq,
+    pub(crate) y: Fq,
+    pub(crate) z: Fq,
+}
+
 impl G1Projective {
     /// Multiply `self` by `crate::BLS_X`, using double and add.
     fn mul_by_x(&self) -> G1Projective {
@@ -256,104 +278,72 @@ impl G1Projective {
     }
 }
 
-impl Serializable<48> for G1Affine {
-    type Error = BytesError;
+impl Add for G1Projective {
+    type Output = Self;
 
-    /// Serializes this element into compressed form. See [`notes::serialization`](crate::notes::serialization)
-    /// for details about how group elements are serialized.
-    fn to_bytes(&self) -> [u8; Self::SIZE] {
-        // Strictly speaking, self.x is zero already when self.infinity is true, but
-        // to guard against implementation mistakes we do not assume this.
-        let mut res = (if self.is_infinity { Fq::zero() } else { self.x }).to_bytes();
-
-        // This point is in compressed form, so we set the most significant bit.
-        res[0] |= 1u8 << 7;
-
-        // Is this point at infinity? If so, set the second-most significant bit.
-        res[0] |= if self.is_infinity { 1u8 << 6 } else { 0u8 };
-
-        // Is the y-coordinate the lexicographically largest of the two associated with the
-        // x-coordinate? If so, set the third-most significant bit so long as this is not
-        // the point at infinity.
-        res[0] |= if !self.is_infinity & self.y.lexicographically_largest() {
-            1u8 << 5
-        } else {
-            0u8
-        };
-
-        res
-    }
-
-    /// Attempts to deserialize a compressed element. See [`notes::serialization`](crate::notes::serialization)
-    /// for details about how group elements are serialized.
-    fn from_bytes(buf: &[u8; Self::SIZE]) -> Result<Self, Self::Error> {
-        // We already know the point is on the curve because this is established
-        // by the y-coordinate recovery procedure in from_compressed_unchecked().
-
-        let compression_flag_set = (buf[0] >> 7) & 1 == 1;
-        let infinity_flag_set = (buf[0] >> 6) & 1 == 1;
-        let sort_flag_set = (buf[0] >> 5) & 1 == 1;
-
-        // Attempt to obtain the x-coordinate
-        let x = {
-            let mut tmp = [0; Self::SIZE];
-            tmp.copy_from_slice(&buf[..Self::SIZE]);
-
-            // Mask away the flag bits
-            tmp[0] &= 0b0001_1111;
-
-            Fq::from_bytes(tmp)
-        };
-
-        let x: Option<Self> = x
-            .and_then(|x| {
-                // If the infinity flag is set, return the value assuming
-                // the x-coordinate is zero and the sort bit is not set.
-                //
-                // Otherwise, return a recovered point (assuming the correct
-                // y-coordinate can be found) so long as the infinity flag
-                // was not set.
-
-                if infinity_flag_set & // Infinity flag should be set
-                compression_flag_set & // Compression flag should be set
-                    (!sort_flag_set) & // Sort flag should not be set
-                    x.is_zero()
-                {
-                    Some(G1Affine::ADDITIVE_IDENTITY)
-                } else {
-                    ((x.square() * x) + B).sqrt().and_then(|y| {
-                        // Switch to the correct y-coordinate if necessary.
-                        let y = if y.lexicographically_largest() ^ sort_flag_set {
-                            -y
-                        } else {
-                            y
-                        };
-                        if (!infinity_flag_set) & // Infinity flag should not be set
-                            compression_flag_set
-                        {
-                            Some(G1Affine {
-                                x,
-                                y,
-                                is_infinity: infinity_flag_set.into(),
-                            })
-                        } else {
-                            None
-                        }
-                    })
-                }
-            })
-            .and_then(|p| {
-                if p.is_torsion_free().into() {
-                    Some(p)
-                } else {
-                    None
-                }
-            })
-            .into();
-
-        x.ok_or(BytesError::InvalidData)
+    fn add(self, rhs: G1Projective) -> Self {
+        add_point(self, rhs)
     }
 }
+
+impl Neg for G1Projective {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            z: self.z,
+        }
+    }
+}
+
+impl Sub for G1Projective {
+    type Output = Self;
+
+    fn sub(self, rhs: G1Projective) -> Self {
+        add_point(self, -rhs)
+    }
+}
+
+impl Mul<Fr> for G1Projective {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self, &rhs)
+    }
+}
+
+impl Mul<G1Projective> for Fr {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: G1Projective) -> Self::Output {
+        scalar_point(rhs, &self)
+    }
+}
+
+impl<T> Sum<T> for G1Projective
+where
+    T: Borrow<G1Projective>,
+{
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + *item.borrow())
+    }
+}
+
+weierstrass_curve_operation!(
+    Fr,
+    Fq,
+    G1_PARAM_A,
+    G1_PARAM_B,
+    G1Affine,
+    G1Projective,
+    G1_GENERATOR_X,
+    G1_GENERATOR_Y
+);
 
 #[cfg(test)]
 mod tests {
