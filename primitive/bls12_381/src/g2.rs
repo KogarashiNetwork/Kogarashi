@@ -5,10 +5,28 @@ use crate::params::*;
 use core::borrow::Borrow;
 use core::iter::Sum;
 use dusk_bytes::{Error as BytesError, Serializable};
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq};
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
 use zkstd::dress::{curve::weierstrass::*, pairing::bls12_g2_pairing};
+
+const B: Fq2 = Fq2([
+    Fq([
+        0xaa270000000cfff3,
+        0x53cc0032fc34000a,
+        0x478fe97a6b0a807f,
+        0xb1d37ebee6ba24d7,
+        0x8ec9733bbf78ab2f,
+        0x9d645513d83de7e,
+    ]),
+    Fq([
+        0xaa270000000cfff3,
+        0x53cc0032fc34000a,
+        0x478fe97a6b0a807f,
+        0xb1d37ebee6ba24d7,
+        0x8ec9733bbf78ab2f,
+        0x9d645513d83de7e,
+    ]),
+]);
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
@@ -131,6 +149,18 @@ impl PartialEq for G2PairingAffine {
     }
 }
 
+impl<T> Sum<T> for G2Projective
+where
+    T: Borrow<G2Projective>,
+{
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + item.borrow())
+    }
+}
+
 weierstrass_curve_operation!(
     Fr,
     Fq2,
@@ -147,36 +177,17 @@ bls12_g2_pairing!(G2Projective, G2Affine, PairingCoeff, G2PairingAffine, Fq12);
 // [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
 // Dusk-Network team and, @str4d and @ebfull
 
-const B: Fq2 = Fq2([
-    Fq([
-        0xaa270000000cfff3,
-        0x53cc0032fc34000a,
-        0x478fe97a6b0a807f,
-        0xb1d37ebee6ba24d7,
-        0x8ec9733bbf78ab2f,
-        0x9d645513d83de7e,
-    ]),
-    Fq([
-        0xaa270000000cfff3,
-        0x53cc0032fc34000a,
-        0x478fe97a6b0a807f,
-        0xb1d37ebee6ba24d7,
-        0x8ec9733bbf78ab2f,
-        0x9d645513d83de7e,
-    ]),
-]);
-
 impl Serializable<96> for G2Affine {
     type Error = BytesError;
 
     /// Serializes this element into compressed form. See [`notes::serialization`](crate::notes::serialization)
     /// for details about how group elements are serialized.
     fn to_bytes(&self) -> [u8; Self::SIZE] {
-        let infinity = Choice::from(self.is_infinity as u8);
+        let infinity = self.is_infinity;
 
         // Strictly speaking, self.x is zero already when self.infinity is true, but
         // to guard against implementation mistakes we do not assume this.
-        let x = Fq2::conditional_select(&self.x, &Fq2::zero(), infinity);
+        let x = if infinity { Fq2::zero() } else { self.x };
 
         let mut res = [0; Self::SIZE];
 
@@ -187,16 +198,16 @@ impl Serializable<96> for G2Affine {
         res[0] |= 1u8 << 7;
 
         // Is this point at infinity? If so, set the second-most significant bit.
-        res[0] |= u8::conditional_select(&0u8, &(1u8 << 6), infinity);
+        res[0] |= if infinity { 1u8 << 6 } else { 0u8 };
 
         // Is the y-coordinate the lexicographically largest of the two associated with the
         // x-coordinate? If so, set the third-most significant bit so long as this is not
         // the point at infinity.
-        res[0] |= u8::conditional_select(
-            &0u8,
-            &(1u8 << 5),
-            (!infinity) & self.y.lexicographically_largest(),
-        );
+        res[0] |= if (!infinity) & self.y.lexicographically_largest() {
+            1u8 << 5
+        } else {
+            0u8
+        };
 
         res
     }
@@ -250,11 +261,11 @@ impl Serializable<96> for G2Affine {
                         // Recover a y-coordinate given x by y = sqrt(x^3 + 4)
                         ((x.square() * x) + B).sqrt().and_then(|y| {
                             // Switch to the correct y-coordinate if necessary.
-                            let y = Fq2::conditional_select(
-                                &y,
-                                &-y,
-                                y.lexicographically_largest() ^ (sort_flag_set as u8).into(),
-                            );
+                            let y = if y.lexicographically_largest() ^ sort_flag_set {
+                                -y
+                            } else {
+                                y
+                            };
                             if (!infinity_flag_set) & // Infinity flag should not be set
                             compression_flag_set
                             {
@@ -273,7 +284,7 @@ impl Serializable<96> for G2Affine {
             .into();
 
         match x {
-            Some(x) if x.is_torsion_free().unwrap_u8() == 1 => Ok(x),
+            Some(x) if x.is_torsion_free() => Ok(x),
             _ => Err(BytesError::InvalidData),
         }
     }
@@ -283,13 +294,13 @@ impl G2Affine {
     /// Returns true if this point is free of an $h$-torsion component, and so it
     /// exists within the $q$-order subgroup $\mathbb{G}_2$. This should always return true
     /// unless an "unchecked" API was used.
-    pub fn is_torsion_free(&self) -> Choice {
+    pub fn is_torsion_free(&self) -> bool {
         // Algorithm from Section 4 of https://eprint.iacr.org/2021/1130
         // Updated proof of correctness in https://eprint.iacr.org/2022/352
         //
         // Check that psi(P) == [x] P
         let p = G2Projective::from(*self);
-        p.psi().ct_eq(&p.mul_by_x())
+        p.psi() == p.mul_by_x()
     }
 }
 
@@ -354,58 +365,6 @@ impl G2Projective {
             // z = frobenius(z)
             z: self.z.frobenius_map(),
         }
-    }
-}
-
-impl ConstantTimeEq for G2Projective {
-    fn ct_eq(&self, other: &Self) -> Choice {
-        // Is (xz^2, yz^3, z) equal to (x'z'^2, yz'^3, z') when converted to affine?
-
-        let self_is_zero = Choice::from(self.is_identity() as u8);
-        let other_is_zero = Choice::from(other.is_identity() as u8);
-
-        let is_same = self.x * other.z == other.x * self.z && self.y * other.z == other.y * self.z;
-
-        (self_is_zero & other_is_zero) // Both point at infinity
-            | Choice::from(is_same as u8)
-        // Neither point at infinity, coordinates are the same
-    }
-}
-
-impl ConditionallySelectable for G2Affine {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        G2Affine {
-            x: Fq2::conditional_select(&a.x, &b.x, choice),
-            y: Fq2::conditional_select(&a.y, &b.y, choice),
-            is_infinity: ConditionallySelectable::conditional_select(
-                &Choice::from(a.is_infinity as u8),
-                &Choice::from(b.is_infinity as u8),
-                choice,
-            )
-            .into(),
-        }
-    }
-}
-
-impl ConditionallySelectable for G2Projective {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        G2Projective {
-            x: Fq2::conditional_select(&a.x, &b.x, choice),
-            y: Fq2::conditional_select(&a.y, &b.y, choice),
-            z: Fq2::conditional_select(&a.z, &b.z, choice),
-        }
-    }
-}
-
-impl<T> Sum<T> for G2Projective
-where
-    T: Borrow<G2Projective>,
-{
-    fn sum<I>(iter: I) -> Self
-    where
-        I: Iterator<Item = T>,
-    {
-        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + item.borrow())
     }
 }
 

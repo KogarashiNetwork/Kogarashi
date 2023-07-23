@@ -1,5 +1,4 @@
 use rand_core::RngCore;
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq};
 use zkstd::arithmetic::bits_384::*;
 use zkstd::common::*;
 use zkstd::dress::field::*;
@@ -139,16 +138,8 @@ impl Fq {
             None
         }
     }
-}
 
-prime_field_operation!(Fq, MODULUS, GENERATOR, INV, R, R2, R3);
-
-// below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
-// [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
-// Dusk-Network team and, @str4d and @ebfull
-
-impl Fq {
-    pub fn lexicographically_largest(&self) -> Choice {
+    pub fn lexicographically_largest(&self) -> bool {
         // This can be determined by checking to see if the element is
         // larger than (p - 1) // 2. If we subtract by ((p - 1) // 2) + 1
         // and there is no underflow, then the element must be larger than
@@ -170,30 +161,8 @@ impl Fq {
         // overflow (and so this element is not lexicographically larger
         // than its negation) and then negate it.
 
-        !Choice::from((borrow as u8) & 1)
+        (borrow & 1) == 0
     }
 }
 
-impl ConstantTimeEq for Fq {
-    fn ct_eq(&self, other: &Self) -> Choice {
-        self.0[0].ct_eq(&other.0[0])
-            & self.0[1].ct_eq(&other.0[1])
-            & self.0[2].ct_eq(&other.0[2])
-            & self.0[3].ct_eq(&other.0[3])
-            & self.0[4].ct_eq(&other.0[4])
-            & self.0[5].ct_eq(&other.0[5])
-    }
-}
-
-impl ConditionallySelectable for Fq {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        Fq([
-            u64::conditional_select(&a.0[0], &b.0[0], choice),
-            u64::conditional_select(&a.0[1], &b.0[1], choice),
-            u64::conditional_select(&a.0[2], &b.0[2], choice),
-            u64::conditional_select(&a.0[3], &b.0[3], choice),
-            u64::conditional_select(&a.0[4], &b.0[4], choice),
-            u64::conditional_select(&a.0[5], &b.0[5], choice),
-        ])
-    }
-}
+prime_field_operation!(Fq, MODULUS, GENERATOR, INV, R, R2, R3);

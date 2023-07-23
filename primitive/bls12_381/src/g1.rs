@@ -5,10 +5,27 @@ use crate::{Fq, Fr};
 use core::borrow::Borrow;
 use core::iter::Sum;
 use dusk_bytes::{Error as BytesError, Serializable};
-use subtle::{Choice, ConditionallySelectable, ConstantTimeEq};
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
 use zkstd::dress::curve::weierstrass::*;
+
+pub const BETA: Fq = Fq([
+    0x30f1361b798a64e8,
+    0xf3b8ddab7ece5a2a,
+    0x16a8ca3ac61577f7,
+    0xc26a2ff874fd029b,
+    0x3636b76660701c6e,
+    0x051ba4ab241b6160,
+]);
+
+const B: Fq = Fq([
+    0xaa270000000cfff3,
+    0x53cc0032fc34000a,
+    0x478fe97a6b0a807f,
+    0xb1d37ebee6ba24d7,
+    0x8ec9733bbf78ab2f,
+    0x9d645513d83de7e,
+]);
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
@@ -114,6 +131,18 @@ impl Mul<G1Affine> for Fr {
     }
 }
 
+impl<T> Sum<T> for G1Projective
+where
+    T: Borrow<G1Projective>,
+{
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + *item.borrow())
+    }
+}
+
 weierstrass_curve_operation!(
     Fr,
     Fq,
@@ -128,24 +157,6 @@ weierstrass_curve_operation!(
 // below here, the crate uses [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) and
 // [https://github.com/dusk-network/bls12_381](https://github.com/dusk-network/bls12_381) implementation designed by
 // Dusk-Network team and, @str4d and @ebfull
-
-pub const BETA: Fq = Fq([
-    0x30f1361b798a64e8,
-    0xf3b8ddab7ece5a2a,
-    0x16a8ca3ac61577f7,
-    0xc26a2ff874fd029b,
-    0x3636b76660701c6e,
-    0x051ba4ab241b6160,
-]);
-
-const B: Fq = Fq([
-    0xaa270000000cfff3,
-    0x53cc0032fc34000a,
-    0x478fe97a6b0a807f,
-    0xb1d37ebee6ba24d7,
-    0x8ec9733bbf78ab2f,
-    0x9d645513d83de7e,
-]);
 
 fn endomorphism(p: &G1Affine) -> G1Affine {
     // Endomorphism of the points on the curve.
@@ -200,7 +211,7 @@ impl G1Affine {
         bytes
     }
 
-    pub fn is_torsion_free(&self) -> Choice {
+    pub fn is_torsion_free(&self) -> bool {
         // Algorithm from Section 6 of https://eprint.iacr.org/2021/1130
         // Updated proof of correctness in https://eprint.iacr.org/2022/352
         //
@@ -208,7 +219,7 @@ impl G1Affine {
 
         let minus_x_squared_times_p = G1Projective::from(*self).mul_by_x().mul_by_x().neg();
         let endomorphism_p = endomorphism(self);
-        minus_x_squared_times_p.ct_eq(&G1Projective::from(endomorphism_p))
+        minus_x_squared_times_p == G1Projective::from(endomorphism_p)
     }
 }
 
@@ -253,23 +264,22 @@ impl Serializable<48> for G1Affine {
     fn to_bytes(&self) -> [u8; Self::SIZE] {
         // Strictly speaking, self.x is zero already when self.infinity is true, but
         // to guard against implementation mistakes we do not assume this.
-        let mut res = Fq::conditional_select(&self.x, &Fq::zero(), (self.is_infinity as u8).into())
-            .to_bytes();
+        let mut res = (if self.is_infinity { Fq::zero() } else { self.x }).to_bytes();
 
         // This point is in compressed form, so we set the most significant bit.
         res[0] |= 1u8 << 7;
 
         // Is this point at infinity? If so, set the second-most significant bit.
-        res[0] |= u8::conditional_select(&0u8, &(1u8 << 6), (self.is_infinity as u8).into());
+        res[0] |= if self.is_infinity { 1u8 << 6 } else { 0u8 };
 
         // Is the y-coordinate the lexicographically largest of the two associated with the
         // x-coordinate? If so, set the third-most significant bit so long as this is not
         // the point at infinity.
-        res[0] |= u8::conditional_select(
-            &0u8,
-            &(1u8 << 5),
-            (!Choice::from(self.is_infinity as u8)) & self.y.lexicographically_largest(),
-        );
+        res[0] |= if !self.is_infinity & self.y.lexicographically_largest() {
+            1u8 << 5
+        } else {
+            0u8
+        };
 
         res
     }
@@ -313,11 +323,11 @@ impl Serializable<48> for G1Affine {
                 } else {
                     ((x.square() * x) + B).sqrt().and_then(|y| {
                         // Switch to the correct y-coordinate if necessary.
-                        let y = Fq::conditional_select(
-                            &y,
-                            &-y,
-                            y.lexicographically_largest() ^ (sort_flag_set as u8).into(),
-                        );
+                        let y = if y.lexicographically_largest() ^ sort_flag_set {
+                            -y
+                        } else {
+                            y
+                        };
                         if (!infinity_flag_set) & // Infinity flag should not be set
                             compression_flag_set
                         {
@@ -342,58 +352,6 @@ impl Serializable<48> for G1Affine {
             .into();
 
         x.ok_or(BytesError::InvalidData)
-    }
-}
-
-impl<T> Sum<T> for G1Projective
-where
-    T: Borrow<G1Projective>,
-{
-    fn sum<I>(iter: I) -> Self
-    where
-        I: Iterator<Item = T>,
-    {
-        iter.fold(Self::ADDITIVE_IDENTITY, |acc, item| acc + *item.borrow())
-    }
-}
-
-impl ConditionallySelectable for G1Affine {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        G1Affine {
-            x: Fq::conditional_select(&a.x, &b.x, choice),
-            y: Fq::conditional_select(&a.y, &b.y, choice),
-            is_infinity: ConditionallySelectable::conditional_select(
-                &Choice::from(a.is_infinity as u8),
-                &Choice::from(b.is_infinity as u8),
-                choice,
-            )
-            .into(),
-        }
-    }
-}
-
-impl ConstantTimeEq for G1Projective {
-    fn ct_eq(&self, other: &Self) -> Choice {
-        // Is (xz^2, yz^3, z) equal to (x'z'^2, yz'^3, z') when converted to affine?
-
-        let self_is_zero = Choice::from(self.is_identity() as u8);
-        let other_is_zero = Choice::from(other.is_identity() as u8);
-
-        let is_same = self.x * other.z == other.x * self.z && self.y * other.z == other.y * self.z;
-
-        (self_is_zero & other_is_zero) // Both point at infinity
-            | Choice::from(is_same as u8)
-        // Neither point at infinity, coordinates are the same
-    }
-}
-
-impl ConditionallySelectable for G1Projective {
-    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        G1Projective {
-            x: Fq::conditional_select(&a.x, &b.x, choice),
-            y: Fq::conditional_select(&a.y, &b.y, choice),
-            z: Fq::conditional_select(&a.z, &b.z, choice),
-        }
     }
 }
 
