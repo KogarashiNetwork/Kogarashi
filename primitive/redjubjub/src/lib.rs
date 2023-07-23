@@ -1,4 +1,20 @@
+// Copyright (C) 2022-2023 Invers (JP) INC.
+// SPDX-License-Identifier: Apache-2.0
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #![cfg_attr(not(feature = "std"), no_std)]
+#![doc = include_str!("../README.md")]
 
 mod constant;
 mod hash;
@@ -10,7 +26,6 @@ mod signature;
 pub use private_key::SecretKey;
 pub use public_key::PublicKey;
 
-use bip39::{Language, Mnemonic, MnemonicType};
 use parity_scale_codec::alloc::string::String;
 use parity_scale_codec::{Decode, Encode};
 use sp_core::crypto::{
@@ -21,6 +36,7 @@ use sp_runtime_interface::pass_by::PassByInner;
 use sp_std::vec::Vec;
 use substrate_bip39::seed_from_entropy;
 
+use bip39::{Language, Mnemonic, MnemonicType};
 use rand_core::OsRng;
 use zkstd::common::SigUtils;
 
@@ -44,7 +60,7 @@ impl Signature {
     }
 }
 
-#[derive(Clone, Encode, Decode, PassByInner, PartialEq, Eq, Hash)]
+#[derive(Clone, Default, Decode, Encode, PassByInner, PartialEq, Eq, Hash)]
 pub struct Public(pub [u8; 32]);
 
 impl Public {
@@ -91,12 +107,6 @@ impl AsMut<[u8]> for Signature {
 }
 
 impl Derive for Public {}
-
-impl Default for Public {
-    fn default() -> Self {
-        Public([0u8; 32])
-    }
-}
 
 impl AsRef<[u8; 32]> for Public {
     fn as_ref(&self) -> &[u8; 32] {

@@ -162,53 +162,47 @@ impl SigUtils<96> for G2Affine {
             Fq::from_bytes(tmp)
         };
 
-        let x: Option<Self> = xc1
-            .and_then(|xc1| {
-                xc0.and_then(|xc0| {
-                    let x = Fq2([xc0, xc1]);
+        xc1.and_then(|xc1| {
+            xc0.and_then(|xc0| {
+                let x = Fq2([xc0, xc1]);
 
-                    // If the infinity flag is set, return the value assuming
-                    // the x-coordinate is zero and the sort bit is not set.
-                    //
-                    // Otherwise, return a recovered point (assuming the correct
-                    // y-coordinate can be found) so long as the infinity flag
-                    // was not set.
-                    if infinity_flag_set & // Infinity flag should be set
+                // If the infinity flag is set, return the value assuming
+                // the x-coordinate is zero and the sort bit is not set.
+                //
+                // Otherwise, return a recovered point (assuming the correct
+                // y-coordinate can be found) so long as the infinity flag
+                // was not set.
+                if infinity_flag_set & // Infinity flag should be set
                     compression_flag_set & // Compression flag should be set
                     (!sort_flag_set) & // Sort flag should not be set
                     x.is_zero()
-                    {
-                        Some(G2Affine::ADDITIVE_IDENTITY)
-                    } else {
-                        // Recover a y-coordinate given x by y = sqrt(x^3 + 4)
-                        ((x.square() * x) + B).sqrt().and_then(|y| {
-                            // Switch to the correct y-coordinate if necessary.
-                            let y = if y.lexicographically_largest() ^ sort_flag_set {
-                                -y
-                            } else {
-                                y
-                            };
-                            if (!infinity_flag_set) & // Infinity flag should not be set
+                {
+                    Some(G2Affine::ADDITIVE_IDENTITY)
+                } else {
+                    // Recover a y-coordinate given x by y = sqrt(x^3 + 4)
+                    ((x.square() * x) + B).sqrt().and_then(|y| {
+                        // Switch to the correct y-coordinate if necessary.
+                        let y = if y.lexicographically_largest() ^ sort_flag_set {
+                            -y
+                        } else {
+                            y
+                        };
+                        if (!infinity_flag_set) & // Infinity flag should not be set
                             compression_flag_set
-                            {
-                                Some(G2Affine {
-                                    x,
-                                    y,
-                                    is_infinity: infinity_flag_set.into(),
-                                })
-                            } else {
-                                None
-                            }
-                        })
-                    }
-                })
+                        {
+                            Some(G2Affine {
+                                x,
+                                y,
+                                is_infinity: infinity_flag_set,
+                            })
+                        } else {
+                            None
+                        }
+                    })
+                }
             })
-            .into();
-
-        match x {
-            Some(x) if x.is_torsion_free() => Some(x),
-            _ => None,
-        }
+        })
+        .and_then(|p| if p.is_torsion_free() { Some(p) } else { None })
     }
 }
 

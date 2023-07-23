@@ -15,10 +15,7 @@ impl SigUtils<32> for PublicKey {
     }
 
     fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
-        match JubjubExtended::from_bytes(bytes) {
-            Some(point) => Some(Self(point)),
-            None => None,
-        }
+        JubjubExtended::from_bytes(bytes).map(Self)
     }
 }
 

@@ -186,7 +186,7 @@ impl Fr {
             let mut j_less_than_v = true;
 
             for j in 2..max_v {
-                j_less_than_v &= !(j == v);
+                j_less_than_v &= j != v;
                 if b2k == Self::one() {
                     if j_less_than_v {
                         z.square_assign()
@@ -197,7 +197,7 @@ impl Fr {
                 };
             }
 
-            if !(b == Self::one()) {
+            if b != Self::one() {
                 x.mul_assign(z)
             };
             z.square_assign();

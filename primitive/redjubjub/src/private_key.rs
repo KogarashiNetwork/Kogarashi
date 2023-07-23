@@ -12,10 +12,7 @@ pub struct SecretKey(pub(crate) Fp);
 
 impl SigUtils<32> for SecretKey {
     fn from_bytes(bytes: [u8; 32]) -> Option<Self> {
-        match Fp::from_bytes(bytes) {
-            Some(x) => Some(SecretKey(x)),
-            None => None,
-        }
+        Fp::from_bytes(bytes).map(Self)
     }
 
     fn to_bytes(self) -> [u8; Self::LENGTH] {

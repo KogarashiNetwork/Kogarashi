@@ -1,4 +1,4 @@
-name: Merged Check
+name: Benchmark Check
 on:
   push:
     branches: [ master ]

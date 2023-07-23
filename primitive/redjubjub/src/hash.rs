@@ -1,8 +1,7 @@
-use zero_jubjub::Fp;
-
 use super::constant::SAPLING_PERSONAL;
 
 use blake2b_simd::{Params, State};
+use zero_jubjub::Fp;
 
 pub(crate) fn hash_to_scalar(a: &[u8], b: &[u8], c: &[u8]) -> Fp {
     SaplingHash::default()

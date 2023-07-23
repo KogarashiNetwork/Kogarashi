@@ -109,7 +109,7 @@ impl SigUtils<48> for G1Affine {
                         Some(G1Affine {
                             x,
                             y,
-                            is_infinity: infinity_flag_set.into(),
+                            is_infinity: infinity_flag_set,
                         })
                     } else {
                         None
@@ -117,14 +117,7 @@ impl SigUtils<48> for G1Affine {
                 })
             }
         })
-        .and_then(|p| {
-            if p.is_torsion_free().into() {
-                Some(p)
-            } else {
-                None
-            }
-        })
-        .into()
+        .and_then(|p| if p.is_torsion_free() { Some(p) } else { None })
     }
 }
 

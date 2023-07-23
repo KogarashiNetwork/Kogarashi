@@ -163,71 +163,7 @@ impl Fp {
         ]);
         d0 * Fp(R2) + d1 * Fp(R3)
     }
-}
 
-impl From<i8> for Fp {
-    fn from(val: i8) -> Fp {
-        match (val >= 0, val < 0) {
-            (true, false) => Fp([val.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
-            (false, true) => -Fp([val.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
-            (_, _) => unreachable!(),
-        }
-    }
-}
-
-impl From<Fp> for Fr {
-    fn from(scalar: Fp) -> Fr {
-        let bls_scalar = Fr::from_bytes(scalar.to_bytes());
-
-        assert!(
-            bls_scalar.is_some(),
-            "Failed to convert a Scalar from JubJub to BLS"
-        );
-
-        bls_scalar.unwrap()
-    }
-}
-
-fft_field_operation!(
-    Fp,
-    MODULUS,
-    GENERATOR,
-    MULTIPLICATIVE_GENERATOR,
-    INV,
-    ROOT_OF_UNITY,
-    R,
-    R2,
-    R3,
-    S
-);
-
-pub fn compute_windowed_naf<F: FftField>(scalar: F, width: u8) -> [i8; 256] {
-    let mut k = scalar.reduce();
-    let mut i = 0;
-    let one = F::one().reduce();
-    let mut res = [0i8; 256];
-
-    while k >= one {
-        if !k.is_even() {
-            let ki = k.mods_2_pow_k(width);
-            res[i] = ki;
-            let k_ = match (ki >= 0, ki < 0) {
-                (true, false) => F::from([ki.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
-                (false, true) => -F::from([ki.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
-                (_, _) => unreachable!(),
-            };
-            k -= k_;
-        } else {
-            res[i] = 0i8;
-        };
-
-        k.divn(1u32);
-        i += 1;
-    }
-    res
-}
-
-impl Fp {
     /// Compute the result from `Scalar (mod 2^k)`.
     ///
     /// # Panics
@@ -255,6 +191,68 @@ impl Fp {
         }
     }
 }
+
+impl From<i8> for Fp {
+    fn from(val: i8) -> Fp {
+        match (val >= 0, val < 0) {
+            (true, false) => Fp([val.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
+            (false, true) => -Fp([val.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
+            (_, _) => unreachable!(),
+        }
+    }
+}
+
+impl From<Fp> for Fr {
+    fn from(scalar: Fp) -> Fr {
+        let bls_scalar = Fr::from_bytes(scalar.to_bytes());
+
+        assert!(
+            bls_scalar.is_some(),
+            "Failed to convert a Scalar from JubJub to BLS"
+        );
+
+        bls_scalar.unwrap()
+    }
+}
+
+pub fn compute_windowed_naf<F: FftField>(scalar: F, width: u8) -> [i8; 256] {
+    let mut k = scalar.reduce();
+    let mut i = 0;
+    let one = F::one().reduce();
+    let mut res = [0i8; 256];
+
+    while k >= one {
+        if !k.is_even() {
+            let ki = k.mods_2_pow_k(width);
+            res[i] = ki;
+            let k_ = match (ki >= 0, ki < 0) {
+                (true, false) => F::from([ki.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
+                (false, true) => -F::from([ki.unsigned_abs() as u64, 0u64, 0u64, 0u64]),
+                (_, _) => unreachable!(),
+            };
+            k -= k_;
+        } else {
+            res[i] = 0i8;
+        };
+
+        k.divn(1u32);
+        i += 1;
+    }
+    res
+}
+
+fft_field_operation!(
+    Fp,
+    MODULUS,
+    GENERATOR,
+    MULTIPLICATIVE_GENERATOR,
+    INV,
+    ROOT_OF_UNITY,
+    R,
+    R2,
+    R3,
+    S
+);
 
 #[cfg(test)]
 mod tests {
