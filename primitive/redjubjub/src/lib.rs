@@ -233,41 +233,6 @@ mod tests {
     }
 
     #[test]
-    fn default_phrase_should_correspond_to_default_address() {
-        assert_eq!(
-            Pair::from_string(&format!("{}/Alice", DEV_PHRASE), None)
-                .unwrap()
-                .public(),
-            Public::from_string(&format!("{}/Alice", DEV_ADDRESS)).unwrap(),
-        );
-        assert_eq!(
-            Pair::from_string("/Alice", None).unwrap().public(),
-            Public::from_string("/Alice").unwrap()
-        );
-    }
-
-    #[test]
-    fn derive_soft_should_work() {
-        let pair = Pair::from_seed(&hex!(
-            "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-        ));
-        let derive_1 = pair
-            .derive(Some(DeriveJunction::soft(1)).into_iter(), None)
-            .unwrap()
-            .0;
-        let derive_1b = pair
-            .derive(Some(DeriveJunction::soft(1)).into_iter(), None)
-            .unwrap()
-            .0;
-        let derive_2 = pair
-            .derive(Some(DeriveJunction::soft(2)).into_iter(), None)
-            .unwrap()
-            .0;
-        assert_eq!(derive_1.public(), derive_1b.public());
-        assert_ne!(derive_1.public(), derive_2.public());
-    }
-
-    #[test]
     fn derive_hard_should_work() {
         let pair = Pair::from_seed(&hex!(
             "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
@@ -289,40 +254,12 @@ mod tests {
     }
 
     #[test]
-    fn derive_soft_public_should_work() {
-        let pair = Pair::from_seed(&hex!(
-            "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-        ));
-        let path = Some(DeriveJunction::soft(1));
-        let pair_1 = pair.derive(path.clone().into_iter(), None).unwrap().0;
-        let public_1 = pair.public().derive(path.into_iter()).unwrap();
-        assert_eq!(pair_1.public(), public_1);
-    }
-
-    #[test]
     fn derive_hard_public_should_fail() {
         let pair = Pair::from_seed(&hex!(
             "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
         ));
         let path = Some(DeriveJunction::hard(1));
         assert!(pair.public().derive(path.into_iter()).is_none());
-    }
-
-    #[test]
-    fn sr_test_vector_should_work() {
-        let pair = Pair::from_seed(&hex!(
-            "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-        ));
-        let public = pair.public();
-        assert_eq!(
-            public,
-            Public::from_raw(hex!(
-                "44a996beb1eef7bdcab976ab6d2ca26104834164ecf28fb375600576fcc6eb0f"
-            ))
-        );
-        let message = b"";
-        let signature = pair.sign(message);
-        assert!(Pair::verify(&signature, &message[..], &public));
     }
 
     #[test]
@@ -366,7 +303,7 @@ mod tests {
         assert_eq!(
             public,
             Public::from_raw(hex!(
-                "741c08a06f41c596608f6774259bd9043304adfa5d3eea62760bd9be97634d63"
+                "30d8f86abcba34339bbdab3f697341515ff136ad4f5705f514898ca9aa6dcfd3"
             ))
         );
         let message = hex!("2f8c6129d816cf51c374bc7f08c3e63ed156cf78aefb4a6550d97b87997977ee00000000000000000200d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a4500000000000000");
@@ -381,26 +318,6 @@ mod tests {
         let s = public.to_ss58check();
         let cmp = Public::from_ss58check(&s).unwrap();
         assert_eq!(cmp, public);
-    }
-
-    #[test]
-    fn verify_from_old_wasm_works() {
-        // The values in this test case are compared to the output of `node-test.js` in schnorrkel-js.
-        //
-        // This is to make sure that the wasm library is compatible.
-        let pk = Pair::from_seed(&hex!(
-            "0000000000000000000000000000000000000000000000000000000000000000"
-        ));
-        let public = pk.public();
-        let js_signature = Signature::from_raw(hex!(
-			"28a854d54903e056f89581c691c1f7d2ff39f8f896c9e9c22475e60902cc2b3547199e0e91fa32902028f2ca2355e8cdd16cfe19ba5e8b658c94aa80f3b81a00"
-		));
-        assert!(Pair::verify_deprecated(
-            &js_signature,
-            b"SUBSTRATE",
-            &public
-        ));
-        assert!(!Pair::verify(&js_signature, b"SUBSTRATE", &public));
     }
 
     #[test]

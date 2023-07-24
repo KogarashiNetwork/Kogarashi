@@ -23,8 +23,8 @@ impl SigUtils<64> for Signature {
 
     fn to_bytes(self) -> [u8; Self::LENGTH] {
         let mut bytes = [0u8; 64];
-        bytes.copy_from_slice(&self.r);
-        bytes.copy_from_slice(&self.s);
+        bytes[..32].copy_from_slice(&self.r);
+        bytes[32..].copy_from_slice(&self.s);
         bytes
     }
 }
