@@ -41,18 +41,19 @@ frame-support = { default-features = false, version = '3.0.0' }
 
 [workspace]
 members = [
+    "client",
     "primitive/bls12_381",
     "primitive/elgamal",
     "primitive/jubjub",
     "primitive/kzg",
     "primitive/pairing",
     "primitive/plonk",
-    "pallets/confidential_transfer",
-    "pallets/encrypted_balance",
-    "pallets/plonk",
     "primitive/r1cs",
     "primitive/redjubjub",
-    "primitive/zkstd"
+    "primitive/zkstd",
+    "pallets/confidential_transfer",
+    "pallets/encrypted_balance",
+    "pallets/plonk"
 ]
 
 [profile.release]
