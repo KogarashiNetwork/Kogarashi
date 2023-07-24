@@ -33,3 +33,5 @@ pub(crate) const SIGNING_CTX: &[u8] = b"substrate";
 
 /// An identifier used to match public keys against redjubjub keys
 pub const CRYPTO_ID: CryptoTypeId = CryptoTypeId(*b"redj");
+
+pub(crate) const KOGARASHI_PERSONAL: &[u8; 16] = b"Kogarashi_FSeedH";

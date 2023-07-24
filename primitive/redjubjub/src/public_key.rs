@@ -1,5 +1,5 @@
 use super::constant::{CRYPTO_ID, SAPLING_BASE_POINT, SAPLING_REDJUBJUB_COFACTOR};
-use super::hash::hash_to_scalar;
+use super::hash::sapling_hash;
 use super::signature::Signature;
 use super::Pair;
 
@@ -42,7 +42,7 @@ impl PublicKey {
     #[allow(non_snake_case)]
     pub fn validate(self, m: &[u8], sig: Signature) -> bool {
         // c = H(R||vk||m)
-        let c = hash_to_scalar(&sig.r, &self.to_bytes(), m);
+        let c = sapling_hash(&sig.r, &self.to_bytes(), m);
 
         let R = match JubjubAffine::from_bytes(sig.r) {
             Some(R) => R,

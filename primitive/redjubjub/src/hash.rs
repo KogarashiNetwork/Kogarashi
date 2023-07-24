@@ -1,9 +1,9 @@
-use super::constant::SAPLING_PERSONAL;
+use super::constant::{KOGARASHI_PERSONAL, SAPLING_PERSONAL};
 
 use blake2b_simd::{Params, State};
 use zero_jubjub::Fp;
 
-pub(crate) fn hash_to_scalar(a: &[u8], b: &[u8], c: &[u8]) -> Fp {
+pub(crate) fn sapling_hash(a: &[u8], b: &[u8], c: &[u8]) -> Fp {
     SaplingHash::default()
         .update(a)
         .update(b)
@@ -25,6 +25,35 @@ impl Default for SaplingHash {
 }
 
 impl SaplingHash {
+    pub(crate) fn update(&mut self, bytes: &[u8]) -> &mut Self {
+        self.0.update(bytes);
+        self
+    }
+
+    pub(crate) fn finalize(&self) -> Fp {
+        let digest = self.0.finalize();
+        Fp::from_hash(digest.as_array())
+    }
+}
+
+pub(crate) fn kogarashi_hash(seed: &[u8]) -> Fp {
+    KogarashiHash::default().update(seed).finalize()
+}
+
+struct KogarashiHash(State);
+
+impl Default for KogarashiHash {
+    fn default() -> Self {
+        let state = Params::new()
+            .hash_length(64)
+            .personal(KOGARASHI_PERSONAL)
+            .to_state();
+
+        Self(state)
+    }
+}
+
+impl KogarashiHash {
     pub(crate) fn update(&mut self, bytes: &[u8]) -> &mut Self {
         self.0.update(bytes);
         self

@@ -24,6 +24,7 @@ mod public_key;
 mod signature;
 
 use constant::SIGNING_CTX;
+use hash::kogarashi_hash;
 pub use private_key::SecretKey;
 pub use public_key::{Public, PublicKey};
 use signature::Sig as Signature;
@@ -32,7 +33,7 @@ use parity_scale_codec::alloc::string::String;
 use parity_scale_codec::Encode;
 use sp_core::crypto::{CryptoType, DeriveJunction, Pair as TraitPair, SecretStringError};
 use sp_std::vec::Vec;
-use substrate_bip39::seed_from_entropy;
+use substrate_bip39::mini_secret_from_entropy;
 
 use bip39::{Language, Mnemonic, MnemonicType};
 use rand_core::OsRng;
@@ -83,16 +84,9 @@ impl TraitPair for Pair {
         phrase: &str,
         password: Option<&str>,
     ) -> Result<(Pair, Seed), SecretStringError> {
-        let big_seed = seed_from_entropy(
-            Mnemonic::from_phrase(phrase, Language::English)
-                .map_err(|_| SecretStringError::InvalidPhrase)?
-                .entropy(),
-            password.unwrap_or(""),
-        )
-        .map_err(|_| SecretStringError::InvalidSeed)?;
-        let mut seed = Seed::default();
-        seed.copy_from_slice(&big_seed[0..32]);
-        Self::from_seed_slice(&big_seed[0..32]).map(|x| (x, seed))
+        Mnemonic::from_phrase(phrase, Language::English)
+            .map_err(|_| SecretStringError::InvalidPhrase)
+            .map(|m| Self::from_entropy(m.entropy(), password))
     }
 
     /// Make a new key pair from secret seed material.
@@ -107,13 +101,9 @@ impl TraitPair for Pair {
     ///
     /// You should never need to use this; generate(), generate_with_phrase
     fn from_seed_slice(seed_slice: &[u8]) -> Result<Pair, SecretStringError> {
-        match SecretKey::from_raw_bytes(seed_slice) {
-            Some(secret) => {
-                let public = secret.to_public_key();
-                Ok(Pair { public, secret })
-            }
-            None => Err(SecretStringError::InvalidSeedLength),
-        }
+        let secret = SecretKey(kogarashi_hash(seed_slice));
+        let public = secret.to_public_key();
+        Ok(Self { secret, public })
     }
 
     /// Derive a child key from a series of given junctions.
@@ -178,10 +168,11 @@ impl Pair {
     /// This uses a key derivation function to convert the entropy into a seed, then returns
     /// the pair generated from it.
     pub fn from_entropy(entropy: &[u8], password: Option<&str>) -> (Pair, Seed) {
-        let seed = seed_from_entropy(entropy, password.unwrap_or(""))
-            .expect("32 bytes can always build a key; qed");
+        let seed = mini_secret_from_entropy(entropy, password.unwrap_or(""))
+            .expect("32 bytes can always build a key; qed")
+            .to_bytes();
 
-        let secret = SecretKey::from_raw_bytes(&seed[..32]).expect("Length is always correct; qed");
+        let secret = SecretKey(kogarashi_hash(&seed));
         let public = secret.to_public_key();
         (Pair { secret, public }, secret.to_bytes())
     }
@@ -388,7 +379,6 @@ mod tests {
         let (pair, _) = Pair::generate();
         let public = pair.public();
         let s = public.to_ss58check();
-        println!("Correct: {}", s);
         let cmp = Public::from_ss58check(&s).unwrap();
         assert_eq!(cmp, public);
     }

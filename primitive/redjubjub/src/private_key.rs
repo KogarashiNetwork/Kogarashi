@@ -1,5 +1,5 @@
 use super::constant::SAPLING_BASE_POINT;
-use super::hash::hash_to_scalar;
+use super::hash::sapling_hash;
 use super::public_key::PublicKey;
 use super::signature::Signature;
 
@@ -23,7 +23,7 @@ impl SigUtils<32> for SecretKey {
 impl SecretKey {
     pub fn from_raw_bytes(bytes: &[u8]) -> Option<Self> {
         assert_eq!(bytes.len(), Self::LENGTH);
-        let bytes: [u8; Self::LENGTH] = bytes[..32].try_into().unwrap();
+        let bytes: [u8; Self::LENGTH] = bytes[..].try_into().unwrap();
         Self::from_bytes(bytes)
     }
 
@@ -35,13 +35,13 @@ impl SecretKey {
 
         // r = H(T||vk||M)
         let pk = self.to_public_key();
-        let r = hash_to_scalar(&T, &pk.to_bytes(), m);
+        let r = sapling_hash(&T, &pk.to_bytes(), m);
 
         // R = r * P_G
         let R = (r * SAPLING_BASE_POINT).to_bytes();
 
         // S = r + H(R||m) * sk
-        let S = (r + hash_to_scalar(&R, &pk.to_bytes(), m) * self.0).to_bytes();
+        let S = (r + sapling_hash(&R, &pk.to_bytes(), m) * self.0).to_bytes();
 
         Signature::new(R, S)
     }
