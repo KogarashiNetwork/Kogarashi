@@ -18,7 +18,6 @@
 
 mod constant;
 mod hash;
-mod keyring;
 mod private_key;
 mod public_key;
 mod signature;
