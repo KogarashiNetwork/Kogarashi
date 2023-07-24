@@ -53,7 +53,8 @@ members = [
     "primitive/zkstd",
     "pallets/confidential_transfer",
     "pallets/encrypted_balance",
-    "pallets/plonk"
+    "pallets/plonk",
+    "zkruntime"
 ]
 
 [profile.release]
