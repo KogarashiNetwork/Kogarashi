@@ -1,4 +1,5 @@
 use crate::Fp;
+
 use serde::{Deserialize, Serialize};
 use zero_bls12_381::Fr;
 use zkstd::arithmetic::edwards::*;
@@ -209,10 +210,7 @@ impl SigUtils<32> for JubjubExtended {
     }
 
     fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
-        match JubjubAffine::from_bytes(bytes) {
-            Some(point) => Some(point.to_extended()),
-            None => None,
-        }
+        JubjubAffine::from_bytes(bytes).map(|point| point.to_extended())
     }
 }
 

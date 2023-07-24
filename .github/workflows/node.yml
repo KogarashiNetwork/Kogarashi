@@ -1,4 +1,4 @@
-name: Node Test
+name: Substrate Node Test
 on:
   pull_request:
     branches: [ master, develop ]

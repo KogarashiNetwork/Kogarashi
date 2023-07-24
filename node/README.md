@@ -2,6 +2,8 @@
 
 ## Environment
 
+Rust: `nightly-2022-11-14`
+
 ## Build
 
 ```sh

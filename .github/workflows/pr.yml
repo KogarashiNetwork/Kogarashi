@@ -1,4 +1,4 @@
-name: Pull Request Check
+name: PR Check
 on:
   pull_request:
     branches: [ master, develop ]
@@ -60,7 +60,7 @@ jobs:
 
   test:
     if: github.event.pull_request.draft == false
-    name: Unit Test
+    name: Calculate Code Coverage
     runs-on: ubuntu-latest
 
     steps:
