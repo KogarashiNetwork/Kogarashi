@@ -7,7 +7,7 @@ use rand_core::RngCore;
 use zero_jubjub::Fp;
 use zkstd::behave::SigUtils;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct SecretKey(pub(crate) Fp);
 
 impl SigUtils<32> for SecretKey {
