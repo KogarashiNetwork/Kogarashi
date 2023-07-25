@@ -22,9 +22,9 @@ sp-runtime = { version = "3.0.0", default-features = false }
 sp-arithmetic = { version = "3.0.0", default-features = false }
 frame-support = { version = "3.0.0", default-features = false }
 frame-system = { version = "3.0.0", default-features = false }
-zero-elgamal = { path = '../../primitive/elgamal', default-features = false }
-zero-jubjub = { path = '../../primitive/jubjub', default-features = false }
-zero-pairing = { path = '../../primitive/pairing', default-features = false }
+lifted-elgamal = { path = '../../primitive/elgamal', default-features = false }
+jub-jub = { path = '../../primitive/jubjub', default-features = false }
+ec-pairing = { path = '../../primitive/pairing', default-features = false }
 zkstd = { path = "../../primitive/zkstd", default-features = false }
 
 [dev-dependencies]

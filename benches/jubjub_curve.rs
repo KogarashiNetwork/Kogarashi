@@ -1,8 +1,8 @@
 use criterion::black_box;
 use criterion::{criterion_group, criterion_main, Criterion};
+use jub_jub::Fp;
+use jub_jub::JubjubExtended;
 use rand::rngs::OsRng;
-use zero_jubjub::Fp;
-use zero_jubjub::JubjubExtended;
 use zkstd::common::{Curve, CurveGroup, Group};
 
 fn bench_jubjub_extended(c: &mut Criterion) {

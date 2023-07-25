@@ -7,7 +7,7 @@
 //! A collection of all possible errors encountered in PLONK.
 
 // use dusk_bytes::Error as DuskBytesError;
-use zero_kzg::KzgError;
+use poly_commit::KzgError;
 
 /// Defines all possible errors that can be encountered in PLONK.
 #[derive(Debug, Clone, Copy)]

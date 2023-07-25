@@ -19,8 +19,8 @@ sp-std = { version = '3.0.0', default-features = false }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 
 [dev-dependencies]
-zero-jubjub = { path = '../jubjub' }
-zero-bls12-381 = { path = '../bls12_381' }
+jub-jub = { path = '../jubjub' }
+bls-12-381 = { path = '../bls12_381' }
 serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 
 [[test]]

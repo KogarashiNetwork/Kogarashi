@@ -1,5 +1,5 @@
 # Bls12 381 Curve
-[![crates.io badge](https://img.shields.io/crates/v/zero-bls12-381.svg)](https://crates.io/crates/zero-bls12-381) [![Documentation](https://docs.rs/zero-bls12-381/badge.svg)](https://docs.rs/zero-bls12-381)  
+[![crates.io badge](https://img.shields.io/crates/v/bls-12-381.svg)](https://crates.io/crates/bls-12-381) [![Documentation](https://docs.rs/bls-12-381/badge.svg)](https://docs.rs/bls-12-381)  
 Pairing friendly bls12-381 curve supports fully `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec).
 
 ## Overview

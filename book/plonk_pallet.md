@@ -18,7 +18,7 @@ First of all, you need to define the `plonk-pallet` when you start to implement 
 ```toml
 [dependencies]
 pallet-plonk = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
-zero-jubjub = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
+jub-jub = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
 zero-plonk = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
 rand_core = {version="0.6", default-features = false }
 ```

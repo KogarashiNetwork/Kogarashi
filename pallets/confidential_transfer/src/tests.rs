@@ -8,9 +8,9 @@ mod plonk_test {
     };
     use crate::traits::ConfidentialTransfer as TraitConfidentialTransfer;
 
+    use ec_pairing::TatePairing;
     use frame_support::assert_ok;
     use pallet_plonk::FullcodecRng;
-    use zero_pairing::TatePairing;
     use zero_plonk::prelude::Compiler;
 
     use ark_std::{end_timer, start_timer};

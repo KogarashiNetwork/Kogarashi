@@ -1,6 +1,6 @@
 use crate::error::Error;
+use bls_12_381::Fr;
 use serde::{Deserialize, Serialize};
-use zero_bls12_381::Fr;
 use zkstd::arithmetic::bits_256::*;
 use zkstd::common::*;
 use zkstd::dress::field::*;

@@ -2,8 +2,8 @@ use crate::commitment::Commitment;
 use crate::poly::Polynomial;
 use crate::util;
 use crate::witness::Witness;
+use ec_pairing::msm_variable_base;
 use parity_scale_codec::{Decode, Encode};
-use zero_pairing::msm_variable_base;
 use zkstd::behave::*;
 use zkstd::common::*;
 

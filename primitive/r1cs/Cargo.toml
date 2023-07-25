@@ -3,7 +3,7 @@ authors = [
     'ashWhiteHat<phantomofrotten@gmail.com>',
     'KiriosK<KiriosK@yandex.ru>'
 ]
-name = "zero-r1cs"
+name = "rank1cs"
 description = 'r1cs implementation'
 version = "0.1.0"
 edition = "2021"
@@ -18,9 +18,9 @@ merlin = {version = "3.0", default-features = false}
 rand_core = { version="0.6", default-features = false }
 
 zkstd = { path = "../zkstd", default-features = false }
-zero-bls12-381 = { path = "../bls12_381", default-features = false }
-zero-kzg = { path = "../kzg", default-features = false }
-zero-pairing = {path = "../pairing", default-features = false}
+bls-12-381 = { path = "../bls12_381", default-features = false }
+poly-commit = { path = "../poly", default-features = false }
+ec-pairing = {path = "../pairing", default-features = false}
 
 [dev-dependencies]
 rand = "0.8"

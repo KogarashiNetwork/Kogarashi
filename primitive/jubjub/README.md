@@ -1,5 +1,5 @@
 # Jubjub Curve
-[![crates.io badge](https://img.shields.io/crates/v/zero-jubjub.svg)](https://crates.io/crates/zero-jubjub) [![Documentation](https://docs.rs/zero-jubjub/badge.svg)](https://docs.rs/zero-jubjub)  
+[![crates.io badge](https://img.shields.io/crates/v/jub-jub.svg)](https://crates.io/crates/jub-jub) [![Documentation](https://docs.rs/jub-jub/badge.svg)](https://docs.rs/jub-jub)  
 This crate provides jubjub curve arithmetic and also supports fully `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec).
 
 ## Specification

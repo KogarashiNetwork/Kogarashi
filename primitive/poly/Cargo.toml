@@ -3,7 +3,7 @@ authors = [
     'ashWhiteHat<phantomofrotten@gmail.com>',
     'KiriosK<KiriosK@yandex.ru>'
 ]
-name = "zero-kzg"
+name = "poly-commit"
 description = 'lifted elgamal encryption implementation'
 version = "0.1.10"
 edition = "2021"
@@ -14,8 +14,8 @@ readme = 'README.md'
 
 [dependencies]
 zkstd = { path = "../zkstd", default-features = false }
-zero-pairing = { path = "../pairing", default-features = false }
-zero-bls12-381 = { path = "../bls12_381", default-features = false }
+ec-pairing = { path = "../pairing", default-features = false }
+bls-12-381 = { path = "../bls12_381", default-features = false }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 rand_core = { version="0.6", default-features = false, features = ["getrandom"] }
 rayon = "1.5.1"

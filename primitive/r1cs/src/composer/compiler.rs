@@ -4,7 +4,7 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-use zero_kzg::KeyPair;
+use poly_commit::KeyPair;
 use zkstd::common::Pairing;
 
 use super::{Builder, Circuit, Composer};

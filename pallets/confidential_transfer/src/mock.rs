@@ -3,11 +3,12 @@ use crate::{
     circuit::{ConfidentialTransferCircuit, ConfidentialTransferTransaction},
     pallet::Config,
 };
+use jub_jub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
+use lifted_elgamal::EncryptedNumber;
 use pallet_encrypted_balance::{Account, AccountData};
-use zero_elgamal::EncryptedNumber;
-use zero_jubjub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
 use zkstd::common::CurveGroup;
 
+use ec_pairing::TatePairing;
 use frame_support::traits::StorageMapShim;
 use frame_support::{construct_runtime, parameter_types};
 use sp_core::H256;
@@ -15,7 +16,6 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zero_pairing::TatePairing;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;

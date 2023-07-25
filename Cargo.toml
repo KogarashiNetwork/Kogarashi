@@ -14,12 +14,12 @@ readme = 'README.md'
 
 [dependencies]
 # primitive
-zero-bls12-381 = { path = "./primitive/bls12_381", default-features = false }
+bls-12-381 = { path = "./primitive/bls12_381", default-features = false }
 zkstd = { path = "./primitive/zkstd", default-features = false }
-zero-elgamal = { path = "./primitive/elgamal", default-features = false }
-zero-jubjub = { path = "./primitive/jubjub", default-features = false }
-zero-kzg = { path = "./primitive/kzg", default-features = false }
-zero-pairing = { path = "./primitive/pairing", default-features = false }
+lifted-elgamal = { path = "./primitive/elgamal", default-features = false }
+jub-jub = { path = "./primitive/jubjub", default-features = false }
+poly-commit = { path = "./primitive/poly", default-features = false }
+ec-pairing = { path = "./primitive/pairing", default-features = false }
 zero-plonk = { path = "./primitive/plonk", default-features = false }
 
 # pallet
@@ -45,9 +45,9 @@ members = [
     "primitive/bls12_381",
     "primitive/elgamal",
     "primitive/jubjub",
-    "primitive/kzg",
     "primitive/pairing",
     "primitive/plonk",
+    "primitive/poly",
     "primitive/r1cs",
     "primitive/redjubjub",
     "primitive/zkstd",

@@ -477,6 +477,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "bls-12-381"
+version = "0.1.10"
+dependencies = [
+ "parity-scale-codec",
+ "paste",
+ "proptest",
+ "rand_core 0.6.4",
+ "serde",
+ "zkstd",
+]
+
+[[package]]
 name = "bs58"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -716,9 +728,13 @@ name = "confidential_transfer"
 version = "0.1.1"
 dependencies = [
  "ark-std",
+ "bls-12-381",
+ "ec-pairing",
  "frame-support",
  "frame-system",
  "fullcodec_rand_xorshift",
+ "jub-jub",
+ "lifted-elgamal",
  "pallet-encrypted-balance",
  "pallet-plonk",
  "parity-scale-codec",
@@ -728,10 +744,6 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std",
- "zero-bls12-381",
- "zero-elgamal",
- "zero-jubjub",
- "zero-pairing",
  "zero-plonk",
  "zkstd",
 ]
@@ -1088,6 +1100,17 @@ name = "dyn-clone"
 version = "1.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "304e6508efa593091e97a9abbc10f90aa7ca635b6d2784feff3c89d41dd12272"
+
+[[package]]
+name = "ec-pairing"
+version = "0.1.10"
+dependencies = [
+ "bls-12-381",
+ "jub-jub",
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "zkstd",
+]
 
 [[package]]
 name = "ed25519"
@@ -1950,6 +1973,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "jub-jub"
+version = "0.1.10"
+dependencies = [
+ "bls-12-381",
+ "parity-scale-codec",
+ "paste",
+ "proptest",
+ "rand_core 0.6.4",
+ "serde",
+ "sp-std",
+ "zkstd",
+]
+
+[[package]]
 name = "keccak"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2089,6 +2126,20 @@ dependencies = [
  "sha2 0.8.2",
  "subtle 2.4.1",
  "typenum",
+]
+
+[[package]]
+name = "lifted-elgamal"
+version = "0.1.10"
+dependencies = [
+ "ec-pairing",
+ "jub-jub",
+ "num-traits",
+ "parity-scale-codec",
+ "rand 0.8.5",
+ "rand_core 0.6.4",
+ "serde",
+ "zkstd",
 ]
 
 [[package]]
@@ -2492,8 +2543,11 @@ dependencies = [
 name = "pallet-encrypted-balance"
 version = "0.2.3"
 dependencies = [
+ "ec-pairing",
  "frame-support",
  "frame-system",
+ "jub-jub",
+ "lifted-elgamal",
  "pallet-transaction-payment",
  "parity-scale-codec",
  "proptest",
@@ -2503,9 +2557,6 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std",
- "zero-elgamal",
- "zero-jubjub",
- "zero-pairing",
  "zkstd",
 ]
 
@@ -2535,19 +2586,19 @@ dependencies = [
 name = "pallet-plonk"
 version = "0.2.5"
 dependencies = [
+ "bls-12-381",
+ "ec-pairing",
  "frame-support",
  "frame-system",
  "fullcodec_rand_xorshift",
+ "jub-jub",
  "parity-scale-codec",
+ "poly-commit",
  "rand 0.8.5",
  "serde",
  "sp-core",
  "sp-io",
  "sp-runtime",
- "zero-bls12-381",
- "zero-jubjub",
- "zero-kzg",
- "zero-pairing",
  "zero-plonk",
  "zkstd",
 ]
@@ -2957,6 +3008,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "poly-commit"
+version = "0.1.10"
+dependencies = [
+ "bls-12-381",
+ "ec-pairing",
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "rayon",
+ "zkstd",
+]
+
+[[package]]
 name = "ppv-lite86"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3281,6 +3344,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "rank1cs"
+version = "0.1.0"
+dependencies = [
+ "bls-12-381",
+ "ec-pairing",
+ "hashbrown 0.13.2",
+ "merlin 3.0.0",
+ "poly-commit",
+ "rand 0.8.5",
+ "rand_core 0.6.4",
+ "zkstd",
+]
+
+[[package]]
 name = "rawpointer"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3318,13 +3395,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "redjubjub"
+name = "red-jubjub"
 version = "0.1.0"
 dependencies = [
  "blake2-rfc",
  "blake2b_simd 1.0.1",
+ "bls-12-381",
  "hex",
  "hex-literal",
+ "jub-jub",
  "lazy_static",
  "parity-scale-codec",
  "rand_core 0.6.4",
@@ -3338,8 +3417,6 @@ dependencies = [
  "strum",
  "substrate-bip39",
  "tiny-bip39",
- "zero-bls12-381",
- "zero-jubjub",
  "zkstd",
 ]
 
@@ -5198,91 +5275,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85e60b0d1b5f99db2556934e21937020776a5d31520bf169e851ac44e6420214"
 
 [[package]]
-name = "zero-bls12-381"
-version = "0.1.10"
-dependencies = [
- "parity-scale-codec",
- "paste",
- "proptest",
- "rand_core 0.6.4",
- "serde",
- "zkstd",
-]
-
-[[package]]
-name = "zero-elgamal"
-version = "0.1.10"
-dependencies = [
- "num-traits",
- "parity-scale-codec",
- "rand 0.8.5",
- "rand_core 0.6.4",
- "serde",
- "zero-jubjub",
- "zero-pairing",
- "zkstd",
-]
-
-[[package]]
-name = "zero-jubjub"
-version = "0.1.10"
-dependencies = [
- "parity-scale-codec",
- "paste",
- "proptest",
- "rand_core 0.6.4",
- "serde",
- "sp-std",
- "zero-bls12-381",
- "zkstd",
-]
-
-[[package]]
-name = "zero-kzg"
-version = "0.1.10"
-dependencies = [
- "parity-scale-codec",
- "rand_core 0.6.4",
- "rayon",
- "zero-bls12-381",
- "zero-pairing",
- "zkstd",
-]
-
-[[package]]
 name = "zero-network"
 version = "0.1.0"
 dependencies = [
+ "bls-12-381",
  "confidential_transfer",
  "criterion 0.4.0",
+ "ec-pairing",
  "frame-support",
  "frame-system",
+ "jub-jub",
+ "lifted-elgamal",
  "pallet-encrypted-balance",
  "pallet-plonk",
  "parity-scale-codec",
+ "poly-commit",
  "rand 0.8.5",
  "rand_core 0.6.4",
  "serde",
  "sp-core",
  "sp-io",
  "sp-runtime",
- "zero-bls12-381",
- "zero-elgamal",
- "zero-jubjub",
- "zero-kzg",
- "zero-pairing",
  "zero-plonk",
- "zkstd",
-]
-
-[[package]]
-name = "zero-pairing"
-version = "0.1.10"
-dependencies = [
- "parity-scale-codec",
- "rand_core 0.6.4",
- "zero-bls12-381",
- "zero-jubjub",
  "zkstd",
 ]
 
@@ -5291,6 +5305,7 @@ name = "zero-plonk"
 version = "0.1.10"
 dependencies = [
  "backtrace",
+ "bls-12-381",
  "bytecheck",
  "canonical",
  "canonical_derive",
@@ -5298,33 +5313,18 @@ dependencies = [
  "criterion 0.3.6",
  "dusk-bytes",
  "dusk-cdf",
+ "ec-pairing",
  "hashbrown 0.9.1",
  "itertools 0.9.0",
+ "jub-jub",
  "merlin 3.0.0",
  "parity-scale-codec",
+ "poly-commit",
  "rand 0.8.5",
  "rand_core 0.6.4",
  "rayon",
  "sp-std",
  "tempdir",
- "zero-bls12-381",
- "zero-jubjub",
- "zero-kzg",
- "zero-pairing",
- "zkstd",
-]
-
-[[package]]
-name = "zero-r1cs"
-version = "0.1.0"
-dependencies = [
- "hashbrown 0.13.2",
- "merlin 3.0.0",
- "rand 0.8.5",
- "rand_core 0.6.4",
- "zero-bls12-381",
- "zero-kzg",
- "zero-pairing",
  "zkstd",
 ]
 
@@ -5388,11 +5388,11 @@ dependencies = [
 name = "zkstd"
 version = "0.0.9"
 dependencies = [
+ "bls-12-381",
+ "jub-jub",
  "parity-scale-codec",
  "paste",
  "rand_core 0.6.4",
  "serde",
  "sp-std",
- "zero-bls12-381",
- "zero-jubjub",
 ]

@@ -1,9 +1,9 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
+use ec_pairing::TatePairing;
+use jub_jub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
 use pallet::*;
 use pallet_plonk::{BlsScalar, Circuit, FullcodecRng, Proof};
-use zero_jubjub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
-use zero_pairing::TatePairing;
 use zero_plonk::{composer::Composer, prelude::*};
 use zkstd::common::{CurveGroup, Pairing};
 

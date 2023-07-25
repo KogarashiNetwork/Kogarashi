@@ -5,9 +5,9 @@ macro_rules! decl_tests {
     ($test:ty, $ext_builder:ty) => {
         use frame_support::{assert_noop, assert_ok};
         use frame_system::RawOrigin;
+        use jub_jub::Fp;
         use sp_runtime::traits::BadOrigin;
         use $crate::*;
-        use zero_jubjub::Fp;
 
         const ID_1_PK: Fp = Fp::to_mont_form([1, 0, 0, 0]);
         const ID_2_PK: Fp = Fp::to_mont_form([2, 0, 0, 0]);

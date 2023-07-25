@@ -54,7 +54,7 @@ impl system::Config for Test {
     type SS58Prefix = SS58Prefix;
 }
 
-use zero_pairing::TatePairing;
+use ec_pairing::TatePairing;
 use zero_plonk::prelude::{Error as CircuitError, *};
 use zkstd::common::CurveGroup;
 

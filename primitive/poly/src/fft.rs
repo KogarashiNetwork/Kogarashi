@@ -215,8 +215,8 @@ mod tests {
     use crate::poly::Polynomial;
 
     use super::Fft;
+    use bls_12_381::Fr;
     use rand_core::OsRng;
-    use zero_bls12_381::Fr;
     use zkstd::behave::{Group, PrimeField};
     use zkstd::common::Vec;
 

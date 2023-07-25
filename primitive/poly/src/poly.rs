@@ -239,8 +239,8 @@ impl<F: FftField> Witness<F> {
 #[cfg(test)]
 mod tests {
     use super::Polynomial;
+    use bls_12_381::Fr;
     use rand_core::OsRng;
-    use zero_bls12_381::Fr;
     use zkstd::behave::{Group, PrimeField};
 
     fn arb_fr() -> Fr {

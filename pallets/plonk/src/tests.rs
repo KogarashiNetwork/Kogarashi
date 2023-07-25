@@ -2,6 +2,7 @@ use crate::mock::{new_test_ext, DummyCircuit};
 use crate::{self as plonk};
 use crate::{pallet::Config, types::*};
 
+use ec_pairing::TatePairing;
 use frame_support::dispatch::{DispatchErrorWithPostInfo, PostDispatchInfo};
 use frame_support::{assert_ok, construct_runtime, parameter_types};
 use sp_core::H256;
@@ -10,7 +11,6 @@ use sp_runtime::{
     traits::{BlakeTwo256, IdentityLookup},
     DispatchError,
 };
-use zero_pairing::TatePairing;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;
@@ -67,8 +67,8 @@ impl Config for TestRuntime {
 mod plonk_test {
     use super::*;
     use crate::types::JubjubScalar;
+    use ec_pairing::TatePairing;
     use rand::SeedableRng;
-    use zero_pairing::TatePairing;
     use zero_plonk::prelude::Compiler;
     use zkstd::behave::Group;
 

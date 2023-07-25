@@ -18,11 +18,11 @@ sp-runtime = { version = "3.0.0", default-features = false }
 
 # primitive
 zero-plonk = { path = "../../primitive/plonk", default-features = false }
-zero-pairing = { path = "../../primitive/pairing", default-features = false }
-zero-jubjub = { path = "../../primitive/jubjub", default-features = false }
+ec-pairing = { path = "../../primitive/pairing", default-features = false }
+jub-jub = { path = "../../primitive/jubjub", default-features = false }
 zkstd = { path = "../../primitive/zkstd", default-features = false }
-zero-bls12-381 = { path = "../../primitive/bls12_381", default-features = false }
-zero-elgamal = { path = "../../primitive/elgamal", default-features = false }
+bls-12-381 = { path = "../../primitive/bls12_381", default-features = false }
+lifted-elgamal = { path = "../../primitive/elgamal", default-features = false }
 
 # pallet
 pallet-plonk = { path = "../plonk", default-features = false }
