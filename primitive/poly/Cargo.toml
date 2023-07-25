@@ -16,7 +16,7 @@ readme = 'README.md'
 zkstd = { path = "../zkstd", default-features = false }
 ec-pairing = { path = "../pairing", default-features = false }
 bls-12-381 = { path = "../bls12_381", default-features = false }
-parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
+parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
 rand_core = { version="0.6", default-features = false, features = ["getrandom"] }
 rayon = "1.5.1"
 

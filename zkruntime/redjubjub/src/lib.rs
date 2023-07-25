@@ -1,4 +1,5 @@
-#[cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
+
 use codec::{Decode, Encode};
 use rand_core::SeedableRng;
 use rand_xorshift::XorShiftRng;

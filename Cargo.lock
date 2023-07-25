@@ -5381,7 +5381,6 @@ dependencies = [
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
  "parity-scale-codec",
- "redjubjub",
  "serde",
  "sp-api",
  "sp-block-builder",

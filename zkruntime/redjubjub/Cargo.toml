@@ -9,19 +9,20 @@ sp-core = { version = "3.0.0", default-features = false }
 codec = { default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0' }
 sp-runtime = { version = "3.0.0", default-features = false }
 sp-runtime-interface = { version = "3.0.0", default-features = false }
-substrate-bip39 = { version = "0.4.2", default-features = false }
 
-tiny-bip39 = { version = "0.8", default-features = false }
 strum = { version = "0.20.0", features = ["derive"] }
-lazy_static = { version = "1.4.0", default-features = false }
 blake2b_simd = { version = "1", default-features = false }
-blake2-rfc = { version = "0.2.18", default-features = false }
-serde = { version = "1.0.102", default-features = false, features = ["derive"] }
-hex = { version = "0.4", default-features = false }
-schnorrkel = { version = "0.9.1", features = ["preaudit_deprecated", "u64_backend"], default-features = false }
-thiserror = { version = "1.0.21", default-features = false }
 rand_xorshift = { version = "0.3", default-features = false }
 rand_core = { version="0.6.4", default-features = false }
+
+hex = { version = "0.4", optional = true }
+tiny-bip39 = { version = "0.8", optional = true }
+thiserror = { version = "1.0.21", optional = true }
+blake2-rfc = { version = "0.2.18", optional = true }
+lazy_static = { version = "1.4.0", optional = true }
+substrate-bip39 = { version = "0.4.2", optional = true }
+serde = { version = "1.0.102", features = ["derive"], optional = true }
+schnorrkel = { version = "0.9.1", features = ["preaudit_deprecated", "u64_backend"], optional = true }
 
 zkstd = { default-features = false, path = "../../primitive/zkstd" }
 bls-12-381 = { default-features = false, path = "../../primitive/bls12_381" }
@@ -30,6 +31,9 @@ red-jubjub = { default-features = false, path = '../../primitive/redjubjub' }
 [features]
 default = ['std']
 full_crypto = [
+	"blake2-rfc",
+	"schnorrkel",
+	"hex",
     "sp-runtime-interface/disable_target_static_assertions",
 ]
 runtime-benchmarks = [
@@ -37,8 +41,12 @@ runtime-benchmarks = [
 ]
 std = [
     'full_crypto',
+	"serde",
     'codec/std',
     'sp-std/std',
     'sp-core/std',
     'sp-runtime/std',
+	"substrate-bip39",
+	"tiny-bip39",
+	"lazy_static",
 ]
