@@ -1,21 +1,23 @@
 use codec::{Decode, Encode};
 #[cfg(feature = "std")]
 pub use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use sp_core::RuntimeDebug;
+use sp_std::convert::TryFrom;
 
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 #[derive(Eq, PartialEq, Clone, Encode, Decode, RuntimeDebug)]
 pub enum MultiSignature {
     /// An Redjubjub signature.
-    Redjubjub(redjubjub::Signature),
+    Redjubjub(red_jubjub::Signature),
 }
 
-impl From<redjubjub::Signature> for MultiSignature {
-    fn from(x: redjubjub::Signature) -> Self {
+impl From<red_jubjub::Signature> for MultiSignature {
+    fn from(x: red_jubjub::Signature) -> Self {
         MultiSignature::Redjubjub(x)
     }
 }
 
-impl TryFrom<MultiSignature> for redjubjub::Signature {
+impl TryFrom<MultiSignature> for red_jubjub::Signature {
     type Error = ();
     fn try_from(m: MultiSignature) -> Result<Self, Self::Error> {
         if let MultiSignature::Redjubjub(x) = m {

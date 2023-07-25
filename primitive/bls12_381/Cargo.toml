@@ -13,8 +13,8 @@ repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
 readme = 'README.md'
 
 [dependencies]
-serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 zkstd = { path = "../zkstd" }
+serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 rand_core = { version="0.6.4", default-features = false }
 parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
 

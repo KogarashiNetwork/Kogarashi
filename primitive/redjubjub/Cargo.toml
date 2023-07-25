@@ -1,15 +1,14 @@
 [package]
-name = "redjubjub"
+name = "red-jubjub"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+zkstd = { path = "../zkstd", default-features = false }
+jub-jub = { path = "../jubjub", default-features = false }
+bls-12-381 = { path = "../bls12_381", default-features = false }
 blake2b_simd = { version = "1", default-features = false }
 rand_core = { version="0.6.4", default-features = false }
-
-zkstd = { path = "../zkstd" }
-jub-jub = { path = "../jubjub" }
-bls-12-381 = { path = "../bls12_381" }
 
 [dev-dependencies]
 serde_json = { version = "1.0" }

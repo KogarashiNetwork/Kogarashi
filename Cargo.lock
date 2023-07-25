@@ -1982,7 +1982,6 @@ dependencies = [
  "proptest",
  "rand_core 0.6.4",
  "serde",
- "sp-std",
  "zkstd",
 ]
 
@@ -3398,25 +3397,12 @@ dependencies = [
 name = "red-jubjub"
 version = "0.1.0"
 dependencies = [
- "blake2-rfc",
  "blake2b_simd 1.0.1",
  "bls-12-381",
- "hex",
  "hex-literal",
  "jub-jub",
- "lazy_static",
- "parity-scale-codec",
  "rand_core 0.6.4",
- "schnorrkel",
- "serde",
  "serde_json",
- "sp-core",
- "sp-runtime",
- "sp-runtime-interface",
- "sp-std",
- "strum",
- "substrate-bip39",
- "tiny-bip39",
  "zkstd",
 ]
 
@@ -4439,27 +4425,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "strum"
-version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7318c509b5ba57f18533982607f24070a55d353e90d4cae30c467cdb2ad5ac5c"
-dependencies = [
- "strum_macros",
-]
-
-[[package]]
-name = "strum_macros"
-version = "0.20.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee8bc6b87a5112aeeab1f4a9f7ab634fe6cbefc4850006df31267f4cfb9e3149"
-dependencies = [
- "heck",
- "proc-macro2",
- "quote",
- "syn 1.0.96",
-]
-
-[[package]]
 name = "substrate-bip39"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5369,6 +5334,7 @@ dependencies = [
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
  "parity-scale-codec",
+ "red-jubjub",
  "serde",
  "sp-api",
  "sp-block-builder",
