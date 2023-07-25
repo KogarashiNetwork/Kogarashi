@@ -71,6 +71,7 @@ jobs:
         id: update
         run: git submodule update --remote --recursive
       - uses: actions-rs/toolchain@v1
+      - run: rustup target add wasm32-unknown-unknown
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         with:

@@ -46,15 +46,11 @@ sp-transaction-pool = { default-features = false, version = '3.0.0' }
 sp-version = { default-features = false, version = '3.0.0' }
 
 # local dependencies
-pallet-template = { default-features = false, path = '../../node/pallets/template', version = '3.0.0' }
+pallet-template = { default-features = false, path = '../template', version = '3.0.0' }
 redjubjub = { default-features = false, path = '../redjubjub' }
 
 [features]
 default = ['std']
-full_crypto = [
-    'sp-core/full_crypto',
-    "redjubjub/full_crypto",
-]
 runtime-benchmarks = [
     'frame-benchmarking',
     'frame-support/runtime-benchmarks',
@@ -67,7 +63,6 @@ runtime-benchmarks = [
     'sp-runtime/runtime-benchmarks',
 ]
 std = [
-    'full_crypto',
     'codec/std',
     'frame-executive/std',
     'frame-support/std',

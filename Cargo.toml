@@ -42,6 +42,9 @@ frame-support = { default-features = false, version = '3.0.0' }
 [workspace]
 members = [
     "client",
+    "pallets/confidential_transfer",
+    "pallets/encrypted_balance",
+    "pallets/plonk",
     "primitive/bls12_381",
     "primitive/elgamal",
     "primitive/jubjub",
@@ -51,9 +54,6 @@ members = [
     "primitive/r1cs",
     "primitive/redjubjub",
     "primitive/zkstd",
-    "pallets/confidential_transfer",
-    "pallets/encrypted_balance",
-    "pallets/plonk",
     "zkruntime/redjubjub",
     "zkruntime/runtime"
 ]
