@@ -53,6 +53,7 @@ jobs:
           run: git submodule update --remote --recursive
         - uses: actions-rs/toolchain@v1
         - run: rustup component add clippy
+        - run: rustup target add wasm32-unknown-unknown
         - uses: actions-rs/cargo@v1
           with:
             command: clippy
