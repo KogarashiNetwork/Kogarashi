@@ -284,6 +284,8 @@ pub mod pallet {
             who: <T::Lookup as StaticLookup>::Source,
             new_balance: T::EncryptedBalance,
         ) -> DispatchResultWithPostInfo {
+            // SBP-M1 review: Think about using some onchain decentralized entity 
+            // instead of Sudo Pallet.
             ensure_root(origin)?;
             let who = T::Lookup::lookup(who)?;
             Self::mutate_account(&who, |account| {
@@ -308,6 +310,8 @@ pub mod pallet {
             sender_amount: T::EncryptedBalance,
             recipient_amount: T::EncryptedBalance,
         ) -> DispatchResultWithPostInfo {
+            // SBP-M1 review: Think about using some onchain decentralized entity 
+            // instead of Sudo Pallet.
             ensure_root(origin)?;
             let source = T::Lookup::lookup(source)?;
             let dest = T::Lookup::lookup(dest)?;
@@ -470,9 +474,11 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         f: impl FnOnce(&mut AccountData<T::EncryptedBalance>, bool) -> Result<R, E>,
     ) -> Result<R, E> {
         T::AccountStore::try_mutate_exists(who, |maybe_account| {
+            // SBP-M1 review: you can use `match` for handling `maybe_account`
             let is_new = maybe_account.is_none();
             let mut account = maybe_account.take().unwrap_or_default();
             f(&mut account, is_new).map(move |result| {
+                // SBP-M1 review: just a note, I prefer `match` instead of `if` `else` 
                 let maybe_endowed = if is_new { Some(account.balance) } else { None };
                 *maybe_account = Some(account);
                 (maybe_endowed, result)
@@ -519,6 +525,7 @@ where
 
         // Emit transfer event.
         Self::deposit_event(Event::Transfer(
+            // SBP-M1 review: try to avoid cloning values
             transactor.clone(),
             dest.clone(),
             sender_amount,

@@ -65,6 +65,7 @@ impl SigUtils<48> for Fq {
     }
 
     fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+        // SBP-M1 review: think about proper error handling instead of `unwrap`
         let l5 = u64::from_be_bytes(<[u8; 8]>::try_from(&bytes[0..8]).unwrap());
         let l4 = u64::from_be_bytes(<[u8; 8]>::try_from(&bytes[8..16]).unwrap());
         let l3 = u64::from_be_bytes(<[u8; 8]>::try_from(&bytes[16..24]).unwrap());
@@ -132,6 +133,7 @@ impl Fq {
             0x680447a8e5ff9a6,
         ]);
 
+        // SBP-M1 review: I would use `match` clause
         if sqrt.square() == *self {
             Some(sqrt)
         } else {

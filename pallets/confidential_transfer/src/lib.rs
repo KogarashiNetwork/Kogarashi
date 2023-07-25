@@ -42,6 +42,8 @@ pub mod pallet {
     use sp_runtime::traits::StaticLookup;
 
     #[pallet::config]
+    // SBP-M1 review: Just a note,
+    // I would suggest showing how to loosely couple `Pallet Plonk`
     pub trait Config:
         frame_system::Config + pallet_plonk::Config + pallet_encrypted_balance::Config
     {
@@ -62,6 +64,7 @@ pub mod pallet {
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
+        // SBP-M1 review: missing proper benchmarking
         #[pallet::weight(10_000)]
         pub fn trusted_setup(
             origin: OriginFor<T>,
@@ -72,6 +75,7 @@ pub mod pallet {
             Ok(().into())
         }
 
+        // SBP-M1 review: missing proper benchmarking
         #[pallet::weight(10_000)]
         pub fn confidential_transfer(
             origin: OriginFor<T>,

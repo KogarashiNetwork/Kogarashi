@@ -1,3 +1,6 @@
+# SBP-M1 review: if you use code from Mozilla Repository
+# You should fetch it directly from there
+# Instead of maintaining your own copy
 [package]
 authors = [
     'ashWhiteHat<phantomofrotten@gmail.com>',

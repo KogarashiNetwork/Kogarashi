@@ -40,6 +40,7 @@ pub use frame_support::{
 use pallet_transaction_payment::CurrencyAdapter;
 
 /// Import the template pallet.
+// SBP-M1 review: get rid of unused pallet.
 pub use pallet_template;
 
 /// An index to a block.
@@ -95,6 +96,7 @@ pub mod opaque {
 // To learn more about runtime versioning and what each of the following value means:
 //   https://substrate.dev/docs/en/knowledgebase/runtime/upgrades#runtime-versioning
 pub const VERSION: RuntimeVersion = RuntimeVersion {
+	// SBP-M1 review: set proper attributes
 	spec_name: create_runtime_str!("node-template"),
 	impl_name: create_runtime_str!("node-template"),
 	authoring_version: 1,
@@ -271,6 +273,7 @@ impl pallet_template::Config for Runtime {
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
+// SBP-M1 review: none of developed pallet used in the Runtime...
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,

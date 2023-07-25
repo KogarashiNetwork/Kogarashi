@@ -40,6 +40,7 @@ pub struct JubjubAffine {
     y: Fr,
 }
 
+// SBP-M1 review: use safe math operations 
 impl SigUtils<32> for JubjubAffine {
     fn to_bytes(self) -> [u8; Self::LENGTH] {
         let mut tmp = self.y.to_bytes();
