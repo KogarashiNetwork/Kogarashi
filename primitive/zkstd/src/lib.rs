@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![no_std]
 #![doc = include_str!("../README.md")]
-#![cfg_attr(not(featusre = "std"), no_std)]
 
 pub mod arithmetic;
 pub mod behave;
