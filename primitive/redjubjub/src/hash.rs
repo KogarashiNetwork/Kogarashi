@@ -1,7 +1,7 @@
 use super::constant::{KOGARASHI_PERSONAL, SAPLING_PERSONAL};
 
 use blake2b_simd::{Params, State};
-use zero_jubjub::Fp;
+use jub_jub::Fp;
 
 pub(crate) fn sapling_hash(a: &[u8], b: &[u8], c: &[u8]) -> Fp {
     SaplingHash::default()
@@ -36,7 +36,7 @@ impl SaplingHash {
     }
 }
 
-pub(crate) fn kogarashi_hash(seed: &[u8]) -> Fp {
+pub fn kogarashi_hash(seed: &[u8]) -> Fp {
     KogarashiHash::default().update(seed).finalize()
 }
 

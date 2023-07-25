@@ -3,8 +3,8 @@ use super::hash::sapling_hash;
 use super::public_key::PublicKey;
 use super::signature::Signature;
 
+use jub_jub::Fp;
 use rand_core::RngCore;
-use zero_jubjub::Fp;
 use zkstd::behave::SigUtils;
 
 #[derive(Clone, Copy, Debug)]
