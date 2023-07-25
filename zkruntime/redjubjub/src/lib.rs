@@ -1,8 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use codec::{Decode, Encode};
-use rand_core::SeedableRng;
-use rand_xorshift::XorShiftRng;
 use sp_core::crypto::{
     CryptoType, CryptoTypeId, CryptoTypePublicPair, Derive, Public as TraitPublic, UncheckedFrom,
 };
@@ -12,6 +10,10 @@ use sp_std::ops::Deref;
 
 #[cfg(feature = "std")]
 use bip39::{Language, Mnemonic, MnemonicType};
+#[cfg(feature = "full_crypto")]
+use rand_core::SeedableRng;
+#[cfg(feature = "full_crypto")]
+use rand_xorshift::XorShiftRng;
 #[cfg(feature = "full_crypto")]
 use schnorrkel::SignatureResult;
 #[cfg(feature = "std")]

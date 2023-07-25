@@ -151,6 +151,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
 
 [[package]]
+name = "arrayvec"
+version = "0.7.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96d30a06541fbafbc7f82ed10c06164cfbd2c401138f6addd8404629c4b16711"
+
+[[package]]
 name = "asn1_der"
 version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -475,7 +481,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d6d530bdd2d52966a6d03b7a964add7ae1a288d25214066fd4b600f0f796400"
 dependencies = [
  "arrayvec 0.4.12",
- "constant_time_eq",
+ "constant_time_eq 0.1.5",
 ]
 
 [[package]]
@@ -486,7 +492,18 @@ checksum = "afa748e348ad3be8263be728124b24a24f268266f6f5d58af9d75f6a40b5c587"
 dependencies = [
  "arrayref",
  "arrayvec 0.5.2",
- "constant_time_eq",
+ "constant_time_eq 0.1.5",
+]
+
+[[package]]
+name = "blake2b_simd"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c2f0dc9a68c6317d884f97cc36cf5a3d20ba14ce404227df55e1af708ab04bc"
+dependencies = [
+ "arrayref",
+ "arrayvec 0.7.4",
+ "constant_time_eq 0.2.6",
 ]
 
 [[package]]
@@ -497,7 +514,7 @@ checksum = "9e461a7034e85b211a4acb57ee2e6730b32912b06c08cc242243c39fc21ae6a2"
 dependencies = [
  "arrayref",
  "arrayvec 0.5.2",
- "constant_time_eq",
+ "constant_time_eq 0.1.5",
 ]
 
 [[package]]
@@ -510,7 +527,7 @@ dependencies = [
  "arrayvec 0.5.2",
  "cc",
  "cfg-if 0.1.10",
- "constant_time_eq",
+ "constant_time_eq 0.1.5",
  "crypto-mac 0.8.0",
  "digest 0.9.0",
 ]
@@ -573,6 +590,16 @@ dependencies = [
  "fastrand",
  "futures-lite",
  "once_cell",
+]
+
+[[package]]
+name = "bls-12-381"
+version = "0.1.10"
+dependencies = [
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "serde",
+ "zkstd",
 ]
 
 [[package]]
@@ -809,6 +836,12 @@ name = "constant_time_eq"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
+
+[[package]]
+name = "constant_time_eq"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21a53c0a4d288377e7415b53dcfc3c04da5cdc2cc95c8d5ac178b58f0b861ad6"
 
 [[package]]
 name = "convert_case"
@@ -1502,7 +1535,7 @@ dependencies = [
  "frame-system",
  "linregress",
  "parity-scale-codec",
- "paste 1.0.5",
+ "paste 1.0.14",
  "sp-api",
  "sp-io",
  "sp-runtime",
@@ -1577,7 +1610,7 @@ dependencies = [
  "log",
  "once_cell",
  "parity-scale-codec",
- "paste 1.0.5",
+ "paste 1.0.14",
  "serde",
  "smallvec 1.6.1",
  "sp-arithmetic",
@@ -2577,6 +2610,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "jub-jub"
+version = "0.1.10"
+dependencies = [
+ "bls-12-381",
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "serde",
+ "zkstd",
+]
+
+[[package]]
 name = "keccak"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3423,7 +3467,7 @@ version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4dac63698b887d2d929306ea48b63760431ff8a24fac40ddb22f9c7f49fb7cab"
 dependencies = [
- "blake2b_simd",
+ "blake2b_simd 0.5.11",
  "blake2s_simd",
  "blake3",
  "digest 0.9.0",
@@ -4131,9 +4175,9 @@ dependencies = [
 
 [[package]]
 name = "paste"
-version = "1.0.5"
+version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "acbf547ad0c65e31259204bd90935776d1c693cec2f4ff7abb7a1bbbd40dfe58"
+checksum = "de3145af08024dea9fa9914f381a17b8fc6034dfb00f3a84013f7ff43f29ed4c"
 
 [[package]]
 name = "paste-impl"
@@ -4584,7 +4628,7 @@ checksum = "0ef9e7e66b4468674bfcb0c81af8b7fa0bb154fa9f28eb840da5c447baeb8d7e"
 dependencies = [
  "libc",
  "rand_chacha 0.3.0",
- "rand_core 0.6.2",
+ "rand_core 0.6.4",
  "rand_hc 0.3.0",
 ]
 
@@ -4605,7 +4649,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e12735cf05c9e10bf21534da50a147b924d555dc7a547c42e6bb2d5b6017ae0d"
 dependencies = [
  "ppv-lite86",
- "rand_core 0.6.2",
+ "rand_core 0.6.4",
 ]
 
 [[package]]
@@ -4634,9 +4678,9 @@ dependencies = [
 
 [[package]]
 name = "rand_core"
-version = "0.6.2"
+version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34cf66eb183df1c5876e2dcf6b13d57340741e8dc255b48e40a26de954d06ae7"
+checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 dependencies = [
  "getrandom 0.2.2",
 ]
@@ -4665,7 +4709,7 @@ version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3190ef7066a446f2e7f42e239d161e905420ccab01eb967c9eb27d21b2322a73"
 dependencies = [
- "rand_core 0.6.2",
+ "rand_core 0.6.4",
 ]
 
 [[package]]
@@ -4675,6 +4719,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "16abd0c1b639e9eb4d7c50c0b8100b0d0f849be2349829c740fe8e6eb4816429"
 dependencies = [
  "rand_core 0.5.1",
+]
+
+[[package]]
+name = "rand_xorshift"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d25bf25ec5ae4a3f1b92f929810509a2f53d7dca2f50b794ff57e3face536c8f"
+dependencies = [
+ "rand_core 0.6.4",
 ]
 
 [[package]]
@@ -4726,6 +4779,42 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "678054eb77286b51581ba43620cc911abf02758c91f93f479767aed0f90458b2"
 dependencies = [
  "rand_core 0.3.1",
+]
+
+[[package]]
+name = "red-jubjub"
+version = "0.1.0"
+dependencies = [
+ "blake2b_simd 1.0.1",
+ "bls-12-381",
+ "jub-jub",
+ "rand_core 0.6.4",
+ "zkstd",
+]
+
+[[package]]
+name = "redjubjub"
+version = "0.1.0"
+dependencies = [
+ "blake2-rfc",
+ "blake2b_simd 1.0.1",
+ "bls-12-381",
+ "hex",
+ "lazy_static",
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "rand_xorshift",
+ "red-jubjub",
+ "schnorrkel",
+ "serde",
+ "sp-core",
+ "sp-runtime",
+ "sp-runtime-interface",
+ "sp-std",
+ "strum",
+ "substrate-bip39",
+ "tiny-bip39",
+ "zkstd",
 ]
 
 [[package]]
@@ -4891,8 +4980,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4b18820d944b33caa75a71378964ac46f58517c92b6ae5f762636247c09e78fb"
 dependencies = [
  "base64 0.13.0",
- "blake2b_simd",
- "constant_time_eq",
+ "blake2b_simd 0.5.11",
+ "constant_time_eq 0.1.5",
  "crossbeam-utils 0.8.3",
 ]
 
@@ -6696,7 +6785,7 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "parity-util-mem",
- "paste 1.0.5",
+ "paste 1.0.14",
  "rand 0.7.3",
  "serde",
  "sp-application-crypto",
@@ -8417,6 +8506,7 @@ dependencies = [
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
  "parity-scale-codec",
+ "redjubjub",
  "serde",
  "sp-api",
  "sp-block-builder",
@@ -8430,6 +8520,16 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "substrate-wasm-builder",
+]
+
+[[package]]
+name = "zkstd"
+version = "0.0.9"
+dependencies = [
+ "parity-scale-codec",
+ "paste 1.0.14",
+ "rand_core 0.6.4",
+ "sp-std",
 ]
 
 [[package]]
