@@ -47,4 +47,13 @@ impl PublicKey {
         // h_G(-S * P_G + R + c * vk)
         (SAPLING_REDJUBJUB_COFACTOR * (-(S * SAPLING_BASE_POINT) + R + c * self.0)).is_identity()
     }
+
+    pub fn verify_simple_preaudit_deprecated<T>(
+        &self,
+        _ctx: &'static [u8],
+        _msg: &[u8],
+        _sig: &[u8],
+    ) -> T {
+        todo!()
+    }
 }

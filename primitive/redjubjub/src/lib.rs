@@ -27,6 +27,22 @@ pub use private_key::SecretKey;
 pub use public_key::PublicKey;
 pub use signature::Signature;
 
+/// An redjubjub keypar.
+#[derive(Debug)]
+pub struct Keypair {
+    /// The secret half of this keypair.
+    pub secret: SecretKey,
+    /// The public half of this keypair.
+    pub public: PublicKey,
+}
+
+impl Keypair {
+    pub fn new(secret: SecretKey) -> Self {
+        let public = secret.to_public_key();
+        Self { secret, public }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

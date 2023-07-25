@@ -46,8 +46,8 @@ sp-transaction-pool = { default-features = false, version = '3.0.0' }
 sp-version = { default-features = false, version = '3.0.0' }
 
 # local dependencies
-pallet-template = { default-features = false, path = '../node/pallets/template', version = '3.0.0' }
-red-jubjub = { default-features = false, path = '../primitive/redjubjub' }
+pallet-template = { default-features = false, path = '../../node/pallets/template', version = '3.0.0' }
+redjubjub = { default-features = false, path = '../redjubjub' }
 
 [features]
 default = ['std']

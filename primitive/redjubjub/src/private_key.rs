@@ -21,6 +21,10 @@ impl SigUtils<32> for SecretKey {
 }
 
 impl SecretKey {
+    pub fn new(key: Fp) -> Self {
+        Self(key)
+    }
+
     pub fn from_raw_bytes(bytes: &[u8]) -> Option<Self> {
         assert_eq!(bytes.len(), Self::LENGTH);
         let bytes: [u8; Self::LENGTH] = bytes[..].try_into().unwrap();

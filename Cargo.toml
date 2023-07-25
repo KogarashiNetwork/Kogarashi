@@ -54,7 +54,8 @@ members = [
     "pallets/confidential_transfer",
     "pallets/encrypted_balance",
     "pallets/plonk",
-    "zkruntime"
+    "zkruntime/redjubjub",
+    "zkruntime/runtime"
 ]
 
 [profile.release]
