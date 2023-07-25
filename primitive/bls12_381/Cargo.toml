@@ -3,7 +3,7 @@ authors = [
     'ashWhiteHat<phantomofrotten@gmail.com>',
     'KiriosK<KiriosK@yandex.ru>'
 ]
-name = "zero-bls12-381"
+name = "bls-12-381"
 description = 'lifted elgamal encryption implementation'
 version = "0.1.10"
 edition = "2021"
@@ -13,10 +13,10 @@ repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
 readme = 'README.md'
 
 [dependencies]
-serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 zkstd = { path = "../zkstd" }
+serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 rand_core = { version="0.6.4", default-features = false }
-parity-scale-codec = { version = "2", default-features = false, features = ["derive"] }
+parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
 
 [dev-dependencies]
 paste = "1.0.11"

@@ -1,6 +1,6 @@
+use bls_12_381::{Fr, G1Affine, G1Projective};
+use ec_pairing::{msm_variable_base, TatePairing};
 use rand_core::OsRng;
-use zero_bls12_381::{Fr, G1Affine, G1Projective};
-use zero_pairing::{msm_variable_base, TatePairing};
 use zkstd::behave::{Group, Projective};
 use zkstd::common::{Affine, CurveGroup};
 

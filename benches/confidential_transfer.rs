@@ -1,11 +1,11 @@
 use confidential_transfer::ConfidentialTransferCircuit;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use ec_pairing::TatePairing;
+use jub_jub::*;
+use lifted_elgamal::EncryptedNumber;
+use poly_commit::KeyPair;
 use rand::rngs::StdRng;
 use rand::SeedableRng;
-use zero_elgamal::EncryptedNumber;
-use zero_jubjub::*;
-use zero_kzg::KeyPair;
-use zero_pairing::TatePairing;
 use zero_plonk::prelude::*;
 use zkstd::common::{CurveGroup, Group};
 

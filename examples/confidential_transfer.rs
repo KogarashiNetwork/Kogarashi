@@ -2,8 +2,11 @@ use confidential_transfer::{
     ConfidentialTransfer as OtherConfidentialTransfer, ConfidentialTransferCircuit,
     ConfidentialTransferTransaction,
 };
+use ec_pairing::TatePairing;
 use frame_support::traits::StorageMapShim;
 use frame_support::{assert_ok, construct_runtime, parameter_types};
+use jub_jub::{Fp, JubjubAffine, JubjubExtended};
+use lifted_elgamal::EncryptedNumber;
 use pallet_encrypted_balance::{Account, AccountData};
 use pallet_plonk::FullcodecRng;
 use rand::Rng;
@@ -13,9 +16,6 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zero_elgamal::EncryptedNumber;
-use zero_jubjub::{Fp, JubjubAffine, JubjubExtended};
-use zero_pairing::TatePairing;
 use zero_plonk::prelude::Compiler;
 use zkstd::behave::Group;
 use zkstd::common::CurveGroup;

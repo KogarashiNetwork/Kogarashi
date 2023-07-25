@@ -1,9 +1,9 @@
 version: '3'
 services:
-  node:
-    build: node
-    container_name: node
+  kogarashi:
+    build: .
+    container_name: kogarashi
     tty: true
     stdin_open: true
     volumes:
-      - ./node:/app
+      - .:/app

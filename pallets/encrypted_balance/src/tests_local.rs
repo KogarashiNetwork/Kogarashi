@@ -1,13 +1,13 @@
 #![cfg(test)]
 
 use crate::{self as pallet_balances, decl_tests, Config};
+use ec_pairing::TatePairing;
 use frame_support::parameter_types;
 use frame_support::traits::StorageMapShim;
 use frame_system as system;
+use lifted_elgamal::EncryptedNumber;
 use sp_core::H256;
 use sp_runtime::{testing::Header, traits::IdentityLookup};
-use zero_elgamal::EncryptedNumber;
-use zero_pairing::TatePairing;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
