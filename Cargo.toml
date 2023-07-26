@@ -51,7 +51,6 @@ members = [
     "primitive/pairing",
     "primitive/plonk",
     "primitive/poly",
-    "primitive/r1cs",
     "primitive/redjubjub",
     "primitive/zkstd",
     "zkruntime/redjubjub",
