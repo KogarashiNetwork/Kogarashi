@@ -741,7 +741,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "sp-core",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "sp-std",
  "zero-plonk",
@@ -1261,7 +1261,7 @@ dependencies = [
  "parity-scale-codec",
  "paste",
  "sp-api",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "sp-runtime-interface",
  "sp-std",
@@ -1279,7 +1279,7 @@ dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-core",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "sp-std",
  "sp-tracing",
@@ -1316,7 +1316,7 @@ dependencies = [
  "sp-arithmetic",
  "sp-core",
  "sp-inherents",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "sp-staking",
  "sp-state-machine",
@@ -1372,7 +1372,7 @@ dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-core",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "sp-std",
  "sp-version",
@@ -2553,7 +2553,7 @@ dependencies = [
  "serde",
  "sp-arithmetic",
  "sp-core",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "sp-std",
  "zkstd",
@@ -2596,7 +2596,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "sp-core",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "zero-plonk",
  "zkstd",
@@ -2629,7 +2629,7 @@ dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-core",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "sp-session",
  "sp-staking",
@@ -2647,7 +2647,7 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "serde",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "sp-std",
 ]
@@ -2662,7 +2662,7 @@ dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-core",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "sp-std",
 ]
@@ -2680,7 +2680,7 @@ dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-inherents",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "sp-std",
  "sp-timestamp",
@@ -2698,7 +2698,7 @@ dependencies = [
  "serde",
  "smallvec",
  "sp-core",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "sp-std",
 ]
@@ -3921,7 +3921,7 @@ dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-core",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std",
 ]
 
@@ -4128,7 +4128,7 @@ dependencies = [
  "sp-api",
  "sp-application-crypto",
  "sp-core",
- "sp-keystore",
+ "sp-keystore 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "sp-std",
 ]
@@ -4149,6 +4149,29 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "3.0.0"
+dependencies = [
+ "futures",
+ "hash-db",
+ "log",
+ "parity-scale-codec",
+ "parking_lot 0.11.2",
+ "redjubjub",
+ "sp-core",
+ "sp-externalities",
+ "sp-keystore 0.9.0",
+ "sp-runtime-interface",
+ "sp-state-machine",
+ "sp-std",
+ "sp-tracing",
+ "sp-trie",
+ "sp-wasm-interface",
+ "tracing",
+ "tracing-core",
+]
+
+[[package]]
+name = "sp-io"
+version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33fd69f0a6e91bedc2fb1c5cc3689c212474b6c918274cb4cb14dbbe3c428c14"
 dependencies = [
@@ -4160,7 +4183,7 @@ dependencies = [
  "parking_lot 0.11.2",
  "sp-core",
  "sp-externalities",
- "sp-keystore",
+ "sp-keystore 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime-interface",
  "sp-state-machine",
  "sp-std",
@@ -4169,6 +4192,25 @@ dependencies = [
  "sp-wasm-interface",
  "tracing",
  "tracing-core",
+]
+
+[[package]]
+name = "sp-keystore"
+version = "0.9.0"
+dependencies = [
+ "async-trait",
+ "derive_more",
+ "futures",
+ "merlin 2.0.1",
+ "parity-scale-codec",
+ "parking_lot 0.11.2",
+ "rand 0.7.3",
+ "rand_chacha 0.2.2",
+ "redjubjub",
+ "schnorrkel",
+ "serde",
+ "sp-core",
+ "sp-externalities",
 ]
 
 [[package]]
@@ -4226,7 +4268,7 @@ dependencies = [
  "sp-application-crypto",
  "sp-arithmetic",
  "sp-core",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std",
 ]
 
@@ -5309,7 +5351,7 @@ dependencies = [
  "rand_core 0.6.4",
  "serde",
  "sp-core",
- "sp-io",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime",
  "zero-plonk",
  "zkstd",

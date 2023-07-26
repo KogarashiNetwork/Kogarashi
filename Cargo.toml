@@ -55,6 +55,8 @@ members = [
     "primitive/r1cs",
     "primitive/redjubjub",
     "primitive/zkstd",
+    "zkruntime/io",
+    "zkruntime/keystore",
     "zkruntime/redjubjub",
     "zkruntime/runtime"
 ]
