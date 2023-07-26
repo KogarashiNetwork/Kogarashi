@@ -11,11 +11,10 @@ rand_xorshift = { version = '0.2.0', default-features = false, package = 'fullco
 
 # parity
 codec = { default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0' }
-# SBP-M1 review: fetch `frame-support`, `frame-system`, `sp-std`, `sp-runtime` directly from GitHub for specified Substrate/Cumulus/Polkadot version.
-frame-system = { default-features = false, version = '3.0.0' }
-frame-support = { default-features = false, version = '3.0.0' }
-sp-std = { version = "3.0.0", default-features = false }
-sp-runtime = { version = "3.0.0", default-features = false }
+frame-system = { tag = 'v3.0.0', default-features = false, git = "https://github.com/paritytech/substrate" }
+frame-support = { tag = 'v3.0.0', default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-std = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-runtime = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
 
 # primitive
 zero-plonk = { path = "../../primitive/plonk", default-features = false }
@@ -32,11 +31,10 @@ pallet-encrypted-balance = { path = "../encrypted_balance", default-features = f
 [dev-dependencies]
 serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 rand = { version = "0.8", default-features = false }
-# SBP-M1 review: fetch `sp-core`, `sp-io`, `sp-runtime` directly from GitHub for specified Substrate/Cumulus/Polkadot version.
-sp-core = { version = '3.0.0', default-features = false }
-sp-io = { version = '3.0.0', default-features = false }
-sp-runtime = { version = '3.0.0', default-features = false }
 ark-std = { version = "0.3", features = ["print-trace"] }
+sp-core = { tag = 'v3.0.0', default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-io = { tag = 'v3.0.0', default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-runtime = { tag = 'v3.0.0', default-features = false, git = "https://github.com/paritytech/substrate" }
 
 [features]
 default = ["std"]
