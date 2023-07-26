@@ -63,6 +63,7 @@ impl Config for TestRuntime {
     type Event = Event;
 }
 
+// SBP-M1 review: poor testing, missing coverage for edge cases, errors, etc.
 #[cfg(test)]
 mod plonk_test {
     use super::*;

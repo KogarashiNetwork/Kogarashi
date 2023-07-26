@@ -52,6 +52,7 @@ impl Fq2 {
         // Algorithm 9, https://eprint.iacr.org/2012/685.pdf
         // with constant time modifications.
 
+        // SBP-M1 review: it should be rewritten to improve overall code quality
         if self.is_zero() {
             Some(Fq2::zero())
         } else {

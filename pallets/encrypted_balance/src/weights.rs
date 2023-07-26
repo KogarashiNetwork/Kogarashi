@@ -1,3 +1,6 @@
+// SBP-M1 review: missing proper benchmarking
+// Using Weights from origin Balances Pallet (just other pallet) may cause security issues.
+
 #![allow(unused_parens)]
 #![allow(unused_imports)]
 

@@ -1,4 +1,5 @@
 [package]
+# SBP-M1 review: set proper attributes
 authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
 edition = '2018'
 homepage = 'https://substrate.dev'
@@ -19,6 +20,7 @@ hex-literal = { optional = true, version = '0.3.1' }
 serde = { version = "1.0.119", optional = true, features = ["derive"] }
 
 # Substrate dependencies
+# SBP-M1 review: fetch Substrate/Cumulus/Polkadot dependencies directly from GitHub for specific version
 frame-benchmarking = { default-features = false, optional = true, version = '3.0.0' }
 frame-executive = { default-features = false, version = '3.0.0' }
 frame-support = { default-features = false, version = '3.0.0' }

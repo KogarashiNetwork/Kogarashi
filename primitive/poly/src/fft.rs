@@ -22,6 +22,8 @@ pub struct Fft<F: FftField> {
     pub elements: Vec<F>,
 }
 
+// SBP-M1 review: use safe math operations
+
 impl<F: FftField> Fft<F> {
     pub fn new(k: usize) -> Self {
         let n = 1 << k;

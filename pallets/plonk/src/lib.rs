@@ -121,6 +121,7 @@ pub mod pallet {
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         /// The function called when we setup the parameters
+        // SBP-M1 review: missing proper benchmarking
         #[pallet::weight(10_000)]
         pub fn trusted_setup(
             origin: OriginFor<T>,
@@ -133,10 +134,12 @@ pub mod pallet {
         }
 
         /// The function called when we verify the statement
+        // SBP-M1 review: missing proper benchmarking
         #[pallet::weight(10_000)]
         pub fn verify(
             origin: OriginFor<T>,
             proof: Proof<T::P>,
+            // SBP-M1 review: use BoundedVec instead of Vec
             public_inputs: Vec<<T::P as Pairing>::ScalarField>,
         ) -> DispatchResultWithPostInfo {
             let transactor = ensure_signed(origin)?;
@@ -159,6 +162,8 @@ impl<T: Config> Plonk<T::AccountId, T::P> for Pallet<T> {
 
     /// The API method to setup public parameters
     fn trusted_setup(
+        // SBP-M1 review: why do you pass unused parameter?
+        // Remove if redundant
         _who: &T::AccountId,
         val: u32,
         mut rng: FullcodecRng,
@@ -166,6 +171,7 @@ impl<T: Config> Plonk<T::AccountId, T::P> for Pallet<T> {
         match Self::keypair() {
             Some(_) => Err(DispatchErrorWithPostInfo {
                 post_info: PostDispatchInfo::from(()),
+                // SBP-M1 review: define proper error type
                 error: DispatchError::Other("already setup"),
             }),
             None => {
@@ -182,6 +188,8 @@ impl<T: Config> Plonk<T::AccountId, T::P> for Pallet<T> {
 
     /// The API method to verify the proof validity
     fn verify(
+        // SBP-M1 review: why do you pass unused parameter?
+        // Remove if redundant
         _who: &T::AccountId,
         proof: Proof<T::P>,
         public_inputs: Vec<<T::P as Pairing>::ScalarField>,
@@ -190,17 +198,20 @@ impl<T: Config> Plonk<T::AccountId, T::P> for Pallet<T> {
             Some(mut pp) => {
                 let label = b"verify";
                 let (_, verifier) = Compiler::compile::<T::CustomCircuit, T::P>(&mut pp, label)
+                    // SBP-M1 review: use proper error handling in extrinsics' code instead of `expect`/`unwrap`
                     .expect("failed to compile circuit");
                 match verifier.verify(&proof, &public_inputs) {
                     Ok(_) => Ok(().into()),
                     Err(_) => Err(DispatchErrorWithPostInfo {
                         post_info: PostDispatchInfo::from(()),
+                        // SBP-M1 review: define proper error type
                         error: DispatchError::Other("invalid proof"),
                     }),
                 }
             }
             None => Err(DispatchErrorWithPostInfo {
                 post_info: PostDispatchInfo::from(()),
+                // SBP-M1 review: define proper error type
                 error: DispatchError::Other("setup not yet"),
             }),
         }

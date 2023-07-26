@@ -41,6 +41,8 @@ impl Default for EncryptedNumber {
     }
 }
 
+// SBP-M1 review: use safe math operations like `checked_add`, `checked_mul`, etc.
+
 impl EncryptedNumber {
     /// Init encrypted number
     pub fn new(s: JubjubAffine, t: JubjubAffine) -> Self {

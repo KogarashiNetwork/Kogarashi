@@ -69,6 +69,7 @@ impl SigUtils<32> for Fp {
     }
 
     fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+        // SBP-M1 review: apply proper error handling instead of `unwrap`
         let l0 = u64::from_le_bytes(bytes[0..8].try_into().unwrap());
         let l1 = u64::from_le_bytes(bytes[8..16].try_into().unwrap());
         let l2 = u64::from_le_bytes(bytes[16..24].try_into().unwrap());
