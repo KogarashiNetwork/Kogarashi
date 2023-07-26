@@ -21,9 +21,8 @@ substrate-build-script-utils = '3.0.0'
 [dependencies]
 jsonrpc-core = '15.1.0'
 structopt = '0.3.8'
-
 # Substrate dependencies
-frame-benchmarking-cli = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+frame-benchmarking-cli = { tag = 'v3.1.0', git = "https://github.com/paritytech/substrate" }
 pallet-transaction-payment-rpc = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 sc-client-api = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 sc-keystore = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
@@ -46,11 +45,16 @@ sc-consensus = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate"
 sc-consensus-aura = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 sc-finality-grandpa = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 sc-basic-authorship = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-executor = { features = ['wasmtime'], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-service = { features = ['wasmtime'], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-cli = { features = ['wasmtime'], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-frame-benchmarking = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-
+sc-executor = { features = [
+    'wasmtime'
+], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-service = { features = [
+    'wasmtime'
+], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-cli = { features = [
+    'wasmtime'
+], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+frame-benchmarking = { tag = 'v3.1.0', git = "https://github.com/paritytech/substrate" }
 # local dependencies
 zkruntime = { path = '../../zkruntime/runtime', version = '3.0.0' }
 

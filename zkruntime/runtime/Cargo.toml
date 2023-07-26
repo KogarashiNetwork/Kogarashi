@@ -19,7 +19,7 @@ hex-literal = { optional = true, version = '0.3.1' }
 serde = { version = "1.0.119", optional = true, features = ["derive"] }
 
 # Substrate dependencies
-frame-benchmarking = { default-features = false, optional = true, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+frame-benchmarking = { default-features = false, optional = true, tag = 'v3.1.0', git = "https://github.com/paritytech/substrate" }
 frame-executive = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 frame-support = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 frame-system = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }

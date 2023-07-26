@@ -16,7 +16,9 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 serde = { version = "1.0.102", default-features = false, features = ["derive"] }
-codec = { version = "2.0.0", default-features = false, package = "parity-scale-codec", features = ["derive"] }
+codec = { version = "2.0.0", default-features = false, package = "parity-scale-codec", features = [
+    "derive"
+] }
 lifted-elgamal = { path = '../../primitive/elgamal', default-features = false }
 jub-jub = { path = '../../primitive/jubjub', default-features = false }
 ec-pairing = { path = '../../primitive/pairing', default-features = false }
@@ -35,9 +37,4 @@ pallet-transaction-payment = { tag = "v3.0.0", default-features = false, git = "
 
 [features]
 default = ["std"]
-std = [
-    'codec/std',
-    "frame-support/std",
-    # SBP-M1 review: think about using formatter :)
-	'frame-system/std',
-]
+std = ['codec/std', "frame-support/std", 'frame-system/std']
