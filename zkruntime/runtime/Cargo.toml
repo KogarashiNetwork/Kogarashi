@@ -19,7 +19,7 @@ hex-literal = { optional = true, version = '0.3.1' }
 serde = { version = "1.0.119", optional = true, features = ["derive"] }
 
 # Substrate dependencies
-frame-benchmarking = { default-features = false, optional = true, tag = 'v3.1.0', git = "https://github.com/paritytech/substrate" }
+frame-benchmarking = { default-features = false, optional = true, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 frame-executive = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 frame-support = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 frame-system = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
@@ -46,7 +46,6 @@ sp-transaction-pool = { default-features = false, tag = 'v3.0.0', git = "https:/
 sp-version = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 
 # local dependencies
-pallet-template = { default-features = false, path = '../template', version = '3.0.0' }
 redjubjub = { default-features = false, path = '../redjubjub' }
 
 [features]
@@ -58,7 +57,6 @@ runtime-benchmarks = [
     'frame-system/runtime-benchmarks',
     'hex-literal',
     'pallet-balances/runtime-benchmarks',
-    'pallet-template/runtime-benchmarks',
     'pallet-timestamp/runtime-benchmarks',
     'sp-runtime/runtime-benchmarks',
 ]
@@ -73,7 +71,6 @@ std = [
     'pallet-grandpa/std',
     'pallet-randomness-collective-flip/std',
     'pallet-sudo/std',
-    'pallet-template/std',
     'pallet-timestamp/std',
     'pallet-transaction-payment-rpc-runtime-api/std',
     'pallet-transaction-payment/std',
