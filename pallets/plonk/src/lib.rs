@@ -198,7 +198,7 @@ impl<T: Config> Plonk<T::AccountId, T::P> for Pallet<T> {
             Some(mut pp) => {
                 let label = b"verify";
                 let (_, verifier) = Compiler::compile::<T::CustomCircuit, T::P>(&mut pp, label)
-                    // SBP-M1 review: use proper error handling in extrinsics' code instead of `expect`/`unwrap` 
+                    // SBP-M1 review: use proper error handling in extrinsics' code instead of `expect`/`unwrap`
                     .expect("failed to compile circuit");
                 match verifier.verify(&proof, &public_inputs) {
                     Ok(_) => Ok(().into()),

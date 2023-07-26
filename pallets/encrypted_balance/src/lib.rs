@@ -284,7 +284,7 @@ pub mod pallet {
             who: <T::Lookup as StaticLookup>::Source,
             new_balance: T::EncryptedBalance,
         ) -> DispatchResultWithPostInfo {
-            // SBP-M1 review: Think about using some onchain decentralized entity 
+            // SBP-M1 review: Think about using some onchain decentralized entity
             // instead of Sudo Pallet.
             ensure_root(origin)?;
             let who = T::Lookup::lookup(who)?;
@@ -310,7 +310,7 @@ pub mod pallet {
             sender_amount: T::EncryptedBalance,
             recipient_amount: T::EncryptedBalance,
         ) -> DispatchResultWithPostInfo {
-            // SBP-M1 review: Think about using some onchain decentralized entity 
+            // SBP-M1 review: Think about using some onchain decentralized entity
             // instead of Sudo Pallet.
             ensure_root(origin)?;
             let source = T::Lookup::lookup(source)?;
@@ -478,7 +478,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
             let is_new = maybe_account.is_none();
             let mut account = maybe_account.take().unwrap_or_default();
             f(&mut account, is_new).map(move |result| {
-                // SBP-M1 review: just a note, I prefer `match` instead of `if` `else` 
+                // SBP-M1 review: just a note, I prefer `match` instead of `if` `else`
                 let maybe_endowed = if is_new { Some(account.balance) } else { None };
                 *maybe_account = Some(account);
                 (maybe_endowed, result)
