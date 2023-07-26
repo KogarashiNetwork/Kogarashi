@@ -1,4 +1,6 @@
-use crate::{Public, Seed, Signature, SIGNING_CTX};
+#[cfg(feature = "full_crypto")]
+use crate::Seed;
+use crate::{Public, Signature, SIGNING_CTX};
 
 use codec::Encode;
 use sp_core::crypto::CryptoType;

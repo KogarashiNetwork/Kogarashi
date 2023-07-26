@@ -7,6 +7,7 @@ mod signature;
 use codec::{Decode, Encode};
 use sp_core::crypto::CryptoTypeId;
 
+#[cfg(feature = "full_crypto")]
 pub use pair::Pair;
 pub use public::Public;
 pub use signature::Signature;

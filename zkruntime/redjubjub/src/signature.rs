@@ -1,3 +1,4 @@
+#[cfg(feature = "full_crypto")]
 use crate::Pair;
 
 use codec::{Decode, Encode};

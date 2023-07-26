@@ -1,6 +1,7 @@
 use codec::{Decode, Encode};
 use redjubjub::{Public, Signature};
 use sp_core::RuntimeDebug;
+use sp_runtime::traits::{Lazy, Verify};
 use sp_std::convert::TryFrom;
 
 #[cfg(feature = "std")]

@@ -1,4 +1,6 @@
-use crate::{Pair, CRYPTO_ID};
+#[cfg(feature = "full_crypto")]
+use crate::Pair;
+use crate::CRYPTO_ID;
 
 use codec::{Decode, Encode};
 use sp_core::crypto::{
