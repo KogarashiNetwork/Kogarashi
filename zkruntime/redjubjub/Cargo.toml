@@ -28,6 +28,11 @@ zkstd = { default-features = false, path = "../../primitive/zkstd" }
 bls-12-381 = { default-features = false, path = "../../primitive/bls12_381" }
 red-jubjub = { default-features = false, path = '../../primitive/redjubjub' }
 
+[dev-dependencies]
+jub-jub = { default-features = false, path = '../../primitive/jubjub' }
+serde_json = { version = "1.0" }
+hex-literal = { version = "0.3.1" }
+
 [features]
 default = ['std']
 full_crypto = [

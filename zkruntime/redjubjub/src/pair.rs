@@ -202,6 +202,7 @@ fn derive_hard_junction(secret_seed: &Seed, cc: &[u8; 32]) -> Seed {
 
 /// An error when deriving a key.
 #[cfg(feature = "full_crypto")]
+#[derive(Debug)]
 pub enum DeriveError {
     /// A soft key was found in the path (and is unsupported).
     SoftKeyInPath,
