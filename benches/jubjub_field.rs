@@ -1,8 +1,8 @@
 use criterion::black_box;
 use criterion::{criterion_group, criterion_main, Criterion};
+use jub_jub::Fp;
 use rand::rngs::OsRng;
 use rand::Rng;
-use zero_jubjub::Fp;
 use zkstd::common::{FftField, Group, PrimeField};
 
 fn bench_fp(c: &mut Criterion) {

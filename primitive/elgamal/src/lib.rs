@@ -13,16 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![no_std]
 #![doc = include_str!("../README.md")]
-#![cfg_attr(not(feature = "std"), no_std)]
 #![deny(missing_docs)]
 
 use core::ops::{Add, Sub};
+use ec_pairing::TatePairing;
+use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
-use zero_jubjub::{Fp, JubjubAffine, JubjubExtended};
-use zero_pairing::TatePairing;
 use zkstd::common::{CurveGroup, Pairing};
 
 /// Number encrypted by ElGamal encryption
@@ -146,9 +146,9 @@ impl ConfidentialTransferPublicInputs<TatePairing> for EncryptedNumber {
 
 #[cfg(test)]
 mod tests {
+    use jub_jub::Fp;
     use rand::{thread_rng, Rng};
     use rand_core::OsRng;
-    use zero_jubjub::Fp;
     use zkstd::behave::*;
 
     use crate::EncryptedNumber;

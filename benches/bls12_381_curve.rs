@@ -1,8 +1,8 @@
+use bls_12_381::{Fr, G1Projective, G2Projective};
+use bls_12_381::{G1Affine, G2Affine};
 use criterion::black_box;
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand::rngs::OsRng;
-use zero_bls12_381::{Fr, G1Projective, G2Projective};
-use zero_bls12_381::{G1Affine, G2Affine};
 use zkstd::common::{Curve, CurveGroup, Group};
 
 fn bench_g1_affine(c: &mut Criterion) {

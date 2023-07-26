@@ -120,9 +120,9 @@ mod tests {
 The following `G1Affine` and `G1Projective` supports point arithmetic.
 
 ```rust
-use zero_jubjub::Fp;
+use jub_jub::Fp;
 use serde::{Deserialize, Serialize};
-use zero_bls12_381::Fr;
+use bls_12_381::Fr;
 use zkstd::arithmetic::edwards::*;
 use zkstd::common::*;
 use zkstd::dress::curve::edwards::*;

@@ -16,8 +16,8 @@ First of all, you need to define the `confidential_transfer`.
 confidential_transfer = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
 pallet_encrypted_balance = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
 pallet_plonk = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
-zero_elgamal = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
-zero_bls12_381 = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
+lifted_elgamal = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
+bls_12_381 = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
 rand_core = {version="0.6", default-features = false }
 ```
 

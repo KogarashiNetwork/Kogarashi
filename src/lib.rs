@@ -7,15 +7,15 @@
 // #[allow(unused_imports)]
 // use pallet_plonk::*;
 #[allow(unused_imports)]
-use zero_bls12_381::*;
+use bls_12_381::*;
 #[allow(unused_imports)]
-use zero_elgamal::*;
+use ec_pairing::*;
 #[allow(unused_imports)]
-use zero_jubjub::*;
+use jub_jub::*;
 #[allow(unused_imports)]
-use zero_kzg::*;
+use lifted_elgamal::*;
 #[allow(unused_imports)]
-use zero_pairing::*;
+use poly_commit::*;
 #[allow(unused_imports)]
 use zero_plonk::*;
 #[allow(unused_imports)]

@@ -10,6 +10,7 @@ use core::marker::PhantomData;
 use hashbrown::HashMap;
 
 use zkstd::behave::*;
+use zkstd::common::Vec;
 
 /// Permutation provides the necessary state information and functions
 /// to create the permutation polynomial. In the literature, Z(X) is the
