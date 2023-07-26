@@ -133,11 +133,9 @@ impl Fq {
             0x680447a8e5ff9a6,
         ]);
 
-        // SBP-M1 review: I would use `match` clause
-        if sqrt.square() == *self {
-            Some(sqrt)
-        } else {
-            None
+        match sqrt.square() == *self {
+            true => Some(sqrt),
+            false => None,
         }
     }
 

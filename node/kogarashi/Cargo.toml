@@ -22,7 +22,7 @@ substrate-build-script-utils = '3.0.0'
 jsonrpc-core = '15.1.0'
 structopt = '0.3.8'
 # Substrate dependencies
-frame-benchmarking-cli = { tag = 'v3.1.0', git = "https://github.com/paritytech/substrate" }
+frame-benchmarking-cli = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 pallet-transaction-payment-rpc = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 sc-client-api = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 sc-keystore = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
@@ -54,7 +54,7 @@ sc-service = { features = [
 sc-cli = { features = [
     'wasmtime'
 ], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-frame-benchmarking = { tag = 'v3.1.0', git = "https://github.com/paritytech/substrate" }
+frame-benchmarking = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 # local dependencies
 zkruntime = { path = '../../zkruntime/runtime', version = '3.0.0' }
 
