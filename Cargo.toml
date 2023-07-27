@@ -16,7 +16,7 @@ readme = 'README.md'
 # primitive
 bls-12-381 = { path = "./primitive/bls12_381", default-features = false }
 zkstd = { path = "./primitive/zkstd", default-features = false }
-lifted-elgamal = { path = "./primitive/elgamal", default-features = false }
+she-elgamal = { path = "./primitive/elgamal", default-features = false }
 jub-jub = { path = "./primitive/jubjub", default-features = false }
 poly-commit = { path = "./primitive/poly", default-features = false }
 ec-pairing = { path = "./primitive/pairing", default-features = false }

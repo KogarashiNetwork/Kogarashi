@@ -6,11 +6,11 @@ use ec_pairing::TatePairing;
 use frame_support::traits::StorageMapShim;
 use frame_support::{assert_ok, construct_runtime, parameter_types};
 use jub_jub::{Fp, JubjubAffine, JubjubExtended};
-use lifted_elgamal::EncryptedNumber;
 use pallet_encrypted_balance::{Account, AccountData};
 use pallet_plonk::FullcodecRng;
 use rand::Rng;
 use rand_core::{OsRng, SeedableRng};
+use she_elgamal::EncryptedNumber;
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,

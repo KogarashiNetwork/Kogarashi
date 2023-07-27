@@ -1,8 +1,8 @@
 use crate::circuit::ConfidentialTransferTransaction;
 use frame_support::pallet_prelude::DispatchResultWithPostInfo;
-use lifted_elgamal::ConfidentialTransferPublicInputs;
 use pallet_plonk::FullcodecRng;
 use pallet_plonk::Proof;
+use she_elgamal::ConfidentialTransferPublicInputs;
 use zkstd::common::Pairing;
 
 /// Confidential transfer by coupling encrypted currency and plonk

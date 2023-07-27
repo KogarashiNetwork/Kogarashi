@@ -1,6 +1,6 @@
 use ec_pairing::TatePairing;
 use jub_jub::{Fp as JubJubScalar, JubjubAffine};
-use lifted_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
+use she_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
 use zero_plonk::prelude::*;
 use zkstd::common::{Curve, CurveGroup, Decode, Encode, Group, Pairing};
 

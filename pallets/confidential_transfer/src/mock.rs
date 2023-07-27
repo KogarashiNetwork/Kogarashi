@@ -4,8 +4,8 @@ use crate::{
     pallet::Config,
 };
 use jub_jub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
-use lifted_elgamal::EncryptedNumber;
 use pallet_encrypted_balance::{Account, AccountData};
+use she_elgamal::EncryptedNumber;
 use zkstd::common::CurveGroup;
 
 use ec_pairing::TatePairing;

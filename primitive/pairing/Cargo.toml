@@ -4,7 +4,7 @@ authors = [
     'KiriosK<KiriosK@yandex.ru>'
 ]
 name = "ec-pairing"
-description = 'lifted elgamal encryption implementation'
+description = 'Tate pairing implementation'
 version = "0.1.10"
 edition = "2021"
 license = "Apache-2.0"

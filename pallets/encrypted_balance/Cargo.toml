@@ -19,7 +19,7 @@ serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 codec = { version = "2.0.0", default-features = false, package = "parity-scale-codec", features = [
     "derive"
 ] }
-lifted-elgamal = { path = '../../primitive/elgamal', default-features = false }
+she-elgamal = { path = '../../primitive/elgamal', default-features = false }
 jub-jub = { path = '../../primitive/jubjub', default-features = false }
 ec-pairing = { path = '../../primitive/pairing', default-features = false }
 zkstd = { path = "../../primitive/zkstd", default-features = false }

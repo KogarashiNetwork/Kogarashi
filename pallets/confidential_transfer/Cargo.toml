@@ -22,7 +22,7 @@ ec-pairing = { path = "../../primitive/pairing", default-features = false }
 jub-jub = { path = "../../primitive/jubjub", default-features = false }
 zkstd = { path = "../../primitive/zkstd", default-features = false }
 bls-12-381 = { path = "../../primitive/bls12_381", default-features = false }
-lifted-elgamal = { path = "../../primitive/elgamal", default-features = false }
+she-elgamal = { path = "../../primitive/elgamal", default-features = false }
 # pallet
 pallet-plonk = { path = "../plonk", default-features = false }
 pallet-encrypted-balance = { path = "../encrypted_balance", default-features = false }
