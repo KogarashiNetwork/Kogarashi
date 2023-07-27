@@ -19,31 +19,31 @@ hex-literal = { optional = true, version = '0.3.1' }
 serde = { version = "1.0.119", optional = true, features = ["derive"] }
 
 # Substrate dependencies
-frame-benchmarking = { default-features = false, optional = true, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-frame-executive = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-frame-support = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-frame-system = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-frame-system-benchmarking = { default-features = false, optional = true, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-frame-system-rpc-runtime-api = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-pallet-aura = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-pallet-balances = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-pallet-grandpa = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-pallet-randomness-collective-flip = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-pallet-sudo = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-pallet-timestamp = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-pallet-transaction-payment = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-pallet-transaction-payment-rpc-runtime-api = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-api = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-block-builder = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-consensus-aura = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-core = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-inherents = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-offchain = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-runtime = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-session = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-std = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-transaction-pool = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-version = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+frame-benchmarking = { default-features = false, optional = true, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-executive = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-support = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-system = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-system-benchmarking = { default-features = false, optional = true, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-system-rpc-runtime-api = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+pallet-aura = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+pallet-balances = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+pallet-grandpa = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+pallet-randomness-collective-flip = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+pallet-sudo = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+pallet-timestamp = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+pallet-transaction-payment = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+pallet-transaction-payment-rpc-runtime-api = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-api = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-block-builder = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-consensus-aura = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-core = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-inherents = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-offchain = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-runtime = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-session = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-std = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-transaction-pool = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-version = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
 
 # local dependencies
 redjubjub = { default-features = false, path = '../redjubjub' }

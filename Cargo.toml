@@ -34,11 +34,11 @@ serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 codec = { version = '2.0.0', default-features = false, features = [
     'derive'
 ], package = 'parity-scale-codec' }
-sp-io = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-core = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-runtime = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-frame-system = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-frame-support = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sp-io = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-core = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-runtime = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-system = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-support = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
 
 [workspace]
 members = [

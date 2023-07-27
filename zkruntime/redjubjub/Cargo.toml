@@ -5,10 +5,10 @@ edition = "2021"
 
 [dependencies]
 codec = { default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0' }
-sp-runtime = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
-sp-runtime-interface = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
-sp-std = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
-sp-core = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-runtime = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-runtime-interface = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-std = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-core = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 
 strum = { version = "0.20.0", features = ["derive"] }
 blake2b_simd = { version = "1", default-features = false }

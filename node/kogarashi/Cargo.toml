@@ -22,39 +22,39 @@ substrate-build-script-utils = '3.0.0'
 jsonrpc-core = '15.1.0'
 structopt = '0.3.8'
 # Substrate dependencies
-frame-benchmarking-cli = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-pallet-transaction-payment-rpc = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-client-api = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-keystore = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-rpc = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-telemetry = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-transaction-pool = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-api = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-block-builder = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-blockchain = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-core = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-finality-grandpa = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-inherents = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-runtime = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-transaction-pool = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-substrate-frame-rpc-system = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-rpc-api = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-consensus = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-consensus-aura = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-consensus = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-consensus-aura = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-finality-grandpa = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sc-basic-authorship = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+frame-benchmarking-cli = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+pallet-transaction-payment-rpc = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sc-client-api = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sc-keystore = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sc-rpc = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sc-telemetry = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sc-transaction-pool = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-api = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-block-builder = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-blockchain = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-core = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-finality-grandpa = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-inherents = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-runtime = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-transaction-pool = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+substrate-frame-rpc-system = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sc-rpc-api = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-consensus = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-consensus-aura = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sc-consensus = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sc-consensus-aura = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sc-finality-grandpa = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sc-basic-authorship = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
 sc-executor = { features = [
     'wasmtime'
-], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+], branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
 sc-service = { features = [
     'wasmtime'
-], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+], branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
 sc-cli = { features = [
     'wasmtime'
-], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-frame-benchmarking = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+], branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-benchmarking = { branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
 # local dependencies
 zkruntime = { path = '../../zkruntime/runtime', version = '3.0.0' }
 
