@@ -16,30 +16,25 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 serde = { version = "1.0.102", default-features = false, features = ["derive"] }
-# SBP-M1 review: fetch `sp-std`, `sp-runtime`, `sp-arithmetic`, `frame-support`, `frame-system` directly from GitHub for specified Substrate/Cumulus/Polkadot version.
-codec = { version = "2.0.0", default-features = false, package = "parity-scale-codec", features = ["derive"] }
-sp-std = { version = "3.0.0", default-features = false }
-sp-runtime = { version = "3.0.0", default-features = false }
-sp-arithmetic = { version = "3.0.0", default-features = false }
-frame-support = { version = "3.0.0", default-features = false }
-frame-system = { version = "3.0.0", default-features = false }
+codec = { version = "2.0.0", default-features = false, package = "parity-scale-codec", features = [
+    "derive"
+] }
 lifted-elgamal = { path = '../../primitive/elgamal', default-features = false }
 jub-jub = { path = '../../primitive/jubjub', default-features = false }
 ec-pairing = { path = '../../primitive/pairing', default-features = false }
 zkstd = { path = "../../primitive/zkstd", default-features = false }
+sp-std = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-runtime = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-arithmetic = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+frame-support = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+frame-system = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
 
 [dev-dependencies]
-# SBP-M1 review: fetch `sp-io`, `sp-core`, `pallet-transaction-payment` directly from GitHub for specified Substrate/Cumulus/Polkadot version.
-sp-io = { path = "../../zkruntime/io", default-features = false }
-sp-core = { version = "3.0.0", default-features = false }
-pallet-transaction-payment = { version = "3.0.0", default-features = false }
 proptest = "1"
+sp-io = { path = "../../zkruntime/io", default-features = false }
+sp-core = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+pallet-transaction-payment = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
 
 [features]
 default = ["std"]
-std = [
-    'codec/std',
-    "frame-support/std",
-    # SBP-M1 review: think about using formatter :)
-	'frame-system/std',
-]
+std = ['codec/std', "frame-support/std", 'frame-system/std']

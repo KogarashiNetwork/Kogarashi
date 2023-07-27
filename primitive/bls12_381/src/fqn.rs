@@ -52,51 +52,44 @@ impl Fq2 {
         // Algorithm 9, https://eprint.iacr.org/2012/685.pdf
         // with constant time modifications.
 
-        // SBP-M1 review: it should be rewritten to improve overall code quality
         if self.is_zero() {
-            Some(Fq2::zero())
-        } else {
-            // a1 = self^((p - 3) / 4)
-            let a1 = self.pow_vartime(&[
-                0xee7fbfffffffeaaa,
-                0x7aaffffac54ffff,
-                0xd9cc34a83dac3d89,
-                0xd91dd2e13ce144af,
-                0x92c6e9ed90d2eb35,
-                0x680447a8e5ff9a6,
-            ]);
+            return Some(Fq2::zero());
+        }
 
-            // alpha = a1^2 * self = self^((p - 3) / 2 + 1) = self^((p - 1) / 2)
-            let alpha = a1.square() * *self;
+        // a1 = self^((p - 3) / 4)
+        let a1 = self.pow_vartime(&[
+            0xee7fbfffffffeaaa,
+            0x7aaffffac54ffff,
+            0xd9cc34a83dac3d89,
+            0xd91dd2e13ce144af,
+            0x92c6e9ed90d2eb35,
+            0x680447a8e5ff9a6,
+        ]);
+        // alpha = a1^2 * self = self^((p - 3) / 2 + 1) = self^((p - 1) / 2)
+        let alpha = a1.square() * *self;
+        // x0 = self^((p + 1) / 4)
+        let x0 = a1 * *self;
 
-            // x0 = self^((p + 1) / 4)
-            let x0 = a1 * *self;
-
-            // In the event that alpha = -1, the element is order p - 1 and so
-            // we're just trying to get the square of an element of the subfield
-            // Fp. This is given by x0 * u, since u = sqrt(-1). Since the element
-            // x0 = a + bu has b = 0, the solution is therefore au.
-            (if alpha == Fq2::one().neg() {
-                Some(Fq2([-x0.0[1], x0.0[0]]))
-            } else {
-                Some(
-                    (alpha + Fq2::one()).pow_vartime(&[
-                        0xdcff7fffffffd555,
-                        0xf55ffff58a9ffff,
-                        0xb39869507b587b12,
-                        0xb23ba5c279c2895f,
-                        0x258dd3db21a5d66b,
-                        0xd0088f51cbff34d,
-                    ]) * x0,
-                )
-            })
-            .and_then(|sqrt| {
-                if sqrt.square() == *self {
-                    Some(sqrt)
-                } else {
-                    None
-                }
-            })
+        // In the event that alpha = -1, the element is order p - 1 and so
+        // we're just trying to get the square of an element of the subfield
+        // Fp. This is given by x0 * u, since u = sqrt(-1). Since the element
+        // x0 = a + bu has b = 0, the solution is therefore au.
+        let sqrt = match alpha == Fq2::one().neg() {
+            true => Fq2([-x0.0[1], x0.0[0]]),
+            false => {
+                (alpha + Fq2::one()).pow_vartime(&[
+                    0xdcff7fffffffd555,
+                    0xf55ffff58a9ffff,
+                    0xb39869507b587b12,
+                    0xb23ba5c279c2895f,
+                    0x258dd3db21a5d66b,
+                    0xd0088f51cbff34d,
+                ]) * x0
+            }
+        };
+        match sqrt.square() == *self {
+            true => Some(sqrt),
+            false => None,
         }
     }
 
