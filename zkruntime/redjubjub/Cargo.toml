@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-sp-std = { version = '3.0.0', default-features = false }
-sp-core = { version = "3.0.0", default-features = false }
 codec = { default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0' }
-sp-runtime = { version = "3.0.0", default-features = false }
-sp-runtime-interface = { version = "3.0.0", default-features = false }
+sp-runtime = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-runtime-interface = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-std = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-core = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
 
 strum = { version = "0.20.0", features = ["derive"] }
 blake2b_simd = { version = "1", default-features = false }

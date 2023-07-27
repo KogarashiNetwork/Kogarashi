@@ -1,8 +1,7 @@
 [package]
-# SBP-M1 review: set proper attributes.
-authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
+authors = ['Kogarashi Dev Team <https://github.com/KogarashiNetwork/Kogarashi>']
 build = 'build.rs'
-description = 'A fresh FRAME-based Substrate node, ready for hacking.'
+description = 'A Substrate-based Kogarashi node.'
 edition = '2018'
 homepage = 'https://substrate.dev'
 license = 'Unlicense'
@@ -22,37 +21,40 @@ substrate-build-script-utils = '3.0.0'
 [dependencies]
 jsonrpc-core = '15.1.0'
 structopt = '0.3.8'
-
 # Substrate dependencies
-# SBP-M1 review: fetch Substrate/Cumulus/Polkadot dependencies directly from GitHub for specific version
-frame-benchmarking = '3.1.0'
-frame-benchmarking-cli = '3.0.0'
-pallet-transaction-payment-rpc = '3.0.0'
-sc-basic-authorship = '0.9.0'
-sc-cli = { features = ['wasmtime'], version = '0.9.0' }
-sc-client-api = '3.0.0'
-sc-consensus = '0.9.0'
-sc-consensus-aura = '0.9.0'
-sc-executor = { features = ['wasmtime'], version = '0.9.0' }
-sc-finality-grandpa = '0.9.0'
-sc-keystore = '3.0.0'
-sc-rpc = '3.0.0'
-sc-rpc-api = '0.9.0'
-sc-service = { features = ['wasmtime'], version = '0.9.0' }
-sc-telemetry = '3.0.0'
-sc-transaction-pool = '3.0.0'
-sp-api = '3.0.0'
-sp-block-builder = '3.0.0'
-sp-blockchain = '3.0.0'
-sp-consensus = '0.9.0'
-sp-consensus-aura = '0.9.0'
-sp-core = '3.0.0'
-sp-finality-grandpa = '3.0.0'
-sp-inherents = '3.0.0'
-sp-runtime = '3.0.0'
-sp-transaction-pool = '3.0.0'
-substrate-frame-rpc-system = '3.0.0'
-
+frame-benchmarking-cli = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+pallet-transaction-payment-rpc = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-client-api = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-keystore = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-rpc = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-telemetry = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-transaction-pool = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sp-api = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sp-block-builder = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sp-blockchain = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sp-core = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sp-finality-grandpa = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sp-inherents = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sp-runtime = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sp-transaction-pool = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+substrate-frame-rpc-system = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-rpc-api = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sp-consensus = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sp-consensus-aura = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-consensus = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-consensus-aura = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-finality-grandpa = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-basic-authorship = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-executor = { features = [
+    'wasmtime'
+], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-service = { features = [
+    'wasmtime'
+], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sc-cli = { features = [
+    'wasmtime'
+], tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+frame-benchmarking = { tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
 # local dependencies
 zkruntime = { path = '../../zkruntime/runtime', version = '3.0.0' }
 
