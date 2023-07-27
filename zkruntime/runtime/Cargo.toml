@@ -50,6 +50,7 @@ sp-version = { default-features = false, version = '3.0.0' }
 # local dependencies
 pallet-template = { default-features = false, path = '../template', version = '3.0.0' }
 redjubjub = { default-features = false, path = '../redjubjub' }
+sp-io = { default-features = false, path = '../io' }
 
 [features]
 default = ['std']
@@ -89,6 +90,7 @@ std = [
     'sp-runtime/std',
     'sp-session/std',
     'sp-std/std',
+    'sp-io/std',
     'sp-transaction-pool/std',
     'sp-version/std',
     "redjubjub/std",

@@ -30,7 +30,7 @@ zkstd = { path = "../../primitive/zkstd", default-features = false }
 
 [dev-dependencies]
 # SBP-M1 review: fetch `sp-io`, `sp-core`, `pallet-transaction-payment` directly from GitHub for specified Substrate/Cumulus/Polkadot version.
-sp-io = { version = "3.0.0", default-features = false }
+sp-io = { path = "../../zkruntime/io", default-features = false }
 sp-core = { version = "3.0.0", default-features = false }
 pallet-transaction-payment = { version = "3.0.0", default-features = false }
 proptest = "1"

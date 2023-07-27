@@ -34,7 +34,7 @@ serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 rand = { version = "0.8", default-features = false }
 # SBP-M1 review: fetch `sp-core`, `sp-io`, `sp-runtime` directly from GitHub for specified Substrate/Cumulus/Polkadot version.
 sp-core = { version = '3.0.0', default-features = false }
-sp-io = { version = '3.0.0', default-features = false }
+sp-io = { path = "../../zkruntime/io", version = '3.0.0' }
 sp-runtime = { version = '3.0.0', default-features = false }
 ark-std = { version = "0.3", features = ["print-trace"] }
 

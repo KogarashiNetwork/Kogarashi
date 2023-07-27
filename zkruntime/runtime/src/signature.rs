@@ -37,6 +37,14 @@ impl Default for MultiSignature {
     }
 }
 
+impl Verify for redjubjub::Signature {
+    type Signer = redjubjub::Public;
+
+    fn verify<L: Lazy<[u8]>>(&self, mut msg: L, signer: &sp_core::ed25519::Public) -> bool {
+        sp_io::crypto::redjubjub_verify(self, msg.get(), signer)
+    }
+}
+
 /// Public key for any known crypto algorithm.
 #[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Encode, Decode, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
