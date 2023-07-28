@@ -729,6 +729,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#errore0433-failed-to-resolve-use-of-undeclared-crate-or-module-imp" class="md-nav__link">
+    error[E0433]: failed to resolve: use of undeclared crate or module imp
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -826,6 +833,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#errore0433-failed-to-resolve-use-of-undeclared-crate-or-module-imp" class="md-nav__link">
+    error[E0433]: failed to resolve: use of undeclared crate or module imp
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -852,6 +866,7 @@
 <li><strong>error: failed to parse manifest at failed to parse the version requirement '0.11 ' for dependency 'parking_lot'</strong></li>
 <li><strong>error: could not compile 'node-template' Caused by: process didn't exit successfully:</strong></li>
 <li><strong>error[E0432]: unresolved import 'rand_core::OsRng'</strong></li>
+<li><strong>error[E0433]: failed to resolve: use of undeclared crate or module <code>imp</code></strong></li>
 </ul>
 <p>Explaining causes and remedies.</p>
 <h2 id="error-duplicate-lang-item-in-crate"><strong>error: duplicate lang item in crate</strong></h2>
@@ -918,6 +933,13 @@ https://github.com/paritytech/polkadot/releases</p>
 <div class="codehilite"><pre><span></span><code><span class="k">[dev-dependencies]</span>
 <span class="na">rand_core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{ version=&quot;0.6.4&quot;, features = [&quot;getrandom&quot;] }</span>
 </code></pre></div>
+
+<h2 id="errore0433-failed-to-resolve-use-of-undeclared-crate-or-module-imp"><strong>error[E0433]: failed to resolve: use of undeclared crate or module <code>imp</code></strong></h2>
+<p>This error happens when some crates depend on getrandom.
+We don't have exact answer for this error.</p>
+<p>Related issues</p>
+<p><a href="https://github.com/paritytech/frontier/issues/308">(upgrade to 3.0) Target not supported: getrandom v0.2.2</a>
+<a href="https://github.com/solana-labs/solana/blob/master/docs/src/developing/on-chain-programs/developing-rust.md#depending-on-rand">Solana: Depending on Rand</a></p>
 
 
 

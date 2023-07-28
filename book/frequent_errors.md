@@ -9,6 +9,7 @@ The main errors happen during development of runtime pallet are followings.
 - **error: failed to parse manifest at failed to parse the version requirement '0.11 ' for dependency 'parking_lot'**
 - **error: could not compile 'node-template' Caused by: process didn't exit successfully:**
 - **error[E0432]: unresolved import 'rand_core::OsRng'**
+- **error[E0433]: failed to resolve: use of undeclared crate or module `imp`**
 
 Explaining causes and remedies.
 
@@ -98,3 +99,12 @@ This error happens because there is no `OsRng` in `rand_core` root.
 [dev-dependencies]
 rand_core = { version="0.6.4", features = ["getrandom"] }
 ```
+
+## **error[E0433]: failed to resolve: use of undeclared crate or module `imp`**
+This error happens when some crates depend on getrandom.
+We don't have exact answer for this error.
+
+Related issues
+
+[(upgrade to 3.0) Target not supported: getrandom v0.2.2](https://github.com/paritytech/frontier/issues/308)
+[Solana: Depending on Rand](https://github.com/solana-labs/solana/blob/master/docs/src/developing/on-chain-programs/developing-rust.md#depending-on-rand)
