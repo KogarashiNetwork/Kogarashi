@@ -9,4 +9,4 @@ RUN apt-get update &&\
     rustup override set nightly-2022-11-14 &&\
     rustup target add wasm32-unknown-unknown --toolchain nightly-2022-11-14
 
-CMD bash -c "cargo build && ./target/debug/kogarashi-node --dev"
+CMD bash -c "cargo build && (ls ./target/debug/kogarashi-node && echo 'build success') || exit 1"
