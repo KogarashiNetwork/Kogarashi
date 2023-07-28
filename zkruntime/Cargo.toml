@@ -45,10 +45,6 @@ sp-std = { default-features = false, branch = 'v3.0.0', git = "https://github.co
 sp-transaction-pool = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
 sp-version = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
 
-# local dependencies
-redjubjub = { default-features = false, path = '../redjubjub' }
-sp-io = { default-features = false, path = '../io' }
-
 [features]
 default = ['std']
 runtime-benchmarks = [
@@ -85,8 +81,6 @@ std = [
     'sp-runtime/std',
     'sp-session/std',
     'sp-std/std',
-    'sp-io/std',
     'sp-transaction-pool/std',
     'sp-version/std',
-    "redjubjub/std",
 ]

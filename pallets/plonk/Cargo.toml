@@ -29,7 +29,7 @@ frame-support = { branch = 'v3.0.0', default-features = false, git = "https://gi
 [dev-dependencies]
 serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 rand = { version = "0.8", default-features = false }
-sp-io = { path = "../../zkruntime/io", default-features = false }
+sp-io = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 sp-core = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 sp-runtime = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 

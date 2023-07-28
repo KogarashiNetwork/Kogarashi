@@ -31,7 +31,7 @@ frame-system = { branch = 'v3.0.0', default-features = false, git = "https://git
 
 [dev-dependencies]
 proptest = "1"
-sp-io = { path = "../../zkruntime/io", default-features = false }
+sp-io = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 sp-core = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 pallet-transaction-payment = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 

@@ -54,10 +54,7 @@ members = [
     "primitive/poly",
     "primitive/redjubjub",
     "primitive/zkstd",
-    "zkruntime/io",
-    "zkruntime/keystore",
-    "zkruntime/redjubjub",
-    "zkruntime/runtime"
+    "zkruntime",
 ]
 
 [profile.release]

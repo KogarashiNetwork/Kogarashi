@@ -32,7 +32,7 @@ serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 rand = { version = "0.8", default-features = false }
 ark-std = { version = "0.3", features = ["print-trace"] }
 sp-core = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
-sp-io = { path = "../../zkruntime/io", version = '3.0.0' }
+sp-io = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 sp-runtime = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 
 [features]
