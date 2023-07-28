@@ -467,6 +467,18 @@ dependencies = [
 
 [[package]]
 name = "bls-12-381"
+version = "0.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4e3a742c4da006d8a93a776781a64a35d4c288f60b2a531b9511b1eddd45b5e7"
+dependencies = [
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "serde",
+ "zkstd 0.0.10",
+]
+
+[[package]]
+name = "bls-12-381"
 version = "0.1.10"
 dependencies = [
  "parity-scale-codec",
@@ -474,7 +486,7 @@ dependencies = [
  "proptest",
  "rand_core 0.6.4",
  "serde",
- "zkstd",
+ "zkstd 0.0.9",
 ]
 
 [[package]]
@@ -717,24 +729,24 @@ name = "confidential_transfer"
 version = "0.1.1"
 dependencies = [
  "ark-std",
- "bls-12-381",
+ "bls-12-381 0.1.10",
  "ec-pairing",
  "frame-support",
  "frame-system",
  "fullcodec_rand_xorshift",
- "jub-jub",
- "lifted-elgamal",
+ "jub-jub 0.0.10",
  "pallet-encrypted-balance",
  "pallet-plonk",
  "parity-scale-codec",
  "rand 0.8.5",
  "serde",
+ "she-elgamal",
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "zero-plonk",
- "zkstd",
+ "zkstd 0.0.9",
 ]
 
 [[package]]
@@ -1092,13 +1104,13 @@ checksum = "304e6508efa593091e97a9abbc10f90aa7ca635b6d2784feff3c89d41dd12272"
 
 [[package]]
 name = "ec-pairing"
-version = "0.1.10"
+version = "0.0.10"
 dependencies = [
- "bls-12-381",
- "jub-jub",
+ "bls-12-381 0.1.10",
+ "jub-jub 0.0.10",
  "parity-scale-codec",
  "rand_core 0.6.4",
- "zkstd",
+ "zkstd 0.0.9",
 ]
 
 [[package]]
@@ -1241,7 +1253,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1252,14 +1264,14 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-runtime-interface",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-storage",
 ]
 
 [[package]]
 name = "frame-executive"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1268,25 +1280,25 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-tracing",
 ]
 
 [[package]]
 name = "frame-metadata"
 version = "13.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-core",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "frame-support"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "bitflags 1.3.2",
  "frame-metadata",
@@ -1305,14 +1317,14 @@ dependencies = [
  "sp-runtime",
  "sp-staking",
  "sp-state-machine",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-tracing",
 ]
 
 [[package]]
 name = "frame-support-procedural"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "Inflector",
  "frame-support-procedural-tools",
@@ -1324,7 +1336,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-support-procedural-tools-derive",
  "proc-macro-crate 0.1.5",
@@ -1336,7 +1348,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1346,7 +1358,7 @@ dependencies = [
 [[package]]
 name = "frame-system"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-support",
  "impl-trait-for-tuples",
@@ -1355,14 +1367,14 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-version",
 ]
 
 [[package]]
 name = "frame-system-benchmarking"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -1370,13 +1382,13 @@ dependencies = [
  "parity-scale-codec",
  "sp-core",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "frame-system-rpc-runtime-api"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -1944,15 +1956,28 @@ dependencies = [
 
 [[package]]
 name = "jub-jub"
-version = "0.1.10"
+version = "0.0.10"
 dependencies = [
- "bls-12-381",
+ "bls-12-381 0.1.10",
  "parity-scale-codec",
  "paste",
  "proptest",
  "rand_core 0.6.4",
  "serde",
- "zkstd",
+ "zkstd 0.0.9",
+]
+
+[[package]]
+name = "jub-jub"
+version = "0.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6daf91f1e3a4585ac60da6ee3d5cecc6ab35efadfd67c14b128dd91b9b419b75"
+dependencies = [
+ "bls-12-381 0.0.10",
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "serde",
+ "zkstd 0.0.10",
 ]
 
 [[package]]
@@ -2095,20 +2120,6 @@ dependencies = [
  "sha2 0.8.2",
  "subtle 2.4.1",
  "typenum",
-]
-
-[[package]]
-name = "lifted-elgamal"
-version = "0.1.10"
-dependencies = [
- "ec-pairing",
- "jub-jub",
- "num-traits",
- "parity-scale-codec",
- "rand 0.8.5",
- "rand_core 0.6.4",
- "serde",
- "zkstd",
 ]
 
 [[package]]
@@ -2461,7 +2472,7 @@ checksum = "4d5d9eb14b174ee9aa2ef96dc2b94637a2d4b6e7cb873c7e171f0c20c6cf3eac"
 [[package]]
 name = "pallet-aura"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2472,14 +2483,14 @@ dependencies = [
  "sp-application-crypto",
  "sp-consensus-aura",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-timestamp",
 ]
 
 [[package]]
 name = "pallet-authorship"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2488,13 +2499,13 @@ dependencies = [
  "sp-authorship",
  "sp-inherents",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "pallet-balances"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -2502,7 +2513,7 @@ dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
@@ -2512,24 +2523,24 @@ dependencies = [
  "ec-pairing",
  "frame-support",
  "frame-system",
- "jub-jub",
- "lifted-elgamal",
+ "jub-jub 0.0.10",
  "pallet-transaction-payment",
  "parity-scale-codec",
  "proptest",
  "serde",
+ "she-elgamal",
  "sp-arithmetic",
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
- "zkstd",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
+ "zkstd 0.0.9",
 ]
 
 [[package]]
 name = "pallet-grandpa"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -2544,19 +2555,19 @@ dependencies = [
  "sp-runtime",
  "sp-session",
  "sp-staking",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "pallet-plonk"
 version = "0.2.5"
 dependencies = [
- "bls-12-381",
+ "bls-12-381 0.1.10",
  "ec-pairing",
  "frame-support",
  "frame-system",
  "fullcodec_rand_xorshift",
- "jub-jub",
+ "jub-jub 0.0.10",
  "parity-scale-codec",
  "poly-commit",
  "rand 0.8.5",
@@ -2565,26 +2576,26 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "zero-plonk",
- "zkstd",
+ "zkstd 0.0.9",
 ]
 
 [[package]]
 name = "pallet-randomness-collective-flip"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-support",
  "frame-system",
  "parity-scale-codec",
  "safe-mix",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "pallet-session"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2597,14 +2608,14 @@ dependencies = [
  "sp-runtime",
  "sp-session",
  "sp-staking",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-trie",
 ]
 
 [[package]]
 name = "pallet-sudo"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2612,13 +2623,13 @@ dependencies = [
  "serde",
  "sp-io",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "pallet-timestamp"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -2629,14 +2640,14 @@ dependencies = [
  "sp-inherents",
  "sp-io",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-timestamp",
 ]
 
 [[package]]
 name = "pallet-transaction-payment"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2646,13 +2657,13 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "pallet-transaction-payment-rpc-runtime-api"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "pallet-transaction-payment",
  "parity-scale-codec",
@@ -2953,14 +2964,14 @@ dependencies = [
 
 [[package]]
 name = "poly-commit"
-version = "0.1.10"
+version = "0.0.10"
 dependencies = [
- "bls-12-381",
+ "bls-12-381 0.1.10",
  "ec-pairing",
  "parity-scale-codec",
  "rand_core 0.6.4",
  "rayon",
- "zkstd",
+ "zkstd 0.0.9",
 ]
 
 [[package]]
@@ -3326,41 +3337,28 @@ dependencies = [
 
 [[package]]
 name = "red-jubjub"
-version = "0.1.0"
+version = "0.0.13"
 dependencies = [
  "blake2b_simd 1.0.1",
- "bls-12-381",
+ "bls-12-381 0.1.10",
  "hex-literal",
- "jub-jub",
+ "jub-jub 0.0.10",
  "rand_core 0.6.4",
  "serde_json",
- "zkstd",
+ "zkstd 0.0.9",
 ]
 
 [[package]]
-name = "redjubjub"
-version = "0.1.0"
+name = "red-jubjub"
+version = "0.0.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16f681387c8a758b1352a94cf5f048978995dafa4cb4fa428d2f22fb1b83fc0d"
 dependencies = [
- "blake2-rfc",
  "blake2b_simd 1.0.1",
- "bls-12-381",
- "hex",
- "lazy_static",
- "parity-scale-codec",
+ "bls-12-381 0.0.10",
+ "jub-jub 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand_core 0.6.4",
- "rand_xorshift",
- "red-jubjub",
- "schnorrkel",
- "serde",
- "sp-core",
- "sp-runtime",
- "sp-runtime-interface",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
- "strum",
- "substrate-bip39",
- "thiserror",
- "tiny-bip39",
- "zkstd",
+ "zkstd 0.0.10",
 ]
 
 [[package]]
@@ -3749,6 +3747,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "she-elgamal"
+version = "0.0.10"
+dependencies = [
+ "ec-pairing",
+ "jub-jub 0.0.10",
+ "num-traits",
+ "parity-scale-codec",
+ "rand 0.8.5",
+ "rand_core 0.6.4",
+ "serde",
+ "zkstd 0.0.9",
+]
+
+[[package]]
 name = "signal-hook"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3813,7 +3825,7 @@ dependencies = [
 [[package]]
 name = "sp-api"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "hash-db",
  "parity-scale-codec",
@@ -3821,7 +3833,7 @@ dependencies = [
  "sp-core",
  "sp-runtime",
  "sp-state-machine",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-version",
  "thiserror",
 ]
@@ -3829,7 +3841,7 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "blake2-rfc",
  "proc-macro-crate 0.1.5",
@@ -3841,55 +3853,55 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-core",
  "sp-io",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-arithmetic"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "integer-sqrt",
  "num-traits",
  "parity-scale-codec",
  "serde",
  "sp-debug-derive",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-authorship"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "parity-scale-codec",
  "sp-inherents",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-block-builder"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
  "sp-inherents",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-blockchain"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "futures",
  "log",
@@ -3907,7 +3919,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus"
 version = "0.9.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "futures",
  "futures-timer",
@@ -3921,7 +3933,7 @@ dependencies = [
  "sp-inherents",
  "sp-runtime",
  "sp-state-machine",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-trie",
  "sp-utils",
  "sp-version",
@@ -3933,7 +3945,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-aura"
 version = "0.9.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -3941,14 +3953,14 @@ dependencies = [
  "sp-consensus-slots",
  "sp-inherents",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-timestamp",
 ]
 
 [[package]]
 name = "sp-consensus-slots"
 version = "0.9.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "parity-scale-codec",
  "sp-arithmetic",
@@ -3958,7 +3970,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -3980,6 +3992,9 @@ dependencies = [
  "parking_lot 0.11.2",
  "primitive-types",
  "rand 0.7.3",
+ "rand_core 0.6.4",
+ "rand_xorshift",
+ "red-jubjub 0.0.13 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex",
  "schnorrkel",
  "secrecy",
@@ -3988,7 +4003,7 @@ dependencies = [
  "sp-debug-derive",
  "sp-externalities",
  "sp-runtime-interface",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-storage",
  "substrate-bip39",
  "thiserror",
@@ -3997,12 +4012,13 @@ dependencies = [
  "twox-hash",
  "wasmi",
  "zeroize",
+ "zkstd 0.0.10",
 ]
 
 [[package]]
 name = "sp-database"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "kvdb",
  "parking_lot 0.11.2",
@@ -4011,7 +4027,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4021,18 +4037,18 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.9.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "environmental",
  "parity-scale-codec",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-storage",
 ]
 
 [[package]]
 name = "sp-finality-grandpa"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "finality-grandpa",
  "log",
@@ -4043,25 +4059,25 @@ dependencies = [
  "sp-core",
  "sp-keystore",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-inherents"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "parity-scale-codec",
  "parking_lot 0.11.2",
  "sp-core",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "thiserror",
 ]
 
 [[package]]
 name = "sp-io"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "futures",
  "hash-db",
@@ -4074,7 +4090,7 @@ dependencies = [
  "sp-keystore",
  "sp-runtime-interface",
  "sp-state-machine",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-tracing",
  "sp-trie",
  "sp-wasm-interface",
@@ -4085,7 +4101,7 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.9.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -4101,7 +4117,7 @@ dependencies = [
 [[package]]
 name = "sp-offchain"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "sp-api",
  "sp-core",
@@ -4111,7 +4127,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "backtrace",
 ]
@@ -4119,7 +4135,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -4134,20 +4150,20 @@ dependencies = [
  "sp-arithmetic",
  "sp-core",
  "sp-io",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-runtime-interface"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
  "primitive-types",
  "sp-externalities",
  "sp-runtime-interface-proc-macro",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-storage",
  "sp-tracing",
  "sp-wasm-interface",
@@ -4157,7 +4173,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "Inflector",
  "proc-macro-crate 0.1.5",
@@ -4169,30 +4185,30 @@ dependencies = [
 [[package]]
 name = "sp-session"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
  "sp-core",
  "sp-runtime",
  "sp-staking",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-staking"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-state-machine"
 version = "0.9.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "hash-db",
  "log",
@@ -4204,7 +4220,7 @@ dependencies = [
  "sp-core",
  "sp-externalities",
  "sp-panic-handler",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-trie",
  "thiserror",
  "trie-db",
@@ -4220,43 +4236,43 @@ checksum = "35391ea974fa5ee869cb094d5b437688fbf3d8127d64d1b9fed5822a1ed39b12"
 [[package]]
 name = "sp-std"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 
 [[package]]
 name = "sp-storage"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
  "ref-cast",
  "serde",
  "sp-debug-derive",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-timestamp"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
  "sp-api",
  "sp-inherents",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "wasm-timer",
 ]
 
 [[package]]
 name = "sp-tracing"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "log",
  "parity-scale-codec",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "tracing",
  "tracing-core",
  "tracing-subscriber",
@@ -4265,7 +4281,7 @@ dependencies = [
 [[package]]
 name = "sp-transaction-pool"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "derive_more",
  "futures",
@@ -4281,13 +4297,13 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "hash-db",
  "memory-db",
  "parity-scale-codec",
  "sp-core",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "trie-db",
  "trie-root",
 ]
@@ -4295,7 +4311,7 @@ dependencies = [
 [[package]]
 name = "sp-utils"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "futures",
  "futures-core",
@@ -4307,23 +4323,23 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
  "serde",
  "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-wasm-interface"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "wasmi",
 ]
 
@@ -4353,27 +4369,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "strum"
-version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7318c509b5ba57f18533982607f24070a55d353e90d4cae30c467cdb2ad5ac5c"
-dependencies = [
- "strum_macros",
-]
-
-[[package]]
-name = "strum_macros"
-version = "0.20.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee8bc6b87a5112aeeab1f4a9f7ab634fe6cbefc4850006df31267f4cfb9e3149"
-dependencies = [
- "heck",
- "proc-macro2",
- "quote",
- "syn 1.0.96",
-]
-
-[[package]]
 name = "substrate-bip39"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4389,7 +4384,7 @@ dependencies = [
 [[package]]
 name = "substrate-prometheus-endpoint"
 version = "0.9.0"
-source = "git+https://github.com/paritytech/substrate?tag=v3.0.0#49a4103f4bfef55be20a5c6d26e18ff3003c3353"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#cd138cabf316340e9de78f608fef6c5a8dba9a1c"
 dependencies = [
  "async-std",
  "derive_more",
@@ -5191,14 +5186,13 @@ checksum = "85e60b0d1b5f99db2556934e21937020776a5d31520bf169e851ac44e6420214"
 name = "zero-network"
 version = "0.1.0"
 dependencies = [
- "bls-12-381",
+ "bls-12-381 0.1.10",
  "confidential_transfer",
  "criterion 0.4.0",
  "ec-pairing",
  "frame-support",
  "frame-system",
- "jub-jub",
- "lifted-elgamal",
+ "jub-jub 0.0.10",
  "pallet-encrypted-balance",
  "pallet-plonk",
  "parity-scale-codec",
@@ -5206,11 +5200,12 @@ dependencies = [
  "rand 0.8.5",
  "rand_core 0.6.4",
  "serde",
+ "she-elgamal",
  "sp-core",
  "sp-io",
  "sp-runtime",
  "zero-plonk",
- "zkstd",
+ "zkstd 0.0.9",
 ]
 
 [[package]]
@@ -5218,7 +5213,7 @@ name = "zero-plonk"
 version = "0.1.10"
 dependencies = [
  "backtrace",
- "bls-12-381",
+ "bls-12-381 0.1.10",
  "bytecheck",
  "canonical",
  "canonical_derive",
@@ -5229,7 +5224,7 @@ dependencies = [
  "ec-pairing",
  "hashbrown 0.9.1",
  "itertools 0.9.0",
- "jub-jub",
+ "jub-jub 0.0.10",
  "merlin 3.0.0",
  "parity-scale-codec",
  "poly-commit",
@@ -5238,7 +5233,7 @@ dependencies = [
  "rayon",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tempdir",
- "zkstd",
+ "zkstd 0.0.9",
 ]
 
 [[package]]
@@ -5281,7 +5276,6 @@ dependencies = [
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
  "parity-scale-codec",
- "redjubjub",
  "serde",
  "sp-api",
  "sp-block-builder",
@@ -5291,7 +5285,7 @@ dependencies = [
  "sp-offchain",
  "sp-runtime",
  "sp-session",
- "sp-std 3.0.0 (git+https://github.com/paritytech/substrate?tag=v3.0.0)",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-transaction-pool",
  "sp-version",
  "substrate-wasm-builder",
@@ -5301,11 +5295,23 @@ dependencies = [
 name = "zkstd"
 version = "0.0.9"
 dependencies = [
- "bls-12-381",
- "jub-jub",
+ "bls-12-381 0.1.10",
+ "jub-jub 0.0.10",
  "parity-scale-codec",
  "paste",
  "rand_core 0.6.4",
  "serde",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "zkstd"
+version = "0.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b979db769dc5d78b4ef00cb85e932a1be04f08459610eafd9055996ee76e7e13"
+dependencies = [
+ "parity-scale-codec",
+ "paste",
+ "rand_core 0.6.4",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

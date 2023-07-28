@@ -1,7 +1,16 @@
 [package]
+authors = [
+    'ashWhiteHat<phantomofrotten@gmail.com>',
+    'KiriosK<KiriosK@yandex.ru>'
+]
 name = "red-jubjub"
-version = "0.1.0"
+description = 'reddsa signature implementation on jubjub'
+version = "0.0.13"
 edition = "2021"
+license = "Apache-2.0"
+homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
+repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
+readme = 'README.md'
 
 [dependencies]
 zkstd = { path = "../zkstd", default-features = false }
@@ -11,5 +20,11 @@ blake2b_simd = { version = "1", default-features = false }
 rand_core = { version="0.6.4", default-features = false }
 
 [dev-dependencies]
-serde_json = { version = "1.0" }
-hex-literal = { version = "0.3.1" }
+serde_json = "1.0"
+hex-literal = { version = "0.3.1", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+    "rand_core/getrandom"
+]

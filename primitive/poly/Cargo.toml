@@ -4,8 +4,8 @@ authors = [
     'KiriosK<KiriosK@yandex.ru>'
 ]
 name = "poly-commit"
-description = 'lifted elgamal encryption implementation'
-version = "0.1.10"
+description = 'polynomial commitment implementation'
+version = "0.0.10"
 edition = "2021"
 license = "Apache-2.0"
 homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
@@ -17,9 +17,9 @@ zkstd = { path = "../zkstd", default-features = false }
 ec-pairing = { path = "../pairing", default-features = false }
 bls-12-381 = { path = "../bls12_381", default-features = false }
 parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
-rand_core = { version="0.6", default-features = false, features = ["getrandom"] }
+rand_core = { version="0.6", default-features = false }
 rayon = "1.5.1"
 
 [features]
 default = ["std"]
-std = []
+std = ["rand_core/getrandom"]

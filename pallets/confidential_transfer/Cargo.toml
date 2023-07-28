@@ -12,17 +12,17 @@ rand_xorshift = { version = '0.2.0', default-features = false, package = 'fullco
 codec = { default-features = false, features = [
     'derive'
 ], package = 'parity-scale-codec', version = '2.0.0' }
-frame-system = { tag = 'v3.0.0', default-features = false, git = "https://github.com/paritytech/substrate" }
-frame-support = { tag = 'v3.0.0', default-features = false, git = "https://github.com/paritytech/substrate" }
-sp-std = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
-sp-runtime = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+frame-system = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-support = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-std = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-runtime = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 # primitive
 zero-plonk = { path = "../../primitive/plonk", default-features = false }
 ec-pairing = { path = "../../primitive/pairing", default-features = false }
 jub-jub = { path = "../../primitive/jubjub", default-features = false }
 zkstd = { path = "../../primitive/zkstd", default-features = false }
 bls-12-381 = { path = "../../primitive/bls12_381", default-features = false }
-lifted-elgamal = { path = "../../primitive/elgamal", default-features = false }
+she-elgamal = { path = "../../primitive/elgamal", default-features = false }
 # pallet
 pallet-plonk = { path = "../plonk", default-features = false }
 pallet-encrypted-balance = { path = "../encrypted_balance", default-features = false }
@@ -31,9 +31,9 @@ pallet-encrypted-balance = { path = "../encrypted_balance", default-features = f
 serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 rand = { version = "0.8", default-features = false }
 ark-std = { version = "0.3", features = ["print-trace"] }
-sp-core = { tag = 'v3.0.0', default-features = false, git = "https://github.com/paritytech/substrate" }
-sp-io = { tag = 'v3.0.0', default-features = false, git = "https://github.com/paritytech/substrate" }
-sp-runtime = { tag = 'v3.0.0', default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-core = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-io = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-runtime = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 
 [features]
 default = ["std"]

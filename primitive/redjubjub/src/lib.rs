@@ -54,13 +54,15 @@ mod tests {
     fn signature_test() {
         for _ in 0..1000 {
             let msg = b"test";
+            let wrong_msg = b"tes";
             let randomness = OsRng;
+
             let priv_key = SecretKey(Fp::random(OsRng));
             let sig = priv_key.sign(msg, randomness);
-
             let pub_key = priv_key.to_public_key();
 
-            assert!(pub_key.validate(msg, sig))
+            assert!(pub_key.validate(msg, sig));
+            assert!(!pub_key.validate(wrong_msg, sig));
         }
     }
 }

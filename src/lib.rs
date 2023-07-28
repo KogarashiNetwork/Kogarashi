@@ -13,9 +13,9 @@ use ec_pairing::*;
 #[allow(unused_imports)]
 use jub_jub::*;
 #[allow(unused_imports)]
-use lifted_elgamal::*;
-#[allow(unused_imports)]
 use poly_commit::*;
+#[allow(unused_imports)]
+use she_elgamal::*;
 #[allow(unused_imports)]
 use zero_plonk::*;
 #[allow(unused_imports)]

@@ -19,21 +19,21 @@ serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 codec = { version = "2.0.0", default-features = false, package = "parity-scale-codec", features = [
     "derive"
 ] }
-lifted-elgamal = { path = '../../primitive/elgamal', default-features = false }
+she-elgamal = { path = '../../primitive/elgamal', default-features = false }
 jub-jub = { path = '../../primitive/jubjub', default-features = false }
 ec-pairing = { path = '../../primitive/pairing', default-features = false }
 zkstd = { path = "../../primitive/zkstd", default-features = false }
-sp-std = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
-sp-runtime = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
-sp-arithmetic = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
-frame-support = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
-frame-system = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-std = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-runtime = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-arithmetic = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-support = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-system = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 
 [dev-dependencies]
 proptest = "1"
-sp-io = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
-sp-core = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
-pallet-transaction-payment = { tag = "v3.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-io = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-core = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+pallet-transaction-payment = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 
 [features]
 default = ["std"]

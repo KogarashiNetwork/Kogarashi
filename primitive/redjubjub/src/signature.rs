@@ -1,6 +1,6 @@
 use zkstd::behave::SigUtils;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Signature {
     pub(crate) r: [u8; 32],
     pub(crate) s: [u8; 32],

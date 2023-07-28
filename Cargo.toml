@@ -16,7 +16,7 @@ readme = 'README.md'
 # primitive
 bls-12-381 = { path = "./primitive/bls12_381", default-features = false }
 zkstd = { path = "./primitive/zkstd", default-features = false }
-lifted-elgamal = { path = "./primitive/elgamal", default-features = false }
+she-elgamal = { path = "./primitive/elgamal", default-features = false }
 jub-jub = { path = "./primitive/jubjub", default-features = false }
 poly-commit = { path = "./primitive/poly", default-features = false }
 ec-pairing = { path = "./primitive/pairing", default-features = false }
@@ -34,11 +34,11 @@ serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 codec = { version = '2.0.0', default-features = false, features = [
     'derive'
 ], package = 'parity-scale-codec' }
-sp-io = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-core = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-sp-runtime = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-frame-system = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
-frame-support = { default-features = false, tag = 'v3.0.0', git = "https://github.com/paritytech/substrate" }
+sp-io = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-core = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-runtime = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-system = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-support = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
 
 [workspace]
 members = [
@@ -54,8 +54,7 @@ members = [
     "primitive/poly",
     "primitive/redjubjub",
     "primitive/zkstd",
-    "zkruntime/redjubjub",
-    "zkruntime/runtime"
+    "zkruntime",
 ]
 
 [profile.release]

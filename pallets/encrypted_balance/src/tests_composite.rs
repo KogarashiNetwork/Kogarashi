@@ -3,7 +3,7 @@
 use crate::{self as pallet_balances, decl_tests, Config};
 use ec_pairing::TatePairing;
 use frame_support::parameter_types;
-use lifted_elgamal::EncryptedNumber;
+use she_elgamal::EncryptedNumber;
 use sp_core::H256;
 use sp_runtime::{testing::Header, traits::IdentityLookup};
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
