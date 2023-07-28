@@ -41,11 +41,7 @@ All users balances are encrypted by the `homomorphic encryption` by default and 
 ## Setup Node
 
 ```shell
-$ rustup override set nightly-2022-11-14
-$ rustup target add wasm32-unknown-unknown
-$ cd node
-$ cargo build
-$ ./target/debug/kogarashi-node --dev
+$ sh scripts/setup.sh
 ```
 
 or
