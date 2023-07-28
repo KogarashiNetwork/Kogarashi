@@ -730,7 +730,7 @@ version = "0.1.1"
 dependencies = [
  "ark-std",
  "bls-12-381 0.1.10",
- "ec-pairing 0.1.10",
+ "ec-pairing 0.0.10",
  "frame-support",
  "frame-system",
  "fullcodec_rand_xorshift",
@@ -1105,6 +1105,17 @@ checksum = "304e6508efa593091e97a9abbc10f90aa7ca635b6d2784feff3c89d41dd12272"
 [[package]]
 name = "ec-pairing"
 version = "0.0.10"
+dependencies = [
+ "bls-12-381 0.1.10",
+ "jub-jub 0.0.10",
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "zkstd 0.0.9",
+]
+
+[[package]]
+name = "ec-pairing"
+version = "0.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aed8e0f6c0d7b177584f2c59dd83af948fcb613b92457d2b87a461331a613eac"
 dependencies = [
@@ -1112,17 +1123,6 @@ dependencies = [
  "jub-jub 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec",
  "zkstd 0.0.10",
-]
-
-[[package]]
-name = "ec-pairing"
-version = "0.1.10"
-dependencies = [
- "bls-12-381 0.1.10",
- "jub-jub 0.0.10",
- "parity-scale-codec",
- "rand_core 0.6.4",
- "zkstd 0.0.9",
 ]
 
 [[package]]
@@ -2532,7 +2532,7 @@ dependencies = [
 name = "pallet-encrypted-balance"
 version = "0.2.3"
 dependencies = [
- "ec-pairing 0.1.10",
+ "ec-pairing 0.0.10",
  "frame-support",
  "frame-system",
  "jub-jub 0.0.10",
@@ -2575,7 +2575,7 @@ name = "pallet-plonk"
 version = "0.2.5"
 dependencies = [
  "bls-12-381 0.1.10",
- "ec-pairing 0.1.10",
+ "ec-pairing 0.0.10",
  "frame-support",
  "frame-system",
  "fullcodec_rand_xorshift",
@@ -2979,7 +2979,7 @@ name = "poly-commit"
 version = "0.0.10"
 dependencies = [
  "bls-12-381 0.1.10",
- "ec-pairing 0.1.10",
+ "ec-pairing 0.0.10",
  "parity-scale-codec",
  "rand_core 0.6.4",
  "rayon",
@@ -3349,7 +3349,7 @@ dependencies = [
 
 [[package]]
 name = "red-jubjub"
-version = "0.0.10"
+version = "0.0.13"
 dependencies = [
  "blake2b_simd 1.0.1",
  "bls-12-381 0.1.10",
@@ -3778,7 +3778,7 @@ dependencies = [
 name = "she-elgamal"
 version = "0.0.10"
 dependencies = [
- "ec-pairing 0.0.10",
+ "ec-pairing 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "jub-jub 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-traits",
  "parity-scale-codec",
@@ -5276,7 +5276,7 @@ dependencies = [
  "bls-12-381 0.1.10",
  "confidential_transfer",
  "criterion 0.4.0",
- "ec-pairing 0.1.10",
+ "ec-pairing 0.0.10",
  "frame-support",
  "frame-system",
  "jub-jub 0.0.10",
@@ -5308,7 +5308,7 @@ dependencies = [
  "criterion 0.3.6",
  "dusk-bytes",
  "dusk-cdf",
- "ec-pairing 0.1.10",
+ "ec-pairing 0.0.10",
  "hashbrown 0.9.1",
  "itertools 0.9.0",
  "jub-jub 0.0.10",

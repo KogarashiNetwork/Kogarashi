@@ -5,7 +5,7 @@ authors = [
 ]
 name = "red-jubjub"
 description = 'reddsa signature implementation on jubjub'
-version = "0.0.10"
+version = "0.0.13"
 edition = "2021"
 license = "Apache-2.0"
 homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
@@ -17,8 +17,14 @@ zkstd = { path = "../zkstd", default-features = false }
 jub-jub = { path = "../jubjub", default-features = false }
 bls-12-381 = { path = "../bls12_381", default-features = false }
 blake2b_simd = { version = "1", default-features = false }
-rand_core = { version="0.6.4", default-features = false, features = ["getrandom"] }
+rand_core = { version="0.6.4", default-features = false }
 
 [dev-dependencies]
-serde_json = { version = "1.0" }
-hex-literal = { version = "0.3.1" }
+serde_json = "1.0"
+hex-literal = { version = "0.3.1", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+    "rand_core/getrandom"
+]
