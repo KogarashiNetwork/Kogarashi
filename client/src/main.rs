@@ -1,5 +1,5 @@
 use rpc::rpc_to_localhost;
-use sp_keyring::AccountKeyring;
+use sp_keyring::RedjubjubKeyring as AccountKeyring;
 
 mod extrinsic;
 mod rpc;
@@ -14,9 +14,8 @@ async fn main() {
     )
     .await;
     println!("Extrinsic: {xt}");
-    let res = rpc_to_localhost("author_submitExtrinsic", [xt])
-        .await
-        .unwrap();
-
-    println!("Result: {res}");
+    match rpc_to_localhost("author_submitExtrinsic", [xt]).await {
+        Ok(res) => println!("Result: {res}"),
+        Err(err) => println!("Error: {err}"),
+    }
 }

@@ -1,5 +1,5 @@
 use sp_core::{blake2_256, Encode};
-use sp_keyring::Sr25519Keyring as Keyring;
+use sp_keyring::RedjubjubKeyring as Keyring;
 use sp_runtime::{codec::Compact, generic::Era, AccountId32, MultiAddress, MultiSignature};
 
 use crate::{rpc, utils};
@@ -43,7 +43,7 @@ pub async fn create_balance_transfer_xt(signer: Keyring, to: AccountId32, amount
 
     let signature_to_encode = Some((
         MultiAddress::Id::<_, u32>(from),
-        MultiSignature::Sr25519(signature),
+        MultiSignature::Redjubjub(signature),
         extra,
     ));
 

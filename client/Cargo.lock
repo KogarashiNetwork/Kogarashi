@@ -185,7 +185,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d6d530bdd2d52966a6d03b7a964add7ae1a288d25214066fd4b600f0f796400"
 dependencies = [
  "arrayvec 0.4.12",
- "constant_time_eq",
+ "constant_time_eq 0.1.5",
+]
+
+[[package]]
+name = "blake2b_simd"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c2f0dc9a68c6317d884f97cc36cf5a3d20ba14ce404227df55e1af708ab04bc"
+dependencies = [
+ "arrayref",
+ "arrayvec 0.7.4",
+ "constant_time_eq 0.2.6",
 ]
 
 [[package]]
@@ -216,6 +227,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fa79dedbb091f449f1f39e53edf88d5dbe95f895dae6135a8d7b881fb5af73f5"
 dependencies = [
  "byte-tools",
+]
+
+[[package]]
+name = "bls-12-381"
+version = "0.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4e3a742c4da006d8a93a776781a64a35d4c288f60b2a531b9511b1eddd45b5e7"
+dependencies = [
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "serde",
+ "zkstd",
 ]
 
 [[package]]
@@ -277,6 +300,12 @@ name = "constant_time_eq"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
+
+[[package]]
+name = "constant_time_eq"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21a53c0a4d288377e7415b53dcfc3c04da5cdc2cc95c8d5ac178b58f0b861ad6"
 
 [[package]]
 name = "convert_case"
@@ -1018,6 +1047,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "jub-jub"
+version = "0.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6daf91f1e3a4585ac60da6ee3d5cecc6ab35efadfd67c14b128dd91b9b419b75"
+dependencies = [
+ "bls-12-381",
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "serde",
+ "zkstd",
+]
+
+[[package]]
 name = "keccak"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1606,6 +1648,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "rand_xorshift"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d25bf25ec5ae4a3f1b92f929810509a2f53d7dca2f50b794ff57e3face536c8f"
+dependencies = [
+ "rand_core 0.6.4",
+]
+
+[[package]]
+name = "red-jubjub"
+version = "0.0.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16f681387c8a758b1352a94cf5f048978995dafa4cb4fa428d2f22fb1b83fc0d"
+dependencies = [
+ "blake2b_simd",
+ "bls-12-381",
+ "jub-jub",
+ "rand_core 0.6.4",
+ "zkstd",
+]
+
+[[package]]
 name = "redox_syscall"
 version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1962,35 +2026,32 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c52e2e6d43036b97c4fce1ed87c5262c1ffdc78c655ada4d3024a3f8094bdd2c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-core",
  "sp-io",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-arithmetic"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d0f1c69966c192d1dee8521f0b29ece2b14db07b9b44d801a94e295234761645"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "integer-sqrt",
  "num-traits",
  "parity-scale-codec",
  "serde",
  "sp-debug-derive",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-core"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abbc8d4e9b8a7d5819ed26f1374017bb32833ef4890e4ff065e1da30669876bc"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -2012,6 +2073,9 @@ dependencies = [
  "parking_lot 0.11.2",
  "primitive-types",
  "rand 0.7.3",
+ "rand_core 0.6.4",
+ "rand_xorshift",
+ "red-jubjub",
  "regex",
  "schnorrkel",
  "secrecy",
@@ -2020,7 +2084,7 @@ dependencies = [
  "sp-debug-derive",
  "sp-externalities",
  "sp-runtime-interface",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-storage",
  "substrate-bip39",
  "thiserror",
@@ -2029,13 +2093,13 @@ dependencies = [
  "twox-hash",
  "wasmi",
  "zeroize",
+ "zkstd",
 ]
 
 [[package]]
 name = "sp-debug-derive"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e80275f23b4e7ba8f54dec5f90f016530e7307d2ee9445f617ab986cbe97f31e"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2045,20 +2109,18 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fdc625f8c7b13b9a136d334888b21b5743d2081cb666cb03efca1dc9b8f74d1"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "environmental",
  "parity-scale-codec",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-storage",
 ]
 
 [[package]]
 name = "sp-io"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33fd69f0a6e91bedc2fb1c5cc3689c212474b6c918274cb4cb14dbbe3c428c14"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "futures",
  "hash-db",
@@ -2071,7 +2133,7 @@ dependencies = [
  "sp-keystore",
  "sp-runtime-interface",
  "sp-state-machine",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-tracing",
  "sp-trie",
  "sp-wasm-interface",
@@ -2082,8 +2144,7 @@ dependencies = [
 [[package]]
 name = "sp-keyring"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b59f2b0e94b2048d4984aa6eb40eef2e4c05d3adf27a083dd3c9b0fce74ef7a"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "lazy_static",
  "sp-core",
@@ -2094,8 +2155,7 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db6ccd2baf189112355338e8b224dc513cd239b974dbd717f12b3dc7a7248c3b"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -2111,8 +2171,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54702e109f1c8a870dd4065a497d2612d42cec5817126e96cc0658c5ea975784"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "backtrace",
 ]
@@ -2120,8 +2179,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dfa4b353b76f04616dbdb8d269d58dcac47acb31c006d3b70e7b64233e68695e"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -2136,21 +2194,20 @@ dependencies = [
  "sp-arithmetic",
  "sp-core",
  "sp-io",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-runtime-interface"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2e5c88b4bc8d607e4e2ff767a85db58cf7101f3dd6064f06929342ea67fe8fb"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
  "primitive-types",
  "sp-externalities",
  "sp-runtime-interface-proc-macro",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-storage",
  "sp-tracing",
  "sp-wasm-interface",
@@ -2160,8 +2217,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "19a6c7c2251512c9e533d15db8a863b06ece1cbee778130dd9adbe44b6b39aa9"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "Inflector",
  "proc-macro-crate 0.1.5",
@@ -2173,8 +2229,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46fa4143e58e9130f726d4e8a9b86f3530a8bd19a2eedcdcf4af205f4b5a6d4f"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "hash-db",
  "log",
@@ -2186,7 +2241,7 @@ dependencies = [
  "sp-core",
  "sp-externalities",
  "sp-panic-handler",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "sp-trie",
  "thiserror",
  "trie-db",
@@ -2200,28 +2255,31 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "35391ea974fa5ee869cb094d5b437688fbf3d8127d64d1b9fed5822a1ed39b12"
 
 [[package]]
+name = "sp-std"
+version = "3.0.0"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
+
+[[package]]
 name = "sp-storage"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86af458d4a0251c490cdde9dcaaccb88d398f3b97ac6694cdd49ed9337e6b961"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
  "ref-cast",
  "serde",
  "sp-debug-derive",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-tracing"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "567382d8d4e14fb572752863b5cd57a78f9e9a6583332b590b726f061f3ea957"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "log",
  "parity-scale-codec",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "tracing",
  "tracing-core",
  "tracing-subscriber",
@@ -2230,14 +2288,13 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b85b7f745da41ef825c6f7b93f1fdc897b03df94a4884adfbb70fbcd0aed1298"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "hash-db",
  "memory-db",
  "parity-scale-codec",
  "sp-core",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "trie-db",
  "trie-root",
 ]
@@ -2245,25 +2302,23 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dbeffa538a13d715d30e01d57a2636ba32845b737a29a3ea32403576588222e7"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
  "serde",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
 ]
 
 [[package]]
 name = "sp-wasm-interface"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b214e125666a6416cf30a70cc6a5dacd34a4e5197f8a3d479f714af7e1dc7a47"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#eae0c64230a4c239393767bd2e43a7a8743c02ec"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
- "sp-std",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "wasmi",
 ]
 
@@ -2974,4 +3029,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.28",
+]
+
+[[package]]
+name = "zkstd"
+version = "0.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b979db769dc5d78b4ef00cb85e932a1be04f08459610eafd9055996ee76e7e13"
+dependencies = [
+ "parity-scale-codec",
+ "paste",
+ "rand_core 0.6.4",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
