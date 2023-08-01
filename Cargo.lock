@@ -164,7 +164,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d0864d84b8e07b145449be9a8537db86bf9de5ce03b913214694643b4743502"
 dependencies = [
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -295,7 +295,7 @@ checksum = "cc6dde6e4ed435a4c1ee4e73592f5ba9da2151af10076cc04858746af9352d09"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -546,7 +546,7 @@ checksum = "a7ec4c6f261935ad534c0c22dbef2201b45918860eb1c574b972bd213a76af61"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -592,7 +592,7 @@ dependencies = [
  "lazy_static",
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -1006,7 +1006,7 @@ checksum = "4b6618553c32cd1c1f4fbdb9418cc035f3168422f24406ebb08576f6db5ed6ec"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -1019,7 +1019,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "rustc_version 0.4.0",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -1105,7 +1105,7 @@ checksum = "558e40ea573c374cf53507fd240b7ee2f5477df7cfebdb97323ec61c719399c5"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -1177,9 +1177,9 @@ checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
 name = "errno"
-version = "0.3.1"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4bcfec3a70f97c962c307b2d2c56e358cf1d00b558d74262b5f929ee8cc7e73a"
+checksum = "6b30f669a7961ef1631673d2766cc92f52d64f7ef354d4fe0ddfd30ed52f0f4f"
 dependencies = [
  "errno-dragonfly",
  "libc",
@@ -1289,7 +1289,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1307,7 +1307,7 @@ dependencies = [
 [[package]]
 name = "frame-executive"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1323,7 +1323,7 @@ dependencies = [
 [[package]]
 name = "frame-metadata"
 version = "13.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -1334,7 +1334,7 @@ dependencies = [
 [[package]]
 name = "frame-support"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "bitflags 1.3.2",
  "frame-metadata",
@@ -1360,41 +1360,41 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "Inflector",
  "frame-support-procedural-tools",
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
 name = "frame-support-procedural-tools"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-support-procedural-tools-derive",
  "proc-macro-crate 0.1.5",
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
 name = "frame-system"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-support",
  "impl-trait-for-tuples",
@@ -1410,7 +1410,7 @@ dependencies = [
 [[package]]
 name = "frame-system-benchmarking"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -1424,7 +1424,7 @@ dependencies = [
 [[package]]
 name = "frame-system-rpc-runtime-api"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -1525,7 +1525,7 @@ checksum = "89ca545a94061b6365f2c7355b4b32bd20df3ff95f02da9329b34ccc3bd6ee72"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -1961,7 +1961,7 @@ checksum = "11d7a9f6330b71fea57921c9b61c47ee6e84f72d394754eff6163ae67e7395eb"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -2218,7 +2218,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f4bc40943156e42138d22ed3c57ff0e1a147237742715937622a99b10fbe0156"
 dependencies = [
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -2271,9 +2271,9 @@ checksum = "ef53942eb7bf7ff43a617b3e2c1c4a5ecf5944a7c1bc12d7ee39bbb15e5c1519"
 
 [[package]]
 name = "linux-raw-sys"
-version = "0.4.3"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "09fc20d2ca12cb9f044c93e3bd6d32d523e6e2ec3db4f7b2939cd99026ecd3f0"
+checksum = "57bcfdad1b858c2db7c38303a6d2ad4dfaf5eb53dfeb0910128b2c26d6158503"
 
 [[package]]
 name = "lock_api"
@@ -2420,7 +2420,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67f6edd23a999c58251c8032db552dc0f1071ad8716e4e181f28d6ea6236a96f"
 dependencies = [
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -2446,7 +2446,7 @@ dependencies = [
  "proc-macro-error",
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
  "synstructure",
 ]
 
@@ -2496,7 +2496,7 @@ checksum = "01fcc0b8149b4632adc89ac3b7b31a12fb6099a0317a4eb2ebff574ef7de7218"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -2652,7 +2652,7 @@ checksum = "a948666b637a0f465e8564c73e89d4dde00d72d4d473cc972f390fc3dcee7d9c"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -2682,7 +2682,7 @@ checksum = "4d5d9eb14b174ee9aa2ef96dc2b94637a2d4b6e7cb873c7e171f0c20c6cf3eac"
 [[package]]
 name = "pallet-aura"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2700,7 +2700,7 @@ dependencies = [
 [[package]]
 name = "pallet-authorship"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2715,7 +2715,7 @@ dependencies = [
 [[package]]
 name = "pallet-balances"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -2750,7 +2750,7 @@ dependencies = [
 [[package]]
 name = "pallet-grandpa"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -2792,7 +2792,7 @@ dependencies = [
 [[package]]
 name = "pallet-randomness-collective-flip"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2805,7 +2805,7 @@ dependencies = [
 [[package]]
 name = "pallet-session"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2825,7 +2825,7 @@ dependencies = [
 [[package]]
 name = "pallet-sudo"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2839,7 +2839,7 @@ dependencies = [
 [[package]]
 name = "pallet-timestamp"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -2857,7 +2857,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2873,7 +2873,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc-runtime-api"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "pallet-transaction-payment",
  "parity-scale-codec",
@@ -2922,7 +2922,7 @@ dependencies = [
  "proc-macro-crate 1.3.1",
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -2947,7 +2947,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f557c32c6d268a07c921471619c0295f5efad3a0e76d4f97a05c091a51d110b2"
 dependencies = [
  "proc-macro2",
- "syn 1.0.96",
+ "syn 1.0.109",
  "synstructure",
 ]
 
@@ -3096,7 +3096,7 @@ checksum = "851c8d0ce9bebe43790dedfc86614c23494ac9f423dd618d3a61fc693eafe61e"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -3107,7 +3107,7 @@ checksum = "ec2e072ecce94ec471b13398d5402c188e76ac03cf74dd1a975161b23a3f6d9c"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -3236,7 +3236,7 @@ dependencies = [
  "proc-macro-error-attr",
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
  "version_check",
 ]
 
@@ -3332,7 +3332,7 @@ dependencies = [
  "itertools 0.9.0",
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -3362,7 +3362,7 @@ checksum = "16b845dbfca988fa33db069c0e230574d15a3088f147a87b64c7589eb662c9ac"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -3373,9 +3373,9 @@ checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
 name = "quote"
-version = "1.0.31"
+version = "1.0.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fe8a65d69dd0808184ebb5f836ab526bb259db23c657efa38711b1072ee47f0"
+checksum = "50f3b39ccfb720540debaa0164757101c08ecb8d326b15358ce76a62c7e85965"
 dependencies = [
  "proc-macro2",
 ]
@@ -3623,7 +3623,7 @@ checksum = "2dfaf0c85b766276c797f3791f5bc6d5bd116b41d53049af2789666b0c0bc9fa"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -3634,7 +3634,7 @@ checksum = "b2eae68fc220f7cf2532e4494aded17545fce192d59cd996e0fe7887f4ceb575"
 dependencies = [
  "aho-corasick",
  "memchr",
- "regex-automata 0.3.3",
+ "regex-automata 0.3.4",
  "regex-syntax 0.7.4",
 ]
 
@@ -3649,9 +3649,9 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "39354c10dd07468c2e73926b23bb9c2caca74c5501e38a35da70406f1d923310"
+checksum = "b7b6d6190b7594385f61bd3911cd1be99dfddcfc365a4160cc2ab5bff4aed294"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -3790,7 +3790,7 @@ dependencies = [
  "bitflags 2.3.3",
  "errno",
  "libc",
- "linux-raw-sys 0.4.3",
+ "linux-raw-sys 0.4.5",
  "windows-sys",
 ]
 
@@ -3958,9 +3958,9 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.174"
+version = "1.0.180"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b88756493a5bd5e5395d53baa70b194b05764ab85b59e43e4b8f4e1192fa9b1"
+checksum = "0ea67f183f058fe88a4e3ec6e2788e003840893b91bac4559cabedd00863b3ed"
 dependencies = [
  "serde_derive",
 ]
@@ -3977,20 +3977,20 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.174"
+version = "1.0.180"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e5c3a298c7f978e53536f95a63bdc4c4a64550582f31a0359a9afda6aede62e"
+checksum = "24e744d7782b686ab3b73267ef05697159cc0e5abbed3f47f9933165e5219036"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
 name = "serde_json"
-version = "1.0.103"
+version = "1.0.104"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d03b412469450d4404fe8499a268edd7f8b79fecb074b0d812ad64ca21f4031b"
+checksum = "076066c5f1078eac5b722a31827a8832fe108bed65dfa75e233c89f8206e976c"
 dependencies = [
  "itoa 1.0.9",
  "ryu",
@@ -4122,7 +4122,7 @@ dependencies = [
 [[package]]
 name = "sp-api"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "hash-db",
  "parity-scale-codec",
@@ -4138,19 +4138,19 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "blake2-rfc",
  "proc-macro-crate 0.1.5",
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
 name = "sp-application-crypto"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -4162,7 +4162,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "integer-sqrt",
  "num-traits",
@@ -4175,7 +4175,7 @@ dependencies = [
 [[package]]
 name = "sp-authorship"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "parity-scale-codec",
  "sp-inherents",
@@ -4186,7 +4186,7 @@ dependencies = [
 [[package]]
 name = "sp-block-builder"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -4198,7 +4198,7 @@ dependencies = [
 [[package]]
 name = "sp-blockchain"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "futures",
  "log",
@@ -4216,7 +4216,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus"
 version = "0.9.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "futures",
  "futures-timer",
@@ -4242,7 +4242,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-aura"
 version = "0.9.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -4257,7 +4257,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-slots"
 version = "0.9.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "parity-scale-codec",
  "sp-arithmetic",
@@ -4267,7 +4267,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -4315,7 +4315,7 @@ dependencies = [
 [[package]]
 name = "sp-database"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "kvdb",
  "parking_lot 0.11.2",
@@ -4324,17 +4324,17 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
 name = "sp-externalities"
 version = "0.9.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -4345,7 +4345,7 @@ dependencies = [
 [[package]]
 name = "sp-finality-grandpa"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "finality-grandpa",
  "log",
@@ -4362,7 +4362,7 @@ dependencies = [
 [[package]]
 name = "sp-inherents"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "parity-scale-codec",
  "parking_lot 0.11.2",
@@ -4374,7 +4374,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "futures",
  "hash-db",
@@ -4398,7 +4398,7 @@ dependencies = [
 [[package]]
 name = "sp-keyring"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "lazy_static",
  "sp-core",
@@ -4409,7 +4409,7 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.9.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -4425,7 +4425,7 @@ dependencies = [
 [[package]]
 name = "sp-offchain"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "sp-api",
  "sp-core",
@@ -4435,7 +4435,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "backtrace",
 ]
@@ -4443,7 +4443,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -4464,7 +4464,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -4481,19 +4481,19 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "Inflector",
  "proc-macro-crate 0.1.5",
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
 name = "sp-session"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -4506,7 +4506,7 @@ dependencies = [
 [[package]]
 name = "sp-staking"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime",
@@ -4516,7 +4516,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.9.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "hash-db",
  "log",
@@ -4544,12 +4544,12 @@ checksum = "35391ea974fa5ee869cb094d5b437688fbf3d8127d64d1b9fed5822a1ed39b12"
 [[package]]
 name = "sp-std"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 
 [[package]]
 name = "sp-storage"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -4562,7 +4562,7 @@ dependencies = [
 [[package]]
 name = "sp-timestamp"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -4576,7 +4576,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "log",
  "parity-scale-codec",
@@ -4589,7 +4589,7 @@ dependencies = [
 [[package]]
 name = "sp-transaction-pool"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "derive_more",
  "futures",
@@ -4605,7 +4605,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "hash-db",
  "memory-db",
@@ -4619,7 +4619,7 @@ dependencies = [
 [[package]]
 name = "sp-utils"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "futures",
  "futures-core",
@@ -4631,7 +4631,7 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -4643,7 +4643,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -4694,7 +4694,7 @@ dependencies = [
  "heck",
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -4713,7 +4713,7 @@ dependencies = [
 [[package]]
 name = "substrate-prometheus-endpoint"
 version = "0.9.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#9f777b07d6868366911fcf2920cd25c032a92b12"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "async-std",
  "derive_more",
@@ -4727,8 +4727,7 @@ dependencies = [
 [[package]]
 name = "substrate-wasm-builder"
 version = "4.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93a3d51ad6abbc408b03ea962062bfcc959b438a318d7d4bedd181e1effd0610"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
 dependencies = [
  "ansi_term",
  "atty",
@@ -4754,9 +4753,9 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "syn"
-version = "1.0.96"
+version = "1.0.109"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0748dd251e24453cb8717f0354206b91557e4ec8703673a4b30208f2abaf1ebf"
+checksum = "72b64191b275b66ffe2469e8af2c1cfe3bafa67b529ead792a6d0160888b4237"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4765,9 +4764,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.27"
+version = "2.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b60f673f44a8255b9c8c657daf66a596d435f2da81a555b06dc644d080ba45e0"
+checksum = "04361975b3f5e348b2189d8dc55bc942f278b2d482a6a0365de5bdd62d351567"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4782,7 +4781,7 @@ checksum = "f36bdaa60a83aca3921b5259d5400cbf5e90fc51931376a9bd4a0eb79aa7210f"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.96",
+ "syn 1.0.109",
  "unicode-xid",
 ]
 
@@ -4847,7 +4846,7 @@ checksum = "090198534930841fab3a5d1bb637cde49e339654e606195f8d9c76eeb081dc96"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -4954,7 +4953,7 @@ checksum = "630bdcf245f78637c13ec01ffae6187cca34625e8c63150d424b59e55af2675e"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -5336,7 +5335,7 @@ dependencies = [
  "once_cell",
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
  "wasm-bindgen-shared",
 ]
 
@@ -5370,7 +5369,7 @@ checksum = "54681b18a46765f095758388f2d0cf16eb8d4169b639ab575a8f5693af210c7b"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
@@ -5559,9 +5558,9 @@ checksum = "1a515f5799fe4961cb532f983ce2b23082366b898e52ffbce459c86f67c8378a"
 
 [[package]]
 name = "winnow"
-version = "0.5.0"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81fac9742fd1ad1bd9643b991319f72dd031016d44b77039a26977eb667141e7"
+checksum = "8bd122eb777186e60c3fdf765a58ac76e41c582f1f535fbf3314434c6b58f3f7"
 dependencies = [
  "memchr",
 ]
@@ -5652,7 +5651,7 @@ checksum = "ce36e65b0d2999d2aafac989fb249189a141aee1f53c612c1f37d72631959f69"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
