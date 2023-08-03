@@ -1,8 +1,10 @@
-use std::str::FromStr;
-
+use crate::utils::{black2_128concat, encoded_key};
+use hex::encode;
 use serde_json::{json, Value};
-use sp_core::H256;
+use sp_core::{redjubjub::Public, H256};
+use sp_io::hashing::twox_128;
 use sp_version::RuntimeVersion;
+use std::str::FromStr;
 
 const LOCALHOST_RPC_URL: &str = "http://localhost:9933";
 
@@ -45,4 +47,25 @@ pub async fn get_runtime_version() -> RuntimeVersion {
         .await
         .unwrap();
     serde_json::from_value(runtime_version_json).unwrap()
+}
+
+pub async fn get_system_account_info(account: Public) {
+    let prefix = encoded_key(b"System", b"Account");
+    let postfix = black2_128concat(account);
+    let account_info = rpc_to_localhost("state_getStorage", (format!("0x{}{}", prefix, postfix),))
+        .await
+        .unwrap();
+    println!("{:?}", account_info);
+}
+
+pub async fn get_storage() {
+    let module = twox_128(b"Sudo");
+    let method = twox_128(b"Key");
+    let storage_value = rpc_to_localhost(
+        "state_getStorage",
+        (format!("0x{}{}", encode(module), encode(&method)),),
+    )
+    .await
+    .unwrap();
+    println!("{:?}", storage_value);
 }
