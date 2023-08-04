@@ -14,7 +14,7 @@ jobs:
           submodules: recursive
       - name: Update submodules
         id: update
-        run: git submodule update --remote --recursive
+        run: git submodule update -i
       - uses: actions-rs/cargo@v1
         with:
           command: bench
