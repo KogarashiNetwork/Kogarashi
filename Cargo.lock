@@ -707,6 +707,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "cli"
+version = "0.1.0"
+
+[[package]]
 name = "colored"
 version = "2.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2102,25 +2106,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f6d5ed8676d904364de097082f4e7d240b571b67989ced0240f08b7f966f940"
 dependencies = [
  "cpufeatures",
-]
-
-[[package]]
-name = "kogarashi-client"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "frame-system",
- "hex",
- "pallet-balances",
- "reqwest",
- "serde",
- "serde_json",
- "sp-core",
- "sp-io",
- "sp-keyring",
- "sp-runtime",
- "sp-version",
- "tokio 1.29.1",
 ]
 
 [[package]]
@@ -4725,6 +4710,25 @@ dependencies = [
  "log",
  "prometheus",
  "tokio 0.2.25",
+]
+
+[[package]]
+name = "substrate-rpc"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "frame-system",
+ "hex",
+ "pallet-balances",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sp-core",
+ "sp-io",
+ "sp-keyring",
+ "sp-runtime",
+ "sp-version",
+ "tokio 1.29.1",
 ]
 
 [[package]]

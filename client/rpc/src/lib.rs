@@ -3,10 +3,10 @@ mod rpc;
 mod utils;
 mod wallet;
 
-use rpc::{get_balance, transfer};
+pub use rpc::{get_balance, transfer};
 use sp_keyring::RedjubjubKeyring as AccountKeyring;
 use std::{thread, time::Duration};
-use wallet::Wallet;
+pub use wallet::Wallet;
 
 #[tokio::main]
 async fn main() {
