@@ -1,8 +1,8 @@
+use crate::{rpc, utils};
+
 use sp_core::{blake2_256, Encode};
 use sp_keyring::RedjubjubKeyring as Keyring;
 use sp_runtime::{codec::Compact, generic::Era, AccountId32, MultiAddress, MultiSignature};
-
-use crate::{rpc, utils};
 
 pub async fn create_balance_transfer_xt(signer: Keyring, to: AccountId32, amount: u128) -> String {
     let pallet_index: u8 = 5;

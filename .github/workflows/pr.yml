@@ -15,7 +15,7 @@ jobs:
           submodules: recursive
       - name: Update submodules
         id: update
-        run: git submodule update --remote --recursive
+        run: git submodule update -i
       - uses: actions-rs/toolchain@v1
       - run: rustup component add rustfmt
       - uses: actions-rs/cargo@v1
@@ -34,7 +34,7 @@ jobs:
             submodules: recursive
         - name: Update submodules
           id: update
-          run: git submodule update --remote --recursive
+          run: git submodule update -i
         - uses: actions-rs/cargo@v1
           with:
             command: bench
@@ -50,7 +50,7 @@ jobs:
             submodules: recursive
         - name: Update submodules
           id: update
-          run: git submodule update --remote --recursive
+          run: git submodule update -i
         - uses: actions-rs/toolchain@v1
         - run: rustup component add clippy
         - run: rustup target add wasm32-unknown-unknown
@@ -70,7 +70,7 @@ jobs:
           submodules: recursive
       - name: Update submodules
         id: update
-        run: git submodule update --remote --recursive
+        run: git submodule update -i
       - uses: actions-rs/toolchain@v1
       - run: rustup target add wasm32-unknown-unknown
       - name: Run cargo-tarpaulin

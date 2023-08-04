@@ -13,4 +13,7 @@ sp-keyring = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zks
 sp-runtime = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }
 sp-version = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }
 sp-core = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }
+sp-io = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }
+frame-system = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }
+pallet-balances = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = 'v3.0.0' }
 reqwest = { version = "0.11.12", features = ["json"] }

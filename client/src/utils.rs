@@ -1,4 +1,10 @@
-use sp_core::Encode;
+use hex::encode;
+use std::vec;
+
+use sp_core::hexdisplay::AsBytesRef;
+use sp_core::redjubjub::Public;
+use sp_core::{blake2_128, Encode};
+use sp_io::hashing::twox_128;
 use sp_runtime::codec::Compact;
 
 pub fn encode_extrinsic<S: Encode, C: Encode>(signature: Option<S>, call: C) -> Vec<u8> {
@@ -24,4 +30,13 @@ pub fn encode_extrinsic<S: Encode, C: Encode>(signature: Option<S>, call: C) -> 
     output.extend(tmp);
 
     output
+}
+
+pub(crate) fn encoded_key(module: &[u8], method: &[u8]) -> String {
+    format!("{}{}", encode(twox_128(module)), encode(twox_128(method)))
+}
+
+pub(crate) fn black2_128concat(public_key: Public) -> String {
+    let hash = blake2_128(public_key.as_bytes_ref());
+    format!("{}{}", encode(hash), encode(public_key.0))
 }

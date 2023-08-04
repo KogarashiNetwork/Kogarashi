@@ -1,21 +1,31 @@
-use rpc::rpc_to_localhost;
-use sp_keyring::RedjubjubKeyring as AccountKeyring;
-
 mod extrinsic;
 mod rpc;
 mod utils;
+mod wallet;
+
+use rpc::{get_balance, transfer};
+use sp_keyring::RedjubjubKeyring as AccountKeyring;
+use std::{thread, time::Duration};
+use wallet::Wallet;
 
 #[tokio::main]
 async fn main() {
-    let xt = extrinsic::create_balance_transfer_xt(
-        AccountKeyring::Alice,
-        AccountKeyring::Bob.to_account_id(),
-        1000,
-    )
-    .await;
-    println!("Extrinsic: {xt}");
-    match rpc_to_localhost("author_submitExtrinsic", [xt]).await {
-        Ok(res) => println!("Result: {res}"),
-        Err(err) => println!("Error: {err}"),
-    }
+    // set param
+    let transfer_amount = 1000000000000;
+
+    // generate wallet
+    let zane = Wallet::generate();
+    let before_balance = get_balance(zane.public()).await;
+
+    // transfer
+    transfer(AccountKeyring::Alice, zane.to_account_id(), transfer_amount)
+        .await
+        .unwrap();
+
+    // wait block inclusion
+    thread::sleep(Duration::from_millis(5000));
+
+    // check state transition
+    let after_balance = get_balance(zane.public()).await;
+    assert_eq!(before_balance + transfer_amount, after_balance)
 }

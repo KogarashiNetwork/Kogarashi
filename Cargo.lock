@@ -2109,11 +2109,14 @@ name = "kogarashi-client"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "frame-system",
  "hex",
+ "pallet-balances",
  "reqwest",
  "serde",
  "serde_json",
  "sp-core",
+ "sp-io",
  "sp-keyring",
  "sp-runtime",
  "sp-version",
