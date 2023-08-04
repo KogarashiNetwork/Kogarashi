@@ -1,7 +1,7 @@
 version: '3'
 services:
   kogarashi:
-    build: .
+    image: docker.pkg.github.com/kogarashinetwork/kogarashi/base
     container_name: kogarashi
     tty: true
     stdin_open: true
