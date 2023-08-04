@@ -10,7 +10,6 @@ pub struct Wallet {
 impl Wallet {
     pub fn generate() -> Self {
         let (pair, seed) = Pair::from_entropy(b"abcdefghijklmnopqrstuvwx", None);
-        println!("{:?}", seed);
         Self { pair, seed }
     }
 

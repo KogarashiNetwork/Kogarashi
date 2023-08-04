@@ -1,5 +1,5 @@
 use super::constant::SAPLING_BASE_POINT;
-use super::hash::{kogarashi_hash, sapling_hash};
+use super::hash::sapling_hash;
 use super::public_key::PublicKey;
 use super::signature::Signature;
 
@@ -27,8 +27,8 @@ impl SecretKey {
 
     pub fn from_seed_bytes(bytes: &[u8]) -> Option<Self> {
         assert_eq!(bytes.len(), Self::LENGTH);
-        let bytes: [u8; Self::LENGTH] = bytes[..].try_into().unwrap();
-        Self::from_bytes(kogarashi_hash(&bytes).to_bytes())
+        let bytes: [u8; Self::LENGTH] = bytes[..Self::LENGTH].try_into().unwrap();
+        Self::from_bytes(bytes)
     }
 
     #[allow(non_snake_case)]

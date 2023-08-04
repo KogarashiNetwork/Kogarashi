@@ -83,7 +83,7 @@ impl SigUtils<32> for Fp {
         if borrow & 1 == 1 {
             Some(Self([l0, l1, l2, l3]) * Self(R2))
         } else {
-            None
+            Some(Self([l0, l1, l2, l3]).reduce() * Self(R2))
         }
     }
 }
