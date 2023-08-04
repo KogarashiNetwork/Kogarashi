@@ -1,10 +1,15 @@
 use crate::utils::{black2_128concat, encoded_key};
-use hex::encode;
+use frame_system::AccountInfo;
+use hex::FromHex;
+use pallet_balances::AccountData;
 use serde_json::{json, Value};
+use sp_core::Decode;
 use sp_core::{redjubjub::Public, H256};
-use sp_io::hashing::twox_128;
+use sp_runtime::AccountId32;
 use sp_version::RuntimeVersion;
 use std::str::FromStr;
+
+type AccountMeta = AccountInfo<u32, AccountData<u128>>;
 
 const LOCALHOST_RPC_URL: &str = "http://localhost:9933";
 
@@ -29,11 +34,16 @@ pub async fn rpc_to_localhost<Params: serde::Serialize>(
     Ok(body["result"].take())
 }
 
-pub async fn get_nonce(account: &sp_runtime::AccountId32) -> u32 {
+pub async fn get_nonce(account: &AccountId32) -> u32 {
     let nonce_json = rpc_to_localhost("system_accountNextIndex", (account,))
         .await
         .unwrap();
     serde_json::from_value(nonce_json).unwrap()
+}
+
+pub async fn get_balance(account: Public) -> u128 {
+    let account_info = get_system_account_info(account).await;
+    account_info.data.free
 }
 
 pub async fn get_genesis_hash() -> H256 {
@@ -49,23 +59,12 @@ pub async fn get_runtime_version() -> RuntimeVersion {
     serde_json::from_value(runtime_version_json).unwrap()
 }
 
-pub async fn get_system_account_info(account: Public) {
+async fn get_system_account_info(account: Public) -> AccountMeta {
     let prefix = encoded_key(b"System", b"Account");
     let postfix = black2_128concat(account);
-    let account_info = rpc_to_localhost("state_getStorage", (format!("0x{}{}", prefix, postfix),))
+    let res = rpc_to_localhost("state_getStorage", (format!("0x{}{}", prefix, postfix),))
         .await
         .unwrap();
-    println!("{:?}", account_info);
-}
-
-pub async fn get_storage() {
-    let module = twox_128(b"Sudo");
-    let method = twox_128(b"Key");
-    let storage_value = rpc_to_localhost(
-        "state_getStorage",
-        (format!("0x{}{}", encode(module), encode(&method)),),
-    )
-    .await
-    .unwrap();
-    println!("{:?}", storage_value);
+    let data = Vec::from_hex(res.as_str().unwrap().replace("0x", "")).unwrap();
+    AccountInfo::decode(&mut data.as_slice()).unwrap()
 }
