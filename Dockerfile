@@ -1,12 +1,13 @@
-FROM rust:1.63.0
+FROM alpine:3.18.2
 
-WORKDIR /app/node
+ENV PATH $PATH:/root/.cargo/bin
 
-COPY . .
+ENV RUSTFLAGS "-C target-feature=-crt-static"
 
-RUN apt-get update &&\
-    apt-get install llvm libclang-dev -y &&\
-    rustup override set nightly-2022-11-14 &&\
-    rustup target add wasm32-unknown-unknown --toolchain nightly-2022-11-14
+RUN apk add --no-cache --update-cache \
+    curl clang15 clang15-dev musl-dev git gcc protoc llvm-dev bash
 
-CMD bash -c "cargo build && (ls ./target/debug/kogarashi-node && echo 'build success') || exit 1"
+RUN curl https://sh.rustup.rs -sSf | \
+    sh -s -- -y --profile minimal --default-toolchain nightly-2022-11-14 &&\
+    rustup target add wasm32-unknown-unknown --toolchain nightly-2022-11-14 &&\
+    rustup component add rustfmt
