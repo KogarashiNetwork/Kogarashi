@@ -3,5 +3,6 @@ members = [
     'kogarashi',
     'client'
 ]
+
 [profile.release]
 panic = 'unwind'

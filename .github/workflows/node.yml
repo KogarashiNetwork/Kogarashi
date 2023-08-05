@@ -22,3 +22,4 @@ jobs:
           run: git submodule update -i
         - uses: actions-rs/toolchain@v1
         - run: sh scripts/test.sh
+        - run: cd node/client && cargo test --features integration cli_test -- --nocapture
