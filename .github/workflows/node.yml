@@ -6,7 +6,7 @@ on:
 jobs:
   node:
         if: contains(github.event.pull_request.labels.*.name, 'node')
-        name: Node Test
+        name: Node RPC Test
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v2
@@ -20,9 +20,5 @@ jobs:
         - name: Update submodules
           id: update
           run: git submodule update -i
-        - name: checkout pushed commit
-          uses: actions/checkout@v2
-          with:
-            ref: ${{ github.event.pull_request.head.sha }}
-        - name: Run docker compose
-          run: docker-compose up
+        - uses: actions-rs/toolchain@v1
+        - run: sh scripts/test.sh

@@ -8,4 +8,4 @@ services:
     volumes:
       - .:/app
     working_dir: /app/node
-    command: bash -c "cargo build && (cargo test & ./target/debug/kogarashi-node)"
+    command: bash -c "cargo build && (cargo test & ./target/debug/kogarashi-node --dev)"

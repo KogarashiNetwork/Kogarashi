@@ -111,7 +111,7 @@ mod tests {
         .unwrap();
 
         // wait for inclusion
-        thread::sleep(Duration::from_millis(5000));
+        thread::sleep(Duration::from_millis(15000));
 
         // check state transition
         let after_balance = get_balance(zane.public()).await;
