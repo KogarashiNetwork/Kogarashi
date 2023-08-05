@@ -5,7 +5,7 @@ use super::signature::Signature;
 
 use jub_jub::Fp;
 use rand_core::RngCore;
-use zkstd::behave::SigUtils;
+use zkstd::behave::{FftField, SigUtils};
 
 #[derive(Clone, Copy, Debug)]
 pub struct SecretKey(pub(crate) Fp);
@@ -25,10 +25,17 @@ impl SecretKey {
         Self(key)
     }
 
-    pub fn from_seed_bytes(bytes: &[u8]) -> Option<Self> {
-        assert_eq!(bytes.len(), Self::LENGTH);
-        let bytes: [u8; Self::LENGTH] = bytes[..Self::LENGTH].try_into().unwrap();
-        Self::from_bytes(bytes)
+    pub fn from_seed(seed: [u8; 32]) -> Option<Self> {
+        Self::from_bytes(seed)
+    }
+
+    pub fn from_raw_bytes(raw_bytes: &[u8]) -> Option<Self> {
+        let mut raw_bytes = raw_bytes.to_vec();
+        if raw_bytes.len() < 64 {
+            raw_bytes.resize(64, 0);
+        }
+        let bytes: [u8; 64] = raw_bytes[..64].try_into().unwrap();
+        Some(Self(Fp::from_bytes_wide(&bytes)))
     }
 
     #[allow(non_snake_case)]

@@ -4,7 +4,7 @@ mod utils;
 mod wallet;
 
 pub use rpc::{get_balance, transfer};
-use sp_keyring::RedjubjubKeyring as AccountKeyring;
+pub use sp_keyring::RedjubjubKeyring as AccountKeyring;
 use std::{thread, time::Duration};
 pub use wallet::Wallet;
 

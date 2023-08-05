@@ -55,8 +55,13 @@ async fn get_system_account_info(account: Public) -> AccountMeta {
     let res = rpc_to_localhost("state_getStorage", (format!("0x{}{}", prefix, postfix),))
         .await
         .unwrap();
-    let data = Vec::from_hex(res.as_str().unwrap().replace("0x", "")).unwrap();
-    AccountInfo::decode(&mut data.as_slice()).unwrap()
+    match res.as_str() {
+        Some(raw_text) => {
+            let data = Vec::from_hex(raw_text.replace("0x", "")).unwrap();
+            AccountInfo::decode(&mut data.as_slice()).unwrap()
+        }
+        None => AccountInfo::default(),
+    }
 }
 
 async fn rpc_to_localhost<Params: serde::Serialize>(

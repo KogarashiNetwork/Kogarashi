@@ -7,3 +7,4 @@ edition = "2021"
 substrate-rpc = { path = "../rpc" }
 hex = "0.4.3"
 clap = { version = "4.3.19", features = ["derive"] }
+tokio = { version = "1.10.0", features = ["full"] }
