@@ -7,7 +7,7 @@ ENV RUSTFLAGS "-C target-feature=-crt-static"
 ENV TOOLCHAIN nightly-2022-11-14
 
 RUN apk add --no-cache --update-cache \
-    curl clang15 clang15-dev musl-dev git gcc g++ protoc llvm-dev bash
+    curl clang15 clang15-dev musl-dev git gcc g++ protoc llvm-dev bash openssl
 
 RUN curl https://sh.rustup.rs -sSf | \
     sh -s -- -y --profile minimal --default-toolchain $TOOLCHAIN &&\

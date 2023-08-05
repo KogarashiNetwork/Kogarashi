@@ -4,7 +4,7 @@ mod wallet;
 
 use clap::{Parser, Subcommand};
 use rpc::{get_balance, transfer};
-use sp_keyring::AccountKeyring;
+use sp_keyring::RedjubjubKeyring as AccountKeyring;
 use sp_runtime::AccountId32;
 use std::fs::File;
 use std::io::Write;
