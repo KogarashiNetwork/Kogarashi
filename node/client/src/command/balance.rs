@@ -1,9 +1,11 @@
-use rpc::{get_balance, transfer};
+use crate::rpc::get_balance;
+use crate::wallet::extract_wallet;
+
 use sp_keyring::RedjubjubKeyring as AccountKeyring;
 
-pub(crate) fn balance_command(person: Option<String>) {
+pub(crate) async fn balance_command(person: &Option<String>) {
     let wallet = match person {
-        Some(name) => match name {
+        Some(name) => match &name as &str {
             "Alice" => AccountKeyring::Alice.public(),
             "Bob" => AccountKeyring::Bob.public(),
             "Charlie" => AccountKeyring::Charlie.public(),
@@ -16,6 +18,6 @@ pub(crate) fn balance_command(person: Option<String>) {
         },
         None => extract_wallet().public(),
     };
-    let balance = get_balance(wallet.public()).await;
+    let balance = get_balance(wallet).await;
     println!("{:?} Balance", balance)
 }

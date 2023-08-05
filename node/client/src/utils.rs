@@ -1,29 +1,10 @@
-use std::fs::File;
-use std::io::Read;
-
-use crate::wallet::Wallet;
-
-pub(crate) fn wallet_info(wallet: &Wallet) {
-    println!("SS58 Address: {:?}", wallet.public().to_string());
-    println!("Wallet ID: {:?}", wallet.to_account_id());
-    println!("Wallet Seed: {:?}", wallet.seed());
-}
-
-pub(crate) fn extract_wallet() -> Wallet {
-    let mut f = File::open("key.kog").unwrap();
-    let mut secret = vec![];
-    f.read_to_end(&mut secret).unwrap();
-    let seed: [u8; 32] = secret[..32].try_into().unwrap();
-    Wallet::from_seed(seed)
-}
 use hex::encode;
-use std::vec;
-
 use sp_core::hexdisplay::AsBytesRef;
 use sp_core::redjubjub::Public;
 use sp_core::{blake2_128, Encode};
 use sp_io::hashing::twox_128;
 use sp_runtime::codec::Compact;
+use std::vec;
 
 pub fn encode_extrinsic<S: Encode, C: Encode>(signature: Option<S>, call: C) -> Vec<u8> {
     let mut tmp: Vec<u8> = vec![];

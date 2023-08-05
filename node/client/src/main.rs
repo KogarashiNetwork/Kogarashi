@@ -5,14 +5,7 @@ mod wallet;
 
 use clap::{Parser, Subcommand};
 use command::{balance_command, fund_command, init_command, list_command, transfer_command};
-use rpc::{get_balance, transfer};
-use sp_keyring::RedjubjubKeyring as AccountKeyring;
-use sp_runtime::AccountId32;
-use std::fs::File;
-use std::io::Write;
 use std::path::PathBuf;
-use utils::{extract_wallet, wallet_info};
-use wallet::Wallet;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -53,9 +46,9 @@ async fn main() {
     match &cli.command {
         Some(Commands::List) => list_command(),
         Some(Commands::Init) => init_command(),
-        Some(Commands::Balance { person }) => balance_command(person),
-        Some(Commands::Fund) => fund_command(),
-        Some(Commands::Transfer { person }) => transfer_command(person),
+        Some(Commands::Balance { person }) => balance_command(person).await,
+        Some(Commands::Fund) => fund_command().await,
+        Some(Commands::Transfer { person }) => transfer_command(person).await,
         None => {}
     }
 }

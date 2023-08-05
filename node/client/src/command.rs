@@ -4,8 +4,8 @@ mod init;
 mod list;
 mod transfer;
 
-pub use balance::balance_command;
-pub use fund::fund_command;
-pub use init::init_command;
-pub use list::list_command;
-pub use transfer::transfer_command;
+pub(crate) use balance::balance_command;
+pub(crate) use fund::fund_command;
+pub(crate) use init::init_command;
+pub(crate) use list::list_command;
+pub(crate) use transfer::transfer_command;

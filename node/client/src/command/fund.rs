@@ -1,4 +1,9 @@
-pub(crate) fn fund_command() {
+use crate::rpc::transfer;
+use crate::wallet::extract_wallet;
+
+use sp_keyring::RedjubjubKeyring as AccountKeyring;
+
+pub(crate) async fn fund_command() {
     let wallet = extract_wallet();
     match transfer(
         wallet.pair(),

@@ -1,7 +1,12 @@
-pub(crate) fn transfer_command(person: Option<String>) {
+use crate::rpc::transfer;
+use crate::wallet::extract_wallet;
+
+use sp_keyring::RedjubjubKeyring as AccountKeyring;
+
+pub(crate) async fn transfer_command(person: &Option<String>) {
     let wallet = extract_wallet();
     let to = match person {
-        Some(name) => match name {
+        Some(name) => match &name as &str {
             "Alice" => AccountKeyring::Alice.to_account_id(),
             "Bob" => AccountKeyring::Bob.to_account_id(),
             "Charlie" => AccountKeyring::Charlie.to_account_id(),

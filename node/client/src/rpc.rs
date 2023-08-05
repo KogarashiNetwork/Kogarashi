@@ -87,7 +87,7 @@ async fn rpc_to_localhost<Params: serde::Serialize>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Wallet;
+    use crate::wallet::Wallet;
     use sp_keyring::RedjubjubKeyring as AccountKeyring;
     use std::{thread, time::Duration};
 

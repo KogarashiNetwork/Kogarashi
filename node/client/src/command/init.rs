@@ -1,5 +1,7 @@
+use crate::wallet::{wallet_info, Wallet};
+
 use std::fs::File;
-use wallet::Wallet;
+use std::io::Write;
 
 pub(crate) fn init_command() {
     println!("Start Wallet Generation...");
