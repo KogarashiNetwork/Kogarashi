@@ -1,12 +1,13 @@
 mod utils;
 
 use clap::{Parser, Subcommand};
+use sp_runtime::AccountId32;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 use std::path::PathBuf;
 use substrate_rpc::{get_balance, transfer, AccountKeyring, Wallet};
-use utils::wallet_info;
+use utils::{extract_wallet, wallet_info};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -28,12 +29,16 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// display account list
+    List,
     /// init redjubjub wallet
     Init,
     /// get balance
     Balance { address: Option<String> },
     /// fund to account
     Fund,
+    /// transfer
+    Transfer { to: Option<AccountId32> },
 }
 
 #[tokio::main]
@@ -41,6 +46,16 @@ async fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
+        Some(Commands::List) => {
+            println!("Alice: {:?}", AccountKeyring::Alice.to_account_id());
+            println!("Bob: {:?}", AccountKeyring::Bob.to_account_id());
+            println!("Charlie: {:?}", AccountKeyring::Charlie.to_account_id());
+            println!("Dave: {:?}", AccountKeyring::Dave.to_account_id());
+            println!("Eve: {:?}", AccountKeyring::Eve.to_account_id());
+            println!("Ferdie: {:?}", AccountKeyring::Ferdie.to_account_id());
+            println!("One: {:?}", AccountKeyring::One.to_account_id());
+            println!("Two: {:?}", AccountKeyring::Two.to_account_id());
+        }
         Some(Commands::Init) => {
             println!("Start Wallet Generation...");
             let wallet = Wallet::generate();
@@ -53,23 +68,20 @@ async fn main() {
                 println!("Get {:?} Balance", x);
             }
             None => {
-                let mut f = File::open("key.kog").unwrap();
-                let mut secret = vec![];
-                f.read_to_end(&mut secret).unwrap();
-                let seed: [u8; 32] = secret[..32].try_into().unwrap();
-                let wallet = Wallet::from_seed(seed);
-                wallet_info(&wallet);
+                let wallet = extract_wallet();
                 let balance = get_balance(wallet.public()).await;
                 println!("{:?} Balance", balance)
             }
         },
         Some(Commands::Fund) => {
-            let mut f = File::open("key.kog").unwrap();
-            let mut secret = vec![];
-            f.read_to_end(&mut secret).unwrap();
-            let seed: [u8; 32] = secret[..32].try_into().unwrap();
-            let wallet = Wallet::from_seed(seed);
-            match transfer(AccountKeyring::Alice, wallet.to_account_id(), 1000000000000).await {
+            let wallet = extract_wallet();
+            match transfer(
+                wallet.pair(),
+                AccountKeyring::Alice.to_account_id(),
+                1000000000000,
+            )
+            .await
+            {
                 Ok(tx_id) => {
                     println!("Transaction Success: {:?}", tx_id)
                 }
@@ -78,6 +90,36 @@ async fn main() {
                 }
             }
         }
+        Some(Commands::Transfer { to }) => match to {
+            Some(to) => {
+                let wallet = extract_wallet();
+                match transfer(wallet.pair(), to.clone(), 1000000000000).await {
+                    Ok(tx_id) => {
+                        println!("Transaction Success: {:?}", tx_id)
+                    }
+                    Err(err) => {
+                        println!("Transaction Failure: {:?}", err)
+                    }
+                }
+            }
+            None => {
+                let wallet = extract_wallet();
+                match transfer(
+                    wallet.pair(),
+                    AccountKeyring::Alice.to_account_id(),
+                    1000000000000,
+                )
+                .await
+                {
+                    Ok(tx_id) => {
+                        println!("Transaction Success: {:?}", tx_id)
+                    }
+                    Err(err) => {
+                        println!("Transaction Failure: {:?}", err)
+                    }
+                }
+            }
+        },
         None => {}
     }
 }

@@ -4,6 +4,7 @@ mod utils;
 mod wallet;
 
 pub use rpc::{get_balance, transfer};
+pub use sp_core::Pair;
 pub use sp_keyring::RedjubjubKeyring as AccountKeyring;
 use std::{thread, time::Duration};
 pub use wallet::Wallet;
@@ -18,9 +19,13 @@ async fn main() {
     let before_balance = get_balance(zane.public()).await;
 
     // transfer
-    transfer(AccountKeyring::Alice, zane.to_account_id(), transfer_amount)
-        .await
-        .unwrap();
+    transfer(
+        AccountKeyring::Alice.pair(),
+        zane.to_account_id(),
+        transfer_amount,
+    )
+    .await
+    .unwrap();
 
     // wait for inclusion
     thread::sleep(Duration::from_millis(5000));

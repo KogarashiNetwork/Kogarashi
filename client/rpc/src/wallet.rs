@@ -14,6 +14,10 @@ impl Wallet {
         Self { pair, seed }
     }
 
+    pub fn pair(&self) -> Pair {
+        self.pair.clone()
+    }
+
     pub fn public(&self) -> Public {
         self.pair.public()
     }
