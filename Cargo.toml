@@ -42,8 +42,6 @@ frame-support = { default-features = false, branch = 'v3.0.0', git = "https://gi
 
 [workspace]
 members = [
-    "client/rpc",
-    "client/cli",
     "pallets/confidential_transfer",
     "pallets/encrypted_balance",
     "pallets/plonk",

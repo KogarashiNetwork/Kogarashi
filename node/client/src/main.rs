@@ -1,13 +1,16 @@
+mod rpc;
 mod utils;
+mod wallet;
 
 use clap::{Parser, Subcommand};
+use rpc::{get_balance, transfer};
+use sp_keyring::AccountKeyring;
 use sp_runtime::AccountId32;
 use std::fs::File;
-use std::io::Read;
 use std::io::Write;
 use std::path::PathBuf;
-use substrate_rpc::{get_balance, transfer, AccountKeyring, Wallet};
 use utils::{extract_wallet, wallet_info};
+use wallet::Wallet;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]

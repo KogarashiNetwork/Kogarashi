@@ -1,4 +1,5 @@
-use crate::extrinsic;
+mod extrinsic;
+
 use crate::utils::{black2_128concat, encoded_key};
 use frame_system::AccountInfo;
 use hex::FromHex;
@@ -9,7 +10,6 @@ use sp_core::{
     redjubjub::{Pair, Public},
     H256,
 };
-use sp_keyring::RedjubjubKeyring;
 use sp_runtime::AccountId32;
 use sp_version::RuntimeVersion;
 use std::str::FromStr;
