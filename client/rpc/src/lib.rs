@@ -22,7 +22,7 @@ async fn main() {
         .await
         .unwrap();
 
-    // wait block inclusion
+    // wait for inclusion
     thread::sleep(Duration::from_millis(5000));
 
     // check state transition

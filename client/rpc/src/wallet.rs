@@ -2,6 +2,7 @@ use sp_core::redjubjub::{Pair, Public};
 use sp_core::Pair as TPair;
 use sp_runtime::AccountId32;
 
+#[derive(Clone, Debug)]
 pub struct Wallet {
     pair: Pair,
     seed: [u8; 32],

@@ -5,7 +5,7 @@ use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 use std::path::PathBuf;
-use substrate_rpc::Wallet;
+use substrate_rpc::{Wallet, get_balance};
 use utils::wallet_info;
 
 #[derive(Parser)]
@@ -56,6 +56,7 @@ fn main() {
                 let seed: [u8; 32] = secret[..32].try_into().unwrap();
                 let wallet = Wallet::from_seed(seed);
                 wallet_info(wallet);
+                get_balance(wallet.public());
             }
         },
         None => {}
