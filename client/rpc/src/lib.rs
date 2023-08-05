@@ -3,10 +3,11 @@ mod rpc;
 mod utils;
 mod wallet;
 
-use rpc::{get_balance, transfer};
-use sp_keyring::RedjubjubKeyring as AccountKeyring;
+pub use rpc::{get_balance, transfer};
+pub use sp_core::Pair;
+pub use sp_keyring::RedjubjubKeyring as AccountKeyring;
 use std::{thread, time::Duration};
-use wallet::Wallet;
+pub use wallet::Wallet;
 
 #[tokio::main]
 async fn main() {
@@ -18,11 +19,15 @@ async fn main() {
     let before_balance = get_balance(zane.public()).await;
 
     // transfer
-    transfer(AccountKeyring::Alice, zane.to_account_id(), transfer_amount)
-        .await
-        .unwrap();
+    transfer(
+        AccountKeyring::Alice.pair(),
+        zane.to_account_id(),
+        transfer_amount,
+    )
+    .await
+    .unwrap();
 
-    // wait block inclusion
+    // wait for inclusion
     thread::sleep(Duration::from_millis(5000));
 
     // check state transition

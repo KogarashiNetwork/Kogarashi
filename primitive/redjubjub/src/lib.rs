@@ -28,7 +28,7 @@ pub use public_key::PublicKey;
 pub use signature::Signature;
 
 /// An redjubjub keypar.
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct Keypair {
     /// The secret half of this keypair.
     pub secret: SecretKey,

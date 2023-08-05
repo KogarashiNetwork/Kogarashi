@@ -1,7 +1,5 @@
 .github
-benches
 book
 docs
 example
-target
-node/target
+**/target

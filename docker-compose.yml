@@ -1,9 +1,11 @@
 version: '3'
 services:
   kogarashi:
-    build: .
+    image: ghcr.io/kogarashinetwork/kogarashi/light
     container_name: kogarashi
     tty: true
     stdin_open: true
     volumes:
       - .:/app
+    working_dir: /app/node
+    command: bash -c "cargo build && (ls ./target/debug/kogarashi-node && echo 'build success') || exit 1"

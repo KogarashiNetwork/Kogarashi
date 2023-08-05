@@ -3,3 +3,4 @@ target
 .DS_Store
 proptest-regressions
 *.proptest-regressions
+*.kog

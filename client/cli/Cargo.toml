@@ -1,0 +1,12 @@
+[package]
+name = "wallet-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+substrate-rpc = { path = "../rpc" }
+hex = "0.4.3"
+clap = { version = "4.3.19", features = ["derive"] }
+tokio = { version = "1.10.0", features = ["full"] }
+sp-core = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }
+sp-runtime = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }

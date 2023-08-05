@@ -1,4 +1,4 @@
-name: Substrate Node Test
+name: Integration Test
 on:
   pull_request:
     branches: [ master, develop ]
@@ -12,6 +12,11 @@ jobs:
         - uses: actions/checkout@v2
           with:
             submodules: recursive
+        - uses: actions/checkout@v2
+        - name: Generate SSH
+          run: ssh-keygen -t rsa -b 4096 -C "sample" -f ~/.ssh/id_rsa -N ""
+        - name: Registry Auth
+          run: echo "${{ secrets.REGISTRY_ACCESS_TOKEN }}" | docker login docker.pkg.github.com -u '${{ secrets.ACCOUNT_NAME }}' --password-stdin
         - name: Update submodules
           id: update
           run: git submodule update -i

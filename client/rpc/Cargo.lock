@@ -2026,7 +2026,7 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -2038,7 +2038,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "integer-sqrt",
  "num-traits",
@@ -2051,7 +2051,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -2099,7 +2099,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2109,7 +2109,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.9.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -2120,7 +2120,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "futures",
  "hash-db",
@@ -2144,7 +2144,7 @@ dependencies = [
 [[package]]
 name = "sp-keyring"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "lazy_static",
  "sp-core",
@@ -2155,7 +2155,7 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.9.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -2171,7 +2171,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "backtrace",
 ]
@@ -2179,7 +2179,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -2200,7 +2200,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -2217,7 +2217,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "Inflector",
  "proc-macro-crate 0.1.5",
@@ -2229,7 +2229,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.9.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "hash-db",
  "log",
@@ -2257,12 +2257,12 @@ checksum = "35391ea974fa5ee869cb094d5b437688fbf3d8127d64d1b9fed5822a1ed39b12"
 [[package]]
 name = "sp-std"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 
 [[package]]
 name = "sp-storage"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -2275,7 +2275,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "log",
  "parity-scale-codec",
@@ -2288,7 +2288,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "hash-db",
  "memory-db",
@@ -2302,7 +2302,7 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -2314,7 +2314,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "3.0.0"
-source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#6874e32e58a9c583db8673bd209a558339e8c82c"
+source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",

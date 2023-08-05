@@ -5,7 +5,10 @@ use hex::FromHex;
 use pallet_balances::AccountData;
 use serde_json::{json, Value};
 use sp_core::Decode;
-use sp_core::{redjubjub::Public, H256};
+use sp_core::{
+    redjubjub::{Pair, Public},
+    H256,
+};
 use sp_keyring::RedjubjubKeyring;
 use sp_runtime::AccountId32;
 use sp_version::RuntimeVersion;
@@ -40,11 +43,7 @@ pub async fn get_runtime_version() -> RuntimeVersion {
     serde_json::from_value(runtime_version_json).unwrap()
 }
 
-pub async fn transfer(
-    from: RedjubjubKeyring,
-    to: AccountId32,
-    amout: u128,
-) -> anyhow::Result<Value> {
+pub async fn transfer(from: Pair, to: AccountId32, amout: u128) -> anyhow::Result<Value> {
     let encoded_tx = extrinsic::create_balance_transfer_xt(from, to, amout).await;
     rpc_to_localhost("author_submitExtrinsic", [encoded_tx]).await
 }
@@ -55,8 +54,13 @@ async fn get_system_account_info(account: Public) -> AccountMeta {
     let res = rpc_to_localhost("state_getStorage", (format!("0x{}{}", prefix, postfix),))
         .await
         .unwrap();
-    let data = Vec::from_hex(res.as_str().unwrap().replace("0x", "")).unwrap();
-    AccountInfo::decode(&mut data.as_slice()).unwrap()
+    match res.as_str() {
+        Some(raw_text) => {
+            let data = Vec::from_hex(raw_text.replace("0x", "")).unwrap();
+            AccountInfo::decode(&mut data.as_slice()).unwrap()
+        }
+        None => AccountInfo::default(),
+    }
 }
 
 async fn rpc_to_localhost<Params: serde::Serialize>(
