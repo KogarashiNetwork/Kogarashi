@@ -1,5 +1,5 @@
 [package]
-name = "substrate-rpc"
+name = "client"
 version = "0.1.0"
 edition = "2021"
 
@@ -17,3 +17,4 @@ sp-io = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstr
 frame-system = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }
 pallet-balances = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = 'v3.0.0' }
 reqwest = { version = "0.11.12", features = ["json"] }
+clap = { version = "4.3.19", features = ["derive"] }
