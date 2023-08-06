@@ -8,6 +8,6 @@ RUN cd node/kogarashi && cargo build --release
 
 FROM alpine:3.18.2
 
-RUN apk update
+RUN apk add --no-cache --update-cach clang15-dev
 
 COPY --from=builder /app/node/target/release/kogarashi-node /usr/local/bin/kogarashi
