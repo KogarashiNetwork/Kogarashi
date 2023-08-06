@@ -9,14 +9,14 @@ on:
 
 jobs:
   test:
-    name: Unit Test
+    name: Rust Inline Test
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: Update submodules
+      - name: Update Submodules
         id: update
         run: git submodule update -i
       - uses: actions-rs/toolchain@v1
