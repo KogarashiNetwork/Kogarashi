@@ -1,10 +1,12 @@
-FROM ghcr.io/kogarashinetwork/kogarashi/light:latest as builder
+FROM rust:1.67 as builder
 
 WORKDIR /app
 
 COPY . .
 
-RUN cd node/kogarashi && cargo build --release
+RUN rustup target add wasm32-unknown-unknown &&\
+    cd node/kogarashi &&\
+    cargo build --release
 
 FROM debian:buster-slim
 
