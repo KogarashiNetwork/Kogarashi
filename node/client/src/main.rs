@@ -36,7 +36,7 @@ enum Commands {
     /// fund to account
     Fund,
     /// transfer
-    Transfer { person: Option<String> },
+    Transfer { person: String, amount: u128 },
 }
 
 #[tokio::main]
@@ -48,7 +48,44 @@ async fn main() {
         Some(Commands::Init) => init_command(),
         Some(Commands::Balance { person }) => balance_command(person).await,
         Some(Commands::Fund) => fund_command().await,
-        Some(Commands::Transfer { person }) => transfer_command(person).await,
+        Some(Commands::Transfer { person, amount }) => transfer_command(person, *amount).await,
         None => {}
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::{thread, time::Duration};
+
+    #[cfg(feature = "integration")]
+    #[tokio::main]
+    #[test]
+    async fn cli_test() {
+        // print account list
+        println!("List Command");
+        list_command();
+
+        // init wallet
+        println!("\n\nInit Command");
+        init_command();
+
+        // fund to wallet
+        println!("\n\nFund Command");
+        fund_command().await;
+        thread::sleep(Duration::from_millis(15000));
+
+        // check balance
+        println!("\n\nBalance Command");
+        balance_command(&None).await;
+
+        // transfer to Alice
+        println!("\n\nTransfer Command");
+        transfer_command("Alice", 500).await;
+        thread::sleep(Duration::from_millis(15000));
+
+        // check state transition
+        println!("\n\nBalance Command");
+        balance_command(&None).await;
     }
 }

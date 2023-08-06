@@ -1,11 +1,11 @@
-name: Integration Test
+name: Publish Package
 on:
   pull_request:
     branches: [ master, develop ]
 
 jobs:
   node:
-        if: contains(github.event.pull_request.labels.*.name, 'node')
+        if: contains(github.event.pull_request.labels.*.name, 'package')
         name: Node RPC Test
         runs-on: ubuntu-latest
         steps:
@@ -16,9 +16,9 @@ jobs:
         - name: Generate SSH
           run: ssh-keygen -t rsa -b 4096 -C "sample" -f ~/.ssh/id_rsa -N ""
         - name: Registry Auth
-          run: echo "${{ secrets.REGISTRY_ACCESS_TOKEN }}" | docker login docker.pkg.github.com -u '${{ secrets.ACCOUNT_NAME }}' --password-stdin
-        - name: Update submodules
+          run: echo "${{ secrets.REGISTRY_ACCESS_TOKEN }}" | docker login ghcr.io -u '${{ secrets.ACCOUNT_NAME }}' --password-stdin
+        - name: Publish Package
           id: update
           run: git submodule update -i
         - uses: actions-rs/toolchain@v1
-        - run: sh scripts/test.sh
+        - run: sh scripts/package.sh

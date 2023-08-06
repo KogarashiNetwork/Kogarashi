@@ -1,8 +1,10 @@
 use sp_core::redjubjub::{Pair, Public};
 use sp_core::Pair as TPair;
 use sp_runtime::AccountId32;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::Read;
+
+const KEY_PATH: &str = "key.kog";
 
 #[derive(Clone)]
 pub struct Wallet {
@@ -49,9 +51,16 @@ pub(crate) fn wallet_info(wallet: &Wallet) {
 }
 
 pub(crate) fn extract_wallet() -> Wallet {
-    let mut f = File::open("key.kog").unwrap();
+    let mut f = File::open(KEY_PATH).unwrap();
     let mut secret = vec![];
     f.read_to_end(&mut secret).unwrap();
     let seed: [u8; 32] = secret[..32].try_into().unwrap();
     Wallet::from_seed(seed)
+}
+
+pub(crate) fn is_wallet_init() -> bool {
+    match fs::metadata(KEY_PATH) {
+        Ok(_) => true,
+        Err(_) => false,
+    }
 }

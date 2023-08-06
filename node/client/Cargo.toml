@@ -1,14 +1,16 @@
 [package]
-name = "client"
+name = "kogarashi-cli"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0"
-tokio = { version = "1.10.0", features = ["full"] }
 hex = "0.4.3"
-serde = { version = "1.0", features = ["derive"] }
+anyhow = "1.0"
 serde_json = "1.0"
+tokio = { version = "1.10.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+reqwest = { version = "0.11.12", features = ["json"] }
+clap = { version = "4.3.19", features = ["derive"] }
 sp-keyring = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }
 sp-runtime = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }
 sp-version = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }
@@ -16,5 +18,6 @@ sp-core = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubs
 sp-io = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }
 frame-system = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = "v3.0.0" }
 pallet-balances = { version = "3.0.0", git = "https://github.com/KogarashiNetwork/zksubstrate", branch = 'v3.0.0' }
-reqwest = { version = "0.11.12", features = ["json"] }
-clap = { version = "4.3.19", features = ["derive"] }
+
+[features]
+integration = []
