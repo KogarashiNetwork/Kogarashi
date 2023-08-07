@@ -11,8 +11,9 @@ nav:
     - Zero Knowledge Scheme: zero_knowledge_scheme.md
   - Tutorial:
     - 'Abstract': tutorial.md
-    - Plonk: plonk_pallet.md
-    - Confidential Transfer: confidential_transfer.md
+    - Plonk Pallet: plonk_pallet.md
+    - Confidential Transfer Pallet: confidential_transfer_pallet.md
+    - RedDSA Wallet: reddsa_wallet.md
   - Constraints:
     - 'Abstract': constraints.md
     - Confidential Transfer Constraints: confidential_transfer_constraints.md
@@ -25,6 +26,7 @@ nav:
       - QAP: qap.md
       - Polynomial Commitment: polynomial_commitment.md
       - Homomorphic Encryption: homomorphic_encryption.md
+    - RedDSA Signature: reddsa_signature.md
   - Help:
     - Frequent Errors: frequent_errors.md
 site_dir: docs

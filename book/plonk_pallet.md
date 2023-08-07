@@ -1,4 +1,4 @@
-# pallet-plonk
+# Plonk Tutorial
 
 In this tutorial, we are going to import plonk-pallet to substrate runtime and test its functionalities.
 

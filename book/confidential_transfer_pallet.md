@@ -1,4 +1,4 @@
-# confidential_transfer
+# Confidential Transfer Tutorial
 
 In this tutorial, we are going to generate test data and test its functionalities. We assume that you already unserstand what [Confidential Transfer](./confidential_transfer_constraints.md) is.
 

@@ -418,7 +418,7 @@
   
     <li class="md-nav__item">
       <a href="../plonk_pallet/" class="md-nav__link">
-        Plonk
+        Plonk Pallet
       </a>
     </li>
   
@@ -431,8 +431,22 @@
   
   
     <li class="md-nav__item">
-      <a href="../confidential_transfer/" class="md-nav__link">
-        Confidential Transfer
+      <a href="../confidential_transfer_pallet/" class="md-nav__link">
+        Confidential Transfer Pallet
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reddsa_wallet/" class="md-nav__link">
+        RedDSA Wallet
       </a>
     </li>
   
@@ -669,6 +683,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reddsa_signature/" class="md-nav__link">
+        RedDSA Signature
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -804,7 +832,7 @@
 <ul>
 <li><a href="../plonk_pallet/">pallet-plonk</a></li>
 <li><a href="../encrypted_balance/">pallet-encrypted-balance</a></li>
-<li><a href="../confidential_transfer/">confidential_transfer</a></li>
+<li><a href="../confidential_transfer_pallet/">confidential_transfer</a></li>
 </ul>
 <p>You can check <a href="../frequent_errors/">Frequent Errors</a> when the error happens.</p>
 <h2 id="abstract">Abstract</h2>
@@ -813,8 +841,8 @@
 <p><code>plonk</code> is a zk-Snarks scheme and allows us to prove that the computation was done correctly. We perform transaction on <code>off-chain</code> and generate the proof. The blockchain verifies the proof and approve the transaction. We define the constraints circuit for <code>confidential transfers</code> and <code>confidential smart contracts</code> by this pallet.</p>
 <h3 id="pallet-encrypted-balance"><a href="../encrypted_balance/">pallet-encrypted-balance</a></h3>
 <p>Users balances are encrypted by default. We use additive homomorphic arithmetic to hide the integer in transaction. Combining original <a href="https://github.com/paritytech/substrate/tree/v3.0.0/frame/balances">pallet-balance</a> and <a href="../elgamal/"><code>ElGamal</code></a> encryption and we implemented <a href="../encrypted_balance/">pallet-encrypted-balance</a>. <strong>This pallet can't be used only by this self, because this doesn't check the validity of additive homomorphic arithmetic</strong>.</p>
-<h3 id="confidential_transfer"><a href="../confidential_transfer/">confidential_transfer</a></h3>
-<p>Users can transfer without being known actual amount by others with this pallet. <code>plonk</code> checks the <a href="../confidential_transfer/"><code>confidential transfer constraints</code></a> and <a href="../encrypted_balance/">pallet-encrypted-balance</a> performs the additive homomorphic state transition.</p>
+<h3 id="confidential_transfer"><a href="../confidential_transfer_pallet/">confidential_transfer</a></h3>
+<p>Users can transfer without being known actual amount by others with this pallet. <code>plonk</code> checks the <a href="./confidential_transfer.md"><code>confidential transfer constraints</code></a> and <a href="../encrypted_balance/">pallet-encrypted-balance</a> performs the additive homomorphic state transition.</p>
 
 
 
