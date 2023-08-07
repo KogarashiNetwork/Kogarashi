@@ -17,7 +17,7 @@ We already implemented RedDSA runtime [here](https://github.com/KogarashiNetwork
 
 ## 1. Run RedDSA compatible Substrate Node
 
-First of all, we would like to run the RedDSA-compatible Substrate Node. There are two ways to do this. We recommend docker-compose.
+First of all, we would like to run the RedDSA-compatible Substrate Node..
 
 Let's clone the RedDSA Substrate Node with the following command.
 
@@ -28,14 +28,6 @@ $ git submodule update -i
 ```
 
 After cloning the repository and submodule dependencies, run the RedDSA Substrate Node with the following command.
-
-### docker-compose
-
-```sh
-$ docker-compose up
-```
-
-### Native
 
 ```sh
 $ sh scripts/setup.sh
