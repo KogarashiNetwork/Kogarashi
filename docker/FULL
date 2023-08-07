@@ -6,8 +6,12 @@ COPY . .
 
 RUN cd node/kogarashi && cargo build --release
 
-FROM debian:buster-slim
+FROM alpine:3.18.2
 
-RUN apt-get update
+RUN apk add --no-cache --update-cach clang15-dev
 
 COPY --from=builder /app/node/target/release/kogarashi-node /usr/local/bin/kogarashi
+
+EXPOSE 9933
+
+CMD kogarashi --dev --listen-addr /ip4/0.0.0.0/tcp/9933

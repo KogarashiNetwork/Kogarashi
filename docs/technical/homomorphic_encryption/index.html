@@ -9,24 +9,24 @@
       
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../polynomial_commitment/">
       
       
-        <link rel="next" href="what_is_privacy/">
+        <link rel="next" href="../reddsa_signature/">
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.14">
     
     
       
-        <title>Abstract - Kogarashi Network</title>
+        <title>Homomorphic Encryption - Kogarashi Network</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.113286f1.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.113286f1.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.a0c5b2b5.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -42,7 +42,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -67,7 +67,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#infrastructure" class="md-skip">
+        <a href="#homomorphic-encryption" class="md-skip">
           Skip to content
         </a>
       
@@ -81,7 +81,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Kogarashi Network" class="md-header__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
+    <a href="../.." title="Kogarashi Network" class="md-header__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -100,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Abstract
+              Homomorphic Encryption
             
           </span>
         </div>
@@ -167,7 +167,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Kogarashi Network" class="md-nav__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
+    <a href="../.." title="Kogarashi Network" class="md-nav__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -186,7 +186,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         Introduction
       </a>
     </li>
@@ -199,16 +199,14 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
       
       
       
@@ -217,7 +215,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2">
           <span class="md-nav__icon md-icon"></span>
           Infrastructure
@@ -228,52 +226,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Abstract
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../infrastructure/" class="md-nav__link">
         Abstract
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#contents" class="md-nav__link">
-    Contents
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -285,7 +242,7 @@
   
   
     <li class="md-nav__item">
-      <a href="what_is_privacy/" class="md-nav__link">
+      <a href="../../infrastructure/what_is_privacy/" class="md-nav__link">
         What is privacy?
       </a>
     </li>
@@ -299,7 +256,7 @@
   
   
     <li class="md-nav__item">
-      <a href="hide_transfer_amount/" class="md-nav__link">
+      <a href="../../infrastructure/hide_transfer_amount/" class="md-nav__link">
         Hide Transfer Amount
       </a>
     </li>
@@ -313,7 +270,7 @@
   
   
     <li class="md-nav__item">
-      <a href="gas_limit/" class="md-nav__link">
+      <a href="../../infrastructure/gas_limit/" class="md-nav__link">
         Gas Limit
       </a>
     </li>
@@ -327,7 +284,7 @@
   
   
     <li class="md-nav__item">
-      <a href="zero_knowledge_scheme/" class="md-nav__link">
+      <a href="../../infrastructure/zero_knowledge_scheme/" class="md-nav__link">
         Zero Knowledge Scheme
       </a>
     </li>
@@ -376,7 +333,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/" class="md-nav__link">
+      <a href="../../tutorial/" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -390,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/plonk_pallet/" class="md-nav__link">
+      <a href="../../tutorial/plonk_pallet/" class="md-nav__link">
         Plonk Pallet
       </a>
     </li>
@@ -404,7 +361,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/confidential_transfer_pallet/" class="md-nav__link">
+      <a href="../../tutorial/confidential_transfer_pallet/" class="md-nav__link">
         Confidential Transfer Pallet
       </a>
     </li>
@@ -418,7 +375,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/reddsa_wallet/" class="md-nav__link">
+      <a href="../../tutorial/reddsa_wallet/" class="md-nav__link">
         RedDSA Wallet
       </a>
     </li>
@@ -467,7 +424,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../constraints/" class="md-nav__link">
+      <a href="../../constraints/" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -481,7 +438,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../constraints/confidential_transfer_constraints/" class="md-nav__link">
+      <a href="../../constraints/confidential_transfer_constraints/" class="md-nav__link">
         Confidential Transfer Constraints
       </a>
     </li>
@@ -501,14 +458,16 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
       
       
       
@@ -517,7 +476,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
           Technical
@@ -530,7 +489,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -544,7 +503,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/stealth_address/" class="md-nav__link">
+      <a href="../stealth_address/" class="md-nav__link">
         Stealth Address
       </a>
     </li>
@@ -558,7 +517,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/pedersen_commitment/" class="md-nav__link">
+      <a href="../pedersen_commitment/" class="md-nav__link">
         Pedersen Commitment
       </a>
     </li>
@@ -570,14 +529,16 @@
               
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" checked>
       
       
       
@@ -586,7 +547,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_5_4">
           <span class="md-nav__icon md-icon"></span>
           Zero Knowledge Proof
@@ -599,7 +560,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/non_interactive_zero_knowlege_proof/" class="md-nav__link">
+      <a href="../non_interactive_zero_knowlege_proof/" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -613,7 +574,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/qap/" class="md-nav__link">
+      <a href="../qap/" class="md-nav__link">
         QAP
       </a>
     </li>
@@ -627,7 +588,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/polynomial_commitment/" class="md-nav__link">
+      <a href="../polynomial_commitment/" class="md-nav__link">
         Polynomial Commitment
       </a>
     </li>
@@ -639,11 +600,73 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../technical/homomorphic_encryption/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Homomorphic Encryption
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Homomorphic Encryption
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#abstract" class="md-nav__link">
+    Abstract
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    Details
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elliptic-curve" class="md-nav__link">
+    Elliptic Curve
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pairing" class="md-nav__link">
+    Pairing
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -662,7 +685,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/reddsa_signature/" class="md-nav__link">
+      <a href="../reddsa_signature/" class="md-nav__link">
         RedDSA Signature
       </a>
     </li>
@@ -711,7 +734,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../frequent_errors/" class="md-nav__link">
+      <a href="../../frequent_errors/" class="md-nav__link">
         Frequent Errors
       </a>
     </li>
@@ -752,8 +775,29 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#contents" class="md-nav__link">
-    Contents
+  <a href="#abstract" class="md-nav__link">
+    Abstract
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    Details
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elliptic-curve" class="md-nav__link">
+    Elliptic Curve
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pairing" class="md-nav__link">
+    Pairing
   </a>
   
 </li>
@@ -773,24 +817,42 @@
                   
 
 
-<h1 id="infrastructure">Infrastructure</h1>
-<p>Basically, all public blockchain state is public for everyone and it can be looked by unknown someone without any permission. To keep the privacy, the projects for example <a href="https://z.cash/"><code>Zcash</code></a> , <a href="https://www.getmonero.org/"><code>Monero</code></a> and so on realized the privacy preserving transfer. Now people can transfer crypto currency with private. However, the real world applications require more complicated functionalities and the blockchain should support various of use case. It was hard to realize the general purpose privacy preserving transactions but recent scaling and privacy technologies evolution allows us to make it practical.</p>
-<p>To achieve general purpose privacy preserving transactions, there are mainly five problems to be addressed. <code>Hide transfer amount</code>, <code>Gas limit</code>, <code>Zero knowledge scheme</code> and <code>Contract constraint</code>, <code>Attack protection</code>. Firstly, we would like to define <code>what is the privacy</code> and describe the solution. Finally, we would like to describe <code>the solution for the attack</code>.</p>
-<h2 id="contents">Contents</h2>
-<p>The introduction contents are following.</p>
-<ol>
-<li><a href="what_is_privacy/"><strong>What is Privacy</strong></a><br />
-    We define what privacy is before we discuss the protocol.</li>
-<li><a href="hide_transfer_amount/"><strong>Hide Transfer Amount</strong></a><br />
-    We describe how to hide the transaction values.</li>
-<li><a href="gas_limit/"><strong>Gas Limit</strong></a><br />
-    We describe how to save the workload avoid to exceed the gas limit.</li>
-<li><a href="zero_knowledge_scheme/"><strong>Zero Knowledge Scheme</strong></a><br />
-    We compare the zero knowledge scheme and describe which is suitable for privacy preserving transactions.</li>
-<li><a href="../constraints/confidential_transfer_constraints/"><strong>Transaction Constraints</strong></a><br />
-    We describe how user generates the transaction proof.</li>
-</ol>
-<p>These sections are work in progress and we are going to add the experiment result.</p>
+<h1 id="homomorphic-encryption">Homomorphic Encryption</h1>
+<p>In previous two sections, we enable to check whether <code>computation</code> was done correctly through polynomials equation and these polynomials are generated with valid process with following equations.</p>
+<ul>
+<li>
+<p><a href="../qap/">QAP</a>
+<script type="math/tex; mode=display"> L(x) * R(x) - O(x) = Z(x) * T(x) </script>
+</p>
+</li>
+<li>
+<p><a href="../polynomial_commitment/">Polynomial Commitment</a>
+<script type="math/tex; mode=display"> L(x) + R(x) * X^{d+1} + O(x) * X^{2d+1} = F(x) </script>
+<script type="math/tex; mode=display"> F(x) = k_0 + k_1X + k_2X^2 + ... + k_{3d}X^{3d} </script>
+<script type="math/tex; mode=display"> (\acute a_0,...,\acute a_{3d}, \acute b_0,...,\acute b_{3d}) = (a_0 * k_0,...,a_{3d} * k_{3d}, b_0 * k_0,...,b_{3d} * k_{3d}) </script>
+<script type="math/tex; mode=display"> (\acute a_0,...,\acute a_{3d}) = α(\acute b_0,...,\acute b_{3d}) </script>
+</p>
+</li>
+</ul>
+<p>Lastly, we would like to send these information with zero knowledge. To do so, we are going to use <code>Homomorphic Encryption</code>.</p>
+<h2 id="abstract">Abstract</h2>
+<p>The <code>Homomorphic Encryption</code> achieves above equations evaluation without revealing any information. The difference between homomorphic encryption and normal encryption is that the <code>Homomorphic Encryption</code> can do add, sub and mul remaining encrypted. With this, the verifier doesn't know any information about these polynomials but able to check the relation between them.</p>
+<h2 id="details">Details</h2>
+<p>Specifically, if the encryption supports <code>additive</code> and <code>multiplicative</code>, we would call it <code>Full Homomorphic Encryption</code> but it takes so much cost to calculate or ciphertext is too big to transfer through the internet. In this case, we deal the encryption which supports multiple additive and one time multiplicative. We realize these with <code>elliptic curve</code> and <code>pairing</code>.</p>
+<h2 id="elliptic-curve">Elliptic Curve</h2>
+<p>The <code>elliptic curve</code> is the equation look like following.</p>
+<p>
+<script type="math/tex; mode=display"> y^2 = x^3 + ax + b </script>
+</p>
+<h2 id="pairing">Pairing</h2>
+<p>The <code>pairing</code> is the mapping which takes two elliptic curve points and map to the element of finitie field as following.</p>
+<p>
+<script type="math/tex; mode=display"> f: G * G -> F_p </script>
+</p>
+<p>There are some types of pairing functions but it's complicated so describing the relationship with simple model. Let's denote the two generators of elliptic as <code>G1</code>, <code>G2</code> and, each scalar as <code>a</code>, <code>b</code> and generator of finite field as <code>g</code>. We can express the relactionship between these two elliptic curve points and finite field element as following.</p>
+<p>
+<script type="math/tex; mode=display"> f: aG1 * bG2 -> g^{ab} </script>
+</p>
 
 
 
@@ -828,10 +890,10 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      <script src="../../assets/javascripts/bundle.2a6f1dda.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       

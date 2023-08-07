@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../zero_knowledge_scheme/">
+        <link rel="prev" href="../infrastructure/zero_knowledge_scheme/">
       
       
-        <link rel="next" href="../plonk_pallet/">
+        <link rel="next" href="plonk_pallet/">
       
       <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.14">
@@ -242,7 +242,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../what_is_privacy/" class="md-nav__link">
+      <a href="../infrastructure/what_is_privacy/" class="md-nav__link">
         What is privacy?
       </a>
     </li>
@@ -256,7 +256,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../hide_transfer_amount/" class="md-nav__link">
+      <a href="../infrastructure/hide_transfer_amount/" class="md-nav__link">
         Hide Transfer Amount
       </a>
     </li>
@@ -270,7 +270,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gas_limit/" class="md-nav__link">
+      <a href="../infrastructure/gas_limit/" class="md-nav__link">
         Gas Limit
       </a>
     </li>
@@ -284,7 +284,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../zero_knowledge_scheme/" class="md-nav__link">
+      <a href="../infrastructure/zero_knowledge_scheme/" class="md-nav__link">
         Zero Knowledge Scheme
       </a>
     </li>
@@ -417,8 +417,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../plonk_pallet/" class="md-nav__link">
-        Plonk
+      <a href="plonk_pallet/" class="md-nav__link">
+        Plonk Pallet
       </a>
     </li>
   
@@ -431,8 +431,22 @@
   
   
     <li class="md-nav__item">
-      <a href="../confidential_transfer/" class="md-nav__link">
-        Confidential Transfer
+      <a href="confidential_transfer_pallet/" class="md-nav__link">
+        Confidential Transfer Pallet
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reddsa_wallet/" class="md-nav__link">
+        RedDSA Wallet
       </a>
     </li>
   
@@ -494,7 +508,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../confidential_transfer_constraints/" class="md-nav__link">
+      <a href="../constraints/confidential_transfer_constraints/" class="md-nav__link">
         Confidential Transfer Constraints
       </a>
     </li>
@@ -557,7 +571,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../stealth_address/" class="md-nav__link">
+      <a href="../technical/stealth_address/" class="md-nav__link">
         Stealth Address
       </a>
     </li>
@@ -571,7 +585,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../pedersen_commitment/" class="md-nav__link">
+      <a href="../technical/pedersen_commitment/" class="md-nav__link">
         Pedersen Commitment
       </a>
     </li>
@@ -612,7 +626,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../non_interactive_zero_knowlege_proof/" class="md-nav__link">
+      <a href="../technical/non_interactive_zero_knowlege_proof/" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -626,7 +640,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qap/" class="md-nav__link">
+      <a href="../technical/qap/" class="md-nav__link">
         QAP
       </a>
     </li>
@@ -640,7 +654,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../polynomial_commitment/" class="md-nav__link">
+      <a href="../technical/polynomial_commitment/" class="md-nav__link">
         Polynomial Commitment
       </a>
     </li>
@@ -654,7 +668,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../homomorphic_encryption/" class="md-nav__link">
+      <a href="../technical/homomorphic_encryption/" class="md-nav__link">
         Homomorphic Encryption
       </a>
     </li>
@@ -664,6 +678,20 @@
           
         </ul>
       </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../technical/reddsa_signature/" class="md-nav__link">
+        RedDSA Signature
+      </a>
     </li>
   
 
@@ -802,19 +830,19 @@
 <h1 id="tutorial">Tutorial</h1>
 <p>In this section, we describe how to use the pallet for privacy-preserving transactions.</p>
 <ul>
-<li><a href="../plonk_pallet/">pallet-plonk</a></li>
+<li><a href="plonk_pallet/">pallet-plonk</a></li>
 <li><a href="../encrypted_balance/">pallet-encrypted-balance</a></li>
-<li><a href="../confidential_transfer/">confidential_transfer</a></li>
+<li><a href="confidential_transfer_pallet/">confidential_transfer</a></li>
 </ul>
 <p>You can check <a href="../frequent_errors/">Frequent Errors</a> when the error happens.</p>
 <h2 id="abstract">Abstract</h2>
 <p>The privacy-preserving transactions consists of several pallet components. We roughly explain what kind of role for each pallet has.</p>
-<h3 id="pallet-plonk"><a href="../plonk_pallet/">pallet-plonk</a></h3>
+<h3 id="pallet-plonk"><a href="plonk_pallet/">pallet-plonk</a></h3>
 <p><code>plonk</code> is a zk-Snarks scheme and allows us to prove that the computation was done correctly. We perform transaction on <code>off-chain</code> and generate the proof. The blockchain verifies the proof and approve the transaction. We define the constraints circuit for <code>confidential transfers</code> and <code>confidential smart contracts</code> by this pallet.</p>
 <h3 id="pallet-encrypted-balance"><a href="../encrypted_balance/">pallet-encrypted-balance</a></h3>
 <p>Users balances are encrypted by default. We use additive homomorphic arithmetic to hide the integer in transaction. Combining original <a href="https://github.com/paritytech/substrate/tree/v3.0.0/frame/balances">pallet-balance</a> and <a href="../elgamal/"><code>ElGamal</code></a> encryption and we implemented <a href="../encrypted_balance/">pallet-encrypted-balance</a>. <strong>This pallet can't be used only by this self, because this doesn't check the validity of additive homomorphic arithmetic</strong>.</p>
-<h3 id="confidential_transfer"><a href="../confidential_transfer/">confidential_transfer</a></h3>
-<p>Users can transfer without being known actual amount by others with this pallet. <code>plonk</code> checks the <a href="../confidential_transfer/"><code>confidential transfer constraints</code></a> and <a href="../encrypted_balance/">pallet-encrypted-balance</a> performs the additive homomorphic state transition.</p>
+<h3 id="confidential_transfer"><a href="confidential_transfer_pallet/">confidential_transfer</a></h3>
+<p>Users can transfer without being known actual amount by others with this pallet. <code>plonk</code> checks the <a href="../constraints/confidential_transfer_constraints/"><code>confidential transfer constraints</code></a> and <a href="../encrypted_balance/">pallet-encrypted-balance</a> performs the additive homomorphic state transition.</p>
 
 
 

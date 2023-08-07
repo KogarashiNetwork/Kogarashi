@@ -1,4 +1,4 @@
-name: Publish Package
+name: Release Package
 on:
   pull_request:
     branches: [ master, develop ]
@@ -6,7 +6,7 @@ on:
 jobs:
   node:
         if: contains(github.event.pull_request.labels.*.name, 'package')
-        name: Node RPC Test
+        name: Publish Package
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v2
@@ -17,7 +17,7 @@ jobs:
           run: ssh-keygen -t rsa -b 4096 -C "sample" -f ~/.ssh/id_rsa -N ""
         - name: Registry Auth
           run: echo "${{ secrets.REGISTRY_ACCESS_TOKEN }}" | docker login ghcr.io -u '${{ secrets.ACCOUNT_NAME }}' --password-stdin
-        - name: Publish Package
+        - name: Push Docker Image
           id: update
           run: git submodule update -i
         - uses: actions-rs/toolchain@v1
