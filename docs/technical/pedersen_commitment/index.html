@@ -9,24 +9,24 @@
       
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../stealth_address/">
       
       
-        <link rel="next" href="what_is_privacy/">
+        <link rel="next" href="../non_interactive_zero_knowlege_proof/">
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.14">
     
     
       
-        <title>Abstract - Kogarashi Network</title>
+        <title>Pedersen Commitment - Kogarashi Network</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.113286f1.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.113286f1.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.a0c5b2b5.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -42,7 +42,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -67,7 +67,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#infrastructure" class="md-skip">
+        <a href="#pedersen-commitment" class="md-skip">
           Skip to content
         </a>
       
@@ -81,7 +81,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Kogarashi Network" class="md-header__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
+    <a href="../.." title="Kogarashi Network" class="md-header__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -100,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Abstract
+              Pedersen Commitment
             
           </span>
         </div>
@@ -167,7 +167,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Kogarashi Network" class="md-nav__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
+    <a href="../.." title="Kogarashi Network" class="md-nav__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -186,7 +186,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         Introduction
       </a>
     </li>
@@ -199,16 +199,14 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
       
       
       
@@ -217,7 +215,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2">
           <span class="md-nav__icon md-icon"></span>
           Infrastructure
@@ -228,52 +226,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Abstract
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../infrastructure/" class="md-nav__link">
         Abstract
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#contents" class="md-nav__link">
-    Contents
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -285,7 +242,7 @@
   
   
     <li class="md-nav__item">
-      <a href="what_is_privacy/" class="md-nav__link">
+      <a href="../../infrastructure/what_is_privacy/" class="md-nav__link">
         What is privacy?
       </a>
     </li>
@@ -299,7 +256,7 @@
   
   
     <li class="md-nav__item">
-      <a href="hide_transfer_amount/" class="md-nav__link">
+      <a href="../../infrastructure/hide_transfer_amount/" class="md-nav__link">
         Hide Transfer Amount
       </a>
     </li>
@@ -313,7 +270,7 @@
   
   
     <li class="md-nav__item">
-      <a href="gas_limit/" class="md-nav__link">
+      <a href="../../infrastructure/gas_limit/" class="md-nav__link">
         Gas Limit
       </a>
     </li>
@@ -327,7 +284,7 @@
   
   
     <li class="md-nav__item">
-      <a href="zero_knowledge_scheme/" class="md-nav__link">
+      <a href="../../infrastructure/zero_knowledge_scheme/" class="md-nav__link">
         Zero Knowledge Scheme
       </a>
     </li>
@@ -376,7 +333,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/" class="md-nav__link">
+      <a href="../../tutorial/" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -390,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/plonk_pallet/" class="md-nav__link">
+      <a href="../../tutorial/plonk_pallet/" class="md-nav__link">
         Plonk Pallet
       </a>
     </li>
@@ -404,7 +361,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/confidential_transfer_pallet/" class="md-nav__link">
+      <a href="../../tutorial/confidential_transfer_pallet/" class="md-nav__link">
         Confidential Transfer Pallet
       </a>
     </li>
@@ -418,7 +375,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/reddsa_wallet/" class="md-nav__link">
+      <a href="../../tutorial/reddsa_wallet/" class="md-nav__link">
         RedDSA Wallet
       </a>
     </li>
@@ -467,7 +424,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../constraints/" class="md-nav__link">
+      <a href="../../constraints/" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -481,7 +438,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../constraints/confidential_transfer_constraints/" class="md-nav__link">
+      <a href="../../constraints/confidential_transfer_constraints/" class="md-nav__link">
         Confidential Transfer Constraints
       </a>
     </li>
@@ -501,14 +458,16 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
       
       
       
@@ -517,7 +476,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
           Technical
@@ -530,7 +489,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -544,7 +503,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/stealth_address/" class="md-nav__link">
+      <a href="../stealth_address/" class="md-nav__link">
         Stealth Address
       </a>
     </li>
@@ -556,11 +515,80 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../technical/pedersen_commitment/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Pedersen Commitment
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Pedersen Commitment
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#abstract" class="md-nav__link">
+    Abstract
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    Details
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup-the-parameters" class="md-nav__link">
+    Setup The Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hide-the-transfer-amount" class="md-nav__link">
+    Hide The Transfer Amount
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verify-the-transfer-amount" class="md-nav__link">
+    Verify The Transfer Amount
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -599,7 +627,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/non_interactive_zero_knowlege_proof/" class="md-nav__link">
+      <a href="../non_interactive_zero_knowlege_proof/" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -613,7 +641,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/qap/" class="md-nav__link">
+      <a href="../qap/" class="md-nav__link">
         QAP
       </a>
     </li>
@@ -627,7 +655,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/polynomial_commitment/" class="md-nav__link">
+      <a href="../polynomial_commitment/" class="md-nav__link">
         Polynomial Commitment
       </a>
     </li>
@@ -641,7 +669,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/homomorphic_encryption/" class="md-nav__link">
+      <a href="../homomorphic_encryption/" class="md-nav__link">
         Homomorphic Encryption
       </a>
     </li>
@@ -662,7 +690,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../technical/reddsa_signature/" class="md-nav__link">
+      <a href="../reddsa_signature/" class="md-nav__link">
         RedDSA Signature
       </a>
     </li>
@@ -711,7 +739,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../frequent_errors/" class="md-nav__link">
+      <a href="../../frequent_errors/" class="md-nav__link">
         Frequent Errors
       </a>
     </li>
@@ -752,8 +780,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#contents" class="md-nav__link">
-    Contents
+  <a href="#abstract" class="md-nav__link">
+    Abstract
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    Details
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup-the-parameters" class="md-nav__link">
+    Setup The Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hide-the-transfer-amount" class="md-nav__link">
+    Hide The Transfer Amount
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verify-the-transfer-amount" class="md-nav__link">
+    Verify The Transfer Amount
   </a>
   
 </li>
@@ -773,24 +829,81 @@
                   
 
 
-<h1 id="infrastructure">Infrastructure</h1>
-<p>Basically, all public blockchain state is public for everyone and it can be looked by unknown someone without any permission. To keep the privacy, the projects for example <a href="https://z.cash/"><code>Zcash</code></a> , <a href="https://www.getmonero.org/"><code>Monero</code></a> and so on realized the privacy preserving transfer. Now people can transfer crypto currency with private. However, the real world applications require more complicated functionalities and the blockchain should support various of use case. It was hard to realize the general purpose privacy preserving transactions but recent scaling and privacy technologies evolution allows us to make it practical.</p>
-<p>To achieve general purpose privacy preserving transactions, there are mainly five problems to be addressed. <code>Hide transfer amount</code>, <code>Gas limit</code>, <code>Zero knowledge scheme</code> and <code>Contract constraint</code>, <code>Attack protection</code>. Firstly, we would like to define <code>what is the privacy</code> and describe the solution. Finally, we would like to describe <code>the solution for the attack</code>.</p>
-<h2 id="contents">Contents</h2>
-<p>The introduction contents are following.</p>
+<h1 id="pedersen-commitment">Pedersen Commitment</h1>
+<h2 id="abstract">Abstract</h2>
+<p>The <code>Pedersen Commitment</code> is the technology which allows us to check the transfer amount is valid without revealing actual amount.</p>
+<h2 id="details">Details</h2>
+<p>This technology uses additivity of elliptic curve. Hiding the transfer amount as scalar of elliptic curve point and mixing random value refer as to <code>blinding factor</code>. Let's take a look the squence.</p>
 <ol>
-<li><a href="what_is_privacy/"><strong>What is Privacy</strong></a><br />
-    We define what privacy is before we discuss the protocol.</li>
-<li><a href="hide_transfer_amount/"><strong>Hide Transfer Amount</strong></a><br />
-    We describe how to hide the transaction values.</li>
-<li><a href="gas_limit/"><strong>Gas Limit</strong></a><br />
-    We describe how to save the workload avoid to exceed the gas limit.</li>
-<li><a href="zero_knowledge_scheme/"><strong>Zero Knowledge Scheme</strong></a><br />
-    We compare the zero knowledge scheme and describe which is suitable for privacy preserving transactions.</li>
-<li><a href="../constraints/confidential_transfer_constraints/"><strong>Transaction Constraints</strong></a><br />
-    We describe how user generates the transaction proof.</li>
+<li>Setup the parameters</li>
+<li>Hide the transfer amount</li>
+<li>Verify the transfer amount</li>
 </ol>
-<p>These sections are work in progress and we are going to add the experiment result.</p>
+<p>Above sequence used for confidential transfer to keep the transfer amount secret.</p>
+<h2 id="setup-the-parameters">Setup The Parameters</h2>
+<p>First of all, we'd like to setup the parameters we are going to use with the <code>Pedersen Commitment</code>. Selecting generator <code>G</code> over prime order elliptic curve group and randomness <code>a</code> less than order prime. Calculating <code>H = aG</code> and making <code>H</code> and <code>G</code> public. We can't predict the <code>a</code> value from <code>H</code> and <code>G</code> because of discrete logarithm.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Variable</th>
+<th align="left">Explanation</th>
+<th align="left">Derivation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">p</td>
+<td align="left">prime number</td>
+<td align="left">-</td>
+</tr>
+<tr>
+<td align="left">a</td>
+<td align="left">random number</td>
+<td align="left">a ∈ Fp</td>
+</tr>
+<tr>
+<td align="left">C(x)</td>
+<td align="left">elliptic curve function</td>
+<td align="left">-</td>
+</tr>
+<tr>
+<td align="left">G</td>
+<td align="left">generator of elliptic curve point</td>
+<td align="left">G ∈ C(Fp)</td>
+</tr>
+<tr>
+<td align="left">H</td>
+<td align="left">generator made by random a</td>
+<td align="left">H = aG</td>
+</tr>
+</tbody>
+</table>
+<h2 id="hide-the-transfer-amount">Hide The Transfer Amount</h2>
+<p>Let's assume that Alice has <code>10</code> balance and send Bob to <code>3</code>. We need to check <code>{Alice balance} - {transfer amount} = {Alice after balance}</code> without revealing any information about Alice balance. Alice knows <code>H</code>, <code>G</code> and her balance so she computes following value.</p>
+<ul>
+<li>Alice balance commitment
+<script type="math/tex; mode=display"> C(10) = 10H + x_1G </script>
+</li>
+<li>Transfer amount commitment
+<script type="math/tex; mode=display"> C(3) = 3H + x_2G </script>
+</li>
+<li>Alice after balance commitment
+<script type="math/tex; mode=display"> C(10 - 3) = 7H + x_3G </script>
+</li>
+</ul>
+<p>In above equation, <code>x_1 ~ x_3</code> are called <code>blinding factor</code> and each blinding factor need to be set to hold <code>{Alice balance} - {transfer amount} = {Alice after balance}</code> equation. Let's say <code>x_1 = 330</code>, <code>x_2 = 30</code> and <code>x_3 = 300</code>.</p>
+<h2 id="verify-the-transfer-amount">Verify The Transfer Amount</h2>
+<p>In previous section, Alice computes the following commitment.</p>
+<p>
+<script type="math/tex; mode=display"> C(10, 330) = 10H + 330G </script>
+<script type="math/tex; mode=display"> C(3, 30) = 3H + 30G </script>
+<script type="math/tex; mode=display"> C(10 - 3, 300) = 7H + 300G </script>
+</p>
+<p>Let's check if Alice transfer amount is valid. The elliptic curve arithmetic supports additive so we can check <code>{Alice balance} - {transfer amount} = {Alice after balance}</code> as following.</p>
+<p>
+<script type="math/tex; mode=display"> C(10, 330) - C(3, 30) - C(10 - 3, 300) = C(10 - 3 - 7, 330 - 30 - 300) = 0H + 0G = 0 </script>
+</p>
+<p>If above equation holds up, we can know the transfer amount is valid. Through this process, <code>balance</code> and <code>transfer amount</code> are encrypted by elliptic curve so no one can predict actual value from public information. This is how we conceal the transfer transaction and verify the validity.</p>
 
 
 
@@ -828,10 +941,10 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      <script src="../../assets/javascripts/bundle.2a6f1dda.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       

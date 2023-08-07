@@ -4,29 +4,29 @@ theme:
 nav:
   - Introduction: index.md
   - Infrastructure:
-    - 'Abstract': infrastructure.md
-    - What is privacy?: what_is_privacy.md
-    - Hide Transfer Amount: hide_transfer_amount.md
-    - Gas Limit: gas_limit.md
-    - Zero Knowledge Scheme: zero_knowledge_scheme.md
+    - 'Abstract': infrastructure/index.md
+    - What is privacy?: infrastructure/what_is_privacy.md
+    - Hide Transfer Amount: infrastructure/hide_transfer_amount.md
+    - Gas Limit: infrastructure/gas_limit.md
+    - Zero Knowledge Scheme: infrastructure/zero_knowledge_scheme.md
   - Tutorial:
-    - 'Abstract': tutorial.md
-    - Plonk Pallet: plonk_pallet.md
-    - Confidential Transfer Pallet: confidential_transfer_pallet.md
-    - RedDSA Wallet: reddsa_wallet.md
+    - 'Abstract': tutorial/index.md
+    - Plonk Pallet: tutorial/plonk_pallet.md
+    - Confidential Transfer Pallet: tutorial/confidential_transfer_pallet.md
+    - RedDSA Wallet: tutorial/reddsa_wallet.md
   - Constraints:
-    - 'Abstract': constraints.md
-    - Confidential Transfer Constraints: confidential_transfer_constraints.md
+    - 'Abstract': constraints/index.md
+    - Confidential Transfer Constraints: constraints/confidential_transfer_constraints.md
   - Technical:
-    - 'Abstract': technical.md
-    - Stealth Address: stealth_address.md
-    - Pedersen Commitment: pedersen_commitment.md
+    - 'Abstract': technical/index.md
+    - Stealth Address: technical/stealth_address.md
+    - Pedersen Commitment: technical/pedersen_commitment.md
     - Zero Knowledge Proof:
-      - 'Abstract': non_interactive_zero_knowlege_proof.md
-      - QAP: qap.md
-      - Polynomial Commitment: polynomial_commitment.md
-      - Homomorphic Encryption: homomorphic_encryption.md
-    - RedDSA Signature: reddsa_signature.md
+      - 'Abstract': technical/non_interactive_zero_knowlege_proof.md
+      - QAP: technical/qap.md
+      - Polynomial Commitment: technical/polynomial_commitment.md
+      - Homomorphic Encryption: technical/homomorphic_encryption.md
+    - RedDSA Signature: technical/reddsa_signature.md
   - Help:
     - Frequent Errors: frequent_errors.md
 site_dir: docs

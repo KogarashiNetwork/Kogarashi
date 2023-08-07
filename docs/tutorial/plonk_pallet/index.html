@@ -1,0 +1,1093 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../confidential_transfer_pallet/">
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.14">
+    
+    
+      
+        <title>Plonk Pallet - Kogarashi Network</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.113286f1.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#plonk-tutorial" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Kogarashi Network" class="md-header__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Kogarashi Network
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Plonk Pallet
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Kogarashi Network" class="md-nav__button md-logo" aria-label="Kogarashi Network" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Kogarashi Network
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          Infrastructure
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Infrastructure
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../infrastructure/" class="md-nav__link">
+        Abstract
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../infrastructure/what_is_privacy/" class="md-nav__link">
+        What is privacy?
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../infrastructure/hide_transfer_amount/" class="md-nav__link">
+        Hide Transfer Amount
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../infrastructure/gas_limit/" class="md-nav__link">
+        Gas Limit
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../infrastructure/zero_knowledge_scheme/" class="md-nav__link">
+        Zero Knowledge Scheme
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          Tutorial
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Tutorial
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        Abstract
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Plonk Pallet
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Plonk Pallet
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-define-the-plonk-pallet-as-depencencies" class="md-nav__link">
+    1. Define the plonk-pallet as depencencies
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-couple-the-plonk-pallet-to-your-own-pallet" class="md-nav__link">
+    2. Couple the plonk-pallet to your own pallet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-define-the-plonk-pallet-functions-on-your-pallet" class="md-nav__link">
+    3. Define the plonk-pallet functions on your pallet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-import-the-coupling-pallet-to-testruntime-and-define-your-circuit" class="md-nav__link">
+    4. Import the coupling pallet to TestRuntime and define your Circuit
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-test-whether-the-functions-work-correctly" class="md-nav__link">
+    5. Test whether the functions work correctly
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../confidential_transfer_pallet/" class="md-nav__link">
+        Confidential Transfer Pallet
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reddsa_wallet/" class="md-nav__link">
+        RedDSA Wallet
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          Constraints
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Constraints
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../constraints/" class="md-nav__link">
+        Abstract
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../constraints/confidential_transfer_constraints/" class="md-nav__link">
+        Confidential Transfer Constraints
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          Technical
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Technical
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/" class="md-nav__link">
+        Abstract
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/stealth_address/" class="md-nav__link">
+        Stealth Address
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/pedersen_commitment/" class="md-nav__link">
+        Pedersen Commitment
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_4" id="__nav_5_4_label" tabindex="0">
+          Zero Knowledge Proof
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_4">
+          <span class="md-nav__icon md-icon"></span>
+          Zero Knowledge Proof
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/non_interactive_zero_knowlege_proof/" class="md-nav__link">
+        Abstract
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/qap/" class="md-nav__link">
+        QAP
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/polynomial_commitment/" class="md-nav__link">
+        Polynomial Commitment
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/homomorphic_encryption/" class="md-nav__link">
+        Homomorphic Encryption
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/reddsa_signature/" class="md-nav__link">
+        RedDSA Signature
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          Help
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Help
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../frequent_errors/" class="md-nav__link">
+        Frequent Errors
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-define-the-plonk-pallet-as-depencencies" class="md-nav__link">
+    1. Define the plonk-pallet as depencencies
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-couple-the-plonk-pallet-to-your-own-pallet" class="md-nav__link">
+    2. Couple the plonk-pallet to your own pallet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-define-the-plonk-pallet-functions-on-your-pallet" class="md-nav__link">
+    3. Define the plonk-pallet functions on your pallet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-import-the-coupling-pallet-to-testruntime-and-define-your-circuit" class="md-nav__link">
+    4. Import the coupling pallet to TestRuntime and define your Circuit
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-test-whether-the-functions-work-correctly" class="md-nav__link">
+    5. Test whether the functions work correctly
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="plonk-tutorial">Plonk Tutorial</h1>
+<p>In this tutorial, we are going to import plonk-pallet to substrate runtime and test its functionalities.</p>
+<p>The steps are following.</p>
+<ol>
+<li>Define the plonk-pallet as depencencies</li>
+<li>Couple the plonk-pallet to your own pallet</li>
+<li>Define the plonk-pallet functions on your pallet</li>
+<li>Import the coupling pallet to TestRuntime and define your Circuit</li>
+<li>Test whether the functions work correctly</li>
+</ol>
+<h2 id="1-define-the-plonk-pallet-as-depencencies">1. Define the plonk-pallet as depencencies</h2>
+<p>First of all, you need to define the <code>plonk-pallet</code> when you start to implement your pallet. Please define as following.</p>
+<ul>
+<li><your-pallet>/Cargo.toml</li>
+</ul>
+<div class="codehilite"><pre><span></span><code><span class="k">[dependencies]</span>
+<span class="n">pallet-plonk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">git</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;https://github.com/KogarashiNetwork/Kogarashi&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;master&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">default-features</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">false</span><span class="w"> </span><span class="p">}</span>
+<span class="n">jub-jub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">git</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;https://github.com/KogarashiNetwork/Kogarashi&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;master&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">default-features</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">false</span><span class="w"> </span><span class="p">}</span>
+<span class="n">zero-plonk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">git</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;https://github.com/KogarashiNetwork/Kogarashi&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;master&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">default-features</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">false</span><span class="w"> </span><span class="p">}</span>
+<span class="n">rand_core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">version</span><span class="o">=</span><span class="s">&quot;0.6&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">default-features</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">false</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<p>The <code>plonk-pallet</code> depends on <code>rand_core</code> so please import it.</p>
+<h2 id="2-couple-the-plonk-pallet-to-your-own-pallet">2. Couple the plonk-pallet to your own pallet</h2>
+<p>The next, the <code>plonk-pallet</code> need to be coupled with your pallet. Please couple the pallet <code>Config</code> as following.</p>
+<ul>
+<li><your-pallet>/src/main.rs</li>
+</ul>
+<div class="codehilite"><pre><span></span><code><span class="cp">#[frame_support::pallet]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">mod</span> <span class="nn">pallet</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="n">frame_support</span>::<span class="n">pallet_prelude</span>::<span class="o">*</span><span class="p">;</span>
+<span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="n">frame_system</span>::<span class="n">pallet_prelude</span>::<span class="o">*</span><span class="p">;</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">use</span><span class="w"> </span><span class="n">plonk_pallet</span>::<span class="p">{</span><span class="n">FullcodecRng</span><span class="p">,</span><span class="w"> </span><span class="n">Proof</span><span class="p">,</span><span class="w"> </span><span class="n">PublicInputValue</span><span class="p">,</span><span class="w"> </span><span class="n">Transcript</span><span class="p">,</span><span class="w"> </span><span class="n">VerifierData</span><span class="p">};</span>
+
+<span class="w">    </span><span class="sd">/// Coupling configuration trait with plonk_pallet.</span>
+<span class="w">    </span><span class="cp">#[pallet::config]</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">Config</span>: <span class="nc">frame_system</span>::<span class="n">Config</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">plonk_pallet</span>::<span class="n">Config</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="sd">/// The overarching event type.</span>
+<span class="w">        </span><span class="k">type</span> <span class="nc">Event</span>: <span class="nb">From</span><span class="o">&lt;</span><span class="n">Event</span><span class="o">&lt;</span><span class="bp">Self</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">IsType</span><span class="o">&lt;&lt;</span><span class="bp">Self</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">frame_system</span>::<span class="n">Config</span><span class="o">&gt;</span>::<span class="n">Event</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+
+<p>With this step, you can use the <code>plonk-pallet</code> in your pallet through <code>Module</code>.</p>
+<h2 id="3-define-the-plonk-pallet-functions-on-your-pallet">3. Define the plonk-pallet functions on your pallet</h2>
+<p>The next, let's define the <code>plonk-pallet</code> function on your pallet. We are going to define the <code>trusted_setup</code> function which generates the public parameters refered as to <code>srs</code> and the <code>verify</code> function which verified the proof. In this tutorial, we use <a href="https://github.com/JoshOrndorff/recipes/blob/master/pallets/sum-storage/src/main.rs">sum-storage</a> pallet as example and add the <code>verify</code> function before set <code>Thing1</code> storage value on <code>set_thing_1</code>. If the <code>verify</code> is success, the <code>set_thing_1</code> can set <code>Thing1</code> value.</p>
+<ul>
+<li><your-pallet>/src/main.rs</li>
+</ul>
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="c1">// The module&#39;s dispatchable functions.</span>
+<span class="w">    </span><span class="cp">#[pallet::call]</span>
+<span class="w">    </span><span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span>: <span class="nc">Config</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Pallet</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Coupled trusted setup</span>
+<span class="w">        </span><span class="cp">#[pallet::weight(10_000)]</span>
+<span class="w">        </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">trusted_setup</span><span class="p">(</span>
+<span class="w">            </span><span class="n">origin</span>: <span class="nc">OriginFor</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">            </span><span class="n">val</span>: <span class="kt">u32</span><span class="p">,</span>
+<span class="w">            </span><span class="n">rng</span>: <span class="nc">FullcodecRng</span><span class="p">,</span>
+<span class="w">        </span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">DispatchResultWithPostInfo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">pallet_plonk</span>::<span class="n">Pallet</span>::<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span>::<span class="n">trusted_setup</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">rng</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">            </span><span class="nb">Ok</span><span class="p">(().</span><span class="n">into</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="sd">/// Sets the first simple storage value</span>
+<span class="w">        </span><span class="cp">#[pallet::weight(10_000)]</span>
+<span class="w">        </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">set_thing_1</span><span class="p">(</span>
+<span class="w">            </span><span class="n">origin</span>: <span class="nc">OriginFor</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">            </span><span class="n">val</span>: <span class="kt">u32</span><span class="p">,</span>
+<span class="w">            </span><span class="n">proof</span>: <span class="nc">Proof</span><span class="p">,</span>
+<span class="w">            </span><span class="n">public_inputs</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">Fr</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">        </span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">DispatchResultWithPostInfo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Define the proof verification</span>
+<span class="w">            </span><span class="n">pallet_plonk</span>::<span class="n">Pallet</span>::<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span>::<span class="n">verify</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span><span class="w"> </span><span class="n">proof</span><span class="p">,</span><span class="w"> </span><span class="n">public_inputs</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">            </span><span class="n">Thing1</span>::<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span>::<span class="n">put</span><span class="p">(</span><span class="n">val</span><span class="p">);</span>
+
+<span class="w">            </span><span class="bp">Self</span>::<span class="n">deposit_event</span><span class="p">(</span><span class="n">Event</span>::<span class="n">ValueSet</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">));</span>
+<span class="w">            </span><span class="nb">Ok</span><span class="p">(().</span><span class="n">into</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+</code></pre></div>
+
+<p>With this step, we can check whether the proof is valid before setting the <code>Thing1</code> value and only if the proof is valid, the value is set.</p>
+<h2 id="4-import-the-coupling-pallet-to-testruntime-and-define-your-circuit">4. Import the coupling pallet to TestRuntime and define your Circuit</h2>
+<p>We already imported the <code>plonk-pallet</code> functions so we are going to import it to <code>TestRumtime</code> and define your customized <code>Circuit</code>.</p>
+<p>In order to use <code>plonk-pallet</code> in <code>TestRuntime</code>, we need to import <code>plonk-pallet</code> crate and define the pallet config to <code>construct_runtime</code> as following.</p>
+<ul>
+<li>runtime/src/main.rs</li>
+</ul>
+<div class="codehilite"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="k">crate</span>::<span class="p">{</span><span class="bp">self</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">sum_storage</span><span class="p">,</span><span class="w"> </span><span class="n">Config</span><span class="p">};</span>
+
+<span class="k">use</span><span class="w"> </span><span class="n">frame_support</span>::<span class="n">dispatch</span>::<span class="p">{</span><span class="n">DispatchError</span><span class="p">,</span><span class="w"> </span><span class="n">DispatchErrorWithPostInfo</span><span class="p">,</span><span class="w"> </span><span class="n">PostDispatchInfo</span><span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">frame_support</span>::<span class="p">{</span><span class="n">assert_ok</span><span class="p">,</span><span class="w"> </span><span class="n">construct_runtime</span><span class="p">,</span><span class="w"> </span><span class="n">parameter_types</span><span class="p">};</span>
+
+<span class="c1">// Import `plonk_pallet` and dependency</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">use</span><span class="w"> </span><span class="n">plonk_pallet</span>::<span class="o">*</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">rand_core</span>::<span class="n">SeedableRng</span><span class="p">;</span>
+
+<span class="o">---</span><span class="w"> </span><span class="n">snip</span><span class="w"> </span><span class="o">---</span>
+
+<span class="n">construct_runtime</span><span class="o">!</span><span class="p">(</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">enum</span> <span class="nc">TestRuntime</span><span class="w"> </span><span class="k">where</span>
+<span class="w">        </span><span class="n">Block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Block</span><span class="p">,</span>
+<span class="w">        </span><span class="n">NodeBlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Block</span><span class="p">,</span>
+<span class="w">        </span><span class="n">UncheckedExtrinsic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UncheckedExtrinsic</span><span class="p">,</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span>: <span class="nc">frame_system</span>::<span class="p">{</span><span class="n">Module</span><span class="p">,</span><span class="w"> </span><span class="n">Call</span><span class="p">,</span><span class="w"> </span><span class="n">Config</span><span class="p">,</span><span class="w"> </span><span class="n">Storage</span><span class="p">,</span><span class="w"> </span><span class="n">Event</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">},</span>
+<span class="w">        </span><span class="c1">// Define the `plonk_pallet` in `contruct_runtime`</span>
+<span class="w">        </span><span class="n">Plonk</span>: <span class="nc">plonk_pallet</span>::<span class="p">{</span><span class="n">Module</span><span class="p">,</span><span class="w"> </span><span class="n">Call</span><span class="p">,</span><span class="w"> </span><span class="n">Storage</span><span class="p">,</span><span class="w"> </span><span class="n">Event</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="n">YourPallet</span><span class="p">}</span>: <span class="p">{</span><span class="n">your_pallet</span><span class="p">}</span>::<span class="p">{</span><span class="n">Module</span><span class="p">,</span><span class="w"> </span><span class="n">Call</span><span class="p">,</span><span class="w"> </span><span class="n">Storage</span><span class="p">,</span><span class="w"> </span><span class="n">Event</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">},</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">);</span>
+</code></pre></div>
+
+<p>As the final step of runtime configuration, we define the zk-SNARKs circuit and extend the <code>TestRuntime</code> config with it. You can replace <code>TestCircuit</code> with your own circuit.</p>
+<ul>
+<li>runtime/src/main.rs</li>
+</ul>
+<div class="codehilite"><pre><span></span><code><span class="c1">// Implement a circuit that checks:</span>
+<span class="c1">// 1) a + b = c where C is a PI</span>
+<span class="c1">// 2) a &lt;= 2^6</span>
+<span class="c1">// 3) b &lt;= 2^5</span>
+<span class="c1">// 4) a * b = d where D is a PI</span>
+<span class="c1">// 5) JubJub::GENERATOR * e(JubJubScalar) = f where F is a Public Input</span>
+
+<span class="cp">#[derive(Debug, Default)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">TestCircuit</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">a</span>: <span class="nc">BlsScalar</span><span class="p">,</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">b</span>: <span class="nc">BlsScalar</span><span class="p">,</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">c</span>: <span class="nc">BlsScalar</span><span class="p">,</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">d</span>: <span class="nc">BlsScalar</span><span class="p">,</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">e</span>: <span class="nc">JubJubScalar</span><span class="p">,</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">f</span>: <span class="nc">JubJubAffine</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">impl</span><span class="w"> </span><span class="n">Circuit</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">TestCircuit</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">circuit</span><span class="o">&lt;</span><span class="n">C</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">composer</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">C</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="n">Error</span><span class="o">&gt;</span>
+<span class="w">    </span><span class="k">where</span>
+<span class="w">        </span><span class="n">C</span>: <span class="nc">Composer</span><span class="p">,</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">composer</span><span class="p">.</span><span class="n">append_witness</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">a</span><span class="p">);</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">composer</span><span class="p">.</span><span class="n">append_witness</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">b</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// Make first constraint a + b = c</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">constraint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Constraint</span>::<span class="n">new</span><span class="p">().</span><span class="n">left</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">right</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">public</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="p">.</span><span class="n">c</span><span class="p">).</span><span class="n">a</span><span class="p">(</span><span class="n">a</span><span class="p">).</span><span class="n">b</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">composer</span><span class="p">.</span><span class="n">append_gate</span><span class="p">(</span><span class="n">constraint</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// Check that a and b are in range</span>
+<span class="w">        </span><span class="n">composer</span><span class="p">.</span><span class="n">component_range</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">);</span>
+<span class="w">        </span><span class="n">composer</span><span class="p">.</span><span class="n">component_range</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// Make second constraint a * b = d</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">constraint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Constraint</span>::<span class="n">new</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="n">mult</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="n">output</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="n">public</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="p">.</span><span class="n">d</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="n">a</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="n">b</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">composer</span><span class="p">.</span><span class="n">append_gate</span><span class="p">(</span><span class="n">constraint</span><span class="p">);</span>
+
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">composer</span><span class="p">.</span><span class="n">append_witness</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">scalar_mul_result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">composer</span><span class="p">.</span><span class="n">component_mul_generator</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="w"> </span><span class="n">GENERATOR_EXTENDED</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">        </span><span class="n">composer</span><span class="p">.</span><span class="n">assert_equal_public_point</span><span class="p">(</span><span class="n">scalar_mul_result</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">f</span><span class="p">);</span>
+<span class="w">        </span><span class="nb">Ok</span><span class="p">(())</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">impl</span><span class="w"> </span><span class="n">plonk_pallet</span>::<span class="n">Config</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">TestRuntime</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span> <span class="nc">CustomCircuit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TestCircuit</span><span class="p">;</span>
+<span class="w">    </span><span class="k">type</span> <span class="nc">Event</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Event</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>With this step, we finish to setup the plonk runtime environment.</p>
+<h2 id="5-test-whether-the-functions-work-correctly">5. Test whether the functions work correctly</h2>
+<p>The plonk functions is available on your pallet so we are going to test them as following tests.</p>
+<ul>
+<li><your-pallet>/src/main.rs</li>
+</ul>
+<div class="codehilite"><pre><span></span><code><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">rng</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_rng</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">b&quot;verify&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">test_circuit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TestCircuit</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">a</span>: <span class="nc">BlsScalar</span>::<span class="n">from</span><span class="p">(</span><span class="mi">20</span><span class="k">u64</span><span class="p">),</span>
+<span class="w">        </span><span class="n">b</span>: <span class="nc">BlsScalar</span>::<span class="n">from</span><span class="p">(</span><span class="mi">5</span><span class="k">u64</span><span class="p">),</span>
+<span class="w">        </span><span class="n">c</span>: <span class="nc">BlsScalar</span>::<span class="n">from</span><span class="p">(</span><span class="mi">25</span><span class="k">u64</span><span class="p">),</span>
+<span class="w">        </span><span class="n">d</span>: <span class="nc">BlsScalar</span>::<span class="n">from</span><span class="p">(</span><span class="mi">100</span><span class="k">u64</span><span class="p">),</span>
+<span class="w">        </span><span class="n">e</span>: <span class="nc">JubJubScalar</span>::<span class="n">from</span><span class="p">(</span><span class="mi">2</span><span class="k">u64</span><span class="p">),</span>
+<span class="w">        </span><span class="n">f</span>: <span class="nc">JubJubAffine</span>::<span class="n">from</span><span class="p">(</span><span class="n">GENERATOR_EXTENDED</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">JubJubScalar</span>::<span class="n">from</span><span class="p">(</span><span class="mi">2</span><span class="k">u64</span><span class="p">)),</span>
+<span class="w">    </span><span class="p">};</span>
+
+<span class="w">    </span><span class="n">new_test_ext</span><span class="p">().</span><span class="n">execute_with</span><span class="p">(</span><span class="o">||</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">SumStorage</span>::<span class="n">get_sum</span><span class="p">(),</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">        </span><span class="n">assert_ok</span><span class="o">!</span><span class="p">(</span><span class="n">Plonk</span>::<span class="n">trusted_setup</span><span class="p">(</span><span class="n">Origin</span>::<span class="n">signed</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="n">rng</span><span class="p">.</span><span class="n">clone</span><span class="p">()));</span>
+
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">pp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Plonk</span>::<span class="n">public_parameter</span><span class="p">().</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">prover</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="p">)</span><span class="w"> </span><span class="o">=</span>
+<span class="w">            </span><span class="n">Compiler</span>::<span class="n">compile</span>::<span class="o">&lt;</span><span class="n">TestCircuit</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pp</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="p">).</span><span class="n">expect</span><span class="p">(</span><span class="s">&quot;failed to compile circuit&quot;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">proof</span><span class="p">,</span><span class="w"> </span><span class="n">public_inputs</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prover</span>
+<span class="w">            </span><span class="p">.</span><span class="n">prove</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">rng</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">test_circuit</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="n">expect</span><span class="p">(</span><span class="s">&quot;failed to prove&quot;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">assert_ok</span><span class="o">!</span><span class="p">(</span><span class="n">SumStorage</span>::<span class="n">set_thing_1</span><span class="p">(</span>
+<span class="w">            </span><span class="n">Origin</span>::<span class="n">signed</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+<span class="w">            </span><span class="mi">42</span><span class="p">,</span>
+<span class="w">            </span><span class="n">proof</span><span class="p">,</span>
+<span class="w">            </span><span class="n">public_inputs</span>
+<span class="w">        </span><span class="p">));</span>
+<span class="w">        </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">SumStorage</span>::<span class="n">get_sum</span><span class="p">(),</span><span class="w"> </span><span class="mi">42</span><span class="p">);</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>With above tests, we can confirm that your pallet is coupling with <code>plonk-pallet</code> and these functions work correctly. You can check the <code>plonk-pallet</code> example <a href="https://github.com/KogarashiNetwork/Kogarashi/blob/master/pallets/plonk/src/tests.rs">here</a>. Happy hacking!</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      
+    
+  </body>
+</html>

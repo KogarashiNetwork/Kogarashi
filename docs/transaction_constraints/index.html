@@ -238,7 +238,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../what_is_privacy/" class="md-nav__link">
+      <a href="../infrastructure/what_is_privacy/" class="md-nav__link">
         What is privacy?
       </a>
     </li>
@@ -252,7 +252,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../hide_transfer_amount/" class="md-nav__link">
+      <a href="../infrastructure/hide_transfer_amount/" class="md-nav__link">
         Hide Transfer Amount
       </a>
     </li>
@@ -266,7 +266,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gas_limit/" class="md-nav__link">
+      <a href="../infrastructure/gas_limit/" class="md-nav__link">
         Gas Limit
       </a>
     </li>
@@ -280,7 +280,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../zero_knowledge_scheme/" class="md-nav__link">
+      <a href="../infrastructure/zero_knowledge_scheme/" class="md-nav__link">
         Zero Knowledge Scheme
       </a>
     </li>
@@ -343,7 +343,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../plonk_pallet/" class="md-nav__link">
+      <a href="../tutorial/plonk_pallet/" class="md-nav__link">
         Plonk Pallet
       </a>
     </li>
@@ -357,7 +357,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../confidential_transfer_pallet/" class="md-nav__link">
+      <a href="../tutorial/confidential_transfer_pallet/" class="md-nav__link">
         Confidential Transfer Pallet
       </a>
     </li>
@@ -371,7 +371,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reddsa_wallet/" class="md-nav__link">
+      <a href="../tutorial/reddsa_wallet/" class="md-nav__link">
         RedDSA Wallet
       </a>
     </li>
@@ -434,7 +434,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../confidential_transfer_constraints/" class="md-nav__link">
+      <a href="../constraints/confidential_transfer_constraints/" class="md-nav__link">
         Confidential Transfer Constraints
       </a>
     </li>
@@ -497,7 +497,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../stealth_address/" class="md-nav__link">
+      <a href="../technical/stealth_address/" class="md-nav__link">
         Stealth Address
       </a>
     </li>
@@ -511,7 +511,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../pedersen_commitment/" class="md-nav__link">
+      <a href="../technical/pedersen_commitment/" class="md-nav__link">
         Pedersen Commitment
       </a>
     </li>
@@ -552,7 +552,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../non_interactive_zero_knowlege_proof/" class="md-nav__link">
+      <a href="../technical/non_interactive_zero_knowlege_proof/" class="md-nav__link">
         Abstract
       </a>
     </li>
@@ -566,7 +566,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qap/" class="md-nav__link">
+      <a href="../technical/qap/" class="md-nav__link">
         QAP
       </a>
     </li>
@@ -580,7 +580,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../polynomial_commitment/" class="md-nav__link">
+      <a href="../technical/polynomial_commitment/" class="md-nav__link">
         Polynomial Commitment
       </a>
     </li>
@@ -594,7 +594,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../homomorphic_encryption/" class="md-nav__link">
+      <a href="../technical/homomorphic_encryption/" class="md-nav__link">
         Homomorphic Encryption
       </a>
     </li>
@@ -615,7 +615,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reddsa_signature/" class="md-nav__link">
+      <a href="../technical/reddsa_signature/" class="md-nav__link">
         RedDSA Signature
       </a>
     </li>
@@ -743,9 +743,9 @@
 <h1 id="transaction-constraints">Transaction Constraints</h1>
 <p>In this section, we describe how to generate the proof for each transactions.</p>
 <h2 id="transfer">Transfer</h2>
-<p>When we transfer the assets, as we described at <a href="../hide_transfer_amount/">Hide Transfer Amount</a> section, at first we encrypt the value and the second we generate the proof which proves the validity of value. In terms of the transfer transactions, the constraints the transfer transactions need to satisfy are always same. We can modularize these constraints and generating the proof. The more details for the constraints, you can see it on <a href="./">Transaction Constraints</a> section.</p>
+<p>When we transfer the assets, as we described at <a href="../infrastructure/hide_transfer_amount/">Hide Transfer Amount</a> section, at first we encrypt the value and the second we generate the proof which proves the validity of value. In terms of the transfer transactions, the constraints the transfer transactions need to satisfy are always same. We can modularize these constraints and generating the proof. The more details for the constraints, you can see it on <a href="../constraints/confidential_transfer_constraints/">Transaction Constraints</a> section.</p>
 <h2 id="smart-contract-execution">Smart Contract Execution</h2>
-<p>When we execute the smart contract, the constraints for each transaction is not the same so we can't use same with as in confidential transfer so we generate constraints for each opcode because the opcode operation is always same. We generate proof for each opcode which proves that the opcode was performed correctly and put these together to one proof. It's the same approach with <a href="https://github.com/privacy-scaling-explorations/zkevm-circuits"><code>zkevm</code></a>. The <code>Substrate</code> works on <code>wasm</code> so we are going to implement <code>zkwasm</code>. We also describe the details constraints in <a href="./">Transaction Constraints</a> section.</p>
+<p>When we execute the smart contract, the constraints for each transaction is not the same so we can't use same with as in confidential transfer so we generate constraints for each opcode because the opcode operation is always same. We generate proof for each opcode which proves that the opcode was performed correctly and put these together to one proof. It's the same approach with <a href="https://github.com/privacy-scaling-explorations/zkevm-circuits"><code>zkevm</code></a>. The <code>Substrate</code> works on <code>wasm</code> so we are going to implement <code>zkwasm</code>. We also describe the details constraints in <a href="../constraints/confidential_transfer_constraints/">Transaction Constraints</a> section.</p>
 <h2 id="summarize">Summarize</h2>
 <p>In terms of transfer, the contraints are always same so we can modularize these constraints. In terms of smart contract execution, the constraints are different for each smart contract so we customize the compiler and output the constraints when it compiles the smart contracts. The developer provides the constraints for users and they can know the constraints when they generate the proof.</p>
 
