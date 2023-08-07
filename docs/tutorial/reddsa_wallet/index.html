@@ -411,8 +411,56 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#re-randomization" class="md-nav__link">
-    Re-Randomization
+  <a href="#1-run-reddsa-compatible-substrate-node" class="md-nav__link">
+    1. Run RedDSA compatible Substrate Node
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Run RedDSA compatible Substrate Node">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker-compose" class="md-nav__link">
+    docker-compose
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#native" class="md-nav__link">
+    Native
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-compile-client-wallet" class="md-nav__link">
+    2. Compile client wallet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-generate-wallet" class="md-nav__link">
+    3. Generate Wallet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-check-balance" class="md-nav__link">
+    4. Check Balance
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-transfer-asset" class="md-nav__link">
+    5. Transfer Asset
   </a>
   
 </li>
@@ -759,8 +807,56 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#re-randomization" class="md-nav__link">
-    Re-Randomization
+  <a href="#1-run-reddsa-compatible-substrate-node" class="md-nav__link">
+    1. Run RedDSA compatible Substrate Node
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Run RedDSA compatible Substrate Node">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker-compose" class="md-nav__link">
+    docker-compose
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#native" class="md-nav__link">
+    Native
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-compile-client-wallet" class="md-nav__link">
+    2. Compile client wallet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-generate-wallet" class="md-nav__link">
+    3. Generate Wallet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-check-balance" class="md-nav__link">
+    4. Check Balance
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-transfer-asset" class="md-nav__link">
+    5. Transfer Asset
   </a>
   
 </li>
@@ -789,8 +885,80 @@
 
 <h1 id="reddsa-tutorial">RedDSA Tutorial</h1>
 <p>In this tutorial, we are going to send transactions through RedDSA wallet and check whether it was processed correctly. We assume that you already unserstand what <a href="../../technical/reddsa_signature/">RedDSA Signature</a> is.</p>
-<h2 id="re-randomization">Re-Randomization</h2>
-<p>We can generate one-time secret related to wallet private key and use it for performing some operation of transactions. After some operation, we can prove that the secret is related to private key and the operation was done correctly. In Zash Sapling, it's used for transaction auditability and proof delegation.</p>
+<p>The steps are following.</p>
+<ol>
+<li>Run RedDSA compatible Substrate Node</li>
+<li>Compile client wallet</li>
+<li>Generate Wallet</li>
+<li>Check Balance</li>
+<li>Transfer Asset</li>
+</ol>
+<p>Final goal is to check whether RedDSA client wallet works through RPC call to Substrate Node.</p>
+<p>You can find wallet client <a href="https://github.com/KogarashiNetwork/Kogarashi/tree/master/node/client">here</a> and RedDSA compatible Substrate Node <a href="https://github.com/KogarashiNetwork/zksubstrate">here</a>.
+We already implemented RedDSA runtime <a href="https://github.com/KogarashiNetwork/Kogarashi/tree/master/zkruntime">here</a> so you can import this runtime to your Substrate Node.</p>
+<h2 id="1-run-reddsa-compatible-substrate-node">1. Run RedDSA compatible Substrate Node</h2>
+<p>First of all, we would like to run the RedDSA compatible Substrate Node. There are two ways to do this. We reccomend docker compose.</p>
+<p>Let's clone the RedDSA Substrate Node with following command.</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:KogarashiNetwork/Kogarashi.git
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>Kogarashi
+$<span class="w"> </span>git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w"> </span>-i
+</code></pre></div>
+
+<p>After cloning repository and submodule dependencies, run the RedDSA Substrate Node with following command.</p>
+<h3 id="docker-compose">docker-compose</h3>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>docker-compose<span class="w"> </span>up
+</code></pre></div>
+
+<h3 id="native">Native</h3>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>sh<span class="w"> </span>scripts/setup.sh
+</code></pre></div>
+
+<h2 id="2-compile-client-wallet">2. Compile client wallet</h2>
+<p>Next, we would like to setup RedDSA Wallet client in <a href="https://github.com/KogarashiNetwork/Kogarashi/tree/master/node/client">here</a>. We can setup with following command in root directly.</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>rustup<span class="w"> </span>target<span class="w"> </span>add<span class="w"> </span>wasm32-unknown-unknown
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>node/client
+</code></pre></div>
+
+<p>And after compilation, we can check whether wallet client is ready with following command.</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>list
+</code></pre></div>
+
+<p>If test accounts list is displayed, the wallet is ready.</p>
+<h2 id="3-generate-wallet">3. Generate Wallet</h2>
+<p>We would like to generate wallet with following command.</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>init
+</code></pre></div>
+
+<p>If it's successfull for generating wallet, it would display your address and seed.</p>
+<h2 id="4-check-balance">4. Check Balance</h2>
+<p>Let's check the account balance with following and whether it's zero.</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>balance
+</code></pre></div>
+
+<p>If you would like to check other account balance, you can do it with following command.</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>balance<span class="w"> </span><span class="o">{</span>Account<span class="w"> </span>Name<span class="o">}</span>
+</code></pre></div>
+
+<p><code>{Account Name}</code> is replaced with 'Alice', 'Bob' and displayed accounts with <code>cargo run list</code>.</p>
+<h2 id="5-transfer-asset">5. Transfer Asset</h2>
+<p>Finally, we would like to transfer asset but you don't have any asset now so let's fund with following command.</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>fund
+</code></pre></div>
+
+<p>Right now, you have some asset and can check how much you want with following command.</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>balance
+</code></pre></div>
+
+<p>Then, let's transfer your asset. We need to decide who and how much we transfer. If you want to transfer 1000 to Bob, it would be following.</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>transfer<span class="w"> </span>Bob<span class="w"> </span><span class="m">1000</span>
+</code></pre></div>
+
+<p>You can check whether Bob amount is increased with following command.</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>balance<span class="w"> </span>Bob
+</code></pre></div>
+
+<p>You can find sample RedDSA implementation <a href="https://github.com/KogarashiNetwork/Kogarashi/blob/master/node/client/src/rpc/extrinsic.rs">here</a>.</p>
+<p>Happy hacking!</p>
 <h2 id="reference">Reference</h2>
 <p><a href="https://zips.z.cash/protocol/protocol.pdf#page=90">Zcash Protocol Specification, Version 2022.3.8</a></p>
 
