@@ -11,3 +11,5 @@ FROM alpine:3.18.2
 RUN apk add --no-cache --update-cach clang15-dev
 
 COPY --from=builder /app/node/target/release/kogarashi-node /usr/local/bin/kogarashi
+
+EXPOSE 9933

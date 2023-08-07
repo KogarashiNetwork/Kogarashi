@@ -5,4 +5,6 @@ services:
     container_name: kogarashi
     tty: true
     stdin_open: true
+    ports:
+      - "9933:9933"
     command: kogarashi --dev
