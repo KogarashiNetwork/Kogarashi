@@ -7,8 +7,8 @@ pub(crate) async fn fund_command() {
     if is_wallet_init() {
         let wallet = extract_wallet();
         match transfer(
-            wallet.pair(),
-            AccountKeyring::Alice.to_account_id(),
+            AccountKeyring::Alice.pair(),
+            wallet.to_account_id(),
             1000000000000,
         )
         .await

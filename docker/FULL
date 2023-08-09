@@ -14,4 +14,4 @@ COPY --from=builder /app/node/target/release/kogarashi-node /usr/local/bin/kogar
 
 EXPOSE 9933
 
-CMD kogarashi --dev --rpc-external --unsafe-rpc-external --rpc-cors * --rpc-methods Unsafe
+CMD kogarashi --dev --rpc-external

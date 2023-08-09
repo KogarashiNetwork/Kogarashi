@@ -29,8 +29,16 @@ $ git submodule update -i
 
 After cloning the repository and submodule dependencies, run the RedDSA Substrate Node with the following command.
 
+- Native
+
 ```sh
 $ sh scripts/setup.sh
+```
+
+- Docker
+
+```sh
+$ docker-compose up
 ```
 
 ## 2. Compile client wallet
