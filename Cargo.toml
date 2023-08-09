@@ -80,23 +80,7 @@ std = [
 ]
 
 [[bench]]
-name = "confidential_transfer"
-harness = false
-
-[[bench]]
-name = "pairing"
-harness = false
-
-[[bench]]
-name = "jubjub_curve"
-harness = false
-
-[[bench]]
 name = "bls12_381_curve"
-harness = false
-
-[[bench]]
-name = "jubjub_field"
 harness = false
 
 [[bench]]
@@ -104,5 +88,21 @@ name = "bls12_381_field"
 harness = false
 
 [[bench]]
+name = "confidential_transfer"
+harness = false
+
+[[bench]]
+name = "jubjub_curve"
+harness = false
+
+[[bench]]
+name = "jubjub_field"
+harness = false
+
+[[bench]]
 name = "msm"
+harness = false
+
+[[bench]]
+name = "pairing"
 harness = false
