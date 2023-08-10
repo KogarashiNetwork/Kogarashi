@@ -1,2 +1,2 @@
 pub mod add;
-mod scalar;
+pub mod scalar;
