@@ -1,11 +1,11 @@
 use parity_scale_codec::{Decode, Encode};
-use zkstd::common::Pairing;
+use zkstd::common::{Affine, CurveGroup};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Default, Decode, Encode)]
-pub struct Commitment<P: Pairing>(pub P::G1Affine);
+pub struct Commitment<A: Affine>(pub A);
 
-impl<P: Pairing> Commitment<P> {
-    pub fn new(value: P::G1Projective) -> Self {
-        Self(P::G1Affine::from(value))
+impl<A: Affine> Commitment<A> {
+    pub fn new(value: <A as CurveGroup>::Extended) -> Self {
+        Self(A::from(value))
     }
 }

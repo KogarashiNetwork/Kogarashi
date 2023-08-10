@@ -25,7 +25,7 @@ pub trait Curve: CurveGroup + ParityCmp + Basic {
 }
 
 /// elliptic curve rational point affine representation
-pub trait Affine: Curve {
+pub trait Affine: Curve + From<<Self as CurveGroup>::Extended> {
     fn to_extended(self) -> <Self as CurveGroup>::Extended;
 }
 

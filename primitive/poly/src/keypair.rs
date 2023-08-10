@@ -38,7 +38,10 @@ impl<P: Pairing> KeyPair<P> {
     }
 
     // commit polynomial to g1 projective group
-    pub fn commit(&self, poly: &Polynomial<P::ScalarField>) -> Result<Commitment<P>, Error> {
+    pub fn commit(
+        &self,
+        poly: &Polynomial<P::ScalarField>,
+    ) -> Result<Commitment<P::G1Affine>, Error> {
         self.check_commit_degree_is_within_bounds(poly.degree())?;
 
         Ok(Commitment::new(msm_variable_base::<P>(&self.g1, poly)))
