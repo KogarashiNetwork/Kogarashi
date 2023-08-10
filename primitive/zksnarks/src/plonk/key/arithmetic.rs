@@ -40,7 +40,7 @@ impl<A: Affine> VerificationKey<A> {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone)]
-pub struct ProverKey<F: FftField> {
+pub struct ProvingKey<F: FftField> {
     pub q_m: (Polynomial<F>, PolyEval<F>),
     pub q_l: (Polynomial<F>, PolyEval<F>),
     pub q_r: (Polynomial<F>, PolyEval<F>),
@@ -50,7 +50,7 @@ pub struct ProverKey<F: FftField> {
     pub q_arith: (Polynomial<F>, PolyEval<F>),
 }
 
-impl<F: FftField> ProverKey<F> {
+impl<F: FftField> ProvingKey<F> {
     pub fn compute_quotient_i(
         &self,
         index: usize,
