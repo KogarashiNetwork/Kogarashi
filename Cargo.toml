@@ -52,6 +52,7 @@ members = [
     "primitive/plonk",
     "primitive/poly",
     "primitive/redjubjub",
+    "primitive/zksnarks",
     "primitive/zkstd",
     "zkruntime",
 ]

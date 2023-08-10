@@ -5227,6 +5227,7 @@ dependencies = [
  "rayon",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tempdir",
+ "zksnarks",
  "zkstd 0.0.9",
 ]
 
@@ -5283,6 +5284,13 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "substrate-wasm-builder",
+]
+
+[[package]]
+name = "zksnarks"
+version = "0.1.0"
+dependencies = [
+ "zkstd 0.0.9",
 ]
 
 [[package]]
