@@ -5290,6 +5290,8 @@ dependencies = [
 name = "zksnarks"
 version = "0.1.0"
 dependencies = [
+ "parity-scale-codec",
+ "poly-commit",
  "zkstd 0.0.9",
 ]
 
