@@ -1,4 +1,4 @@
-mod key;
+pub mod key;
 mod proof;
 
 pub use key::*;
