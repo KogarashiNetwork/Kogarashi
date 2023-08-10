@@ -51,9 +51,47 @@ macro_rules! ext_field_group_operation {
             }
         }
 
+        impl<'a, 'b> Add<&'b $extension_field> for &'a $extension_field {
+            type Output = $extension_field;
+
+            fn add(self, rhs: &'b $extension_field) -> $extension_field {
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = self.0[i] + rhs.0[i];
+                }
+                $extension_field(limbs)
+            }
+        }
+
+        impl<'a> Add<$extension_field> for &'a $extension_field {
+            type Output = $extension_field;
+
+            fn add(self, rhs: $extension_field) -> $extension_field {
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = self.0[i] + rhs.0[i];
+                }
+                $extension_field(limbs)
+            }
+        }
+
         impl AddAssign for $extension_field {
             fn add_assign(&mut self, rhs: $extension_field) {
                 *self = *self + rhs;
+            }
+        }
+
+        impl<'b> AddAssign<&'b $extension_field> for $extension_field {
+            fn add_assign(&mut self, rhs: &'b $extension_field) {
+                *self = *self + rhs;
+            }
+        }
+
+        impl<'b> Add<&'b $extension_field> for $extension_field {
+            type Output = $extension_field;
+
+            fn add(self, rhs: &'b $extension_field) -> Self {
+                self + rhs
             }
         }
 
@@ -89,6 +127,36 @@ macro_rules! ext_field_group_operation {
             }
         }
 
+        impl<'b> SubAssign<&'b $extension_field> for $extension_field {
+            fn sub_assign(&mut self, rhs: &'b $extension_field) {
+                *self = *self - *rhs
+            }
+        }
+
+        impl<'a, 'b> Sub<&'b $extension_field> for &'a $extension_field {
+            type Output = $extension_field;
+
+            fn sub(self, rhs: &'b $extension_field) -> $extension_field {
+                *self * *rhs
+            }
+        }
+
+        impl<'b> Sub<&'b $extension_field> for $extension_field {
+            type Output = $extension_field;
+
+            fn sub(self, rhs: &'b $extension_field) -> $extension_field {
+                self * *rhs
+            }
+        }
+
+        impl<'a> Sub<$extension_field> for &'a $extension_field {
+            type Output = $extension_field;
+
+            fn sub(self, rhs: $extension_field) -> $extension_field {
+                *self * rhs
+            }
+        }
+
         impl Mul for $extension_field {
             type Output = Self;
 
@@ -101,6 +169,28 @@ macro_rules! ext_field_group_operation {
         impl MulAssign for $extension_field {
             fn mul_assign(&mut self, rhs: $extension_field) {
                 *self = *self * rhs;
+            }
+        }
+
+        impl<'b> MulAssign<&'b $extension_field> for $extension_field {
+            fn mul_assign(&mut self, rhs: &'b $extension_field) {
+                *self = &*self * rhs;
+            }
+        }
+
+        impl<'a, 'b> Mul<&'b $extension_field> for &'a $extension_field {
+            type Output = $extension_field;
+
+            fn mul(self, rhs: &'b $extension_field) -> $extension_field {
+                *self + *rhs
+            }
+        }
+
+        impl<'b> Mul<&'b $extension_field> for $extension_field {
+            type Output = $extension_field;
+
+            fn mul(self, rhs: &'b $extension_field) -> $extension_field {
+                self + *rhs
             }
         }
 
