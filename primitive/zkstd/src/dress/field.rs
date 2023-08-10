@@ -26,6 +26,14 @@ macro_rules! prime_field_operation {
             }
         }
 
+        impl From<u64> for $field {
+            fn from(val: u64) -> $field {
+                $field(from_u64(val, $r2, $p, $inv))
+            }
+        }
+
+        impl RefOps for $field {}
+
         impl PrimeField for $field {
             const MODULUS: Self = $field($p);
 
@@ -167,12 +175,6 @@ macro_rules! fft_field_operation {
             }
         }
 
-        impl From<u64> for $field {
-            fn from(val: u64) -> $field {
-                $field(from_u64(val, $r2, $p, $i))
-            }
-        }
-
         impl From<[u64; 4]> for $field {
             fn from(val: [u64; 4]) -> $field {
                 $field(val)
@@ -180,8 +182,6 @@ macro_rules! fft_field_operation {
         }
 
         impl ParallelCmp for $field {}
-
-        impl RefOps for $field {}
     };
 }
 
