@@ -1,13 +1,16 @@
-use core::ops::{Add, Deref, DerefMut, Mul, Sub};
+use core::ops::{Add, Deref, DerefMut, Index, Mul, Sub};
 
 use core::iter::{self, Sum};
 use rand_core::RngCore;
 use zkstd::behave::FftField;
-use zkstd::common::Vec;
+use zkstd::common::{PrimeField, Vec};
 
 // a_n-1 , a_n-2, ... , a_0
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Polynomial<F>(pub Vec<F>);
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct Evaluations<F>(pub Vec<F>);
 
 pub struct Witness<F> {
     s_eval: F,
@@ -30,6 +33,14 @@ impl<F> DerefMut for Polynomial<F> {
     }
 }
 
+impl<F: PrimeField> Index<usize> for Evaluations<F> {
+    type Output = F;
+
+    fn index(&self, index: usize) -> &F {
+        &self.0[index]
+    }
+}
+
 impl<F: FftField> Sum for Polynomial<F> {
     fn sum<I>(iter: I) -> Self
     where
@@ -40,6 +51,12 @@ impl<F: FftField> Sum for Polynomial<F> {
             res
         });
         sum
+    }
+}
+
+impl<F: FftField> Evaluations<F> {
+    pub fn new(coeffs: Vec<F>) -> Self {
+        Self(coeffs)
     }
 }
 
