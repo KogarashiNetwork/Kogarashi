@@ -7,3 +7,4 @@ edition = "2021"
 zkstd = { path = "../zkstd", default-features = false }
 poly-commit = { path = "../poly", default-features = false }
 parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
+merlin = { version = "3.0", default-features = false }
