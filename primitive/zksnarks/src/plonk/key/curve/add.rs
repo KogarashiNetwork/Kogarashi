@@ -1,6 +1,6 @@
 use crate::plonk::Evaluations;
 
-use poly_commit::{Coefficients, Commitment, Evaluations as PolyEval};
+use poly_commit::{Coefficients, Commitment, PointsValue};
 use zkstd::common::{vec, Pairing, PrimeField, TwistedEdwardsCurve, Vec};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -56,7 +56,7 @@ impl<P: Pairing> VerificationKey<P> {
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct ProvingKey<P: Pairing> {
-    pub q_variable_group_add: (Coefficients<P::ScalarField>, PolyEval<P::ScalarField>),
+    pub q_variable_group_add: (Coefficients<P::ScalarField>, PointsValue<P::ScalarField>),
 }
 
 impl<P: Pairing> ProvingKey<P> {

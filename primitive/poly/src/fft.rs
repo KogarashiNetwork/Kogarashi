@@ -1,6 +1,6 @@
 use crate::poly::Coefficients;
 use crate::util::batch_inversion;
-use crate::Evaluations;
+use crate::PointsValue;
 use rayon::join;
 use zkstd::common::{FftField, Vec};
 
@@ -223,13 +223,13 @@ impl<F: FftField> Fft<F> {
     pub fn compute_vanishing_poly_over_coset(
         &self,            // domain to evaluate over
         poly_degree: u64, // degree of the vanishing polynomial
-    ) -> Evaluations<F> {
+    ) -> PointsValue<F> {
         assert!((self.size() as u64) > poly_degree);
         let coset_gen = F::MULTIPLICATIVE_GENERATOR.pow(poly_degree);
         let v_h: Vec<_> = (0..self.size())
             .map(|i| (coset_gen * self.generator().pow(poly_degree * i as u64)) - F::one())
             .collect();
-        Evaluations::new(v_h)
+        PointsValue::new(v_h)
     }
 }
 

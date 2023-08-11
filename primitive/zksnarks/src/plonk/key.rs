@@ -6,7 +6,7 @@ pub mod range;
 
 use crate::plonk::transcript::TranscriptProtocol;
 use merlin::Transcript;
-use poly_commit::Evaluations;
+use poly_commit::PointsValue;
 use zkstd::common::Pairing;
 
 /// Verification Key
@@ -131,16 +131,16 @@ pub struct ProvingKey<P: Pairing> {
     pub variable_base: curve::add::ProvingKey<P>,
     /// ProvingKey for permutation checks
     pub permutation: permutation::ProvingKey<P::ScalarField>,
-    // Pre-processes the 8n Evaluations for the vanishing polynomial, so
+    // Pre-processes the 8n PointsValue for the vanishing polynomial, so
     // they do not need to be computed at the proving stage.
     // Note: With this, we can combine all parts of the quotient polynomial
     // in their evaluation phase and divide by the quotient
     // polynomial without having to perform IFFT
-    pub v_h_coset_8n: Evaluations<P::ScalarField>,
+    pub v_h_coset_8n: PointsValue<P::ScalarField>,
 }
 
 impl<P: Pairing> ProvingKey<P> {
-    pub fn v_h_coset_8n(&self) -> &Evaluations<P::ScalarField> {
+    pub fn v_h_coset_8n(&self) -> &PointsValue<P::ScalarField> {
         &self.v_h_coset_8n
     }
 }

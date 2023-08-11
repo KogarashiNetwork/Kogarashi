@@ -10,7 +10,7 @@ use zkstd::common::{PrimeField, Vec};
 pub struct Coefficients<F>(pub Vec<F>);
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct Evaluations<F>(pub Vec<F>);
+pub struct PointsValue<F>(pub Vec<F>);
 
 pub struct Witness<F> {
     s_eval: F,
@@ -33,7 +33,7 @@ impl<F> DerefMut for Coefficients<F> {
     }
 }
 
-impl<F: PrimeField> Index<usize> for Evaluations<F> {
+impl<F: PrimeField> Index<usize> for PointsValue<F> {
     type Output = F;
 
     fn index(&self, index: usize) -> &F {
@@ -54,7 +54,7 @@ impl<F: FftField> Sum for Coefficients<F> {
     }
 }
 
-impl<F: FftField> Evaluations<F> {
+impl<F: FftField> PointsValue<F> {
     pub fn new(coeffs: Vec<F>) -> Self {
         Self(coeffs)
     }

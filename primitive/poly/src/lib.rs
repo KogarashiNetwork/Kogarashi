@@ -27,6 +27,6 @@ pub use commitment::Commitment;
 pub use fft::Fft;
 pub use keypair::Error as KzgError;
 pub use keypair::KeyPair;
-pub use poly::{Coefficients, Evaluations};
+pub use poly::{Coefficients, PointsValue};
 pub use util::batch_inversion;
 pub use witness::Witness;

@@ -1,5 +1,5 @@
 use crate::Evaluations;
-use poly_commit::{Coefficients, Commitment, Evaluations as PolyEvals};
+use poly_commit::{Coefficients, Commitment, PointsValue};
 use zkstd::common::{vec, Pairing, PrimeField, Ring, TwistedEdwardsCurve, Vec};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -77,10 +77,10 @@ impl<P: Pairing> VerificationKey<P> {
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct ProvingKey<P: Pairing> {
-    pub q_l: (Coefficients<P::ScalarField>, PolyEvals<P::ScalarField>),
-    pub q_r: (Coefficients<P::ScalarField>, PolyEvals<P::ScalarField>),
-    pub q_c: (Coefficients<P::ScalarField>, PolyEvals<P::ScalarField>),
-    pub q_fixed_group_add: (Coefficients<P::ScalarField>, PolyEvals<P::ScalarField>),
+    pub q_l: (Coefficients<P::ScalarField>, PointsValue<P::ScalarField>),
+    pub q_r: (Coefficients<P::ScalarField>, PointsValue<P::ScalarField>),
+    pub q_c: (Coefficients<P::ScalarField>, PointsValue<P::ScalarField>),
+    pub q_fixed_group_add: (Coefficients<P::ScalarField>, PointsValue<P::ScalarField>),
 }
 
 impl<P: Pairing> ProvingKey<P> {

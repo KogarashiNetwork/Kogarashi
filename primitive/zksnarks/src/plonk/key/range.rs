@@ -1,6 +1,6 @@
 use crate::plonk::proof::Evaluations;
 
-use poly_commit::{Coefficients, Commitment, Evaluations as PolyEval};
+use poly_commit::{Coefficients, Commitment, PointsValue};
 use zkstd::common::{vec, Affine, FftField, PrimeField, Vec};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -34,7 +34,7 @@ impl<A: Affine> VerificationKey<A> {
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct ProvingKey<F: FftField> {
-    pub q_range: (Coefficients<F>, PolyEval<F>),
+    pub q_range: (Coefficients<F>, PointsValue<F>),
 }
 
 impl<F: FftField> ProvingKey<F> {

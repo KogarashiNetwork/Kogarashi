@@ -1,6 +1,6 @@
 use crate::plonk::proof::Evaluations;
 
-use poly_commit::{Coefficients, Commitment, Evaluations as PolyEval, Fft};
+use poly_commit::{Coefficients, Commitment, Fft, PointsValue};
 use zkstd::common::{vec, Affine, FftField, PrimeField, Vec};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -72,11 +72,11 @@ impl<A: Affine> VerificationKey<A> {
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct ProvingKey<F: FftField> {
-    pub s_sigma_1: (Coefficients<F>, PolyEval<F>),
-    pub s_sigma_2: (Coefficients<F>, PolyEval<F>),
-    pub s_sigma_3: (Coefficients<F>, PolyEval<F>),
-    pub s_sigma_4: (Coefficients<F>, PolyEval<F>),
-    pub linear_evaluations: PolyEval<F>,
+    pub s_sigma_1: (Coefficients<F>, PointsValue<F>),
+    pub s_sigma_2: (Coefficients<F>, PointsValue<F>),
+    pub s_sigma_3: (Coefficients<F>, PointsValue<F>),
+    pub s_sigma_4: (Coefficients<F>, PointsValue<F>),
+    pub linear_evaluations: PointsValue<F>,
     /* Evaluations of f(x) = X
      * [XXX: Remove this and
      * benchmark if it makes a
