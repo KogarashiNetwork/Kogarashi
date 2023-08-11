@@ -162,6 +162,49 @@ impl<F: FftField> Fft<F> {
         self.idft(&mut mul_poly);
         mul_poly
     }
+
+    #[allow(clippy::needless_range_loop)]
+    /// Evaluate all the lagrange polynomials defined by this domain at the
+    /// point `tau`.
+    pub fn evaluate_all_lagrange_coefficients(&self, tau: F) -> Vec<F> {
+        // Evaluate all Lagrange polynomials
+        let size = self.n as usize;
+        let t_size = tau.pow(size as u64);
+        let one = F::one();
+        if t_size == F::one() {
+            let mut u = vec![F::zero(); size];
+            let mut omega_i = one;
+            for i in 0..size {
+                if omega_i == tau {
+                    u[i] = one;
+                    break;
+                }
+                omega_i *= &self.generator();
+            }
+            u
+        } else {
+            use crate::util::batch_inversion;
+
+            let mut l = (t_size - one) * self.n_inv;
+            let mut r = one;
+            let mut u = vec![F::zero(); size];
+            let mut ls = vec![F::zero(); size];
+            for i in 0..size {
+                u[i] = tau - r;
+                ls[i] = l;
+                l *= &self.generator();
+                r *= &self.generator();
+            }
+
+            batch_inversion(u.as_mut_slice());
+
+            u.iter_mut().zip(ls).for_each(|(tau_minus_r, l)| {
+                *tau_minus_r = l * *tau_minus_r;
+            });
+
+            u
+        }
+    }
 }
 
 // classic fft using divide and conquer algorithm
