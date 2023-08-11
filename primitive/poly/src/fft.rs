@@ -2,7 +2,7 @@ use crate::poly::Coefficients;
 use crate::util::batch_inversion;
 use crate::PointsValue;
 use rayon::join;
-use zkstd::common::{FftField, Vec};
+use zkstd::common::{vec, FftField, Vec};
 
 // fft structure
 #[derive(Clone, Debug, Eq, PartialEq)]
