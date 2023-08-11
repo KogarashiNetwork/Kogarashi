@@ -1,4 +1,6 @@
 use crate::poly::Polynomial;
+use crate::util::batch_inversion;
+use crate::Evaluations;
 use rayon::join;
 use zkstd::common::{FftField, Vec};
 
@@ -26,6 +28,7 @@ pub struct Fft<F: FftField> {
 
 impl<F: FftField> Fft<F> {
     pub fn new(k: usize) -> Self {
+        assert!(k >= 1);
         let n = 1 << k;
         let half_n = n / 2;
         let offset = 64 - k;
@@ -102,9 +105,19 @@ impl<F: FftField> Fft<F> {
         self.n
     }
 
+    /// size inverse
+    pub fn size_inv(&self) -> F {
+        self.n_inv
+    }
+
     /// nth unity of root
     pub fn generator(&self) -> F {
         self.twiddle_factors[1]
+    }
+
+    /// nth unity of root
+    pub fn generator_inv(&self) -> F {
+        self.inv_twiddle_factors[1]
     }
 
     /// perform discrete fourier transform
@@ -183,8 +196,6 @@ impl<F: FftField> Fft<F> {
             }
             u
         } else {
-            use crate::util::batch_inversion;
-
             let mut l = (t_size - one) * self.n_inv;
             let mut r = one;
             let mut u = vec![F::zero(); size];
@@ -204,6 +215,21 @@ impl<F: FftField> Fft<F> {
 
             u
         }
+    }
+
+    /// Given that the domain size is `D`
+    /// This function computes the `D` evaluation points for
+    /// the vanishing polynomial of degree `n` over a coset
+    pub fn compute_vanishing_poly_over_coset(
+        &self,            // domain to evaluate over
+        poly_degree: u64, // degree of the vanishing polynomial
+    ) -> Evaluations<F> {
+        assert!((self.size() as u64) > poly_degree);
+        let coset_gen = F::MULTIPLICATIVE_GENERATOR.pow(poly_degree);
+        let v_h: Vec<_> = (0..self.size())
+            .map(|i| (coset_gen * self.generator().pow(poly_degree * i as u64)) - F::one())
+            .collect();
+        Evaluations::new(v_h)
     }
 }
 
