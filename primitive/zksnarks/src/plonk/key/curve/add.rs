@@ -1,6 +1,6 @@
 use crate::plonk::Evaluations;
 
-use poly_commit::{Commitment, Evaluations as PolyEval, Polynomial};
+use poly_commit::{Coefficients, Commitment, Evaluations as PolyEval};
 use zkstd::common::{vec, Pairing, PrimeField, TwistedEdwardsCurve, Vec};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -56,7 +56,7 @@ impl<P: Pairing> VerificationKey<P> {
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct ProvingKey<P: Pairing> {
-    pub q_variable_group_add: (Polynomial<P::ScalarField>, PolyEval<P::ScalarField>),
+    pub q_variable_group_add: (Coefficients<P::ScalarField>, PolyEval<P::ScalarField>),
 }
 
 impl<P: Pairing> ProvingKey<P> {
@@ -120,7 +120,7 @@ impl<P: Pairing> ProvingKey<P> {
         c_eval: &P::ScalarField,
         d_eval: &P::ScalarField,
         d_next_eval: &P::ScalarField,
-    ) -> Polynomial<P::ScalarField> {
+    ) -> Coefficients<P::ScalarField> {
         let q_variable_group_add_poly = &self.q_variable_group_add.0;
 
         let kappa = curve_add_separation_challenge.square();

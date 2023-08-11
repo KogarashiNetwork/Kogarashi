@@ -1,5 +1,5 @@
 use crate::Evaluations;
-use poly_commit::{Commitment, Evaluations as PolyEvals, Polynomial};
+use poly_commit::{Coefficients, Commitment, Evaluations as PolyEvals};
 use zkstd::common::{vec, Pairing, PrimeField, Ring, TwistedEdwardsCurve, Vec};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -77,10 +77,10 @@ impl<P: Pairing> VerificationKey<P> {
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct ProvingKey<P: Pairing> {
-    pub q_l: (Polynomial<P::ScalarField>, PolyEvals<P::ScalarField>),
-    pub q_r: (Polynomial<P::ScalarField>, PolyEvals<P::ScalarField>),
-    pub q_c: (Polynomial<P::ScalarField>, PolyEvals<P::ScalarField>),
-    pub q_fixed_group_add: (Polynomial<P::ScalarField>, PolyEvals<P::ScalarField>),
+    pub q_l: (Coefficients<P::ScalarField>, PolyEvals<P::ScalarField>),
+    pub q_r: (Coefficients<P::ScalarField>, PolyEvals<P::ScalarField>),
+    pub q_c: (Coefficients<P::ScalarField>, PolyEvals<P::ScalarField>),
+    pub q_fixed_group_add: (Coefficients<P::ScalarField>, PolyEvals<P::ScalarField>),
 }
 
 impl<P: Pairing> ProvingKey<P> {
@@ -169,7 +169,7 @@ impl<P: Pairing> ProvingKey<P> {
         q_l_eval: &P::ScalarField,
         q_r_eval: &P::ScalarField,
         q_c_eval: &P::ScalarField,
-    ) -> Polynomial<P::ScalarField> {
+    ) -> Coefficients<P::ScalarField> {
         let q_fixed_group_add_poly = &self.q_fixed_group_add.0;
 
         let kappa = ecc_separation_challenge.square();

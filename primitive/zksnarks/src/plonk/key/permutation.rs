@@ -1,6 +1,6 @@
 use crate::plonk::proof::Evaluations;
 
-use poly_commit::{Commitment, Evaluations as PolyEval, Fft, Polynomial};
+use poly_commit::{Coefficients, Commitment, Evaluations as PolyEval, Fft};
 use zkstd::common::{vec, Affine, FftField, PrimeField, Vec};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -72,10 +72,10 @@ impl<A: Affine> VerificationKey<A> {
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct ProvingKey<F: FftField> {
-    pub s_sigma_1: (Polynomial<F>, PolyEval<F>),
-    pub s_sigma_2: (Polynomial<F>, PolyEval<F>),
-    pub s_sigma_3: (Polynomial<F>, PolyEval<F>),
-    pub s_sigma_4: (Polynomial<F>, PolyEval<F>),
+    pub s_sigma_1: (Coefficients<F>, PolyEval<F>),
+    pub s_sigma_2: (Coefficients<F>, PolyEval<F>),
+    pub s_sigma_3: (Coefficients<F>, PolyEval<F>),
+    pub s_sigma_4: (Coefficients<F>, PolyEval<F>),
     pub linear_evaluations: PolyEval<F>,
     /* Evaluations of f(x) = X
      * [XXX: Remove this and
@@ -177,8 +177,8 @@ impl<F: FftField> ProvingKey<F> {
         (a_eval, b_eval, c_eval, d_eval): (&F, &F, &F, &F),
         (sigma_1_eval, sigma_2_eval, sigma_3_eval): (&F, &F, &F),
         z_eval: &F,
-        z_poly: &Polynomial<F>,
-    ) -> Polynomial<F> {
+        z_poly: &Coefficients<F>,
+    ) -> Coefficients<F> {
         let a = self.compute_linearizer_identity_range_check(
             (a_eval, b_eval, c_eval, d_eval),
             z_challenge,
@@ -209,8 +209,8 @@ impl<F: FftField> ProvingKey<F> {
         (a_eval, b_eval, c_eval, d_eval): (&F, &F, &F, &F),
         z_challenge: &F,
         (alpha, beta, gamma): (&F, &F, &F),
-        z_poly: &Polynomial<F>,
-    ) -> Polynomial<F> {
+        z_poly: &Coefficients<F>,
+    ) -> Coefficients<F> {
         let beta_z = *beta * z_challenge;
 
         // a_eval + beta * z_challenge + gamma
@@ -252,8 +252,8 @@ impl<F: FftField> ProvingKey<F> {
         sigma_2_eval: &F,
         sigma_3_eval: &F,
         (alpha, beta, gamma): (&F, &F, &F),
-        s_sigma_4_poly: &Polynomial<F>,
-    ) -> Polynomial<F> {
+        s_sigma_4_poly: &Coefficients<F>,
+    ) -> Coefficients<F> {
         // a_eval + beta * sigma_1 + gamma
         let beta_sigma_1 = *beta * sigma_1_eval;
         let mut a_0 = *a_eval + beta_sigma_1;
@@ -287,8 +287,8 @@ impl<F: FftField> ProvingKey<F> {
         domain: &Fft<F>,
         z_challenge: &F,
         alpha_sq: &F,
-        z_coeffs: &Polynomial<F>,
-    ) -> Polynomial<F> {
+        z_coeffs: &Coefficients<F>,
+    ) -> Coefficients<F> {
         // Evaluate l_1(z)
         let l_1_z = domain.evaluate_all_lagrange_coefficients(*z_challenge)[0];
 

@@ -1,4 +1,4 @@
-use crate::poly::Polynomial;
+use crate::poly::Coefficients;
 use crate::util::batch_inversion;
 use crate::Evaluations;
 use rayon::join;
@@ -121,20 +121,20 @@ impl<F: FftField> Fft<F> {
     }
 
     /// perform discrete fourier transform
-    pub fn dft(&self, coeffs: &mut Polynomial<F>) {
+    pub fn dft(&self, coeffs: &mut Coefficients<F>) {
         self.prepare_fft(coeffs);
         classic_fft_arithmetic(&mut coeffs.0, self.n, 1, &self.twiddle_factors)
     }
 
     /// perform classic inverse discrete fourier transform
-    pub fn idft(&self, coeffs: &mut Polynomial<F>) {
+    pub fn idft(&self, coeffs: &mut Coefficients<F>) {
         self.prepare_fft(coeffs);
         classic_fft_arithmetic(&mut coeffs.0, self.n, 1, &self.inv_twiddle_factors);
         coeffs.0.iter_mut().for_each(|coeff| *coeff *= self.n_inv)
     }
 
     /// perform discrete fourier transform on coset
-    pub fn coset_dft(&self, coeffs: &mut Polynomial<F>) {
+    pub fn coset_dft(&self, coeffs: &mut Coefficients<F>) {
         coeffs
             .0
             .iter_mut()
@@ -144,7 +144,7 @@ impl<F: FftField> Fft<F> {
     }
 
     /// perform discrete fourier transform on coset
-    pub fn coset_idft(&self, coeffs: &mut Polynomial<F>) {
+    pub fn coset_idft(&self, coeffs: &mut Coefficients<F>) {
         self.idft(coeffs);
         coeffs
             .0
@@ -154,7 +154,7 @@ impl<F: FftField> Fft<F> {
     }
 
     /// resize polynomial and bit reverse swap
-    fn prepare_fft(&self, coeffs: &mut Polynomial<F>) {
+    fn prepare_fft(&self, coeffs: &mut Coefficients<F>) {
         coeffs.0.resize(self.n, F::zero());
         self.bit_reverse
             .iter()
@@ -162,10 +162,10 @@ impl<F: FftField> Fft<F> {
     }
 
     /// polynomial multiplication
-    pub fn poly_mul(&self, mut rhs: Polynomial<F>, mut lhs: Polynomial<F>) -> Polynomial<F> {
+    pub fn poly_mul(&self, mut rhs: Coefficients<F>, mut lhs: Coefficients<F>) -> Coefficients<F> {
         self.dft(&mut rhs);
         self.dft(&mut lhs);
-        let mut mul_poly = Polynomial::new(
+        let mut mul_poly = Coefficients::new(
             rhs.0
                 .iter()
                 .zip(lhs.0.iter())
@@ -283,7 +283,7 @@ fn butterfly_arithmetic<F: FftField>(
 
 #[cfg(test)]
 mod tests {
-    use crate::poly::Polynomial;
+    use crate::poly::Coefficients;
 
     use super::Fft;
     use bls_12_381::Fr;
@@ -308,9 +308,9 @@ mod tests {
         c
     }
 
-    fn point_mutiply<F: PrimeField>(a: Polynomial<F>, b: Polynomial<F>) -> Polynomial<F> {
+    fn point_mutiply<F: PrimeField>(a: Coefficients<F>, b: Coefficients<F>) -> Coefficients<F> {
         assert_eq!(a.0.len(), b.0.len());
-        Polynomial(
+        Coefficients(
             a.0.iter()
                 .zip(b.0.iter())
                 .map(|(coeff_a, coeff_b)| *coeff_a * *coeff_b)
@@ -321,7 +321,7 @@ mod tests {
     #[test]
     fn fft_transformation_test() {
         let coeffs = arb_poly(10);
-        let mut poly_a = Polynomial(coeffs);
+        let mut poly_a = Coefficients(coeffs);
         let poly_b = poly_a.clone();
         let classic_fft = Fft::new(10);
 
@@ -338,12 +338,12 @@ mod tests {
         let fft = Fft::new(5);
         let poly_c = coeffs_a.clone();
         let poly_d = coeffs_b.clone();
-        let mut poly_a = Polynomial(coeffs_a);
-        let mut poly_b = Polynomial(coeffs_b);
+        let mut poly_a = Coefficients(coeffs_a);
+        let mut poly_b = Coefficients(coeffs_b);
         let poly_g = poly_a.clone();
         let poly_h = poly_b.clone();
 
-        let poly_e = Polynomial(naive_multiply(poly_c, poly_d));
+        let poly_e = Coefficients(naive_multiply(poly_c, poly_d));
 
         fft.dft(&mut poly_a);
         fft.dft(&mut poly_b);

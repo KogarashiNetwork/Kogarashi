@@ -7,7 +7,7 @@ use zkstd::common::{PrimeField, Vec};
 
 // a_n-1 , a_n-2, ... , a_0
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct Polynomial<F>(pub Vec<F>);
+pub struct Coefficients<F>(pub Vec<F>);
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Evaluations<F>(pub Vec<F>);
@@ -19,7 +19,7 @@ pub struct Witness<F> {
     denominator: F,
 }
 
-impl<F> Deref for Polynomial<F> {
+impl<F> Deref for Coefficients<F> {
     type Target = [F];
 
     fn deref(&self) -> &[F] {
@@ -27,7 +27,7 @@ impl<F> Deref for Polynomial<F> {
     }
 }
 
-impl<F> DerefMut for Polynomial<F> {
+impl<F> DerefMut for Coefficients<F> {
     fn deref_mut(&mut self) -> &mut [F] {
         &mut self.0
     }
@@ -41,12 +41,12 @@ impl<F: PrimeField> Index<usize> for Evaluations<F> {
     }
 }
 
-impl<F: FftField> Sum for Polynomial<F> {
+impl<F: FftField> Sum for Coefficients<F> {
     fn sum<I>(iter: I) -> Self
     where
         I: Iterator<Item = Self>,
     {
-        let sum: Polynomial<F> = iter.fold(Polynomial::default(), |mut res, val| {
+        let sum: Coefficients<F> = iter.fold(Coefficients::default(), |mut res, val| {
             res = &res + &val;
             res
         });
@@ -60,7 +60,7 @@ impl<F: FftField> Evaluations<F> {
     }
 }
 
-impl<F: FftField> Polynomial<F> {
+impl<F: FftField> Coefficients<F> {
     pub fn new(coeffs: Vec<F>) -> Self {
         Self(coeffs)
     }
@@ -161,7 +161,7 @@ impl<F: FftField> Polynomial<F> {
         self
     }
 
-    /// Returns the degree of the [`Polynomial`].
+    /// Returns the degree of the [`Coefficients`].
     pub fn degree(&self) -> usize {
         if self.is_zero() {
             return 0;
@@ -196,8 +196,8 @@ impl<F: FftField> Polynomial<F> {
     }
 }
 
-impl<F: FftField> Add for Polynomial<F> {
-    type Output = Polynomial<F>;
+impl<F: FftField> Add for Coefficients<F> {
+    type Output = Coefficients<F>;
 
     fn add(self, rhs: Self) -> Self::Output {
         let zero = F::zero();
@@ -210,22 +210,22 @@ impl<F: FftField> Add for Polynomial<F> {
     }
 }
 
-impl<'a, 'b, F: FftField> Add<&'a Polynomial<F>> for &'b Polynomial<F> {
-    type Output = Polynomial<F>;
+impl<'a, 'b, F: FftField> Add<&'a Coefficients<F>> for &'b Coefficients<F> {
+    type Output = Coefficients<F>;
 
-    fn add(self, rhs: &'a Polynomial<F>) -> Self::Output {
+    fn add(self, rhs: &'a Coefficients<F>) -> Self::Output {
         let zero = F::zero();
         let (left, right) = if self.0.len() > rhs.0.len() {
             (self.0.iter(), rhs.0.iter().chain(iter::repeat(&zero)))
         } else {
             (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
         };
-        Polynomial(left.zip(right).map(|(a, b)| *a + *b).collect()).format_degree()
+        Coefficients(left.zip(right).map(|(a, b)| *a + *b).collect()).format_degree()
     }
 }
 
-impl<F: FftField> Sub for Polynomial<F> {
-    type Output = Polynomial<F>;
+impl<F: FftField> Sub for Coefficients<F> {
+    type Output = Coefficients<F>;
 
     fn sub(self, rhs: Self) -> Self::Output {
         let zero = F::zero();
@@ -238,11 +238,11 @@ impl<F: FftField> Sub for Polynomial<F> {
     }
 }
 
-impl<'a, 'b, F: FftField> Mul<&'a F> for &'b Polynomial<F> {
-    type Output = Polynomial<F>;
+impl<'a, 'b, F: FftField> Mul<&'a F> for &'b Coefficients<F> {
+    type Output = Coefficients<F>;
 
-    fn mul(self, scalar: &'a F) -> Polynomial<F> {
-        Polynomial(self.0.iter().map(|coeff| *coeff * scalar).collect())
+    fn mul(self, scalar: &'a F) -> Coefficients<F> {
+        Coefficients(self.0.iter().map(|coeff| *coeff * scalar).collect())
     }
 }
 
@@ -255,7 +255,7 @@ impl<F: FftField> Witness<F> {
 
 #[cfg(test)]
 mod tests {
-    use super::Polynomial;
+    use super::Coefficients;
     use bls_12_381::Fr;
     use rand_core::OsRng;
     use zkstd::behave::{Group, PrimeField};
@@ -264,8 +264,8 @@ mod tests {
         Fr::random(OsRng)
     }
 
-    fn arb_poly(k: u32) -> Polynomial<Fr> {
-        Polynomial(
+    fn arb_poly(k: u32) -> Coefficients<Fr> {
+        Coefficients(
             (0..(1 << k))
                 .map(|_| Fr::random(OsRng))
                 .collect::<Vec<Fr>>(),
@@ -287,7 +287,7 @@ mod tests {
         let poly = arb_poly(10);
         let at = arb_fr();
         let scalared = &poly * &at;
-        let test = Polynomial(poly.0.into_iter().map(|coeff| coeff * at).collect());
+        let test = Coefficients(poly.0.into_iter().map(|coeff| coeff * at).collect());
         assert_eq!(scalared, test);
     }
 
@@ -299,13 +299,13 @@ mod tests {
         let factor_poly = vec![-at, Fr::one()];
 
         // divisor * (x - at) = dividend
-        let poly_a = Polynomial(naive_multiply(divisor.0, factor_poly.clone()));
+        let poly_a = Coefficients(naive_multiply(divisor.0, factor_poly.clone()));
 
         // dividend / (x - at) = quotient
         let quotient = poly_a.divide(&at);
 
         // quotient * (x - at) = divident
-        let original = Polynomial(naive_multiply(quotient.0, factor_poly));
+        let original = Coefficients(naive_multiply(quotient.0, factor_poly));
 
         assert_eq!(poly_a.0, original.0);
     }
