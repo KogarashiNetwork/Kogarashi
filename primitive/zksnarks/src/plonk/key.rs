@@ -6,6 +6,7 @@ pub mod range;
 
 use crate::plonk::transcript::TranscriptProtocol;
 use merlin::Transcript;
+use poly_commit::Evaluations;
 use zkstd::common::Pairing;
 
 /// Verification Key
@@ -110,5 +111,36 @@ impl<P: Pairing> VerificationKey<P> {
 
         // Append circuit size to transcript
         <Transcript as TranscriptProtocol<P>>::circuit_domain_sep(transcript, self.n as u64);
+    }
+}
+
+/// Proving Key.
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct ProvingKey<P: Pairing> {
+    /// Circuit size
+    pub n: usize,
+    /// ProvingKey for arithmetic gate
+    pub arithmetic: arithmetic::ProvingKey<P::ScalarField>,
+    /// ProvingKey for logic gate
+    pub logic: logic::ProvingKey<P::ScalarField>,
+    /// ProvingKey for range gate
+    pub range: range::ProvingKey<P::ScalarField>,
+    /// ProvingKey for fixed base curve addition gates
+    pub fixed_base: curve::scalar::ProvingKey<P>,
+    /// ProvingKey for variable base curve addition gates
+    pub variable_base: curve::add::ProvingKey<P>,
+    /// ProvingKey for permutation checks
+    pub permutation: permutation::ProvingKey<P::ScalarField>,
+    // Pre-processes the 8n Evaluations for the vanishing polynomial, so
+    // they do not need to be computed at the proving stage.
+    // Note: With this, we can combine all parts of the quotient polynomial
+    // in their evaluation phase and divide by the quotient
+    // polynomial without having to perform IFFT
+    pub v_h_coset_8n: Evaluations<P::ScalarField>,
+}
+
+impl<P: Pairing> ProvingKey<P> {
+    pub fn v_h_coset_8n(&self) -> &Evaluations<P::ScalarField> {
+        &self.v_h_coset_8n
     }
 }
