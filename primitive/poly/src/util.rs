@@ -1,14 +1,8 @@
-use zkstd::behave::Ring;
-use zkstd::common::Pairing;
-use zkstd::common::PrimeField;
-use zkstd::common::Vec;
+use zkstd::common::{PrimeField, Vec};
 
-pub(crate) fn powers_of<P: Pairing>(
-    scalar: &P::ScalarField,
-    max_degree: usize,
-) -> Vec<P::ScalarField> {
+pub fn powers_of<F: PrimeField>(scalar: &F, max_degree: usize) -> Vec<F> {
     let mut powers = Vec::with_capacity(max_degree + 1);
-    powers.push(P::ScalarField::one());
+    powers.push(F::one());
     for i in 1..=max_degree {
         powers.push(powers[i - 1] * scalar);
     }

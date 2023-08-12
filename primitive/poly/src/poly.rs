@@ -71,14 +71,14 @@ impl<F: FftField> Coefficients<F> {
         for _ in 0..=d {
             random_coeffs.push(F::random(&mut rng));
         }
-        Self::from_coefficients_vec(random_coeffs)
+        Self::from_vec(random_coeffs)
     }
 
     /// Constructs a new polynomial from a list of coefficients.
     ///
     /// # Panics
     /// When the length of the coeffs is zero.
-    pub fn from_coefficients_vec(coeffs: Vec<F>) -> Self {
+    pub fn from_vec(coeffs: Vec<F>) -> Self {
         let mut result = Self(coeffs);
         // While there are zeros at the end of the coefficient vector, pop them
         // off.

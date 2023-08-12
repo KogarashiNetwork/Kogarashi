@@ -1,3 +1,4 @@
+use crate::plonk::utils::{check_bit_consistency, extract_bit};
 use crate::Evaluations;
 use poly_commit::{Coefficients, Commitment, PointsValue};
 use zkstd::common::{vec, Pairing, PrimeField, Ring, TwistedEdwardsCurve, Vec};
@@ -31,10 +32,10 @@ impl<P: Pairing> VerificationKey<P> {
 
         let accumulated_bit = evaluations.d_eval;
         let accumulated_bit_next = evaluations.d_next_eval;
-        let bit = extract_bit::<P::ScalarField>(&accumulated_bit, &accumulated_bit_next);
+        let bit = extract_bit(&accumulated_bit, &accumulated_bit_next);
 
         // Check bit consistency
-        let bit_consistency = check_bit_consistency::<P::ScalarField>(bit);
+        let bit_consistency = check_bit_consistency(bit);
 
         let y_alpha =
             (bit.square() * (y_beta_eval - P::ScalarField::one())) + P::ScalarField::one();
@@ -226,15 +227,4 @@ impl<P: Pairing> ProvingKey<P> {
 
         q_fixed_group_add_poly * &(a * ecc_separation_challenge)
     }
-}
-
-pub fn extract_bit<F: PrimeField>(curr_acc: &F, next_acc: &F) -> F {
-    // Next - 2 * current
-    *next_acc - *curr_acc - *curr_acc
-}
-
-// Ensures that the bit is either +1, -1 or 0
-pub fn check_bit_consistency<F: PrimeField>(bit: F) -> F {
-    let one = F::one();
-    bit * (bit - one) * (bit + one)
 }

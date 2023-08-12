@@ -3,6 +3,7 @@ pub mod curve;
 pub mod logic;
 pub mod permutation;
 pub mod range;
+pub(crate) mod utils;
 
 use crate::plonk::transcript::TranscriptProtocol;
 use merlin::Transcript;

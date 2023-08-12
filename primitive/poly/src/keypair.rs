@@ -44,7 +44,7 @@ impl<P: Pairing> KeyPair<P> {
     ) -> Result<Commitment<P::G1Affine>, Error> {
         self.check_commit_degree_is_within_bounds(poly.degree())?;
 
-        Ok(Commitment::new(msm_variable_base::<P>(&self.g1, poly)))
+        Ok(Commitment::new(msm_variable_base::<P>(&self.g1, &poly.0)))
     }
 
     fn check_commit_degree_is_within_bounds(&self, poly_degree: usize) -> Result<(), Error> {
@@ -126,7 +126,7 @@ impl<P: Pairing> KeyPair<P> {
         point: &P::ScalarField,
         v_challenge: &P::ScalarField,
     ) -> Coefficients<P::ScalarField> {
-        let powers = util::powers_of::<P>(v_challenge, polynomials.len() - 1);
+        let powers = util::powers_of(v_challenge, polynomials.len() - 1);
 
         assert_eq!(powers.len(), polynomials.len());
 

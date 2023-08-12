@@ -1,7 +1,7 @@
 use crate::plonk::key::VerificationKey;
 
 use core::mem;
-use merlin::Transcript;
+pub use merlin::Transcript;
 use poly_commit::Commitment;
 use zkstd::behave::{FftField, SigUtils};
 use zkstd::common::Pairing;

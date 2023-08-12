@@ -28,5 +28,5 @@ pub use fft::Fft;
 pub use keypair::Error as KzgError;
 pub use keypair::KeyPair;
 pub use poly::{Coefficients, PointsValue};
-pub use util::batch_inversion;
+pub use util::{batch_inversion, powers_of};
 pub use witness::Witness;
