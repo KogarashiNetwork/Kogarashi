@@ -16,17 +16,23 @@ use zkstd::common::Pairing;
 pub struct VerificationKey<P: Pairing> {
     /// Circuit size (not padded to a power of two).
     pub n: usize,
-    /// VerificationKey for arithmetic gates
+    /// inverse of n
+    pub n_inv: P::ScalarField,
+    /// generator of omega
+    pub generator: P::ScalarField,
+    /// inverse of generator
+    pub generator_inv: P::ScalarField,
+    /// arithmetic gates
     pub arithmetic: arithmetic::VerificationKey<P::G1Affine>,
-    /// VerificationKey for logic gates
+    /// logic gates
     pub logic: logic::VerificationKey<P::G1Affine>,
-    /// VerificationKey for range gates
+    /// range gates
     pub range: range::VerificationKey<P::G1Affine>,
-    /// VerificationKey for fixed base curve addition gates
+    /// fixed base curve addition gates
     pub fixed_base: curve::scalar::VerificationKey<P>,
-    /// VerificationKey for variable base curve addition gates
+    /// variable base curve addition gates
     pub variable_base: curve::add::VerificationKey<P>,
-    /// VerificationKey for permutation checks
+    /// permutation checks
     pub permutation: permutation::VerificationKey<P::G1Affine>,
 }
 

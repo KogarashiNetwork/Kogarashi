@@ -7,10 +7,10 @@ use zkstd::common::{PrimeField, Vec};
 
 // a_n-1 , a_n-2, ... , a_0
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct Coefficients<F>(pub Vec<F>);
+pub struct Coefficients<F: PrimeField>(pub Vec<F>);
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct PointsValue<F>(pub Vec<F>);
+pub struct PointsValue<F: PrimeField>(pub Vec<F>);
 
 pub struct Witness<F> {
     s_eval: F,
@@ -19,7 +19,7 @@ pub struct Witness<F> {
     denominator: F,
 }
 
-impl<F> Deref for Coefficients<F> {
+impl<F: PrimeField> Deref for Coefficients<F> {
     type Target = [F];
 
     fn deref(&self) -> &[F] {
@@ -27,7 +27,7 @@ impl<F> Deref for Coefficients<F> {
     }
 }
 
-impl<F> DerefMut for Coefficients<F> {
+impl<F: PrimeField> DerefMut for Coefficients<F> {
     fn deref_mut(&mut self) -> &mut [F] {
         &mut self.0
     }
