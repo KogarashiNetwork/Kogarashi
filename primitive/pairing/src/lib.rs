@@ -117,7 +117,7 @@ impl Pairing for TatePairing {
 }
 
 /// Performs a Variable Base Multiscalar Multiplication.
-pub fn msm_variable_base<P: Pairing>(
+pub fn msm_curve_addtion<P: Pairing>(
     points: &[P::G1Affine],
     scalars: &[P::ScalarField],
 ) -> P::G1Projective {

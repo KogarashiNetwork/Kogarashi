@@ -2,7 +2,7 @@ use bls_12_381::Fr;
 use bls_12_381::G1Affine;
 use criterion::{black_box, BenchmarkId};
 use criterion::{criterion_group, criterion_main, Criterion};
-use ec_pairing::{msm_variable_base, TatePairing};
+use ec_pairing::{msm_curve_addtion, TatePairing};
 use rand::rngs::OsRng;
 use zkstd::common::{CurveGroup, Group};
 
@@ -16,7 +16,7 @@ fn msm(c: &mut Criterion) {
         // 8-18 points
         group.bench_function(BenchmarkId::new("msm_based", i), |b| {
             b.iter(|| {
-                black_box(msm_variable_base::<TatePairing>(
+                black_box(msm_curve_addtion::<TatePairing>(
                     black_box(&p),
                     black_box(&k),
                 ))

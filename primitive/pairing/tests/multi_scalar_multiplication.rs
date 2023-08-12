@@ -1,5 +1,5 @@
 use bls_12_381::{Fr, G1Affine, G1Projective};
-use ec_pairing::{msm_variable_base, TatePairing};
+use ec_pairing::{msm_curve_addtion, TatePairing};
 use rand_core::OsRng;
 use zkstd::behave::{Group, Projective};
 use zkstd::common::{Affine, CurveGroup};
@@ -29,7 +29,7 @@ fn multi_scalar_multiplication_test() {
         .map(|_| G1Affine::from(G1Affine::random(OsRng)))
         .collect::<Vec<_>>();
     let scalars = (0..n).map(|_| Fr::random(OsRng)).collect::<Vec<_>>();
-    let msm = msm_variable_base::<TatePairing>(&points[..], &scalars[..]);
+    let msm = msm_curve_addtion::<TatePairing>(&points[..], &scalars[..]);
     let naive = points
         .iter()
         .rev()

@@ -2,7 +2,7 @@ use crate::commitment::Commitment;
 use crate::poly::Coefficients;
 use crate::util;
 use crate::witness::Witness;
-use ec_pairing::msm_variable_base;
+use ec_pairing::msm_curve_addtion;
 use parity_scale_codec::{Decode, Encode};
 use zkstd::behave::*;
 use zkstd::common::*;
@@ -44,7 +44,7 @@ impl<P: Pairing> KeyPair<P> {
     ) -> Result<Commitment<P::G1Affine>, Error> {
         self.check_commit_degree_is_within_bounds(poly.degree())?;
 
-        Ok(Commitment::new(msm_variable_base::<P>(&self.g1, &poly.0)))
+        Ok(Commitment::new(msm_curve_addtion::<P>(&self.g1, &poly.0)))
     }
 
     fn check_commit_degree_is_within_bounds(&self, poly_degree: usize) -> Result<(), Error> {

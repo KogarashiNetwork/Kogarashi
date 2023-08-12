@@ -29,9 +29,9 @@ pub struct VerificationKey<P: Pairing> {
     /// range gates
     pub range: range::VerificationKey<P::G1Affine>,
     /// fixed base curve addition gates
-    pub fixed_base: curve::scalar::VerificationKey<P>,
+    pub curve_scalar: curve::scalar::VerificationKey<P>,
     /// variable base curve addition gates
-    pub variable_base: curve::add::VerificationKey<P>,
+    pub curve_addtion: curve::add::VerificationKey<P>,
     /// permutation checks
     pub permutation: permutation::VerificationKey<P::G1Affine>,
 }
@@ -87,12 +87,12 @@ impl<P: Pairing> VerificationKey<P> {
         <Transcript as TranscriptProtocol<P>>::append_commitment(
             transcript,
             b"q_variable_group_add",
-            &self.variable_base.q_variable_group_add,
+            &self.curve_addtion.q_variable_group_add,
         );
         <Transcript as TranscriptProtocol<P>>::append_commitment(
             transcript,
             b"q_fixed_group_add",
-            &self.fixed_base.q_fixed_group_add,
+            &self.curve_scalar.q_fixed_group_add,
         );
 
         <Transcript as TranscriptProtocol<P>>::append_commitment(
@@ -133,9 +133,9 @@ pub struct ProvingKey<P: Pairing> {
     /// ProvingKey for range gate
     pub range: range::ProvingKey<P::ScalarField>,
     /// ProvingKey for fixed base curve addition gates
-    pub fixed_base: curve::scalar::ProvingKey<P>,
+    pub curve_scalar: curve::scalar::ProvingKey<P>,
     /// ProvingKey for variable base curve addition gates
-    pub variable_base: curve::add::ProvingKey<P>,
+    pub curve_addtion: curve::add::ProvingKey<P>,
     /// ProvingKey for permutation checks
     pub permutation: permutation::ProvingKey<P::ScalarField>,
     // Pre-processes the 8n PointsValue for the vanishing polynomial, so
