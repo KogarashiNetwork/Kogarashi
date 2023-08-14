@@ -5,10 +5,7 @@ use super::signature::Signature;
 
 use jub_jub::Fp;
 use rand_core::RngCore;
-use zkstd::{
-    behave::{FftField, SigUtils},
-    common::Group,
-};
+use zkstd::behave::{FftField, SigUtils};
 
 #[derive(Clone, Copy, Debug)]
 pub struct SecretKey(pub(crate) Fp);
@@ -64,8 +61,7 @@ impl SecretKey {
         PublicKey(SAPLING_BASE_POINT * self.0)
     }
 
-    pub fn randomize_private(&self, rand: impl RngCore) -> Self {
-        let r = Fp::random(rand);
+    pub fn randomize_private(&self, r: Fp) -> Self {
         Self(r * self.0)
     }
 }
