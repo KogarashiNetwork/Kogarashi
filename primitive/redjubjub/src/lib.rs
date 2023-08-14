@@ -65,4 +65,21 @@ mod tests {
             assert!(!pub_key.validate(wrong_msg, sig));
         }
     }
+
+    #[test]
+    fn rerandomize_test() {
+        for _ in 0..1000 {
+            let msg = b"test";
+            let wrong_msg = b"tes";
+            let randomness = OsRng;
+
+            let priv_key = SecretKey(Fp::random(OsRng));
+            let randomize_key = priv_key.randomize_private(OsRng);
+            let sig = randomize_key.sign(msg, randomness);
+            let pub_key = randomize_key.to_public_key();
+
+            assert!(pub_key.validate(msg, sig));
+            assert!(!pub_key.validate(wrong_msg, sig));
+        }
+    }
 }
