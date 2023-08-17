@@ -5219,6 +5219,7 @@ dependencies = [
  "hashbrown 0.9.1",
  "itertools 0.9.0",
  "jub-jub 0.0.10",
+ "merlin 3.0.0",
  "parity-scale-codec",
  "poly-commit",
  "rand 0.8.5",
@@ -5226,7 +5227,6 @@ dependencies = [
  "rayon",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tempdir",
- "zksnarks",
  "zkstd 0.0.9",
 ]
 
@@ -5249,6 +5249,10 @@ dependencies = [
  "quote",
  "syn 2.0.28",
 ]
+
+[[package]]
+name = "zk_rollup"
+version = "0.1.0"
 
 [[package]]
 name = "zkruntime"

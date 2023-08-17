@@ -53,6 +53,7 @@ members = [
     "primitive/poly",
     "primitive/redjubjub",
     "primitive/zksnarks",
+    "primitive/zk_rollup",
     "primitive/zkstd",
     "zkruntime",
 ]
