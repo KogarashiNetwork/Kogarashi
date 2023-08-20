@@ -15,10 +15,16 @@ pub(crate) struct Transaction {
     nonce: u64,
 }
 
-#[derive(Hash)]
+#[derive(Hash, Default)]
 pub(crate) struct UserData {
     balance: u64,
     address: String,
+}
+
+impl UserData {
+    pub fn balance(&self) -> u64 {
+        self.balance
+    }
 }
 
 impl Transaction {
@@ -35,7 +41,8 @@ pub(crate) struct Batch {
     transactions: Vec<Transaction>,
 }
 
-struct RollupOperator {
+#[derive(Default)]
+pub(crate) struct RollupOperator {
     state_merkle: MerkleTree<UserData>,
     transactions: Vec<(Transaction, TreeHash)>,
 }

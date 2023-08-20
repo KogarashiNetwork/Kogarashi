@@ -1,6 +1,6 @@
 use crate::{merkle_tree::TreeHash, operator::Transaction, proof::Proof};
 
-struct VerifierContract {}
+pub(crate) struct VerifierContract {}
 
 impl VerifierContract {
     pub fn verify_proof(

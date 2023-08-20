@@ -3,8 +3,9 @@ use crate::{
     operator::Transaction,
 };
 
-struct MainContract {
-    rollup_state_root: TreeHash,
+#[derive(Default)]
+pub(crate) struct MainContract {
+    pub(crate) rollup_state_root: TreeHash,
     deposits: Vec<Transaction>,
 }
 
