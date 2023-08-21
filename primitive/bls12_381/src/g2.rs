@@ -102,8 +102,6 @@ pub struct G2Projective {
 }
 
 impl SigUtils<96> for G2Affine {
-    /// Serializes this element into compressed form. See [`notes::serialization`](crate::notes::serialization)
-    /// for details about how group elements are serialized.
     fn to_bytes(self) -> [u8; Self::LENGTH] {
         let infinity = self.is_infinity;
 
@@ -134,8 +132,6 @@ impl SigUtils<96> for G2Affine {
         res
     }
 
-    /// Attempts to deserialize a compressed element. See [`notes::serialization`](crate::notes::serialization)
-    /// for details about how group elements are serialized.
     fn from_bytes(buf: [u8; Self::LENGTH]) -> Option<Self> {
         // We already know the point is on the curve because this is established
         // by the y-coordinate recovery procedure in from_compressed_unchecked().
