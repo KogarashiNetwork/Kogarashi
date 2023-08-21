@@ -1,6 +1,6 @@
 use crate::arithmetic::{bits_384::to_bits, utils::*};
 
-#[inline]
+#[inline(always)]
 pub const fn add(a: [u64; 6], b: [u64; 6], p: [u64; 6]) -> [u64; 6] {
     let (l0, c) = addnc(a[0], b[0]);
     let (l1, c) = adc(a[1], b[1], c);
@@ -12,7 +12,7 @@ pub const fn add(a: [u64; 6], b: [u64; 6], p: [u64; 6]) -> [u64; 6] {
     sub([l0, l1, l2, l3, l4, l5], p, p)
 }
 
-#[inline]
+#[inline(always)]
 pub const fn sub(a: [u64; 6], b: [u64; 6], p: [u64; 6]) -> [u64; 6] {
     let (l0, brw) = sbb(a[0], b[0], 0);
     let (l1, brw) = sbb(a[1], b[1], brw);
@@ -31,7 +31,7 @@ pub const fn sub(a: [u64; 6], b: [u64; 6], p: [u64; 6]) -> [u64; 6] {
     [l0, l1, l2, l3, l4, l5]
 }
 
-#[inline]
+#[inline(always)]
 pub const fn double(a: [u64; 6], p: [u64; 6]) -> [u64; 6] {
     let (l0, c) = dbc(a[0], 0);
     let (l1, c) = dbc(a[1], c);
@@ -43,7 +43,7 @@ pub const fn double(a: [u64; 6], p: [u64; 6]) -> [u64; 6] {
     sub([l0, l1, l2, l3, l4, l5], p, p)
 }
 
-#[inline]
+#[inline(always)]
 pub const fn mul(a: [u64; 6], b: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
     let (l0, c) = mulnc(a[0], b[0]);
     let (l1, c) = muladd(a[0], b[1], c);
@@ -90,7 +90,7 @@ pub const fn mul(a: [u64; 6], b: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
     mont([l0, l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11], p, inv)
 }
 
-#[inline]
+#[inline(always)]
 pub const fn square(a: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
     let (l1, c) = mulnc(a[1], a[0]);
     let (l2, c) = muladd(a[2], a[0], c);
@@ -141,7 +141,7 @@ pub const fn square(a: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
     mont([l0, l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11], p, inv)
 }
 
-#[inline]
+#[inline(always)]
 pub const fn neg(a: [u64; 6], p: [u64; 6]) -> [u64; 6] {
     if (a[0] | a[1] | a[2] | a[3] | a[4] | a[5]) == 0 {
         a
@@ -150,7 +150,7 @@ pub const fn neg(a: [u64; 6], p: [u64; 6]) -> [u64; 6] {
     }
 }
 
-#[inline]
+#[inline(always)]
 pub const fn mont(a: [u64; 12], p: [u64; 6], inv: u64) -> [u64; 6] {
     let rhs = a[0].wrapping_mul(inv);
 
@@ -211,7 +211,7 @@ pub const fn mont(a: [u64; 12], p: [u64; 6], inv: u64) -> [u64; 6] {
     sub([l6, l7, l8, l9, l10, l11], p, p)
 }
 
-#[inline]
+#[inline(always)]
 pub fn invert(
     a: [u64; 6],
     little_fermat: [u64; 6],
@@ -227,6 +227,7 @@ pub fn invert(
     }
 }
 
+#[inline(always)]
 pub fn pow(a: [u64; 6], b: [u64; 6], mut identity: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
     let zero: [u64; 6] = [0; 6];
     if b == zero {

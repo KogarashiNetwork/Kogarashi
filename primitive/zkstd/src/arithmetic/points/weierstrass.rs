@@ -2,6 +2,7 @@ use crate::arithmetic::utils::Naf;
 use crate::common::{CurveGroup, PrimeField, Projective};
 
 /// weierstrass projective coordinate addition
+#[inline(always)]
 pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
     if lhs.is_identity() {
         return rhs;
@@ -37,6 +38,7 @@ pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
 }
 
 /// weierstrass projective coordinate doubling
+#[inline(always)]
 pub fn double_point<P: Projective>(point: P) -> P {
     if point.is_identity() || point.get_y().is_zero() {
         <P as CurveGroup>::ADDITIVE_IDENTITY
@@ -57,6 +59,7 @@ pub fn double_point<P: Projective>(point: P) -> P {
 }
 
 /// coordinate scalar
+#[inline(always)]
 pub fn scalar_point<P: Projective>(point: P, scalar: &<P as CurveGroup>::Scalar) -> P {
     let mut res = P::ADDITIVE_IDENTITY;
     let mut acc = point;
