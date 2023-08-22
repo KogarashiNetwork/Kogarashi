@@ -35,17 +35,15 @@ impl Circuit<TatePairing> for RedJubjubCircuit {
         C: Composer<TatePairing>,
     {
         let r = match JubjubAffine::from_bytes(self.signature.r) {
-            Some(r) => r,
+            Some(r) => composer.append_point(r),
             None => return Err(Error::ProofVerificationError),
         };
         let s = match JubjubScalar::from_bytes(self.signature.s) {
-            Some(r) => r,
+            Some(s) => composer.append_witness(s),
             None => return Err(Error::ProofVerificationError),
         };
 
         let msg_hash = composer.append_witness(self.msg_hash);
-        let s = composer.append_witness(s);
-        let r = composer.append_point(r);
         let public_key = composer.append_point(self.public_key);
 
         let sapling_base_point = composer.append_constant_point(SAPLING_BASE_POINT);
