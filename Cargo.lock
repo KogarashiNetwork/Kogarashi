@@ -3337,9 +3337,13 @@ version = "0.0.13"
 dependencies = [
  "blake2b_simd 1.0.1",
  "bls-12-381 0.1.10",
+ "ec-pairing",
  "hex-literal",
  "jub-jub 0.0.10",
+ "poly-commit",
+ "rand 0.8.5",
  "rand_core 0.6.4",
+ "zero-plonk",
  "zkstd 0.0.9",
 ]
 
