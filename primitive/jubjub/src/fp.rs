@@ -52,6 +52,7 @@ const ROOT_OF_UNITY: Fp = Fp([
     0x4d6b87b1da259e2,
 ]);
 
+/// Twisted Edwards curve Jubjub base field
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fp(pub(crate) [u64; 4]);
 
@@ -216,6 +217,7 @@ impl From<Fp> for Fr {
     }
 }
 
+/// wNAF expression computation over field
 pub fn compute_windowed_naf<F: FftField>(scalar: F, width: u8) -> [i8; 256] {
     let mut k = scalar.reduce();
     let mut i = 0;

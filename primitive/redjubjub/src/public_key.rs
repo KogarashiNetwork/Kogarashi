@@ -6,6 +6,7 @@ use bls_12_381::Fr;
 use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 use zkstd::behave::{CurveGroup, SigUtils};
 
+/// RedJubjub public key struct used for signature verification
 #[derive(Clone, Copy, Debug)]
 pub struct PublicKey(pub(crate) JubjubExtended);
 

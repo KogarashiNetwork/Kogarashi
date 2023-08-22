@@ -1,5 +1,6 @@
 use zkstd::behave::SigUtils;
 
+/// RedJubjub signature for message
 #[derive(Clone, Copy, Debug)]
 pub struct Signature {
     pub(crate) r: [u8; 32],

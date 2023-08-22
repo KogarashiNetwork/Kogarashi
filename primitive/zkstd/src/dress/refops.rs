@@ -1,3 +1,5 @@
+/// basic operation reference macro
+// TODO: integrate to field macro
 #[macro_export]
 macro_rules! ref_ops {
     ($t:ident) => {

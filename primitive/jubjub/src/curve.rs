@@ -6,6 +6,7 @@ use zkstd::arithmetic::edwards::*;
 use zkstd::common::*;
 use zkstd::dress::curve::edwards::*;
 
+/// Twisted Edwards curve Jubjub D params
 pub const EDWARDS_D: Fr = Fr::to_mont_form([
     0x01065fd6d6343eb1,
     0x292d7f6d37579d26,
@@ -34,6 +35,7 @@ const T: Fr = Fr::to_mont_form([
     0x2cdcdf03c0d96e14,
 ]);
 
+/// Twisted Edwards curve Jubjub affine coordinate
 #[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
 pub struct JubjubAffine {
     x: Fr,
@@ -176,6 +178,7 @@ impl<'a, 'b> Mul<&'b Fp> for &'a JubjubAffine {
     }
 }
 
+/// Twisted Edwards curve Jubjub extended coordinate
 #[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize)]
 pub struct JubjubExtended {
     x: Fr,

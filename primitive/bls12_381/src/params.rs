@@ -1,3 +1,4 @@
+//! Bls12 381 construction and frobennius map constant
 use crate::{Fq, Fq2, Fr};
 
 pub const BLS_X: u64 = 0xd201000000010000;

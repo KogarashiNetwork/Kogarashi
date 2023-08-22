@@ -1,6 +1,6 @@
 use zkstd::common::{Group, Pairing, PairingRange};
 
-// witness for polynomial commitment
+/// witness for Kate polynomial commitment
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct Witness<P: Pairing> {

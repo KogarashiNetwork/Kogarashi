@@ -1,3 +1,5 @@
+//! The arithmetic operation of limbs, points and bit operation.
+//! Algebraic algorithms are here.
 mod limbs;
 mod points;
 pub mod utils;

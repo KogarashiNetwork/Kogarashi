@@ -7,6 +7,7 @@ use jub_jub::Fp;
 use rand_core::RngCore;
 use zkstd::behave::{FftField, SigUtils};
 
+/// RedJubjub secret key struct used for signing transactions
 #[derive(Clone, Copy, Debug)]
 pub struct SecretKey(pub(crate) Fp);
 

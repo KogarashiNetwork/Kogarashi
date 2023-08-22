@@ -1,3 +1,4 @@
+/// abstract algebra ring operation macro
 #[macro_export]
 macro_rules! ring_operation {
     ($field:ident, $p:ident, $g:ident, $r:ident, $r2:ident, $r3:ident, $inv:ident) => {
