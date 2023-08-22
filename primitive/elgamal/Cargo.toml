@@ -5,14 +5,14 @@ authors = [
 ]
 name = "she-elgamal"
 description = 'lifted elgamal encryption implementation'
-version = "0.0.10"
+version = "0.0.11"
 edition = "2021"
 license = "Apache-2.0"
 homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
 repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
 readme = 'README.md'
 categories = ["cryptography"]
-keywords = ["zkp", "blockchain", "elliptic curve"]
+keywords = ["zkp", "blockchain", "elliptic-curve"]
 
 [package.metadata.docs.rs]
 all-features = true
@@ -27,5 +27,5 @@ serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 num-traits = { version = "0.2.15", default-features = false }
 
 [dev-dependencies]
-rand = { version = "0.8", default-features = false }
+rand = { version = "0.8" }
 rand_core = { version="0.6.4", default-features = false }

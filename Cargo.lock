@@ -479,14 +479,14 @@ dependencies = [
 
 [[package]]
 name = "bls-12-381"
-version = "0.1.10"
+version = "0.0.12"
 dependencies = [
  "parity-scale-codec",
  "paste",
  "proptest",
  "rand_core 0.6.4",
  "serde",
- "zkstd 0.0.9",
+ "zkstd 0.0.12",
 ]
 
 [[package]]
@@ -725,12 +725,12 @@ name = "confidential_transfer"
 version = "0.1.1"
 dependencies = [
  "ark-std",
- "bls-12-381 0.1.10",
+ "bls-12-381 0.0.12",
  "ec-pairing",
  "frame-support",
  "frame-system",
  "fullcodec_rand_xorshift",
- "jub-jub 0.0.10",
+ "jub-jub 0.0.14",
  "pallet-encrypted-balance",
  "pallet-plonk",
  "parity-scale-codec",
@@ -742,7 +742,7 @@ dependencies = [
  "sp-runtime",
  "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "zero-plonk",
- "zkstd 0.0.9",
+ "zkstd 0.0.12",
 ]
 
 [[package]]
@@ -1100,13 +1100,13 @@ checksum = "304e6508efa593091e97a9abbc10f90aa7ca635b6d2784feff3c89d41dd12272"
 
 [[package]]
 name = "ec-pairing"
-version = "0.0.10"
+version = "0.0.11"
 dependencies = [
- "bls-12-381 0.1.10",
- "jub-jub 0.0.10",
+ "bls-12-381 0.0.12",
+ "jub-jub 0.0.14",
  "parity-scale-codec",
  "rand_core 0.6.4",
- "zkstd 0.0.9",
+ "zkstd 0.0.12",
 ]
 
 [[package]]
@@ -1952,19 +1952,6 @@ dependencies = [
 
 [[package]]
 name = "jub-jub"
-version = "0.0.10"
-dependencies = [
- "bls-12-381 0.1.10",
- "parity-scale-codec",
- "paste",
- "proptest",
- "rand_core 0.6.4",
- "serde",
- "zkstd 0.0.9",
-]
-
-[[package]]
-name = "jub-jub"
 version = "0.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f3dc3213f5c72c26e4a9bc4b4d1b4c797bb5ea366962f5a5d81bfb9f57ab58ed"
@@ -1974,6 +1961,19 @@ dependencies = [
  "rand_core 0.6.4",
  "serde",
  "zkstd 0.0.11",
+]
+
+[[package]]
+name = "jub-jub"
+version = "0.0.14"
+dependencies = [
+ "bls-12-381 0.0.12",
+ "parity-scale-codec",
+ "paste",
+ "proptest",
+ "rand_core 0.6.4",
+ "serde",
+ "zkstd 0.0.12",
 ]
 
 [[package]]
@@ -2519,7 +2519,7 @@ dependencies = [
  "ec-pairing",
  "frame-support",
  "frame-system",
- "jub-jub 0.0.10",
+ "jub-jub 0.0.14",
  "pallet-transaction-payment",
  "parity-scale-codec",
  "proptest",
@@ -2530,7 +2530,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
- "zkstd 0.0.9",
+ "zkstd 0.0.12",
 ]
 
 [[package]]
@@ -2558,12 +2558,12 @@ dependencies = [
 name = "pallet-plonk"
 version = "0.2.5"
 dependencies = [
- "bls-12-381 0.1.10",
+ "bls-12-381 0.0.12",
  "ec-pairing",
  "frame-support",
  "frame-system",
  "fullcodec_rand_xorshift",
- "jub-jub 0.0.10",
+ "jub-jub 0.0.14",
  "parity-scale-codec",
  "poly-commit",
  "rand 0.8.5",
@@ -2572,7 +2572,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "zero-plonk",
- "zkstd 0.0.9",
+ "zkstd 0.0.12",
 ]
 
 [[package]]
@@ -2960,14 +2960,14 @@ dependencies = [
 
 [[package]]
 name = "poly-commit"
-version = "0.0.10"
+version = "0.0.11"
 dependencies = [
- "bls-12-381 0.1.10",
+ "bls-12-381 0.0.12",
  "ec-pairing",
  "parity-scale-codec",
  "rand_core 0.6.4",
  "rayon",
- "zkstd 0.0.9",
+ "zkstd 0.0.12",
 ]
 
 [[package]]
@@ -3333,14 +3333,14 @@ dependencies = [
 
 [[package]]
 name = "red-jubjub"
-version = "0.0.13"
+version = "0.0.15"
 dependencies = [
  "blake2b_simd 1.0.1",
- "bls-12-381 0.1.10",
+ "bls-12-381 0.0.12",
  "hex-literal",
- "jub-jub 0.0.10",
+ "jub-jub 0.0.14",
  "rand_core 0.6.4",
- "zkstd 0.0.9",
+ "zkstd 0.0.12",
 ]
 
 [[package]]
@@ -3743,16 +3743,16 @@ dependencies = [
 
 [[package]]
 name = "she-elgamal"
-version = "0.0.10"
+version = "0.0.11"
 dependencies = [
  "ec-pairing",
- "jub-jub 0.0.10",
+ "jub-jub 0.0.14",
  "num-traits",
  "parity-scale-codec",
  "rand 0.8.5",
  "rand_core 0.6.4",
  "serde",
- "zkstd 0.0.9",
+ "zkstd 0.0.12",
 ]
 
 [[package]]
@@ -5180,13 +5180,13 @@ checksum = "85e60b0d1b5f99db2556934e21937020776a5d31520bf169e851ac44e6420214"
 name = "zero-network"
 version = "0.1.0"
 dependencies = [
- "bls-12-381 0.1.10",
+ "bls-12-381 0.0.12",
  "confidential_transfer",
  "criterion 0.4.0",
  "ec-pairing",
  "frame-support",
  "frame-system",
- "jub-jub 0.0.10",
+ "jub-jub 0.0.14",
  "pallet-encrypted-balance",
  "pallet-plonk",
  "parity-scale-codec",
@@ -5199,7 +5199,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "zero-plonk",
- "zkstd 0.0.9",
+ "zkstd 0.0.12",
 ]
 
 [[package]]
@@ -5207,7 +5207,7 @@ name = "zero-plonk"
 version = "0.1.10"
 dependencies = [
  "backtrace",
- "bls-12-381 0.1.10",
+ "bls-12-381 0.0.12",
  "bytecheck",
  "canonical",
  "canonical_derive",
@@ -5218,7 +5218,7 @@ dependencies = [
  "ec-pairing",
  "hashbrown 0.9.1",
  "itertools 0.9.0",
- "jub-jub 0.0.10",
+ "jub-jub 0.0.14",
  "parity-scale-codec",
  "poly-commit",
  "rand 0.8.5",
@@ -5227,7 +5227,7 @@ dependencies = [
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tempdir",
  "zksnarks",
- "zkstd 0.0.9",
+ "zkstd 0.0.12",
 ]
 
 [[package]]
@@ -5292,20 +5292,7 @@ dependencies = [
  "merlin 3.0.0",
  "parity-scale-codec",
  "poly-commit",
- "zkstd 0.0.9",
-]
-
-[[package]]
-name = "zkstd"
-version = "0.0.9"
-dependencies = [
- "bls-12-381 0.1.10",
- "jub-jub 0.0.10",
- "parity-scale-codec",
- "paste",
- "rand_core 0.6.4",
- "serde",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "zkstd 0.0.12",
 ]
 
 [[package]]
@@ -5317,5 +5304,18 @@ dependencies = [
  "parity-scale-codec",
  "paste",
  "rand_core 0.6.4",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "zkstd"
+version = "0.0.12"
+dependencies = [
+ "bls-12-381 0.0.12",
+ "jub-jub 0.0.14",
+ "parity-scale-codec",
+ "paste",
+ "rand_core 0.6.4",
+ "serde",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

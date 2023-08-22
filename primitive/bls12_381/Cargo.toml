@@ -5,14 +5,14 @@ authors = [
 ]
 name = "bls-12-381"
 description = 'lifted elgamal encryption implementation'
-version = "0.1.10"
+version = "0.0.12"
 edition = "2021"
 license = "Apache-2.0"
 homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
 repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
 readme = 'README.md'
 categories = ["cryptography"]
-keywords = ["zkp", "blockchain", "elliptic curve"]
+keywords = ["zkp", "blockchain", "elliptic-curve"]
 
 [package.metadata.docs.rs]
 all-features = true
