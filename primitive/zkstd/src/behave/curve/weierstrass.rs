@@ -12,6 +12,8 @@ pub trait WeierstrassCurve:
 {
     // b param
     const PARAM_B: Self::Range;
+    // 3b param
+    const PARAM_3B: Self::Range;
 }
 
 /// rational point affine representation

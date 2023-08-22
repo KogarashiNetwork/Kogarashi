@@ -91,6 +91,10 @@ impl SigUtils<48> for Fq {
 }
 
 impl Fq {
+    pub(crate) const fn add_const(self, rhs: Self) -> Self {
+        Self(add(self.0, rhs.0, MODULUS))
+    }
+
     pub(crate) const fn to_mont_form(val: [u64; 6]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }

@@ -26,6 +26,8 @@ const B: Fq = Fq([
     0x9d645513d83de7e,
 ]);
 
+const B3: Fq = B.add_const(B).add_const(B);
+
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct G1Affine {
@@ -328,6 +330,7 @@ weierstrass_curve_operation!(
     Fq,
     G1_PARAM_A,
     G1_PARAM_B,
+    B3,
     G1Affine,
     G1Projective,
     G1_GENERATOR_X,

@@ -34,6 +34,10 @@ bls12_range_field_pairing!(
 );
 
 impl Fq2 {
+    pub(crate) const fn add_const(self, rhs: Self) -> Self {
+        Self([self.0[0].add_const(rhs.0[0]), self.0[1].add_const(rhs.0[1])])
+    }
+
     /// Returns whether or not this element is strictly lexicographically
     /// larger than its negation.
     #[inline]
