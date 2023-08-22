@@ -22,17 +22,16 @@ mod private_key;
 mod public_key;
 mod signature;
 
-pub use hash::kogarashi_hash;
 pub use private_key::SecretKey;
 pub use public_key::PublicKey;
 pub use signature::Signature;
 
-/// An redjubjub keypar.
+/// An redjubjub secret key and public key pair.
 #[derive(Copy, Clone, Debug)]
 pub struct Keypair {
-    /// The secret half of this keypair.
+    /// secret key
     pub secret: SecretKey,
-    /// The public half of this keypair.
+    /// public key
     pub public: PublicKey,
 }
 
@@ -63,6 +62,26 @@ mod tests {
 
             assert!(pub_key.validate(msg, sig));
             assert!(!pub_key.validate(wrong_msg, sig));
+        }
+    }
+
+    #[test]
+    fn rerandomize_test() {
+        for _ in 0..1000 {
+            let msg = b"test";
+            let wrong_msg = b"tes";
+
+            let priv_key = SecretKey(Fp::random(OsRng));
+            let pub_key = priv_key.to_public_key();
+
+            // randomization
+            let randomize = Fp::random(OsRng);
+            let randomize_priv_key = priv_key.randomize_private(randomize);
+            let randomize_pub_key = pub_key.randomize_public(randomize);
+            let sig = randomize_priv_key.sign(msg, OsRng);
+
+            assert!(randomize_pub_key.validate(msg, sig));
+            assert!(!randomize_pub_key.validate(wrong_msg, sig));
         }
     }
 }

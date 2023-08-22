@@ -4,6 +4,7 @@ mod test;
 pub use group::*;
 pub use test::*;
 
+/// Weierstrass standard curve operation macro
 #[macro_export]
 macro_rules! weierstrass_curve_operation {
     ($scalar:ident, $range:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $x:ident, $y:ident) => {

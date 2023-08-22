@@ -3,8 +3,6 @@ use jub_jub::JubjubAffine;
 
 pub(crate) const SAPLING_PERSONAL: &[u8; 16] = b"Zcash_RedJubjubH";
 
-pub(crate) const KOGARASHI_PERSONAL: &[u8; 16] = b"Kogarashi_FSeedH";
-
 const SAPLING_BASE_POINT_X: Fr = Fr::to_mont_form([
     0x47bf46920a95a753,
     0xd5b9a7d3ef8e2827,

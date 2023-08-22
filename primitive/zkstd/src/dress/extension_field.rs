@@ -6,11 +6,13 @@ pub use field::*;
 pub use group::*;
 pub use ring::*;
 
+/// extension field basic operation macro
 #[macro_export]
 macro_rules! extension_field_operation {
     ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
         prime_extension_field_operation!($extension_field, $sub_field, $limbs_length);
 
+        /// extension field of base field
         #[derive(Clone, Copy, Decode, Encode)]
         pub struct $extension_field(pub(crate) [$sub_field; $limbs_length]);
 
@@ -25,6 +27,7 @@ macro_rules! extension_field_operation {
     };
 }
 
+/// prime field operation for extension field macro
 #[macro_export]
 macro_rules! prime_extension_field_operation {
     ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {

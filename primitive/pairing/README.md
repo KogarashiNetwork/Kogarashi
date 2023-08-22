@@ -3,6 +3,12 @@
 
 This crate provides pairing arithmetic and also supports fully `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec).
 
+## Specification
+
+$$
+e(aG, bH) = e(G, H)^{ab}\ where\ a,b \in F_r,~G \in G_1,~H \in G_2
+$$
+
 ## Test
 
 ```shell

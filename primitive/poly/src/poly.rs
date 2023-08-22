@@ -5,10 +5,12 @@ use rand_core::RngCore;
 use zkstd::behave::FftField;
 use zkstd::common::{PrimeField, Vec};
 
-// a_n-1 , a_n-2, ... , a_0
+/// polynomial coefficients form expression
+/// a_n-1 , a_n-2, ... , a_0
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Coefficients<F: PrimeField>(pub Vec<F>);
 
+/// polynomial points-value form expression
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct PointsValue<F: PrimeField>(pub Vec<F>);
 

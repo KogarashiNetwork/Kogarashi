@@ -4,7 +4,7 @@ use crate::PointsValue;
 use rayon::join;
 use zkstd::common::{vec, FftField, Vec};
 
-// fft structure
+/// fft construction using n th root of unity supports polynomial operation less than n degree
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Fft<F: FftField> {
     // polynomial degree 2^k
@@ -25,7 +25,6 @@ pub struct Fft<F: FftField> {
 }
 
 // SBP-M1 review: use safe math operations
-
 impl<F: FftField> Fft<F> {
     pub fn new(k: usize) -> Self {
         assert!(k >= 1);

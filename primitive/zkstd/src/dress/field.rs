@@ -6,6 +6,7 @@ pub use group::*;
 pub use ring::*;
 pub use test::*;
 
+/// prime field macro
 #[macro_export]
 macro_rules! prime_field_operation {
     ($field:ident, $p:ident, $g:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
@@ -70,6 +71,7 @@ macro_rules! prime_field_operation {
     };
 }
 
+/// fft field macro
 #[macro_export]
 macro_rules! fft_field_operation {
     ($field:ident, $p:ident, $g:ident, $mul_g:ident, $i:ident, $u:ident, $r:ident, $r2:ident, $r3:ident, $s:ident) => {
@@ -185,6 +187,7 @@ macro_rules! fft_field_operation {
     };
 }
 
+/// abstract algebra field operation macro
 #[macro_export]
 macro_rules! field_operation {
     ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {

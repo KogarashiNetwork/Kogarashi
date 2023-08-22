@@ -3,9 +3,10 @@ use super::hash::sapling_hash;
 use super::signature::Signature;
 
 use bls_12_381::Fr;
-use jub_jub::{JubjubAffine, JubjubExtended};
+use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 use zkstd::behave::{CurveGroup, SigUtils};
 
+/// RedJubjub public key struct used for signature verification
 #[derive(Clone, Copy, Debug)]
 pub struct PublicKey(pub(crate) JubjubExtended);
 
@@ -55,5 +56,9 @@ impl PublicKey {
         _sig: &[u8],
     ) -> T {
         todo!()
+    }
+
+    pub fn randomize_public(&self, r: Fp) -> Self {
+        Self(self.0 * r)
     }
 }

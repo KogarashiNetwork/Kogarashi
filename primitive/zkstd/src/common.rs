@@ -1,3 +1,4 @@
+//! export necessary traits for crypto Substrate compatible.
 extern crate alloc;
 
 pub use super::behave::*;

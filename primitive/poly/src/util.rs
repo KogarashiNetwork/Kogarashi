@@ -1,5 +1,6 @@
 use zkstd::common::{PrimeField, Vec};
 
+/// power operation for prime field
 pub fn powers_of<F: PrimeField>(scalar: &F, max_degree: usize) -> Vec<F> {
     let mut powers = Vec::with_capacity(max_degree + 1);
     powers.push(F::one());
@@ -9,6 +10,7 @@ pub fn powers_of<F: PrimeField>(scalar: &F, max_degree: usize) -> Vec<F> {
     powers
 }
 
+/// batch inversion operation for prime field vectors
 pub fn batch_inversion<F: PrimeField>(v: &mut [F]) {
     // Montgomery’s Trick and Fast Implementation of Masked AES
     // Genelle, Prouff and Quisquater

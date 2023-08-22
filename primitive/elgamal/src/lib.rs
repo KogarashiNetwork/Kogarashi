@@ -25,7 +25,8 @@ use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use zkstd::common::{CurveGroup, Pairing};
 
-/// Number encrypted by ElGamal encryption
+/// ElGamal encryption number encrypted supports additive homomorphism.
+/// allows perform Enc(a) + Enc(b) = Enc(a + b)
 #[derive(Debug, Clone, Copy, Encode, Decode, PartialEq, Eq, Deserialize, Serialize)]
 pub struct EncryptedNumber {
     s: JubjubAffine,

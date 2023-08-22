@@ -2,6 +2,7 @@ mod group;
 
 pub use group::*;
 
+/// Twisted Edwards curve group operation macro
 #[macro_export]
 macro_rules! twisted_edwards_curve_operation {
     ($scalar:ident, $range:ident, $d:ident, $affine:ident, $extended:ident, $x:ident, $y:ident, $t:ident) => {

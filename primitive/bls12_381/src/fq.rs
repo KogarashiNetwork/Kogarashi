@@ -46,6 +46,7 @@ const R3: [u64; 6] = [
 
 const INV: u64 = 0x89f3fffcfffcfffd;
 
+/// Bls12 381 curve base field
 #[derive(Clone, Copy, Decode, Encode)]
 pub struct Fq(pub(crate) [u64; 6]);
 
