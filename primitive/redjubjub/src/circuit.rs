@@ -42,14 +42,15 @@ impl Circuit<TatePairing> for RedJubjubCircuit {
             Some(r) => r,
             None => return Err(Error::ProofVerificationError),
         };
-        let neg = composer.append_witness(-JubjubScalar::one());
-        let public_key = composer.append_point(self.public_key);
-        let msg_hash = composer.append_witness(self.msg_hash);
-        let sapling_base_point = composer.append_constant_point(SAPLING_BASE_POINT);
-        let sapling_redjubjub_cofactor = composer.append_constant(SAPLING_REDJUBJUB_COFACTOR);
 
+        let msg_hash = composer.append_witness(self.msg_hash);
         let s = composer.append_witness(s);
         let r = composer.append_point(r);
+        let public_key = composer.append_point(self.public_key);
+
+        let sapling_base_point = composer.append_constant_point(SAPLING_BASE_POINT);
+        let sapling_redjubjub_cofactor = composer.append_constant(SAPLING_REDJUBJUB_COFACTOR);
+        let neg = composer.append_witness(-JubjubScalar::one());
 
         let s_bp = composer.component_mul_point(s, sapling_base_point);
         let hash_pub_key = composer.component_mul_point(msg_hash, public_key);
@@ -59,7 +60,7 @@ impl Circuit<TatePairing> for RedJubjubCircuit {
         let finalized =
             composer.component_mul_point(sapling_redjubjub_cofactor, s_bp_neg_r_hash_pub_key);
 
-        composer.assert_equal_public_point(finalized, JubjubExtended::ADDITIVE_GENERATOR);
+        composer.assert_equal_public_point(finalized, JubjubExtended::ADDITIVE_IDENTITY);
 
         Ok(())
     }
@@ -67,6 +68,7 @@ impl Circuit<TatePairing> for RedJubjubCircuit {
 
 #[cfg(test)]
 mod tests {
+
     use ec_pairing::TatePairing;
     use jub_jub::Fp;
     use poly_commit::KeyPair;
@@ -81,7 +83,7 @@ mod tests {
 
     #[test]
     fn redjubjub_verification() {
-        let n = 8;
+        let n = 13;
         let label = b"verify";
         let mut rng = StdRng::seed_from_u64(8349u64);
 
