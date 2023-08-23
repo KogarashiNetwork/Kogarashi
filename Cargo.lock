@@ -2678,6 +2678,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-zk-rollup"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "ark-std 0.4.0",
+ "ec-pairing",
+ "jub-jub 0.0.10",
+ "rand 0.8.5",
+ "zero-plonk",
+ "zkstd 0.0.9",
+]
+
+[[package]]
 name = "parity-multiaddr"
 version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3347,13 +3360,10 @@ version = "0.0.13"
 dependencies = [
  "blake2b_simd 1.0.1",
  "bls-12-381 0.1.10",
- "ec-pairing",
  "hex-literal",
  "jub-jub 0.0.10",
- "poly-commit",
  "rand 0.8.5",
  "rand_core 0.6.4",
- "zero-plonk",
  "zkstd 0.0.9",
 ]
 
@@ -5262,17 +5272,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.28",
-]
-
-[[package]]
-name = "zk_rollup"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "ark-std 0.4.0",
- "jub-jub 0.0.10",
- "rand 0.8.5",
- "zkstd 0.0.9",
 ]
 
 [[package]]

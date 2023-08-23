@@ -5,6 +5,7 @@ mod merkle_tree;
 mod operator;
 mod poseidon;
 mod proof;
+mod redjubjub_circuit;
 mod verifier_contract;
 
 #[cfg(test)]

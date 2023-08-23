@@ -1,5 +1,5 @@
 [package]
-name = "zk_rollup"
+name = "pallet-zk-rollup"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,6 +10,8 @@ anyhow = "1.0.75"
 zkstd = { path = "../zkstd", default-features = false }
 jub-jub = { path = "../jubjub", default-features = false }
 ark-std = "0.4.0"
+zero-plonk = { path = "../plonk", default-features = false }
+ec-pairing = { path = "../pairing", default-features = false }
 
 [dev-dependencies]
 rand = "0.8.5"

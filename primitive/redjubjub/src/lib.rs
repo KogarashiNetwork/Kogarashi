@@ -16,7 +16,6 @@
 #![no_std]
 #![doc = include_str!("../README.md")]
 
-mod circuit;
 mod constant;
 mod hash;
 mod private_key;
