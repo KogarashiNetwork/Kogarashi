@@ -33,4 +33,12 @@ impl Signature {
         let bytes: [u8; Self::LENGTH] = bytes[..64].try_into().unwrap();
         Self::from_bytes(bytes)
     }
+
+    pub fn r(&self) -> [u8; 32] {
+        self.r
+    }
+
+    pub fn s(&self) -> [u8; 32] {
+        self.s
+    }
 }

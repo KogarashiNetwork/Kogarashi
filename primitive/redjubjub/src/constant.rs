@@ -17,10 +17,10 @@ const SAPLING_BASE_POINT_Y: Fr = Fr::to_mont_form([
     0x57a1019e6de9b675,
 ]);
 
-pub(crate) const SAPLING_BASE_POINT: JubjubAffine =
+pub const SAPLING_BASE_POINT: JubjubAffine =
     JubjubAffine::from_raw_unchecked(SAPLING_BASE_POINT_X, SAPLING_BASE_POINT_Y);
 
-pub(crate) const SAPLING_REDJUBJUB_COFACTOR: Fr = Fr::to_mont_form([
+pub const SAPLING_REDJUBJUB_COFACTOR: Fr = Fr::to_mont_form([
     0x0000000000000008,
     0x0000000000000000,
     0x0000000000000000,

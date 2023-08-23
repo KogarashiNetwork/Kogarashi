@@ -2685,7 +2685,10 @@ dependencies = [
  "ark-std 0.4.0",
  "ec-pairing",
  "jub-jub 0.0.14",
+ "poly-commit",
  "rand 0.8.5",
+ "rand_core 0.6.4",
+ "red-jubjub 0.0.15",
  "zero-plonk",
  "zkstd 0.0.12",
 ]

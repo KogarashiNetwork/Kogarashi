@@ -3,7 +3,7 @@ use jub_jub::JubjubAffine;
 use zero_plonk::prelude::*;
 use zkstd::common::{CurveGroup, SigUtils};
 
-use crate::{
+use red_jubjub::{
     constant::{SAPLING_BASE_POINT, SAPLING_REDJUBJUB_COFACTOR},
     Signature,
 };
@@ -34,11 +34,11 @@ impl Circuit<TatePairing> for RedJubjubCircuit {
     where
         C: Composer<TatePairing>,
     {
-        let r = match JubjubAffine::from_bytes(self.signature.r) {
+        let r = match JubjubAffine::from_bytes(self.signature.r()) {
             Some(r) => composer.append_point(r),
             None => return Err(Error::ProofVerificationError),
         };
-        let s = match JubjubScalar::from_bytes(self.signature.s) {
+        let s = match JubjubScalar::from_bytes(self.signature.s()) {
             Some(s) => composer.append_witness(s),
             None => return Err(Error::ProofVerificationError),
         };
@@ -75,7 +75,7 @@ mod tests {
     use zero_plonk::prelude::*;
     use zkstd::common::{Group, SigUtils};
 
-    use crate::{hash::sapling_hash, SecretKey};
+    use red_jubjub::{sapling_hash, SecretKey};
 
     use super::RedJubjubCircuit;
 
@@ -89,14 +89,14 @@ mod tests {
 
         let msg = b"test";
 
-        let priv_key = SecretKey(Fp::random(&mut rng));
+        let priv_key = SecretKey::new(Fp::random(&mut rng));
         let sig = priv_key.sign(msg, &mut rng);
         let pub_key = priv_key.to_public_key();
 
         let redjubjub_circuit = RedJubjubCircuit::new(
-            pub_key.0.into(),
+            pub_key.inner().into(),
             sig,
-            sapling_hash(&sig.r, &pub_key.to_bytes(), msg),
+            sapling_hash(&sig.r(), &pub_key.to_bytes(), msg),
         );
         let prover = Compiler::compile::<RedJubjubCircuit, TatePairing>(&mut pp, label)
             .expect("failed to compile circuit");

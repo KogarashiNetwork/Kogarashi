@@ -16,12 +16,13 @@
 #![no_std]
 #![doc = include_str!("../README.md")]
 
-mod constant;
+pub mod constant;
 mod hash;
 mod private_key;
 mod public_key;
 mod signature;
 
+pub use hash::sapling_hash;
 pub use private_key::SecretKey;
 pub use public_key::PublicKey;
 pub use signature::Signature;
