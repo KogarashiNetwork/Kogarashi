@@ -7,7 +7,7 @@ use parity_scale_codec::{Decode, Encode};
 use zkstd::behave::*;
 use zkstd::common::*;
 
-// key pair structure
+/// Kate polynomial commitment params used for prover polynomial domain and proof verification
 #[derive(Clone, Debug, PartialEq, Decode, Encode)]
 #[allow(dead_code)]
 pub struct KeyPair<P: Pairing> {

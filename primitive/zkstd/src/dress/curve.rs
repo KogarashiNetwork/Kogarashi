@@ -1,6 +1,7 @@
 pub mod edwards;
 pub mod weierstrass;
 
+/// curve reference basic operation macro
 #[macro_export]
 macro_rules! curve_arithmetic_extension {
     ($curve:ident, $scalar:ident, $extended:ident) => {
@@ -110,6 +111,7 @@ macro_rules! curve_arithmetic_extension {
     };
 }
 
+/// affine and projective coordinate mixed basic operation
 #[macro_export]
 macro_rules! mixed_curve_operations {
     ($affine:ident, $extended:ident) => {

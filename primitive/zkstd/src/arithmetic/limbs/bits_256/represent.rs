@@ -31,6 +31,7 @@ pub const fn to_mont_form(val: [u64; 4], r2: [u64; 4], p: [u64; 4], inv: u64) ->
     mul(val, r2, p, inv)
 }
 
+#[inline(always)]
 pub fn to_bits(val: [u64; 4]) -> Bits {
     let mut index = 256;
     let mut bits: [u8; 256] = [0; 256];
@@ -45,6 +46,7 @@ pub fn to_bits(val: [u64; 4]) -> Bits {
     bits.to_vec()
 }
 
+#[inline(always)]
 pub fn to_nafs(val: [u64; 4]) -> Nafs {
     let mut index = 0;
     let mut bits: [u8; 258] = [0; 258];

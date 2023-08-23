@@ -46,6 +46,7 @@ const R3: [u64; 6] = [
 
 const INV: u64 = 0x89f3fffcfffcfffd;
 
+/// Bls12 381 curve base field
 #[derive(Clone, Copy, Decode, Encode)]
 pub struct Fq(pub(crate) [u64; 6]);
 
@@ -90,6 +91,10 @@ impl SigUtils<48> for Fq {
 }
 
 impl Fq {
+    pub(crate) const fn add_const(self, rhs: Self) -> Self {
+        Self(add(self.0, rhs.0, MODULUS))
+    }
+
     pub(crate) const fn to_mont_form(val: [u64; 6]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }

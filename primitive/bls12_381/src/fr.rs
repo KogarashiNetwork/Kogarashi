@@ -19,7 +19,7 @@ const GENERATOR: [u64; 4] = [
     0x351332208fc5a8c4,
 ];
 
-/// Generator of the Scalar field
+/// generator of the scalar field
 pub const MULTIPLICATIVE_GENERATOR: Fr = Fr([7, 0, 0, 0]);
 
 /// R = 2^256 mod r
@@ -50,6 +50,7 @@ pub const INV: u64 = 0xfffffffeffffffff;
 
 const S: usize = 32;
 
+/// multiplicative group generator of n th root of unity
 pub const ROOT_OF_UNITY: Fr = Fr([
     0xb9b58d8c5f0e466a,
     0x5b1b4c801819d7ec,
@@ -59,6 +60,7 @@ pub const ROOT_OF_UNITY: Fr = Fr([
 
 pub const TWO_ADACITY: u32 = 32;
 
+/// Bls12 381 curve scalar field
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fr(pub [u64; 4]);
 

@@ -1,3 +1,5 @@
+//! the interface of cryptography components.
+//! define crypto components behavior
 mod algebra;
 mod comp;
 mod curve;

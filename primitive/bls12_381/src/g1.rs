@@ -26,6 +26,8 @@ const B: Fq = Fq([
     0x9d645513d83de7e,
 ]);
 
+const B3: Fq = B.add_const(B).add_const(B);
+
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
 pub struct G1Affine {
@@ -35,8 +37,6 @@ pub struct G1Affine {
 }
 
 impl SigUtils<48> for G1Affine {
-    /// Serializes this element into compressed form. See [`notes::serialization`](crate::notes::serialization)
-    /// for details about how group elements are serialized.
     fn to_bytes(self) -> [u8; Self::LENGTH] {
         // Strictly speaking, self.x is zero already when self.infinity is true, but
         // to guard against implementation mistakes we do not assume this.
@@ -60,8 +60,6 @@ impl SigUtils<48> for G1Affine {
         res
     }
 
-    /// Attempts to deserialize a compressed element. See [`notes::serialization`](crate::notes::serialization)
-    /// for details about how group elements are serialized.
     fn from_bytes(buf: [u8; Self::LENGTH]) -> Option<Self> {
         // We already know the point is on the curve because this is established
         // by the y-coordinate recovery procedure in from_compressed_unchecked().
@@ -332,6 +330,7 @@ weierstrass_curve_operation!(
     Fq,
     G1_PARAM_A,
     G1_PARAM_B,
+    B3,
     G1Affine,
     G1Projective,
     G1_GENERATOR_X,

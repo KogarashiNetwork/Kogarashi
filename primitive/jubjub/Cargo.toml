@@ -5,12 +5,18 @@ authors = [
 ]
 name = "jub-jub"
 description = 'twisted edwards curve implementation'
-version = "0.0.10"
+version = "0.0.14"
 edition = "2021"
 license = "Apache-2.0"
 homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
 repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
 readme = 'README.md'
+categories = ["cryptography"]
+keywords = ["zkp", "blockchain", "elliptic-curve"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "katex-header.html"]
 
 [dependencies]
 zkstd = { path = "../zkstd", default-features = false }

@@ -22,7 +22,9 @@ use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 use zkstd::common::*;
 use zkstd::common::{G2Pairing, Group, Pairing, PairingRange, PrimeField, Ring, Vec};
 
-// tate pairing with miller algorithm
+/// Tate pairing struct holds necessary components for pairing.
+/// `pairing` function takes G1 and G2 group elements and output
+/// GT target group element.
 #[derive(Debug, Clone, Eq, PartialEq, Default, Encode, Decode)]
 pub struct TatePairing;
 

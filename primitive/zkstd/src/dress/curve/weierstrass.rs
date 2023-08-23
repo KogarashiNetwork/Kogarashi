@@ -4,9 +4,10 @@ mod test;
 pub use group::*;
 pub use test::*;
 
+/// Weierstrass standard curve operation macro
 #[macro_export]
 macro_rules! weierstrass_curve_operation {
-    ($scalar:ident, $range:ident, $a:ident, $b:ident, $affine:ident, $projective:ident, $x:ident, $y:ident) => {
+    ($scalar:ident, $range:ident, $a:ident, $b:ident, $b3:ident, $affine:ident, $projective:ident, $x:ident, $y:ident) => {
         use zkstd::behave::*;
         use zkstd::common::*;
 
@@ -47,6 +48,7 @@ macro_rules! weierstrass_curve_operation {
 
         impl WeierstrassCurve for $affine {
             const PARAM_B: $range = $b;
+            const PARAM_3B: $range = $b3;
         }
 
         impl Affine for $affine {
@@ -94,6 +96,7 @@ macro_rules! weierstrass_curve_operation {
 
         impl WeierstrassCurve for $projective {
             const PARAM_B: $range = $b;
+            const PARAM_3B: $range = $b3;
         }
 
         impl CurveExtended for $projective {
