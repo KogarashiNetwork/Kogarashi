@@ -1,5 +1,8 @@
+use zkstd::common::FftField;
+
 use crate::{
-    merkle_tree::{MerkleProof, MerkleTree, TreeHash},
+    merkle_tree::{MerkleProof, SparseMerkleTree},
+    poseidon::FieldHasher,
     proof::Proof,
 };
 
@@ -35,23 +38,26 @@ impl Transaction {
         }
     }
 }
-pub(crate) struct Batch {
-    prev_root: TreeHash,
-    new_root: TreeHash,
+pub(crate) struct Batch<F: FftField> {
+    prev_root: F,
+    new_root: F,
     transactions: Vec<Transaction>,
 }
 
 #[derive(Default)]
-pub(crate) struct RollupOperator {
-    state_merkle: MerkleTree<UserData>,
-    transactions: Vec<(Transaction, TreeHash)>,
+pub(crate) struct RollupOperator<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
+    state_merkle: SparseMerkleTree<F, H, N>,
+    transactions: Vec<(Transaction, F)>,
 }
 
-impl RollupOperator {
+// ACCOUNT_LIMIT -> StateMerkleTree
+// BATCH_SIZE -> TransactionMerkleTree
+
+impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> RollupOperator<F, H, N> {
     const BATCH_SIZE: usize = 25;
     pub fn execute_transaction(&mut self, transaction: Transaction) {
         // process transactions
-        let new_root = [0; 32];
+        let new_root = F::zero();
         self.transactions.push((transaction, new_root));
         if self.transactions.len() > Self::BATCH_SIZE {
             self.create_batch();
@@ -60,7 +66,7 @@ impl RollupOperator {
             // send proof to Verifier contract
         }
     }
-    pub fn create_batch(&mut self) -> Batch {
+    pub fn create_batch(&mut self) -> Batch<F> {
         let batch = Batch {
             prev_root: self.transactions[0].1,
             new_root: self.transactions[Self::BATCH_SIZE - 1].1,
@@ -75,10 +81,10 @@ impl RollupOperator {
 
     pub fn create_proof(
         &self,
-        batch_tree: MerkleTree<Transaction>,
-        t_merkle_proofs: Vec<MerkleProof>,
-        sender_receiver_in_state_merkle_proofs: Vec<MerkleProof>,
-        state_roots: Vec<TreeHash>,
+        batch_tree: SparseMerkleTree<F, H, N>,
+        t_merkle_proofs: Vec<MerkleProof<F>>,
+        sender_receiver_in_state_merkle_proofs: Vec<MerkleProof<F>>,
+        state_roots: Vec<F>,
     ) -> Proof {
         Proof {}
     }

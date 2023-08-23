@@ -85,9 +85,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.72"
+version = "1.0.75"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b13c32d80ecc7ab747b80c3784bce54ee8a7a0cc4fbda9bf4cda2cf6fe90854"
+checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
 
 [[package]]
 name = "approx"
@@ -111,6 +111,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1df2c09229cbc5a028b1d70e00fdb2acee28b1055dfb5ca73eea49c5a25c4e7c"
 dependencies = [
  "colored",
+ "num-traits",
+ "rand 0.8.5",
+]
+
+[[package]]
+name = "ark-std"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "94893f1e0c6eeab764ade8dc4c0db24caf4fe7cbbaafc0eba0a9030f447b5185"
+dependencies = [
  "num-traits",
  "rand 0.8.5",
 ]
@@ -724,7 +734,7 @@ dependencies = [
 name = "confidential_transfer"
 version = "0.1.1"
 dependencies = [
- "ark-std",
+ "ark-std 0.3.0",
  "bls-12-381 0.1.10",
  "ec-pairing",
  "frame-support",
@@ -5257,6 +5267,13 @@ dependencies = [
 [[package]]
 name = "zk_rollup"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "ark-std 0.4.0",
+ "jub-jub 0.0.10",
+ "rand 0.8.5",
+ "zkstd 0.0.9",
+]
 
 [[package]]
 name = "zkruntime"
