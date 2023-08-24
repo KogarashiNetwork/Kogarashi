@@ -195,11 +195,11 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
         Ok(())
     }
 
-    pub fn update(&mut self, index: u32, val: F, hasher: &H) -> Result<(), Error> {
-        self.insert_batch(&BTreeMap::from([(index, val)]), hasher)
+    pub fn update(&mut self, index: u64, val: F, hasher: &H) -> Result<(), Error> {
+        self.insert_batch(&BTreeMap::from([(index as u32, val)]), hasher)
     }
 
-    pub fn delete(&mut self, index: u32, hasher: &H) -> Result<(), Error> {
+    pub fn delete(&mut self, index: u64, hasher: &H) -> Result<(), Error> {
         self.update(index, self.empty_hashes[0], hasher)
     }
 
