@@ -179,9 +179,7 @@ impl<'a, 'b> Mul<&'b Fp> for &'a JubjubAffine {
 }
 
 /// Twisted Edwards curve Jubjub extended coordinate
-#[derive(
-    Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord,
-)]
+#[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize, PartialOrd, Ord)]
 pub struct JubjubExtended {
     x: Fr,
     y: Fr,

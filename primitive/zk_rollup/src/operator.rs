@@ -9,7 +9,7 @@ use crate::{
     proof::Proof,
 };
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Copy)]
 pub(crate) struct Transaction {
     sender_address: PublicKey,
     receiver_address: PublicKey,
@@ -19,24 +19,34 @@ pub(crate) struct Transaction {
 
 impl SigUtils<136> for Transaction {
     fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+        let mut sender_address = [0_u8; 32];
+        let mut receiver_address = [0_u8; 32];
+        let mut signature = [0_u8; 64];
+        let mut amount = [0_u8; 8];
+
+        sender_address.copy_from_slice(&bytes[0..32]);
+        receiver_address.copy_from_slice(&bytes[32..64]);
+        signature.copy_from_slice(&bytes[64..128]);
+        amount.copy_from_slice(&bytes[128..]);
         Some(Self {
-            sender_address: PublicKey::from_bytes(&bytes[0..32]),
-            receiver_address: PublicKey::from_bytes(&bytes[32..64]),
-            signature: Signature::from_bytes(&bytes[64..128]),
-            amount: u64::from_be_bytes(bytes[128..]),
+            sender_address: PublicKey::from_bytes(sender_address).unwrap(),
+            receiver_address: PublicKey::from_bytes(receiver_address).unwrap(),
+            signature: Signature::from_bytes(signature).unwrap(),
+            amount: u64::from_be_bytes(amount),
         })
     }
 
     fn to_bytes(self) -> [u8; Self::LENGTH] {
         let mut bytes = [0u8; 136];
-        bytes[0..32].copy_from_slice(&self.sender_address);
-        bytes[32..64].copy_from_slice(&self.receiver_address);
-        bytes[64..128].copy_from_slice(&self.signature);
+        bytes[0..32].copy_from_slice(&self.sender_address.to_bytes());
+        bytes[32..64].copy_from_slice(&self.receiver_address.to_bytes());
+        bytes[64..128].copy_from_slice(&self.signature.to_bytes());
         bytes[128..].copy_from_slice(&self.amount.to_be_bytes());
+        bytes
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Copy, Clone)]
 pub(crate) struct UserData {
     index: u64,
     balance: u64,
@@ -44,28 +54,44 @@ pub(crate) struct UserData {
     nonce: u64,
 }
 
-impl SigUtils<64> for UserData {
+impl SigUtils<56> for UserData {
     fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+        let mut index = [0_u8; 8];
+        let mut balance = [0_u8; 8];
+        let mut address = [0_u8; 32];
+        let mut nonce = [0_u8; 8];
+
+        index.copy_from_slice(&bytes[0..8]);
+        balance.copy_from_slice(&bytes[8..16]);
+        address.copy_from_slice(&bytes[16..48]);
+        nonce.copy_from_slice(&bytes[48..]);
         Some(Self {
-            index: u64::from_be_bytes(&bytes[0..8]),
-            balance: u64::from_be_bytes(&bytes[8..16]),
-            address: PublicKey::from_bytes(&bytes[16..48]),
-            nonce: u64::from_be_bytes(bytes[48..]),
+            index: u64::from_be_bytes(index),
+            balance: u64::from_be_bytes(balance),
+            address: PublicKey::from_bytes(address).unwrap(),
+            nonce: u64::from_be_bytes(nonce),
         })
     }
 
     fn to_bytes(self) -> [u8; Self::LENGTH] {
-        let mut bytes = [0u8; 136];
+        let mut bytes = [0u8; 56];
         bytes[0..8].copy_from_slice(&self.index.to_be_bytes());
         bytes[8..16].copy_from_slice(&self.balance.to_be_bytes());
-        bytes[16..48].copy_from_slice(&self.address);
+        bytes[16..48].copy_from_slice(&self.address.to_bytes());
         bytes[48..].copy_from_slice(&self.nonce.to_be_bytes());
+        bytes
     }
 }
 
 impl UserData {
     pub fn balance(&self) -> u64 {
         self.balance
+    }
+
+    pub fn to_field_element<F: FftField>(self) -> F {
+        let mut field = [0_u8; 64];
+        field.copy_from_slice(&self.to_bytes()[0..56]);
+        F::from_bytes_wide(&field)
     }
 }
 
@@ -75,6 +101,12 @@ impl Transaction {
             amount,
             ..Default::default()
         }
+    }
+
+    pub fn to_field_element<F: FftField>(self) -> F {
+        let mut field = [0_u8; 64];
+        field.copy_from_slice(&self.to_bytes()[0..64]);
+        F::from_bytes_wide(&field)
     }
 }
 pub(crate) struct Batch<F: FftField> {
@@ -95,12 +127,12 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> RollupOperator<F, H, N> 
     pub fn execute_transaction(&mut self, transaction: Transaction, hasher: &H) {
         let sender = self
             .users
-            .get_mut(&&transaction.sender_address)
+            .get_mut(&transaction.sender_address)
             .expect("Sender is not presented in the state");
 
         let sender_index = sender.index;
 
-        let sender_hash = F::zero(); // do hashing
+        let sender_hash = sender.to_field_element();
 
         self.state_merkle
             .generate_membership_proof(sender_index)
@@ -113,21 +145,21 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> RollupOperator<F, H, N> 
 
         assert!(sender.balance >= transaction.amount);
         sender.balance -= transaction.amount;
-        let user_hash = F::zero(); // do hashing
+        let sender_hash = sender.to_field_element();
 
         self.state_merkle
-            .update(sender_index, user_hash, hasher)
+            .update(sender_index, sender_hash, hasher)
             .expect("Failed to update balance");
 
         let intermediate_root = self.state_merkle.root();
 
         let receiver = self
             .users
-            .get_mut(&&transaction.receiver_address)
+            .get_mut(&transaction.receiver_address)
             .expect("Sender is not presented in the state");
 
         let receiver_index = receiver.index;
-        let receiver_hash = F::zero(); // do hashing
+        let receiver_hash = receiver.to_field_element();
 
         self.state_merkle
             .generate_membership_proof(receiver_index)
@@ -135,7 +167,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> RollupOperator<F, H, N> 
             .expect("Sender is not presented in the state");
 
         receiver.balance += transaction.amount;
-        let receiver_hash = F::zero(); // do hashing
+        let receiver_hash = receiver.to_field_element();
 
         self.state_merkle
             .update(receiver_index, receiver_hash, hasher)
@@ -157,7 +189,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> RollupOperator<F, H, N> 
             new_root: self.transactions[Self::BATCH_SIZE - 1].1,
             transactions: self.transactions[..Self::BATCH_SIZE]
                 .iter()
-                .map(|(t, _)| t.clone())
+                .map(|(t, _)| *t)
                 .collect(),
         };
         self.transactions.drain(..Self::BATCH_SIZE);
