@@ -3,7 +3,7 @@ use super::constant::SAPLING_PERSONAL;
 use blake2b_simd::{Params, State};
 use jub_jub::Fp;
 
-pub(crate) fn sapling_hash(a: &[u8], b: &[u8], c: &[u8]) -> Fp {
+pub fn sapling_hash(a: &[u8], b: &[u8], c: &[u8]) -> Fp {
     SaplingHash::default()
         .update(a)
         .update(b)

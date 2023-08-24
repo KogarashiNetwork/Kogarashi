@@ -25,6 +25,10 @@ impl PublicKey {
         PublicKey(raw)
     }
 
+    pub fn inner(&self) -> JubjubExtended {
+        self.0
+    }
+
     pub fn from_raw_bytes(bytes: &[u8]) -> Option<Self> {
         assert_eq!(bytes.len(), Self::LENGTH);
         let bytes: [u8; Self::LENGTH] = bytes[..32].try_into().unwrap();

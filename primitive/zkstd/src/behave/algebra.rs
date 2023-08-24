@@ -19,6 +19,7 @@ pub trait Group:
     + Mul<Self::Scalar, Output = Self>
     + MulAssign<Self::Scalar>
     + Sized
+    + Copy
 {
     // scalar domain
     type Scalar: Group;
