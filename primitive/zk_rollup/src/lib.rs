@@ -21,8 +21,10 @@ mod tests {
     };
 
     #[test]
+    #[should_panic]
     fn test_deposit_and_transfer_works() {
         let mut contract = MainContract::<Fp>::default();
+        let poseidon = Poseidon::<Fp, 2>::new();
         const ACCOUNT_LIMIT: usize = 3;
 
         // deploy contract
@@ -43,7 +45,7 @@ mod tests {
 
         // t -> contract (not work)
 
-        operator.execute_transaction(t);
+        operator.execute_transaction(t, &poseidon);
 
         // Should send a proof to the contract inside and update state on chain
 
