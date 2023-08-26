@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 
-use red_jubjub::{PublicKey, Signature};
+use rand_core::RngCore;
+use red_jubjub::{PublicKey, SecretKey, Signature};
 use zkstd::common::{FftField, SigUtils};
 
 use crate::{
@@ -9,44 +10,62 @@ use crate::{
     proof::Proof,
 };
 
-#[derive(Default, Clone, Copy)]
-pub(crate) struct Transaction {
+#[derive(Default, Clone, Copy, Debug, PartialEq)]
+pub(crate) struct Transaction(Signature, TransactionData);
+#[derive(Default, Clone, Copy, Debug, PartialEq)]
+pub(crate) struct TransactionData {
     sender_address: PublicKey,
     receiver_address: PublicKey,
-    signature: Signature,
     amount: u64,
 }
 
 impl SigUtils<136> for Transaction {
     fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
-        let mut sender_address = [0_u8; 32];
-        let mut receiver_address = [0_u8; 32];
         let mut signature = [0_u8; 64];
-        let mut amount = [0_u8; 8];
+        let mut transaction_data = [0_u8; 72];
 
-        sender_address.copy_from_slice(&bytes[0..32]);
-        receiver_address.copy_from_slice(&bytes[32..64]);
-        signature.copy_from_slice(&bytes[64..128]);
-        amount.copy_from_slice(&bytes[128..]);
-        Some(Self {
-            sender_address: PublicKey::from_bytes(sender_address).unwrap(),
-            receiver_address: PublicKey::from_bytes(receiver_address).unwrap(),
-            signature: Signature::from_bytes(signature).unwrap(),
-            amount: u64::from_be_bytes(amount),
-        })
+        signature.copy_from_slice(&bytes[0..64]);
+        transaction_data.copy_from_slice(&bytes[64..]);
+        Some(Self(
+            Signature::from_bytes(signature).unwrap(),
+            TransactionData::from_bytes(transaction_data).unwrap(),
+        ))
     }
 
     fn to_bytes(self) -> [u8; Self::LENGTH] {
         let mut bytes = [0u8; 136];
-        bytes[0..32].copy_from_slice(&self.sender_address.to_bytes());
-        bytes[32..64].copy_from_slice(&self.receiver_address.to_bytes());
-        bytes[64..128].copy_from_slice(&self.signature.to_bytes());
-        bytes[128..].copy_from_slice(&self.amount.to_be_bytes());
+        bytes[0..64].copy_from_slice(&self.0.to_bytes());
+        bytes[64..].copy_from_slice(&self.1.to_bytes());
         bytes
     }
 }
 
-#[derive(Default, Copy, Clone)]
+impl SigUtils<72> for TransactionData {
+    fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+        let mut sender_address = [0_u8; 32];
+        let mut receiver_address = [0_u8; 32];
+        let mut amount = [0_u8; 8];
+
+        sender_address.copy_from_slice(&bytes[0..32]);
+        receiver_address.copy_from_slice(&bytes[32..64]);
+        amount.copy_from_slice(&bytes[64..]);
+        Some(Self {
+            sender_address: PublicKey::from_bytes(sender_address).unwrap(),
+            receiver_address: PublicKey::from_bytes(receiver_address).unwrap(),
+            amount: u64::from_le_bytes(amount),
+        })
+    }
+
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
+        let mut bytes = [0u8; 72];
+        bytes[0..32].copy_from_slice(&self.sender_address.to_bytes());
+        bytes[32..64].copy_from_slice(&self.receiver_address.to_bytes());
+        bytes[64..].copy_from_slice(&self.amount.to_le_bytes());
+        bytes
+    }
+}
+
+#[derive(Debug, Default, Copy, Clone)]
 pub(crate) struct UserData {
     index: u64,
     balance: u64,
@@ -66,53 +85,85 @@ impl SigUtils<56> for UserData {
         address.copy_from_slice(&bytes[16..48]);
         nonce.copy_from_slice(&bytes[48..]);
         Some(Self {
-            index: u64::from_be_bytes(index),
-            balance: u64::from_be_bytes(balance),
+            index: u64::from_le_bytes(index),
+            balance: u64::from_le_bytes(balance),
             address: PublicKey::from_bytes(address).unwrap(),
-            nonce: u64::from_be_bytes(nonce),
+            nonce: u64::from_le_bytes(nonce),
         })
     }
 
     fn to_bytes(self) -> [u8; Self::LENGTH] {
         let mut bytes = [0u8; 56];
-        bytes[0..8].copy_from_slice(&self.index.to_be_bytes());
-        bytes[8..16].copy_from_slice(&self.balance.to_be_bytes());
+        bytes[0..8].copy_from_slice(&self.index.to_le_bytes());
+        bytes[8..16].copy_from_slice(&self.balance.to_le_bytes());
         bytes[16..48].copy_from_slice(&self.address.to_bytes());
-        bytes[48..].copy_from_slice(&self.nonce.to_be_bytes());
+        bytes[48..].copy_from_slice(&self.nonce.to_le_bytes());
         bytes
     }
 }
 
 impl UserData {
+    pub fn new(index: u64, balance: u64, address: PublicKey) -> Self {
+        Self {
+            index,
+            balance,
+            address,
+            ..Default::default()
+        }
+    }
+
     pub fn balance(&self) -> u64 {
         self.balance
     }
 
+    pub fn address(&self) -> PublicKey {
+        self.address
+    }
+
     pub fn to_field_element<F: FftField>(self) -> F {
         let mut field = [0_u8; 64];
-        field.copy_from_slice(&self.to_bytes()[0..56]);
+        field[0..56].copy_from_slice(&self.to_bytes()[0..56]);
         F::from_bytes_wide(&field)
     }
 }
 
 impl Transaction {
-    pub fn new(amount: u64) -> Self {
-        Self {
-            amount,
-            ..Default::default()
-        }
-    }
-
     pub fn to_field_element<F: FftField>(self) -> F {
         let mut field = [0_u8; 64];
         field.copy_from_slice(&self.to_bytes()[0..64]);
         F::from_bytes_wide(&field)
     }
 }
+
+impl TransactionData {
+    pub fn new(sender_address: PublicKey, receiver_address: PublicKey, amount: u64) -> Self {
+        Self {
+            sender_address,
+            receiver_address,
+            amount,
+        }
+    }
+
+    pub fn signed(self, secret_key: SecretKey, rand: impl RngCore) -> Transaction {
+        let sig = secret_key.sign(&self.to_bytes(), rand);
+        Transaction(sig, self)
+    }
+}
+
 pub(crate) struct Batch<F: FftField> {
     prev_root: F,
     new_root: F,
     transactions: Vec<Transaction>,
+}
+
+impl<F: FftField> Batch<F> {
+    pub fn transactions(&self) -> &Vec<Transaction> {
+        &self.transactions
+    }
+
+    pub fn roots(&self) -> (F, F) {
+        (self.prev_root, self.new_root)
+    }
 }
 
 #[derive(Default)]
@@ -120,69 +171,82 @@ pub(crate) struct RollupOperator<F: FftField, H: FieldHasher<F, 2>, const N: usi
     state_merkle: SparseMerkleTree<F, H, N>,
     users: BTreeMap<PublicKey, UserData>,
     transactions: Vec<(Transaction, F)>,
+    index_counter: u64,
 }
 
 impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> RollupOperator<F, H, N> {
-    const BATCH_SIZE: usize = 25;
-    pub fn execute_transaction(&mut self, transaction: Transaction, hasher: &H) {
+    const BATCH_SIZE: usize = 2;
+    pub fn execute_transaction(
+        &mut self,
+        transaction: Transaction,
+        hasher: &H,
+    ) -> Option<Batch<F>> {
+        let Transaction(signature, transaction_data) = transaction;
         let sender = self
             .users
-            .get_mut(&transaction.sender_address)
+            .get_mut(&transaction_data.sender_address)
             .expect("Sender is not presented in the state");
 
         let sender_index = sender.index;
 
-        let sender_hash = sender.to_field_element();
-
         self.state_merkle
             .generate_membership_proof(sender_index)
-            .check_membership(&self.state_merkle.root(), &sender_hash, hasher)
+            .check_membership(
+                &self.state_merkle.root(),
+                &sender.to_field_element(),
+                hasher,
+            )
             .expect("Sender is not presented in the state");
 
-        transaction
+        assert!(transaction_data
             .sender_address
-            .validate(&transaction.to_bytes(), transaction.signature);
+            .validate(&transaction_data.to_bytes(), signature));
 
-        assert!(sender.balance >= transaction.amount);
-        sender.balance -= transaction.amount;
-        let sender_hash = sender.to_field_element();
+        assert!(sender.balance >= transaction_data.amount);
 
+        assert!(sender.balance >= transaction_data.amount);
+        sender.balance -= transaction_data.amount;
         self.state_merkle
-            .update(sender_index, sender_hash, hasher)
+            .update(sender_index, sender.to_field_element(), hasher)
             .expect("Failed to update balance");
 
         let intermediate_root = self.state_merkle.root();
 
         let receiver = self
             .users
-            .get_mut(&transaction.receiver_address)
+            .get_mut(&transaction_data.receiver_address)
             .expect("Sender is not presented in the state");
 
         let receiver_index = receiver.index;
-        let receiver_hash = receiver.to_field_element();
 
         self.state_merkle
             .generate_membership_proof(receiver_index)
-            .check_membership(&self.state_merkle.root(), &receiver_hash, hasher)
+            .check_membership(
+                &self.state_merkle.root(),
+                &receiver.to_field_element(),
+                hasher,
+            )
             .expect("Sender is not presented in the state");
 
-        receiver.balance += transaction.amount;
-        let receiver_hash = receiver.to_field_element();
+        receiver.balance += transaction_data.amount;
 
         self.state_merkle
-            .update(receiver_index, receiver_hash, hasher)
+            .update(receiver_index, receiver.to_field_element(), hasher)
             .expect("Failed to update balance");
 
         self.transactions
             .push((transaction, self.state_merkle.root()));
 
-        if self.transactions.len() > Self::BATCH_SIZE {
-            self.create_batch();
+        if self.transactions.len() >= Self::BATCH_SIZE {
+            Some(self.create_batch())
             // create merkle tree
             //self.create_proof();
             // send proof to Verifier contract
+        } else {
+            None
         }
     }
+
     pub fn create_batch(&mut self) -> Batch<F> {
         let batch = Batch {
             prev_root: self.transactions[0].1,
@@ -204,5 +268,22 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> RollupOperator<F, H, N> 
         state_roots: Vec<F>,
     ) -> Proof {
         Proof {}
+    }
+
+    pub fn state_root(&self) -> F {
+        self.state_merkle.root()
+    }
+
+    pub(crate) fn process_deposits(&mut self, txs: Vec<Transaction>, hasher: &H) {
+        for t in txs {
+            let user = UserData::new(self.index_counter, t.1.amount, t.1.sender_address);
+            self.users.insert(user.address, user);
+            self.index_counter += 1;
+
+            self.state_merkle
+                .update(user.index, user.to_field_element(), hasher)
+                .expect("Failed to update user info");
+            // self.transactions.push((t, self.state_root()));
+        }
     }
 }

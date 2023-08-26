@@ -1,16 +1,26 @@
+use red_jubjub::PublicKey;
 use zkstd::common::FftField;
 
 use crate::{merkle_tree::MerkleProof, operator::Transaction};
 
-#[derive(Default)]
 pub(crate) struct MainContract<F: FftField> {
+    address: PublicKey,
     pub(crate) rollup_state_root: F,
     deposits: Vec<Transaction>,
 }
 
+impl<F: FftField> Default for MainContract<F> {
+    fn default() -> Self {
+        Self {
+            address: Default::default(),
+            rollup_state_root: Default::default(),
+            deposits: Default::default(),
+        }
+    }
+}
+
 impl<F: FftField> MainContract<F> {
-    pub fn deposit(&mut self, amount: u64) {
-        let t = Transaction::new(amount);
+    pub fn deposit(&mut self, t: Transaction) {
         self.deposits.push(t);
     }
 
@@ -36,5 +46,21 @@ impl<F: FftField> MainContract<F> {
         // merkle_verify(merkle_proof, self.rollup_state_root);
         // get_balance()
         0
+    }
+
+    pub fn deposits(&self) -> &Vec<Transaction> {
+        &self.deposits
+    }
+
+    pub(crate) fn new(address: PublicKey) -> Self {
+        Self {
+            address,
+            rollup_state_root: F::zero(),
+            deposits: vec![],
+        }
+    }
+
+    pub(crate) fn address(&self) -> PublicKey {
+        self.address
     }
 }
