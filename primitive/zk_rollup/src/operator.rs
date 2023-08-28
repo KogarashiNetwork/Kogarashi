@@ -1,10 +1,9 @@
-use std::collections::BTreeMap;
-
 use rand_core::RngCore;
 use red_jubjub::{PublicKey, SecretKey, Signature};
 use zkstd::common::{FftField, SigUtils};
 
 use crate::{
+    db::Db,
     merkle_tree::{MerkleProof, SparseMerkleTree},
     poseidon::FieldHasher,
     proof::Proof,
@@ -65,7 +64,7 @@ impl SigUtils<72> for TransactionData {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub(crate) struct UserData {
     index: u64,
     balance: u64,
@@ -169,23 +168,29 @@ impl<F: FftField> Batch<F> {
 #[derive(Default)]
 pub(crate) struct RollupOperator<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
     state_merkle: SparseMerkleTree<F, H, N>,
-    users: BTreeMap<PublicKey, UserData>,
+    db: Db,
     transactions: Vec<(Transaction, F)>,
     index_counter: u64,
 }
 
 impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> RollupOperator<F, H, N> {
     const BATCH_SIZE: usize = 2;
+
+    pub fn new(hasher: &H) -> Self {
+        Self {
+            state_merkle: SparseMerkleTree::new_empty(hasher, &[0; 64])
+                .expect("Failed to create state merkle tree"),
+            ..Default::default()
+        }
+    }
+
     pub fn execute_transaction(
         &mut self,
         transaction: Transaction,
         hasher: &H,
     ) -> Option<Batch<F>> {
         let Transaction(signature, transaction_data) = transaction;
-        let sender = self
-            .users
-            .get_mut(&transaction_data.sender_address)
-            .expect("Sender is not presented in the state");
+        let sender = self.db.get_mut(&transaction_data.sender_address);
 
         let sender_index = sender.index;
 
@@ -212,10 +217,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> RollupOperator<F, H, N> 
 
         let intermediate_root = self.state_merkle.root();
 
-        let receiver = self
-            .users
-            .get_mut(&transaction_data.receiver_address)
-            .expect("Sender is not presented in the state");
+        let receiver = self.db.get_mut(&transaction_data.receiver_address);
 
         let receiver_index = receiver.index;
 
@@ -277,7 +279,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> RollupOperator<F, H, N> 
     pub(crate) fn process_deposits(&mut self, txs: Vec<Transaction>, hasher: &H) {
         for t in txs {
             let user = UserData::new(self.index_counter, t.1.amount, t.1.sender_address);
-            self.users.insert(user.address, user);
+            self.db.insert(user.address, user);
             self.index_counter += 1;
 
             self.state_merkle

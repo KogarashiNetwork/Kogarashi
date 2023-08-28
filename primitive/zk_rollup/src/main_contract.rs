@@ -3,20 +3,11 @@ use zkstd::common::FftField;
 
 use crate::{merkle_tree::MerkleProof, operator::Transaction};
 
+#[derive(Default)]
 pub(crate) struct MainContract<F: FftField> {
     address: PublicKey,
     pub(crate) rollup_state_root: F,
     deposits: Vec<Transaction>,
-}
-
-impl<F: FftField> Default for MainContract<F> {
-    fn default() -> Self {
-        Self {
-            address: Default::default(),
-            rollup_state_root: Default::default(),
-            deposits: Default::default(),
-        }
-    }
 }
 
 impl<F: FftField> MainContract<F> {
@@ -52,10 +43,10 @@ impl<F: FftField> MainContract<F> {
         &self.deposits
     }
 
-    pub(crate) fn new(address: PublicKey) -> Self {
+    pub(crate) fn new(rollup_state_root: F, address: PublicKey) -> Self {
         Self {
             address,
-            rollup_state_root: F::zero(),
+            rollup_state_root,
             deposits: vec![],
         }
     }
