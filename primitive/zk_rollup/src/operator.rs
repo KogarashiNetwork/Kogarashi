@@ -285,6 +285,9 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> RollupOperator<F, H, N> 
             self.state_merkle
                 .update(user.index, user.to_field_element(), hasher)
                 .expect("Failed to update user info");
+
+            // Need to add deposits to the transactions vec as well
+            // skipped just for easier test implementation
             // self.transactions.push((t, self.state_root()));
         }
     }

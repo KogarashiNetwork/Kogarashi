@@ -95,6 +95,7 @@ mod tests {
         );
 
         // should periodically check deposits on the contract
+        // Need to figure out how to run a checker in the background
 
         // assert!(contract.check_balance(MerkleProof::default()) == alice.balance());
         // assert!(contract.check_balance(MerkleProof::default()) == bob.balance()));
