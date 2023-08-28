@@ -188,7 +188,7 @@ impl Add for G1Affine {
     type Output = G1Projective;
 
     fn add(self, rhs: G1Affine) -> Self::Output {
-        add_projective_point(self.to_extended(), rhs.to_extended())
+        add_affine_point(self, rhs)
     }
 }
 
@@ -208,7 +208,7 @@ impl Sub for G1Affine {
     type Output = G1Projective;
 
     fn sub(self, rhs: G1Affine) -> Self::Output {
-        add_projective_point(self.to_extended(), rhs.neg().to_extended())
+        add_affine_point(self, rhs.neg())
     }
 }
 

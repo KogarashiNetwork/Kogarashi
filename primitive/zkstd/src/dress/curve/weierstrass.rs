@@ -65,7 +65,25 @@ macro_rules! weierstrass_curve_operation {
             }
         }
 
-        impl WeierstrassAffine for $affine {}
+        impl WeierstrassAffine for $affine {
+            type Projective = $projective;
+
+            fn to_projective(self) -> $projective {
+                if self.is_identity() {
+                    $projective::ADDITIVE_IDENTITY
+                } else {
+                    $projective {
+                        x: self.x,
+                        y: self.y,
+                        z: Self::Range::one(),
+                    }
+                }
+            }
+
+            fn new_projective(x: Self::Range, y: Self::Range, z: Self::Range) -> Self::Projective {
+                $projective::new(x, y, z)
+            }
+        }
 
         impl Curve for $projective {
             type Range = $range;
