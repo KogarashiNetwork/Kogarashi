@@ -6,7 +6,7 @@ mod twisted_edwards_points_tests {
     use construction::jubjub_curve::{BlsScalar, JubjubAffine, JubjubExtended};
     use rand_core::OsRng;
     use zkstd::{
-        arithmetic::edwards::{add_point, double_point},
+        arithmetic::edwards::{add_projective_point, double_projective_point},
         common::{Curve, CurveGroup},
     };
 
@@ -46,8 +46,8 @@ mod twisted_edwards_points_tests {
         let b = JubjubAffine::random(OsRng);
 
         // 2 * (a + b) = 2 * a + 2 * b
-        let c = double_point(add_point(a, b));
-        let d = add_point(double_point(a), double_point(b));
+        let c = double_projective_point(add_projective_point(a, b));
+        let d = add_projective_point(double_projective_point(a), double_projective_point(b));
 
         assert_eq!(c, d);
     }
@@ -58,7 +58,10 @@ mod twisted_edwards_points_tests {
         let a = JubjubAffine::random(OsRng);
 
         // (2 * 2 * 2 * b) + b = 9 * b
-        let b = add_point(a, double_point(double_point(double_point(a))));
+        let b = add_projective_point(
+            a,
+            double_projective_point(double_projective_point(double_projective_point(a))),
+        );
         let c = a * r;
 
         assert_eq!(b, c);

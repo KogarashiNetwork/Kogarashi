@@ -32,3 +32,7 @@ serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 [[test]]
 name = "arithmetics"
 path = "tests/limbs.rs"
+
+[features]
+default = ["std"]
+std = ["rand_core/getrandom"]

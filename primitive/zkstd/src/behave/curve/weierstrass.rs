@@ -18,10 +18,14 @@ pub trait WeierstrassCurve:
 
 /// rational point affine representation
 /// affine representation check that a point is infinite by the struct field
-pub trait WeierstrassAffine: WeierstrassCurve + Affine {}
+pub trait WeierstrassAffine: WeierstrassCurve + Affine {
+    type Projective: WeierstrassProjective;
+    fn to_projective(self) -> Self::Projective;
+    fn new_projective(x: Self::Range, y: Self::Range, z: Self::Range) -> Self::Projective;
+}
 
 /// rational point projective representation
 /// projective representation check that a point is infinite by z coordinate
-pub trait Projective: WeierstrassCurve + CurveExtended {
+pub trait WeierstrassProjective: WeierstrassCurve + CurveExtended {
     fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self;
 }

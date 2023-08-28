@@ -4,12 +4,15 @@ use crate::common::{CurveGroup, PrimeField, TwistedEdwardsExtended};
 /// twisted edwards coordinate addition
 /// 10M + 4A + 3B
 #[inline(always)]
-pub fn add_point<P: TwistedEdwardsExtended>(lhs: P, rhs: P) -> P {
-    let a = lhs.get_x() * rhs.get_x();
-    let b = lhs.get_y() * rhs.get_y();
-    let c = P::PARAM_D * lhs.get_t() * rhs.get_t();
-    let d = lhs.get_z() * rhs.get_z();
-    let e = (lhs.get_x() + lhs.get_y()) * (rhs.get_x() + rhs.get_y()) - a - b;
+pub fn add_projective_point<P: TwistedEdwardsExtended>(lhs: P, rhs: P) -> P {
+    let (x0, y0, z0, t0) = (lhs.get_x(), lhs.get_y(), lhs.get_z(), lhs.get_t());
+    let (x1, y1, z1, t1) = (rhs.get_x(), rhs.get_y(), rhs.get_z(), rhs.get_t());
+
+    let a = x0 * x1;
+    let b = y0 * y1;
+    let c = P::PARAM_D * t0 * t1;
+    let d = z0 * z1;
+    let e = (x0 + y0) * (x1 + y1) - a - b;
     let f = d - c;
     let g = d + c;
     let h = b + a;
@@ -25,12 +28,14 @@ pub fn add_point<P: TwistedEdwardsExtended>(lhs: P, rhs: P) -> P {
 /// twisted edwards coordinate doubling
 /// 4M + 4S + 1D + 4B + 1A
 #[inline(always)]
-pub fn double_point<P: TwistedEdwardsExtended>(lhs: P) -> P {
-    let a = lhs.get_x().square();
-    let b = lhs.get_y().square();
-    let c = lhs.get_z().square().double();
+pub fn double_projective_point<P: TwistedEdwardsExtended>(lhs: P) -> P {
+    let (x, y, z) = (lhs.get_x(), lhs.get_y(), lhs.get_z());
+
+    let a = x.square();
+    let b = y.square();
+    let c = z.square().double();
     let d = -a;
-    let e = (lhs.get_x() + lhs.get_y()).square() - a - b;
+    let e = (x + y).square() - a - b;
     let g = d + b;
     let f = g - c;
     let h = d - b;

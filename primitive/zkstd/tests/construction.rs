@@ -147,7 +147,7 @@ pub mod jubjub_curve {
         type Output = JubjubExtended;
 
         fn add(self, rhs: JubjubAffine) -> Self::Output {
-            add_point(self.to_extended(), rhs.to_extended())
+            add_projective_point(self.to_extended(), rhs.to_extended())
         }
     }
 
@@ -166,7 +166,7 @@ pub mod jubjub_curve {
         type Output = JubjubExtended;
 
         fn sub(self, rhs: JubjubAffine) -> Self::Output {
-            add_point(self.to_extended(), rhs.neg().to_extended())
+            add_projective_point(self.to_extended(), rhs.neg().to_extended())
         }
     }
 
@@ -198,7 +198,7 @@ pub mod jubjub_curve {
         type Output = JubjubExtended;
 
         fn add(self, rhs: JubjubExtended) -> Self::Output {
-            add_point(self, rhs)
+            add_projective_point(self, rhs)
         }
     }
 
@@ -219,7 +219,7 @@ pub mod jubjub_curve {
         type Output = JubjubExtended;
 
         fn sub(self, rhs: JubjubExtended) -> Self::Output {
-            add_point(self, rhs.neg())
+            add_projective_point(self, rhs.neg())
         }
     }
 

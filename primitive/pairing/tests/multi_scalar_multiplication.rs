@@ -1,10 +1,10 @@
 use bls_12_381::{Fr, G1Affine, G1Projective};
 use ec_pairing::{msm_curve_addtion, TatePairing};
 use rand_core::OsRng;
-use zkstd::behave::{Group, Projective};
+use zkstd::behave::{Group, WeierstrassProjective};
 use zkstd::common::{Affine, CurveGroup};
 
-fn customized_scalar_point<P: Projective<Extended = P>>(point: P, scalar: &Fr) -> P {
+fn customized_scalar_point<P: WeierstrassProjective<Extended = P>>(point: P, scalar: &Fr) -> P {
     let mut res = P::ADDITIVE_IDENTITY;
     let one = point;
     let two = one + point;

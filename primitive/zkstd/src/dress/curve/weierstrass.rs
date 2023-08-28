@@ -26,7 +26,7 @@ macro_rules! weierstrass_curve_operation {
             const PARAM_A: $range = $a;
 
             fn double(self) -> $projective {
-                double_point(self.to_extended())
+                double_projective_point(self.to_extended())
             }
 
             fn is_on_curve(self) -> bool {
@@ -65,7 +65,25 @@ macro_rules! weierstrass_curve_operation {
             }
         }
 
-        impl WeierstrassAffine for $affine {}
+        impl WeierstrassAffine for $affine {
+            type Projective = $projective;
+
+            fn to_projective(self) -> $projective {
+                if self.is_identity() {
+                    $projective::ADDITIVE_IDENTITY
+                } else {
+                    $projective {
+                        x: self.x,
+                        y: self.y,
+                        z: Self::Range::one(),
+                    }
+                }
+            }
+
+            fn new_projective(x: Self::Range, y: Self::Range, z: Self::Range) -> Self::Projective {
+                $projective::new(x, y, z)
+            }
+        }
 
         impl Curve for $projective {
             type Range = $range;
@@ -73,7 +91,7 @@ macro_rules! weierstrass_curve_operation {
             const PARAM_A: $range = $a;
 
             fn double(self) -> Self {
-                double_point(self)
+                double_projective_point(self)
             }
 
             fn is_on_curve(self) -> bool {
@@ -116,7 +134,7 @@ macro_rules! weierstrass_curve_operation {
             }
         }
 
-        impl Projective for $projective {
+        impl WeierstrassProjective for $projective {
             fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self {
                 Self { x, y, z }
             }
