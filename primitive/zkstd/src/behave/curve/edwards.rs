@@ -16,6 +16,12 @@ pub trait TwistedEdwardsCurve:
 
 pub trait TwistedEdwardsAffine: TwistedEdwardsCurve + Affine {
     fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self;
+    fn new_extended(
+        x: Self::Range,
+        y: Self::Range,
+        t: Self::Range,
+        z: Self::Range,
+    ) -> Self::Extended;
 }
 
 pub trait TwistedEdwardsExtended: TwistedEdwardsCurve + CurveExtended {

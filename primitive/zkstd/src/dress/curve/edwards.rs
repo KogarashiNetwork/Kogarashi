@@ -24,7 +24,7 @@ macro_rules! twisted_edwards_curve_operation {
             const PARAM_A: $scalar = $scalar::one();
 
             fn double(self) -> Self::Extended {
-                double_projective_point(self.to_extended())
+                double_affine_point(self)
             }
 
             fn is_on_curve(self) -> bool {
@@ -65,6 +65,15 @@ macro_rules! twisted_edwards_curve_operation {
         impl TwistedEdwardsAffine for $affine {
             fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self {
                 Self { x, y }
+            }
+
+            fn new_extended(
+                x: Self::Range,
+                y: Self::Range,
+                t: Self::Range,
+                z: Self::Range,
+            ) -> Self::Extended {
+                Self::Extended { x, y, t, z }
             }
         }
 
