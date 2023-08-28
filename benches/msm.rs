@@ -1,7 +1,5 @@
-use bls_12_381::Fr;
-use bls_12_381::G1Affine;
-use criterion::{black_box, BenchmarkId};
-use criterion::{criterion_group, criterion_main, Criterion};
+use bls_12_381::{Fr, G1Affine};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use ec_pairing::{msm_curve_addtion, TatePairing};
 use rand::rngs::OsRng;
 use zkstd::common::{CurveGroup, Group};

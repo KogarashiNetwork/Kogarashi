@@ -1,15 +1,13 @@
-use bls_12_381::{Fr, G1Projective, G2Projective};
-use bls_12_381::{G1Affine, G2Affine};
-use criterion::black_box;
-use criterion::{criterion_group, criterion_main, Criterion};
+use bls_12_381::{Fr, G1Affine, G1Projective, G2Affine, G2Projective};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rand::rngs::OsRng;
-use zkstd::common::{Curve, CurveGroup, Group};
+use zkstd::common::{Curve, CurveExtended, CurveGroup, Group};
 
 fn bench_g1_affine(c: &mut Criterion) {
     let mut group = c.benchmark_group("g1_affine");
 
-    let p1 = G1Affine::random(OsRng);
-    let p2 = G1Affine::random(OsRng);
+    let p1 = G1Affine::random(OsRng).to_affine();
+    let p2 = G1Affine::random(OsRng).to_affine();
     let k = Fr::random(OsRng);
 
     group.bench_function("add", |b| {

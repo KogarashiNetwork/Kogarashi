@@ -1,5 +1,4 @@
-use bls_12_381::{Fq12, Fr, G2PairingAffine};
-use bls_12_381::{G1Affine, G2Affine};
+use bls_12_381::{Fq12, Fr, G1Affine, G2Affine, G2PairingAffine};
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use ec_pairing::TatePairing;
 use rand::rngs::OsRng;

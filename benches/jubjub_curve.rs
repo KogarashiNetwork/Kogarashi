@@ -1,7 +1,5 @@
-use criterion::black_box;
-use criterion::{criterion_group, criterion_main, Criterion};
-use jub_jub::Fp;
-use jub_jub::JubjubExtended;
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use jub_jub::{Fp, JubjubExtended};
 use rand::rngs::OsRng;
 use zkstd::common::{Curve, CurveGroup, Group};
 
