@@ -14,7 +14,7 @@ impl<F: FftField, const L: usize> Poseidon<F, L> {
     }
 }
 
-pub trait FieldHasher<F: FftField, const L: usize> {
+pub trait FieldHasher<F: FftField, const L: usize>: Default + Send + Sync {
     fn hash(&self, inputs: [F; L]) -> Result<F>;
     fn hasher() -> Self;
 }

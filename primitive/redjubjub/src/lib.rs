@@ -48,7 +48,28 @@ mod tests {
     use super::*;
     use jub_jub::Fp;
     use rand_core::OsRng;
-    use zkstd::behave::Group;
+    use zkstd::{behave::Group, common::SigUtils};
+
+    #[test]
+    fn sig_utils() {
+        let randomness = OsRng;
+        let msg = b"test";
+        let secret = SecretKey(Fp::random(OsRng));
+        let sig = secret.sign(msg, randomness);
+        let pub_key = secret.to_public_key();
+
+        let sig_bytes = sig.to_bytes();
+        let sig_back = Signature::from_bytes(sig_bytes).unwrap();
+        assert_eq!(sig, sig_back);
+
+        let pub_key_bytes = pub_key.to_bytes();
+        let pub_key_back = PublicKey::from_bytes(pub_key_bytes).unwrap();
+        assert_eq!(pub_key, pub_key_back);
+
+        let secret_bytes = secret.to_bytes();
+        let secret_back = SecretKey::from_bytes(secret_bytes).unwrap();
+        assert_eq!(secret, secret_back);
+    }
 
     #[test]
     fn signature_test() {

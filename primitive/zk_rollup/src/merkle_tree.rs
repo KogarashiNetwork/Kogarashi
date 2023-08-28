@@ -203,6 +203,10 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
         self.update(index, self.empty_hashes[0], hasher)
     }
 
+    pub fn new_empty(hasher: &H, empty_leaf: &[u8; 64]) -> Result<Self, Error> {
+        Self::new_sequential(&[], hasher, empty_leaf)
+    }
+
     /// Creates a new Sparse Merkle Tree from a map of indices to field
     /// elements.
     pub fn new(
