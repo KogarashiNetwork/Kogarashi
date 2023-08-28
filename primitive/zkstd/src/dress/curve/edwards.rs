@@ -24,7 +24,7 @@ macro_rules! twisted_edwards_curve_operation {
             const PARAM_A: $scalar = $scalar::one();
 
             fn double(self) -> Self::Extended {
-                double_point(self.to_extended())
+                double_projective_point(self.to_extended())
             }
 
             fn is_on_curve(self) -> bool {
@@ -74,7 +74,7 @@ macro_rules! twisted_edwards_curve_operation {
             const PARAM_A: $scalar = $scalar::one();
 
             fn double(self) -> Self {
-                double_point(self)
+                double_projective_point(self)
             }
 
             fn is_on_curve(self) -> bool {

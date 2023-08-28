@@ -4,7 +4,7 @@ use crate::common::{CurveGroup, PrimeField, TwistedEdwardsExtended};
 /// twisted edwards coordinate addition
 /// 10M + 4A + 3B
 #[inline(always)]
-pub fn add_point<P: TwistedEdwardsExtended>(lhs: P, rhs: P) -> P {
+pub fn add_projective_point<P: TwistedEdwardsExtended>(lhs: P, rhs: P) -> P {
     let (x0, y0, z0, t0) = (lhs.get_x(), lhs.get_y(), lhs.get_z(), lhs.get_t());
     let (x1, y1, z1, t1) = (rhs.get_x(), rhs.get_y(), rhs.get_z(), rhs.get_t());
 
@@ -28,7 +28,7 @@ pub fn add_point<P: TwistedEdwardsExtended>(lhs: P, rhs: P) -> P {
 /// twisted edwards coordinate doubling
 /// 4M + 4S + 1D + 4B + 1A
 #[inline(always)]
-pub fn double_point<P: TwistedEdwardsExtended>(lhs: P) -> P {
+pub fn double_projective_point<P: TwistedEdwardsExtended>(lhs: P) -> P {
     let (x, y, z) = (lhs.get_x(), lhs.get_y(), lhs.get_z());
 
     let a = x.square();

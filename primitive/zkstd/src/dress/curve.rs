@@ -119,7 +119,7 @@ macro_rules! mixed_curve_operations {
             type Output = $extended;
 
             fn add(self, rhs: $extended) -> $extended {
-                add_point(self.to_extended(), rhs)
+                add_projective_point(self.to_extended(), rhs)
             }
         }
 
@@ -151,7 +151,7 @@ macro_rules! mixed_curve_operations {
             type Output = $extended;
 
             fn sub(self, rhs: $extended) -> $extended {
-                add_point(self.to_extended(), -rhs)
+                add_projective_point(self.to_extended(), -rhs)
             }
         }
 
@@ -183,7 +183,7 @@ macro_rules! mixed_curve_operations {
             type Output = $extended;
 
             fn add(self, rhs: $affine) -> $extended {
-                add_point(self, rhs.to_extended())
+                add_projective_point(self, rhs.to_extended())
             }
         }
 
@@ -215,7 +215,7 @@ macro_rules! mixed_curve_operations {
             type Output = $extended;
 
             fn sub(self, rhs: $affine) -> $extended {
-                add_point(self, -rhs.to_extended())
+                add_projective_point(self, -rhs.to_extended())
             }
         }
 
@@ -245,25 +245,25 @@ macro_rules! mixed_curve_operations {
 
         impl AddAssign<$affine> for $extended {
             fn add_assign(&mut self, rhs: $affine) {
-                *self = add_point(*self, rhs.to_extended())
+                *self = add_projective_point(*self, rhs.to_extended())
             }
         }
 
         impl<'a> AddAssign<&'a $affine> for $extended {
             fn add_assign(&mut self, rhs: &'a $affine) {
-                *self = add_point(*self, rhs.to_extended())
+                *self = add_projective_point(*self, rhs.to_extended())
             }
         }
 
         impl SubAssign<$affine> for $extended {
             fn sub_assign(&mut self, rhs: $affine) {
-                *self = add_point(*self, -rhs.to_extended())
+                *self = add_projective_point(*self, -rhs.to_extended())
             }
         }
 
         impl<'a> SubAssign<&'a $affine> for $extended {
             fn sub_assign(&mut self, rhs: &'a $affine) {
-                *self = add_point(*self, -rhs.to_extended())
+                *self = add_projective_point(*self, -rhs.to_extended())
             }
         }
     };

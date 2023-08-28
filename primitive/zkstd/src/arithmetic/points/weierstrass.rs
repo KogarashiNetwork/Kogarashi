@@ -3,7 +3,7 @@ use crate::common::{CurveGroup, PrimeField, Projective, WeierstrassCurve};
 
 /// weierstrass projective coordinate addition
 #[inline(always)]
-pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
+pub fn add_projective_point<P: Projective>(lhs: P, rhs: P) -> P {
     let (x0, y0, z0) = (lhs.get_x(), lhs.get_y(), lhs.get_z());
     let (x1, y1, z1) = (rhs.get_x(), rhs.get_y(), rhs.get_z());
 
@@ -20,7 +20,7 @@ pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
 
     if u1 == u2 {
         if s1 == s2 {
-            return double_point(lhs);
+            return double_projective_point(lhs);
         } else {
             return <P as CurveGroup>::ADDITIVE_IDENTITY;
         }
@@ -42,7 +42,7 @@ pub fn add_point<P: Projective>(lhs: P, rhs: P) -> P {
 
 /// weierstrass projective coordinate doubling
 #[inline(always)]
-pub fn double_point<P: Projective>(point: P) -> P {
+pub fn double_projective_point<P: Projective>(point: P) -> P {
     // Algorithm 9, https://eprint.iacr.org/2015/1060.pdf
     if point.is_identity() {
         <P as CurveGroup>::ADDITIVE_IDENTITY

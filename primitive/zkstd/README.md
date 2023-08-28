@@ -166,7 +166,7 @@ impl Add for JubjubAffine {
     type Output = JubjubExtended;
 
     fn add(self, rhs: JubjubAffine) -> Self::Output {
-        add_point(self.to_extended(), rhs.to_extended())
+        add_projective_point(self.to_extended(), rhs.to_extended())
     }
 }
 
@@ -185,7 +185,7 @@ impl Sub for JubjubAffine {
     type Output = JubjubExtended;
 
     fn sub(self, rhs: JubjubAffine) -> Self::Output {
-        add_point(self.to_extended(), rhs.neg().to_extended())
+        add_projective_point(self.to_extended(), rhs.neg().to_extended())
     }
 }
 
@@ -225,7 +225,7 @@ impl Add for JubjubExtended {
     type Output = JubjubExtended;
 
     fn add(self, rhs: JubjubExtended) -> Self::Output {
-        add_point(self, rhs)
+        add_projective_point(self, rhs)
     }
 }
 
@@ -246,7 +246,7 @@ impl Sub for JubjubExtended {
     type Output = JubjubExtended;
 
     fn sub(self, rhs: JubjubExtended) -> Self::Output {
-        add_point(self, rhs.neg())
+        add_projective_point(self, rhs.neg())
     }
 }
 
