@@ -116,7 +116,7 @@ macro_rules! weierstrass_curve_operation {
             }
         }
 
-        impl Projective for $projective {
+        impl WeierstrassProjective for $projective {
             fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self {
                 Self { x, y, z }
             }

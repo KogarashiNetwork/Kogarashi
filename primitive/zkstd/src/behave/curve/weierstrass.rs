@@ -22,6 +22,6 @@ pub trait WeierstrassAffine: WeierstrassCurve + Affine {}
 
 /// rational point projective representation
 /// projective representation check that a point is infinite by z coordinate
-pub trait Projective: WeierstrassCurve + CurveExtended {
+pub trait WeierstrassProjective: WeierstrassCurve + CurveExtended {
     fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self;
 }

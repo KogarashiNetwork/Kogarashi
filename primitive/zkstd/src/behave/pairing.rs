@@ -11,8 +11,8 @@ use super::{
     comp::{Basic, ParityCmp},
     curve::Affine,
     sign::SigUtils,
-    Curve, CurveExtended, FftField, Group, Projective, TwistedEdwardsAffine, TwistedEdwardsCurve,
-    TwistedEdwardsExtended, WeierstrassAffine,
+    Curve, CurveExtended, FftField, Group, TwistedEdwardsAffine, TwistedEdwardsCurve,
+    TwistedEdwardsExtended, WeierstrassAffine, WeierstrassProjective,
 };
 
 /// extension field
@@ -40,7 +40,7 @@ pub trait PairingRange: ExtensionField {
 }
 
 /// G2 group pairing interface
-pub trait G2Pairing: Projective {
+pub trait G2Pairing: WeierstrassProjective {
     type PairingRange: PairingRange;
     type PairingCoeff: ParityCmp;
     type PairingRepr: ParityCmp;
@@ -80,7 +80,7 @@ pub trait Pairing:
         + Encode
         + Decode;
     // g1 group projective point
-    type G1Projective: Projective<
+    type G1Projective: WeierstrassProjective<
             Affine = Self::G1Affine,
             Extended = Self::G1Projective,
             Scalar = Self::ScalarField,
@@ -91,7 +91,7 @@ pub trait Pairing:
         + PartialEq
         + Eq;
     // g2 group projective point
-    type G2Projective: Projective<
+    type G2Projective: WeierstrassProjective<
             Affine = Self::G2Affine,
             Extended = Self::G2Projective,
             Scalar = Self::ScalarField,
