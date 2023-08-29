@@ -3,6 +3,7 @@
 mod db;
 mod domain;
 mod main_contract;
+mod merkle_circuit;
 mod merkle_tree;
 mod operator;
 mod poseidon;
