@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use red_jubjub::PublicKey;
 
-use crate::operator::UserData;
+use crate::domain::UserData;
 
 #[derive(Default)]
 pub(crate) struct Db {
