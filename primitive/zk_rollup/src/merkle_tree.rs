@@ -65,23 +65,23 @@ impl core::fmt::Display for MerkleError {
 
 impl std::error::Error for MerkleError {}
 
-#[derive(Default)]
-pub(crate) struct MerkleProof<F: FftField>(Vec<F>);
+// #[derive(Default)]
+// pub(crate) struct MerkleProof<F: FftField>(Vec<F>);
 
-/// The Path struct.
+/// The MerkleProof struct.
 ///
-/// The path contains a sequence of sibling nodes that make up a merkle proof.
+/// Contains a sequence of sibling nodes that make up a merkle proof.
 /// Each pair is used to identify whether an incremental merkle root
 /// construction is valid at each intermediate step.
 #[derive(Clone)]
-pub struct Path<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
+pub struct MerkleProof<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
     /// The path represented as a sequence of sibling pairs.
     pub path: [(F, F); N],
     /// The phantom hasher type used to reconstruct the merkle root.
     pub marker: PhantomData<H>,
 }
 
-impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> Path<F, H, N> {
+impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> MerkleProof<F, H, N> {
     /// Takes in an expected `root_hash` and leaf-level data (i.e. hashes of
     /// secrets) for a leaf and checks that the leaf belongs to a tree having
     /// the expected hash.
@@ -257,7 +257,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
     /// Give the path leading from the leaf at `index` up to the root.  This is
     /// a "proof" in the sense of "valid path in a Merkle tree", not a ZK
     /// argument.
-    pub fn generate_membership_proof(&self, index: u64) -> Path<F, H, N> {
+    pub fn generate_membership_proof(&self, index: u64) -> MerkleProof<F, H, N> {
         let mut path = [(F::zero(), F::zero()); N];
 
         let tree_index = convert_index_to_last_level(index, N);
@@ -282,7 +282,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
             level += 1;
         }
 
-        Path {
+        MerkleProof {
             path,
             marker: PhantomData,
         }
