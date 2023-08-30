@@ -11,10 +11,11 @@ zkstd = { path = "../zkstd", default-features = false }
 jub-jub = { path = "../jubjub", default-features = false }
 ark-std = "0.4.0"
 zero-plonk = { path = "../plonk", default-features = false }
+zksnarks = { path = "../zksnarks", default-features = false }
 ec-pairing = { path = "../pairing", default-features = false }
 red-jubjub = { path = "../redjubjub", default-features = false}
 rand_core = { version="0.6.4", features = ["getrandom"] }
+poly-commit = { path = "../poly", default-features = false }
 
 [dev-dependencies]
 rand = "0.8.5"
-poly-commit = { path = "../poly", default-features = false }

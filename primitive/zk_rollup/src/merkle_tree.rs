@@ -77,6 +77,7 @@ impl std::error::Error for MerkleError {}
 pub struct MerkleProof<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
     /// The path represented as a sequence of sibling pairs.
     pub path: [(F, F); N],
+    pub path_pos: [u64; N],
     /// The phantom hasher type used to reconstruct the merkle root.
     pub marker: PhantomData<H>,
 }
@@ -259,6 +260,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
     /// argument.
     pub fn generate_membership_proof(&self, index: u64) -> MerkleProof<F, H, N> {
         let mut path = [(F::zero(), F::zero()); N];
+        let mut path_pos = [0; N];
 
         let tree_index = convert_index_to_last_level(index, N);
 
@@ -277,6 +279,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
                 path[level] = (current, sibling);
             } else {
                 path[level] = (sibling, current);
+                path_pos[level] = 1;
             }
             current_node = parent(current_node).unwrap();
             level += 1;
@@ -284,6 +287,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
 
         MerkleProof {
             path,
+            path_pos,
             marker: PhantomData,
         }
     }
