@@ -5316,6 +5316,7 @@ dependencies = [
 name = "zksnarks"
 version = "0.1.0"
 dependencies = [
+ "bls-12-381 0.0.12",
  "merlin 3.0.0",
  "parity-scale-codec",
  "poly-commit",

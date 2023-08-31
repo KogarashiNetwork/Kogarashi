@@ -1,8 +1,8 @@
-use zkstd::behave::FftField;
+use zkstd::behave::PrimeField;
 
 /// Each gate expression
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Gate<Selector: FftField> {
+pub struct Gate<Selector: PrimeField> {
     // Selectors
     /// Multiplier
     pub q_m: Selector,
