@@ -59,9 +59,12 @@ macro_rules! prime_extension_field_operation {
                 unimplemented!()
             }
 
-            // TODO should be optimized
             fn double(self) -> Self {
-                self + self
+                let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
+                for i in 0..$limbs_length {
+                    limbs[i] = self.0[i].double();
+                }
+                $extension_field(limbs)
             }
 
             fn square(self) -> Self {

@@ -6,14 +6,14 @@ use crate::common::{
 /// weierstrass affine coordinate addition
 #[inline(always)]
 pub fn add_affine_point<A: WeierstrassAffine>(lhs: A, rhs: A) -> A::Projective {
-    let (x0, y0) = (lhs.get_x(), lhs.get_y());
-    let (x1, y1) = (rhs.get_x(), rhs.get_y());
-
     if lhs.is_identity() {
         return rhs.to_projective();
     } else if rhs.is_identity() {
         return lhs.to_projective();
     }
+
+    let (x0, y0) = (lhs.get_x(), lhs.get_y());
+    let (x1, y1) = (rhs.get_x(), rhs.get_y());
 
     if x0 == x1 {
         if y0 == y1 {
@@ -48,13 +48,11 @@ pub fn double_affine_point<A: WeierstrassAffine>(point: A) -> A::Projective {
 
         let t0 = y.square();
         let z3 = t0.double().double().double();
-        let t1 = y;
-        let t2 = b3;
-        let x3 = t2 * z3;
-        let y3 = t0 + t2;
-        let z3 = t1 * z3;
-        let t1 = t2.double();
-        let t2 = t1 + t2;
+        let x3 = b3 * z3;
+        let y3 = t0 + b3;
+        let z3 = y * z3;
+        let t1 = b3.double();
+        let t2 = t1 + b3;
         let t0 = t0 - t2;
         let y3 = t0 * y3;
         let y3 = x3 + y3;
@@ -69,14 +67,14 @@ pub fn double_affine_point<A: WeierstrassAffine>(point: A) -> A::Projective {
 /// weierstrass projective coordinate addition
 #[inline(always)]
 pub fn add_projective_point<P: WeierstrassProjective>(lhs: P, rhs: P) -> P {
-    let (x0, y0, z0) = (lhs.get_x(), lhs.get_y(), lhs.get_z());
-    let (x1, y1, z1) = (rhs.get_x(), rhs.get_y(), rhs.get_z());
-
     if lhs.is_identity() {
         return rhs;
     } else if rhs.is_identity() {
         return lhs;
     }
+
+    let (x0, y0, z0) = (lhs.get_x(), lhs.get_y(), lhs.get_z());
+    let (x1, y1, z1) = (rhs.get_x(), rhs.get_y(), rhs.get_z());
 
     let s1 = y0 * z1;
     let s2 = y1 * z0;
