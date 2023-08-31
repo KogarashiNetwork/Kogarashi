@@ -89,11 +89,9 @@ macro_rules! peculiar_extension_field_operation {
                 let b_b = self.0[1] * rhs.0[1];
                 let c_c = self.0[2] * rhs.0[2];
 
-                let mut t1 = rhs.0[1];
-                t1 += rhs.0[2];
+                let mut t1 = rhs.0[1] + rhs.0[2];
                 {
-                    let mut tmp = self.0[1];
-                    tmp += self.0[2];
+                    let mut tmp = self.0[1] + self.0[2];
 
                     t1 *= tmp;
                     t1 -= b_b;
@@ -102,11 +100,9 @@ macro_rules! peculiar_extension_field_operation {
                     t1 += a_a;
                 }
 
-                let mut t3 = rhs.0[0];
-                t3 += rhs.0[2];
+                let mut t3 = rhs.0[0] + rhs.0[2];
                 {
-                    let mut tmp = self.0[0];
-                    tmp += self.0[2];
+                    let mut tmp = self.0[0] + self.0[2];
 
                     t3 *= tmp;
                     t3 -= a_a;
@@ -114,11 +110,9 @@ macro_rules! peculiar_extension_field_operation {
                     t3 -= c_c;
                 }
 
-                let mut t2 = rhs.0[0];
-                t2 += rhs.0[1];
+                let mut t2 = rhs.0[0] + rhs.0[1];
                 {
-                    let mut tmp = self.0[0];
-                    tmp += self.0[1];
+                    let mut tmp = self.0[0] + self.0[1];
 
                     t2 *= tmp;
                     t2 -= a_a;
