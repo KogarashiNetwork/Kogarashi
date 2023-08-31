@@ -48,8 +48,8 @@ fn bench_g1_projective(c: &mut Criterion) {
 fn bench_g2_affine(c: &mut Criterion) {
     let mut group = c.benchmark_group("g2_affine");
 
-    let p1 = G2Affine::random(OsRng);
-    let p2 = G2Affine::random(OsRng);
+    let p1 = G2Affine::random(OsRng).to_affine();
+    let p2 = G2Affine::random(OsRng).to_affine();
     let k = Fr::random(OsRng);
 
     group.bench_function("add", |b| {
