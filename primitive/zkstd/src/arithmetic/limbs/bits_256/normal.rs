@@ -5,22 +5,22 @@ pub const fn add(a: [u64; 4], b: [u64; 4], p: [u64; 4]) -> [u64; 4] {
     let (l0, c) = addnc(a[0], b[0]);
     let (l1, c) = adc(a[1], b[1], c);
     let (l2, c) = adc(a[2], b[2], c);
-    let (l3, _) = adc(a[3], b[3], c);
+    let l3 = adcskip(a[3], b[3], c);
 
     sub([l0, l1, l2, l3], p, p)
 }
 
 #[inline(always)]
 pub const fn sub(a: [u64; 4], b: [u64; 4], p: [u64; 4]) -> [u64; 4] {
-    let (l0, brw) = sbb(a[0], b[0], 0);
+    let (l0, brw) = sbbnc(a[0], b[0]);
     let (l1, brw) = sbb(a[1], b[1], brw);
     let (l2, brw) = sbb(a[2], b[2], brw);
     let (l3, brw) = sbb(a[3], b[3], brw);
 
-    let (l0, c) = adc(l0, p[0] & brw, 0);
+    let (l0, c) = addnc(l0, p[0] & brw);
     let (l1, c) = adc(l1, p[1] & brw, c);
     let (l2, c) = adc(l2, p[2] & brw, c);
-    let (l3, _) = adc(l3, p[3] & brw, c);
+    let l3 = adcskip(l3, p[3] & brw, c);
 
     [l0, l1, l2, l3]
 }
@@ -69,7 +69,7 @@ pub const fn square(a: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
     let (l5, l6) = muladd(a[2], a[3], c);
     let (l3, c) = muladd(a[1], a[2], l3);
     let (l4, c) = addnc(l4, c);
-    let (l5, _) = addnc(l5, c);
+    let l5 = addncskip(l5, c);
 
     let (l1, c) = dbc(l1, 0);
     let (l2, c) = dbc(l2, c);
@@ -85,7 +85,7 @@ pub const fn square(a: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
     let (l4, c) = mac(l4, a[2], a[2], c);
     let (l5, c) = addnc(l5, c);
     let (l6, c) = mac(l6, a[3], a[3], c);
-    let (l7, _) = addnc(l7, c);
+    let l7 = addncskip(l7, c);
 
     mont([l0, l1, l2, l3, l4, l5, l6, l7], p, inv)
 }
@@ -103,7 +103,7 @@ pub const fn neg(a: [u64; 4], p: [u64; 4]) -> [u64; 4] {
 pub const fn mont(a: [u64; 8], p: [u64; 4], inv: u64) -> [u64; 4] {
     let rhs = a[0].wrapping_mul(inv);
 
-    let (_, d) = muladd(rhs, p[0], a[0]);
+    let d = muladdbackskip(rhs, p[0], a[0]);
     let (l1, d) = mac(a[1], rhs, p[1], d);
     let (l2, d) = mac(a[2], rhs, p[2], d);
     let (l3, d) = mac(a[3], rhs, p[3], d);
@@ -111,25 +111,25 @@ pub const fn mont(a: [u64; 8], p: [u64; 4], inv: u64) -> [u64; 4] {
 
     let rhs = l1.wrapping_mul(inv);
 
-    let (_, d) = muladd(rhs, p[0], l1);
+    let d = muladdbackskip(rhs, p[0], l1);
     let (l2, d) = mac(l2, rhs, p[1], d);
     let (l3, d) = mac(l3, rhs, p[2], d);
     let (l4, d) = mac(l4, rhs, p[3], d);
     let (l5, e) = adc(a[5], e, d);
 
     let rhs = l2.wrapping_mul(inv);
-    let (_, d) = muladd(rhs, p[0], l2);
+    let d = muladdbackskip(rhs, p[0], l2);
     let (l3, d) = mac(l3, rhs, p[1], d);
     let (l4, d) = mac(l4, rhs, p[2], d);
     let (l5, d) = mac(l5, rhs, p[3], d);
     let (l6, e) = adc(a[6], e, d);
 
     let rhs = l3.wrapping_mul(inv);
-    let (_, d) = muladd(rhs, p[0], l3);
+    let d = muladdbackskip(rhs, p[0], l3);
     let (l4, d) = mac(l4, rhs, p[1], d);
     let (l5, d) = mac(l5, rhs, p[2], d);
     let (l6, d) = mac(l6, rhs, p[3], d);
-    let (l7, _) = adc(a[7], e, d);
+    let l7 = adcskip(a[7], e, d);
 
     sub([l4, l5, l6, l7], p, p)
 }

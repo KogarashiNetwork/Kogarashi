@@ -60,9 +60,12 @@ pub trait CurveGroup:
     + for<'a, 'b> Mul<&'b Self::Scalar, Output = Self::Extended>
     + Sized
 {
+    // range field of curve
+    type Range: PrimeField;
+
     // scalar domain
     type Affine: Curve;
-    type Extended: CurveExtended;
+    type Extended: CurveExtended<Range = Self::Range>;
     type Scalar: PrimeField;
 
     // generator of group

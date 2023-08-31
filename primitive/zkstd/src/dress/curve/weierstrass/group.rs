@@ -13,6 +13,8 @@ macro_rules! affine_group_operation {
         }
 
         impl CurveGroup for $affine {
+            type Range = $range;
+
             type Affine = $affine;
             type Extended = $projective;
             type Scalar = $scalar;
@@ -71,6 +73,8 @@ macro_rules! projective_group_operation {
         }
 
         impl CurveGroup for $projective {
+            type Range = $range;
+
             type Affine = $affine;
             type Extended = $projective;
             type Scalar = $scalar;

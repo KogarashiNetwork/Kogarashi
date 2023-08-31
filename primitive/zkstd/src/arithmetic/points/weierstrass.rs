@@ -1,6 +1,7 @@
 use crate::arithmetic::utils::Naf;
 use crate::common::{
-    CurveGroup, PrimeField, WeierstrassAffine, WeierstrassCurve, WeierstrassProjective,
+    Curve, CurveExtended, CurveGroup, PrimeField, WeierstrassAffine, WeierstrassCurve,
+    WeierstrassProjective,
 };
 
 /// weierstrass affine coordinate addition
@@ -64,6 +65,44 @@ pub fn double_affine_point<A: WeierstrassAffine>(point: A) -> A::Projective {
     }
 }
 
+/// weierstrass mixed coordinate addition
+#[inline(always)]
+pub fn add_mixed_point<A: WeierstrassAffine>(lhs: A, rhs: A::Projective) -> A::Projective {
+    if lhs.is_identity() {
+        return rhs;
+    } else if rhs.is_identity() {
+        return lhs.to_projective();
+    }
+
+    let (x1, y1, z1) = (rhs.get_x(), rhs.get_y(), rhs.get_z());
+    let (x2, y2) = (lhs.get_x(), lhs.get_y());
+
+    let s1 = y2 * z1;
+    let u1 = x2 * z1;
+
+    if u1 == x1 {
+        if s1 == y1 {
+            return double_affine_point(lhs);
+        } else {
+            return <A as CurveGroup>::ADDITIVE_IDENTITY.to_projective();
+        }
+    }
+
+    let u = s1 - y1;
+    let uu = u.square();
+    let v = u1 - x1;
+    let vv = v.square();
+    let vvv = vv * v;
+    let r = vv * x1;
+    let a = uu * z1 - vvv - r.double();
+
+    let x = v * a;
+    let y = u * (r - a) - vvv * y1;
+    let z = vvv * z1;
+
+    A::new_projective(x, y, z)
+}
+
 /// weierstrass projective coordinate addition
 #[inline(always)]
 pub fn add_projective_point<P: WeierstrassProjective>(lhs: P, rhs: P) -> P {
@@ -105,13 +144,13 @@ pub fn add_projective_point<P: WeierstrassProjective>(lhs: P, rhs: P) -> P {
 
 /// weierstrass projective coordinate doubling
 #[inline(always)]
-pub fn double_projective_point<P: WeierstrassProjective>(point: P) -> P {
+pub fn double_projective_point<P: WeierstrassProjective>(lhs: P) -> P {
     // Algorithm 9, https://eprint.iacr.org/2015/1060.pdf
-    if point.is_identity() {
+    if lhs.is_identity() {
         <P as CurveGroup>::ADDITIVE_IDENTITY
     } else {
         let b3 = <P as WeierstrassCurve>::PARAM_3B;
-        let (x, y, z) = (point.get_x(), point.get_y(), point.get_z());
+        let (x, y, z) = (lhs.get_x(), lhs.get_y(), lhs.get_z());
 
         let t0 = y.square();
         let z3 = t0.double().double().double();
