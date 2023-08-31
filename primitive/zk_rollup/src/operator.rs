@@ -10,6 +10,7 @@ use crate::{
 #[cfg(test)]
 use red_jubjub::PublicKey;
 
+#[derive(Debug, PartialEq, Default)]
 pub(crate) struct Batch<F: FftField> {
     transactions: Vec<Transaction>,
     roots: Vec<(F, F)>,
