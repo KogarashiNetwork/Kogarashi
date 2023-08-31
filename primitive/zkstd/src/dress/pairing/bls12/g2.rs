@@ -25,10 +25,8 @@ macro_rules! bls12_g2_pairing {
                 let zsquared = self.z.square();
                 self.x = tmp5 - tmp3.double();
                 self.z = (self.z + self.y).square() - tmp1 - zsquared;
-                self.y = (tmp3 - self.x) * tmp4;
-                self.y -= tmp2.double().double().double();
-                let tmp3 = tmp4 * zsquared;
-                let tmp3 = -tmp3.double();
+                self.y = (tmp3 - self.x) * tmp4 - tmp2.double().double().double();
+                let tmp3 = -(tmp4 * zsquared).double();
                 let tmp6 = tmp6.square() - tmp0 - tmp5;
                 let tmp1 = tmp1.double().double();
                 let tmp6 = tmp6 - tmp1;
@@ -48,7 +46,7 @@ macro_rules! bls12_g2_pairing {
                 let t3 = t2.square();
                 let t4 = t3.double().double();
                 let t5 = t4 * t2;
-                let t6 = t1 - self.y - self.y;
+                let t6 = t1 - self.y.double();
                 let t9 = t6 * rhs.x;
                 let t7 = t4 * self.x;
                 self.x = t6.square() - t5 - t7.double();
@@ -61,15 +59,15 @@ macro_rules! bls12_g2_pairing {
                 let ztsquared = self.z.square();
                 let t10 = t10 - ztsquared;
                 let t9 = t9.double() - t10;
-                let t10 = self.z + self.z;
+                let t10 = self.z.double();
                 let t1 = -t6.double();
 
                 $pairng_coeff(t10, t1, t9)
             }
         }
 
-        impl From<G2Affine> for $g2_pairing_affine {
-            fn from(g2: G2Affine) -> $g2_pairing_affine {
+        impl From<$g2_affine> for $g2_pairing_affine {
+            fn from(g2: $g2_affine) -> $g2_pairing_affine {
                 if g2.is_identity() {
                     Self {
                         coeffs: vec![],
