@@ -126,14 +126,13 @@ pub fn msm_curve_addtion<P: Pairing>(
     let c = if scalars.len() < 32 {
         3
     } else {
-        ln_without_floats(scalars.len()) + 2
+        let log2 = usize::BITS - scalars.len().leading_zeros();
+        (log2 * 69 / 100) as usize + 2
     };
 
     let num_bits = 255usize;
     let fr_one = P::ScalarField::one();
-
     let zero = P::G1Projective::ADDITIVE_IDENTITY;
-
     let window_starts_iter = (0..num_bits).step_by(c);
 
     // Each window is of size `c`.
@@ -199,18 +198,4 @@ pub fn msm_curve_addtion<P: Pairing>(
         + lowest;
 
     x
-}
-
-fn ln_without_floats(a: usize) -> usize {
-    // log2(a) * ln(2)
-    (log2(a) * 69 / 100) as usize
-}
-
-fn log2(x: usize) -> u32 {
-    if x <= 1 {
-        return 0;
-    }
-
-    let n = x.leading_zeros();
-    core::mem::size_of::<usize>() as u32 * 8 - n
 }
