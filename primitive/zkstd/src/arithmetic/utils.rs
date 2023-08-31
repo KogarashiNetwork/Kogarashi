@@ -13,8 +13,26 @@ pub(crate) const fn addnc(a: u64, b: u64) -> (u64, u64) {
 }
 
 #[inline(always)]
+pub const fn adcskip(a: u64, b: u64, c: u64) -> u64 {
+    let t = a as u128 + b as u128 + c as u128;
+    t as u64
+}
+
+#[inline(always)]
+pub const fn addncskip(a: u64, b: u64) -> u64 {
+    let t = a as u128 + b as u128;
+    t as u64
+}
+
+#[inline(always)]
 pub(crate) const fn mulnc(a: u64, b: u64) -> (u64, u64) {
     let t = a as u128 * b as u128;
+    (t as u64, (t >> 64) as u64)
+}
+
+#[inline(always)]
+pub const fn sbbnc(a: u64, b: u64) -> (u64, u64) {
+    let t = (a as u128).wrapping_sub(b as u128);
     (t as u64, (t >> 64) as u64)
 }
 
@@ -34,6 +52,12 @@ pub const fn mac(a: u64, b: u64, c: u64, d: u64) -> (u64, u64) {
 pub(crate) const fn muladd(a: u64, b: u64, c: u64) -> (u64, u64) {
     let t = a as u128 * b as u128 + c as u128;
     (t as u64, (t >> 64) as u64)
+}
+
+#[inline(always)]
+pub(crate) const fn muladdbackskip(a: u64, b: u64, c: u64) -> u64 {
+    let t = a as u128 * b as u128 + c as u128;
+    (t >> 64) as u64
 }
 
 #[inline(always)]
