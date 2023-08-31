@@ -2,7 +2,7 @@ use crate::arithmetic::utils::Naf;
 use crate::common::{CurveGroup, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsExtended};
 
 /// twisted edwards coordinate addition
-/// 9M + 4A + 3B
+/// 9M + 4A + 2B
 #[inline(always)]
 pub fn add_affine_point<P: TwistedEdwardsAffine>(lhs: P, rhs: P) -> P::Extended {
     let (x0, y0) = (lhs.get_x(), lhs.get_y());
@@ -11,10 +11,10 @@ pub fn add_affine_point<P: TwistedEdwardsAffine>(lhs: P, rhs: P) -> P::Extended 
     let a = x0 * x1;
     let b = y0 * y1;
     let c = P::PARAM_D * a * b;
-    let e = (x0 + y0) * (x1 + y1) - a - b;
+    let h = a + b;
+    let e = (x0 + y0) * (x1 + y1) - h;
     let f = P::Range::one() - c;
     let g = P::Range::one() + c;
-    let h = b + a;
 
     let x = e * f;
     let y = g * h;
@@ -25,29 +25,28 @@ pub fn add_affine_point<P: TwistedEdwardsAffine>(lhs: P, rhs: P) -> P::Extended 
 }
 
 /// twisted edwards extended coordinate doubling
-/// 4M + 3S + 1D + 3B + 2A
+/// 3M + 4S + 1D + 2B + 2A
 #[inline(always)]
 pub fn double_affine_point<P: TwistedEdwardsAffine>(lhs: P) -> P::Extended {
     let (x, y) = (lhs.get_x(), lhs.get_y());
 
-    let a = x.square();
+    let a = -x.square();
     let b = y.square();
     let c = P::Range::one().double();
-    let d = -a - b;
-    let e = (x + y).square() + d;
-    let g = b - a;
-    let f = g - c;
+    let d = a + b;
+    let e = (x + y).square() - d;
+    let f = d - c;
 
     let x = e * f;
-    let y = g * d;
+    let y = d.square();
     let t = e * d;
-    let z = f * g;
+    let z = f * d;
 
     P::new_extended(x, y, t, z)
 }
 
 /// twisted edwards extended coordinate addition
-/// 10M + 4A + 3B
+/// 10M + 4A + 2B
 #[inline(always)]
 pub fn add_projective_point<P: TwistedEdwardsExtended>(lhs: P, rhs: P) -> P {
     let (x0, y0, z0, t0) = (lhs.get_x(), lhs.get_y(), lhs.get_z(), lhs.get_t());
@@ -57,10 +56,10 @@ pub fn add_projective_point<P: TwistedEdwardsExtended>(lhs: P, rhs: P) -> P {
     let b = y0 * y1;
     let c = P::PARAM_D * t0 * t1;
     let d = z0 * z1;
-    let e = (x0 + y0) * (x1 + y1) - a - b;
+    let h = a + b;
+    let e = (x0 + y0) * (x1 + y1) - h;
     let f = d - c;
     let g = d + c;
-    let h = b + a;
 
     let x = e * f;
     let y = g * h;
@@ -71,7 +70,7 @@ pub fn add_projective_point<P: TwistedEdwardsExtended>(lhs: P, rhs: P) -> P {
 }
 
 /// twisted edwards extended coordinate doubling
-/// 5M + 3S + 2D + 2B + 2A
+/// 5M + 3S + 2D + 2B + 1A
 #[inline(always)]
 pub fn double_projective_point<P: TwistedEdwardsExtended>(lhs: P) -> P {
     let (x, y, z) = (lhs.get_x(), lhs.get_y(), lhs.get_z());
