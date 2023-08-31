@@ -42,7 +42,9 @@ macro_rules! peculiar_extension_field_operation {
             }
 
             fn square_ext_field(self) -> Self {
-                self * self
+                let re = self.0[0].square() - self.0[1].square();
+                let im = (self.0[0] * self.0[1]).double();
+                Self([re, im])
             }
 
             fn mul_by_nonres(self) -> Self {
@@ -83,12 +85,9 @@ macro_rules! peculiar_extension_field_operation {
             }
 
             fn mul_ext_field(self, rhs: Self) -> Self {
-                let mut a_a = self.0[0];
-                let mut b_b = self.0[1];
-                let mut c_c = self.0[2];
-                a_a *= rhs.0[0];
-                b_b *= rhs.0[1];
-                c_c *= rhs.0[2];
+                let a_a = self.0[0] * rhs.0[0];
+                let b_b = self.0[1] * rhs.0[1];
+                let c_c = self.0[2] * rhs.0[2];
 
                 let mut t1 = rhs.0[1];
                 t1 += rhs.0[2];
@@ -124,8 +123,7 @@ macro_rules! peculiar_extension_field_operation {
                     t2 *= tmp;
                     t2 -= a_a;
                     t2 -= b_b;
-                    c_c = c_c.mul_by_nonresidue();
-                    t2 += c_c;
+                    t2 += c_c.mul_by_nonresidue();
                 }
 
                 Self([t1, t2, t3])
