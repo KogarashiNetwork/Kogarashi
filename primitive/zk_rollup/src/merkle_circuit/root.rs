@@ -1,12 +1,14 @@
+use bls_12_381::Fr;
 use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
 use zksnarks::Witness;
 use zkstd::behave::Group;
+
 #[derive(Debug, PartialEq)]
 pub struct RootCalculateCircuit<const K: usize> {
-    leaf: JubjubScalar,
-    final_root: JubjubScalar,
-    path: [(JubjubScalar, JubjubScalar); K],
+    leaf: Fr,
+    final_root: Fr,
+    path: [(Fr, Fr); K],
     path_pos: [u64; K],
 }
 
@@ -14,7 +16,7 @@ impl<const K: usize> Default for RootCalculateCircuit<K> {
     fn default() -> Self {
         Self {
             leaf: Default::default(),
-            path: [(JubjubScalar::zero(), JubjubScalar::zero()); K],
+            path: [(Fr::zero(), Fr::zero()); K],
             final_root: Default::default(),
             path_pos: [0; K],
         }
@@ -22,12 +24,7 @@ impl<const K: usize> Default for RootCalculateCircuit<K> {
 }
 
 impl<const K: usize> RootCalculateCircuit<K> {
-    pub(crate) fn new(
-        leaf: JubjubScalar,
-        final_root: JubjubScalar,
-        path: [(JubjubScalar, JubjubScalar); K],
-        path_pos: [u64; K],
-    ) -> Self {
+    pub(crate) fn new(leaf: Fr, final_root: Fr, path: [(Fr, Fr); K], path_pos: [u64; K]) -> Self {
         Self {
             leaf,
             path,
@@ -43,27 +40,23 @@ where
 {
     let sum: Constraint<TatePairing> = Constraint::new()
         .left(1)
-        .constant(JubjubScalar::ADDITIVE_GENERATOR)
+        .constant(Fr::ADDITIVE_GENERATOR)
         .a(inputs.0);
     let gen_plus_first = composer.gate_add(sum);
 
-    let first_hash = Constraint::new()
-        .mult(1)
-        .a(gen_plus_first)
-        .constant(JubjubScalar::from(2_u64));
+    let first_hash = Constraint::new().left(2).a(gen_plus_first);
     let first_hash = composer.gate_add(first_hash);
 
     let sum = Constraint::new()
         .left(1)
-        .constant(JubjubScalar::ADDITIVE_GENERATOR)
+        .constant(Fr::ADDITIVE_GENERATOR)
         .a(inputs.1);
+
     let gen_plus_second = composer.gate_add(sum);
 
-    let second_hash = Constraint::new()
-        .mult(1)
-        .a(gen_plus_second)
-        .constant(JubjubScalar::from(2_u64));
+    let second_hash = Constraint::new().left(2).a(gen_plus_second);
     let second_hash = composer.gate_add(second_hash);
+
     composer.gate_add(
         Constraint::new()
             .left(1)
@@ -98,13 +91,69 @@ impl<const K: usize> Circuit<TatePairing> for RootCalculateCircuit<K> {
             .collect();
 
         for ((left, right), pos) in path.into_iter().zip(path_pos) {
-            let cur = composer.component_select(pos, right, left);
-            composer.assert_equal(prev, cur);
+            let left = composer.component_select(pos, left, prev);
+            let right = composer.component_select(pos, prev, right);
+
             prev = hash(composer, (left, right));
         }
 
         composer.assert_equal(prev, final_root);
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use bls_12_381::Fr;
+    use ec_pairing::TatePairing;
+    use poly_commit::KeyPair;
+    use rand::rngs::StdRng;
+    use rand_core::SeedableRng;
+    use red_jubjub::PublicKey;
+    use zero_plonk::prelude::*;
+    use zkstd::common::{CurveGroup, Group};
+
+    use crate::{domain::UserData, merkle_tree::SparseMerkleTree, poseidon::Poseidon};
+
+    use super::RootCalculateCircuit;
+
+    #[test]
+    fn merkle_root_update() {
+        let n = 13;
+        let label = b"verify";
+        let mut rng = StdRng::seed_from_u64(8349u64);
+        let mut pp = KeyPair::setup(n, BlsScalar::random(&mut rng));
+
+        let poseidon = Poseidon::<Fr, 2>::new();
+
+        let mut merkle_tree =
+            SparseMerkleTree::<Fr, Poseidon<Fr, 2>, 1>::new_empty(&poseidon, &[0; 64]).unwrap();
+
+        // Sibling hashes before update
+        let proof = merkle_tree.generate_membership_proof(0);
+
+        // New leaf data
+        let user = UserData::new(0, 10, PublicKey::new(JubjubExtended::random(&mut rng)));
+
+        merkle_tree
+            .update(0, user.to_field_element(), &poseidon)
+            .unwrap();
+        let final_root = merkle_tree.root();
+
+        let merkle_circuit = RootCalculateCircuit::new(
+            user.to_field_element(),
+            final_root,
+            proof.path,
+            proof.path_pos,
+        );
+
+        let prover = Compiler::compile::<RootCalculateCircuit<1>, TatePairing>(&mut pp, label)
+            .expect("failed to compile circuit");
+        prover
+            .0
+            .prove(&mut rng, &merkle_circuit)
+            .expect("failed to prove");
     }
 }

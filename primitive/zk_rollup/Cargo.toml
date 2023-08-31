@@ -15,6 +15,7 @@ zksnarks = { path = "../zksnarks", default-features = false }
 ec-pairing = { path = "../pairing", default-features = false }
 red-jubjub = { path = "../redjubjub", default-features = false}
 rand_core = { version="0.6.4", features = ["getrandom"] }
+bls-12-381 = { path = '../bls12_381', default-features = false }
 poly-commit = { path = "../poly", default-features = false }
 
 [dev-dependencies]

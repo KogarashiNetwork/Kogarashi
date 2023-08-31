@@ -2683,6 +2683,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "ark-std 0.4.0",
+ "bls-12-381 0.0.12",
  "ec-pairing",
  "jub-jub 0.0.14",
  "poly-commit",

@@ -5,7 +5,6 @@ mod root;
 
 // use crate::merkle_tree::MerkleProof;
 
-// /// Confidential transfer circuit
 // #[derive(Debug, PartialEq, Default)]
 // pub struct MerkleCircuit {
 // path: [JubjubScalar; K],
@@ -40,53 +39,57 @@ mod root;
 //     }
 // }
 
-#[cfg(test)]
-mod tests {
+// #[cfg(test)]
+// mod tests {
 
-    use ec_pairing::TatePairing;
-    use jub_jub::Fp;
-    use poly_commit::KeyPair;
-    use rand::rngs::StdRng;
-    use rand_core::SeedableRng;
-    use red_jubjub::PublicKey;
-    use zero_plonk::prelude::*;
-    use zkstd::common::{CurveGroup, Group};
+//     use bls_12_381::Fr;
+//     use ec_pairing::TatePairing;
+//     use poly_commit::KeyPair;
+//     use rand::rngs::StdRng;
+//     use rand_core::SeedableRng;
+//     use red_jubjub::PublicKey;
+//     use zero_plonk::prelude::*;
+//     use zkstd::common::{CurveGroup, Group};
 
-    use crate::{domain::UserData, merkle_tree::SparseMerkleTree, poseidon::Poseidon};
+//     use crate::{domain::UserData, merkle_tree::SparseMerkleTree, poseidon::Poseidon};
 
-    use super::root::RootCalculateCircuit;
+//     use super::root::RootCalculateCircuit;
 
-    #[test]
-    fn merkle_update() {
-        let n = 13;
-        let label = b"verify";
-        let mut rng = StdRng::seed_from_u64(8349u64);
-        let mut pp = KeyPair::setup(n, BlsScalar::random(&mut rng));
+//     #[test]
+//     fn batch_update() {
+//         let n = 13;
+//         let label = b"verify";
+//         let mut rng = StdRng::seed_from_u64(8349u64);
+//         let mut pp = KeyPair::setup(n, BlsScalar::random(&mut rng));
 
-        let poseidon = Poseidon::<Fp, 2>::new();
+//         let poseidon = Poseidon::<Fr, 2>::new();
 
-        let mut merkle_tree =
-            SparseMerkleTree::<Fp, Poseidon<Fp, 2>, 1>::new_empty(&poseidon, &[0; 64]).unwrap();
+//         let mut merkle_tree =
+//             SparseMerkleTree::<Fr, Poseidon<Fr, 2>, 1>::new_empty(&poseidon, &[0; 64]).unwrap();
 
-        let proof = merkle_tree.generate_membership_proof(0);
+//         // Sibling hashes before update
+//         let proof = merkle_tree.generate_membership_proof(0);
 
-        let user = UserData::new(0, 10, PublicKey::new(JubjubExtended::random(&mut rng)));
-        merkle_tree
-            .update(0, user.to_field_element(), &poseidon)
-            .unwrap();
-        let final_root = merkle_tree.root();
+//         // New leaf data
+//         let user = UserData::new(0, 10, PublicKey::new(JubjubExtended::random(&mut rng)));
 
-        let merkle_circuit = RootCalculateCircuit::new(
-            user.to_field_element(),
-            final_root,
-            proof.path,
-            proof.path_pos,
-        );
-        let prover = Compiler::compile::<RootCalculateCircuit<1>, TatePairing>(&mut pp, label)
-            .expect("failed to compile circuit");
-        prover
-            .0
-            .prove(&mut rng, &merkle_circuit)
-            .expect("failed to prove");
-    }
-}
+//         merkle_tree
+//             .update(0, user.to_field_element(), &poseidon)
+//             .unwrap();
+//         let final_root = merkle_tree.root();
+
+//         let merkle_circuit = RootCalculateCircuit::new(
+//             user.to_field_element(),
+//             final_root,
+//             proof.path,
+//             proof.path_pos,
+//         );
+
+//         let prover = Compiler::compile::<RootCalculateCircuit<1>, TatePairing>(&mut pp, label)
+//             .expect("failed to compile circuit");
+//         prover
+//             .0
+//             .prove(&mut rng, &merkle_circuit)
+//             .expect("failed to prove");
+//     }
+// }
