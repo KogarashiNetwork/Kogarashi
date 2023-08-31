@@ -21,8 +21,6 @@ macro_rules! weierstrass_curve_operation {
         impl Basic for $projective {}
 
         impl Curve for $affine {
-            type Range = $range;
-
             const PARAM_A: $range = $a;
 
             fn double(self) -> $projective {
@@ -86,8 +84,6 @@ macro_rules! weierstrass_curve_operation {
         }
 
         impl Curve for $projective {
-            type Range = $range;
-
             const PARAM_A: $range = $a;
 
             fn double(self) -> Self {

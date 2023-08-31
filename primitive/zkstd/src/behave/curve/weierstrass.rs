@@ -19,7 +19,7 @@ pub trait WeierstrassCurve:
 /// rational point affine representation
 /// affine representation check that a point is infinite by the struct field
 pub trait WeierstrassAffine: WeierstrassCurve + Affine {
-    type Projective: WeierstrassProjective;
+    type Projective: WeierstrassProjective<Range = Self::Range>;
     fn to_projective(self) -> Self::Projective;
     fn new_projective(x: Self::Range, y: Self::Range, z: Self::Range) -> Self::Projective;
 }

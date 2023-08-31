@@ -11,7 +11,7 @@ use super::{
     comp::{Basic, ParityCmp},
     curve::Affine,
     sign::SigUtils,
-    Curve, CurveExtended, FftField, Group, TwistedEdwardsAffine, TwistedEdwardsCurve,
+    CurveExtended, CurveGroup, FftField, Group, TwistedEdwardsAffine, TwistedEdwardsCurve,
     TwistedEdwardsExtended, WeierstrassAffine, WeierstrassProjective,
 };
 
@@ -126,10 +126,10 @@ pub trait Pairing:
     type ScalarField: FftField
         + Sum
         + Product
-        + From<<Self::JubjubExtended as Curve>::Range>
-        + From<<Self::JubjubAffine as Curve>::Range>
-        + Into<<Self::JubjubExtended as Curve>::Range>
-        + Into<<Self::JubjubAffine as Curve>::Range>
+        + From<<Self::JubjubExtended as CurveGroup>::Range>
+        + From<<Self::JubjubAffine as CurveGroup>::Range>
+        + Into<<Self::JubjubExtended as CurveGroup>::Range>
+        + Into<<Self::JubjubAffine as CurveGroup>::Range>
         + Encode
         + Decode
         + Eq

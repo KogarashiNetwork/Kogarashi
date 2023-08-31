@@ -141,7 +141,7 @@ macro_rules! curve_operation_test {
                 // a + e = a
                 let a_prime = a + $curve::ADDITIVE_IDENTITY;
 
-                assert_eq!(a_prime, a);
+                assert_eq!(a_prime.to_affine(), a.to_affine());
             }
         }
 
