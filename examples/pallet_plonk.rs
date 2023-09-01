@@ -4,7 +4,7 @@ use ec_pairing::TatePairing;
 use jub_jub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
 use pallet::*;
 use pallet_plonk::{BlsScalar, Circuit, FullcodecRng, Proof};
-use zero_plonk::{composer::Composer, prelude::*};
+use zero_plonk::prelude::*;
 use zkstd::common::{CurveGroup, Pairing};
 
 use frame_support::{assert_ok, construct_runtime, parameter_types};
@@ -119,10 +119,7 @@ pub struct TestCircuit {
 }
 
 impl Circuit<TatePairing> for TestCircuit {
-    fn circuit<C>(&self, composer: &mut C) -> Result<(), Error>
-    where
-        C: Composer<TatePairing>,
-    {
+    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
         let a = composer.append_witness(self.a);
         let b = composer.append_witness(self.b);
 

@@ -30,10 +30,7 @@ impl RedJubjubCircuit {
 }
 
 impl Circuit<TatePairing> for RedJubjubCircuit {
-    fn circuit<C>(&self, composer: &mut C) -> Result<(), Error>
-    where
-        C: Composer<TatePairing>,
-    {
+    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
         let r = match JubjubAffine::from_bytes(self.signature.r()) {
             Some(r) => composer.append_point(r),
             None => return Err(Error::ProofVerificationError),
