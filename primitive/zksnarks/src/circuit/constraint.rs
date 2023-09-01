@@ -2,7 +2,7 @@ use zkstd::behave::PrimeField;
 
 /// Each gate expression
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Gate<Selector: PrimeField> {
+pub struct Constraint<Selector: PrimeField> {
     // Selectors
     /// Multiplier
     pub q_m: Selector,
@@ -40,7 +40,7 @@ pub struct Gate<Selector: PrimeField> {
     pub public_input: Option<Selector>,
 }
 
-impl<F: PrimeField> Default for Gate<F> {
+impl<F: PrimeField> Default for Constraint<F> {
     fn default() -> Self {
         Self {
             q_m: F::zero(),
@@ -63,7 +63,7 @@ impl<F: PrimeField> Default for Gate<F> {
     }
 }
 
-impl<F: PrimeField> Gate<F> {
+impl<F: PrimeField> Constraint<F> {
     fn from_external(mut constraint: Self) -> Self {
         constraint.q_range = F::zero();
         constraint.q_logic = F::zero();
