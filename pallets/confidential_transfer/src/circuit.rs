@@ -70,10 +70,7 @@ impl Default for ConfidentialTransferCircuit {
 }
 
 impl Circuit<TatePairing> for ConfidentialTransferCircuit {
-    fn circuit<C>(&self, composer: &mut C) -> Result<(), Error>
-    where
-        C: Composer<TatePairing>,
-    {
+    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
         let (alice_t_balance, alice_s_balance) = self.sender_encrypted_balance.get();
         let (alice_t_transfer_amount, alice_s_transfer_amount) =
             self.sender_encrypted_transfer_amount.get();
