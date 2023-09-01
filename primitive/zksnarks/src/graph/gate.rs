@@ -37,7 +37,7 @@ pub struct Gate<Selector: PrimeField> {
     pub w_o: Witness,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Default)]
 pub struct Witness(usize);
 
 impl Witness {
