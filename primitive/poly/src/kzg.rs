@@ -1,10 +1,15 @@
+mod key;
+mod proof;
+
 use crate::commitment::Commitment;
 use crate::poly::Coefficients;
 use crate::util;
 use crate::witness::Witness;
+pub use key::EvaluationKey;
+pub use proof::Proof;
+
 use ec_pairing::msm_curve_addtion;
 use parity_scale_codec::{Decode, Encode};
-use zkstd::behave::*;
 use zkstd::common::*;
 
 /// Kate polynomial commitment params used for prover polynomial domain and proof verification
