@@ -1,22 +1,27 @@
+mod key;
+mod proof;
+
 use crate::commitment::Commitment;
 use crate::poly::Coefficients;
 use crate::util;
 use crate::witness::Witness;
+pub use key::EvaluationKey;
+pub use proof::Proof;
+
 use ec_pairing::msm_curve_addtion;
 use parity_scale_codec::{Decode, Encode};
-use zkstd::behave::*;
 use zkstd::common::*;
 
 /// Kate polynomial commitment params used for prover polynomial domain and proof verification
 #[derive(Clone, Debug, PartialEq, Decode, Encode)]
 #[allow(dead_code)]
-pub struct KeyPair<P: Pairing> {
+pub struct KzgParams<P: Pairing> {
     pub(crate) g1: Vec<P::G1Affine>,
     pub(crate) g2: P::G2Affine,
     pub(crate) beta_h: P::G2Affine,
 }
 
-impl<P: Pairing> KeyPair<P> {
+impl<P: Pairing> KzgParams<P> {
     const ADDED_BLINDING_DEGREE: usize = 6;
 
     // setup polynomial evaluation domain

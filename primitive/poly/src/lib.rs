@@ -17,16 +17,18 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 mod commitment;
+#[cfg(feature = "std")]
 mod fft;
-mod keypair;
+mod kzg;
 mod poly;
 mod util;
 mod witness;
 
 pub use commitment::Commitment;
+#[cfg(feature = "std")]
 pub use fft::Fft;
-pub use keypair::Error as KzgError;
-pub use keypair::KeyPair;
+pub use kzg::Error as KzgError;
+pub use kzg::{EvaluationKey, KzgParams, Proof};
 pub use poly::{Coefficients, PointsValue};
 pub use util::{batch_inversion, powers_of};
 pub use witness::Witness;

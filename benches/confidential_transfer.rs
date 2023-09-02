@@ -2,7 +2,7 @@ use confidential_transfer::ConfidentialTransferCircuit;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use ec_pairing::TatePairing;
 use jub_jub::*;
-use poly_commit::KeyPair;
+use poly_commit::KzgParams;
 use rand::{rngs::StdRng, SeedableRng};
 use she_elgamal::EncryptedNumber;
 use zero_plonk::prelude::*;
@@ -16,10 +16,10 @@ fn circuit(c: &mut Criterion) {
     let n = 14;
     let label = b"bench";
     group.bench_function("setup", |b| {
-        b.iter(|| KeyPair::<TatePairing>::setup(n, BlsScalar::random(&mut rng)));
+        b.iter(|| KzgParams::<TatePairing>::setup(n, BlsScalar::random(&mut rng)));
     });
 
-    let mut pp = KeyPair::<TatePairing>::setup(n, BlsScalar::random(&mut rng));
+    let mut pp = KzgParams::<TatePairing>::setup(n, BlsScalar::random(&mut rng));
     let (prover, verifier) =
         Compiler::compile::<ConfidentialTransferCircuit, TatePairing>(&mut pp, label)
             .expect("failed to compile circuit");

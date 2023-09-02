@@ -55,7 +55,6 @@ members = [
     "primitive/zksnarks",
     "primitive/zk_rollup",
     "primitive/zkstd",
-    "zkruntime",
 ]
 
 [profile.release]
