@@ -85,6 +85,7 @@ pub trait Pairing:
             Extended = Self::G1Projective,
             Scalar = Self::ScalarField,
         > + From<Self::G1Affine>
+        + Copy
         + Sum
         + Send
         + Sync
