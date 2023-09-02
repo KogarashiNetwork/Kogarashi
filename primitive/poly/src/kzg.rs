@@ -10,13 +10,13 @@ use zkstd::common::*;
 /// Kate polynomial commitment params used for prover polynomial domain and proof verification
 #[derive(Clone, Debug, PartialEq, Decode, Encode)]
 #[allow(dead_code)]
-pub struct KeyPair<P: Pairing> {
+pub struct KzgParams<P: Pairing> {
     pub(crate) g1: Vec<P::G1Affine>,
     pub(crate) g2: P::G2Affine,
     pub(crate) beta_h: P::G2Affine,
 }
 
-impl<P: Pairing> KeyPair<P> {
+impl<P: Pairing> KzgParams<P> {
     const ADDED_BLINDING_DEGREE: usize = 6;
 
     // setup polynomial evaluation domain
