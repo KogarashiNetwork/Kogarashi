@@ -17,6 +17,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 mod commitment;
+#[cfg(feature = "std")]
 mod fft;
 mod kzg;
 mod poly;
@@ -24,6 +25,7 @@ mod util;
 mod witness;
 
 pub use commitment::Commitment;
+#[cfg(feature = "std")]
 pub use fft::Fft;
 pub use kzg::Error as KzgError;
 pub use kzg::{EvaluationKey, KzgParams, Proof};
