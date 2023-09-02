@@ -193,15 +193,15 @@ fn get_at(segment: usize, c: usize, bytes: [u8; 32]) -> usize {
     let skip_bytes = skip_bits / 8;
 
     if skip_bytes >= 32 {
-        return 0;
-    }
+        0
+    } else {
+        let mut v = [0; 8];
+        for (v, o) in v.iter_mut().zip(bytes[skip_bytes..].iter()) {
+            *v = *o;
+        }
 
-    let mut v = [0; 8];
-    for (v, o) in v.iter_mut().zip(bytes[skip_bytes..].iter()) {
-        *v = *o;
+        let mut tmp = u64::from_le_bytes(v);
+        tmp >>= skip_bits - (skip_bytes * 8);
+        (tmp % (1 << c)) as usize
     }
-
-    let mut tmp = u64::from_le_bytes(v);
-    tmp >>= skip_bits - (skip_bytes * 8);
-    (tmp % (1 << c)) as usize
 }
