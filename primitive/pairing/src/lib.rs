@@ -20,12 +20,12 @@ use bls_12_381::params::{BLS_X, BLS_X_IS_NEGATIVE};
 use bls_12_381::{Fq12, Fr, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective, Gt};
 use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 use zkstd::common::*;
-use zkstd::common::{G2Pairing, Group, Pairing, PairingRange, PrimeField, Ring, Vec};
+use zkstd::common::{G2Pairing, Pairing, PairingRange, PrimeField, Vec};
 
 /// Tate pairing struct holds necessary components for pairing.
 /// `pairing` function takes G1 and G2 group elements and output
 /// GT target group element.
-#[derive(Debug, Clone, Eq, PartialEq, Default, Encode, Decode)]
+#[derive(Debug, Clone, Eq, PartialEq, Default, Encode, Decode, Copy)]
 pub struct TatePairing;
 
 impl Pairing for TatePairing {
@@ -120,82 +120,88 @@ impl Pairing for TatePairing {
 
 /// Performs a Variable Base Multiscalar Multiplication.
 pub fn msm_curve_addtion<P: Pairing>(
-    points: &[P::G1Affine],
-    scalars: &[P::ScalarField],
+    bases: &[P::G1Affine],
+    coeffs: &[P::ScalarField],
 ) -> P::G1Projective {
-    let c = if scalars.len() < 32 {
+    let c = if bases.len() < 4 {
+        1
+    } else if bases.len() < 32 {
         3
     } else {
-        let log2 = usize::BITS - scalars.len().leading_zeros();
+        let log2 = usize::BITS - bases.len().leading_zeros();
         (log2 * 69 / 100) as usize + 2
     };
+    let mut buckets: Vec<Vec<Bucket<P>>> = vec![vec![Bucket::None; (1 << c) - 1]; (256 / c) + 1];
 
-    let num_bits = 255usize;
-    let fr_one = P::ScalarField::one();
-    let zero = P::G1Projective::ADDITIVE_IDENTITY;
-    let window_starts_iter = (0..num_bits).step_by(c);
-
-    // Each window is of size `c`.
-    // We divide up the bits 0..num_bits into windows of size `c`, and
-    // in parallel process each such window.
-    let window_sums: Vec<_> = window_starts_iter
-        .map(|w_start| {
-            let mut res = zero;
-            // We don't need the "zero" bucket, so we only have 2^c - 1 buckets
-            let mut buckets = vec![zero; (1 << c) - 1];
-            scalars
-                .iter()
-                .zip(points)
-                .filter(|(s, _)| *s != &P::ScalarField::zero())
-                .for_each(|(&scalar, base)| {
-                    if scalar == fr_one {
-                        // We only process unit scalars once in the first window.
-                        if w_start == 0 {
-                            res += *base;
-                        }
-                    } else {
-                        let mut scalar = scalar.reduce();
-
-                        // We right-shift by w_start, thus getting rid of the
-                        // lower bits.
-                        scalar.divn(w_start as u32);
-
-                        // We mod the remaining bits by the window size.
-                        let scalar = scalar.mod_by_window(c);
-
-                        // If the scalar is non-zero, we update the corresponding
-                        // bucket.
-                        // (Recall that `buckets` doesn't have a zero bucket.)
-                        if scalar != 0 {
-                            buckets[(scalar - 1) as usize] += *base;
-                        }
-                    }
-                });
-
-            let mut running_sum = P::G1Projective::ADDITIVE_IDENTITY;
-            for b in buckets.into_iter().rev() {
-                running_sum += b;
-                res += running_sum;
-            }
-
-            res
-        })
-        .collect();
-
-    // We store the sum for the lowest window.
-    let lowest = *window_sums.first().unwrap();
-    // We're traversing windows from high to low.
-    let x = window_sums[1..]
-        .iter()
+    buckets
+        .iter_mut()
+        .enumerate()
         .rev()
-        .fold(zero, |mut total, sum_i| {
-            total += *sum_i;
-            for _ in 0..c {
-                total = total.double();
+        .map(|(i, bucket)| {
+            for (coeff, base) in coeffs.iter().zip(bases.iter()) {
+                let seg = get_at(i, c, coeff.to_bytes());
+                if seg != 0 {
+                    bucket[seg - 1].add_assign(base);
+                }
             }
-            total
+            bucket
         })
-        + lowest;
+        .fold(P::G1Projective::ADDITIVE_IDENTITY, |mut sum, bucket| {
+            for _ in 0..c {
+                sum = sum.double();
+            }
+            // Summation by parts
+            // e.g. 3a + 2b + 1c = a +
+            //                    (a) + b +
+            //                    ((a) + b) + c
+            let mut running_sum = P::G1Projective::ADDITIVE_IDENTITY;
+            bucket.iter().rev().for_each(|exp| {
+                running_sum = exp.add(running_sum);
+                sum += running_sum;
+            });
+            sum
+        })
+}
 
-    x
+#[derive(Clone, Copy)]
+enum Bucket<P: Pairing> {
+    None,
+    Affine(P::G1Affine),
+    Projective(P::G1Projective),
+}
+
+impl<P: Pairing> Bucket<P> {
+    fn add_assign(&mut self, other: &P::G1Affine) {
+        *self = match *self {
+            Bucket::None => Bucket::Affine(*other),
+            Bucket::Affine(a) => Bucket::Projective(a + other),
+            Bucket::Projective(a) => Bucket::Projective(a + other),
+        }
+    }
+
+    fn add(&self, other: P::G1Projective) -> P::G1Projective {
+        match self {
+            Bucket::None => other,
+            Bucket::Affine(a) => other + a,
+            Bucket::Projective(a) => other + a,
+        }
+    }
+}
+
+fn get_at(segment: usize, c: usize, bytes: [u8; 32]) -> usize {
+    let skip_bits = segment * c;
+    let skip_bytes = skip_bits / 8;
+
+    if skip_bytes >= 32 {
+        0
+    } else {
+        let mut v = [0; 8];
+        for (v, o) in v.iter_mut().zip(bytes[skip_bytes..].iter()) {
+            *v = *o;
+        }
+
+        let mut tmp = u64::from_le_bytes(v);
+        tmp >>= skip_bits - (skip_bytes * 8);
+        (tmp % (1 << c)) as usize
+    }
 }

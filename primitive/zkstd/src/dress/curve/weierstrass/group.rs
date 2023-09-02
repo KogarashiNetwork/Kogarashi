@@ -121,6 +121,12 @@ macro_rules! projective_group_operation {
             }
         }
 
+        impl<'a> AddAssign<$projective> for &'a $projective {
+            fn add_assign(&mut self, rhs: $projective) {
+                *self += rhs;
+            }
+        }
+
         impl<'b> AddAssign<&'b $projective> for $projective {
             fn add_assign(&mut self, rhs: &'b $projective) {
                 *self += *rhs;
