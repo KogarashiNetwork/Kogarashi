@@ -2,10 +2,13 @@ use crate::arithmetic::{bits_256::*, utils::*};
 
 #[inline(always)]
 pub const fn add(a: [u64; 4], b: [u64; 4], p: [u64; 4]) -> [u64; 4] {
-    let (l0, c) = addnc(a[0], b[0]);
-    let (l1, c) = adc(a[1], b[1], c);
-    let (l2, c) = adc(a[2], b[2], c);
-    let l3 = adcskip(a[3], b[3], c);
+    let s = a[0] as u128 + b[0] as u128;
+    let (l0, c) = (s as u64, (s >> 64) as u64);
+    let s = a[1] as u128 + b[1] as u128 + c as u128;
+    let (l1, c) = (s as u64, (s >> 64) as u64);
+    let s = a[2] as u128 + b[2] as u128 + c as u128;
+    let (l2, c) = (s as u64, (s >> 64) as u64);
+    let l3 = a[3].wrapping_add(b[3]).wrapping_add(c);
 
     sub([l0, l1, l2, l3], p, p)
 }
