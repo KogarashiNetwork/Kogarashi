@@ -172,11 +172,20 @@ pub const fn square(a: [u64; 4], p: [u64; 4], inv: u64) -> [u64; 4] {
 }
 
 #[inline(always)]
+/// a needs to be less than p
 pub const fn neg(a: [u64; 4], p: [u64; 4]) -> [u64; 4] {
     if (a[0] | a[1] | a[2] | a[3]) == 0 {
         a
     } else {
-        sub(p, a, p)
+        let s = (p[0] as u128).wrapping_sub(a[0] as u128);
+        let (l0, b) = (s as u64, (s >> 64) as u64);
+        let s = (p[1] as u128).wrapping_sub(a[1] as u128 + (b >> 63) as u128);
+        let (l1, b) = (s as u64, (s >> 64) as u64);
+        let s = (p[2] as u128).wrapping_sub(a[2] as u128 + (b >> 63) as u128);
+        let (l2, b) = (s as u64, (s >> 64) as u64);
+        let l3 = (p[3]).wrapping_sub(a[3]).wrapping_sub(b >> 63);
+
+        [l0, l1, l2, l3]
     }
 }
 
