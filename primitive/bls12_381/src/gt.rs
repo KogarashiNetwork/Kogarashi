@@ -62,19 +62,15 @@ impl Mul<Fr> for Gt {
     fn mul(self, other: Fr) -> Self::Output {
         let mut res = Self::Output::ADDITIVE_IDENTITY;
         let mut acc = self;
-        let bits: Vec<u8> = other
-            .to_bits()
-            .into_iter()
-            .skip_while(|x| *x == 0)
-            .collect();
-        for &bit in bits.iter().rev() {
-            if bit == 1 {
+        for &naf in other.to_nafs().iter() {
+            if naf == Naf::Plus {
                 res += acc;
+            } else if naf == Naf::Minus {
+                res -= acc;
             }
             acc = acc.double();
         }
-
-        acc
+        res
     }
 }
 

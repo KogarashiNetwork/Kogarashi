@@ -181,7 +181,7 @@ impl<F: FftField> Fft<F> {
     /// point `tau`.
     pub fn evaluate_all_lagrange_coefficients(&self, tau: F) -> Vec<F> {
         // Evaluate all Lagrange polynomials
-        let size = self.n as usize;
+        let size = self.n;
         let t_size = tau.pow(size as u64);
         let one = F::one();
         if t_size == F::one() {
