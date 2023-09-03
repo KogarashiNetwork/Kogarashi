@@ -54,12 +54,31 @@ pub const fn sub(a: [u64; 4], b: [u64; 4], p: [u64; 4]) -> [u64; 4] {
 
 #[inline(always)]
 pub const fn double(a: [u64; 4], p: [u64; 4]) -> [u64; 4] {
-    let (l0, c) = dbc(a[0], 0);
-    let (l1, c) = dbc(a[1], c);
-    let (l2, c) = dbc(a[2], c);
-    let (l3, _) = dbc(a[3], c);
+    let (l0, c) = (a[0] << 1, a[0] >> 63);
+    let s = ((a[1] as u128) << 1) + c as u128;
+    let (l1, c) = (s as u64, (s >> 64) as u64);
+    let s = ((a[2] as u128) << 1) + c as u128;
+    let (l2, c) = (s as u64, (s >> 64) as u64);
+    let l3 = (a[3] << 1).wrapping_add(c);
 
-    sub([l0, l1, l2, l3], p, p)
+    let s = (l0 as u128).wrapping_sub(p[0] as u128);
+    let (l0, brw) = (s as u64, (s >> 64) as u64);
+    let s = (l1 as u128).wrapping_sub(p[1] as u128 + (brw >> 63) as u128);
+    let (l1, brw) = (s as u64, (s >> 64) as u64);
+    let s = (l2 as u128).wrapping_sub(p[2] as u128 + (brw >> 63) as u128);
+    let (l2, brw) = (s as u64, (s >> 64) as u64);
+    let s = (l3 as u128).wrapping_sub(p[3] as u128 + (brw >> 63) as u128);
+    let (l3, brw) = (s as u64, (s >> 64) as u64);
+
+    let s = l0 as u128 + (p[0] & brw) as u128;
+    let (l0, c) = (s as u64, (s >> 64) as u64);
+    let s = l1 as u128 + (p[1] & brw) as u128 + c as u128;
+    let (l1, c) = (s as u64, (s >> 64) as u64);
+    let s = l2 as u128 + (p[2] & brw) as u128 + c as u128;
+    let (l2, c) = (s as u64, (s >> 64) as u64);
+    let l3 = l3.wrapping_add(p[3] & brw).wrapping_add(c);
+
+    [l0, l1, l2, l3]
 }
 
 #[inline(always)]
