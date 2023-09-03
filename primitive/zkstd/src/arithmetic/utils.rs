@@ -6,8 +6,6 @@ pub const fn sbb(a: u64, b: u64, brw: u64) -> (u64, u64) {
     (t as u64, (t >> 64) as u64)
 }
 
-pub type ProjectiveCoordinate<L> = (L, L, L);
-
 #[derive(Clone, Copy, Eq, PartialEq, Debug)]
 pub enum Naf {
     Zero = 0,
