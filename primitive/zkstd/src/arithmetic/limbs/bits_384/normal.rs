@@ -148,51 +148,88 @@ pub const fn mul(a: [u64; 6], b: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
 
 #[inline(always)]
 pub const fn square(a: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
-    let (l1, c) = mulnc(a[1], a[0]);
-    let (l2, c) = muladd(a[2], a[0], c);
-    let (l3, c) = muladd(a[3], a[0], c);
-    let (l4, c) = muladd(a[4], a[0], c);
-    let (l5, c) = muladd(a[5], a[0], c);
-    let (l6, c) = muladd(a[1], a[5], c);
-    let (l7, c) = muladd(a[2], a[5], c);
-    let (l8, c) = muladd(a[3], a[5], c);
-    let (l9, l10) = muladd(a[4], a[5], c);
+    let s = a[1] as u128 * a[0] as u128;
+    let (l1, c) = (s as u64, (s >> 64) as u64);
+    let s = a[2] as u128 * a[0] as u128 + c as u128;
+    let (l2, c) = (s as u64, (s >> 64) as u64);
+    let s = a[3] as u128 * a[0] as u128 + c as u128;
+    let (l3, c) = (s as u64, (s >> 64) as u64);
+    let s = a[4] as u128 * a[0] as u128 + c as u128;
+    let (l4, c) = (s as u64, (s >> 64) as u64);
+    let s = a[5] as u128 * a[0] as u128 + c as u128;
+    let (l5, c) = (s as u64, (s >> 64) as u64);
+    let s = a[1] as u128 * a[5] as u128 + c as u128;
+    let (l6, c) = (s as u64, (s >> 64) as u64);
+    let s = a[2] as u128 * a[5] as u128 + c as u128;
+    let (l7, c) = (s as u64, (s >> 64) as u64);
+    let s = a[3] as u128 * a[5] as u128 + c as u128;
+    let (l8, c) = (s as u64, (s >> 64) as u64);
+    let s = a[4] as u128 * a[5] as u128 + c as u128;
+    let (l9, l10) = (s as u64, (s >> 64) as u64);
 
-    let (l3, c) = muladd(a[1], a[2], l3);
-    let (l4, c) = mac(l4, a[1], a[3], c);
-    let (l5, c) = mac(l5, a[1], a[4], c);
-    let (l6, c) = mac(l6, a[2], a[4], c);
-    let (l7, c) = mac(l7, a[3], a[4], c);
-    let (l8, c) = addnc(l8, c);
-    let l9 = addncskip(l9, c);
+    let s = a[1] as u128 * a[2] as u128 + l3 as u128;
+    let (l3, c) = (s as u64, (s >> 64) as u64);
+    let s = l4 as u128 + a[1] as u128 * a[3] as u128 + c as u128;
+    let (l4, c) = (s as u64, (s >> 64) as u64);
+    let s = l5 as u128 + a[1] as u128 * a[4] as u128 + c as u128;
+    let (l5, c) = (s as u64, (s >> 64) as u64);
+    let s = l6 as u128 + a[2] as u128 * a[4] as u128 + c as u128;
+    let (l6, c) = (s as u64, (s >> 64) as u64);
+    let s = l7 as u128 + a[3] as u128 * a[4] as u128 + c as u128;
+    let (l7, c) = (s as u64, (s >> 64) as u64);
+    let s = l8 as u128 + c as u128;
+    let (l8, c) = (s as u64, (s >> 64) as u64);
+    let l9 = l9.wrapping_add(c);
 
-    let (l5, c) = muladd(a[2], a[3], l5);
-    let (l6, c) = addnc(l6, c);
-    let l7 = addncskip(l7, c);
+    let s = a[2] as u128 * a[3] as u128 + l5 as u128;
+    let (l5, c) = (s as u64, (s >> 64) as u64);
+    let s = l6 as u128 + c as u128;
+    let (l6, c) = (s as u64, (s >> 64) as u64);
+    let l7 = l7.wrapping_add(c);
 
-    let (l1, c) = dbc(l1, 0);
-    let (l2, c) = dbc(l2, c);
-    let (l3, c) = dbc(l3, c);
-    let (l4, c) = dbc(l4, c);
-    let (l5, c) = dbc(l5, c);
-    let (l6, c) = dbc(l6, c);
-    let (l7, c) = dbc(l7, c);
-    let (l8, c) = dbc(l8, c);
-    let (l9, c) = dbc(l9, c);
-    let (l10, l11) = dbc(l10, c);
+    let (l1, c) = (l1 << 1, l1 >> 63);
+    let s = ((l2 as u128) << 1) + c as u128;
+    let (l2, c) = (s as u64, (s >> 64) as u64);
+    let s = ((l3 as u128) << 1) + c as u128;
+    let (l3, c) = (s as u64, (s >> 64) as u64);
+    let s = ((l4 as u128) << 1) + c as u128;
+    let (l4, c) = (s as u64, (s >> 64) as u64);
+    let s = ((l5 as u128) << 1) + c as u128;
+    let (l5, c) = (s as u64, (s >> 64) as u64);
+    let s = ((l6 as u128) << 1) + c as u128;
+    let (l6, c) = (s as u64, (s >> 64) as u64);
+    let s = ((l7 as u128) << 1) + c as u128;
+    let (l7, c) = (s as u64, (s >> 64) as u64);
+    let s = ((l8 as u128) << 1) + c as u128;
+    let (l8, c) = (s as u64, (s >> 64) as u64);
+    let s = ((l9 as u128) << 1) + c as u128;
+    let (l9, c) = (s as u64, (s >> 64) as u64);
+    let s = ((l10 as u128) << 1) + c as u128;
+    let (l10, l11) = (s as u64, (s >> 64) as u64);
 
-    let (l0, c) = mulnc(a[0], a[0]);
-    let (l1, c) = addnc(l1, c);
-    let (l2, c) = mac(l2, a[1], a[1], c);
-    let (l3, c) = addnc(l3, c);
-    let (l4, c) = mac(l4, a[2], a[2], c);
-    let (l5, c) = addnc(l5, c);
-    let (l6, c) = mac(l6, a[3], a[3], c);
-    let (l7, c) = addnc(l7, c);
-    let (l8, c) = mac(l8, a[4], a[4], c);
-    let (l9, c) = addnc(l9, c);
-    let (l10, c) = mac(l10, a[5], a[5], c);
-    let l11 = addncskip(l11, c);
+    let s = a[0] as u128 * a[0] as u128;
+    let (l0, c) = (s as u64, (s >> 64) as u64);
+    let s = l1 as u128 + c as u128;
+    let (l1, c) = (s as u64, (s >> 64) as u64);
+    let s = l2 as u128 + a[1] as u128 * a[1] as u128 + c as u128;
+    let (l2, c) = (s as u64, (s >> 64) as u64);
+    let s = l3 as u128 + c as u128;
+    let (l3, c) = (s as u64, (s >> 64) as u64);
+    let s = l4 as u128 + a[2] as u128 * a[2] as u128 + c as u128;
+    let (l4, c) = (s as u64, (s >> 64) as u64);
+    let s = l5 as u128 + c as u128;
+    let (l5, c) = (s as u64, (s >> 64) as u64);
+    let s = l6 as u128 + a[3] as u128 * a[3] as u128 + c as u128;
+    let (l6, c) = (s as u64, (s >> 64) as u64);
+    let s = l7 as u128 + c as u128;
+    let (l7, c) = (s as u64, (s >> 64) as u64);
+    let s = l8 as u128 + a[4] as u128 * a[4] as u128 + c as u128;
+    let (l8, c) = (s as u64, (s >> 64) as u64);
+    let s = l9 as u128 + c as u128;
+    let (l9, c) = (s as u64, (s >> 64) as u64);
+    let s = l10 as u128 + a[5] as u128 * a[5] as u128 + c as u128;
+    let (l10, c) = (s as u64, (s >> 64) as u64);
+    let l11 = l11.wrapping_add(c);
 
     mont([l0, l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11], p, inv)
 }
@@ -202,7 +239,19 @@ pub const fn neg(a: [u64; 6], p: [u64; 6]) -> [u64; 6] {
     if (a[0] | a[1] | a[2] | a[3] | a[4] | a[5]) == 0 {
         a
     } else {
-        sub(p, a, p)
+        let s = (p[0] as u128).wrapping_sub(a[0] as u128);
+        let (l0, b) = (s as u64, (s >> 64) as u64);
+        let s = (p[1] as u128).wrapping_sub(a[1] as u128 + (b >> 63) as u128);
+        let (l1, b) = (s as u64, (s >> 64) as u64);
+        let s = (p[2] as u128).wrapping_sub(a[2] as u128 + (b >> 63) as u128);
+        let (l2, b) = (s as u64, (s >> 64) as u64);
+        let s = (p[3] as u128).wrapping_sub(a[3] as u128 + (b >> 63) as u128);
+        let (l3, b) = (s as u64, (s >> 64) as u64);
+        let s = (p[4] as u128).wrapping_sub(a[4] as u128 + (b >> 63) as u128);
+        let (l4, b) = (s as u64, (s >> 64) as u64);
+        let l5 = (p[5]).wrapping_sub(a[5]).wrapping_sub(b >> 63);
+
+        [l0, l1, l2, l3, l4, l5]
     }
 }
 
