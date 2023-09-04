@@ -2,29 +2,29 @@ mod root;
 
 use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
+use zkstd::common::SigUtils;
 
-use crate::{domain::Transaction, operator::Batch};
+use crate::{
+    domain::{RollupTransactionInfo, Transaction, UserData},
+    operator::Batch,
+    poseidon::Poseidon,
+    redjubjub_circuit::RedJubjubCircuit,
+};
+use bls_12_381::Fr;
+use red_jubjub::sapling_hash;
+
+use self::root::MerkleMembershipCircuit;
 
 #[derive(Debug, PartialEq, Default)]
 pub struct BatchCircuit {
-    batch: Batch<JubjubScalar>,
-    initial_root: JubjubScalar,
-    final_root: JubjubScalar,
+    batch: Batch<Fr, Poseidon<Fr, 2>, 2>,
 }
 
 impl BatchCircuit {
     #[allow(dead_code)]
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn new(
-        batch: Batch<JubjubScalar>,
-        initial_root: JubjubScalar,
-        final_root: JubjubScalar,
-    ) -> Self {
-        Self {
-            batch,
-            initial_root,
-            final_root,
-        }
+    pub(crate) fn new(batch: Batch<Fr, Poseidon<Fr, 2>, 2>) -> Self {
+        Self { batch }
     }
 }
 
@@ -33,16 +33,69 @@ impl Circuit<TatePairing> for BatchCircuit {
     where
         C: Composer<TatePairing>,
     {
-        let initial_root = composer.append_witness(self.initial_root);
-        let final_root = composer.append_witness(self.final_root);
-        for t in self.batch.transactions() {
-            let Transaction(signature, data) = t;
-            // verify_signature
-            let sender = data.sender_address;
-            let receiver = data.receiver_address;
-        }
+        for RollupTransactionInfo {
+            transaction,
+            pre_root,
+            post_root,
+            pre_sender,
+            pre_receiver,
+            pre_sender_proof,
+            pre_receiver_proof,
+            post_sender_proof,
+            post_receiver_proof,
+        } in self.batch.transactions.iter()
+        {
+            let Transaction(sig, t) = transaction;
 
-        // calculate root
+            MerkleMembershipCircuit::new(
+                pre_sender.to_field_element(),
+                *pre_root,
+                pre_sender_proof.path,
+                pre_sender_proof.path_pos,
+            )
+            .circuit(composer)?;
+
+            MerkleMembershipCircuit::new(
+                pre_receiver.to_field_element(),
+                *pre_root,
+                pre_receiver_proof.path,
+                pre_receiver_proof.path_pos,
+            )
+            .circuit(composer)?;
+
+            RedJubjubCircuit::new(
+                t.sender_address.inner().into(),
+                *sig,
+                sapling_hash(&sig.r(), &t.sender_address.to_bytes(), &t.to_bytes()),
+            )
+            .circuit(composer)?;
+
+            let post_sender = UserData {
+                balance: pre_sender.balance - t.amount,
+                ..*pre_sender
+            };
+
+            let post_receiver = UserData {
+                balance: pre_sender.balance + t.amount,
+                ..*pre_sender
+            };
+
+            // MerkleMembershipCircuit::new(
+            //     post_sender.to_field_element(),
+            //     *post_root,
+            //     post_sender_proof.path,
+            //     post_sender_proof.path_pos,
+            // )
+            // .circuit(composer)?;
+
+            // MerkleMembershipCircuit::new(
+            //     pre_receiver.to_field_element(),
+            //     *post_root,
+            //     post_receiver_proof.path,
+            //     post_receiver_proof.path_pos,
+            // )
+            // .circuit(composer)?;
+        }
 
         Ok(())
     }
@@ -51,64 +104,67 @@ impl Circuit<TatePairing> for BatchCircuit {
 #[cfg(test)]
 mod tests {
 
+    use bls_12_381::Fr;
     use ec_pairing::TatePairing;
     use jub_jub::Fp;
     use poly_commit::KeyPair;
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
-    use red_jubjub::SecretKey;
+    use red_jubjub::{PublicKey, SecretKey};
     use zero_plonk::prelude::*;
-    use zkstd::common::Group;
+    use zkstd::common::{CurveGroup, Group};
 
     use crate::{
-        domain::{Transaction, TransactionData, UserData},
-        merkle_tree::SparseMerkleTree,
-        operator::Batch,
+        domain::{TransactionData, UserData},
+        operator::RollupOperator,
         poseidon::Poseidon,
     };
 
     use super::BatchCircuit;
 
-    fn create_batch(
-        txs: (Transaction, Transaction),
-        sender: &mut UserData,
-        receiver: &mut UserData,
-        merkle: &mut SparseMerkleTree<Fp, Poseidon<Fp, 2>, 2>,
-    ) -> Batch<Fp> {
-        todo!()
-    }
-
     #[test]
     fn batch_update() {
-        let n = 13;
+        let n = 15;
         let label = b"verify";
         let mut rng = StdRng::seed_from_u64(8349u64);
         let mut pp = KeyPair::setup(n, BlsScalar::random(&mut rng));
+        const ACCOUNT_LIMIT: usize = 2;
+        const BATCH_SIZE: usize = 2;
+
+        // Create an operator and contract
+        let mut operator = RollupOperator::<Fr, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
+            Poseidon::<Fr, 2>::new(),
+        );
+
+        let contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
 
         let alice_secret = SecretKey::new(Fp::random(&mut rng));
         let bob_secret = SecretKey::new(Fp::random(&mut rng));
         let alice_address = alice_secret.to_public_key();
         let bob_address = bob_secret.to_public_key();
 
-        let mut alice = UserData::new(0, 10, alice_address);
-        let mut bob = UserData::new(1, 0, bob_address);
+        let alice = UserData::new(0, 10, alice_address);
+        let bob = UserData::new(1, 0, bob_address);
 
-        let poseidon = Poseidon::<Fp, 2>::new();
+        let deposit1 = TransactionData::new(alice_address, contract_address, 10)
+            .signed(alice_secret, &mut rng);
+        let deposit2 =
+            TransactionData::new(bob_address, contract_address, 0).signed(bob_secret, &mut rng);
 
-        let mut merkle_tree = SparseMerkleTree::<Fp, Poseidon<Fp, 2>, 2>::new_sequential(
-            &[alice.to_field_element(), bob.to_field_element()],
-            &poseidon,
-            &[0; 64],
-        )
-        .unwrap();
+        let poseidon = Poseidon::<Fr, 2>::new();
 
+        // Explicitly process data on L2. Will be changed, when communication between layers will be decided.
+        operator.process_deposits(vec![deposit1, deposit2]);
+
+        // Prepared and sign transfer transactions
         let t1 =
             TransactionData::new(alice_address, bob_address, 10).signed(alice_secret, &mut rng);
         let t2 = TransactionData::new(bob_address, alice_address, 5).signed(bob_secret, &mut rng);
 
-        let batch = create_batch((t1, t2), &mut alice, &mut bob, &mut merkle_tree);
+        assert!(operator.execute_transaction(t1).is_none());
+        let (proof, batch) = operator.execute_transaction(t2).unwrap();
 
-        let batch_circuit = BatchCircuit::new(batch, Fp::zero(), Fp::zero());
+        let batch_circuit = BatchCircuit::new(batch);
 
         let prover = Compiler::compile::<BatchCircuit, TatePairing>(&mut pp, label)
             .expect("failed to compile circuit");

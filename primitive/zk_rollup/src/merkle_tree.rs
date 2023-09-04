@@ -73,7 +73,7 @@ impl std::error::Error for MerkleError {}
 /// Contains a sequence of sibling nodes that make up a merkle proof.
 /// Each pair is used to identify whether an incremental merkle root
 /// construction is valid at each intermediate step.
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct MerkleProof<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
     /// The path represented as a sequence of sibling pairs.
     pub path: [(F, F); N],
@@ -205,7 +205,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
     }
 
     pub fn new_empty(hasher: &H, empty_leaf: &[u8; 64]) -> Result<Self, Error> {
-        Self::new_sequential(&[], hasher, empty_leaf)
+        Self::new_sequential(&[F::from_bytes_wide(empty_leaf); N], hasher, empty_leaf)
     }
 
     /// Creates a new Sparse Merkle Tree from a map of indices to field

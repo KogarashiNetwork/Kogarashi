@@ -1,8 +1,10 @@
+use std::vec;
+
 use zkstd::common::{FftField, SigUtils};
 
 use crate::{
     db::Db,
-    domain::{Transaction, UserData},
+    domain::{RollupTransactionInfo, Transaction, UserData},
     merkle_tree::{MerkleProof, SparseMerkleTree},
     poseidon::FieldHasher,
     proof::Proof,
@@ -11,18 +13,20 @@ use crate::{
 use red_jubjub::PublicKey;
 
 #[derive(Debug, PartialEq, Default)]
-pub(crate) struct Batch<F: FftField> {
-    transactions: Vec<Transaction>,
-    roots: Vec<(F, F)>,
+pub(crate) struct Batch<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
+    pub(crate) transactions: Vec<RollupTransactionInfo<F, H, N>>,
 }
 
-impl<F: FftField> Batch<F> {
-    pub fn transactions(&self) -> impl Iterator<Item = &Transaction> {
-        self.transactions.iter()
+impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> Batch<F, H, N> {
+    pub fn raw_transactions(&self) -> impl Iterator<Item = &Transaction> {
+        self.transactions.iter().map(|info| &info.transaction)
     }
 
     pub fn intermediate_roots(&self) -> Vec<(F, F)> {
-        self.roots.clone()
+        self.transactions
+            .iter()
+            .map(|data| (data.pre_root, data.post_root))
+            .collect()
     }
 
     pub fn border_roots(&self) -> (F, F) {
@@ -30,17 +34,19 @@ impl<F: FftField> Batch<F> {
     }
 
     pub(crate) fn first_root(&self) -> F {
-        self.roots
-            .first()
-            .expect("Batch size should be greater than zero")
-            .0
+        self.transactions
+            .iter()
+            .last()
+            .map(|data| data.pre_root)
+            .unwrap()
     }
 
     pub(crate) fn final_root(&self) -> F {
-        self.roots
+        self.transactions
+            .iter()
             .last()
-            .expect("Batch size should be greater than zero")
-            .1
+            .map(|data| data.post_root)
+            .unwrap()
     }
 }
 
@@ -53,7 +59,7 @@ pub(crate) struct RollupOperator<
 > {
     state_merkle: SparseMerkleTree<F, H, N>,
     db: Db,
-    transactions: Vec<(Transaction, (F, F))>,
+    transactions: Vec<RollupTransactionInfo<F, H, N>>,
     index_counter: u64,
     hasher: H,
 }
@@ -75,55 +81,83 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
     pub fn execute_transaction(
         &mut self,
         transaction: Transaction,
-    ) -> Option<(Proof<F, H, N, BATCH_SIZE>, Batch<F>)> {
+    ) -> Option<(Proof<F, H, N, BATCH_SIZE>, Batch<F, H, N>)> {
         let Transaction(signature, transaction_data) = transaction;
-        let prev_root = self.state_root();
-        let sender = self.db.get_mut(&transaction_data.sender_address);
+        let pre_root = self.state_root();
 
-        let sender_index = sender.index;
+        let pre_sender = *self.db.get(&transaction_data.sender_address);
 
-        self.state_merkle
-            .generate_membership_proof(sender_index)
+        let pre_sender_proof = self
+            .state_merkle
+            .generate_membership_proof(pre_sender.index);
+        assert!(pre_sender_proof
             .check_membership(
                 &self.state_merkle.root(),
-                &sender.to_field_element(),
+                &pre_sender.to_field_element(),
                 &self.hasher,
             )
-            .expect("Sender is not presented in the state");
+            .expect("Sender is not presented in the state"));
 
+        let pre_receiver = *self.db.get(&transaction_data.receiver_address);
+
+        let pre_receiver_proof = self
+            .state_merkle
+            .generate_membership_proof(pre_receiver.index);
+        assert!(pre_receiver_proof
+            .check_membership(
+                &self.state_merkle.root(),
+                &pre_receiver.to_field_element(),
+                &self.hasher,
+            )
+            .expect("Receiver is not presented in the state"));
         assert!(transaction_data
             .sender_address
             .validate(&transaction_data.to_bytes(), signature));
 
-        assert!(sender.balance >= transaction_data.amount);
+        {
+            let post_sender = self.db.get_mut(&transaction_data.sender_address);
 
-        assert!(sender.balance >= transaction_data.amount);
-        sender.balance -= transaction_data.amount;
-        self.state_merkle
-            .update(sender_index, sender.to_field_element(), &self.hasher)
-            .expect("Failed to update balance");
+            assert!(pre_sender.balance >= transaction_data.amount);
+            post_sender.balance -= transaction_data.amount;
 
-        let receiver = self.db.get_mut(&transaction_data.receiver_address);
+            self.state_merkle
+                .update(
+                    pre_sender.index,
+                    post_sender.to_field_element(),
+                    &self.hasher,
+                )
+                .expect("Failed to update balance");
 
-        let receiver_index = receiver.index;
+            let post_receiver = self.db.get_mut(&transaction_data.receiver_address);
+            post_receiver.balance += transaction_data.amount;
 
-        self.state_merkle
-            .generate_membership_proof(receiver_index)
-            .check_membership(
-                &self.state_merkle.root(),
-                &receiver.to_field_element(),
-                &self.hasher,
-            )
-            .expect("Sender is not presented in the state");
+            self.state_merkle
+                .update(
+                    pre_receiver.index,
+                    post_receiver.to_field_element(),
+                    &self.hasher,
+                )
+                .expect("Failed to update balance");
+        }
 
-        receiver.balance += transaction_data.amount;
+        let post_sender_proof = self
+            .state_merkle
+            .generate_membership_proof(pre_sender.index);
+        let post_receiver_proof = self
+            .state_merkle
+            .generate_membership_proof(pre_receiver.index);
 
-        self.state_merkle
-            .update(receiver_index, receiver.to_field_element(), &self.hasher)
-            .expect("Failed to update balance");
-
-        self.transactions
-            .push((transaction, (prev_root, self.state_merkle.root())));
+        self.transactions.push(RollupTransactionInfo {
+            transaction,
+            pre_root,
+            post_root: self.state_root(),
+            pre_sender,
+            pre_receiver,
+            pre_sender_proof,
+            pre_receiver_proof,
+            post_sender_proof,
+            post_receiver_proof,
+        });
 
         if self.transactions.len() >= BATCH_SIZE {
             Some(self.process_batch())
@@ -132,9 +166,12 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
         }
     }
 
-    pub fn process_batch(&mut self) -> (Proof<F, H, N, BATCH_SIZE>, Batch<F>) {
+    pub fn process_batch(&mut self) -> (Proof<F, H, N, BATCH_SIZE>, Batch<F, H, N>) {
         let batch = self.create_batch();
-        let batch_leaves: Vec<F> = batch.transactions().map(|t| t.to_field_element()).collect();
+        let batch_leaves: Vec<F> = batch
+            .raw_transactions()
+            .map(|t| t.to_field_element())
+            .collect();
         let batch_tree = SparseMerkleTree::<F, H, BATCH_SIZE>::new_sequential(
             &batch_leaves,
             &self.hasher,
@@ -160,12 +197,9 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
         // send proof to Verifier contract
     }
 
-    pub fn create_batch(&mut self) -> Batch<F> {
-        let (transactions, roots): (Vec<Transaction>, Vec<(F, F)>) =
-            self.transactions.iter().take(BATCH_SIZE).cloned().unzip();
+    pub fn create_batch(&mut self) -> Batch<F, H, N> {
         let batch = Batch {
-            transactions,
-            roots,
+            transactions: (self.transactions[0..BATCH_SIZE]).to_vec(),
         };
         self.transactions.drain(..BATCH_SIZE);
         batch

@@ -110,7 +110,7 @@ mod tests {
         // Check that batch info is on L1.
         assert_eq!(contract.calldata.len(), 1);
         let batch = contract.calldata.first().unwrap();
-        let txs: Vec<Transaction> = batch.transactions().cloned().collect();
+        let txs: Vec<Transaction> = batch.raw_transactions().cloned().collect();
         let expected_txs = vec![t1, t2];
         assert_eq!(&txs, &expected_txs);
         assert_eq!(batch.border_roots(), (root_after_dep, root_after_tx));
