@@ -37,12 +37,12 @@
 
 use crate::poseidon::FieldHasher;
 use anyhow::{Error, Result};
-use std::{
+use sp_std::{
     borrow::ToOwned,
-    collections::{BTreeMap, BTreeSet},
+    collections::{btree_map::BTreeMap, btree_set::BTreeSet},
     marker::PhantomData,
 };
-use zkstd::common::FftField;
+use zkstd::common::{FftField, Vec};
 
 /// Error enum for Sparse Merkle Tree.
 #[derive(Debug)]
@@ -63,7 +63,7 @@ impl core::fmt::Display for MerkleError {
     }
 }
 
-impl std::error::Error for MerkleError {}
+impl ark_std::error::Error for MerkleError {}
 
 // #[derive(Default)]
 // pub(crate) struct MerkleProof<F: FftField>(Vec<F>);
@@ -73,12 +73,30 @@ impl std::error::Error for MerkleError {}
 /// Contains a sequence of sibling nodes that make up a merkle proof.
 /// Each pair is used to identify whether an incremental merkle root
 /// construction is valid at each intermediate step.
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq, Copy)]
 pub struct MerkleProof<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
     /// The path represented as a sequence of sibling pairs.
     pub path: [(F, F); N],
+    pub path_pos: [u64; N],
     /// The phantom hasher type used to reconstruct the merkle root.
     pub marker: PhantomData<H>,
+}
+
+impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> Default for MerkleProof<F, H, N> {
+    fn default() -> Self {
+        let empty: [F; N] =
+            gen_empty_hashes(&H::default(), &[0; 64]).expect("Failed to generate empty hashes");
+        Self {
+            path: empty
+                .iter()
+                .map(|x| (*x, *x))
+                .collect::<Vec<_>>()
+                .try_into()
+                .expect("Failed to convert vec to array"),
+            path_pos: [0; N],
+            marker: Default::default(),
+        }
+    }
 }
 
 impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> MerkleProof<F, H, N> {
@@ -204,7 +222,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
     }
 
     pub fn new_empty(hasher: &H, empty_leaf: &[u8; 64]) -> Result<Self, Error> {
-        Self::new_sequential(&[], hasher, empty_leaf)
+        Self::new_sequential(&[F::from_bytes_wide(empty_leaf); N], hasher, empty_leaf)
     }
 
     /// Creates a new Sparse Merkle Tree from a map of indices to field
@@ -259,6 +277,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
     /// argument.
     pub fn generate_membership_proof(&self, index: u64) -> MerkleProof<F, H, N> {
         let mut path = [(F::zero(), F::zero()); N];
+        let mut path_pos = [0; N];
 
         let tree_index = convert_index_to_last_level(index, N);
 
@@ -277,6 +296,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
                 path[level] = (current, sibling);
             } else {
                 path[level] = (sibling, current);
+                path_pos[level] = 1;
             }
             current_node = parent(current_node).unwrap();
             level += 1;
@@ -284,6 +304,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
 
         MerkleProof {
             path,
+            path_pos,
             marker: PhantomData,
         }
     }

@@ -1,5 +1,7 @@
+#![cfg_attr(not(feature = "std"), no_std)]
 #![allow(dead_code)]
 #![allow(unused_variables)]
+mod batch_circuit;
 mod db;
 mod domain;
 mod main_contract;
@@ -17,7 +19,7 @@ mod tests {
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
     use red_jubjub::{PublicKey, SecretKey};
-    use zkstd::common::{CurveGroup, Group};
+    use zkstd::common::{vec, CurveGroup, Group, Vec};
 
     use crate::{
         domain::{Transaction, TransactionData},
@@ -45,7 +47,7 @@ mod tests {
         let root_before_dep = operator.state_root();
         assert_eq!(
             root_before_dep,
-            Fp::from_hex("0x0d3aa68d8765c3e6dc78d34ac24b4e75e5bb06cec683e802e31f52602a2263d1")
+            Fp::from_hex("0x082e6d1a102e14de34bf3471c6a79c4ae3069fbaad7346032d40626576cf4039")
                 .unwrap()
         );
 
@@ -109,7 +111,7 @@ mod tests {
         // Check that batch info is on L1.
         assert_eq!(contract.calldata.len(), 1);
         let batch = contract.calldata.first().unwrap();
-        let txs: Vec<Transaction> = batch.transactions().cloned().collect();
+        let txs: Vec<Transaction> = batch.raw_transactions().cloned().collect();
         let expected_txs = vec![t1, t2];
         assert_eq!(&txs, &expected_txs);
         assert_eq!(batch.border_roots(), (root_after_dep, root_after_tx));

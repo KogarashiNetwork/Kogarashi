@@ -38,6 +38,7 @@ pub struct ProvingKey<F: FftField> {
 }
 
 impl<F: FftField> ProvingKey<F> {
+    #[allow(clippy::too_many_arguments)]
     pub fn compute_quotient_i(
         &self,
         index: usize,

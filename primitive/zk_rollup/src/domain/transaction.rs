@@ -1,4 +1,19 @@
-use super::{FftField, PublicKey, RngCore, SecretKey, SigUtils, Signature};
+use crate::{merkle_tree::MerkleProof, poseidon::FieldHasher};
+
+use super::{FftField, PublicKey, RngCore, SecretKey, SigUtils, Signature, UserData};
+
+#[derive(Clone, Debug, PartialEq, Default, Copy)]
+pub(crate) struct RollupTransactionInfo<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
+    pub(crate) transaction: Transaction,
+    pub(crate) pre_root: F,
+    pub(crate) post_root: F,
+    pub(crate) pre_sender: UserData,
+    pub(crate) pre_receiver: UserData,
+    pub(crate) pre_sender_proof: MerkleProof<F, H, N>,
+    pub(crate) pre_receiver_proof: MerkleProof<F, H, N>,
+    pub(crate) post_sender_proof: MerkleProof<F, H, N>,
+    pub(crate) post_receiver_proof: MerkleProof<F, H, N>,
+}
 
 #[derive(Default, Clone, Copy, Debug, PartialEq)]
 pub(crate) struct Transaction(pub(crate) Signature, pub(crate) TransactionData);
