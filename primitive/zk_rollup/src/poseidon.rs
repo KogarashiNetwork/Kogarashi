@@ -5,7 +5,7 @@ use anyhow::Result;
 use std::marker::PhantomData;
 use zkstd::common::FftField;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub struct Poseidon<F: FftField, const L: usize>(PhantomData<F>);
 
 impl<F: FftField, const L: usize> Poseidon<F, L> {
@@ -14,7 +14,7 @@ impl<F: FftField, const L: usize> Poseidon<F, L> {
     }
 }
 
-pub trait FieldHasher<F: FftField, const L: usize>: Default + Send + Sync + Clone {
+pub trait FieldHasher<F: FftField, const L: usize>: Default + Send + Sync + Clone + Copy {
     fn hash(&self, inputs: [F; L]) -> Result<F>;
     fn hasher() -> Self;
 }

@@ -12,12 +12,25 @@ use crate::{
 #[cfg(test)]
 use red_jubjub::PublicKey;
 
-#[derive(Debug, PartialEq, Default)]
-pub(crate) struct Batch<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
-    pub(crate) transactions: Vec<RollupTransactionInfo<F, H, N>>,
+#[derive(Debug, PartialEq)]
+pub(crate) struct Batch<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
+{
+    pub(crate) transactions: [RollupTransactionInfo<F, H, N>; BATCH_SIZE],
 }
 
-impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> Batch<F, H, N> {
+impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize> Default
+    for Batch<F, H, N, BATCH_SIZE>
+{
+    fn default() -> Self {
+        Self {
+            transactions: [RollupTransactionInfo::default(); BATCH_SIZE],
+        }
+    }
+}
+
+impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
+    Batch<F, H, N, BATCH_SIZE>
+{
     pub fn raw_transactions(&self) -> impl Iterator<Item = &Transaction> {
         self.transactions.iter().map(|info| &info.transaction)
     }
@@ -81,7 +94,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
     pub fn execute_transaction(
         &mut self,
         transaction: Transaction,
-    ) -> Option<(Proof<F, H, N, BATCH_SIZE>, Batch<F, H, N>)> {
+    ) -> Option<(Proof<F, H, N, BATCH_SIZE>, Batch<F, H, N, BATCH_SIZE>)> {
         let Transaction(signature, transaction_data) = transaction;
         let pre_root = self.state_root();
 
@@ -166,7 +179,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
         }
     }
 
-    pub fn process_batch(&mut self) -> (Proof<F, H, N, BATCH_SIZE>, Batch<F, H, N>) {
+    pub fn process_batch(&mut self) -> (Proof<F, H, N, BATCH_SIZE>, Batch<F, H, N, BATCH_SIZE>) {
         let batch = self.create_batch();
         let batch_leaves: Vec<F> = batch
             .raw_transactions()
@@ -197,9 +210,11 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
         // send proof to Verifier contract
     }
 
-    pub fn create_batch(&mut self) -> Batch<F, H, N> {
+    pub fn create_batch(&mut self) -> Batch<F, H, N, BATCH_SIZE> {
         let batch = Batch {
-            transactions: (self.transactions[0..BATCH_SIZE]).to_vec(),
+            transactions: self.transactions[0..BATCH_SIZE]
+                .try_into()
+                .expect("Failed to get batch transactions from slice"),
         };
         self.transactions.drain(..BATCH_SIZE);
         batch

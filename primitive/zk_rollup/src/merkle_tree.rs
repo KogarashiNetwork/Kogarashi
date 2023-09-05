@@ -73,13 +73,30 @@ impl std::error::Error for MerkleError {}
 /// Contains a sequence of sibling nodes that make up a merkle proof.
 /// Each pair is used to identify whether an incremental merkle root
 /// construction is valid at each intermediate step.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Copy)]
 pub struct MerkleProof<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
     /// The path represented as a sequence of sibling pairs.
     pub path: [(F, F); N],
     pub path_pos: [u64; N],
     /// The phantom hasher type used to reconstruct the merkle root.
     pub marker: PhantomData<H>,
+}
+
+impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> Default for MerkleProof<F, H, N> {
+    fn default() -> Self {
+        let empty: [F; N] =
+            gen_empty_hashes(&H::default(), &[0; 64]).expect("Failed to generate empty hashes");
+        Self {
+            path: empty
+                .iter()
+                .map(|x| (*x, *x))
+                .collect::<Vec<_>>()
+                .try_into()
+                .expect("Failed to convert vec to array"),
+            path_pos: [0; N],
+            marker: Default::default(),
+        }
+    }
 }
 
 impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> MerkleProof<F, H, N> {

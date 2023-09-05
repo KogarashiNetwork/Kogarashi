@@ -8,22 +8,22 @@ use crate::{
     domain::{RollupTransactionInfo, Transaction, UserData},
     operator::Batch,
     poseidon::Poseidon,
-    redjubjub_circuit::RedJubjubCircuit,
+    redjubjub_circuit::check_signature,
 };
 use bls_12_381::Fr;
 use red_jubjub::sapling_hash;
 
-use self::root::MerkleMembershipCircuit;
+use self::root::check_membership;
 
 #[derive(Debug, PartialEq, Default)]
 pub struct BatchCircuit {
-    batch: Batch<Fr, Poseidon<Fr, 2>, 2>,
+    batch: Batch<Fr, Poseidon<Fr, 2>, 2, 2>,
 }
 
 impl BatchCircuit {
     #[allow(dead_code)]
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn new(batch: Batch<Fr, Poseidon<Fr, 2>, 2>) -> Self {
+    pub(crate) fn new(batch: Batch<Fr, Poseidon<Fr, 2>, 2, 2>) -> Self {
         Self { batch }
     }
 }
@@ -44,28 +44,28 @@ impl Circuit<TatePairing> for BatchCircuit {
         {
             let Transaction(sig, t) = transaction;
 
-            MerkleMembershipCircuit::new(
+            check_membership(
+                composer,
                 pre_sender.to_field_element(),
                 *pre_root,
                 pre_sender_proof.path,
                 pre_sender_proof.path_pos,
-            )
-            .circuit(composer)?;
+            )?;
 
-            MerkleMembershipCircuit::new(
+            check_membership(
+                composer,
                 pre_receiver.to_field_element(),
                 *pre_root,
                 pre_receiver_proof.path,
                 pre_receiver_proof.path_pos,
-            )
-            .circuit(composer)?;
+            )?;
 
-            RedJubjubCircuit::new(
+            check_signature(
+                composer,
                 t.sender_address.inner().into(),
                 *sig,
                 sapling_hash(&sig.r(), &t.sender_address.to_bytes(), &t.to_bytes()),
-            )
-            .circuit(composer)?;
+            )?;
 
             let post_sender = UserData {
                 balance: pre_sender.balance - t.amount,
@@ -73,25 +73,25 @@ impl Circuit<TatePairing> for BatchCircuit {
             };
 
             let post_receiver = UserData {
-                balance: pre_sender.balance + t.amount,
-                ..*pre_sender
+                balance: pre_receiver.balance + t.amount,
+                ..*pre_receiver
             };
 
-            MerkleMembershipCircuit::new(
+            check_membership(
+                composer,
                 post_sender.to_field_element(),
                 *post_root,
                 post_sender_proof.path,
                 post_sender_proof.path_pos,
-            )
-            .circuit(composer)?;
+            )?;
 
-            MerkleMembershipCircuit::new(
-                pre_receiver.to_field_element(),
+            check_membership(
+                composer,
+                post_receiver.to_field_element(),
                 *post_root,
                 post_receiver_proof.path,
                 post_receiver_proof.path_pos,
-            )
-            .circuit(composer)?;
+            )?;
         }
 
         Ok(())

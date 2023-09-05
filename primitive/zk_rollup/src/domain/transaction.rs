@@ -2,7 +2,7 @@ use crate::{merkle_tree::MerkleProof, poseidon::FieldHasher};
 
 use super::{FftField, PublicKey, RngCore, SecretKey, SigUtils, Signature, UserData};
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Default, Copy)]
 pub(crate) struct RollupTransactionInfo<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
     pub(crate) transaction: Transaction,
     pub(crate) pre_root: F,

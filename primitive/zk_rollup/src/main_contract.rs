@@ -19,7 +19,7 @@ pub(crate) struct MainContract<
     pub(crate) rollup_state_root: F,
     deposits: Vec<Transaction>,
     verifier_contract: VerifierContract<F, H, N, BATCH_SIZE>,
-    pub(crate) calldata: Vec<Batch<F, H, N>>,
+    pub(crate) calldata: Vec<Batch<F, H, N, BATCH_SIZE>>,
 
     marker: PhantomData<H>,
 }
@@ -48,7 +48,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
     pub fn add_batch(
         &mut self,
         proof: Proof<F, H, N, BATCH_SIZE>,
-        compressed_batch_data: Batch<F, H, N>,
+        compressed_batch_data: Batch<F, H, N, BATCH_SIZE>,
     ) {
         assert!(self.verifier_contract.verify_proof(proof));
         self.update_state(compressed_batch_data.final_root());

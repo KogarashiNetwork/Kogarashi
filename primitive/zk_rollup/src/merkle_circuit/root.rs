@@ -63,49 +63,62 @@ fn hash(composer: &mut Builder<TatePairing>, inputs: (Witness, Witness)) -> Witn
     )
 }
 
-impl<const K: usize> MerkleMembershipCircuit<K> {
-    fn calculate_root(&self, composer: &mut Builder<TatePairing>) -> Result<Witness, Error> {
-        let mut prev = composer.append_witness(self.leaf);
+fn calculate_root<const K: usize>(
+    composer: &mut Builder<TatePairing>,
+    leaf: Fr,
+    path: [(Fr, Fr); K],
+    path_pos: [u64; K],
+) -> Result<Witness, Error> {
+    let mut prev = composer.append_witness(leaf);
 
-        let path: Vec<(Witness, Witness)> = self
-            .path
-            .iter()
-            .map(|(node_l, node_r)| {
-                (
-                    composer.append_witness(*node_l),
-                    composer.append_witness(*node_r),
-                )
-            })
-            .collect();
+    let path: Vec<(Witness, Witness)> = path
+        .iter()
+        .map(|(node_l, node_r)| {
+            (
+                composer.append_witness(*node_l),
+                composer.append_witness(*node_r),
+            )
+        })
+        .collect();
 
-        let path_pos: Vec<Witness> = self
-            .path_pos
-            .iter()
-            .map(|pos| composer.append_witness(JubjubScalar::from(*pos)))
-            .collect();
+    let path_pos: Vec<Witness> = path_pos
+        .iter()
+        .map(|pos| composer.append_witness(JubjubScalar::from(*pos)))
+        .collect();
 
-        for ((left, right), pos) in path.into_iter().zip(path_pos) {
-            // left ^ prev == 0, if equal
-            let w1 = composer.append_logic_xor(left, prev, 256);
-            // right ^ prev == 0, if equal
-            let w2 = composer.append_logic_xor(right, prev, 256);
-            // if one is 0, then and will result to 0
-            let check = composer.append_logic_and(w1, w2, 256);
-            composer.assert_equal_constant(check, 0, None);
+    for ((left, right), pos) in path.into_iter().zip(path_pos) {
+        // TODO: If provided leaf == 0, and w1 == 0 || w2 == 0, then we pass both checks with invalid leaf
+        // left ^ prev == 0, if equal
+        let w1 = composer.append_logic_xor(left, prev, 256);
+        // right ^ prev == 0, if equal
+        let w2 = composer.append_logic_xor(right, prev, 256);
+        // if one is 0, then and will result to 0
+        let check = composer.append_logic_and(w1, w2, 256);
+        composer.assert_equal_constant(check, 0, None);
 
-            prev = hash(composer, (left, right));
-        }
-
-        Ok(prev)
+        prev = hash(composer, (left, right));
     }
+
+    Ok(prev)
+}
+
+pub(crate) fn check_membership<const K: usize>(
+    composer: &mut Builder<TatePairing>,
+    leaf: Fr,
+    root: Fr,
+    path: [(Fr, Fr); K],
+    path_pos: [u64; K],
+) -> Result<(), Error> {
+    let real_root = composer.append_witness(root);
+
+    let root = calculate_root(composer, leaf, path, path_pos)?;
+    composer.assert_equal(root, real_root);
+    Ok(())
 }
 
 impl<const K: usize> Circuit<TatePairing> for MerkleMembershipCircuit<K> {
     fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
-        let real_root = composer.append_witness(self.root);
-        let root = self.calculate_root(composer)?;
-        composer.assert_equal(root, real_root);
-        Ok(())
+        check_membership(composer, self.leaf, self.root, self.path, self.path_pos)
     }
 }
 

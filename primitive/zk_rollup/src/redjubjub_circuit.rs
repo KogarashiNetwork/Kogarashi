@@ -29,35 +29,44 @@ impl RedJubjubCircuit {
     }
 }
 
+pub(crate) fn check_signature(
+    composer: &mut Builder<TatePairing>,
+    public_key: JubjubAffine,
+    signature: Signature,
+    msg_hash: JubjubScalar,
+) -> Result<(), Error> {
+    let r = match JubjubAffine::from_bytes(signature.r()) {
+        Some(r) => composer.append_point(r),
+        None => return Err(Error::ProofVerificationError),
+    };
+    let s = match JubjubScalar::from_bytes(signature.s()) {
+        Some(s) => composer.append_witness(s),
+        None => return Err(Error::ProofVerificationError),
+    };
+
+    let msg_hash = composer.append_witness(msg_hash);
+    let public_key = composer.append_point(public_key);
+
+    let sapling_base_point = composer.append_constant_point(SAPLING_BASE_POINT);
+    let sapling_redjubjub_cofactor = composer.append_constant(SAPLING_REDJUBJUB_COFACTOR);
+    let neg = composer.append_witness(-JubjubScalar::one());
+
+    let s_bp = composer.component_mul_point(s, sapling_base_point);
+    let hash_pub_key = composer.component_mul_point(msg_hash, public_key);
+    let s_bp_neg = composer.component_mul_point(neg, s_bp);
+    let s_bp_neg_r = composer.component_add_point(s_bp_neg, r);
+    let s_bp_neg_r_hash_pub_key = composer.component_add_point(s_bp_neg_r, hash_pub_key);
+    let finalized =
+        composer.component_mul_point(sapling_redjubjub_cofactor, s_bp_neg_r_hash_pub_key);
+
+    composer.assert_equal_public_point(finalized, JubjubExtended::ADDITIVE_IDENTITY);
+
+    Ok(())
+}
+
 impl Circuit<TatePairing> for RedJubjubCircuit {
     fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
-        let r = match JubjubAffine::from_bytes(self.signature.r()) {
-            Some(r) => composer.append_point(r),
-            None => return Err(Error::ProofVerificationError),
-        };
-        let s = match JubjubScalar::from_bytes(self.signature.s()) {
-            Some(s) => composer.append_witness(s),
-            None => return Err(Error::ProofVerificationError),
-        };
-
-        let msg_hash = composer.append_witness(self.msg_hash);
-        let public_key = composer.append_point(self.public_key);
-
-        let sapling_base_point = composer.append_constant_point(SAPLING_BASE_POINT);
-        let sapling_redjubjub_cofactor = composer.append_constant(SAPLING_REDJUBJUB_COFACTOR);
-        let neg = composer.append_witness(-JubjubScalar::one());
-
-        let s_bp = composer.component_mul_point(s, sapling_base_point);
-        let hash_pub_key = composer.component_mul_point(msg_hash, public_key);
-        let s_bp_neg = composer.component_mul_point(neg, s_bp);
-        let s_bp_neg_r = composer.component_add_point(s_bp_neg, r);
-        let s_bp_neg_r_hash_pub_key = composer.component_add_point(s_bp_neg_r, hash_pub_key);
-        let finalized =
-            composer.component_mul_point(sapling_redjubjub_cofactor, s_bp_neg_r_hash_pub_key);
-
-        composer.assert_equal_public_point(finalized, JubjubExtended::ADDITIVE_IDENTITY);
-
-        Ok(())
+        check_signature(composer, self.public_key, self.signature, self.msg_hash)
     }
 }
 
