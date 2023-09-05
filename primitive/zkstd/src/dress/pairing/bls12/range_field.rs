@@ -33,8 +33,7 @@ macro_rules! bls12_range_field_pairing {
                 let c1 = self.0[1] + self.0[0];
                 let c1 = c1.mul_by_01(c0, o);
                 let c1 = c1 - aa - bb;
-                let c0 = bb;
-                let c0 = c0.mul_by_nonresidue();
+                let c0 = bb.mul_by_nonresidue();
                 let c0 = c0 + aa;
 
                 Self([c0, c1])
@@ -70,31 +69,32 @@ macro_rules! bls12_range_field_pairing {
 
                     // For A
                     z0 = t0 - z0;
-                    z0 = z0 + z0 + t0;
+                    z0 = z0.double() + t0;
 
                     z1 = t1 + z1;
-                    z1 = z1 + z1 + t1;
+                    z1 = z1.double() + t1;
 
                     let (mut t0, t1) = fp4_square(z2, z3);
                     let (t2, t3) = fp4_square(z4, z5);
 
                     // For C
                     z4 = t0 - z4;
-                    z4 = z4 + z4 + t0;
+                    z4 = z4.double() + t0;
 
                     z5 = t1 + z5;
-                    z5 = z5 + z5 + t1;
+                    z5 = z5.double() + t1;
 
                     // For B
                     t0 = t3.mul_by_nonresidue();
                     z2 = t0 + z2;
-                    z2 = z2 + z2 + t0;
+                    z2 = z2.double() + t0;
 
                     z3 = t2 - z3;
-                    z3 = z3 + z3 + t2;
+                    z3 = z3.double() + t2;
 
                     Fq12([Fq6([z0, z4, z3]), Fq6([z2, z1, z5])])
                 }
+
                 #[must_use]
                 fn cycolotomic_exp(f: Fq12) -> Fq12 {
                     let mut tmp = Fq12::one();

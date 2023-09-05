@@ -1,7 +1,7 @@
 use bls_12_381::Fr;
 use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
-use zksnarks::Witness;
+use zksnarks::{Constraint, Witness};
 use zkstd::behave::Group;
 
 #[derive(Debug, PartialEq)]
@@ -34,31 +34,28 @@ impl<const K: usize> MerkleMembershipCircuit<K> {
     }
 }
 
-fn hash<C>(composer: &mut C, inputs: (Witness, Witness)) -> Witness
-where
-    C: Composer<TatePairing>,
-{
-    let sum: Constraint<TatePairing> = Constraint::new()
+fn hash(composer: &mut Builder<TatePairing>, inputs: (Witness, Witness)) -> Witness {
+    let sum = Constraint::default()
         .left(1)
         .constant(Fr::ADDITIVE_GENERATOR)
         .a(inputs.0);
     let gen_plus_first = composer.gate_add(sum);
 
-    let first_hash = Constraint::new().left(2).a(gen_plus_first);
+    let first_hash = Constraint::default().left(2).a(gen_plus_first);
     let first_hash = composer.gate_add(first_hash);
 
-    let sum = Constraint::new()
+    let sum = Constraint::default()
         .left(1)
         .constant(Fr::ADDITIVE_GENERATOR)
         .a(inputs.1);
 
     let gen_plus_second = composer.gate_add(sum);
 
-    let second_hash = Constraint::new().left(2).a(gen_plus_second);
+    let second_hash = Constraint::default().left(2).a(gen_plus_second);
     let second_hash = composer.gate_add(second_hash);
 
     composer.gate_add(
-        Constraint::new()
+        Constraint::default()
             .left(1)
             .right(1)
             .a(first_hash)
@@ -67,10 +64,7 @@ where
 }
 
 impl<const K: usize> MerkleMembershipCircuit<K> {
-    fn calculate_root<C>(&self, composer: &mut C) -> Result<Witness, Error>
-    where
-        C: Composer<TatePairing>,
-    {
+    fn calculate_root(&self, composer: &mut Builder<TatePairing>) -> Result<Witness, Error> {
         let mut prev = composer.append_witness(self.leaf);
 
         let path: Vec<(Witness, Witness)> = self
@@ -107,10 +101,7 @@ impl<const K: usize> MerkleMembershipCircuit<K> {
 }
 
 impl<const K: usize> Circuit<TatePairing> for MerkleMembershipCircuit<K> {
-    fn circuit<C>(&self, composer: &mut C) -> Result<(), Error>
-    where
-        C: Composer<TatePairing>,
-    {
+    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
         let real_root = composer.append_witness(self.root);
         let root = self.calculate_root(composer)?;
         composer.assert_equal(root, real_root);
@@ -123,7 +114,7 @@ mod tests {
 
     use bls_12_381::Fr;
     use ec_pairing::TatePairing;
-    use poly_commit::KeyPair;
+    use poly_commit::KzgParams;
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
     use red_jubjub::PublicKey;
@@ -139,7 +130,7 @@ mod tests {
         let n = 13;
         let label = b"verify";
         let mut rng = StdRng::seed_from_u64(8349u64);
-        let mut pp = KeyPair::setup(n, BlsScalar::random(&mut rng));
+        let mut pp = KzgParams::setup(n, BlsScalar::random(&mut rng));
 
         let poseidon = Poseidon::<Fr, 2>::new();
 

@@ -161,9 +161,6 @@ macro_rules! fft_field_operation {
             fn mod_2_pow_k(&self, k: u8) -> u8 {
                 (self.0[0] & ((1 << k) - 1)) as u8
             }
-            fn mod_by_window(&self, c: usize) -> u64 {
-                self.0[0] % (1 << c)
-            }
 
             fn mods_2_pow_k(&self, w: u8) -> i8 {
                 assert!(w < 32u8);

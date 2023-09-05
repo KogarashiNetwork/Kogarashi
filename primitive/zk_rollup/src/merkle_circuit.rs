@@ -29,10 +29,7 @@ impl BatchCircuit {
 }
 
 impl Circuit<TatePairing> for BatchCircuit {
-    fn circuit<C>(&self, composer: &mut C) -> Result<(), Error>
-    where
-        C: Composer<TatePairing>,
-    {
+    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
         for RollupTransactionInfo {
             transaction,
             pre_root,
@@ -107,7 +104,7 @@ mod tests {
     use bls_12_381::Fr;
     use ec_pairing::TatePairing;
     use jub_jub::Fp;
-    use poly_commit::KeyPair;
+    use poly_commit::KzgParams;
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
     use red_jubjub::{PublicKey, SecretKey};
@@ -127,7 +124,7 @@ mod tests {
         let n = 15;
         let label = b"verify";
         let mut rng = StdRng::seed_from_u64(8349u64);
-        let mut pp = KeyPair::setup(n, BlsScalar::random(&mut rng));
+        let mut pp = KzgParams::setup(n, BlsScalar::random(&mut rng));
         const ACCOUNT_LIMIT: usize = 2;
         const BATCH_SIZE: usize = 2;
 

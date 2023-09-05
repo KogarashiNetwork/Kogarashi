@@ -80,10 +80,7 @@ impl Default for DummyCircuit {
 }
 
 impl Circuit<TatePairing> for DummyCircuit {
-    fn circuit<C>(&self, composer: &mut C) -> Result<(), CircuitError>
-    where
-        C: Composer<TatePairing>,
-    {
+    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), CircuitError> {
         let w_a = composer.append_witness(self.a);
         let w_b = composer.append_point(self.b);
 

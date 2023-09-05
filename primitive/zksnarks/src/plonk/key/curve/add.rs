@@ -60,6 +60,7 @@ pub struct ProvingKey<P: Pairing> {
 }
 
 impl<P: Pairing> ProvingKey<P> {
+    #[allow(clippy::too_many_arguments)]
     pub fn compute_quotient_i(
         &self,
         index: usize,
@@ -110,6 +111,7 @@ impl<P: Pairing> ProvingKey<P> {
         identity * q_variable_group_add_i * curve_add_separation_challenge
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn linearize(
         &self,
         curve_add_separation_challenge: &P::ScalarField,

@@ -131,31 +131,6 @@ impl Fr {
         (raw[0] % 2) != 0
     }
 
-    pub fn divn(&mut self, mut n: u32) {
-        if n >= 256 {
-            *self = Self::from(0_u64);
-            return;
-        }
-
-        while n >= 64 {
-            let mut t = 0;
-            for i in self.0.iter_mut().rev() {
-                core::mem::swap(&mut t, i);
-            }
-            n -= 64;
-        }
-
-        if n > 0 {
-            let mut t = 0;
-            for i in self.0.iter_mut().rev() {
-                let t2 = *i << (64 - n);
-                *i >>= n;
-                *i |= t;
-                t = t2;
-            }
-        }
-    }
-
     pub fn pow_vartime(&self, by: &[u64; 4]) -> Self {
         let mut res = Self::one();
         for e in by.iter().rev() {

@@ -30,10 +30,7 @@ impl RedJubjubCircuit {
 }
 
 impl Circuit<TatePairing> for RedJubjubCircuit {
-    fn circuit<C>(&self, composer: &mut C) -> Result<(), Error>
-    where
-        C: Composer<TatePairing>,
-    {
+    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
         let r = match JubjubAffine::from_bytes(self.signature.r()) {
             Some(r) => composer.append_point(r),
             None => return Err(Error::ProofVerificationError),
@@ -69,7 +66,7 @@ mod tests {
 
     use ec_pairing::TatePairing;
     use jub_jub::Fp;
-    use poly_commit::KeyPair;
+    use poly_commit::KzgParams;
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
     use zero_plonk::prelude::*;
@@ -85,7 +82,7 @@ mod tests {
         let label = b"verify";
         let mut rng = StdRng::seed_from_u64(8349u64);
 
-        let mut pp = KeyPair::setup(n, BlsScalar::random(&mut rng));
+        let mut pp = KzgParams::setup(n, BlsScalar::random(&mut rng));
 
         let msg = b"test";
 

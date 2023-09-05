@@ -90,6 +90,7 @@ impl<F: FftField> ProvingKey<F> {
     const K2: u64 = 13;
     const K3: u64 = 17;
 
+    #[allow(clippy::too_many_arguments)]
     pub fn compute_quotient_i(
         &self,
         index: usize,
@@ -115,6 +116,7 @@ impl<F: FftField> ProvingKey<F> {
     }
     // (a(x) + beta * X + gamma) (b(X) + beta * k1 * X + gamma) (c(X) + beta *
     // k2 * X + gamma)(d(X) + beta * k3 * X + gamma)z(X) * alpha
+    #[allow(clippy::too_many_arguments)]
     fn compute_quotient_identity_range_check_i(
         &self,
         index: usize,
@@ -139,6 +141,7 @@ impl<F: FftField> ProvingKey<F> {
     // (a(x) + beta* Sigma1(X) + gamma) (b(X) + beta * Sigma2(X) + gamma) (c(X)
     // + beta * Sigma3(X) + gamma)(d(X) + beta * Sigma4(X) + gamma) Z(X.omega) *
     // alpha
+    #[allow(clippy::too_many_arguments)]
     fn compute_quotient_copy_range_check_i(
         &self,
         index: usize,
@@ -244,6 +247,7 @@ impl<F: FftField> ProvingKey<F> {
     }
     // -(a_eval + beta * sigma_1 + gamma)(b_eval + beta * sigma_2 + gamma)
     // (c_eval + beta * sigma_3 + gamma) * beta *z_eval * alpha^2 * Sigma_4(X)
+    #[allow(clippy::too_many_arguments)]
     fn compute_linearizer_copy_range_check(
         &self,
         (a_eval, b_eval, c_eval): (&F, &F, &F),

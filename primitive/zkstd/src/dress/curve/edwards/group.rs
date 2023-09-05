@@ -9,6 +9,8 @@ macro_rules! twisted_edwards_affine_group_operation {
         }
 
         impl CurveGroup for $affine {
+            type Range = $range;
+
             type Affine = $affine;
             type Extended = $extended;
             type Scalar = $scalar;
@@ -57,6 +59,8 @@ macro_rules! twisted_edwards_extend_group_operation {
         }
 
         impl CurveGroup for $extended {
+            type Range = $range;
+
             type Affine = $affine;
             type Extended = $extended;
             type Scalar = $scalar;

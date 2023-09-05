@@ -13,6 +13,8 @@ macro_rules! affine_group_operation {
         }
 
         impl CurveGroup for $affine {
+            type Range = $range;
+
             type Affine = $affine;
             type Extended = $projective;
             type Scalar = $scalar;
@@ -71,6 +73,8 @@ macro_rules! projective_group_operation {
         }
 
         impl CurveGroup for $projective {
+            type Range = $range;
+
             type Affine = $affine;
             type Extended = $projective;
             type Scalar = $scalar;
@@ -114,6 +118,12 @@ macro_rules! projective_group_operation {
         impl AddAssign for $projective {
             fn add_assign(&mut self, rhs: $projective) {
                 *self = *self + rhs;
+            }
+        }
+
+        impl<'a> AddAssign<$projective> for &'a $projective {
+            fn add_assign(&mut self, rhs: $projective) {
+                *self += rhs;
             }
         }
 

@@ -1,6 +1,7 @@
 use crate::poly::Coefficients;
 use crate::util::batch_inversion;
 use crate::PointsValue;
+#[cfg(feature = "std")]
 use rayon::join;
 use zkstd::common::{vec, FftField, Vec};
 
@@ -180,7 +181,7 @@ impl<F: FftField> Fft<F> {
     /// point `tau`.
     pub fn evaluate_all_lagrange_coefficients(&self, tau: F) -> Vec<F> {
         // Evaluate all Lagrange polynomials
-        let size = self.n as usize;
+        let size = self.n;
         let t_size = tau.pow(size as u64);
         let one = F::one();
         if t_size == F::one() {
@@ -246,10 +247,17 @@ fn classic_fft_arithmetic<F: FftField>(
         coeffs[1] -= t;
     } else {
         let (left, right) = coeffs.split_at_mut(n / 2);
+        #[cfg(feature = "std")]
         join(
             || classic_fft_arithmetic(left, n / 2, twiddle_chunk * 2, twiddles),
             || classic_fft_arithmetic(right, n / 2, twiddle_chunk * 2, twiddles),
         );
+        #[cfg(not(feature = "std"))]
+        {
+            // TODO: recursion is quite inefficient when not parallel
+            classic_fft_arithmetic(left, n / 2, twiddle_chunk * 2, twiddles);
+            classic_fft_arithmetic(right, n / 2, twiddle_chunk * 2, twiddles);
+        };
         butterfly_arithmetic(left, right, twiddle_chunk, twiddles)
     }
 }

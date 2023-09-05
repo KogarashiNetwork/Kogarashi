@@ -25,8 +25,6 @@ pub trait FftField: PrimeField + ParallelCmp + From<[u64; 4]> {
 
     fn mods_2_pow_k(&self, w: u8) -> i8;
 
-    fn mod_by_window(&self, c: usize) -> u64;
-
     fn from_bytes_wide(bytes: &[u8; 64]) -> Self;
 
     fn reduce(&self) -> Self;

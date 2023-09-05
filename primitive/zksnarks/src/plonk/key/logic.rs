@@ -51,6 +51,7 @@ pub struct ProvingKey<F: FftField> {
 }
 
 impl<F: FftField> ProvingKey<F> {
+    #[allow(clippy::too_many_arguments)]
     pub fn compute_quotient_i(
         &self,
         index: usize,
@@ -90,6 +91,7 @@ impl<F: FftField> ProvingKey<F> {
         *q_logic_i * (c_3 + c_0 + c_1 + c_2 + c_4) * logic_separation_challenge
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn linearize(
         &self,
         logic_separation_challenge: &F,

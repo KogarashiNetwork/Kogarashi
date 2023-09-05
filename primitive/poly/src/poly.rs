@@ -1,9 +1,7 @@
-use core::ops::{Add, Deref, DerefMut, Index, Mul, Sub};
-
 use core::iter::{self, Sum};
+use core::ops::{Add, Deref, DerefMut, Index, Mul, Sub};
 use rand_core::RngCore;
-use zkstd::behave::FftField;
-use zkstd::common::{PrimeField, Vec};
+use zkstd::common::{FftField, PrimeField, Vec};
 
 /// polynomial coefficients form expression
 /// a_n-1 , a_n-2, ... , a_0

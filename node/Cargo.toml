@@ -1,7 +1,8 @@
 [workspace]
 members = [
     'kogarashi',
-    'client'
+    'client',
+    'zkruntime'
 ]
 
 [profile.release]

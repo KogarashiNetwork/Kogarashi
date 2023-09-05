@@ -1,13 +1,10 @@
 use crate::{
-    behave::{Basic, ParityCmp, PrimeField},
+    behave::{Basic, ParityCmp},
     common::CurveGroup,
 };
 use core::ops::{Add, AddAssign, MulAssign, Sub, SubAssign};
 
 pub trait Curve: CurveGroup + ParityCmp + Basic {
-    // range field of curve
-    type Range: PrimeField;
-
     // a param
     const PARAM_A: Self::Range;
 
