@@ -80,21 +80,21 @@ impl Circuit<TatePairing> for BatchCircuit {
                 ..*pre_sender
             };
 
-            // MerkleMembershipCircuit::new(
-            //     post_sender.to_field_element(),
-            //     *post_root,
-            //     post_sender_proof.path,
-            //     post_sender_proof.path_pos,
-            // )
-            // .circuit(composer)?;
+            MerkleMembershipCircuit::new(
+                post_sender.to_field_element(),
+                *post_root,
+                post_sender_proof.path,
+                post_sender_proof.path_pos,
+            )
+            .circuit(composer)?;
 
-            // MerkleMembershipCircuit::new(
-            //     pre_receiver.to_field_element(),
-            //     *post_root,
-            //     post_receiver_proof.path,
-            //     post_receiver_proof.path_pos,
-            // )
-            // .circuit(composer)?;
+            MerkleMembershipCircuit::new(
+                pre_receiver.to_field_element(),
+                *post_root,
+                post_receiver_proof.path,
+                post_receiver_proof.path_pos,
+            )
+            .circuit(composer)?;
         }
 
         Ok(())
