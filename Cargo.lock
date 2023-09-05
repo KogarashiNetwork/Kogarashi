@@ -1700,6 +1700,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-rollup-main-contract"
+version = "0.2.3"
+dependencies = [
+ "ec-pairing",
+ "frame-support",
+ "frame-system",
+ "jub-jub 0.0.14",
+ "pallet-transaction-payment",
+ "parity-scale-codec",
+ "proptest",
+ "serde",
+ "she-elgamal",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
+ "zkstd 0.0.12",
+]
+
+[[package]]
 name = "pallet-transaction-payment"
 version = "3.0.0"
 source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
@@ -1722,6 +1743,8 @@ dependencies = [
  "ark-std 0.4.0",
  "bls-12-381 0.0.12",
  "ec-pairing",
+ "frame-support",
+ "frame-system",
  "jub-jub 0.0.14",
  "poly-commit",
  "rand 0.8.5",
@@ -3413,6 +3436,7 @@ dependencies = [
  "jub-jub 0.0.14",
  "pallet-encrypted-balance",
  "pallet-plonk",
+ "pallet-rollup-main-contract",
  "parity-scale-codec",
  "poly-commit",
  "rand 0.8.5",

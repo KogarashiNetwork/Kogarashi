@@ -24,6 +24,7 @@ zero-plonk = { path = "./primitive/plonk", default-features = false }
 # pallet
 pallet-plonk = { path = "./pallets/plonk", default-features = false }
 pallet-encrypted-balance = { path = "./pallets/encrypted_balance", default-features = false }
+pallet-rollup-main-contract = { path = "./pallets/rollup_main_contract", default-features = false }
 confidential_transfer = { path = "./pallets/confidential_transfer", default-features = false }
 
 [dev-dependencies]
@@ -45,6 +46,7 @@ members = [
     "pallets/confidential_transfer",
     "pallets/encrypted_balance",
     "pallets/plonk",
+    "pallets/rollup_main_contract",
     "primitive/bls12_381",
     "primitive/elgamal",
     "primitive/jubjub",
@@ -78,6 +80,7 @@ std = [
     'confidential_transfer/std',
     'pallet-plonk/std',
     'pallet-encrypted-balance/std',
+    'pallet-rollup-main-contract/std'
 ]
 
 [[bench]]
