@@ -17,6 +17,7 @@ red-jubjub = { path = "../redjubjub", default-features = false}
 rand_core = { version="0.6.4", features = ["getrandom"] }
 bls-12-381 = { path = '../bls12_381', default-features = false }
 poly-commit = { path = "../poly", default-features = false }
+sp-std = { version = '3.0.0', default-features = false }
 
 [dev-dependencies]
 rand = "0.8.5"

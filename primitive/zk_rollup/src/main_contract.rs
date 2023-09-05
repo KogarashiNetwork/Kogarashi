@@ -1,7 +1,7 @@
-use std::marker::PhantomData;
+use sp_std::marker::PhantomData;
 
 use red_jubjub::PublicKey;
-use zkstd::common::FftField;
+use zkstd::common::{vec, FftField, Vec};
 
 use crate::{
     domain::Transaction, merkle_tree::MerkleProof, operator::Batch, poseidon::FieldHasher,

@@ -1,4 +1,4 @@
-use zkstd::common::FftField;
+use zkstd::common::{FftField, Vec};
 
 use crate::{
     merkle_tree::{MerkleProof, SparseMerkleTree},

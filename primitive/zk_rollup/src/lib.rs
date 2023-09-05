@@ -1,9 +1,10 @@
+#![cfg_attr(not(feature = "std"), no_std)]
 #![allow(dead_code)]
 #![allow(unused_variables)]
+mod batch_circuit;
 mod db;
 mod domain;
 mod main_contract;
-mod merkle_circuit;
 mod merkle_tree;
 mod operator;
 mod poseidon;
@@ -18,7 +19,7 @@ mod tests {
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
     use red_jubjub::{PublicKey, SecretKey};
-    use zkstd::common::{CurveGroup, Group};
+    use zkstd::common::{vec, CurveGroup, Group, Vec};
 
     use crate::{
         domain::{Transaction, TransactionData},

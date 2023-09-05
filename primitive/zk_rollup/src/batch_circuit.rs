@@ -1,4 +1,4 @@
-mod root;
+mod merkle;
 
 use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
@@ -13,7 +13,7 @@ use crate::{
 use bls_12_381::Fr;
 use red_jubjub::sapling_hash;
 
-use self::root::check_membership;
+use self::merkle::check_membership;
 
 #[derive(Debug, PartialEq, Default)]
 pub struct BatchCircuit {
@@ -109,7 +109,7 @@ mod tests {
     use rand_core::SeedableRng;
     use red_jubjub::{PublicKey, SecretKey};
     use zero_plonk::prelude::*;
-    use zkstd::common::{CurveGroup, Group};
+    use zkstd::common::{vec, CurveGroup, Group};
 
     use crate::{
         domain::{TransactionData, UserData},
@@ -120,19 +120,18 @@ mod tests {
     use super::BatchCircuit;
 
     #[test]
-    fn batch_update() {
+    fn batch_circuit_test() {
         let n = 15;
         let label = b"verify";
         let mut rng = StdRng::seed_from_u64(8349u64);
         let mut pp = KzgParams::setup(n, BlsScalar::random(&mut rng));
+
         const ACCOUNT_LIMIT: usize = 2;
         const BATCH_SIZE: usize = 2;
-
         // Create an operator and contract
         let mut operator = RollupOperator::<Fr, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
             Poseidon::<Fr, 2>::new(),
         );
-
         let contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
 
         let alice_secret = SecretKey::new(Fp::random(&mut rng));
@@ -147,8 +146,6 @@ mod tests {
             .signed(alice_secret, &mut rng);
         let deposit2 =
             TransactionData::new(bob_address, contract_address, 0).signed(bob_secret, &mut rng);
-
-        let poseidon = Poseidon::<Fr, 2>::new();
 
         // Explicitly process data on L2. Will be changed, when communication between layers will be decided.
         operator.process_deposits(vec![deposit1, deposit2]);

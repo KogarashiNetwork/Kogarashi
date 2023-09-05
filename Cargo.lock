@@ -1727,6 +1727,7 @@ dependencies = [
  "rand 0.8.5",
  "rand_core 0.6.4",
  "red-jubjub 0.0.15",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "zero-plonk",
  "zksnarks",
  "zkstd 0.0.12",

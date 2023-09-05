@@ -1,6 +1,4 @@
-use std::vec;
-
-use zkstd::common::{FftField, SigUtils};
+use zkstd::common::{vec, FftField, SigUtils, Vec};
 
 use crate::{
     db::Db,

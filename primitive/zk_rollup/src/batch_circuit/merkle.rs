@@ -3,6 +3,7 @@ use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
 use zksnarks::{Constraint, Witness};
 use zkstd::behave::Group;
+use zkstd::common::Vec;
 
 #[derive(Debug, PartialEq)]
 pub struct MerkleMembershipCircuit<const K: usize> {
@@ -109,10 +110,10 @@ pub(crate) fn check_membership<const K: usize>(
     path: [(Fr, Fr); K],
     path_pos: [u64; K],
 ) -> Result<(), Error> {
-    let real_root = composer.append_witness(root);
+    let precomputed_root = composer.append_witness(root);
 
     let root = calculate_root(composer, leaf, path, path_pos)?;
-    composer.assert_equal(root, real_root);
+    composer.assert_equal(root, precomputed_root);
     Ok(())
 }
 

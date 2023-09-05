@@ -37,12 +37,12 @@
 
 use crate::poseidon::FieldHasher;
 use anyhow::{Error, Result};
-use std::{
+use sp_std::{
     borrow::ToOwned,
-    collections::{BTreeMap, BTreeSet},
+    collections::{btree_map::BTreeMap, btree_set::BTreeSet},
     marker::PhantomData,
 };
-use zkstd::common::FftField;
+use zkstd::common::{FftField, Vec};
 
 /// Error enum for Sparse Merkle Tree.
 #[derive(Debug)]
@@ -63,7 +63,7 @@ impl core::fmt::Display for MerkleError {
     }
 }
 
-impl std::error::Error for MerkleError {}
+impl ark_std::error::Error for MerkleError {}
 
 // #[derive(Default)]
 // pub(crate) struct MerkleProof<F: FftField>(Vec<F>);

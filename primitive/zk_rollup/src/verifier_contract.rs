@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use sp_std::marker::PhantomData;
 
 use zkstd::common::FftField;
 
