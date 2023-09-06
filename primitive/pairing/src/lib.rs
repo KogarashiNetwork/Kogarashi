@@ -144,25 +144,24 @@ pub fn msm_curve_addtion<P: Pairing>(
                     bucket[seg - 1].add_assign(base);
                 }
             }
-            bucket
+            // Summation by parts
+            // e.g. 3a + 2b + 1c = a +
+            //                    (a) + b +
+            //                    ((a) + b) + c
+            let mut acc = P::G1Projective::ADDITIVE_IDENTITY;
+            let mut sum = P::G1Projective::ADDITIVE_IDENTITY;
+            bucket.iter().rev().for_each(|b| {
+                sum = b.add(sum);
+                acc += sum;
+            });
+            acc
         })
         .collect::<Vec<_>>();
     new_buckets
         .iter()
         .fold(P::G1Projective::ADDITIVE_IDENTITY, |mut sum, bucket| {
-            for _ in 0..c {
-                sum = sum.double();
-            }
-            // Summation by parts
-            // e.g. 3a + 2b + 1c = a +
-            //                    (a) + b +
-            //                    ((a) + b) + c
-            let mut running_sum = P::G1Projective::ADDITIVE_IDENTITY;
-            bucket.iter().rev().for_each(|exp| {
-                running_sum = exp.add(running_sum);
-                sum += running_sum;
-            });
-            sum
+            (0..c).for_each(|_| sum = sum.double());
+            sum + bucket
         })
 }
 
