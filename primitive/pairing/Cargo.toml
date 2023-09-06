@@ -23,6 +23,11 @@ zkstd = { path = "../zkstd", default-features = false }
 bls-12-381 = { path = "../bls12_381", default-features = false }
 jub-jub = { path = "../jubjub", default-features = false }
 parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
+rayon = { version = "1.5.1", optional = true }
 
 [dev-dependencies]
 rand_core = { version="0.6.4", features = ["getrandom"] }
+
+[features]
+default = ["std"]
+std = ["rayon"]

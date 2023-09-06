@@ -13,12 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![no_std]
 #![doc = include_str!("../README.md")]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 use bls_12_381::params::{BLS_X, BLS_X_IS_NEGATIVE};
 use bls_12_381::{Fq12, Fr, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective, Gt};
 use jub_jub::{Fp, JubjubAffine, JubjubExtended};
+#[cfg(feature = "std")]
+use rayon::prelude::*;
 use zkstd::common::*;
 use zkstd::common::{G2Pairing, Pairing, PairingRange, PrimeField, Vec};
 
@@ -131,10 +133,13 @@ pub fn msm_curve_addtion<P: Pairing>(
         let log2 = usize::BITS - bases.len().leading_zeros();
         (log2 * 69 / 100) as usize + 2
     };
-    let mut buckets: Vec<Vec<Bucket<P>>> = vec![vec![Bucket::None; (1 << c) - 1]; (256 / c) + 1];
 
-    let new_buckets = buckets
-        .iter_mut()
+    let mut buckets: Vec<Vec<Bucket<P>>> = vec![vec![Bucket::None; (1 << c) - 1]; (256 / c) + 1];
+    #[cfg(feature = "std")]
+    let bucket_iteration = buckets.par_iter_mut();
+    #[cfg(not(feature = "std"))]
+    let bucket_iteration = buckets.iter_mut();
+    let new_buckets = bucket_iteration
         .enumerate()
         .rev()
         .map(|(i, bucket)| {
