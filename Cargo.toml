@@ -21,6 +21,7 @@ jub-jub = { path = "./primitive/jubjub", default-features = false }
 poly-commit = { path = "./primitive/poly", default-features = false }
 ec-pairing = { path = "./primitive/pairing", default-features = false }
 zero-plonk = { path = "./primitive/plonk", default-features = false }
+pallet-zk-rollup = { path = "./primitive/zk_rollup", default-features = false }
 # pallet
 pallet-plonk = { path = "./pallets/plonk", default-features = false }
 pallet-encrypted-balance = { path = "./pallets/encrypted_balance", default-features = false }

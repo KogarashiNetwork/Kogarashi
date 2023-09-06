@@ -19,8 +19,6 @@ bls-12-381 = { path = '../bls12_381', default-features = false }
 poly-commit = { path = "../poly", default-features = false }
 sp-std = { version = '3.0.0', default-features = false }
 
-frame-system = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
-frame-support = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 
 [dev-dependencies]
 rand = "0.8.5"

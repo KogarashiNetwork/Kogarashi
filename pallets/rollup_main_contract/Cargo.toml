@@ -28,6 +28,7 @@ sp-runtime = { branch = 'v3.0.0', default-features = false, git = "https://githu
 sp-arithmetic = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 frame-support = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 frame-system = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+pallet-zk-rollup = { path = "../../primitive/zk_rollup", default-features = false }
 
 [dev-dependencies]
 proptest = "1"

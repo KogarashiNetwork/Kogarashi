@@ -12,6 +12,8 @@ mod proof;
 mod redjubjub_circuit;
 mod verifier_contract;
 
+pub use poseidon::FieldHasher;
+
 #[cfg(test)]
 mod tests {
 
