@@ -29,12 +29,15 @@ sp-arithmetic = { branch = 'v3.0.0', default-features = false, git = "https://gi
 frame-support = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 frame-system = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 pallet-zk-rollup = { path = "../../primitive/zk_rollup", default-features = false }
+bls-12-381 = { path = '../../primitive/bls12_381', default-features = false }
+red-jubjub = { path = "../../primitive/redjubjub", default-features = false}
 
 [dev-dependencies]
 proptest = "1"
 sp-io = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 sp-core = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 pallet-transaction-payment = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+rand = "0.8.5"
 
 [features]
 default = ["std"]

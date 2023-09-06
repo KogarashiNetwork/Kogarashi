@@ -1703,6 +1703,7 @@ dependencies = [
 name = "pallet-rollup-main-contract"
 version = "0.2.3"
 dependencies = [
+ "bls-12-381 0.0.12",
  "ec-pairing",
  "frame-support",
  "frame-system",
@@ -1711,6 +1712,8 @@ dependencies = [
  "pallet-zk-rollup",
  "parity-scale-codec",
  "proptest",
+ "rand 0.8.5",
+ "red-jubjub 0.0.15",
  "serde",
  "she-elgamal",
  "sp-arithmetic",
@@ -1745,10 +1748,12 @@ dependencies = [
  "bls-12-381 0.0.12",
  "ec-pairing",
  "jub-jub 0.0.14",
+ "parity-scale-codec",
  "poly-commit",
  "rand 0.8.5",
  "rand_core 0.6.4",
  "red-jubjub 0.0.15",
+ "serde",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "zero-plonk",
  "zksnarks",
@@ -2158,8 +2163,10 @@ dependencies = [
  "bls-12-381 0.0.12",
  "hex-literal",
  "jub-jub 0.0.14",
+ "parity-scale-codec",
  "rand 0.8.5",
  "rand_core 0.6.4",
+ "serde",
  "zkstd 0.0.12",
 ]
 

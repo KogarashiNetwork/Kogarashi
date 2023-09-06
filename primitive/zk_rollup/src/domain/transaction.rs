@@ -1,6 +1,9 @@
+use serde::{Deserialize, Serialize};
+
 use crate::{merkle_tree::MerkleProof, poseidon::FieldHasher};
 
 use super::{FftField, PublicKey, RngCore, SecretKey, SigUtils, Signature, UserData};
+use zkstd::common::*;
 
 #[derive(Clone, Debug, PartialEq, Default, Copy)]
 pub(crate) struct RollupTransactionInfo<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
@@ -15,8 +18,8 @@ pub(crate) struct RollupTransactionInfo<F: FftField, H: FieldHasher<F, 2>, const
     pub(crate) post_receiver_proof: MerkleProof<F, H, N>,
 }
 
-#[derive(Default, Clone, Copy, Debug, PartialEq)]
-pub(crate) struct Transaction(pub(crate) Signature, pub(crate) TransactionData);
+#[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Decode, Encode)]
+pub struct Transaction(pub(crate) Signature, pub(crate) TransactionData);
 
 impl Transaction {
     pub fn to_field_element<F: FftField>(self) -> F {
@@ -26,8 +29,8 @@ impl Transaction {
     }
 }
 
-#[derive(Default, Clone, Copy, Debug, PartialEq)]
-pub(crate) struct TransactionData {
+#[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Decode, Encode)]
+pub struct TransactionData {
     pub(crate) sender_address: PublicKey,
     pub(crate) receiver_address: PublicKey,
     pub(crate) amount: u64,

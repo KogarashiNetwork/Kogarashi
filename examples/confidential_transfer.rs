@@ -92,6 +92,7 @@ impl confidential_transfer::Config for TestRuntime {
     type Event = Event;
 }
 
+#[allow(clippy::too_many_arguments)]
 fn new_test_ext(
     alice_address: u64,
     alice_private_key: Fp,

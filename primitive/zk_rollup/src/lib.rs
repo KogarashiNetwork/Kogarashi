@@ -12,7 +12,10 @@ mod proof;
 mod redjubjub_circuit;
 mod verifier_contract;
 
-pub use poseidon::FieldHasher;
+pub use domain::{Transaction, TransactionData};
+pub use operator::{Batch, BatchGetter, RollupOperator};
+pub use poseidon::{FieldHasher, Poseidon};
+pub use proof::Proof;
 
 #[cfg(test)]
 mod tests {
@@ -26,7 +29,7 @@ mod tests {
     use crate::{
         domain::{Transaction, TransactionData},
         main_contract::MainContract,
-        operator::RollupOperator,
+        operator::{BatchGetter, RollupOperator},
         poseidon::Poseidon,
     };
 
