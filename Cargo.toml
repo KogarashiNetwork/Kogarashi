@@ -75,6 +75,7 @@ codegen-units = 1
 [features]
 default = ["std"]
 std = [
+    'poly-commit/std',
     'confidential_transfer/std',
     'pallet-plonk/std',
     'pallet-encrypted-balance/std',
@@ -91,6 +92,7 @@ harness = false
 [[bench]]
 name = "confidential_transfer"
 harness = false
+required-features = ["std"]
 
 [[bench]]
 name = "jubjub_curve"
@@ -103,6 +105,7 @@ harness = false
 [[bench]]
 name = "msm"
 harness = false
+required-features = ["std"]
 
 [[bench]]
 name = "pairing"
