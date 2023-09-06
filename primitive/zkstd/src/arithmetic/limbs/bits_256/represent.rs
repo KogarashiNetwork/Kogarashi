@@ -73,7 +73,6 @@ pub fn to_nafs(val: [u64; 4]) -> Nafs {
         .skip_while(|x| x == &Naf::Zero)
         .collect::<Vec<_>>();
     nafs.pop();
-    nafs.reverse();
     nafs
 }
 
