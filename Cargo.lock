@@ -778,7 +778,6 @@ dependencies = [
  "jub-jub 0.0.14",
  "parity-scale-codec",
  "rand_core 0.6.4",
- "rayon",
  "zkstd 0.0.12",
 ]
 

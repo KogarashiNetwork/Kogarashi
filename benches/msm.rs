@@ -1,6 +1,7 @@
 use bls_12_381::{Fr, G1Affine};
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
-use ec_pairing::{msm_curve_addtion, TatePairing};
+use ec_pairing::TatePairing;
+use poly_commit::msm_curve_addtion;
 use rand::rngs::OsRng;
 use zkstd::common::{CurveGroup, Group};
 
@@ -11,7 +12,7 @@ fn msm(c: &mut Criterion) {
         let p = vec![G1Affine::from(G1Affine::random(OsRng)); 1 << i];
         let k = vec![Fr::random(OsRng); 1 << i];
 
-        // 8-18 points
+        // 2^{8-14} points
         group.bench_function(BenchmarkId::new("msm_based", i), |b| {
             b.iter(|| {
                 black_box(msm_curve_addtion::<TatePairing>(

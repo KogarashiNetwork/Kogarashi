@@ -2,13 +2,13 @@ mod key;
 mod proof;
 
 use crate::commitment::Commitment;
+use crate::msm::msm_curve_addtion;
 use crate::poly::Coefficients;
 use crate::util;
 use crate::witness::Witness;
 pub use key::EvaluationKey;
 pub use proof::Proof;
 
-use ec_pairing::msm_curve_addtion;
 use parity_scale_codec::{Decode, Encode};
 use zkstd::common::*;
 

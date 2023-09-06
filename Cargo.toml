@@ -76,7 +76,6 @@ codegen-units = 1
 default = ["std"]
 std = [
     'poly-commit/std',
-    'ec-pairing/std',
     'confidential_transfer/std',
     'pallet-plonk/std',
     'pallet-encrypted-balance/std',
