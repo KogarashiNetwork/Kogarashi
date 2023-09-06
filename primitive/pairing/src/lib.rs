@@ -133,7 +133,7 @@ pub fn msm_curve_addtion<P: Pairing>(
     };
     let mut buckets: Vec<Vec<Bucket<P>>> = vec![vec![Bucket::None; (1 << c) - 1]; (256 / c) + 1];
 
-    buckets
+    let new_buckets = buckets
         .iter_mut()
         .enumerate()
         .rev()
@@ -146,6 +146,9 @@ pub fn msm_curve_addtion<P: Pairing>(
             }
             bucket
         })
+        .collect::<Vec<_>>();
+    new_buckets
+        .iter()
         .fold(P::G1Projective::ADDITIVE_IDENTITY, |mut sum, bucket| {
             for _ in 0..c {
                 sum = sum.double();
