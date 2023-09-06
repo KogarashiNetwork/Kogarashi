@@ -41,15 +41,13 @@ pub fn msm_curve_addtion<P: Pairing>(
                 sum = b.add(sum);
                 acc += sum;
             });
+            (0..c * i).for_each(|_| acc = acc.double());
             acc
         })
         .collect::<Vec<_>>();
     filled_buckets
         .iter()
-        .fold(P::G1Projective::ADDITIVE_IDENTITY, |mut sum, bucket| {
-            (0..c).for_each(|_| sum = sum.double());
-            sum + bucket
-        })
+        .fold(P::G1Projective::ADDITIVE_IDENTITY, |a, b| a + b)
 }
 
 #[derive(Clone, Copy)]
