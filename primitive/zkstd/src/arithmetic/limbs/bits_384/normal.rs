@@ -74,16 +74,12 @@ pub const fn sub(a: [u64; 6], b: [u64; 6], p: [u64; 6]) -> [u64; 6] {
 
 #[inline(always)]
 pub const fn double(a: [u64; 6], p: [u64; 6]) -> [u64; 6] {
-    let (l0, c) = (a[0] << 1, a[0] >> 63);
-    let s = ((a[1] as u128) << 1) + c as u128;
-    let (l1, c) = (s as u64, (s >> 64) as u64);
-    let s = ((a[2] as u128) << 1) + c as u128;
-    let (l2, c) = (s as u64, (s >> 64) as u64);
-    let s = ((a[3] as u128) << 1) + c as u128;
-    let (l3, c) = (s as u64, (s >> 64) as u64);
-    let s = ((a[4] as u128) << 1) + c as u128;
-    let (l4, c) = (s as u64, (s >> 64) as u64);
-    let l5 = (a[5] << 1).wrapping_add(c);
+    let l0 = a[0] << 1;
+    let l1 = a[1] << 1 | a[0] >> 63;
+    let l2 = a[2] << 1 | a[1] >> 63;
+    let l3 = a[3] << 1 | a[2] >> 63;
+    let l4 = a[4] << 1 | a[3] >> 63;
+    let l5 = a[5] << 1 | a[4] >> 63;
 
     let s = (l0 as u128).wrapping_sub(p[0] as u128);
     let (l0, brw) = (s as u64, (s >> 64) as u64);
@@ -237,25 +233,17 @@ pub const fn square(a: [u64; 6], p: [u64; 6], inv: u64) -> [u64; 6] {
     let (l6, c) = (s as u64, (s >> 64) as u64);
     let l7 = l7.wrapping_add(c);
 
-    let (l1, c) = (l1 << 1, l1 >> 63);
-    let s = ((l2 as u128) << 1) + c as u128;
-    let (l2, c) = (s as u64, (s >> 64) as u64);
-    let s = ((l3 as u128) << 1) + c as u128;
-    let (l3, c) = (s as u64, (s >> 64) as u64);
-    let s = ((l4 as u128) << 1) + c as u128;
-    let (l4, c) = (s as u64, (s >> 64) as u64);
-    let s = ((l5 as u128) << 1) + c as u128;
-    let (l5, c) = (s as u64, (s >> 64) as u64);
-    let s = ((l6 as u128) << 1) + c as u128;
-    let (l6, c) = (s as u64, (s >> 64) as u64);
-    let s = ((l7 as u128) << 1) + c as u128;
-    let (l7, c) = (s as u64, (s >> 64) as u64);
-    let s = ((l8 as u128) << 1) + c as u128;
-    let (l8, c) = (s as u64, (s >> 64) as u64);
-    let s = ((l9 as u128) << 1) + c as u128;
-    let (l9, c) = (s as u64, (s >> 64) as u64);
-    let s = ((l10 as u128) << 1) + c as u128;
-    let (l10, l11) = (s as u64, (s >> 64) as u64);
+    let l11 = l10 >> 63;
+    let l10 = (l10 << 1) | (l9 >> 63);
+    let l9 = (l9 << 1) | (l8 >> 63);
+    let l8 = (l8 << 1) | (l7 >> 63);
+    let l7 = (l7 << 1) | (l6 >> 63);
+    let l6 = (l6 << 1) | (l5 >> 63);
+    let l5 = (l5 << 1) | (l4 >> 63);
+    let l4 = (l4 << 1) | (l3 >> 63);
+    let l3 = (l3 << 1) | (l2 >> 63);
+    let l2 = (l2 << 1) | (l1 >> 63);
+    let l1 = l1 << 1;
 
     let s = a[0] as u128 * a[0] as u128;
     let (l0, c) = (s as u64, (s >> 64) as u64);
