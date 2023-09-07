@@ -165,14 +165,13 @@ impl<'a, 'b> Mul<&'b Fp> for &'a JubjubAffine {
     #[inline]
     fn mul(self, rhs: &'b Fp) -> JubjubExtended {
         let mut res = JubjubExtended::ADDITIVE_IDENTITY;
-        let mut acc = self.to_extended();
         for &naf in rhs.to_nafs().iter() {
+            res = double_projective_point(res);
             if naf == Naf::Plus {
-                res += acc;
+                res += self;
             } else if naf == Naf::Minus {
-                res -= acc;
+                res -= self;
             }
-            acc = acc.double();
         }
         res
     }
@@ -277,14 +276,13 @@ impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtended {
     #[inline]
     fn mul(self, rhs: &'b Fp) -> JubjubExtended {
         let mut res = JubjubExtended::ADDITIVE_IDENTITY;
-        let mut acc = *self;
         for &naf in rhs.to_nafs().iter() {
+            res = double_projective_point(res);
             if naf == Naf::Plus {
-                res += acc;
+                res += self;
             } else if naf == Naf::Minus {
-                res -= acc;
+                res -= self;
             }
-            acc = acc.double();
         }
         res
     }

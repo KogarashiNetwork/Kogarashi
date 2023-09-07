@@ -177,14 +177,13 @@ pub fn double_projective_point<P: WeierstrassProjective>(lhs: P) -> P {
 #[inline(always)]
 pub fn scalar_point<P: WeierstrassProjective>(point: P, scalar: &<P as CurveGroup>::Scalar) -> P {
     let mut res = P::ADDITIVE_IDENTITY;
-    let mut acc = point;
     for &naf in scalar.to_nafs().iter() {
+        res = double_projective_point(res);
         if naf == Naf::Plus {
-            res += acc;
+            res += point;
         } else if naf == Naf::Minus {
-            res -= acc;
+            res -= point;
         }
-        acc = Into::<P>::into(acc.double());
     }
     res
 }
