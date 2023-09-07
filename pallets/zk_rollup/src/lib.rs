@@ -31,14 +31,14 @@ mod traits;
 
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
-use traits::MainContract;
+use traits::Rollup;
 
 #[frame_support::pallet]
 pub mod pallet {
 
     use super::*;
 
-    use pallet_zk_rollup::BatchGetter;
+    use zk_rollup::BatchGetter;
     use zkstd::common::FftField;
 
     #[pallet::config]
@@ -93,7 +93,7 @@ pub mod pallet {
         }
 
         #[pallet::weight(10_000)]
-        pub fn add_batch(
+        pub fn update_state(
             origin: OriginFor<T>,
             proof: T::Proof,
             compressed_batch_data: T::Batch,
@@ -126,7 +126,7 @@ pub mod pallet {
     }
 }
 
-impl<T: Config> MainContract for Pallet<T> {
+impl<T: Config> Rollup for Pallet<T> {
     type F = T::F;
     type Transaction = T::Transaction;
     type Batch = T::Batch;

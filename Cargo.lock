@@ -1700,31 +1700,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-rollup-main-contract"
-version = "0.2.3"
-dependencies = [
- "bls-12-381 0.0.12",
- "ec-pairing",
- "frame-support",
- "frame-system",
- "jub-jub 0.0.14",
- "pallet-transaction-payment",
- "pallet-zk-rollup",
- "parity-scale-codec",
- "proptest",
- "rand 0.8.5",
- "red-jubjub 0.0.15",
- "serde",
- "she-elgamal",
- "sp-arithmetic",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
- "zkstd 0.0.12",
-]
-
-[[package]]
 name = "pallet-transaction-payment"
 version = "3.0.0"
 source = "git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0#95f493c45c7a9b7d3649487e7048b657a327a48c"
@@ -1741,22 +1716,26 @@ dependencies = [
 
 [[package]]
 name = "pallet-zk-rollup"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
- "anyhow",
- "ark-std 0.4.0",
  "bls-12-381 0.0.12",
  "ec-pairing",
+ "frame-support",
+ "frame-system",
  "jub-jub 0.0.14",
+ "pallet-transaction-payment",
  "parity-scale-codec",
- "poly-commit",
+ "proptest",
  "rand 0.8.5",
- "rand_core 0.6.4",
  "red-jubjub 0.0.15",
  "serde",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "zero-plonk",
- "zksnarks",
+ "she-elgamal",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
+ "zk-rollup",
  "zkstd 0.0.12",
 ]
 
@@ -3442,7 +3421,6 @@ dependencies = [
  "jub-jub 0.0.14",
  "pallet-encrypted-balance",
  "pallet-plonk",
- "pallet-rollup-main-contract",
  "pallet-zk-rollup",
  "parity-scale-codec",
  "poly-commit",
@@ -3454,6 +3432,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "zero-plonk",
+ "zk-rollup",
  "zkstd 0.0.12",
 ]
 
@@ -3498,6 +3477,27 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.28",
+]
+
+[[package]]
+name = "zk-rollup"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "ark-std 0.4.0",
+ "bls-12-381 0.0.12",
+ "ec-pairing",
+ "jub-jub 0.0.14",
+ "parity-scale-codec",
+ "poly-commit",
+ "rand 0.8.5",
+ "rand_core 0.6.4",
+ "red-jubjub 0.0.15",
+ "serde",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "zero-plonk",
+ "zksnarks",
+ "zkstd 0.0.12",
 ]
 
 [[package]]

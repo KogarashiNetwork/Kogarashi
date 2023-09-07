@@ -1,5 +1,5 @@
 [package]
-name = "pallet-zk-rollup"
+name = "zk-rollup"
 version = "0.1.0"
 edition = "2021"
 

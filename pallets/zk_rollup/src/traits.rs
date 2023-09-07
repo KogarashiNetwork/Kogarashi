@@ -1,4 +1,4 @@
-pub trait MainContract {
+pub trait Rollup {
     type F;
     type Transaction;
     type Batch;

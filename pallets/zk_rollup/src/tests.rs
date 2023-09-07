@@ -1,16 +1,16 @@
 use crate::mock::new_test_ext;
 use crate::pallet::Config;
-use crate::{self as main_contract};
+use crate::{self as zk_rollup_pallet};
 
 use frame_support::{construct_runtime, parameter_types};
 use jub_jub::Fp;
-use pallet_zk_rollup::{Batch, Poseidon, Proof, Transaction};
 use red_jubjub::PublicKey;
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
+use zk_rollup::{Batch, Poseidon, Proof, Transaction};
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;
@@ -22,7 +22,7 @@ construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        MainContract: main_contract::{Module, Call, Storage, Event<T>},
+        ZkRollup: zk_rollup_pallet::{Module, Call, Storage, Event<T>},
     }
 );
 
@@ -81,17 +81,18 @@ impl Config for TestRuntime {
 // }
 
 #[cfg(test)]
-mod main_contract_test {
+mod zk_rollup_tests {
     use super::*;
+    use crate::traits::Rollup;
     use frame_support::assert_ok;
     use jub_jub::{Fp, JubjubExtended};
-    use pallet_zk_rollup::{Poseidon, RollupOperator, TransactionData};
     use rand::{rngs::StdRng, SeedableRng};
     use red_jubjub::SecretKey;
+    use zk_rollup::{Poseidon, RollupOperator, TransactionData};
     use zkstd::{behave::Group, common::CurveGroup};
 
     #[test]
-    fn rollup_test() {
+    fn zk_rollup_test() {
         let mut rng = StdRng::seed_from_u64(8349u64);
         const ACCOUNT_LIMIT: usize = 2;
         const BATCH_SIZE: usize = 2;
@@ -120,7 +121,7 @@ mod main_contract_test {
             let deposit2 = TransactionData::new(bob_address, main_contract_address, 0)
                 .signed(bob_secret, &mut rng);
 
-            assert_ok!(MainContract::deposit(alice_origin, deposit1));
+            assert_ok!(ZkRollup::deposit(alice_origin, deposit1));
 
             // let deposit = events();
             // assert_eq!(
@@ -131,7 +132,7 @@ mod main_contract_test {
             operator.process_deposit(deposit1);
             // }
 
-            assert_ok!(MainContract::deposit(bob_origin, deposit2));
+            assert_ok!(ZkRollup::deposit(bob_origin, deposit2));
             // let deposit = events();
             // assert_eq!(
             //     deposit,
@@ -150,7 +151,7 @@ mod main_contract_test {
             let (proof, batch) = operator.execute_transaction(t2).unwrap();
             let root_after_tx = operator.state_root();
 
-            assert_ok!(MainContract::add_batch(operator_origin, proof, batch));
+            assert_ok!(ZkRollup::update_state(operator_origin, proof, batch));
             // assert_eq!(
             //     events(),
             //     [Event::main_contract(crate::Event::StateUpdated(
@@ -159,10 +160,7 @@ mod main_contract_test {
             // );
 
             // 10. Check that state root on L1 changed.
-            assert_eq!(
-                <MainContract as crate::traits::MainContract>::state_root(),
-                root_after_tx
-            );
+            assert_eq!(<ZkRollup as Rollup>::state_root(), root_after_tx);
         });
     }
 }
