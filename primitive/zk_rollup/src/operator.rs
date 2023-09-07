@@ -1,5 +1,4 @@
-use serde::{Deserialize, Serialize};
-use zkstd::common::{vec, FftField, SigUtils, Vec};
+use zkstd::common::{vec, Decode, Encode, FftField, SigUtils, Vec};
 
 use crate::{
     db::Db,
@@ -20,9 +19,9 @@ pub trait BatchGetter<F: FftField> {
     // }
 }
 
-#[derive(Debug, PartialEq)]
-pub struct Batch<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize> {
-    pub(crate) transactions: [RollupTransactionInfo<F, H, N>; BATCH_SIZE],
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Encode, Decode)]
+pub struct Batch<Fld: FftField, H: FieldHasher<Fld, 2>, const N: usize, const BATCH_SIZE: usize> {
+    pub(crate) transactions: [RollupTransactionInfo<Fld, H, N>; BATCH_SIZE],
 }
 
 impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize> BatchGetter<F>

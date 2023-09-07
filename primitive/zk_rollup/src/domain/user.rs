@@ -1,6 +1,7 @@
 use super::{FftField, PublicKey, SigUtils};
+use zkstd::common::{Decode, Encode};
 
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Encode, Decode)]
 pub(crate) struct UserData {
     pub(crate) index: u64,
     pub(crate) balance: u64,

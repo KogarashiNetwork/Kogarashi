@@ -43,16 +43,11 @@ pub mod pallet {
 
     #[pallet::config]
     pub trait Config: frame_system::Config {
-        type F: FftField + Parameter + Member + Default + Copy + MaybeSerializeDeserialize;
-        type Transaction: Parameter + Member + Default + Copy + MaybeSerializeDeserialize;
-        type Batch: BatchGetter<Self::F>
-            + Parameter
-            + Member
-            + Default
-            + Copy
-            + MaybeSerializeDeserialize;
-        type Proof: Parameter + Member + Default + Copy + MaybeSerializeDeserialize;
-        type PublicKey: Parameter + Member + Default + Copy + MaybeSerializeDeserialize;
+        type F: FftField + Parameter + Member + Default + Copy;
+        type Transaction: Parameter + Member + Default + Copy;
+        type Batch: BatchGetter<Self::F> + Parameter + Member + Default + Copy;
+        type Proof: Parameter + Member + Default;
+        type PublicKey: Parameter + Member + Default + Copy;
 
         /// The overarching event type.
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;

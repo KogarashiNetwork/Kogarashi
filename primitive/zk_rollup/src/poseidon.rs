@@ -3,10 +3,10 @@
 
 use anyhow::Result;
 use sp_std::marker::PhantomData;
-use zkstd::common::FftField;
+use zkstd::common::{Decode, Encode, FftField};
 
-#[derive(Debug, Clone, PartialEq, Copy)]
-pub struct Poseidon<F: FftField, const L: usize>(PhantomData<F>);
+#[derive(Debug, Clone, PartialEq, Eq, Copy, Encode, Decode)]
+pub struct Poseidon<Fld: FftField, const L: usize>(PhantomData<Fld>);
 
 impl<F: FftField, const L: usize> Poseidon<F, L> {
     pub fn new() -> Self {
@@ -14,7 +14,9 @@ impl<F: FftField, const L: usize> Poseidon<F, L> {
     }
 }
 
-pub trait FieldHasher<F: FftField, const L: usize>: Default + Send + Sync + Clone + Copy {
+pub trait FieldHasher<F: FftField, const L: usize>:
+    Default + Send + Sync + Clone + Copy + Encode + Decode + PartialEq + Eq
+{
     fn hash(&self, inputs: [F; L]) -> Result<F>;
     fn hasher() -> Self;
 }

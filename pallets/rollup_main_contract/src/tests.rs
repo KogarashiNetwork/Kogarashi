@@ -1,6 +1,6 @@
 use crate::mock::new_test_ext;
+use crate::pallet::Config;
 use crate::{self as main_contract};
-use crate::{pallet::Config, types::*};
 
 use frame_support::{construct_runtime, parameter_types};
 use jub_jub::Fp;
@@ -72,21 +72,12 @@ impl Config for TestRuntime {
 // SBP-M1 review: poor testing, missing coverage for edge cases, errors, etc.
 #[cfg(test)]
 mod main_contract_test {
-    use crate::traits::MainContract;
-
     use super::*;
     use jub_jub::{Fp, JubjubExtended};
     use pallet_zk_rollup::{Poseidon, RollupOperator, TransactionData};
     use rand::{rngs::StdRng, SeedableRng};
     use red_jubjub::SecretKey;
     use zkstd::{behave::Group, common::CurveGroup};
-
-    // fn get_rng() -> FullcodecRng {
-    //     FullcodecRng::from_seed([
-    //         0x59, 0x62, 0xbe, 0x5d, 0x76, 0x3d, 0x31, 0x8d, 0x17, 0xdb, 0x37, 0x32, 0x54, 0x06,
-    //         0xbc, 0xe5,
-    //     ])
-    // }
 
     #[test]
     fn default_test() {
@@ -108,6 +99,7 @@ mod main_contract_test {
         let bob_address = bob_secret.to_public_key();
         // Decided by the operator
         let withdraw_address = PublicKey::new(JubjubExtended::random(&mut rng));
+        let main_contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
         // Will be changed. Implementation for test
         operator.add_withdrawal_address(withdraw_address);
         // State root will be changed here, but we can ignore it.
@@ -129,9 +121,9 @@ mod main_contract_test {
             );
 
             // 3. Create and sign deposit transactions
-            let deposit1 = TransactionData::new(alice_address, MainContract::address(), 10)
+            let deposit1 = TransactionData::new(alice_address, main_contract_address, 10)
                 .signed(alice_secret, &mut rng);
-            let deposit2 = TransactionData::new(bob_address, MainContract::address(), 0)
+            let deposit2 = TransactionData::new(bob_address, main_contract_address, 0)
                 .signed(bob_secret, &mut rng);
 
             // 4. Add them to the deposit pool on the L1
@@ -182,7 +174,10 @@ mod main_contract_test {
             assert_eq!(&txs, &expected_txs);
             assert_eq!(batch.border_roots(), (root_after_dep, root_after_tx));
             // 10. Check that state root on L1 changed.
-            assert_eq!(MainContract::state_root(), root_after_tx);
+            assert_eq!(
+                <MainContract as crate::traits::MainContract>::state_root(),
+                root_after_tx
+            );
         });
     }
 }
