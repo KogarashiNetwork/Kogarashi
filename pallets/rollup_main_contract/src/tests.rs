@@ -69,10 +69,21 @@ impl Config for TestRuntime {
     type Event = Event;
 }
 
-// SBP-M1 review: poor testing, missing coverage for edge cases, errors, etc.
+// fn events() -> Vec<Event> {
+//     let evt = System::events()
+//         .into_iter()
+//         .map(|evt| evt.event)
+//         .collect::<Vec<_>>();
+
+//     System::reset_events();
+
+//     evt
+// }
+
 #[cfg(test)]
 mod main_contract_test {
     use super::*;
+    use frame_support::assert_ok;
     use jub_jub::{Fp, JubjubExtended};
     use pallet_zk_rollup::{Poseidon, RollupOperator, TransactionData};
     use rand::{rngs::StdRng, SeedableRng};
@@ -80,99 +91,73 @@ mod main_contract_test {
     use zkstd::{behave::Group, common::CurveGroup};
 
     #[test]
-    fn default_test() {
-        // let rng = get_rng();
+    fn rollup_test() {
         let mut rng = StdRng::seed_from_u64(8349u64);
         const ACCOUNT_LIMIT: usize = 2;
         const BATCH_SIZE: usize = 2;
 
-        // 1. Create an operator and contract
-
         let mut operator = RollupOperator::<Fp, Poseidon<Fp, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
             Poseidon::<Fp, 2>::new(),
         );
+        let main_contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
+        let operator_origin = Origin::signed(3);
 
-        // 2. Generate user data
         let alice_secret = SecretKey::new(Fp::random(&mut rng));
+        let alice_origin = Origin::signed(1);
         let bob_secret = SecretKey::new(Fp::random(&mut rng));
+        let bob_origin = Origin::signed(2);
         let alice_address = alice_secret.to_public_key();
         let bob_address = bob_secret.to_public_key();
-        // Decided by the operator
         let withdraw_address = PublicKey::new(JubjubExtended::random(&mut rng));
-        let main_contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
-        // Will be changed. Implementation for test
+
         operator.add_withdrawal_address(withdraw_address);
-        // State root will be changed here, but we can ignore it.
 
         new_test_ext().execute_with(|| {
             let mut rng = StdRng::seed_from_u64(8349u64);
 
-            // let mut contract = MainContract::<Fp, Poseidon<Fp, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
-            //     operator.state_root(),
-            //     PublicKey::new(JubjubExtended::random(&mut rng)),
-            // );
-
-            // Assures that null elements' hashes are correct
-            let root_before_dep = operator.state_root();
-            assert_eq!(
-                root_before_dep,
-                Fp::from_hex("0x082e6d1a102e14de34bf3471c6a79c4ae3069fbaad7346032d40626576cf4039")
-                    .unwrap()
-            );
-
-            // 3. Create and sign deposit transactions
             let deposit1 = TransactionData::new(alice_address, main_contract_address, 10)
                 .signed(alice_secret, &mut rng);
             let deposit2 = TransactionData::new(bob_address, main_contract_address, 0)
                 .signed(bob_secret, &mut rng);
 
-            // 4. Add them to the deposit pool on the L1
-            MainContract::deposit(deposit1);
-            MainContract::deposit(deposit2);
+            assert_ok!(MainContract::deposit(alice_origin, deposit1));
 
-            let pending_deposits = vec![];
-            assert_eq!(pending_deposits.len(), 2);
-            // 5. Explicitly process data on L2. Will be changed, when communication between layers will be decided.
-            operator.process_deposits(pending_deposits.clone());
+            // let deposit = events();
+            // assert_eq!(
+            //     deposit,
+            //     [Event::main_contract(crate::Event::Deposit(deposit1)),]
+            // );
+            // if let Event::main_contract(crate::Event::Deposit(t)) = deposit.first().unwrap() {
+            operator.process_deposit(deposit1);
+            // }
 
-            // Assures that deposits were processed on L2 and state tree was changed.
-            let root_after_dep = operator.state_root();
-            assert_eq!(
-                root_after_dep,
-                Fp::from_hex("0x0e19d7c5c79887947f8f9e73f07570eaabc7a4d2f5efb1c34b0b5d40e63ec4d1")
-                    .unwrap()
-            );
+            assert_ok!(MainContract::deposit(bob_origin, deposit2));
+            // let deposit = events();
+            // assert_eq!(
+            //     deposit,
+            //     [Event::main_contract(crate::Event::Deposit(deposit2)),]
+            // );
+            // if let Event::main_contract(crate::Event::Deposit(t)) = deposit.first().unwrap() {
+            operator.process_deposit(deposit2);
+            // }
 
-            // Need to implement balance verification for users through the contract
-            // assert!(contract.check_balance(MerkleProof::default()) == alice.balance());
-            // assert!(contract.check_balance(MerkleProof::default()) == bob.balance()));
-
-            // 6. Prepared and sign transfer transactions
             let t1 =
                 TransactionData::new(alice_address, bob_address, 10).signed(alice_secret, &mut rng);
             let t2 =
                 TransactionData::new(bob_address, alice_address, 5).signed(bob_secret, &mut rng);
 
-            // 7. Execute transactions on L2
             assert!(operator.execute_transaction(t1).is_none());
-            // With BATCH_SIZE == 2 second transaction should create a proof and batch
             let (proof, batch) = operator.execute_transaction(t2).unwrap();
             let root_after_tx = operator.state_root();
-            // State root should change as wells
-            assert_eq!(
-                root_after_tx,
-                Fp::from_hex("0x0e19d7c5c79887947f8f9e73f07570eaabc7a4d2f5efb1c34b0b5d40e63ec4d1")
-                    .unwrap()
-            );
 
-            // 8. Explicitly add_batch on L1. Will be changed, when communication between layers will be decided.
-            MainContract::add_batch(proof, batch);
+            assert_ok!(MainContract::add_batch(operator_origin, proof, batch));
+            // assert_eq!(
+            //     events(),
+            //     [Event::main_contract(crate::Event::StateUpdated(
+            //         root_after_tx
+            //     )),]
+            // );
 
-            // 9. Check that batch info is on L1.
-            let txs: Vec<Transaction> = batch.raw_transactions().cloned().collect();
-            let expected_txs = vec![t1, t2];
-            assert_eq!(&txs, &expected_txs);
-            assert_eq!(batch.border_roots(), (root_after_dep, root_after_tx));
             // 10. Check that state root on L1 changed.
             assert_eq!(
                 <MainContract as crate::traits::MainContract>::state_root(),

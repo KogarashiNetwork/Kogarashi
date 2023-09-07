@@ -1,5 +1,4 @@
 use crate as main_contract_pallet;
-use crate::*;
 use bls_12_381::Fr;
 use frame_support::parameter_types;
 use frame_system as system;

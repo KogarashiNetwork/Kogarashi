@@ -66,16 +66,13 @@ pub mod pallet {
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
 
     #[pallet::call]
-    impl<T: Config> Pallet<T>
-    // where
-    //     pallet::Call<T, I>: Codec,
-    {
+    impl<T: Config> Pallet<T> {
         #[pallet::weight(10_000)]
         pub(super) fn deposit(
             origin: OriginFor<T>,
             t: T::Transaction,
         ) -> DispatchResultWithPostInfo {
-            ensure_root(origin)?;
+            ensure_signed(origin)?;
 
             Self::deposit_event(Event::Deposit(t));
             Ok(().into())
@@ -89,15 +86,11 @@ pub mod pallet {
             transaction: T::Transaction,
             l1_address: T::PublicKey,
         ) -> DispatchResultWithPostInfo {
-            ensure_root(origin)?;
+            ensure_signed(origin)?;
             // merkle_verify(l2_burn_merkle_proof, batch_root);
             // send(transaction.amount, l1_address);
             Ok(().into())
         }
-
-        // fn update_state(&mut self, new_state_root: F) {
-        //     self.rollup_state_root = new_state_root;
-        // }
 
         #[pallet::weight(10_000)]
         pub fn add_batch(
@@ -105,7 +98,7 @@ pub mod pallet {
             proof: T::Proof,
             compressed_batch_data: T::Batch,
         ) -> DispatchResultWithPostInfo {
-            ensure_root(origin)?;
+            ensure_signed(origin)?;
             // assert!(self.verifier_contract.verify_proof(proof));
 
             let new_root = compressed_batch_data.final_root();
@@ -140,6 +133,7 @@ impl<T: Config> MainContract for Pallet<T> {
     type Proof = T::Proof;
     type PublicKey = T::PublicKey;
 
+    // TODO: Put initial root
     fn state_root() -> Self::F {
         Self::state_root().expect("No state root")
     }

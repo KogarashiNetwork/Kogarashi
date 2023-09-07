@@ -11,12 +11,6 @@ use red_jubjub::PublicKey;
 
 pub trait BatchGetter<F: FftField> {
     fn final_root(&self) -> F;
-    // self.transactions
-    //     .iter()
-    //     .last()
-    //     .map(|data| data.post_root)
-    //     .unwrap()
-    // }
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Encode, Decode)]
@@ -257,20 +251,18 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
         self.state_merkle.root()
     }
 
-    pub fn process_deposits(&mut self, txs: Vec<Transaction>) {
-        for t in txs {
-            let user = UserData::new(self.index_counter, t.1.amount, t.1.sender_address);
-            self.db.insert(user.address, user);
-            self.index_counter += 1;
+    pub fn process_deposit(&mut self, t: Transaction) {
+        let user = UserData::new(self.index_counter, t.1.amount, t.1.sender_address);
+        self.db.insert(user.address, user);
+        self.index_counter += 1;
 
-            self.state_merkle
-                .update(user.index, user.to_field_element(), &self.hasher)
-                .expect("Failed to update user info");
+        self.state_merkle
+            .update(user.index, user.to_field_element(), &self.hasher)
+            .expect("Failed to update user info");
 
-            // Need to add deposits to the transactions vec as well
-            // skipped just for easier test implementation
-            // self.transactions.push((t, self.state_root()));
-        }
+        // Need to add deposits to the transactions vec as well
+        // skipped just for easier test implementation
+        // self.transactions.push((t, self.state_root()));
     }
 
     pub fn add_withdrawal_address(&mut self, address: PublicKey) {

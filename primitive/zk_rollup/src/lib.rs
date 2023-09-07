@@ -80,7 +80,8 @@ mod tests {
         let pending_deposits = contract.deposits();
         assert_eq!(pending_deposits.len(), 2);
         // 5. Explicitly process data on L2. Will be changed, when communication between layers will be decided.
-        operator.process_deposits(pending_deposits.clone());
+        operator.process_deposit(pending_deposits[0]);
+        operator.process_deposit(pending_deposits[1]);
 
         // Assures that deposits were processed on L2 and state tree was changed.
         let root_after_dep = operator.state_root();

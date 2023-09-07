@@ -109,7 +109,7 @@ mod tests {
     use rand_core::SeedableRng;
     use red_jubjub::{PublicKey, SecretKey};
     use zero_plonk::prelude::*;
-    use zkstd::common::{vec, CurveGroup, Group};
+    use zkstd::common::{CurveGroup, Group};
 
     use crate::{
         domain::{TransactionData, UserData},
@@ -148,7 +148,8 @@ mod tests {
             TransactionData::new(bob_address, contract_address, 0).signed(bob_secret, &mut rng);
 
         // Explicitly process data on L2. Will be changed, when communication between layers will be decided.
-        operator.process_deposits(vec![deposit1, deposit2]);
+        operator.process_deposit(deposit1);
+        operator.process_deposit(deposit2);
 
         // Prepared and sign transfer transactions
         let t1 =
