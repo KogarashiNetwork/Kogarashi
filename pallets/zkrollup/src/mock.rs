@@ -1,4 +1,4 @@
-use crate as zk_rollup_pallet;
+use crate as zkrollup_pallet;
 use bls_12_381::Fr;
 use frame_support::parameter_types;
 use frame_system as system;
@@ -8,7 +8,7 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zk_rollup::{Batch, Poseidon, Proof, Transaction};
+use zkrollup::{Batch, Poseidon, Proof, Transaction};
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -21,7 +21,7 @@ frame_support::construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        TemplateModule: zk_rollup_pallet::{Module, Call, Storage, Event<T>},
+        TemplateModule: zkrollup_pallet::{Module, Call, Storage, Event<T>},
     }
 );
 
@@ -55,7 +55,7 @@ impl system::Config for Test {
     type SS58Prefix = SS58Prefix;
 }
 
-impl zk_rollup_pallet::Config for Test {
+impl zkrollup_pallet::Config for Test {
     type Event = Event;
 
     type F = Fr;

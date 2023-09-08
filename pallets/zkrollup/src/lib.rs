@@ -38,7 +38,7 @@ pub mod pallet {
 
     use super::*;
 
-    use zk_rollup::BatchGetter;
+    use zkrollup::BatchGetter;
     use zkstd::common::FftField;
 
     #[pallet::config]

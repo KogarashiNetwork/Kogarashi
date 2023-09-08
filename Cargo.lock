@@ -1715,7 +1715,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-zk-rollup"
+name = "pallet-zkrollup"
 version = "0.0.1"
 dependencies = [
  "bls-12-381 0.0.12",
@@ -1735,7 +1735,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
- "zk-rollup",
+ "zkrollup",
  "zkstd 0.0.12",
 ]
 
@@ -3421,7 +3421,7 @@ dependencies = [
  "jub-jub 0.0.14",
  "pallet-encrypted-balance",
  "pallet-plonk",
- "pallet-zk-rollup",
+ "pallet-zkrollup",
  "parity-scale-codec",
  "poly-commit",
  "rand 0.8.5",
@@ -3432,7 +3432,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "zero-plonk",
- "zk-rollup",
+ "zkrollup",
  "zkstd 0.0.12",
 ]
 
@@ -3480,7 +3480,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zk-rollup"
+name = "zkrollup"
 version = "0.1.0"
 dependencies = [
  "anyhow",

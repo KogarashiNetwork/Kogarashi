@@ -1,6 +1,6 @@
 use crate::mock::new_test_ext;
 use crate::pallet::Config;
-use crate::{self as zk_rollup_pallet};
+use crate::{self as zkrollup_pallet};
 
 use frame_support::{construct_runtime, parameter_types};
 use jub_jub::Fp;
@@ -10,7 +10,7 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zk_rollup::{Batch, Poseidon, Proof, Transaction};
+use zkrollup::{Batch, Poseidon, Proof, Transaction};
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;
@@ -22,7 +22,7 @@ construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        ZkRollup: zk_rollup_pallet::{Module, Call, Storage, Event<T>},
+        ZkRollup: zkrollup_pallet::{Module, Call, Storage, Event<T>},
     }
 );
 
@@ -81,18 +81,18 @@ impl Config for TestRuntime {
 // }
 
 #[cfg(test)]
-mod zk_rollup_tests {
+mod zkrollup_tests {
     use super::*;
     use crate::traits::Rollup;
     use frame_support::assert_ok;
     use jub_jub::{Fp, JubjubExtended};
     use rand::{rngs::StdRng, SeedableRng};
     use red_jubjub::SecretKey;
-    use zk_rollup::{Poseidon, RollupOperator, TransactionData};
+    use zkrollup::{Poseidon, RollupOperator, TransactionData};
     use zkstd::{behave::Group, common::CurveGroup};
 
     #[test]
-    fn zk_rollup_test() {
+    fn zkrollup_test() {
         let mut rng = StdRng::seed_from_u64(8349u64);
         const ACCOUNT_LIMIT: usize = 2;
         const BATCH_SIZE: usize = 2;
