@@ -47,7 +47,7 @@ pub mod pallet {
     pub trait Config:
         frame_system::Config + pallet_plonk::Config + pallet_encrypted_balance::Config
     {
-        type Plonk: Plonk<Self::AccountId, <Self as pallet_encrypted_balance::Config>::P>;
+        type Plonk: Plonk<<Self as pallet_encrypted_balance::Config>::P>;
         type EncryptedCurrency: EncryptedCurrency<Self::AccountId, Self::EncryptedBalance>;
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
     }
@@ -108,12 +108,8 @@ impl<T: Config> ConfidentialTransfer<T::AccountId, <T as pallet_encrypted_balanc
         T::EncryptedCurrency::total_balance(who)
     }
 
-    fn trusted_setup(
-        who: &T::AccountId,
-        val: u32,
-        rng: FullcodecRng,
-    ) -> DispatchResultWithPostInfo {
-        T::Plonk::trusted_setup(who, val, rng)
+    fn trusted_setup(val: u32, rng: FullcodecRng) -> DispatchResultWithPostInfo {
+        T::Plonk::trusted_setup(val, rng)
     }
 
     fn confidential_transfer(
@@ -127,7 +123,7 @@ impl<T: Config> ConfidentialTransfer<T::AccountId, <T as pallet_encrypted_balanc
     ) -> DispatchResultWithPostInfo {
         let public_inputs = transaction_params.clone().public_inputs();
         let (sender_amount, recipient_amount) = transaction_params.transaction_amount();
-        T::Plonk::verify(who, proof, public_inputs.to_vec())?;
+        T::Plonk::verify(proof, public_inputs.to_vec())?;
         T::EncryptedCurrency::transfer(who, dest, sender_amount, recipient_amount)?;
         Ok(().into())
     }

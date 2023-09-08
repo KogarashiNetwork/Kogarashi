@@ -130,8 +130,8 @@ pub mod pallet {
             val: u32,
             rng: FullcodecRng,
         ) -> DispatchResultWithPostInfo {
-            let transactor = ensure_signed(origin)?;
-            <Self as Plonk<_, T::P>>::trusted_setup(&transactor, val, rng)?;
+            ensure_signed(origin)?;
+            <Self as Plonk<T::P>>::trusted_setup(val, rng)?;
             Ok(().into())
         }
 
@@ -144,8 +144,8 @@ pub mod pallet {
             // SBP-M1 review: use BoundedVec instead of Vec
             public_inputs: Vec<<T::P as Pairing>::ScalarField>,
         ) -> DispatchResultWithPostInfo {
-            let transactor = ensure_signed(origin)?;
-            <Self as Plonk<_, T::P>>::verify(&transactor, proof, public_inputs)?;
+            ensure_signed(origin)?;
+            <Self as Plonk<T::P>>::verify(proof, public_inputs)?;
             Ok(().into())
         }
     }
@@ -158,7 +158,7 @@ impl<T: Config> Pallet<T> {
     }
 }
 
-impl<T: Config> Plonk<T::AccountId, T::P> for Pallet<T> {
+impl<T: Config> Plonk<T::P> for Pallet<T> {
     /// The circuit customized by developer
     type CustomCircuit = T::CustomCircuit;
 
@@ -166,7 +166,6 @@ impl<T: Config> Plonk<T::AccountId, T::P> for Pallet<T> {
     fn trusted_setup(
         // SBP-M1 review: why do you pass unused parameter?
         // Remove if redundant
-        _who: &T::AccountId,
         val: u32,
         mut rng: FullcodecRng,
     ) -> DispatchResultWithPostInfo {
@@ -192,7 +191,6 @@ impl<T: Config> Plonk<T::AccountId, T::P> for Pallet<T> {
     fn verify(
         // SBP-M1 review: why do you pass unused parameter?
         // Remove if redundant
-        _who: &T::AccountId,
         proof: Proof<T::P>,
         public_inputs: Vec<<T::P as Pairing>::ScalarField>,
     ) -> DispatchResultWithPostInfo {

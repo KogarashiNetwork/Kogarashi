@@ -1,14 +1,16 @@
 use crate as zkrollup_pallet;
 use bls_12_381::Fr;
+use ec_pairing::TatePairing;
 use frame_support::parameter_types;
 use frame_system as system;
+// use pallet_plonk::Plonk;
 use red_jubjub::PublicKey;
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zkrollup::{Batch, Poseidon, Proof, Transaction};
+use zkrollup::{Batch, BatchCircuit, Poseidon, Proof, Transaction};
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -21,6 +23,7 @@ frame_support::construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
+        Plonk: pallet_plonk::{Module, Call, Storage, Event<T>},
         TemplateModule: zkrollup_pallet::{Module, Call, Storage, Event<T>},
     }
 );
@@ -55,6 +58,12 @@ impl system::Config for Test {
     type SS58Prefix = SS58Prefix;
 }
 
+impl pallet_plonk::Config for Test {
+    type P = TatePairing;
+    type CustomCircuit = BatchCircuit;
+    type Event = Event;
+}
+
 impl zkrollup_pallet::Config for Test {
     type Event = Event;
 
@@ -67,6 +76,8 @@ impl zkrollup_pallet::Config for Test {
     type Proof = Proof<Self::F, Poseidon<Self::F, 2>, 2, 2>;
 
     type PublicKey = PublicKey;
+
+    type Plonk = Plonk;
 }
 
 // Build genesis storage according to the mock runtime.

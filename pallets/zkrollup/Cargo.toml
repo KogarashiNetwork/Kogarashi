@@ -31,6 +31,7 @@ frame-system = { branch = 'v3.0.0', default-features = false, git = "https://git
 zkrollup = { path = "../../primitive/zkrollup", default-features = false }
 bls-12-381 = { path = '../../primitive/bls12_381', default-features = false }
 red-jubjub = { path = "../../primitive/redjubjub", default-features = false}
+pallet-plonk = { path = "../plonk", default-features = false }
 
 [dev-dependencies]
 proptest = "1"

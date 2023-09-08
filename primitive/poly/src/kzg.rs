@@ -13,7 +13,7 @@ use parity_scale_codec::{Decode, Encode};
 use zkstd::common::*;
 
 /// Kate polynomial commitment params used for prover polynomial domain and proof verification
-#[derive(Clone, Debug, PartialEq, Decode, Encode)]
+#[derive(Clone, Debug, PartialEq, Decode, Encode, Default)]
 #[allow(dead_code)]
 pub struct KzgParams<P: Pairing> {
     pub(crate) g1: Vec<P::G1Affine>,
