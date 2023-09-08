@@ -1,4 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
+#![allow(clippy::unused_unit)]
 
 use ec_pairing::TatePairing;
 use jub_jub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};

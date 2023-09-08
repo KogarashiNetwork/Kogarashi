@@ -24,6 +24,8 @@ jub-jub = { path = "../jubjub", default-features = false }
 bls-12-381 = { path = "../bls12_381", default-features = false }
 blake2b_simd = { version = "1", default-features = false }
 rand_core = { version="0.6.4", default-features = false }
+serde = { version = "1.0.102", default-features = false, features = ["derive"] }
+parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
 
 [dev-dependencies]
 hex-literal = { version = "0.3.1", default-features = false }

@@ -50,6 +50,7 @@
 //!
 //! You can see the details with [tutorial](https://astarnetwork.github.io/plonk)
 #![cfg_attr(not(feature = "std"), no_std)]
+#![allow(clippy::unused_unit)]
 
 pub use pallet::*;
 
@@ -97,6 +98,7 @@ pub mod pallet {
     pub type Keypair<T: Config> = StorageValue<_, KzgParams<T::P>>;
 
     #[pallet::event]
+    #[pallet::generate_deposit(pub(super) fn deposit_event)]
     #[pallet::metadata(u32 = "Metadata")]
     pub enum Event<T: Config> {
         /// The event called when setup parameter
@@ -180,7 +182,7 @@ impl<T: Config> Plonk<T::AccountId, T::P> for Pallet<T> {
                     <T::P as Pairing>::ScalarField::random(&mut rng),
                 );
                 Keypair::<T>::put(&pp);
-                Event::<T>::TrustedSetup(pp);
+                Self::deposit_event(Event::<T>::TrustedSetup(pp));
                 Ok(().into())
             }
         }

@@ -1715,21 +1715,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-zk-rollup"
-version = "0.1.0"
+name = "pallet-zkrollup"
+version = "0.0.1"
 dependencies = [
- "anyhow",
- "ark-std 0.4.0",
  "bls-12-381 0.0.12",
  "ec-pairing",
+ "frame-support",
+ "frame-system",
  "jub-jub 0.0.14",
- "poly-commit",
+ "pallet-transaction-payment",
+ "parity-scale-codec",
+ "proptest",
  "rand 0.8.5",
- "rand_core 0.6.4",
  "red-jubjub 0.0.15",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "zero-plonk",
- "zksnarks",
+ "serde",
+ "she-elgamal",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
+ "zkrollup",
  "zkstd 0.0.12",
 ]
 
@@ -2136,8 +2142,10 @@ dependencies = [
  "bls-12-381 0.0.12",
  "hex-literal",
  "jub-jub 0.0.14",
+ "parity-scale-codec",
  "rand 0.8.5",
  "rand_core 0.6.4",
+ "serde",
  "zkstd 0.0.12",
 ]
 
@@ -3094,7 +3102,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97fee6b57c6a41524a810daee9286c02d7752c4253064d0b05472833a438f675"
 dependencies = [
  "cfg-if",
- "rand 0.8.5",
+ "rand 0.4.6",
  "static_assertions",
 ]
 
@@ -3413,6 +3421,7 @@ dependencies = [
  "jub-jub 0.0.14",
  "pallet-encrypted-balance",
  "pallet-plonk",
+ "pallet-zkrollup",
  "parity-scale-codec",
  "poly-commit",
  "rand 0.8.5",
@@ -3423,6 +3432,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "zero-plonk",
+ "zkrollup",
  "zkstd 0.0.12",
 ]
 
@@ -3467,6 +3477,27 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.28",
+]
+
+[[package]]
+name = "zkrollup"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "ark-std 0.4.0",
+ "bls-12-381 0.0.12",
+ "ec-pairing",
+ "jub-jub 0.0.14",
+ "parity-scale-codec",
+ "poly-commit",
+ "rand 0.8.5",
+ "rand_core 0.6.4",
+ "red-jubjub 0.0.15",
+ "serde",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "zero-plonk",
+ "zksnarks",
+ "zkstd 0.0.12",
 ]
 
 [[package]]

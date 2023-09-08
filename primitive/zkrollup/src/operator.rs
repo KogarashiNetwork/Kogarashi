@@ -1,4 +1,4 @@
-use zkstd::common::{vec, FftField, SigUtils, Vec};
+use zkstd::common::{vec, Decode, Encode, FftField, SigUtils, Vec};
 
 use crate::{
     db::Db,
@@ -7,13 +7,27 @@ use crate::{
     poseidon::FieldHasher,
     proof::Proof,
 };
-#[cfg(test)]
 use red_jubjub::PublicKey;
 
-#[derive(Debug, PartialEq)]
-pub(crate) struct Batch<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
+pub trait BatchGetter<F: FftField> {
+    fn final_root(&self) -> F;
+}
+
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Encode, Decode)]
+pub struct Batch<Fld: FftField, H: FieldHasher<Fld, 2>, const N: usize, const BATCH_SIZE: usize> {
+    pub(crate) transactions: [RollupTransactionInfo<Fld, H, N>; BATCH_SIZE],
+}
+
+impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize> BatchGetter<F>
+    for Batch<F, H, N, BATCH_SIZE>
 {
-    pub(crate) transactions: [RollupTransactionInfo<F, H, N>; BATCH_SIZE],
+    fn final_root(&self) -> F {
+        self.transactions
+            .iter()
+            .last()
+            .map(|data| data.post_root)
+            .unwrap()
+    }
 }
 
 impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize> Default
@@ -52,17 +66,17 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
             .unwrap()
     }
 
-    pub(crate) fn final_root(&self) -> F {
-        self.transactions
-            .iter()
-            .last()
-            .map(|data| data.post_root)
-            .unwrap()
-    }
+    // pub(crate) fn final_root(&self) -> F {
+    //     self.transactions
+    //         .iter()
+    //         .last()
+    //         .map(|data| data.post_root)
+    //         .unwrap()
+    // }
 }
 
 #[derive(Default)]
-pub(crate) struct RollupOperator<
+pub struct RollupOperator<
     F: FftField,
     H: FieldHasher<F, 2>,
     const N: usize,
@@ -237,24 +251,21 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
         self.state_merkle.root()
     }
 
-    pub(crate) fn process_deposits(&mut self, txs: Vec<Transaction>) {
-        for t in txs {
-            let user = UserData::new(self.index_counter, t.1.amount, t.1.sender_address);
-            self.db.insert(user.address, user);
-            self.index_counter += 1;
+    pub fn process_deposit(&mut self, t: Transaction) {
+        let user = UserData::new(self.index_counter, t.1.amount, t.1.sender_address);
+        self.db.insert(user.address, user);
+        self.index_counter += 1;
 
-            self.state_merkle
-                .update(user.index, user.to_field_element(), &self.hasher)
-                .expect("Failed to update user info");
+        self.state_merkle
+            .update(user.index, user.to_field_element(), &self.hasher)
+            .expect("Failed to update user info");
 
-            // Need to add deposits to the transactions vec as well
-            // skipped just for easier test implementation
-            // self.transactions.push((t, self.state_root()));
-        }
+        // Need to add deposits to the transactions vec as well
+        // skipped just for easier test implementation
+        // self.transactions.push((t, self.state_root()));
     }
 
-    #[cfg(test)]
-    pub(crate) fn add_withdrawal_address(&mut self, address: PublicKey) {
+    pub fn add_withdrawal_address(&mut self, address: PublicKey) {
         let user = UserData::new(self.index_counter, 0, address);
         self.db.insert(user.address, user);
         self.index_counter += 1;

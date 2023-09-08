@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
 use zkstd::behave::SigUtils;
+use zkstd::common::*;
 
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, Decode, Encode)]
 pub struct Signature {
     pub(crate) r: [u8; 32],
     pub(crate) s: [u8; 32],

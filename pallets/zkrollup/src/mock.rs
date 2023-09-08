@@ -1,12 +1,14 @@
-use crate as plonk_pallet;
-use crate::*;
+use crate as zkrollup_pallet;
+use bls_12_381::Fr;
 use frame_support::parameter_types;
 use frame_system as system;
+use red_jubjub::PublicKey;
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
+use zkrollup::{Batch, Poseidon, Proof, Transaction};
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -19,7 +21,7 @@ frame_support::construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        TemplateModule: plonk_pallet::{Module, Call, Storage, Event<T>},
+        TemplateModule: zkrollup_pallet::{Module, Call, Storage, Event<T>},
     }
 );
 
@@ -53,48 +55,18 @@ impl system::Config for Test {
     type SS58Prefix = SS58Prefix;
 }
 
-use ec_pairing::TatePairing;
-use zero_plonk::prelude::{Error as CircuitError, *};
-use zkstd::common::CurveGroup;
-
-#[derive(Debug)]
-pub struct DummyCircuit {
-    a: JubjubScalar,
-    b: JubjubExtended,
-}
-
-impl DummyCircuit {
-    pub fn new(a: JubjubScalar) -> Self {
-        Self {
-            a,
-            b: JubjubExtended::ADDITIVE_GENERATOR * a,
-        }
-    }
-}
-
-impl Default for DummyCircuit {
-    fn default() -> Self {
-        Self::new(JubjubScalar::from(7u64))
-    }
-}
-
-impl Circuit<TatePairing> for DummyCircuit {
-    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), CircuitError> {
-        let w_a = composer.append_witness(self.a);
-        let w_b = composer.append_point(self.b);
-
-        let w_x = composer.component_mul_generator(w_a, JubjubExtended::ADDITIVE_GENERATOR)?;
-
-        composer.assert_equal_point(w_b, w_x);
-
-        Ok(())
-    }
-}
-
-impl plonk_pallet::Config for Test {
-    type P = TatePairing;
+impl zkrollup_pallet::Config for Test {
     type Event = Event;
-    type CustomCircuit = DummyCircuit;
+
+    type F = Fr;
+
+    type Transaction = Transaction;
+
+    type Batch = Batch<Self::F, Poseidon<Self::F, 2>, 2, 2>;
+
+    type Proof = Proof<Self::F, Poseidon<Self::F, 2>, 2, 2>;
+
+    type PublicKey = PublicKey;
 }
 
 // Build genesis storage according to the mock runtime.

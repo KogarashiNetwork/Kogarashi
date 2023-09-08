@@ -5,9 +5,8 @@ use rand_core::RngCore;
 use red_jubjub::{PublicKey, SecretKey, Signature};
 use zkstd::common::{FftField, SigUtils};
 
-#[cfg(test)]
-pub(crate) use transaction::TransactionData;
-pub(crate) use transaction::{RollupTransactionInfo, Transaction};
+pub(crate) use transaction::RollupTransactionInfo;
+pub use transaction::{Transaction, TransactionData};
 pub(crate) use user::UserData;
 
 #[cfg(test)]

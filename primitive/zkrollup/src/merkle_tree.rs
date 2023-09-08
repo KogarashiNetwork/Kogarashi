@@ -42,7 +42,7 @@ use sp_std::{
     collections::{btree_map::BTreeMap, btree_set::BTreeSet},
     marker::PhantomData,
 };
-use zkstd::common::{FftField, Vec};
+use zkstd::common::{Decode, Encode, FftField, Vec};
 
 /// Error enum for Sparse Merkle Tree.
 #[derive(Debug)]
@@ -73,7 +73,7 @@ impl ark_std::error::Error for MerkleError {}
 /// Contains a sequence of sibling nodes that make up a merkle proof.
 /// Each pair is used to identify whether an incremental merkle root
 /// construction is valid at each intermediate step.
-#[derive(Clone, Debug, PartialEq, Copy)]
+#[derive(Clone, Debug, PartialEq, Eq, Copy, Encode, Decode)]
 pub struct MerkleProof<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
     /// The path represented as a sequence of sibling pairs.
     pub path: [(F, F); N],
@@ -152,7 +152,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> MerkleProof<F, H, N> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Encode, Decode)]
 /// The Sparse Merkle Tree struct.
 ///
 /// The Sparse Merkle Tree stores a set of leaves represented in a map and

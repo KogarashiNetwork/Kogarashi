@@ -1,0 +1,44 @@
+[package]
+authors = [
+    'ashWhiteHat<phantomofrotten@gmail.com>',
+    'KiriosK<KiriosK@yandex.ru>'
+]
+name = "pallet-zkrollup"
+version = "0.0.1"
+edition = "2021"
+license = "Apache-2.0"
+homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
+repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
+readme = 'README.md'
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[dependencies]
+serde = { version = "1.0.102", default-features = false, features = ["derive"] }
+codec = { version = "2.0.0", default-features = false, package = "parity-scale-codec", features = [
+    "derive"
+] }
+she-elgamal = { path = '../../primitive/elgamal', default-features = false }
+jub-jub = { path = '../../primitive/jubjub', default-features = false }
+ec-pairing = { path = '../../primitive/pairing', default-features = false }
+zkstd = { path = "../../primitive/zkstd", default-features = false }
+sp-std = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-runtime = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-arithmetic = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-support = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-system = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+zkrollup = { path = "../../primitive/zkrollup", default-features = false }
+bls-12-381 = { path = '../../primitive/bls12_381', default-features = false }
+red-jubjub = { path = "../../primitive/redjubjub", default-features = false}
+
+[dev-dependencies]
+proptest = "1"
+sp-io = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-core = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+pallet-transaction-payment = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+rand = "0.8.5"
+
+[features]
+default = ["std"]
+std = ['codec/std', "frame-support/std", 'frame-system/std']

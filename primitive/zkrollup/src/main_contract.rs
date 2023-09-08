@@ -4,8 +4,12 @@ use red_jubjub::PublicKey;
 use zkstd::common::{vec, FftField, Vec};
 
 use crate::{
-    domain::Transaction, merkle_tree::MerkleProof, operator::Batch, poseidon::FieldHasher,
-    proof::Proof, verifier_contract::VerifierContract,
+    domain::Transaction,
+    merkle_tree::MerkleProof,
+    operator::{Batch, BatchGetter},
+    poseidon::FieldHasher,
+    proof::Proof,
+    verifier_contract::VerifierContract,
 };
 
 #[derive(Default)]

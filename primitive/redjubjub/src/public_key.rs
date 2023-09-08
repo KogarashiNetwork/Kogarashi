@@ -4,10 +4,25 @@ use super::signature::Signature;
 
 use bls_12_381::Fr;
 use jub_jub::{Fp, JubjubAffine, JubjubExtended};
+use serde::{Deserialize, Serialize};
 use zkstd::behave::{CurveGroup, SigUtils};
+use zkstd::common::*;
 
 /// RedJubjub public key struct used for signature verification
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Default,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    Decode,
+    Encode,
+)]
 pub struct PublicKey(pub(crate) JubjubExtended);
 
 impl SigUtils<32> for PublicKey {
