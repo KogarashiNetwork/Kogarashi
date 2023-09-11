@@ -106,7 +106,8 @@ pub trait Pairing:
             Extended = Self::JubjubExtended,
             Scalar = Self::ScalarField,
         > + PartialEq
-        + Eq;
+        + Eq
+        + SigUtils<32>;
 
     // Jubjub extend point
     type JubjubExtended: CurveExtended<
@@ -116,7 +117,8 @@ pub trait Pairing:
         > + TwistedEdwardsExtended
         + TwistedEdwardsCurve
         + PartialEq
-        + Eq;
+        + Eq
+        + SigUtils<32>;
 
     // g2 pairing representation
     type G2PairngRepr: From<Self::G2Affine> + ParityCmp + Debug + Eq + PartialEq + Clone;

@@ -1,13 +1,17 @@
-use zkstd::common::{vec, Decode, Encode, FftField, SigUtils, Vec};
-
 use crate::{
     db::Db,
     domain::{RollupTransactionInfo, Transaction, UserData},
     merkle_tree::{MerkleProof, SparseMerkleTree},
     poseidon::FieldHasher,
     proof::Proof,
+    BatchCircuit,
 };
+use poly_commit::KzgParams;
+use rand_core::SeedableRng;
+use rand_xorshift::XorShiftRng as FullcodecRng;
 use red_jubjub::PublicKey;
+use zero_plonk::prelude::Compiler;
+use zkstd::common::{vec, Decode, Encode, FftField, Pairing, SigUtils, Vec};
 
 pub trait BatchGetter<F: FftField> {
     fn final_root(&self) -> F;
@@ -75,30 +79,39 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
     // }
 }
 
+fn get_rng() -> FullcodecRng {
+    FullcodecRng::from_seed([
+        0x59, 0x62, 0xbe, 0x5d, 0x76, 0x3d, 0x31, 0x8d, 0x17, 0xdb, 0x37, 0x32, 0x54, 0x06, 0xbc,
+        0xe5,
+    ])
+}
+
 #[derive(Default)]
 pub struct RollupOperator<
-    F: FftField,
-    H: FieldHasher<F, 2>,
+    P: Pairing,
+    H: FieldHasher<P::ScalarField, 2>,
     const N: usize,
     const BATCH_SIZE: usize,
 > {
-    state_merkle: SparseMerkleTree<F, H, N>,
+    state_merkle: SparseMerkleTree<P::ScalarField, H, N>,
     db: Db,
-    transactions: Vec<RollupTransactionInfo<F, H, N>>,
+    transactions: Vec<RollupTransactionInfo<P::ScalarField, H, N>>,
     index_counter: u64,
     hasher: H,
+    pp: KzgParams<P>,
 }
 
-impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
-    RollupOperator<F, H, N, BATCH_SIZE>
+impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
+    RollupOperator<P, H, N, BATCH_SIZE>
 {
     // const BATCH_SIZE: usize = 2;
 
-    pub fn new(hasher: H) -> Self {
+    pub fn new(hasher: H, pp: KzgParams<P>) -> Self {
         Self {
             state_merkle: SparseMerkleTree::new_empty(&hasher, &[0; 64])
                 .expect("Failed to create state merkle tree"),
             hasher,
+            pp,
             ..Default::default()
         }
     }
@@ -106,7 +119,10 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
     pub fn execute_transaction(
         &mut self,
         transaction: Transaction,
-    ) -> Option<(Proof<F, H, N, BATCH_SIZE>, Batch<F, H, N, BATCH_SIZE>)> {
+    ) -> Option<(
+        Proof<P::ScalarField, H, N, BATCH_SIZE>,
+        Batch<P::ScalarField, H, N, BATCH_SIZE>,
+    )> {
         let Transaction(signature, transaction_data) = transaction;
         let pre_root = self.state_root();
 
@@ -191,38 +207,35 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
         }
     }
 
-    pub fn process_batch(&mut self) -> (Proof<F, H, N, BATCH_SIZE>, Batch<F, H, N, BATCH_SIZE>) {
+    pub fn process_batch(
+        &mut self,
+    ) -> (
+        Proof<P::ScalarField, H, N, BATCH_SIZE>,
+        Batch<P::ScalarField, H, N, BATCH_SIZE>,
+    ) {
         let batch = self.create_batch();
-        let batch_leaves: Vec<F> = batch
+        let batch_leaves: Vec<P::ScalarField> = batch
             .raw_transactions()
             .map(|t| t.to_field_element())
             .collect();
-        let batch_tree = SparseMerkleTree::<F, H, BATCH_SIZE>::new_sequential(
+        let batch_tree = SparseMerkleTree::<P::ScalarField, H, BATCH_SIZE>::new_sequential(
             &batch_leaves,
             &self.hasher,
             &[0; 64],
         )
         .expect("Failed to create batch merkle tree");
 
-        let t_merkle_proofs: Vec<MerkleProof<F, H, BATCH_SIZE>> = (0..batch.transactions.len())
-            .map(|index| batch_tree.generate_membership_proof(index as u64))
-            .collect();
+        let t_merkle_proofs: Vec<MerkleProof<P::ScalarField, H, BATCH_SIZE>> =
+            (0..batch.transactions.len())
+                .map(|index| batch_tree.generate_membership_proof(index as u64))
+                .collect();
         let state_roots = batch.intermediate_roots();
 
-        let sender_receiver_in_state_merkle_proofs = vec![];
-        (
-            self.create_proof(
-                batch_tree,
-                t_merkle_proofs,
-                sender_receiver_in_state_merkle_proofs,
-                state_roots,
-            ),
-            batch,
-        )
+        (self.create_proof(batch), batch)
         // send proof to Verifier contract
     }
 
-    pub fn create_batch(&mut self) -> Batch<F, H, N, BATCH_SIZE> {
+    pub fn create_batch(&mut self) -> Batch<P::ScalarField, H, N, BATCH_SIZE> {
         let batch = Batch {
             transactions: self.transactions[0..BATCH_SIZE]
                 .try_into()
@@ -234,20 +247,20 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
 
     pub fn create_proof(
         &self,
-        batch_tree: SparseMerkleTree<F, H, BATCH_SIZE>,
-        t_merkle_proofs: Vec<MerkleProof<F, H, BATCH_SIZE>>,
-        sender_receiver_in_state_merkle_proofs: Vec<MerkleProof<F, H, N>>,
-        state_roots: Vec<(F, F)>,
-    ) -> Proof<F, H, N, BATCH_SIZE> {
-        Proof {
-            batch_tree,
-            t_merkle_proofs,
-            sender_receiver_in_state_merkle_proofs,
-            state_roots,
-        }
+        batch: Batch<P::ScalarField, H, N, BATCH_SIZE>,
+    ) -> Proof<P::ScalarField, H, N, BATCH_SIZE> {
+        let label = b"verify";
+        let batch_circuit = BatchCircuit::new(batch);
+        let prover = Compiler::compile::<BatchCircuit<P, H, N, BATCH_SIZE>, P>(&mut self.pp, label)
+            .expect("failed to compile circuit");
+        let proof = prover
+            .0
+            .prove(&mut get_rng(), &batch_circuit)
+            .expect("failed to prove");
+        Proof::default()
     }
 
-    pub fn state_root(&self) -> F {
+    pub fn state_root(&self) -> P::ScalarField {
         self.state_merkle.root()
     }
 

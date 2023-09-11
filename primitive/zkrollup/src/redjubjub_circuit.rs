@@ -1,7 +1,8 @@
 use ec_pairing::TatePairing;
 use jub_jub::JubjubAffine;
 use zero_plonk::prelude::*;
-use zkstd::common::{CurveGroup, SigUtils};
+use zkstd::behave::Ring;
+use zkstd::common::{CurveGroup, Pairing, SigUtils};
 
 use red_jubjub::{
     constant::{SAPLING_BASE_POINT, SAPLING_REDJUBJUB_COFACTOR},
@@ -29,17 +30,17 @@ impl RedJubjubCircuit {
     }
 }
 
-pub(crate) fn check_signature(
-    composer: &mut Builder<TatePairing>,
-    public_key: JubjubAffine,
+pub(crate) fn check_signature<P: Pairing>(
+    composer: &mut Builder<P>,
+    public_key: P::JubjubAffine,
     signature: Signature,
-    msg_hash: JubjubScalar,
+    msg_hash: P::JubjubScalar,
 ) -> Result<(), Error> {
-    let r = match JubjubAffine::from_bytes(signature.r()) {
+    let r = match P::JubjubAffine::from_bytes(signature.r()) {
         Some(r) => composer.append_point(r),
         None => return Err(Error::ProofVerificationError),
     };
-    let s = match JubjubScalar::from_bytes(signature.s()) {
+    let s = match P::JubjubScalar::from_bytes(signature.s()) {
         Some(s) => composer.append_witness(s),
         None => return Err(Error::ProofVerificationError),
     };
@@ -49,7 +50,7 @@ pub(crate) fn check_signature(
 
     let sapling_base_point = composer.append_constant_point(SAPLING_BASE_POINT);
     let sapling_redjubjub_cofactor = composer.append_constant(SAPLING_REDJUBJUB_COFACTOR);
-    let neg = composer.append_witness(-JubjubScalar::one());
+    let neg = composer.append_witness(-P::JubjubScalar::one());
 
     let s_bp = composer.component_mul_point(s, sapling_base_point);
     let hash_pub_key = composer.component_mul_point(msg_hash, public_key);
@@ -59,7 +60,7 @@ pub(crate) fn check_signature(
     let finalized =
         composer.component_mul_point(sapling_redjubjub_cofactor, s_bp_neg_r_hash_pub_key);
 
-    composer.assert_equal_public_point(finalized, JubjubExtended::ADDITIVE_IDENTITY);
+    composer.assert_equal_public_point(finalized, P::JubjubExtended::ADDITIVE_IDENTITY);
 
     Ok(())
 }

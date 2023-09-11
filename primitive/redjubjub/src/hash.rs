@@ -1,14 +1,15 @@
 use super::constant::SAPLING_PERSONAL;
 
 use blake2b_simd::{Params, State};
-use jub_jub::Fp;
+use zkstd::behave::Group;
+use zkstd::common::Pairing;
 
-pub fn sapling_hash(a: &[u8], b: &[u8], c: &[u8]) -> Fp {
+pub fn sapling_hash<P: Pairing>(a: &[u8], b: &[u8], c: &[u8]) -> P::JubjubScalar {
     SaplingHash::default()
         .update(a)
         .update(b)
         .update(c)
-        .finalize()
+        .finalize::<P>()
 }
 
 struct SaplingHash(State);
@@ -30,8 +31,9 @@ impl SaplingHash {
         self
     }
 
-    pub(crate) fn finalize(&self) -> Fp {
+    pub(crate) fn finalize<P: Pairing>(&self) -> P::JubjubScalar {
         let digest = self.0.finalize();
-        Fp::from_hash(digest.as_array())
+        // P::JubjubScalar::from_hash(digest.as_array())
+        P::JubjubScalar::zero()
     }
 }

@@ -2141,6 +2141,7 @@ version = "0.0.15"
 dependencies = [
  "blake2b_simd",
  "bls-12-381 0.0.12",
+ "ec-pairing",
  "hex-literal",
  "jub-jub 0.0.14",
  "parity-scale-codec",
