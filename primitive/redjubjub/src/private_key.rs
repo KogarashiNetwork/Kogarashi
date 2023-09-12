@@ -15,7 +15,7 @@ pub struct SecretKey<P: Pairing>(pub(crate) P::JubjubScalar);
 
 impl<P: Pairing> SigUtils<32> for SecretKey<P> {
     fn from_bytes(bytes: [u8; 32]) -> Option<Self> {
-        P::JubjubScalar::from_bytes(bytes).map(Self)
+        P::JubjubScalar::from_bytes(bytes).map(Self::new)
     }
 
     fn to_bytes(self) -> [u8; 32] {
@@ -49,19 +49,19 @@ impl<P: Pairing> SecretKey<P> {
 
         // r = H(T||vk||M)
         let pk = self.to_public_key();
-        let r = sapling_hash::<P>(&T, &pk.to_bytes(), m);
+        let r = sapling_hash::<P::JubjubScalar>(&T, &pk.to_bytes(), m);
 
         // R = r * P_G
-        let R = (r * sapling_base_point::<P>()).to_bytes();
+        let R = ((sapling_base_point::<P>() * r.into()) as P::JubjubExtended).to_bytes();
 
         // S = r + H(R||m) * sk
-        let S = (r + sapling_hash(&R, &pk.to_bytes(), m) * self.0).to_bytes();
+        let S = (r + sapling_hash::<P::JubjubScalar>(&R, &pk.to_bytes(), m) * self.0).to_bytes();
 
         Signature::new(R, S)
     }
 
     pub fn to_public_key(&self) -> PublicKey<P> {
-        PublicKey(sapling_base_point() * self.0)
+        PublicKey(sapling_base_point::<P>() * self.0.into())
     }
 
     pub fn randomize_private(&self, r: P::JubjubScalar) -> Self {

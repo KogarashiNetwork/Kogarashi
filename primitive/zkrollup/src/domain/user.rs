@@ -1,16 +1,16 @@
 use super::{FftField, PublicKey, SigUtils};
-use zkstd::common::{Decode, Encode};
+use zkstd::common::{Decode, Encode, Pairing};
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Encode, Decode)]
-pub(crate) struct UserData {
+pub(crate) struct UserData<P: Pairing> {
     pub(crate) index: u64,
     pub(crate) balance: u64,
-    pub(crate) address: PublicKey,
+    pub(crate) address: PublicKey<P>,
     pub(crate) nonce: u64,
 }
 
-impl SigUtils<56> for UserData {
-    fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+impl<P: Pairing> SigUtils<56> for UserData<P> {
+    fn from_bytes(bytes: [u8; 56]) -> Option<Self> {
         let mut index = [0_u8; 8];
         let mut balance = [0_u8; 8];
         let mut address = [0_u8; 32];
@@ -28,7 +28,7 @@ impl SigUtils<56> for UserData {
         })
     }
 
-    fn to_bytes(self) -> [u8; Self::LENGTH] {
+    fn to_bytes(self) -> [u8; 56] {
         let mut bytes = [0u8; 56];
         bytes[0..8].copy_from_slice(&self.index.to_le_bytes());
         bytes[8..16].copy_from_slice(&self.balance.to_le_bytes());
@@ -38,8 +38,8 @@ impl SigUtils<56> for UserData {
     }
 }
 
-impl UserData {
-    pub fn new(index: u64, balance: u64, address: PublicKey) -> Self {
+impl<P: Pairing> UserData<P> {
+    pub fn new(index: u64, balance: u64, address: PublicKey<P>) -> Self {
         Self {
             index,
             balance,
@@ -52,13 +52,13 @@ impl UserData {
         self.balance
     }
 
-    pub fn address(&self) -> PublicKey {
+    pub fn address(&self) -> PublicKey<P> {
         self.address
     }
 
-    pub fn to_field_element<F: FftField>(self) -> F {
+    pub fn to_field_element(self) -> P::ScalarField {
         let mut field = [0_u8; 64];
         field[0..56].copy_from_slice(&self.to_bytes()[0..56]);
-        F::from_bytes_wide(&field)
+        P::ScalarField::from_bytes_wide(&field)
     }
 }

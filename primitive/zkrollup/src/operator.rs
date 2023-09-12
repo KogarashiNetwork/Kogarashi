@@ -11,21 +11,26 @@ use rand_core::SeedableRng;
 use rand_xorshift::XorShiftRng as FullcodecRng;
 use red_jubjub::PublicKey;
 use zero_plonk::prelude::Compiler;
-use zkstd::common::{vec, Decode, Encode, FftField, Pairing, SigUtils, Vec};
+use zkstd::common::{Decode, Encode, FftField, Pairing, SigUtils, Vec};
 
 pub trait BatchGetter<F: FftField> {
     fn final_root(&self) -> F;
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Encode, Decode)]
-pub struct Batch<Fld: FftField, H: FieldHasher<Fld, 2>, const N: usize, const BATCH_SIZE: usize> {
-    pub(crate) transactions: [RollupTransactionInfo<Fld, H, N>; BATCH_SIZE],
+pub struct Batch<
+    P: Pairing,
+    H: FieldHasher<P::ScalarField, 2>,
+    const N: usize,
+    const BATCH_SIZE: usize,
+> {
+    pub(crate) transactions: [RollupTransactionInfo<P, H, N>; BATCH_SIZE],
 }
 
-impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize> BatchGetter<F>
-    for Batch<F, H, N, BATCH_SIZE>
+impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
+    BatchGetter<P::ScalarField> for Batch<P, H, N, BATCH_SIZE>
 {
-    fn final_root(&self) -> F {
+    fn final_root(&self) -> P::ScalarField {
         self.transactions
             .iter()
             .last()
@@ -34,8 +39,8 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
     }
 }
 
-impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize> Default
-    for Batch<F, H, N, BATCH_SIZE>
+impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize> Default
+    for Batch<P, H, N, BATCH_SIZE>
 {
     fn default() -> Self {
         Self {
@@ -44,25 +49,25 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
     }
 }
 
-impl<F: FftField, H: FieldHasher<F, 2>, const N: usize, const BATCH_SIZE: usize>
-    Batch<F, H, N, BATCH_SIZE>
+impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
+    Batch<P, H, N, BATCH_SIZE>
 {
-    pub fn raw_transactions(&self) -> impl Iterator<Item = &Transaction> {
+    pub fn raw_transactions(&self) -> impl Iterator<Item = &Transaction<P>> {
         self.transactions.iter().map(|info| &info.transaction)
     }
 
-    pub fn intermediate_roots(&self) -> Vec<(F, F)> {
+    pub fn intermediate_roots(&self) -> Vec<(P::ScalarField, P::ScalarField)> {
         self.transactions
             .iter()
             .map(|data| (data.pre_root, data.post_root))
             .collect()
     }
 
-    pub fn border_roots(&self) -> (F, F) {
+    pub fn border_roots(&self) -> (P::ScalarField, P::ScalarField) {
         (self.first_root(), self.final_root())
     }
 
-    pub(crate) fn first_root(&self) -> F {
+    pub(crate) fn first_root(&self) -> P::ScalarField {
         self.transactions
             .iter()
             .last()
@@ -94,8 +99,8 @@ pub struct RollupOperator<
     const BATCH_SIZE: usize,
 > {
     state_merkle: SparseMerkleTree<P::ScalarField, H, N>,
-    db: Db,
-    transactions: Vec<RollupTransactionInfo<P::ScalarField, H, N>>,
+    db: Db<P>,
+    transactions: Vec<RollupTransactionInfo<P, H, N>>,
     index_counter: u64,
     hasher: H,
     pp: KzgParams<P>,
@@ -118,10 +123,10 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
 
     pub fn execute_transaction(
         &mut self,
-        transaction: Transaction,
+        transaction: Transaction<P>,
     ) -> Option<(
         Proof<P::ScalarField, H, N, BATCH_SIZE>,
-        Batch<P::ScalarField, H, N, BATCH_SIZE>,
+        Batch<P, H, N, BATCH_SIZE>,
     )> {
         let Transaction(signature, transaction_data) = transaction;
         let pre_root = self.state_root();
@@ -211,7 +216,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
         &mut self,
     ) -> (
         Proof<P::ScalarField, H, N, BATCH_SIZE>,
-        Batch<P::ScalarField, H, N, BATCH_SIZE>,
+        Batch<P, H, N, BATCH_SIZE>,
     ) {
         let batch = self.create_batch();
         let batch_leaves: Vec<P::ScalarField> = batch
@@ -235,7 +240,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
         // send proof to Verifier contract
     }
 
-    pub fn create_batch(&mut self) -> Batch<P::ScalarField, H, N, BATCH_SIZE> {
+    pub fn create_batch(&mut self) -> Batch<P, H, N, BATCH_SIZE> {
         let batch = Batch {
             transactions: self.transactions[0..BATCH_SIZE]
                 .try_into()
@@ -246,8 +251,8 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
     }
 
     pub fn create_proof(
-        &self,
-        batch: Batch<P::ScalarField, H, N, BATCH_SIZE>,
+        &mut self,
+        batch: Batch<P, H, N, BATCH_SIZE>,
     ) -> Proof<P::ScalarField, H, N, BATCH_SIZE> {
         let label = b"verify";
         let batch_circuit = BatchCircuit::new(batch);
@@ -264,7 +269,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
         self.state_merkle.root()
     }
 
-    pub fn process_deposit(&mut self, t: Transaction) {
+    pub fn process_deposit(&mut self, t: Transaction<P>) {
         let user = UserData::new(self.index_counter, t.1.amount, t.1.sender_address);
         self.db.insert(user.address, user);
         self.index_counter += 1;
@@ -278,7 +283,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
         // self.transactions.push((t, self.state_root()));
     }
 
-    pub fn add_withdrawal_address(&mut self, address: PublicKey) {
+    pub fn add_withdrawal_address(&mut self, address: PublicKey<P>) {
         let user = UserData::new(self.index_counter, 0, address);
         self.db.insert(user.address, user);
         self.index_counter += 1;

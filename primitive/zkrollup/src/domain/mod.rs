@@ -12,6 +12,7 @@ pub(crate) use user::UserData;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use ec_pairing::TatePairing;
     use jub_jub::{Fp, JubjubExtended};
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
@@ -20,7 +21,7 @@ mod tests {
     #[test]
     fn sig_utils() {
         let mut rng = StdRng::seed_from_u64(8349u64);
-        let secret = SecretKey::new(Fp::random(&mut rng));
+        let secret = SecretKey::<TatePairing>::new(Fp::random(&mut rng));
         let td = TransactionData::new(
             secret.to_public_key(),
             PublicKey::new(JubjubExtended::random(&mut rng)),

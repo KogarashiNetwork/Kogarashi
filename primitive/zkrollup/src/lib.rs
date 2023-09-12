@@ -50,18 +50,18 @@ mod tests {
                 Poseidon::<Fr, 2>::new(),
                 pp,
             );
-        let mut contract = MainContract::<Fr, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
-            operator.state_root(),
-            PublicKey::new(JubjubExtended::random(&mut rng)),
-        );
+        let mut contract =
+            MainContract::<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
+                operator.state_root(),
+                PublicKey::new(JubjubExtended::random(&mut rng)),
+            );
 
         // Assures that null elements' hashes are correct
         let root_before_dep = operator.state_root();
         assert_eq!(
             root_before_dep,
-            Fp::from_hex("0x082e6d1a102e14de34bf3471c6a79c4ae3069fbaad7346032d40626576cf4039")
+            Fr::from_hex("0x082e6d1a102e14de34bf3471c6a79c4ae3069fbaad7346032d40626576cf4039")
                 .unwrap()
-                .into()
         );
 
         // 2. Generate user data
@@ -95,9 +95,8 @@ mod tests {
         let root_after_dep = operator.state_root();
         assert_eq!(
             root_after_dep,
-            Fp::from_hex("0x0e19d7c5c79887947f8f9e73f07570eaabc7a4d2f5efb1c34b0b5d40e63ec4d1")
+            Fr::from_hex("0x0e19d7c5c79887947f8f9e73f07570eaabc7a4d2f5efb1c34b0b5d40e63ec4d1")
                 .unwrap()
-                .into()
         );
 
         // Need to implement balance verification for users through the contract
@@ -117,9 +116,8 @@ mod tests {
         // State root should change as wells
         assert_eq!(
             root_after_tx,
-            Fp::from_hex("0x0e19d7c5c79887947f8f9e73f07570eaabc7a4d2f5efb1c34b0b5d40e63ec4d1")
+            Fr::from_hex("0x0e19d7c5c79887947f8f9e73f07570eaabc7a4d2f5efb1c34b0b5d40e63ec4d1")
                 .unwrap()
-                .into()
         );
 
         // 8. Explicitly add_batch on L1. Will be changed, when communication between layers will be decided.
@@ -128,7 +126,7 @@ mod tests {
         // 9. Check that batch info is on L1.
         assert_eq!(contract.calldata.len(), 1);
         let batch = contract.calldata.first().unwrap();
-        let txs: Vec<Transaction> = batch.raw_transactions().cloned().collect();
+        let txs: Vec<Transaction<TatePairing>> = batch.raw_transactions().cloned().collect();
         let expected_txs = vec![t1, t2];
         assert_eq!(&txs, &expected_txs);
         assert_eq!(batch.border_roots(), (root_after_dep, root_after_tx));
@@ -138,9 +136,9 @@ mod tests {
         // Withdrawal
 
         // 1. Burn funds on L2 by sending to a special address
-        let alice_withdraw: Transaction =
+        let alice_withdraw: Transaction<TatePairing> =
             TransactionData::new(alice_address, withdraw_address, 5).signed(alice_secret, &mut rng);
-        let bob_withdraw: Transaction =
+        let bob_withdraw: Transaction<TatePairing> =
             TransactionData::new(bob_address, withdraw_address, 5).signed(bob_secret, &mut rng);
 
         operator.execute_transaction(alice_withdraw);

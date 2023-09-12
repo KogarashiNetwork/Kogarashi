@@ -1,9 +1,7 @@
 mod merkle;
 
-use bls_12_381::Fr;
-use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
-use zkstd::common::{FftField, Pairing, SigUtils};
+use zkstd::common::{Pairing, SigUtils};
 
 use crate::{
     domain::{RollupTransactionInfo, Transaction, UserData},
@@ -22,7 +20,7 @@ pub struct BatchCircuit<
     const N: usize,
     const BATCH_SIZE: usize,
 > {
-    batch: Batch<P::ScalarField, H, N, BATCH_SIZE>,
+    batch: Batch<P, H, N, BATCH_SIZE>,
 }
 
 impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
@@ -30,7 +28,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
 {
     #[allow(dead_code)]
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn new(batch: Batch<P::ScalarField, H, N, BATCH_SIZE>) -> Self {
+    pub(crate) fn new(batch: Batch<P, H, N, BATCH_SIZE>) -> Self {
         Self { batch }
     }
 }
@@ -141,7 +139,7 @@ mod tests {
         let mut operator =
             RollupOperator::<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
                 Poseidon::<Fr, 2>::new(),
-                pp,
+                pp.clone(),
             );
         let contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
 
@@ -173,7 +171,7 @@ mod tests {
         let batch_circuit = BatchCircuit::new(batch);
 
         let prover = Compiler::compile::<
-            BatchCircuit<Fr, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>,
+            BatchCircuit<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>,
             TatePairing,
         >(&mut pp, label)
         .expect("failed to compile circuit");

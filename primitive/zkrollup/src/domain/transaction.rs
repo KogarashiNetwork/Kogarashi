@@ -1,43 +1,45 @@
-use serde::{Deserialize, Serialize};
-
 use crate::{merkle_tree::MerkleProof, poseidon::FieldHasher};
 
 use super::{FftField, PublicKey, RngCore, SecretKey, SigUtils, Signature, UserData};
 use zkstd::common::*;
 
 #[derive(Clone, Debug, PartialEq, Eq, Default, Copy, Encode, Decode)]
-pub(crate) struct RollupTransactionInfo<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
-    pub(crate) transaction: Transaction,
-    pub(crate) pre_root: F,
-    pub(crate) post_root: F,
-    pub(crate) pre_sender: UserData,
-    pub(crate) pre_receiver: UserData,
-    pub(crate) pre_sender_proof: MerkleProof<F, H, N>,
-    pub(crate) pre_receiver_proof: MerkleProof<F, H, N>,
-    pub(crate) post_sender_proof: MerkleProof<F, H, N>,
-    pub(crate) post_receiver_proof: MerkleProof<F, H, N>,
+pub(crate) struct RollupTransactionInfo<
+    P: Pairing,
+    H: FieldHasher<P::ScalarField, 2>,
+    const N: usize,
+> {
+    pub(crate) transaction: Transaction<P>,
+    pub(crate) pre_root: P::ScalarField,
+    pub(crate) post_root: P::ScalarField,
+    pub(crate) pre_sender: UserData<P>,
+    pub(crate) pre_receiver: UserData<P>,
+    pub(crate) pre_sender_proof: MerkleProof<P::ScalarField, H, N>,
+    pub(crate) pre_receiver_proof: MerkleProof<P::ScalarField, H, N>,
+    pub(crate) post_sender_proof: MerkleProof<P::ScalarField, H, N>,
+    pub(crate) post_receiver_proof: MerkleProof<P::ScalarField, H, N>,
 }
 
-#[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Decode, Encode)]
-pub struct Transaction(pub(crate) Signature, pub(crate) TransactionData);
+#[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Decode, Encode)]
+pub struct Transaction<P: Pairing>(pub(crate) Signature, pub(crate) TransactionData<P>);
 
-impl Transaction {
-    pub fn to_field_element<F: FftField>(self) -> F {
+impl<P: Pairing> Transaction<P> {
+    pub fn to_field_element(self) -> P::ScalarField {
         let mut field = [0_u8; 64];
         field.copy_from_slice(&self.to_bytes()[0..64]);
-        F::from_bytes_wide(&field)
+        P::ScalarField::from_bytes_wide(&field)
     }
 }
 
-#[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Decode, Encode)]
-pub struct TransactionData {
-    pub(crate) sender_address: PublicKey,
-    pub(crate) receiver_address: PublicKey,
+#[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Decode, Encode)]
+pub struct TransactionData<P: Pairing> {
+    pub(crate) sender_address: PublicKey<P>,
+    pub(crate) receiver_address: PublicKey<P>,
     pub(crate) amount: u64,
 }
 
-impl TransactionData {
-    pub fn new(sender_address: PublicKey, receiver_address: PublicKey, amount: u64) -> Self {
+impl<P: Pairing> TransactionData<P> {
+    pub fn new(sender_address: PublicKey<P>, receiver_address: PublicKey<P>, amount: u64) -> Self {
         Self {
             sender_address,
             receiver_address,
@@ -45,14 +47,14 @@ impl TransactionData {
         }
     }
 
-    pub fn signed(self, secret_key: SecretKey, rand: impl RngCore) -> Transaction {
+    pub fn signed(self, secret_key: SecretKey<P>, rand: impl RngCore) -> Transaction<P> {
         let sig = secret_key.sign(&self.to_bytes(), rand);
         Transaction(sig, self)
     }
 }
 
-impl SigUtils<136> for Transaction {
-    fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+impl<P: Pairing> SigUtils<136> for Transaction<P> {
+    fn from_bytes(bytes: [u8; 136]) -> Option<Self> {
         let mut signature = [0_u8; 64];
         let mut transaction_data = [0_u8; 72];
 
@@ -64,7 +66,7 @@ impl SigUtils<136> for Transaction {
         ))
     }
 
-    fn to_bytes(self) -> [u8; Self::LENGTH] {
+    fn to_bytes(self) -> [u8; 136] {
         let mut bytes = [0u8; 136];
         bytes[0..64].copy_from_slice(&self.0.to_bytes());
         bytes[64..].copy_from_slice(&self.1.to_bytes());
@@ -72,8 +74,8 @@ impl SigUtils<136> for Transaction {
     }
 }
 
-impl SigUtils<72> for TransactionData {
-    fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+impl<P: Pairing> SigUtils<72> for TransactionData<P> {
+    fn from_bytes(bytes: [u8; 72]) -> Option<Self> {
         let mut sender_address = [0_u8; 32];
         let mut receiver_address = [0_u8; 32];
         let mut amount = [0_u8; 8];
@@ -88,7 +90,7 @@ impl SigUtils<72> for TransactionData {
         })
     }
 
-    fn to_bytes(self) -> [u8; Self::LENGTH] {
+    fn to_bytes(self) -> [u8; 72] {
         let mut bytes = [0u8; 72];
         bytes[0..32].copy_from_slice(&self.sender_address.to_bytes());
         bytes[32..64].copy_from_slice(&self.receiver_address.to_bytes());

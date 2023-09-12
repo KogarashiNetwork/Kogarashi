@@ -155,7 +155,8 @@ mod tests {
         let proof = merkle_tree.generate_membership_proof(0);
 
         // New leaf data
-        let user = UserData::new(0, 10, PublicKey::new(JubjubExtended::random(&mut rng)));
+        let user =
+            UserData::<TatePairing>::new(0, 10, PublicKey::new(JubjubExtended::random(&mut rng)));
 
         let merkle_circuit = MerkleMembershipCircuit::new(
             user.to_field_element(),

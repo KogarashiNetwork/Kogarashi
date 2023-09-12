@@ -5,7 +5,7 @@ use zkstd::behave::Ring;
 use zkstd::common::{CurveGroup, Pairing, SigUtils};
 
 use red_jubjub::{
-    constant::{SAPLING_BASE_POINT, SAPLING_REDJUBJUB_COFACTOR},
+    constant::{sapling_base_point, sapling_redjubjub_cofactor},
     Signature,
 };
 
@@ -48,8 +48,9 @@ pub(crate) fn check_signature<P: Pairing>(
     let msg_hash = composer.append_witness(msg_hash);
     let public_key = composer.append_point(public_key);
 
-    let sapling_base_point = composer.append_constant_point(SAPLING_BASE_POINT);
-    let sapling_redjubjub_cofactor = composer.append_constant(SAPLING_REDJUBJUB_COFACTOR);
+    let sapling_base_point = composer.append_constant_point(sapling_base_point::<P>());
+    let sapling_redjubjub_cofactor =
+        composer.append_constant(sapling_redjubjub_cofactor::<P::ScalarField>());
     let neg = composer.append_witness(-P::JubjubScalar::one());
 
     let s_bp = composer.component_mul_point(s, sapling_base_point);
@@ -96,7 +97,7 @@ mod tests {
 
         let msg = b"test";
 
-        let priv_key = SecretKey::new(Fp::random(&mut rng));
+        let priv_key = SecretKey::<TatePairing>::new(Fp::random(&mut rng));
         let sig = priv_key.sign(msg, &mut rng);
         let pub_key = priv_key.to_public_key();
 

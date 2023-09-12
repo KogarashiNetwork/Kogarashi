@@ -53,7 +53,7 @@ pub trait G2Pairing: WeierstrassProjective {
 
 /// pairing abstraction
 pub trait Pairing:
-    Send + Sync + Clone + Debug + Eq + PartialEq + Default + Encode + Decode
+    Send + Sync + Clone + Copy + Debug + Eq + PartialEq + Ord + Default + Encode + Decode
 {
     // g1 group affine point
     type G1Affine: WeierstrassAffine<
@@ -118,6 +118,7 @@ pub trait Pairing:
         + TwistedEdwardsCurve
         + PartialEq
         + Eq
+        + Ord
         + SigUtils<32>;
 
     // g2 pairing representation

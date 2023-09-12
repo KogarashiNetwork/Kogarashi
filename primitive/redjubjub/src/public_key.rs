@@ -51,7 +51,7 @@ impl<P: Pairing> PublicKey<P> {
     #[allow(non_snake_case)]
     pub fn validate(self, m: &[u8], sig: Signature) -> bool {
         // c = H(R||vk||m)
-        let c = sapling_hash(&sig.r, &self.to_bytes(), m);
+        let c = sapling_hash::<P::JubjubScalar>(&sig.r, &self.to_bytes(), m);
 
         let R = match P::JubjubAffine::from_bytes(sig.r) {
             Some(R) => R,
@@ -63,8 +63,9 @@ impl<P: Pairing> PublicKey<P> {
         };
 
         // h_G(-S * P_G + R + c * vk)
-        (sapling_redjubjub_cofactor::<P>() * (-(S * sapling_base_point::<P>()) + R + c * self.0))
-            .is_identity()
+        ((-(sapling_base_point::<P>() * S) + R + self.0 * c.into())
+            * sapling_redjubjub_cofactor::<P::ScalarField>())
+        .is_identity()
     }
 
     pub fn verify_simple_preaudit_deprecated<T>(
