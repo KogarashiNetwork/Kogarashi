@@ -3,12 +3,12 @@ use super::constant::SAPLING_PERSONAL;
 use blake2b_simd::{Params, State};
 use zkstd::common::FftField;
 
-pub fn sapling_hash<JS: FftField>(a: &[u8], b: &[u8], c: &[u8]) -> JS {
+pub fn sapling_hash<F: FftField>(a: &[u8], b: &[u8], c: &[u8]) -> F {
     SaplingHash::default()
         .update(a)
         .update(b)
         .update(c)
-        .finalize::<JS>()
+        .finalize()
 }
 
 struct SaplingHash(State);
@@ -30,8 +30,8 @@ impl SaplingHash {
         self
     }
 
-    pub(crate) fn finalize<JS: FftField>(&self) -> JS {
+    pub(crate) fn finalize<F: FftField>(&self) -> F {
         let digest = self.0.finalize();
-        JS::from_hash(digest.as_array())
+        F::from_hash(digest.as_array())
     }
 }

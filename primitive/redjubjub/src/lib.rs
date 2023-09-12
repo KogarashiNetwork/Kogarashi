@@ -28,6 +28,7 @@ pub use public_key::PublicKey;
 pub use signature::Signature;
 use zkstd::common::Pairing;
 
+// TODO fix pairing dependency
 /// An redjubjub secret key and public key pair.
 #[derive(Copy, Clone, Debug)]
 pub struct Keypair<P: Pairing> {
