@@ -1,35 +1,42 @@
 mod merkle;
 
-use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
-use zkstd::common::SigUtils;
+use zkstd::common::{Pairing, SigUtils};
 
 use crate::{
     domain::{RollupTransactionInfo, Transaction, UserData},
     operator::Batch,
-    poseidon::Poseidon,
     redjubjub_circuit::check_signature,
+    FieldHasher,
 };
-use bls_12_381::Fr;
 use red_jubjub::sapling_hash;
 
 use self::merkle::check_membership;
 
 #[derive(Debug, PartialEq, Default)]
-pub struct BatchCircuit {
-    batch: Batch<Fr, Poseidon<Fr, 2>, 2, 2>,
+pub struct BatchCircuit<
+    P: Pairing,
+    H: FieldHasher<P::ScalarField, 2>,
+    const N: usize,
+    const BATCH_SIZE: usize,
+> {
+    batch: Batch<P, H, N, BATCH_SIZE>,
 }
 
-impl BatchCircuit {
+impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
+    BatchCircuit<P, H, N, BATCH_SIZE>
+{
     #[allow(dead_code)]
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn new(batch: Batch<Fr, Poseidon<Fr, 2>, 2, 2>) -> Self {
+    pub(crate) fn new(batch: Batch<P, H, N, BATCH_SIZE>) -> Self {
         Self { batch }
     }
 }
 
-impl Circuit<TatePairing> for BatchCircuit {
-    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
+impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
+    Circuit<P> for BatchCircuit<P, H, N, BATCH_SIZE>
+{
+    fn circuit(&self, composer: &mut Builder<P>) -> Result<(), Error> {
         for RollupTransactionInfo {
             transaction,
             pre_root,
@@ -129,9 +136,11 @@ mod tests {
         const ACCOUNT_LIMIT: usize = 2;
         const BATCH_SIZE: usize = 2;
         // Create an operator and contract
-        let mut operator = RollupOperator::<Fr, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
-            Poseidon::<Fr, 2>::new(),
-        );
+        let mut operator =
+            RollupOperator::<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
+                Poseidon::<Fr, 2>::new(),
+                pp.clone(),
+            );
         let contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
 
         let alice_secret = SecretKey::new(Fp::random(&mut rng));
@@ -161,8 +170,11 @@ mod tests {
 
         let batch_circuit = BatchCircuit::new(batch);
 
-        let prover = Compiler::compile::<BatchCircuit, TatePairing>(&mut pp, label)
-            .expect("failed to compile circuit");
+        let prover = Compiler::compile::<
+            BatchCircuit<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>,
+            TatePairing,
+        >(&mut pp, label)
+        .expect("failed to compile circuit");
         prover
             .0
             .prove(&mut rng, &batch_circuit)

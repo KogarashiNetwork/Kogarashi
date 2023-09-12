@@ -2,9 +2,9 @@ use crate::mock::new_test_ext;
 use crate::pallet::Config;
 use crate::{self as zkrollup_pallet};
 
+use bls_12_381::Fr;
 use ec_pairing::TatePairing;
 use frame_support::{construct_runtime, parameter_types};
-use jub_jub::Fp;
 use red_jubjub::PublicKey;
 use sp_core::H256;
 use sp_runtime::{
@@ -61,19 +61,19 @@ impl frame_system::Config for TestRuntime {
 
 impl pallet_plonk::Config for TestRuntime {
     type P = TatePairing;
-    type CustomCircuit = BatchCircuit;
+    type CustomCircuit = BatchCircuit<TatePairing, Poseidon<Fr, 2>, 2, 2>;
     type Event = Event;
 }
 
 impl Config for TestRuntime {
-    type F = Fp;
-    type Transaction = Transaction;
+    type F = Fr;
+    type Transaction = Transaction<TatePairing>;
 
-    type Batch = Batch<Self::F, Poseidon<Self::F, 2>, 2, 2>;
+    type Batch = Batch<TatePairing, Poseidon<Self::F, 2>, 2, 2>;
 
     type Proof = Proof<Self::F, Poseidon<Self::F, 2>, 2, 2>;
 
-    type PublicKey = PublicKey;
+    type PublicKey = PublicKey<TatePairing>;
     type Event = Event;
     type Plonk = Plonk;
 }
@@ -124,8 +124,8 @@ mod zkrollup_tests {
         let pp = Plonk::keypair().unwrap();
 
         let mut operator =
-            RollupOperator::<TatePairing, Fp, Poseidon<Fp, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
-                Poseidon::<Fp, 2>::new(),
+            RollupOperator::<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
+                Poseidon::<Fr, 2>::new(),
                 pp,
             );
 

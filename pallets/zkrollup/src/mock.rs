@@ -3,7 +3,6 @@ use bls_12_381::Fr;
 use ec_pairing::TatePairing;
 use frame_support::parameter_types;
 use frame_system as system;
-// use pallet_plonk::Plonk;
 use red_jubjub::PublicKey;
 use sp_core::H256;
 use sp_runtime::{
@@ -60,7 +59,7 @@ impl system::Config for Test {
 
 impl pallet_plonk::Config for Test {
     type P = TatePairing;
-    type CustomCircuit = BatchCircuit;
+    type CustomCircuit = BatchCircuit<TatePairing, Poseidon<Fr, 2>, 2, 2>;
     type Event = Event;
 }
 
@@ -69,13 +68,13 @@ impl zkrollup_pallet::Config for Test {
 
     type F = Fr;
 
-    type Transaction = Transaction;
+    type Transaction = Transaction<TatePairing>;
 
-    type Batch = Batch<Self::F, Poseidon<Self::F, 2>, 2, 2>;
+    type Batch = Batch<TatePairing, Poseidon<Self::F, 2>, 2, 2>;
 
     type Proof = Proof<Self::F, Poseidon<Self::F, 2>, 2, 2>;
 
-    type PublicKey = PublicKey;
+    type PublicKey = PublicKey<TatePairing>;
 
     type Plonk = Plonk;
 }

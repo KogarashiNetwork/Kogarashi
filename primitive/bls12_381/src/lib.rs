@@ -19,6 +19,7 @@
 #![allow(clippy::suspicious_op_assign_impl)]
 #![allow(dead_code)]
 
+mod error;
 mod fq;
 mod fqn;
 mod fr;
