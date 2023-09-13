@@ -417,11 +417,8 @@ mod test {
         let rng = OsRng;
         let leaves = [Fp::random(rng), Fp::random(rng), Fp::random(rng)];
         const HEIGHT: usize = 3;
-        let smt = create_merkle_tree::<Fp, Poseidon<Fp, 2>, HEIGHT>(
-            poseidon.clone(),
-            &leaves,
-            &default_leaf,
-        );
+        let smt =
+            create_merkle_tree::<Fp, Poseidon<Fp, 2>, HEIGHT>(poseidon, &leaves, &default_leaf);
 
         let root = smt.root();
 
@@ -447,11 +444,8 @@ mod test {
         let rng = OsRng;
         let leaves = [Fp::random(rng), Fp::random(rng), Fp::random(rng)];
         const HEIGHT: usize = 3;
-        let smt = create_merkle_tree::<Fp, Poseidon<Fp, 2>, HEIGHT>(
-            poseidon.clone(),
-            &leaves,
-            &default_leaf,
-        );
+        let smt =
+            create_merkle_tree::<Fp, Poseidon<Fp, 2>, HEIGHT>(poseidon, &leaves, &default_leaf);
 
         let proof = smt.generate_membership_proof(0);
 
@@ -468,11 +462,8 @@ mod test {
         let rng = OsRng;
         let leaves = [Fp::random(rng), Fp::random(rng), Fp::random(rng)];
         const HEIGHT: usize = 3;
-        let smt = create_merkle_tree::<Fp, Poseidon<Fp, 2>, HEIGHT>(
-            poseidon.clone(),
-            &leaves,
-            &default_leaf,
-        );
+        let smt =
+            create_merkle_tree::<Fp, Poseidon<Fp, 2>, HEIGHT>(poseidon, &leaves, &default_leaf);
 
         let index = 2;
 
@@ -493,11 +484,8 @@ mod test {
         let rng = OsRng;
         let leaves = [Fp::random(rng), Fp::random(rng), Fp::random(rng)];
         const HEIGHT: usize = 3;
-        let mut smt = create_merkle_tree::<Fp, Poseidon<Fp, 2>, HEIGHT>(
-            poseidon.clone(),
-            &leaves,
-            &default_leaf,
-        );
+        let mut smt =
+            create_merkle_tree::<Fp, Poseidon<Fp, 2>, HEIGHT>(poseidon, &leaves, &default_leaf);
 
         let empty_hashes =
             gen_empty_hashes::<Fp, Poseidon<Fp, 2>, HEIGHT>(&poseidon, &default_leaf).unwrap();
@@ -529,11 +517,8 @@ mod test {
         let rng = OsRng;
         let leaves = [Fp::random(rng), Fp::random(rng), Fp::random(rng)];
         const HEIGHT: usize = 3;
-        let mut smt = create_merkle_tree::<Fp, Poseidon<Fp, 2>, HEIGHT>(
-            poseidon.clone(),
-            &leaves,
-            &default_leaf,
-        );
+        let mut smt =
+            create_merkle_tree::<Fp, Poseidon<Fp, 2>, HEIGHT>(poseidon, &leaves, &default_leaf);
 
         let empty_hashes =
             gen_empty_hashes::<Fp, Poseidon<Fp, 2>, HEIGHT>(&poseidon, &default_leaf).unwrap();

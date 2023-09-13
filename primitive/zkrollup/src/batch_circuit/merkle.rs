@@ -42,7 +42,7 @@ fn hash<P: Pairing>(composer: &mut Builder<P>, inputs: (Witness, Witness)) -> Wi
         .a(inputs.0);
     let gen_plus_first = composer.gate_add(sum);
 
-    let first_hash = Constraint::default().left(2).a(gen_plus_first);
+    let first_hash = Constraint::default().left(42).a(gen_plus_first);
     let first_hash = composer.gate_add(first_hash);
 
     let sum = Constraint::default()
@@ -52,7 +52,7 @@ fn hash<P: Pairing>(composer: &mut Builder<P>, inputs: (Witness, Witness)) -> Wi
 
     let gen_plus_second = composer.gate_add(sum);
 
-    let second_hash = Constraint::default().left(2).a(gen_plus_second);
+    let second_hash = Constraint::default().left(42).a(gen_plus_second);
     let second_hash = composer.gate_add(second_hash);
 
     composer.gate_add(

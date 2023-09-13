@@ -121,6 +121,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
         }
     }
 
+    #[allow(clippy::type_complexity)]
     pub fn execute_transaction(
         &mut self,
         transaction: Transaction<P>,

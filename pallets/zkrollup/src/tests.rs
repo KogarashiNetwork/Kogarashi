@@ -85,7 +85,7 @@ mod zkrollup_tests {
     use frame_support::assert_ok;
     use jub_jub::{Fp, JubjubExtended};
     use pallet_plonk::FullcodecRng;
-    use rand::{rngs::StdRng, SeedableRng};
+    use rand::SeedableRng;
     use red_jubjub::SecretKey;
     use zkrollup::{Poseidon, RollupOperator, TransactionData};
     use zkstd::{behave::Group, common::CurveGroup};
@@ -114,20 +114,7 @@ mod zkrollup_tests {
         const ACCOUNT_LIMIT: usize = 2;
         const BATCH_SIZE: usize = 2;
 
-        let main_contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
         let operator_origin = Origin::signed(3);
-        assert_ok!(ZkRollup::trusted_setup(
-            operator_origin.clone(),
-            15,
-            rng.clone()
-        ));
-        let pp = Plonk::keypair().unwrap();
-
-        let mut operator =
-            RollupOperator::<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
-                Poseidon::<Fr, 2>::new(),
-                pp,
-            );
 
         let alice_secret = SecretKey::new(Fp::random(&mut rng));
         let alice_origin = Origin::signed(1);
@@ -137,10 +124,22 @@ mod zkrollup_tests {
         let bob_address = bob_secret.to_public_key();
         let withdraw_address = PublicKey::new(JubjubExtended::random(&mut rng));
 
-        operator.add_withdrawal_address(withdraw_address);
-
         new_test_ext().execute_with(|| {
-            let mut rng = StdRng::seed_from_u64(8349u64);
+            let main_contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
+            assert_ok!(ZkRollup::trusted_setup(
+                operator_origin.clone(),
+                15,
+                rng.clone()
+            ));
+            let pp = Plonk::keypair().unwrap();
+
+            let mut operator =
+                RollupOperator::<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
+                    Poseidon::<Fr, 2>::new(),
+                    pp,
+                );
+
+            operator.add_withdrawal_address(withdraw_address);
 
             let deposit1 = TransactionData::new(alice_address, main_contract_address, 10)
                 .signed(alice_secret, &mut rng);

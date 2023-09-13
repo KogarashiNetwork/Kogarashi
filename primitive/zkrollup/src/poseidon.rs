@@ -29,7 +29,7 @@ where
     fn hash(&self, inputs: [F; L]) -> Result<F> {
         let mut sum = F::zero();
         for x in inputs {
-            sum += (F::ADDITIVE_GENERATOR + x) * F::from(2);
+            sum += (F::ADDITIVE_GENERATOR + x) * F::from(42);
         }
         Ok(sum)
     }

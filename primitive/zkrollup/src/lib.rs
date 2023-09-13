@@ -40,7 +40,7 @@ mod tests {
     #[test]
     fn test_zkrollup() {
         let mut rng = StdRng::seed_from_u64(8349u64);
-        const ACCOUNT_LIMIT: usize = 2;
+        const ACCOUNT_LIMIT: usize = 3;
         const BATCH_SIZE: usize = 2;
 
         // 1. Create an operator and contract
@@ -60,7 +60,7 @@ mod tests {
         let root_before_dep = operator.state_root();
         assert_eq!(
             root_before_dep,
-            Fr::from_hex("0x082e6d1a102e14de34bf3471c6a79c4ae3069fbaad7346032d40626576cf4039")
+            Fr::from_hex("0x00000000000000000000000000000000000000000000000000000000004011fc")
                 .unwrap()
         );
 
@@ -76,10 +76,10 @@ mod tests {
         // State root will be changed here, but we can ignore it.
 
         // 3. Create and sign deposit transactions
-        let deposit1 = TransactionData::new(alice_address, contract.address(), 10)
+        let deposit1 = TransactionData::new(alice_address, contract.address(), 20)
             .signed(alice_secret, &mut rng);
         let deposit2 =
-            TransactionData::new(bob_address, contract.address(), 0).signed(bob_secret, &mut rng);
+            TransactionData::new(bob_address, contract.address(), 10).signed(bob_secret, &mut rng);
 
         // 4. Add them to the deposit pool on the L1
         contract.deposit(deposit1);
@@ -95,7 +95,7 @@ mod tests {
         let root_after_dep = operator.state_root();
         assert_eq!(
             root_after_dep,
-            Fr::from_hex("0x0e19d7c5c79887947f8f9e73f07570eaabc7a4d2f5efb1c34b0b5d40e63ec4d1")
+            Fr::from_hex("0x655776b5b3af763fa1707db8283ce87eea944351d0f7c75104299b7bc0324b41")
                 .unwrap()
         );
 
@@ -114,9 +114,10 @@ mod tests {
         let (proof, batch) = operator.execute_transaction(t2).unwrap();
         let root_after_tx = operator.state_root();
         // State root should change as wells
+        // TODO: check the hashing
         assert_eq!(
             root_after_tx,
-            Fr::from_hex("0x0e19d7c5c79887947f8f9e73f07570eaabc7a4d2f5efb1c34b0b5d40e63ec4d1")
+            Fr::from_hex("0x655776b5b3af763fa1707db8283ce87eea944351d0f7c75104299b7bc0324b41")
                 .unwrap()
         );
 
