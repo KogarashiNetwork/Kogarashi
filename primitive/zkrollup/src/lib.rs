@@ -1,4 +1,4 @@
-// #![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
 #![allow(dead_code)]
 #![allow(unused_variables)]
 mod batch_circuit;
