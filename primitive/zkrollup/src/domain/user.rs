@@ -1,4 +1,7 @@
+use crate::get_rng;
+
 use super::{FftField, PublicKey, SigUtils};
+use ark_std::rand::Rng;
 use zkstd::common::{Decode, Encode, Pairing};
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Encode, Decode)]
@@ -44,7 +47,7 @@ impl<P: Pairing> UserData<P> {
             index,
             balance,
             address,
-            ..Default::default()
+            nonce: get_rng().gen(),
         }
     }
 

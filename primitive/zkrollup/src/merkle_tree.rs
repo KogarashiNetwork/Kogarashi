@@ -42,7 +42,7 @@ use sp_std::{
     collections::{btree_map::BTreeMap, btree_set::BTreeSet},
     marker::PhantomData,
 };
-use zkstd::common::{Decode, Encode, FftField, Vec};
+use zkstd::common::{vec, Decode, Encode, FftField, Vec};
 
 /// Error enum for Sparse Merkle Tree.
 #[derive(Debug)]
@@ -73,11 +73,11 @@ impl ark_std::error::Error for MerkleError {}
 /// Contains a sequence of sibling nodes that make up a merkle proof.
 /// Each pair is used to identify whether an incremental merkle root
 /// construction is valid at each intermediate step.
-#[derive(Clone, Debug, PartialEq, Eq, Copy, Encode, Decode)]
+#[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
 pub struct MerkleProof<F: FftField, H: FieldHasher<F, 2>, const N: usize> {
     /// The path represented as a sequence of sibling pairs.
-    pub path: [(F, F); N],
-    pub path_pos: [u64; N],
+    pub path: Vec<(F, F)>,
+    pub path_pos: Vec<u64>,
     /// The phantom hasher type used to reconstruct the merkle root.
     pub marker: PhantomData<H>,
 }
@@ -87,13 +87,8 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> Default for MerkleProof<
         let empty: [F; N] =
             gen_empty_hashes(&H::default(), &[0; 64]).expect("Failed to generate empty hashes");
         Self {
-            path: empty
-                .iter()
-                .map(|x| (*x, *x))
-                .collect::<Vec<_>>()
-                .try_into()
-                .expect("Failed to convert vec to array"),
-            path_pos: [0; N],
+            path: empty.into_iter().take(N - 1).map(|x| (x, x)).collect(),
+            path_pos: vec![0; N - 1],
             marker: Default::default(),
         }
     }
@@ -181,7 +176,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
     /// Takes a batch of field elements, inserts
     /// these hashes into the tree, and updates the merkle root.
     pub fn insert_batch(&mut self, leaves: &BTreeMap<u32, F>, hasher: &H) -> Result<(), Error> {
-        let last_level_index: u64 = (1u64 << N) - 1;
+        let last_level_index: u64 = (1u64 << (N - 1)) - 1;
 
         let mut level_idxs: BTreeSet<u64> = BTreeSet::new();
 
@@ -222,7 +217,7 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
     }
 
     pub fn new_empty(hasher: &H, empty_leaf: &[u8; 64]) -> Result<Self, Error> {
-        Self::new_sequential(&[F::from_bytes_wide(empty_leaf); N], hasher, empty_leaf)
+        Self::new_sequential(&[], hasher, empty_leaf)
     }
 
     /// Creates a new Sparse Merkle Tree from a map of indices to field
@@ -276,8 +271,8 @@ impl<F: FftField, H: FieldHasher<F, 2>, const N: usize> SparseMerkleTree<F, H, N
     /// a "proof" in the sense of "valid path in a Merkle tree", not a ZK
     /// argument.
     pub fn generate_membership_proof(&self, index: u64) -> MerkleProof<F, H, N> {
-        let mut path = [(F::zero(), F::zero()); N];
-        let mut path_pos = [0; N];
+        let mut path = vec![(F::zero(), F::zero()); N - 1];
+        let mut path_pos = vec![0; N - 1];
 
         let tree_index = convert_index_to_last_level(index, N);
 
@@ -332,7 +327,7 @@ pub fn gen_empty_hashes<F: FftField, H: FieldHasher<F, 2>, const N: usize>(
 }
 
 fn convert_index_to_last_level(index: u64, height: usize) -> u64 {
-    index + (1u64 << height) - 1
+    index + (1u64 << (height - 1)) - 1
 }
 
 /// Returns the log2 value of the given number.
@@ -431,8 +426,7 @@ mod test {
         let hash12 = poseidon.hash([hash1, hash2]).unwrap();
         let hash34 = poseidon.hash([hash3, empty_hashes[0]]).unwrap();
 
-        let hash1234 = poseidon.hash([hash12, hash34]).unwrap();
-        let calc_root = poseidon.hash([hash1234, empty_hashes[2]]).unwrap();
+        let calc_root = poseidon.hash([hash12, hash34]).unwrap();
 
         assert_eq!(root, calc_root);
     }
@@ -502,8 +496,7 @@ mod test {
         let hash12 = poseidon.hash([hash1, hash2]).unwrap();
         let hash34 = poseidon.hash([hash3, empty_hashes[0]]).unwrap();
 
-        let hash1234 = poseidon.hash([hash12, hash34]).unwrap();
-        let calc_root = poseidon.hash([hash1234, empty_hashes[2]]).unwrap();
+        let calc_root = poseidon.hash([hash12, hash34]).unwrap();
 
         let new_root = smt.root();
         assert_ne!(root, new_root);
@@ -534,8 +527,7 @@ mod test {
         let hash12 = poseidon.hash([hash1, hash2]).unwrap();
         let hash34 = poseidon.hash([hash3, empty_hashes[0]]).unwrap();
 
-        let hash1234 = poseidon.hash([hash12, hash34]).unwrap();
-        let calc_root = poseidon.hash([hash1234, empty_hashes[2]]).unwrap();
+        let calc_root = poseidon.hash([hash12, hash34]).unwrap();
 
         let new_root = smt.root();
         assert_ne!(root, new_root);

@@ -3,7 +3,7 @@ use crate::{merkle_tree::MerkleProof, poseidon::FieldHasher};
 use super::{FftField, PublicKey, RngCore, SecretKey, SigUtils, Signature, UserData};
 use zkstd::common::*;
 
-#[derive(Clone, Debug, PartialEq, Eq, Default, Copy, Encode, Decode)]
+#[derive(Clone, Debug, PartialEq, Eq, Default, Encode, Decode)]
 pub(crate) struct RollupTransactionInfo<
     P: Pairing,
     H: FieldHasher<P::ScalarField, 2>,

@@ -9,7 +9,7 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zkrollup::{Batch, BatchCircuit, Poseidon, Proof, Transaction};
+use zkrollup::{Batch, BatchCircuit, Poseidon, Transaction};
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -71,8 +71,6 @@ impl zkrollup_pallet::Config for Test {
     type Transaction = Transaction<TatePairing>;
 
     type Batch = Batch<TatePairing, Poseidon<Self::F, 2>, 2, 2>;
-
-    type Proof = Proof<Self::F, Poseidon<Self::F, 2>, 2, 2>;
 
     type PublicKey = PublicKey<TatePairing>;
 

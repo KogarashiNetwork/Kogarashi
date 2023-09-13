@@ -51,20 +51,20 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
         {
             let Transaction(sig, t) = transaction;
 
-            check_membership(
+            check_membership::<P, N>(
                 composer,
                 pre_sender.to_field_element(),
                 *pre_root,
-                pre_sender_proof.path,
-                pre_sender_proof.path_pos,
+                &pre_sender_proof.path,
+                &pre_sender_proof.path_pos,
             )?;
 
-            check_membership(
+            check_membership::<P, N>(
                 composer,
                 pre_receiver.to_field_element(),
                 *pre_root,
-                pre_receiver_proof.path,
-                pre_receiver_proof.path_pos,
+                &pre_receiver_proof.path,
+                &pre_receiver_proof.path_pos,
             )?;
 
             check_signature(
@@ -84,20 +84,20 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
                 ..*pre_receiver
             };
 
-            check_membership(
+            check_membership::<P, N>(
                 composer,
                 post_sender.to_field_element(),
                 *post_root,
-                post_sender_proof.path,
-                post_sender_proof.path_pos,
+                &post_sender_proof.path,
+                &post_sender_proof.path_pos,
             )?;
 
-            check_membership(
+            check_membership::<P, N>(
                 composer,
                 post_receiver.to_field_element(),
                 *post_root,
-                post_receiver_proof.path,
-                post_receiver_proof.path_pos,
+                &post_receiver_proof.path,
+                &post_receiver_proof.path_pos,
             )?;
         }
 
@@ -133,7 +133,7 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(8349u64);
         let mut pp = KzgParams::setup(n, BlsScalar::random(&mut rng));
 
-        const ACCOUNT_LIMIT: usize = 2;
+        const ACCOUNT_LIMIT: usize = 3;
         const BATCH_SIZE: usize = 2;
         // Create an operator and contract
         let mut operator =

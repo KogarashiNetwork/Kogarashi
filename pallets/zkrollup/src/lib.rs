@@ -31,7 +31,7 @@ mod traits;
 
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
-use pallet_plonk::{FullcodecRng, Plonk};
+use pallet_plonk::{FullcodecRng, Plonk, Proof};
 use traits::Rollup;
 
 #[frame_support::pallet]
@@ -40,15 +40,14 @@ pub mod pallet {
     use super::*;
 
     use zkrollup::BatchGetter;
-    use zkstd::common::FftField;
+    use zkstd::common::{FftField, Pairing};
 
     #[pallet::config]
     pub trait Config: frame_system::Config + pallet_plonk::Config {
         type Plonk: Plonk<<Self as pallet_plonk::Config>::P>;
         type F: FftField + Parameter + Member + Default + Copy;
         type Transaction: Parameter + Member + Default + Copy;
-        type Batch: BatchGetter<Self::F> + Parameter + Member + Default + Copy;
-        type Proof: Parameter + Member + Default;
+        type Batch: BatchGetter<Self::F> + Parameter + Member + Default + Clone;
         type PublicKey: Parameter + Member + Default + Copy;
 
         /// The overarching event type.
@@ -117,13 +116,13 @@ pub mod pallet {
         #[pallet::weight(10_000)]
         pub fn update_state(
             origin: OriginFor<T>,
-            proof: T::Proof,
+            proof: Proof<<T as pallet_plonk::Config>::P>,
+            public_inputs: Vec<<<T as pallet_plonk::Config>::P as Pairing>::ScalarField>,
             compressed_batch_data: T::Batch,
         ) -> DispatchResultWithPostInfo {
             ensure_signed(origin)?;
-            // assert!(self.verifier_contract.verify_proof(proof));
 
-            // pallet_plonk::Pallet::<T>::verify(origin, proof, public_inputs)?;
+            T::Plonk::verify(proof, public_inputs)?;
 
             let new_root = compressed_batch_data.final_root();
 
@@ -156,10 +155,8 @@ impl<T: Config> Rollup for Pallet<T> {
     type F = T::F;
     type Transaction = T::Transaction;
     type Batch = T::Batch;
-    type Proof = T::Proof;
     type PublicKey = T::PublicKey;
 
-    // TODO: Put initial root
     fn state_root() -> Self::F {
         Self::state_root().expect("No state root")
     }
