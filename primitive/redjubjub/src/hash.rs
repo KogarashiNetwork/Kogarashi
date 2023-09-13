@@ -1,9 +1,9 @@
 use super::constant::SAPLING_PERSONAL;
 
 use blake2b_simd::{Params, State};
-use jub_jub::Fp;
+use zkstd::common::FftField;
 
-pub fn sapling_hash(a: &[u8], b: &[u8], c: &[u8]) -> Fp {
+pub fn sapling_hash<F: FftField>(a: &[u8], b: &[u8], c: &[u8]) -> F {
     SaplingHash::default()
         .update(a)
         .update(b)
@@ -30,8 +30,8 @@ impl SaplingHash {
         self
     }
 
-    pub(crate) fn finalize(&self) -> Fp {
+    pub(crate) fn finalize<F: FftField>(&self) -> F {
         let digest = self.0.finalize();
-        Fp::from_hash(digest.as_array())
+        F::from_hash(digest.as_array())
     }
 }

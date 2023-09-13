@@ -1,28 +1,30 @@
-use super::constant::SAPLING_BASE_POINT;
 use super::hash::sapling_hash;
 use super::public_key::PublicKey;
 use super::signature::Signature;
+use crate::constant::sapling_base_point;
 
-use jub_jub::Fp;
 use rand_core::RngCore;
-use zkstd::behave::{FftField, SigUtils};
+use zkstd::{
+    behave::{FftField, SigUtils},
+    common::Pairing,
+};
 
 /// RedJubjub secret key struct used for signing transactions
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct SecretKey(pub(crate) Fp);
+pub struct SecretKey<P: Pairing>(pub(crate) P::JubjubScalar);
 
-impl SigUtils<32> for SecretKey {
+impl<P: Pairing> SigUtils<32> for SecretKey<P> {
     fn from_bytes(bytes: [u8; 32]) -> Option<Self> {
-        Fp::from_bytes(bytes).map(Self)
+        P::JubjubScalar::from_bytes(bytes).map(Self::new)
     }
 
-    fn to_bytes(self) -> [u8; Self::LENGTH] {
+    fn to_bytes(self) -> [u8; 32] {
         self.0.to_bytes()
     }
 }
 
-impl SecretKey {
-    pub fn new(key: Fp) -> Self {
+impl<P: Pairing> SecretKey<P> {
+    pub fn new(key: P::JubjubScalar) -> Self {
         Self(key)
     }
 
@@ -36,7 +38,7 @@ impl SecretKey {
             raw_bytes.resize(64, 0);
         }
         let bytes: [u8; 64] = raw_bytes[..64].try_into().unwrap();
-        Some(Self(Fp::from_bytes_wide(&bytes)))
+        Some(Self(P::JubjubScalar::from_bytes_wide(&bytes)))
     }
 
     #[allow(non_snake_case)]
@@ -47,22 +49,22 @@ impl SecretKey {
 
         // r = H(T||vk||M)
         let pk = self.to_public_key();
-        let r = sapling_hash(&T, &pk.to_bytes(), m);
+        let r = sapling_hash::<P::JubjubScalar>(&T, &pk.to_bytes(), m);
 
         // R = r * P_G
-        let R = (r * SAPLING_BASE_POINT).to_bytes();
+        let R = ((sapling_base_point::<P>() * r.into()) as P::JubjubExtended).to_bytes();
 
         // S = r + H(R||m) * sk
-        let S = (r + sapling_hash(&R, &pk.to_bytes(), m) * self.0).to_bytes();
+        let S = (r + sapling_hash::<P::JubjubScalar>(&R, &pk.to_bytes(), m) * self.0).to_bytes();
 
         Signature::new(R, S)
     }
 
-    pub fn to_public_key(&self) -> PublicKey {
-        PublicKey(SAPLING_BASE_POINT * self.0)
+    pub fn to_public_key(&self) -> PublicKey<P> {
+        PublicKey(sapling_base_point::<P>() * self.0.into())
     }
 
-    pub fn randomize_private(&self, r: Fp) -> Self {
+    pub fn randomize_private(&self, r: P::JubjubScalar) -> Self {
         Self(r * self.0)
     }
 }

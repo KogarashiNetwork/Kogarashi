@@ -2,15 +2,16 @@ use crate::mock::new_test_ext;
 use crate::pallet::Config;
 use crate::{self as zkrollup_pallet};
 
+use bls_12_381::Fr;
+use ec_pairing::TatePairing;
 use frame_support::{construct_runtime, parameter_types};
-use jub_jub::Fp;
 use red_jubjub::PublicKey;
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zkrollup::{Batch, Poseidon, Proof, Transaction};
+use zkrollup::{Batch, BatchCircuit, Poseidon, Proof, Transaction};
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;
@@ -22,6 +23,7 @@ construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
+        Plonk: pallet_plonk::{Module, Call, Storage, Event<T>},
         ZkRollup: zkrollup_pallet::{Module, Call, Storage, Event<T>},
     }
 );
@@ -57,28 +59,24 @@ impl frame_system::Config for TestRuntime {
     type SS58Prefix = ();
 }
 
-impl Config for TestRuntime {
-    type F = Fp;
-    type Transaction = Transaction;
-
-    type Batch = Batch<Self::F, Poseidon<Self::F, 2>, 2, 2>;
-
-    type Proof = Proof<Self::F, Poseidon<Self::F, 2>, 2, 2>;
-
-    type PublicKey = PublicKey;
+impl pallet_plonk::Config for TestRuntime {
+    type P = TatePairing;
+    type CustomCircuit = BatchCircuit<TatePairing, Poseidon<Fr, 2>, 2, 2>;
     type Event = Event;
 }
 
-// fn events() -> Vec<Event> {
-//     let evt = System::events()
-//         .into_iter()
-//         .map(|evt| evt.event)
-//         .collect::<Vec<_>>();
+impl Config for TestRuntime {
+    type F = Fr;
+    type Transaction = Transaction<TatePairing>;
 
-//     System::reset_events();
+    type Batch = Batch<TatePairing, Poseidon<Self::F, 2>, 2, 2>;
 
-//     evt
-// }
+    type Proof = Proof<Self::F, Poseidon<Self::F, 2>, 2, 2>;
+
+    type PublicKey = PublicKey<TatePairing>;
+    type Event = Event;
+    type Plonk = Plonk;
+}
 
 #[cfg(test)]
 mod zkrollup_tests {
@@ -86,21 +84,36 @@ mod zkrollup_tests {
     use crate::traits::Rollup;
     use frame_support::assert_ok;
     use jub_jub::{Fp, JubjubExtended};
-    use rand::{rngs::StdRng, SeedableRng};
+    use pallet_plonk::FullcodecRng;
+    use rand::SeedableRng;
     use red_jubjub::SecretKey;
     use zkrollup::{Poseidon, RollupOperator, TransactionData};
     use zkstd::{behave::Group, common::CurveGroup};
 
+    // fn events() -> Vec<Event> {
+    //     let evt = System::events()
+    //         .into_iter()
+    //         .map(|evt| evt.event)
+    //         .collect::<Vec<_>>();
+
+    //     System::reset_events();
+
+    //     evt
+    // }
+
+    fn get_rng() -> FullcodecRng {
+        FullcodecRng::from_seed([
+            0x59, 0x62, 0xbe, 0x5d, 0x76, 0x3d, 0x31, 0x8d, 0x17, 0xdb, 0x37, 0x32, 0x54, 0x06,
+            0xbc, 0xe5,
+        ])
+    }
+
     #[test]
     fn zkrollup_test() {
-        let mut rng = StdRng::seed_from_u64(8349u64);
+        let mut rng = get_rng();
         const ACCOUNT_LIMIT: usize = 2;
         const BATCH_SIZE: usize = 2;
 
-        let mut operator = RollupOperator::<Fp, Poseidon<Fp, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
-            Poseidon::<Fp, 2>::new(),
-        );
-        let main_contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
         let operator_origin = Origin::signed(3);
 
         let alice_secret = SecretKey::new(Fp::random(&mut rng));
@@ -111,10 +124,22 @@ mod zkrollup_tests {
         let bob_address = bob_secret.to_public_key();
         let withdraw_address = PublicKey::new(JubjubExtended::random(&mut rng));
 
-        operator.add_withdrawal_address(withdraw_address);
-
         new_test_ext().execute_with(|| {
-            let mut rng = StdRng::seed_from_u64(8349u64);
+            let main_contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
+            assert_ok!(ZkRollup::trusted_setup(
+                operator_origin.clone(),
+                15,
+                rng.clone()
+            ));
+            let pp = Plonk::keypair().unwrap();
+
+            let mut operator =
+                RollupOperator::<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
+                    Poseidon::<Fr, 2>::new(),
+                    pp,
+                );
+
+            operator.add_withdrawal_address(withdraw_address);
 
             let deposit1 = TransactionData::new(alice_address, main_contract_address, 10)
                 .signed(alice_secret, &mut rng);

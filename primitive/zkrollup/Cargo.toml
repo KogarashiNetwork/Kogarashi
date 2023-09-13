@@ -20,6 +20,7 @@ poly-commit = { path = "../poly", default-features = false }
 sp-std = { version = '3.0.0', default-features = false }
 serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
+rand_xorshift = { version = '0.2.0', default-features = false, package = 'fullcodec_rand_xorshift' }
 
 [dev-dependencies]
 rand = "0.8.5"

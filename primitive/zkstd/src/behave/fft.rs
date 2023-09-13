@@ -3,6 +3,7 @@
 use super::field::PrimeField;
 use super::{algebra::Field, comp::ParallelCmp};
 
+// TODO: need to rethink fft and prime field method
 /// This is fft field
 /// This is used for fft and has roots of unity
 pub trait FftField: PrimeField + ParallelCmp + From<[u64; 4]> {
@@ -28,6 +29,8 @@ pub trait FftField: PrimeField + ParallelCmp + From<[u64; 4]> {
     fn from_bytes_wide(bytes: &[u8; 64]) -> Self;
 
     fn reduce(&self) -> Self;
+
+    fn from_hash(hash: &[u8; 64]) -> Self;
 }
 
 /// This is polynomial

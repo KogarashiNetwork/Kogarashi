@@ -146,6 +146,22 @@ macro_rules! fft_field_operation {
                 ))
             }
 
+            fn from_hash(hash: &[u8; 64]) -> Self {
+                let d0 = Self([
+                    u64::from_le_bytes(hash[0..8].try_into().unwrap()),
+                    u64::from_le_bytes(hash[8..16].try_into().unwrap()),
+                    u64::from_le_bytes(hash[16..24].try_into().unwrap()),
+                    u64::from_le_bytes(hash[24..32].try_into().unwrap()),
+                ]);
+                let d1 = Self([
+                    u64::from_le_bytes(hash[32..40].try_into().unwrap()),
+                    u64::from_le_bytes(hash[40..48].try_into().unwrap()),
+                    u64::from_le_bytes(hash[48..56].try_into().unwrap()),
+                    u64::from_le_bytes(hash[56..64].try_into().unwrap()),
+                ]);
+                d0 * Self($r2) + d1 * Self($r3)
+            }
+
             fn reduce(&self) -> Self {
                 Self(mont(
                     [self.0[0], self.0[1], self.0[2], self.0[3], 0, 0, 0, 0],

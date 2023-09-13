@@ -3,29 +3,29 @@ use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
 use zksnarks::{Constraint, Witness};
 use zkstd::behave::Group;
-use zkstd::common::Vec;
+use zkstd::common::{Pairing, Vec};
 
 #[derive(Debug, PartialEq)]
-pub struct MerkleMembershipCircuit<const K: usize> {
+pub struct MerkleMembershipCircuit<const N: usize> {
     leaf: Fr,
     root: Fr,
-    path: [(Fr, Fr); K],
-    path_pos: [u64; K],
+    path: [(Fr, Fr); N],
+    path_pos: [u64; N],
 }
 
-impl<const K: usize> Default for MerkleMembershipCircuit<K> {
+impl<const N: usize> Default for MerkleMembershipCircuit<N> {
     fn default() -> Self {
         Self {
             leaf: Default::default(),
-            path: [(Fr::zero(), Fr::zero()); K],
+            path: [(Fr::zero(), Fr::zero()); N],
             root: Default::default(),
-            path_pos: [0; K],
+            path_pos: [0; N],
         }
     }
 }
 
-impl<const K: usize> MerkleMembershipCircuit<K> {
-    pub(crate) fn new(leaf: Fr, root: Fr, path: [(Fr, Fr); K], path_pos: [u64; K]) -> Self {
+impl<const N: usize> MerkleMembershipCircuit<N> {
+    pub(crate) fn new(leaf: Fr, root: Fr, path: [(Fr, Fr); N], path_pos: [u64; N]) -> Self {
         Self {
             leaf,
             path,
@@ -35,24 +35,24 @@ impl<const K: usize> MerkleMembershipCircuit<K> {
     }
 }
 
-fn hash(composer: &mut Builder<TatePairing>, inputs: (Witness, Witness)) -> Witness {
+fn hash<P: Pairing>(composer: &mut Builder<P>, inputs: (Witness, Witness)) -> Witness {
     let sum = Constraint::default()
         .left(1)
-        .constant(Fr::ADDITIVE_GENERATOR)
+        .constant(P::ScalarField::ADDITIVE_GENERATOR)
         .a(inputs.0);
     let gen_plus_first = composer.gate_add(sum);
 
-    let first_hash = Constraint::default().left(2).a(gen_plus_first);
+    let first_hash = Constraint::default().left(42).a(gen_plus_first);
     let first_hash = composer.gate_add(first_hash);
 
     let sum = Constraint::default()
         .left(1)
-        .constant(Fr::ADDITIVE_GENERATOR)
+        .constant(P::ScalarField::ADDITIVE_GENERATOR)
         .a(inputs.1);
 
     let gen_plus_second = composer.gate_add(sum);
 
-    let second_hash = Constraint::default().left(2).a(gen_plus_second);
+    let second_hash = Constraint::default().left(42).a(gen_plus_second);
     let second_hash = composer.gate_add(second_hash);
 
     composer.gate_add(
@@ -64,11 +64,11 @@ fn hash(composer: &mut Builder<TatePairing>, inputs: (Witness, Witness)) -> Witn
     )
 }
 
-fn calculate_root<const K: usize>(
-    composer: &mut Builder<TatePairing>,
-    leaf: Fr,
-    path: [(Fr, Fr); K],
-    path_pos: [u64; K],
+fn calculate_root<P: Pairing, const N: usize>(
+    composer: &mut Builder<P>,
+    leaf: P::ScalarField,
+    path: [(P::ScalarField, P::ScalarField); N],
+    path_pos: [u64; N],
 ) -> Result<Witness, Error> {
     let mut prev = composer.append_witness(leaf);
 
@@ -84,7 +84,7 @@ fn calculate_root<const K: usize>(
 
     let path_pos: Vec<Witness> = path_pos
         .iter()
-        .map(|pos| composer.append_witness(JubjubScalar::from(*pos)))
+        .map(|pos| composer.append_witness(P::JubjubScalar::from(*pos)))
         .collect();
 
     for ((left, right), pos) in path.into_iter().zip(path_pos) {
@@ -103,23 +103,23 @@ fn calculate_root<const K: usize>(
     Ok(prev)
 }
 
-pub(crate) fn check_membership<const K: usize>(
-    composer: &mut Builder<TatePairing>,
-    leaf: Fr,
-    root: Fr,
-    path: [(Fr, Fr); K],
-    path_pos: [u64; K],
+pub(crate) fn check_membership<P: Pairing, const N: usize>(
+    composer: &mut Builder<P>,
+    leaf: P::ScalarField,
+    root: P::ScalarField,
+    path: [(P::ScalarField, P::ScalarField); N],
+    path_pos: [u64; N],
 ) -> Result<(), Error> {
     let precomputed_root = composer.append_witness(root);
 
-    let root = calculate_root(composer, leaf, path, path_pos)?;
+    let root = calculate_root::<P, N>(composer, leaf, path, path_pos)?;
     composer.assert_equal(root, precomputed_root);
     Ok(())
 }
 
-impl<const K: usize> Circuit<TatePairing> for MerkleMembershipCircuit<K> {
+impl<const N: usize> Circuit<TatePairing> for MerkleMembershipCircuit<N> {
     fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
-        check_membership(composer, self.leaf, self.root, self.path, self.path_pos)
+        check_membership::<TatePairing, N>(composer, self.leaf, self.root, self.path, self.path_pos)
     }
 }
 
@@ -155,7 +155,8 @@ mod tests {
         let proof = merkle_tree.generate_membership_proof(0);
 
         // New leaf data
-        let user = UserData::new(0, 10, PublicKey::new(JubjubExtended::random(&mut rng)));
+        let user =
+            UserData::<TatePairing>::new(0, 10, PublicKey::new(JubjubExtended::random(&mut rng)));
 
         let merkle_circuit = MerkleMembershipCircuit::new(
             user.to_field_element(),

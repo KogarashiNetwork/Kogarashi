@@ -1,11 +1,9 @@
-use super::constant::{SAPLING_BASE_POINT, SAPLING_REDJUBJUB_COFACTOR};
+use super::constant::{sapling_base_point, sapling_redjubjub_cofactor};
 use super::hash::sapling_hash;
 use super::signature::Signature;
 
-use bls_12_381::Fr;
-use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 use serde::{Deserialize, Serialize};
-use zkstd::behave::{CurveGroup, SigUtils};
+use zkstd::behave::SigUtils;
 use zkstd::common::*;
 
 /// RedJubjub public key struct used for signature verification
@@ -23,49 +21,51 @@ use zkstd::common::*;
     Decode,
     Encode,
 )]
-pub struct PublicKey(pub(crate) JubjubExtended);
+pub struct PublicKey<P: Pairing>(pub(crate) P::JubjubExtended);
 
-impl SigUtils<32> for PublicKey {
-    fn to_bytes(self) -> [u8; Self::LENGTH] {
+impl<P: Pairing> SigUtils<32> for PublicKey<P> {
+    fn to_bytes(self) -> [u8; 32] {
         self.0.to_bytes()
     }
 
-    fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
-        JubjubExtended::from_bytes(bytes).map(Self)
+    fn from_bytes(bytes: [u8; 32]) -> Option<Self> {
+        P::JubjubExtended::from_bytes(bytes).map(Self)
     }
 }
 
-impl PublicKey {
-    pub fn new(raw: JubjubExtended) -> Self {
+impl<P: Pairing> PublicKey<P> {
+    pub fn new(raw: P::JubjubExtended) -> Self {
         PublicKey(raw)
     }
 
-    pub fn inner(&self) -> JubjubExtended {
+    pub fn inner(&self) -> P::JubjubExtended {
         self.0
     }
 
     pub fn from_raw_bytes(bytes: &[u8]) -> Option<Self> {
         assert_eq!(bytes.len(), Self::LENGTH);
-        let bytes: [u8; Self::LENGTH] = bytes[..32].try_into().unwrap();
+        let bytes: [u8; 32] = bytes[..32].try_into().unwrap();
         Self::from_bytes(bytes)
     }
 
     #[allow(non_snake_case)]
     pub fn validate(self, m: &[u8], sig: Signature) -> bool {
         // c = H(R||vk||m)
-        let c = sapling_hash(&sig.r, &self.to_bytes(), m);
+        let c = sapling_hash::<P::JubjubScalar>(&sig.r, &self.to_bytes(), m);
 
-        let R = match JubjubAffine::from_bytes(sig.r) {
+        let R = match P::JubjubAffine::from_bytes(sig.r) {
             Some(R) => R,
             None => return false,
         };
-        let S = match Fr::from_bytes(sig.s) {
+        let S = match P::ScalarField::from_bytes(sig.s) {
             Some(S) => S,
             None => return false,
         };
 
         // h_G(-S * P_G + R + c * vk)
-        (SAPLING_REDJUBJUB_COFACTOR * (-(S * SAPLING_BASE_POINT) + R + c * self.0)).is_identity()
+        ((-(sapling_base_point::<P>() * S) + R + self.0 * c.into())
+            * sapling_redjubjub_cofactor::<P::ScalarField>())
+        .is_identity()
     }
 
     pub fn verify_simple_preaudit_deprecated<T>(
@@ -77,7 +77,7 @@ impl PublicKey {
         todo!()
     }
 
-    pub fn randomize_public(&self, r: Fp) -> Self {
-        Self(self.0 * r)
+    pub fn randomize_public(&self, r: P::JubjubScalar) -> Self {
+        Self(self.0 * r.into())
     }
 }

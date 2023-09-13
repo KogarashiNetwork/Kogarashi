@@ -31,6 +31,7 @@ mod traits;
 
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
+use pallet_plonk::{FullcodecRng, Plonk};
 use traits::Rollup;
 
 #[frame_support::pallet]
@@ -42,7 +43,8 @@ pub mod pallet {
     use zkstd::common::FftField;
 
     #[pallet::config]
-    pub trait Config: frame_system::Config {
+    pub trait Config: frame_system::Config + pallet_plonk::Config {
+        type Plonk: Plonk<<Self as pallet_plonk::Config>::P>;
         type F: FftField + Parameter + Member + Default + Copy;
         type Transaction: Parameter + Member + Default + Copy;
         type Batch: BatchGetter<Self::F> + Parameter + Member + Default + Copy;
@@ -67,6 +69,16 @@ pub mod pallet {
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
+        #[pallet::weight(10_000)]
+        pub fn trusted_setup(
+            origin: OriginFor<T>,
+            degree: u32,
+            rng: pallet_plonk::FullcodecRng,
+        ) -> DispatchResultWithPostInfo {
+            pallet_plonk::Pallet::<T>::trusted_setup(origin, degree, rng)?;
+            Ok(().into())
+        }
+
         #[pallet::weight(10_000)]
         pub(super) fn deposit(
             origin: OriginFor<T>,
@@ -93,6 +105,16 @@ pub mod pallet {
         }
 
         #[pallet::weight(10_000)]
+        pub fn set_initial_root(origin: OriginFor<T>, root: T::F) -> DispatchResultWithPostInfo {
+            // Need to ensure that the caller is operator
+            ensure_signed(origin)?;
+
+            StateRoot::<T>::put(root);
+            Self::deposit_event(Event::StateInitialized(root));
+            Ok(().into())
+        }
+
+        #[pallet::weight(10_000)]
         pub fn update_state(
             origin: OriginFor<T>,
             proof: T::Proof,
@@ -101,10 +123,12 @@ pub mod pallet {
             ensure_signed(origin)?;
             // assert!(self.verifier_contract.verify_proof(proof));
 
+            // pallet_plonk::Pallet::<T>::verify(origin, proof, public_inputs)?;
+
             let new_root = compressed_batch_data.final_root();
+
             StateRoot::<T>::put(new_root);
             Self::deposit_event(Event::StateUpdated(new_root));
-            // self.calldata.push(compressed_batch_data);
             Ok(().into())
         }
 
@@ -123,6 +147,8 @@ pub mod pallet {
         Deposit(T::Transaction),
         /// State update after proof verification
         StateUpdated(T::F),
+        /// State update after proof verification
+        StateInitialized(T::F),
     }
 }
 
@@ -136,5 +162,9 @@ impl<T: Config> Rollup for Pallet<T> {
     // TODO: Put initial root
     fn state_root() -> Self::F {
         Self::state_root().expect("No state root")
+    }
+
+    fn trusted_setup(val: u32, rng: FullcodecRng) -> DispatchResultWithPostInfo {
+        T::Plonk::trusted_setup(val, rng)
     }
 }

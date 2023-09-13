@@ -53,7 +53,7 @@ pub trait G2Pairing: WeierstrassProjective {
 
 /// pairing abstraction
 pub trait Pairing:
-    Send + Sync + Clone + Debug + Eq + PartialEq + Default + Encode + Decode
+    Send + Sync + Clone + Copy + Debug + Eq + PartialEq + Ord + Default + Encode + Decode
 {
     // g1 group affine point
     type G1Affine: WeierstrassAffine<
@@ -106,7 +106,8 @@ pub trait Pairing:
             Extended = Self::JubjubExtended,
             Scalar = Self::ScalarField,
         > + PartialEq
-        + Eq;
+        + Eq
+        + SigUtils<32>;
 
     // Jubjub extend point
     type JubjubExtended: CurveExtended<
@@ -116,7 +117,9 @@ pub trait Pairing:
         > + TwistedEdwardsExtended
         + TwistedEdwardsCurve
         + PartialEq
-        + Eq;
+        + Eq
+        + Ord
+        + SigUtils<32>;
 
     // g2 pairing representation
     type G2PairngRepr: From<Self::G2Affine> + ParityCmp + Debug + Eq + PartialEq + Clone;

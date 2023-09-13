@@ -25,7 +25,7 @@ use zkstd::common::*;
 /// Tate pairing struct holds necessary components for pairing.
 /// `pairing` function takes G1 and G2 group elements and output
 /// GT target group element.
-#[derive(Debug, Clone, Eq, PartialEq, Default, Encode, Decode, Copy)]
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Default, Encode, Decode, Copy)]
 pub struct TatePairing;
 
 impl Pairing for TatePairing {

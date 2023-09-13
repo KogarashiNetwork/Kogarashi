@@ -13,7 +13,7 @@ pub trait ConfidentialTransfer<AccountId, P: Pairing> {
     fn total_balance(who: &AccountId) -> Self::EncryptedBalance;
 
     /// trusted setup
-    fn trusted_setup(who: &AccountId, val: u32, rng: FullcodecRng) -> DispatchResultWithPostInfo;
+    fn trusted_setup(val: u32, rng: FullcodecRng) -> DispatchResultWithPostInfo;
 
     /// run confidential transfer transaction
     fn confidential_transfer(
