@@ -166,18 +166,16 @@ mod tests {
         let t2 = TransactionData::new(bob_address, alice_address, 5).signed(bob_secret, &mut rng);
 
         assert!(operator.execute_transaction(t1).is_none());
-        let (proof, batch) = operator.execute_transaction(t2).unwrap();
+        let ((proof, public_inputs), batch) = operator.execute_transaction(t2).unwrap();
 
-        let batch_circuit = BatchCircuit::new(batch);
-
-        let prover = Compiler::compile::<
+        let (_, verifier) = Compiler::compile::<
             BatchCircuit<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>,
             TatePairing,
         >(&mut pp, label)
         .expect("failed to compile circuit");
-        prover
-            .0
-            .prove(&mut rng, &batch_circuit)
-            .expect("failed to prove");
+
+        verifier
+            .verify(&proof, &public_inputs)
+            .expect("failed to verify proof");
     }
 }

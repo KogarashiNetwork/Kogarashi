@@ -17,9 +17,9 @@ impl<const N: usize> Default for MerkleMembershipCircuit<N> {
     fn default() -> Self {
         Self {
             leaf: Default::default(),
-            path: vec![(Fr::zero(), Fr::zero()); N],
+            path: vec![(Fr::zero(), Fr::zero()); N - 1],
             root: Default::default(),
-            path_pos: vec![0; N],
+            path_pos: vec![0; N - 1],
         }
     }
 }
@@ -163,13 +163,17 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(8349u64);
         let mut pp = KzgParams::setup(n, BlsScalar::random(&mut rng));
 
+        let (prover, verifier) =
+            Compiler::compile::<MerkleMembershipCircuit<3>, TatePairing>(&mut pp, label)
+                .expect("failed to compile circuit");
+
         let poseidon = Poseidon::<Fr, 2>::new();
 
         let mut merkle_tree =
             SparseMerkleTree::<Fr, Poseidon<Fr, 2>, 3>::new_empty(&poseidon, &[0; 64]).unwrap();
 
         // Sibling hashes before update
-        let proof = merkle_tree.generate_membership_proof(0);
+        let merkle_proof = merkle_tree.generate_membership_proof(0);
 
         // New leaf data
         let user =
@@ -178,33 +182,31 @@ mod tests {
         let merkle_circuit = MerkleMembershipCircuit::new(
             user.to_field_element(),
             merkle_tree.root(),
-            proof.path,
-            proof.path_pos,
+            merkle_proof.path,
+            merkle_proof.path_pos,
         );
 
-        let prover = Compiler::compile::<MerkleMembershipCircuit<3>, TatePairing>(&mut pp, label)
-            .expect("failed to compile circuit");
         // Should fail
-        assert!(prover.0.prove(&mut rng, &merkle_circuit).is_err());
+        assert!(prover.prove(&mut rng, &merkle_circuit).is_err());
 
         merkle_tree
             .update(0, user.to_field_element(), &poseidon)
             .unwrap();
 
-        let proof = merkle_tree.generate_membership_proof(0);
+        let merkle_proof = merkle_tree.generate_membership_proof(0);
 
         let merkle_circuit = MerkleMembershipCircuit::new(
             user.to_field_element(),
             merkle_tree.root(),
-            proof.path,
-            proof.path_pos,
+            merkle_proof.path,
+            merkle_proof.path_pos,
         );
 
-        let prover = Compiler::compile::<MerkleMembershipCircuit<3>, TatePairing>(&mut pp, label)
-            .expect("failed to compile circuit");
-        prover
-            .0
+        let (proof, public_inputs) = prover
             .prove(&mut rng, &merkle_circuit)
             .expect("failed to prove");
+        verifier
+            .verify(&proof, &public_inputs)
+            .expect("failed to verify proof");
     }
 }
