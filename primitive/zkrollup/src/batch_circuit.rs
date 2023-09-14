@@ -51,20 +51,20 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
         {
             let Transaction(sig, t) = transaction;
 
-            check_membership(
+            check_membership::<P, N>(
                 composer,
                 pre_sender.to_field_element(),
                 *pre_root,
-                pre_sender_proof.path,
-                pre_sender_proof.path_pos,
+                &pre_sender_proof.path,
+                &pre_sender_proof.path_pos,
             )?;
 
-            check_membership(
+            check_membership::<P, N>(
                 composer,
                 pre_receiver.to_field_element(),
                 *pre_root,
-                pre_receiver_proof.path,
-                pre_receiver_proof.path_pos,
+                &pre_receiver_proof.path,
+                &pre_receiver_proof.path_pos,
             )?;
 
             check_signature(
@@ -84,20 +84,20 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
                 ..*pre_receiver
             };
 
-            check_membership(
+            check_membership::<P, N>(
                 composer,
                 post_sender.to_field_element(),
                 *post_root,
-                post_sender_proof.path,
-                post_sender_proof.path_pos,
+                &post_sender_proof.path,
+                &post_sender_proof.path_pos,
             )?;
 
-            check_membership(
+            check_membership::<P, N>(
                 composer,
                 post_receiver.to_field_element(),
                 *post_root,
-                post_receiver_proof.path,
-                post_receiver_proof.path_pos,
+                &post_receiver_proof.path,
+                &post_receiver_proof.path_pos,
             )?;
         }
 
@@ -133,7 +133,7 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(8349u64);
         let mut pp = KzgParams::setup(n, BlsScalar::random(&mut rng));
 
-        const ACCOUNT_LIMIT: usize = 2;
+        const ACCOUNT_LIMIT: usize = 3;
         const BATCH_SIZE: usize = 2;
         // Create an operator and contract
         let mut operator =
@@ -166,18 +166,16 @@ mod tests {
         let t2 = TransactionData::new(bob_address, alice_address, 5).signed(bob_secret, &mut rng);
 
         assert!(operator.execute_transaction(t1).is_none());
-        let (proof, batch) = operator.execute_transaction(t2).unwrap();
+        let ((proof, public_inputs), batch) = operator.execute_transaction(t2).unwrap();
 
-        let batch_circuit = BatchCircuit::new(batch);
-
-        let prover = Compiler::compile::<
+        let (_, verifier) = Compiler::compile::<
             BatchCircuit<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>,
             TatePairing,
         >(&mut pp, label)
         .expect("failed to compile circuit");
-        prover
-            .0
-            .prove(&mut rng, &batch_circuit)
-            .expect("failed to prove");
+
+        verifier
+            .verify(&proof, &public_inputs)
+            .expect("failed to verify proof");
     }
 }

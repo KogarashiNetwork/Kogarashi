@@ -3,29 +3,29 @@ use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
 use zksnarks::{Constraint, Witness};
 use zkstd::behave::Group;
-use zkstd::common::{Pairing, Vec};
+use zkstd::common::{vec, Pairing, Vec};
 
 #[derive(Debug, PartialEq)]
 pub struct MerkleMembershipCircuit<const N: usize> {
     leaf: Fr,
     root: Fr,
-    path: [(Fr, Fr); N],
-    path_pos: [u64; N],
+    path: Vec<(Fr, Fr)>,
+    path_pos: Vec<u64>,
 }
 
 impl<const N: usize> Default for MerkleMembershipCircuit<N> {
     fn default() -> Self {
         Self {
             leaf: Default::default(),
-            path: [(Fr::zero(), Fr::zero()); N],
+            path: vec![(Fr::zero(), Fr::zero()); N - 1],
             root: Default::default(),
-            path_pos: [0; N],
+            path_pos: vec![0; N - 1],
         }
     }
 }
 
 impl<const N: usize> MerkleMembershipCircuit<N> {
-    pub(crate) fn new(leaf: Fr, root: Fr, path: [(Fr, Fr); N], path_pos: [u64; N]) -> Self {
+    pub(crate) fn new(leaf: Fr, root: Fr, path: Vec<(Fr, Fr)>, path_pos: Vec<u64>) -> Self {
         Self {
             leaf,
             path,
@@ -52,8 +52,17 @@ fn hash<P: Pairing>(composer: &mut Builder<P>, inputs: (Witness, Witness)) -> Wi
 
     let gen_plus_second = composer.gate_add(sum);
 
-    let second_hash = Constraint::default().left(42).a(gen_plus_second);
-    let second_hash = composer.gate_add(second_hash);
+    let sum_plus_42 = Constraint::default()
+        .left(1)
+        .constant(P::ScalarField::from(42))
+        .a(first_hash);
+    let sum_plus_42 = composer.gate_add(sum_plus_42);
+
+    let second_hash = Constraint::default()
+        .mult(1)
+        .a(gen_plus_second)
+        .b(sum_plus_42);
+    let second_hash = composer.gate_mul(second_hash);
 
     composer.gate_add(
         Constraint::default()
@@ -67,8 +76,8 @@ fn hash<P: Pairing>(composer: &mut Builder<P>, inputs: (Witness, Witness)) -> Wi
 fn calculate_root<P: Pairing, const N: usize>(
     composer: &mut Builder<P>,
     leaf: P::ScalarField,
-    path: [(P::ScalarField, P::ScalarField); N],
-    path_pos: [u64; N],
+    path: &[(P::ScalarField, P::ScalarField)],
+    path_pos: &[u64],
 ) -> Result<Witness, Error> {
     let mut prev = composer.append_witness(leaf);
 
@@ -107,9 +116,11 @@ pub(crate) fn check_membership<P: Pairing, const N: usize>(
     composer: &mut Builder<P>,
     leaf: P::ScalarField,
     root: P::ScalarField,
-    path: [(P::ScalarField, P::ScalarField); N],
-    path_pos: [u64; N],
+    path: &[(P::ScalarField, P::ScalarField)],
+    path_pos: &[u64],
 ) -> Result<(), Error> {
+    assert_eq!(path.len(), path_pos.len());
+
     let precomputed_root = composer.append_witness(root);
 
     let root = calculate_root::<P, N>(composer, leaf, path, path_pos)?;
@@ -119,7 +130,13 @@ pub(crate) fn check_membership<P: Pairing, const N: usize>(
 
 impl<const N: usize> Circuit<TatePairing> for MerkleMembershipCircuit<N> {
     fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
-        check_membership::<TatePairing, N>(composer, self.leaf, self.root, self.path, self.path_pos)
+        check_membership::<TatePairing, N>(
+            composer,
+            self.leaf,
+            self.root,
+            &self.path,
+            &self.path_pos,
+        )
     }
 }
 
@@ -146,13 +163,17 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(8349u64);
         let mut pp = KzgParams::setup(n, BlsScalar::random(&mut rng));
 
+        let (prover, verifier) =
+            Compiler::compile::<MerkleMembershipCircuit<3>, TatePairing>(&mut pp, label)
+                .expect("failed to compile circuit");
+
         let poseidon = Poseidon::<Fr, 2>::new();
 
         let mut merkle_tree =
-            SparseMerkleTree::<Fr, Poseidon<Fr, 2>, 2>::new_empty(&poseidon, &[0; 64]).unwrap();
+            SparseMerkleTree::<Fr, Poseidon<Fr, 2>, 3>::new_empty(&poseidon, &[0; 64]).unwrap();
 
         // Sibling hashes before update
-        let proof = merkle_tree.generate_membership_proof(0);
+        let merkle_proof = merkle_tree.generate_membership_proof(0);
 
         // New leaf data
         let user =
@@ -161,33 +182,31 @@ mod tests {
         let merkle_circuit = MerkleMembershipCircuit::new(
             user.to_field_element(),
             merkle_tree.root(),
-            proof.path,
-            proof.path_pos,
+            merkle_proof.path,
+            merkle_proof.path_pos,
         );
 
-        let prover = Compiler::compile::<MerkleMembershipCircuit<2>, TatePairing>(&mut pp, label)
-            .expect("failed to compile circuit");
         // Should fail
-        assert!(prover.0.prove(&mut rng, &merkle_circuit).is_err());
+        assert!(prover.prove(&mut rng, &merkle_circuit).is_err());
 
         merkle_tree
             .update(0, user.to_field_element(), &poseidon)
             .unwrap();
 
-        let proof = merkle_tree.generate_membership_proof(0);
+        let merkle_proof = merkle_tree.generate_membership_proof(0);
 
         let merkle_circuit = MerkleMembershipCircuit::new(
             user.to_field_element(),
             merkle_tree.root(),
-            proof.path,
-            proof.path_pos,
+            merkle_proof.path,
+            merkle_proof.path_pos,
         );
 
-        let prover = Compiler::compile::<MerkleMembershipCircuit<2>, TatePairing>(&mut pp, label)
-            .expect("failed to compile circuit");
-        prover
-            .0
+        let (proof, public_inputs) = prover
             .prove(&mut rng, &merkle_circuit)
             .expect("failed to prove");
+        verifier
+            .verify(&proof, &public_inputs)
+            .expect("failed to verify proof");
     }
 }

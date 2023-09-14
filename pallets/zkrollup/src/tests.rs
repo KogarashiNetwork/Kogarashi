@@ -11,7 +11,14 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zkrollup::{Batch, BatchCircuit, Poseidon, Proof, Transaction};
+use zkrollup::{Batch, BatchCircuit, Poseidon, Transaction};
+
+// let last_level_size = leaves.len().next_power_of_two();
+// let tree_size = 2 * last_level_size - 1;
+// let tree_height = tree_height(tree_size as u64);
+const TREE_HEIGH: usize = 3;
+// Need to specify the size of tree as well
+const BATCH_SIZE: usize = 2;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;
@@ -61,7 +68,7 @@ impl frame_system::Config for TestRuntime {
 
 impl pallet_plonk::Config for TestRuntime {
     type P = TatePairing;
-    type CustomCircuit = BatchCircuit<TatePairing, Poseidon<Fr, 2>, 2, 2>;
+    type CustomCircuit = BatchCircuit<TatePairing, Poseidon<Fr, 2>, TREE_HEIGH, BATCH_SIZE>;
     type Event = Event;
 }
 
@@ -69,9 +76,7 @@ impl Config for TestRuntime {
     type F = Fr;
     type Transaction = Transaction<TatePairing>;
 
-    type Batch = Batch<TatePairing, Poseidon<Self::F, 2>, 2, 2>;
-
-    type Proof = Proof<Self::F, Poseidon<Self::F, 2>, 2, 2>;
+    type Batch = Batch<TatePairing, Poseidon<Self::F, 2>, TREE_HEIGH, BATCH_SIZE>;
 
     type PublicKey = PublicKey<TatePairing>;
     type Event = Event;
@@ -111,11 +116,9 @@ mod zkrollup_tests {
     #[test]
     fn zkrollup_test() {
         let mut rng = get_rng();
-        const ACCOUNT_LIMIT: usize = 2;
-        const BATCH_SIZE: usize = 2;
 
+        // 1. Generate user data
         let operator_origin = Origin::signed(3);
-
         let alice_secret = SecretKey::new(Fp::random(&mut rng));
         let alice_origin = Origin::signed(1);
         let bob_secret = SecretKey::new(Fp::random(&mut rng));
@@ -123,9 +126,11 @@ mod zkrollup_tests {
         let alice_address = alice_secret.to_public_key();
         let bob_address = bob_secret.to_public_key();
         let withdraw_address = PublicKey::new(JubjubExtended::random(&mut rng));
+        // Address to which we deposit funds as user
+        let main_contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
 
         new_test_ext().execute_with(|| {
-            let main_contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
+            // 2. Generate trusted setup
             assert_ok!(ZkRollup::trusted_setup(
                 operator_origin.clone(),
                 15,
@@ -133,19 +138,45 @@ mod zkrollup_tests {
             ));
             let pp = Plonk::keypair().unwrap();
 
+            // 3. Create an operator
             let mut operator =
-                RollupOperator::<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
+                RollupOperator::<TatePairing, Poseidon<Fr, 2>, TREE_HEIGH, BATCH_SIZE>::new(
                     Poseidon::<Fr, 2>::new(),
                     pp,
                 );
 
-            operator.add_withdrawal_address(withdraw_address);
+            // Assures that null elements' hashes are correct
+            assert_eq!(
+                operator.state_root(),
+                Fr::from_hex("0x0000000000000000000000000000000000000000000000000000000011a2197e")
+                    .unwrap()
+            );
 
+            // Decided by the operator
+            operator.add_withdraw_address(withdraw_address);
+
+            // State root will be changed here
+            assert_eq!(
+                operator.state_root(),
+                Fr::from_hex("0x4ac4ba7fd748d1dac2984fed7389b62860ab9f2b9feef22cbbb62ad02c4448fd")
+                    .unwrap()
+            );
+
+            // 4. Set initial root on L1
+            assert_ok!(ZkRollup::set_initial_root(
+                operator_origin.clone(),
+                operator.state_root()
+            ));
+
+            assert_eq!(<ZkRollup as Rollup>::state_root(), operator.state_root());
+
+            // 5. Create and sign deposit transactions
             let deposit1 = TransactionData::new(alice_address, main_contract_address, 10)
                 .signed(alice_secret, &mut rng);
             let deposit2 = TransactionData::new(bob_address, main_contract_address, 0)
                 .signed(bob_secret, &mut rng);
 
+            // 6. Add them to the deposit pool on the L1
             assert_ok!(ZkRollup::deposit(alice_origin, deposit1));
 
             // let deposit = events();
@@ -154,9 +185,18 @@ mod zkrollup_tests {
             //     [Event::main_contract(crate::Event::Deposit(deposit1)),]
             // );
             // if let Event::main_contract(crate::Event::Deposit(t)) = deposit.first().unwrap() {
+
+            // 7. Explicitly process data on L2. Will be changed, when communication between layers will be decided.
             operator.process_deposit(deposit1);
             // }
 
+            assert_eq!(
+                operator.state_root(),
+                Fr::from_hex("0x6de0dc9479e61cefda6be0f704f077060d574e5322ef5546a5cb4f9802ca1c23")
+                    .unwrap()
+            );
+
+            // Same for the second deposit
             assert_ok!(ZkRollup::deposit(bob_origin, deposit2));
             // let deposit = events();
             // assert_eq!(
@@ -167,16 +207,47 @@ mod zkrollup_tests {
             operator.process_deposit(deposit2);
             // }
 
+            assert_eq!(
+                operator.state_root(),
+                Fr::from_hex("0x2613603990a71c155983132f0a2df05694f6dcedca646e2da307d451e6610a2f")
+                    .unwrap()
+            );
+
+            // Need to implement balance verification for users through the contract
+            // assert!(contract.check_balance(MerkleProof::default()) == alice.balance());
+            // assert!(contract.check_balance(MerkleProof::default()) == bob.balance()));
+
+            // 8. Prepared and sign transfer transactions
             let t1 =
                 TransactionData::new(alice_address, bob_address, 10).signed(alice_secret, &mut rng);
             let t2 =
                 TransactionData::new(bob_address, alice_address, 5).signed(bob_secret, &mut rng);
 
+            // 9. Execute transactions on L2
             assert!(operator.execute_transaction(t1).is_none());
-            let (proof, batch) = operator.execute_transaction(t2).unwrap();
-            let root_after_tx = operator.state_root();
 
-            assert_ok!(ZkRollup::update_state(operator_origin, proof, batch));
+            assert_eq!(
+                operator.state_root(),
+                Fr::from_hex("0x62b2341b616b111be03b16ffcb13724c849c5764538dd1074e742d6ace20a88e")
+                    .unwrap()
+            );
+
+            // With BATCH_SIZE == 2 second transaction should create a proof and batch
+            let ((proof, public_inputs), batch) = operator.execute_transaction(t2).unwrap();
+            assert_eq!(
+                operator.state_root(),
+                Fr::from_hex("0x0d27ef4dd857ef830c23668ad14a2dff40038972e1dd26660c3240e6f0b2fd4e")
+                    .unwrap()
+            );
+
+            // 10. Explicitly add_batch on L1. Will be changed, when communication between layers will be decided.
+
+            assert_ok!(ZkRollup::update_state(
+                operator_origin,
+                proof,
+                public_inputs,
+                batch
+            ));
             // assert_eq!(
             //     events(),
             //     [Event::main_contract(crate::Event::StateUpdated(
@@ -184,8 +255,38 @@ mod zkrollup_tests {
             //     )),]
             // );
 
-            // 10. Check that state root on L1 changed.
-            assert_eq!(<ZkRollup as Rollup>::state_root(), root_after_tx);
+            // 11. Check that state root on L1 changed.
+            assert_eq!(<ZkRollup as Rollup>::state_root(), operator.state_root());
+
+            // // Withdraw
+
+            // // 1. Burn funds on L2 by sending to a special address
+            // let alice_withdraw: Transaction<TatePairing> =
+            //     TransactionData::new(alice_address, withdraw_address, 5)
+            //         .signed(alice_secret, &mut rng);
+            // let bob_withdraw: Transaction<TatePairing> =
+            //     TransactionData::new(bob_address, withdraw_address, 5).signed(bob_secret, &mut rng);
+
+            // operator.execute_transaction(alice_withdraw);
+            // let (proof, batch) = operator.execute_transaction(bob_withdraw).unwrap();
+
+            // // 2. l2_burn_merkle_proof_alice and l2_burn_merkle_proof_bob should be generated with batch_tree
+            // // Will decide the process, while implementing the gadget
+
+            // // 3. Withdraw on L1
+            // contract.withdraw(
+            //     // l2_burn_merkle_proof_alice,
+            //     batch.final_root(),
+            //     alice_withdraw,
+            //     alice_address,
+            // );
+
+            // contract.withdraw(
+            //     // l2_burn_merkle_proof_bob,
+            //     batch.final_root(),
+            //     bob_withdraw,
+            //     bob_address,
+            // );
         });
     }
 }

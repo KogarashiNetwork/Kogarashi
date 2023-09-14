@@ -106,11 +106,13 @@ mod tests {
             sig,
             sapling_hash(&sig.r(), &pub_key.to_bytes(), msg),
         );
-        let prover = Compiler::compile::<RedJubjubCircuit, TatePairing>(&mut pp, label)
+        let (prover, verifier) = Compiler::compile::<RedJubjubCircuit, TatePairing>(&mut pp, label)
             .expect("failed to compile circuit");
-        prover
-            .0
+        let (proof, public_inputs) = prover
             .prove(&mut rng, &redjubjub_circuit)
             .expect("failed to prove");
+        verifier
+            .verify(&proof, &public_inputs)
+            .expect("failed to verify proof");
     }
 }
