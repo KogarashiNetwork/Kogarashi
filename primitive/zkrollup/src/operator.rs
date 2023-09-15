@@ -10,10 +10,11 @@ use ark_std::rand::Rng;
 use poly_commit::KzgParams;
 use red_jubjub::PublicKey;
 use zero_plonk::{prelude::Compiler, proof_system::Proof};
-use zkstd::common::{vec, Decode, Encode, FftField, Pairing, SigUtils, Vec};
+use zkstd::common::{vec, Decode, Encode, Pairing, SigUtils, Vec};
 
-pub trait BatchGetter<F: FftField> {
-    fn final_root(&self) -> F;
+pub trait BatchGetter<P: Pairing> {
+    fn final_root(&self) -> P::ScalarField;
+    fn withdraw_info(&self) -> Vec<(u64, PublicKey<P>)>;
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Encode, Decode)]
@@ -27,7 +28,7 @@ pub struct Batch<
 }
 
 impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
-    BatchGetter<P::ScalarField> for Batch<P, H, N, BATCH_SIZE>
+    BatchGetter<P> for Batch<P, H, N, BATCH_SIZE>
 {
     fn final_root(&self) -> P::ScalarField {
         self.transactions
@@ -35,6 +36,14 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
             .last()
             .map(|data| data.post_root)
             .unwrap()
+    }
+
+    fn withdraw_info(&self) -> Vec<(u64, PublicKey<P>)> {
+        self.transactions
+            .iter()
+            .filter(|t| t.is_withdraw)
+            .map(|t| (t.transaction.1.amount, t.transaction.1.sender_address))
+            .collect()
     }
 }
 
@@ -86,6 +95,7 @@ pub struct RollupOperator<
     db: Db<P>,
     transactions: Vec<RollupTransactionInfo<P, H, N>>,
     index_counter: u64,
+    withdraw_address: PublicKey<P>,
     hasher: H,
     pp: KzgParams<P>,
 }
@@ -187,6 +197,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
             pre_receiver_proof,
             post_sender_proof,
             post_receiver_proof,
+            is_withdraw: pre_receiver.address == self.withdraw_address,
         });
 
         if self.transactions.len() >= BATCH_SIZE {
@@ -266,6 +277,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
 
     pub fn add_withdraw_address(&mut self, address: PublicKey<P>) {
         let user = UserData::new(self.index_counter, 0, address);
+        self.withdraw_address = address;
         self.db.insert(user.address, user);
         self.index_counter += 1;
 

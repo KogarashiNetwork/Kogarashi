@@ -47,6 +47,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
             pre_receiver_proof,
             post_sender_proof,
             post_receiver_proof,
+            is_withdraw,
         } in self.batch.transactions.iter()
         {
             let Transaction(sig, t) = transaction;

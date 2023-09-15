@@ -4,7 +4,7 @@ use core::{
     ops::Add,
 };
 
-use parity_scale_codec::{Decode, Encode};
+use parity_scale_codec::{Decode, Encode, EncodeLike};
 
 use super::{
     algebra::Field,
@@ -134,7 +134,7 @@ pub trait Pairing:
         + From<<Self::JubjubAffine as CurveGroup>::Range>
         + Into<<Self::JubjubExtended as CurveGroup>::Range>
         + Into<<Self::JubjubAffine as CurveGroup>::Range>
-        + Encode
+        + EncodeLike
         + Decode
         + Eq
         + PartialEq
