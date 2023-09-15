@@ -33,21 +33,24 @@ use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
 use pallet_plonk::{FullcodecRng, Plonk, Proof};
 use traits::Rollup;
+use zkstd::common::Pairing;
 
 #[frame_support::pallet]
 pub mod pallet {
 
     use super::*;
-
     use zkrollup::BatchGetter;
-    use zkstd::common::{FftField, Pairing};
+    use zkstd::common::Pairing;
 
     #[pallet::config]
     pub trait Config: frame_system::Config + pallet_plonk::Config {
         type Plonk: Plonk<<Self as pallet_plonk::Config>::P>;
-        type F: FftField + Parameter + Member + Default + Copy;
         type Transaction: Parameter + Member + Default + Copy;
-        type Batch: BatchGetter<Self::F> + Parameter + Member + Default + Clone;
+        type Batch: BatchGetter<<Self as pallet_plonk::Config>::P>
+            + Parameter
+            + Member
+            + Default
+            + Clone;
         type PublicKey: Parameter + Member + Default + Copy;
 
         /// The overarching event type.
@@ -57,7 +60,8 @@ pub mod pallet {
     #[pallet::storage]
     #[pallet::getter(fn state_root)]
     /// The setup parameter referred to as SRS
-    pub type StateRoot<T: Config> = StorageValue<_, T::F>;
+    pub type StateRoot<T: Config> =
+        StorageValue<_, <<T as pallet_plonk::Config>::P as Pairing>::ScalarField>;
 
     #[pallet::pallet]
     #[pallet::generate_store(pub(super) trait Store)]
@@ -93,7 +97,7 @@ pub mod pallet {
         pub(super) fn withdraw(
             origin: OriginFor<T>,
             // l2_burn_merkle_proof: MerkleProof<F, H, N>,
-            batch_root: T::F,
+            batch_root: <<T as pallet_plonk::Config>::P as Pairing>::ScalarField,
             transaction: T::Transaction,
             l1_address: T::PublicKey,
         ) -> DispatchResultWithPostInfo {
@@ -104,7 +108,10 @@ pub mod pallet {
         }
 
         #[pallet::weight(10_000)]
-        pub fn set_initial_root(origin: OriginFor<T>, root: T::F) -> DispatchResultWithPostInfo {
+        pub fn set_initial_root(
+            origin: OriginFor<T>,
+            root: <<T as pallet_plonk::Config>::P as Pairing>::ScalarField,
+        ) -> DispatchResultWithPostInfo {
             // Need to ensure that the caller is operator
             ensure_signed(origin)?;
 
@@ -126,6 +133,10 @@ pub mod pallet {
 
             let new_root = compressed_batch_data.final_root();
 
+            for (amount, address) in compressed_batch_data.withdraw_info() {
+                // process withdrawals
+            }
+
             StateRoot::<T>::put(new_root);
             Self::deposit_event(Event::StateUpdated(new_root));
             Ok(().into())
@@ -145,14 +156,14 @@ pub mod pallet {
         /// Deposit to process on L2
         Deposit(T::Transaction),
         /// State update after proof verification
-        StateUpdated(T::F),
+        StateUpdated(<<T as pallet_plonk::Config>::P as Pairing>::ScalarField),
         /// State update after proof verification
-        StateInitialized(T::F),
+        StateInitialized(<<T as pallet_plonk::Config>::P as Pairing>::ScalarField),
     }
 }
 
 impl<T: Config> Rollup for Pallet<T> {
-    type F = T::F;
+    type F = <<T as pallet_plonk::Config>::P as Pairing>::ScalarField;
     type Transaction = T::Transaction;
     type Batch = T::Batch;
     type PublicKey = T::PublicKey;

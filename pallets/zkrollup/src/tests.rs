@@ -12,6 +12,7 @@ use sp_runtime::{
     traits::{BlakeTwo256, IdentityLookup},
 };
 use zkrollup::{Batch, BatchCircuit, Poseidon, Transaction};
+use zkstd::common::Pairing;
 
 // let last_level_size = leaves.len().next_power_of_two();
 // let tree_size = 2 * last_level_size - 1;
@@ -73,12 +74,16 @@ impl pallet_plonk::Config for TestRuntime {
 }
 
 impl Config for TestRuntime {
-    type F = Fr;
-    type Transaction = Transaction<TatePairing>;
+    type Transaction = Transaction<<Self as pallet_plonk::Config>::P>;
 
-    type Batch = Batch<TatePairing, Poseidon<Self::F, 2>, TREE_HEIGH, BATCH_SIZE>;
+    type Batch = Batch<
+        <Self as pallet_plonk::Config>::P,
+        Poseidon<<<Self as pallet_plonk::Config>::P as Pairing>::ScalarField, 2>,
+        TREE_HEIGH,
+        BATCH_SIZE,
+    >;
 
-    type PublicKey = PublicKey<TatePairing>;
+    type PublicKey = PublicKey<<Self as pallet_plonk::Config>::P>;
     type Event = Event;
     type Plonk = Plonk;
 }
@@ -92,7 +97,7 @@ mod zkrollup_tests {
     use pallet_plonk::FullcodecRng;
     use rand::SeedableRng;
     use red_jubjub::SecretKey;
-    use zkrollup::{Poseidon, RollupOperator, TransactionData};
+    use zkrollup::{BatchGetter, Poseidon, RollupOperator, TransactionData};
     use zkstd::{behave::Group, common::CurveGroup};
 
     // fn events() -> Vec<Event> {
@@ -258,17 +263,22 @@ mod zkrollup_tests {
             // 11. Check that state root on L1 changed.
             assert_eq!(<ZkRollup as Rollup>::state_root(), operator.state_root());
 
-            // // Withdraw
+            // Withdraw
 
-            // // 1. Burn funds on L2 by sending to a special address
-            // let alice_withdraw: Transaction<TatePairing> =
-            //     TransactionData::new(alice_address, withdraw_address, 5)
-            //         .signed(alice_secret, &mut rng);
-            // let bob_withdraw: Transaction<TatePairing> =
-            //     TransactionData::new(bob_address, withdraw_address, 5).signed(bob_secret, &mut rng);
+            // 1. Burn funds on L2 by sending to a special address
+            let alice_withdraw: Transaction<TatePairing> =
+                TransactionData::new(alice_address, withdraw_address, 5)
+                    .signed(alice_secret, &mut rng);
+            let bob_withdraw: Transaction<TatePairing> =
+                TransactionData::new(bob_address, withdraw_address, 5).signed(bob_secret, &mut rng);
 
-            // operator.execute_transaction(alice_withdraw);
-            // let (proof, batch) = operator.execute_transaction(bob_withdraw).unwrap();
+            operator.execute_transaction(alice_withdraw);
+            let (proof, batch) = operator.execute_transaction(bob_withdraw).unwrap();
+
+            assert_eq!(
+                batch.withdraw_info(),
+                [(5, alice_address), (5, bob_address)]
+            );
 
             // // 2. l2_burn_merkle_proof_alice and l2_burn_merkle_proof_bob should be generated with batch_tree
             // // Will decide the process, while implementing the gadget

@@ -10,6 +10,7 @@ use sp_runtime::{
     traits::{BlakeTwo256, IdentityLookup},
 };
 use zkrollup::{Batch, BatchCircuit, Poseidon, Transaction};
+use zkstd::common::Pairing;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -66,13 +67,16 @@ impl pallet_plonk::Config for Test {
 impl zkrollup_pallet::Config for Test {
     type Event = Event;
 
-    type F = Fr;
+    type Transaction = Transaction<<Self as pallet_plonk::Config>::P>;
 
-    type Transaction = Transaction<TatePairing>;
+    type Batch = Batch<
+        <Self as pallet_plonk::Config>::P,
+        Poseidon<<<Self as pallet_plonk::Config>::P as Pairing>::ScalarField, 2>,
+        2,
+        2,
+    >;
 
-    type Batch = Batch<TatePairing, Poseidon<Self::F, 2>, 2, 2>;
-
-    type PublicKey = PublicKey<TatePairing>;
+    type PublicKey = PublicKey<<Self as pallet_plonk::Config>::P>;
 
     type Plonk = Plonk;
 }
