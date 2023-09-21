@@ -712,38 +712,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dirs"
-version = "4.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca3aa72a6f96ea37bbc5aa912f6788242832f75369bdfdadcb0e38423f100059"
-dependencies = [
- "dirs-sys",
-]
-
-[[package]]
-name = "dirs-sys"
-version = "0.3.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b1d1d91c932ef41c0f2663aa8b0ca0342d444d842c06914aa0a7e352d0bada6"
-dependencies = [
- "libc",
- "redox_users",
- "winapi",
-]
-
-[[package]]
-name = "dusk-cdf"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a18b6d1d9f4a14aa615ddafa642c614b6be91dc9b26ac62fc3424edc9a08707"
-dependencies = [
- "dirs",
- "msgpacker",
- "serde",
- "toml",
-]
-
-[[package]]
 name = "dyn-clonable"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1541,25 +1509,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "msgpacker"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8111c79f2b2dec1dae93831dc4d97747db5bf134c8cd1a7c48777349984e875"
-dependencies = [
- "msgpacker-derive",
-]
-
-[[package]]
-name = "msgpacker-derive"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "67f6edd23a999c58251c8032db552dc0f1071ad8716e4e181f28d6ea6236a96f"
-dependencies = [
- "quote",
- "syn 1.0.96",
-]
-
-[[package]]
 name = "nodrop"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2180,17 +2129,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "567664f262709473930a4bf9e51bf2ebf3348f2e748ccc50dea20646858f8f29"
 dependencies = [
  "bitflags 1.3.2",
-]
-
-[[package]]
-name = "redox_users"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b033d837a7cf162d7993aded9304e30a83213c648b6e389db233191f891e5c2b"
-dependencies = [
- "getrandom 0.2.10",
- "redox_syscall 0.2.16",
- "thiserror",
 ]
 
 [[package]]
@@ -3442,10 +3380,8 @@ dependencies = [
 name = "zero-plonk"
 version = "0.1.10"
 dependencies = [
- "backtrace",
  "bls-12-381 0.0.12",
  "criterion 0.3.6",
- "dusk-cdf",
  "ec-pairing",
  "hashbrown 0.9.1",
  "itertools 0.9.0",
