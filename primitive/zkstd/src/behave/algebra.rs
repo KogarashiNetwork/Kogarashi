@@ -63,13 +63,16 @@ pub trait CurveGroup:
     // range field of curve
     type Range: PrimeField;
 
-    // scalar domain
-    type Affine: Curve;
-    type Extended: CurveExtended<Range = Self::Range>;
+    // scalar field of curve
     type Scalar: PrimeField;
+
+    // curve group
+    type Affine: Curve<Range = Self::Range, Scalar = Self::Scalar>;
+    type Extended: CurveExtended<Range = Self::Range, Scalar = Self::Scalar>;
 
     // generator of group
     const ADDITIVE_GENERATOR: Self;
+
     // additive identity of group
     // a * e = a for any a
     const ADDITIVE_IDENTITY: Self;

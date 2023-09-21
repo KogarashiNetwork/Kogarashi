@@ -136,12 +136,6 @@ macro_rules! twisted_edwards_curve_operation {
             fn get_t(&self) -> Self::Range {
                 self.t
             }
-
-            fn batch_normalize<'a>(
-                y: &'a mut [$extended],
-            ) -> Box<dyn Iterator<Item = Self::Affine> + 'a> {
-                Box::new(y.iter().map(|p| Self::Affine::from(*p)))
-            }
         }
 
         impl From<$extended> for $affine {
