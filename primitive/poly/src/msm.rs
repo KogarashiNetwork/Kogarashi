@@ -1,6 +1,6 @@
 #[cfg(feature = "std")]
 use rayon::prelude::*;
-use zkstd::common::{vec, Curve, CurveGroup, Pairing, SigUtils, Vec};
+use zkstd::common::{vec, CurveAffine, CurveGroup, Pairing, SigUtils, Vec};
 
 /// Performs a Variable Base Multiscalar Multiplication.
 pub fn msm_curve_addtion<P: Pairing>(

@@ -1,6 +1,6 @@
 use crate::arithmetic::utils::Naf;
 use crate::common::{
-    Curve, CurveExtended, CurveGroup, PrimeField, Ring, TwistedEdwardsAffine,
+    CurveAffine, CurveExtended, CurveGroup, PrimeField, Ring, TwistedEdwardsAffine,
     TwistedEdwardsExtended,
 };
 

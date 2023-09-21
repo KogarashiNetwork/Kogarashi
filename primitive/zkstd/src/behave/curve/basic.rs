@@ -4,7 +4,7 @@ use crate::{
 };
 use core::ops::{Add, AddAssign, MulAssign, Sub, SubAssign};
 
-pub trait Curve: CurveGroup + ParityCmp + Basic {
+pub trait CurveAffine: CurveGroup + ParityCmp + Basic {
     // a param
     const PARAM_A: Self::Range;
 
@@ -22,14 +22,14 @@ pub trait Curve: CurveGroup + ParityCmp + Basic {
 }
 
 /// elliptic curve rational point affine representation
-pub trait Affine: Curve + From<<Self as CurveGroup>::Extended> {
+pub trait Affine: CurveAffine + From<<Self as CurveGroup>::Extended> {
     fn to_extended(self) -> <Self as CurveGroup>::Extended;
 }
 
 /// extend curve point representation
 /// projective, jacobian and so on
 pub trait CurveExtended:
-    Curve
+    CurveAffine
     + AddAssign
     + AddAssign<Self::Affine>
     + for<'a> AddAssign<&'a Self::Affine>

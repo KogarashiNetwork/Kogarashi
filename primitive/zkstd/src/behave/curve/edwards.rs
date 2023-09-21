@@ -1,12 +1,12 @@
 use crate::{
-    behave::{Curve, CurveExtended},
+    behave::{CurveAffine, CurveExtended},
     common::CurveGroup,
 };
 
 use super::Affine;
 
 pub trait TwistedEdwardsCurve:
-    Curve + Into<<Self as CurveGroup>::Extended> + From<<Self as CurveGroup>::Extended>
+    CurveAffine + Into<<Self as CurveGroup>::Extended> + From<<Self as CurveGroup>::Extended>
 {
     const PARAM_D: Self::Range;
 }

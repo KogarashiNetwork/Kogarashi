@@ -1,5 +1,5 @@
 use crate::{
-    behave::{Curve, CurveExtended},
+    behave::{CurveAffine, CurveExtended},
     common::CurveGroup,
 };
 
@@ -8,7 +8,7 @@ use super::Affine;
 /// elliptic curve rational points group
 /// rational points group behaves as abelian group
 pub trait WeierstrassCurve:
-    Curve + Into<<Self as CurveGroup>::Extended> + From<<Self as CurveGroup>::Extended>
+    CurveAffine + Into<<Self as CurveGroup>::Extended> + From<<Self as CurveGroup>::Extended>
 {
     // b param
     const PARAM_B: Self::Range;

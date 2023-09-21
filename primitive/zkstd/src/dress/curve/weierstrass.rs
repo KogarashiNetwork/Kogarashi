@@ -20,7 +20,7 @@ macro_rules! weierstrass_curve_operation {
         impl Basic for $affine {}
         impl Basic for $projective {}
 
-        impl Curve for $affine {
+        impl CurveAffine for $affine {
             const PARAM_A: $range = $a;
 
             fn double(self) -> $projective {
@@ -83,7 +83,7 @@ macro_rules! weierstrass_curve_operation {
             }
         }
 
-        impl Curve for $projective {
+        impl CurveAffine for $projective {
             const PARAM_A: $range = $a;
 
             fn double(self) -> Self {

@@ -18,7 +18,7 @@ macro_rules! twisted_edwards_curve_operation {
         impl Basic for $affine {}
         impl Basic for $extended {}
 
-        impl Curve for $affine {
+        impl CurveAffine for $affine {
             const PARAM_A: $scalar = $scalar::one();
 
             fn double(self) -> Self::Extended {
@@ -84,7 +84,7 @@ macro_rules! twisted_edwards_curve_operation {
             }
         }
 
-        impl Curve for $extended {
+        impl CurveAffine for $extended {
             const PARAM_A: $scalar = $scalar::one();
 
             fn double(self) -> Self {
