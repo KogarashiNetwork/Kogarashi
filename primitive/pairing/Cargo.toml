@@ -5,7 +5,7 @@ authors = [
 ]
 name = "ec-pairing"
 description = 'Tate pairing implementation'
-version = "0.0.11"
+version = "0.0.12"
 edition = "2021"
 license = "Apache-2.0"
 homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
