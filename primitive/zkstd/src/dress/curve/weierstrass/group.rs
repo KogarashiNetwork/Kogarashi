@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! affine_group_operation {
-    ($affine:ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident) => {
+    ($affine:ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident, $a:ident) => {
         curve_arithmetic_extension!($affine, $scalar, $projective);
         impl PartialEq for $affine {
             fn eq(&self, other: &Self) -> bool {
@@ -14,10 +14,11 @@ macro_rules! affine_group_operation {
 
         impl CurveGroup for $affine {
             type Range = $range;
-
             type Affine = $affine;
             type Extended = $projective;
             type Scalar = $scalar;
+
+            const PARAM_A: $range = $a;
 
             const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
@@ -53,13 +54,33 @@ macro_rules! affine_group_operation {
             fn random(rand: impl RngCore) -> $projective {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
             }
+
+            fn double(self) -> $projective {
+                double_projective_point(self.to_extended())
+            }
+
+            fn is_on_curve(self) -> bool {
+                if self.is_infinity {
+                    true
+                } else {
+                    self.y.square() == self.x.square() * self.x + Self::PARAM_B
+                }
+            }
+
+            fn get_x(&self) -> Self::Range {
+                self.x
+            }
+
+            fn get_y(&self) -> Self::Range {
+                self.y
+            }
         }
     };
 }
 
 #[macro_export]
 macro_rules! projective_group_operation {
-    ($affine: ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident) => {
+    ($affine: ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident, $a:ident) => {
         curve_arithmetic_extension!($projective, $scalar, $projective);
 
         impl PartialEq for $projective {
@@ -74,10 +95,11 @@ macro_rules! projective_group_operation {
 
         impl CurveGroup for $projective {
             type Range = $range;
-
             type Affine = $affine;
             type Extended = $projective;
             type Scalar = $scalar;
+
+            const PARAM_A: $range = $a;
 
             const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
@@ -112,6 +134,27 @@ macro_rules! projective_group_operation {
 
             fn random(rand: impl RngCore) -> Self {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
+            }
+
+            fn double(self) -> Self {
+                double_projective_point(self)
+            }
+
+            fn is_on_curve(self) -> bool {
+                if self.is_identity() {
+                    true
+                } else {
+                    self.y.square() * self.z
+                        == self.x.square() * self.x + Self::PARAM_B * self.z.square() * self.z
+                }
+            }
+
+            fn get_x(&self) -> Self::Range {
+                self.x
+            }
+
+            fn get_y(&self) -> Self::Range {
+                self.y
             }
         }
 

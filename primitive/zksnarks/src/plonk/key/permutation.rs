@@ -1,17 +1,17 @@
 use crate::plonk::proof::Evaluations;
 
 use poly_commit::{Coefficients, Commitment, Fft, PointsValue};
-use zkstd::common::{vec, Affine, FftField, PrimeField, Vec};
+use zkstd::common::{vec, CurveAffine, FftField, PrimeField, Vec};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct VerificationKey<A: Affine> {
+pub struct VerificationKey<A: CurveAffine> {
     pub s_sigma_1: Commitment<A>,
     pub s_sigma_2: Commitment<A>,
     pub s_sigma_3: Commitment<A>,
     pub s_sigma_4: Commitment<A>,
 }
 
-impl<A: Affine> VerificationKey<A> {
+impl<A: CurveAffine> VerificationKey<A> {
     const K1: u64 = 7;
     const K2: u64 = 13;
     const K3: u64 = 17;

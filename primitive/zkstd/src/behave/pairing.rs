@@ -9,7 +9,7 @@ use parity_scale_codec::{Decode, Encode, EncodeLike};
 use super::{
     algebra::Field,
     comp::{Basic, ParityCmp},
-    curve::Affine,
+    curve::CurveAffine,
     sign::SigUtils,
     CurveExtended, CurveGroup, FftField, Group, TwistedEdwardsAffine, TwistedEdwardsCurve,
     TwistedEdwardsExtended, WeierstrassAffine, WeierstrassProjective,
@@ -22,7 +22,7 @@ pub trait ExtensionField: Field + Basic + ParityCmp {
 
 /// pairing function range field
 pub trait PairingRange: ExtensionField {
-    type G1Affine: Affine;
+    type G1Affine: CurveAffine;
     type G2Coeff: ParityCmp;
     type QuadraticField: ExtensionField;
     type Gt: Group + Debug;
@@ -44,7 +44,7 @@ pub trait G2Pairing: WeierstrassProjective {
     type PairingRange: PairingRange;
     type PairingCoeff: ParityCmp;
     type PairingRepr: ParityCmp;
-    type G2Affine: Affine;
+    type G2Affine: CurveAffine;
 
     fn double_eval(&mut self) -> Self::PairingCoeff;
 

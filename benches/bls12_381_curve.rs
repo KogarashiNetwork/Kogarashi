@@ -1,7 +1,7 @@
 use bls_12_381::{Fr, G1Affine, G1Projective, G2Affine, G2Projective};
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rand::rngs::OsRng;
-use zkstd::common::{Curve, CurveExtended, CurveGroup, Group};
+use zkstd::common::{CurveExtended, CurveGroup, Group};
 
 fn bench_g1_affine(c: &mut Criterion) {
     let mut group = c.benchmark_group("g1_affine");

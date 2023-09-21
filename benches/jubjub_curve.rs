@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 use rand::rngs::OsRng;
-use zkstd::common::{Curve, CurveExtended, CurveGroup, Group};
+use zkstd::common::{CurveExtended, CurveGroup, Group};
 
 fn bench_jubjub_affine(c: &mut Criterion) {
     let mut group = c.benchmark_group("jubjub_affine");

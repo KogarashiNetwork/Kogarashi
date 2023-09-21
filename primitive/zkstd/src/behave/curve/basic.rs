@@ -4,32 +4,17 @@ use crate::{
 };
 use core::ops::{Add, AddAssign, MulAssign, Sub, SubAssign};
 
-pub trait CurveAffine: CurveGroup + ParityCmp + Basic {
-    // a param
-    const PARAM_A: Self::Range;
-
-    // check that point is on curve
-    fn is_on_curve(self) -> bool;
-
-    // get x coordinate
-    fn get_x(&self) -> Self::Range;
-
-    // get y coordinate
-    fn get_y(&self) -> Self::Range;
-
-    // doubling this point
-    fn double(self) -> <Self as CurveGroup>::Extended;
-}
-
 /// elliptic curve rational point affine representation
-pub trait Affine: CurveAffine + From<<Self as CurveGroup>::Extended> {
+pub trait CurveAffine:
+    CurveGroup + ParityCmp + Basic + From<<Self as CurveGroup>::Extended>
+{
     fn to_extended(self) -> <Self as CurveGroup>::Extended;
 }
 
 /// extend curve point representation
 /// projective, jacobian and so on
 pub trait CurveExtended:
-    CurveAffine
+    CurveGroup
     + AddAssign
     + AddAssign<Self::Affine>
     + for<'a> AddAssign<&'a Self::Affine>

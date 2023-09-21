@@ -1,5 +1,8 @@
 // trait resresenting abstract algebra concept
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use core::{
+    fmt::Debug,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
+};
 use rand_core::RngCore;
 
 use super::{CurveAffine, CurveExtended, PrimeField};
@@ -22,7 +25,7 @@ pub trait Group:
     + Copy
 {
     // scalar domain
-    type Scalar: Group;
+    type Scalar: PrimeField;
 
     // generator of group
     const ADDITIVE_GENERATOR: Self;
@@ -45,6 +48,10 @@ pub trait Group:
 pub trait CurveGroup:
     PartialEq
     + Eq
+    + Sized
+    + Copy
+    + Debug
+    + Default
     + Add<Self, Output = Self::Extended>
     + for<'a> Add<&'a Self, Output = Self::Extended>
     + for<'b> Add<&'b Self, Output = Self::Extended>
@@ -58,7 +65,6 @@ pub trait CurveGroup:
     + for<'a> Mul<&'a Self::Scalar, Output = Self::Extended>
     + for<'b> Mul<&'b Self::Scalar, Output = Self::Extended>
     + for<'a, 'b> Mul<&'b Self::Scalar, Output = Self::Extended>
-    + Sized
 {
     // range field of curve
     type Range: PrimeField;
@@ -69,6 +75,9 @@ pub trait CurveGroup:
     // curve group
     type Affine: CurveAffine<Range = Self::Range, Scalar = Self::Scalar, Extended = Self::Extended>;
     type Extended: CurveExtended<Range = Self::Range, Scalar = Self::Scalar, Affine = Self::Affine>;
+
+    // a param
+    const PARAM_A: Self::Range;
 
     // generator of group
     const ADDITIVE_GENERATOR: Self;
@@ -90,6 +99,18 @@ pub trait CurveGroup:
 
     // get randome element
     fn random(rand: impl RngCore) -> Self::Extended;
+
+    // check that point is on curve
+    fn is_on_curve(self) -> bool;
+
+    // get x coordinate
+    fn get_x(&self) -> Self::Range;
+
+    // get y coordinate
+    fn get_y(&self) -> Self::Range;
+
+    // doubling this point
+    fn double(self) -> <Self as CurveGroup>::Extended;
 }
 
 /// ring trait which supports additive and multiplicative arithmetics

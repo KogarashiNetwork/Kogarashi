@@ -2,15 +2,15 @@ use crate::plonk::proof::Evaluations;
 use crate::plonk::utils::{delta, delta_xor_and};
 
 use poly_commit::{Coefficients, Commitment, PointsValue};
-use zkstd::common::{vec, Affine, FftField, PrimeField, Vec};
+use zkstd::common::{vec, CurveAffine, FftField, PrimeField, Vec};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct VerificationKey<A: Affine> {
+pub struct VerificationKey<A: CurveAffine> {
     pub q_c: Commitment<A>,
     pub q_logic: Commitment<A>,
 }
 
-impl<A: Affine> VerificationKey<A> {
+impl<A: CurveAffine> VerificationKey<A> {
     pub fn linearize(
         &self,
         logic_separation_challenge: &A::Scalar,
