@@ -6,15 +6,15 @@ use core::ops::{Add, AddAssign, MulAssign, Sub, SubAssign};
 
 /// elliptic curve rational point affine representation
 pub trait CurveAffine:
-    CurveGroup + ParityCmp + Basic + From<<Self as CurveGroup>::Extended>
+    CurveGroup<Affine = Self> + ParityCmp + Basic + From<Self::Extended>
 {
-    fn to_extended(self) -> <Self as CurveGroup>::Extended;
+    fn to_extended(self) -> Self::Extended;
 }
 
 /// extend curve point representation
 /// projective, jacobian and so on
 pub trait CurveExtended:
-    CurveGroup
+    CurveGroup<Extended = Self>
     + AddAssign
     + AddAssign<Self::Affine>
     + for<'a> AddAssign<&'a Self::Affine>
@@ -40,5 +40,5 @@ pub trait CurveExtended:
     fn get_z(&self) -> Self::Range;
 
     // convert projective to affine representation
-    fn to_affine(self) -> <Self as CurveGroup>::Affine;
+    fn to_affine(self) -> Self::Affine;
 }
