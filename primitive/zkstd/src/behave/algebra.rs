@@ -67,8 +67,8 @@ pub trait CurveGroup:
     type Scalar: PrimeField;
 
     // curve group
-    type Affine: Curve<Range = Self::Range, Scalar = Self::Scalar>;
-    type Extended: CurveExtended<Range = Self::Range, Scalar = Self::Scalar>;
+    type Affine: Curve<Range = Self::Range, Scalar = Self::Scalar, Extended = Self::Extended>;
+    type Extended: CurveExtended<Range = Self::Range, Scalar = Self::Scalar, Affine = Self::Affine>;
 
     // generator of group
     const ADDITIVE_GENERATOR: Self;
