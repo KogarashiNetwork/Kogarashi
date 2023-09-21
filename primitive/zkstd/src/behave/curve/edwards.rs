@@ -1,6 +1,3 @@
-extern crate alloc;
-use alloc::boxed::Box;
-
 use crate::{
     behave::{Curve, CurveExtended},
     common::CurveGroup,
@@ -37,6 +34,4 @@ pub trait TwistedEdwardsExtended: TwistedEdwardsCurve + CurveExtended {
 
     // get t coordinate
     fn get_t(&self) -> Self::Range;
-
-    fn batch_normalize<'a>(y: &'a mut [Self]) -> Box<dyn Iterator<Item = Self::Affine> + 'a>;
 }
