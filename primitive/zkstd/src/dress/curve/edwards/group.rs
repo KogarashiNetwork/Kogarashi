@@ -10,10 +10,11 @@ macro_rules! twisted_edwards_affine_group_operation {
 
         impl CurveGroup for $affine {
             type Range = $range;
-
             type Affine = $affine;
             type Extended = $extended;
             type Scalar = $scalar;
+
+            const PARAM_A: $scalar = $scalar::one();
 
             const ADDITIVE_GENERATOR: Self = Self { x: $x, y: $y };
 
@@ -43,6 +44,28 @@ macro_rules! twisted_edwards_affine_group_operation {
             fn random(rand: impl RngCore) -> $extended {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
             }
+
+            fn double(self) -> Self::Extended {
+                double_affine_point(self)
+            }
+
+            fn is_on_curve(self) -> bool {
+                if self.x.is_zero() {
+                    true
+                } else {
+                    let xx = self.x.square();
+                    let yy = self.y.square();
+                    yy == $scalar::one() + Self::PARAM_D * xx * yy + xx
+                }
+            }
+
+            fn get_x(&self) -> Self::Range {
+                self.x
+            }
+
+            fn get_y(&self) -> Self::Range {
+                self.y
+            }
         }
     };
 }
@@ -64,6 +87,8 @@ macro_rules! twisted_edwards_extend_group_operation {
             type Affine = $affine;
             type Extended = $extended;
             type Scalar = $scalar;
+
+            const PARAM_A: $scalar = $scalar::one();
 
             const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
@@ -101,6 +126,27 @@ macro_rules! twisted_edwards_extend_group_operation {
 
             fn random(rand: impl RngCore) -> Self {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
+            }
+
+            fn double(self) -> Self {
+                double_projective_point(self)
+            }
+
+            fn is_on_curve(self) -> bool {
+                if self.z.is_zero() {
+                    true
+                } else {
+                    let affine = $affine::from(self);
+                    affine.is_on_curve()
+                }
+            }
+
+            fn get_x(&self) -> Self::Range {
+                self.x
+            }
+
+            fn get_y(&self) -> Self::Range {
+                self.y
             }
         }
 

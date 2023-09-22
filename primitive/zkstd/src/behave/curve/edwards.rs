@@ -1,17 +1,10 @@
-use crate::{
-    behave::{Curve, CurveExtended},
-    common::CurveGroup,
-};
+use crate::behave::{CurveAffine, CurveExtended, CurveGroup};
 
-use super::Affine;
-
-pub trait TwistedEdwardsCurve:
-    Curve + Into<<Self as CurveGroup>::Extended> + From<<Self as CurveGroup>::Extended>
-{
+pub trait TwistedEdwardsCurve: CurveGroup + Into<Self::Extended> + From<Self::Extended> {
     const PARAM_D: Self::Range;
 }
 
-pub trait TwistedEdwardsAffine: TwistedEdwardsCurve + Affine {
+pub trait TwistedEdwardsAffine: CurveAffine + TwistedEdwardsCurve {
     // TODO: Integrate Extended and Projective
     type Projective: TwistedEdwardsExtended<Range = Self::Range>;
     fn new_projective(

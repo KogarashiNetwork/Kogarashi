@@ -1,10 +1,10 @@
 use crate::plonk::proof::Evaluations;
 
 use poly_commit::{Coefficients, Commitment, PointsValue};
-use zkstd::common::{vec, Affine, FftField, Vec};
+use zkstd::common::{vec, CurveAffine, FftField, Vec};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct VerificationKey<A: Affine> {
+pub struct VerificationKey<A: CurveAffine> {
     pub q_m: Commitment<A>,
     pub q_l: Commitment<A>,
     pub q_r: Commitment<A>,
@@ -14,7 +14,7 @@ pub struct VerificationKey<A: Affine> {
     pub q_arith: Commitment<A>,
 }
 
-impl<A: Affine> VerificationKey<A> {
+impl<A: CurveAffine> VerificationKey<A> {
     pub fn linearize(&self, evaluations: &Evaluations<A::Scalar>) -> (Vec<A::Scalar>, Vec<A>) {
         let (q_arith_eval, a_eval, b_eval, c_eval, d_eval) = (
             evaluations.q_arith_eval,
