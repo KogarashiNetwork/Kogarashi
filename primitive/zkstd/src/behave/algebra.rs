@@ -5,7 +5,7 @@ use core::{
 };
 use rand_core::RngCore;
 
-use super::{CurveAffine, CurveExtended, PrimeField};
+use super::{CurveAffine, CurveExtended, FftField, PrimeField};
 
 /// group trait which supports additive and scalar arithmetic
 /// additive and scalar arithmetic hold associative and distributive property
@@ -70,7 +70,7 @@ pub trait CurveGroup:
     type Range: PrimeField;
 
     // scalar field of curve
-    type Scalar: PrimeField;
+    type Scalar: FftField;
 
     // curve group
     type Affine: CurveAffine<Range = Self::Range, Scalar = Self::Scalar, Extended = Self::Extended>;
