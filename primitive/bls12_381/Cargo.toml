@@ -5,7 +5,7 @@ authors = [
 ]
 name = "bls-12-381"
 description = 'Bls12 381 pairing-friendly curve implementation'
-version = "0.0.17"
+version = "0.0.19"
 edition = "2021"
 license = "Apache-2.0"
 homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
