@@ -70,7 +70,7 @@ pub trait CurveGroup:
     type Range: PrimeField;
 
     // scalar field of curve
-    type Scalar: FftField;
+    type Scalar: FftField + From<Self::Range>;
 
     // curve group
     type Affine: CurveAffine<Range = Self::Range, Scalar = Self::Scalar, Extended = Self::Extended>;
