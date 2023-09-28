@@ -290,14 +290,14 @@ dependencies = [
 
 [[package]]
 name = "bls-12-381"
-version = "0.0.16"
+version = "0.0.17"
 dependencies = [
  "parity-scale-codec",
  "paste",
  "proptest",
  "rand_core 0.6.4",
  "serde",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
@@ -429,7 +429,7 @@ name = "confidential_transfer"
 version = "0.1.1"
 dependencies = [
  "ark-std 0.3.0",
- "bls-12-381 0.0.16",
+ "bls-12-381 0.0.17",
  "ec-pairing",
  "frame-support",
  "frame-system",
@@ -446,7 +446,7 @@ dependencies = [
  "sp-runtime",
  "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "zero-plonk",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
@@ -742,11 +742,11 @@ checksum = "304e6508efa593091e97a9abbc10f90aa7ca635b6d2784feff3c89d41dd12272"
 name = "ec-pairing"
 version = "0.0.12"
 dependencies = [
- "bls-12-381 0.0.16",
+ "bls-12-381 0.0.17",
  "jub-jub 0.0.15",
  "parity-scale-codec",
  "rand_core 0.6.4",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
@@ -1360,13 +1360,13 @@ dependencies = [
 name = "jub-jub"
 version = "0.0.15"
 dependencies = [
- "bls-12-381 0.0.16",
+ "bls-12-381 0.0.17",
  "parity-scale-codec",
  "paste",
  "proptest",
  "rand_core 0.6.4",
  "serde",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
@@ -1624,14 +1624,14 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
 name = "pallet-plonk"
 version = "0.2.5"
 dependencies = [
- "bls-12-381 0.0.16",
+ "bls-12-381 0.0.17",
  "ec-pairing",
  "frame-support",
  "frame-system",
@@ -1645,7 +1645,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "zero-plonk",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
@@ -1667,7 +1667,7 @@ dependencies = [
 name = "pallet-zkrollup"
 version = "0.0.1"
 dependencies = [
- "bls-12-381 0.0.16",
+ "bls-12-381 0.0.17",
  "ec-pairing",
  "frame-support",
  "frame-system",
@@ -1686,7 +1686,7 @@ dependencies = [
  "sp-runtime",
  "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "zkrollup",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
@@ -1840,12 +1840,12 @@ dependencies = [
 name = "poly-commit"
 version = "0.0.11"
 dependencies = [
- "bls-12-381 0.0.16",
+ "bls-12-381 0.0.17",
  "ec-pairing",
  "parity-scale-codec",
  "rand_core 0.6.4",
  "rayon",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
@@ -2089,7 +2089,7 @@ name = "red-jubjub"
 version = "0.0.15"
 dependencies = [
  "blake2b_simd",
- "bls-12-381 0.0.16",
+ "bls-12-381 0.0.17",
  "ec-pairing",
  "hex-literal",
  "jub-jub 0.0.15",
@@ -2097,7 +2097,7 @@ dependencies = [
  "rand 0.8.5",
  "rand_core 0.6.4",
  "serde",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
@@ -2397,7 +2397,7 @@ dependencies = [
  "rand 0.8.5",
  "rand_core 0.6.4",
  "serde",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
@@ -3352,7 +3352,7 @@ checksum = "85e60b0d1b5f99db2556934e21937020776a5d31520bf169e851ac44e6420214"
 name = "zero-network"
 version = "0.1.0"
 dependencies = [
- "bls-12-381 0.0.16",
+ "bls-12-381 0.0.17",
  "confidential_transfer",
  "criterion 0.4.0",
  "ec-pairing",
@@ -3373,14 +3373,14 @@ dependencies = [
  "sp-runtime",
  "zero-plonk",
  "zkrollup",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
 name = "zero-plonk"
 version = "0.1.10"
 dependencies = [
- "bls-12-381 0.0.16",
+ "bls-12-381 0.0.17",
  "criterion 0.3.6",
  "ec-pairing",
  "hashbrown 0.9.1",
@@ -3394,7 +3394,7 @@ dependencies = [
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tempdir",
  "zksnarks",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
@@ -3423,7 +3423,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "ark-std 0.4.0",
- "bls-12-381 0.0.16",
+ "bls-12-381 0.0.17",
  "ec-pairing",
  "fullcodec_rand_xorshift",
  "jub-jub 0.0.15",
@@ -3436,7 +3436,7 @@ dependencies = [
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "zero-plonk",
  "zksnarks",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
@@ -3446,7 +3446,7 @@ dependencies = [
  "merlin 3.0.0",
  "parity-scale-codec",
  "poly-commit",
- "zkstd 0.0.15",
+ "zkstd 0.0.16",
 ]
 
 [[package]]
@@ -3463,9 +3463,9 @@ dependencies = [
 
 [[package]]
 name = "zkstd"
-version = "0.0.15"
+version = "0.0.16"
 dependencies = [
- "bls-12-381 0.0.16",
+ "bls-12-381 0.0.17",
  "jub-jub 0.0.15",
  "parity-scale-codec",
  "paste",
