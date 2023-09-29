@@ -290,7 +290,7 @@ dependencies = [
 
 [[package]]
 name = "bls-12-381"
-version = "0.0.19"
+version = "0.0.20"
 dependencies = [
  "parity-scale-codec",
  "paste",
@@ -429,7 +429,7 @@ name = "confidential_transfer"
 version = "0.1.1"
 dependencies = [
  "ark-std 0.3.0",
- "bls-12-381 0.0.19",
+ "bls-12-381 0.0.20",
  "ec-pairing",
  "frame-support",
  "frame-system",
@@ -742,7 +742,7 @@ checksum = "304e6508efa593091e97a9abbc10f90aa7ca635b6d2784feff3c89d41dd12272"
 name = "ec-pairing"
 version = "0.0.12"
 dependencies = [
- "bls-12-381 0.0.19",
+ "bls-12-381 0.0.20",
  "jub-jub 0.0.15",
  "parity-scale-codec",
  "rand_core 0.6.4",
@@ -1360,7 +1360,7 @@ dependencies = [
 name = "jub-jub"
 version = "0.0.15"
 dependencies = [
- "bls-12-381 0.0.19",
+ "bls-12-381 0.0.20",
  "parity-scale-codec",
  "paste",
  "proptest",
@@ -1631,7 +1631,7 @@ dependencies = [
 name = "pallet-plonk"
 version = "0.2.5"
 dependencies = [
- "bls-12-381 0.0.19",
+ "bls-12-381 0.0.20",
  "ec-pairing",
  "frame-support",
  "frame-system",
@@ -1667,7 +1667,7 @@ dependencies = [
 name = "pallet-zkrollup"
 version = "0.0.1"
 dependencies = [
- "bls-12-381 0.0.19",
+ "bls-12-381 0.0.20",
  "ec-pairing",
  "frame-support",
  "frame-system",
@@ -1840,7 +1840,7 @@ dependencies = [
 name = "poly-commit"
 version = "0.0.11"
 dependencies = [
- "bls-12-381 0.0.19",
+ "bls-12-381 0.0.20",
  "ec-pairing",
  "parity-scale-codec",
  "rand_core 0.6.4",
@@ -2089,7 +2089,7 @@ name = "red-jubjub"
 version = "0.0.15"
 dependencies = [
  "blake2b_simd",
- "bls-12-381 0.0.19",
+ "bls-12-381 0.0.20",
  "ec-pairing",
  "hex-literal",
  "jub-jub 0.0.15",
@@ -3352,7 +3352,7 @@ checksum = "85e60b0d1b5f99db2556934e21937020776a5d31520bf169e851ac44e6420214"
 name = "zero-network"
 version = "0.1.0"
 dependencies = [
- "bls-12-381 0.0.19",
+ "bls-12-381 0.0.20",
  "confidential_transfer",
  "criterion 0.4.0",
  "ec-pairing",
@@ -3380,7 +3380,7 @@ dependencies = [
 name = "zero-plonk"
 version = "0.1.10"
 dependencies = [
- "bls-12-381 0.0.19",
+ "bls-12-381 0.0.20",
  "criterion 0.3.6",
  "ec-pairing",
  "hashbrown 0.9.1",
@@ -3423,7 +3423,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "ark-std 0.4.0",
- "bls-12-381 0.0.19",
+ "bls-12-381 0.0.20",
  "ec-pairing",
  "fullcodec_rand_xorshift",
  "jub-jub 0.0.15",
@@ -3465,7 +3465,7 @@ dependencies = [
 name = "zkstd"
 version = "0.0.20"
 dependencies = [
- "bls-12-381 0.0.19",
+ "bls-12-381 0.0.20",
  "jub-jub 0.0.15",
  "parity-scale-codec",
  "paste",
