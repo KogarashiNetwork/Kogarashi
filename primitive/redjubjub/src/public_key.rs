@@ -38,6 +38,10 @@ impl<P: Pairing> PublicKey<P> {
         PublicKey(raw)
     }
 
+    pub fn zero() -> Self {
+        Self(P::JubjubExtended::zero())
+    }
+
     pub fn inner(&self) -> P::JubjubExtended {
         self.0
     }

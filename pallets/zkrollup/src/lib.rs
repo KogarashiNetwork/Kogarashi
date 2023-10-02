@@ -85,11 +85,12 @@ pub mod pallet {
         #[pallet::weight(10_000)]
         pub(super) fn deposit(
             origin: OriginFor<T>,
-            t: T::Transaction,
+            amount: u64,
+            address: T::PublicKey,
         ) -> DispatchResultWithPostInfo {
             ensure_signed(origin)?;
 
-            Self::deposit_event(Event::Deposit(t));
+            Self::deposit_event(Event::Deposit(amount, address));
             Ok(().into())
         }
 
@@ -154,7 +155,7 @@ pub mod pallet {
     #[pallet::metadata(T::Transaction = "Transaction")]
     pub enum Event<T: Config> {
         /// Deposit to process on L2
-        Deposit(T::Transaction),
+        Deposit(u64, <T as Config>::PublicKey),
         /// State update after proof verification
         StateUpdated(<<T as pallet_plonk::Config>::P as Pairing>::ScalarField),
         /// State update after proof verification
