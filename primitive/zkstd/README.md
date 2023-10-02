@@ -32,6 +32,39 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fr(pub [u64; 4]);
 
+impl SigUtils<32> for Fr {
+    fn to_bytes(self) -> [u8; Self::LENGTH] {
+        let tmp = self.montgomery_reduce();
+
+        let mut res = [0; Self::LENGTH];
+        res[0..8].copy_from_slice(&tmp[0].to_le_bytes());
+        res[8..16].copy_from_slice(&tmp[1].to_le_bytes());
+        res[16..24].copy_from_slice(&tmp[2].to_le_bytes());
+        res[24..32].copy_from_slice(&tmp[3].to_le_bytes());
+
+        res
+    }
+
+    fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+        // SBP-M1 review: apply proper error handling instead of `unwrap`
+        let l0 = u64::from_le_bytes(bytes[0..8].try_into().unwrap());
+        let l1 = u64::from_le_bytes(bytes[8..16].try_into().unwrap());
+        let l2 = u64::from_le_bytes(bytes[16..24].try_into().unwrap());
+        let l3 = u64::from_le_bytes(bytes[24..32].try_into().unwrap());
+
+        let (_, borrow) = sbb(l0, MODULUS[0], 0);
+        let (_, borrow) = sbb(l1, MODULUS[1], borrow);
+        let (_, borrow) = sbb(l2, MODULUS[2], borrow);
+        let (_, borrow) = sbb(l3, MODULUS[3], borrow);
+
+        if borrow & 1 == 1 {
+            Some(Self([l0, l1, l2, l3]) * Self(R2))
+        } else {
+            None
+        }
+    }
+}
+
 const MODULUS: [u64; 4] = [
     0xffffffff00000001,
     0x53bda402fffe5bfe,

@@ -18,38 +18,12 @@ macro_rules! twisted_edwards_curve_operation {
         impl Basic for $affine {}
         impl Basic for $extended {}
 
-        impl Curve for $affine {
-            const PARAM_A: $scalar = $scalar::one();
-
-            fn double(self) -> Self::Extended {
-                double_affine_point(self)
-            }
-
-            fn is_on_curve(self) -> bool {
-                if self.x.is_zero() {
-                    true
-                } else {
-                    let xx = self.x.square();
-                    let yy = self.y.square();
-                    yy == $scalar::one() + Self::PARAM_D * xx * yy + xx
-                }
-            }
-
-            fn get_x(&self) -> Self::Range {
-                self.x
-            }
-
-            fn get_y(&self) -> Self::Range {
-                self.y
-            }
-        }
-
         impl TwistedEdwardsCurve for $affine {
             // d param
             const PARAM_D: $range = $d;
         }
 
-        impl Affine for $affine {
+        impl CurveAffine for $affine {
             fn to_extended(self) -> Self::Extended {
                 Self::Extended {
                     x: self.x,
@@ -84,31 +58,6 @@ macro_rules! twisted_edwards_curve_operation {
             }
         }
 
-        impl Curve for $extended {
-            const PARAM_A: $scalar = $scalar::one();
-
-            fn double(self) -> Self {
-                double_projective_point(self)
-            }
-
-            fn is_on_curve(self) -> bool {
-                if self.z.is_zero() {
-                    true
-                } else {
-                    let affine = $affine::from(self);
-                    affine.is_on_curve()
-                }
-            }
-
-            fn get_x(&self) -> Self::Range {
-                self.x
-            }
-
-            fn get_y(&self) -> Self::Range {
-                self.y
-            }
-        }
-
         impl TwistedEdwardsCurve for $extended {
             // d param
             const PARAM_D: $range = $d;
@@ -135,12 +84,6 @@ macro_rules! twisted_edwards_curve_operation {
 
             fn get_t(&self) -> Self::Range {
                 self.t
-            }
-
-            fn batch_normalize<'a>(
-                y: &'a mut [$extended],
-            ) -> Box<dyn Iterator<Item = Self::Affine> + 'a> {
-                Box::new(y.iter().map(|p| Self::Affine::from(*p)))
             }
         }
 

@@ -283,19 +283,6 @@ impl BitAnd<Fr> for Fr {
     }
 }
 
-fft_field_operation!(
-    Fr,
-    MODULUS,
-    GENERATOR,
-    MULTIPLICATIVE_GENERATOR,
-    INV,
-    ROOT_OF_UNITY,
-    R,
-    R2,
-    R3,
-    S
-);
-
 impl<T> Product<T> for Fr
 where
     T: Borrow<Fr>,
@@ -317,6 +304,34 @@ where
         I: Iterator<Item = T>,
     {
         iter.fold(Self::zero(), |acc, item| acc + *item.borrow())
+    }
+}
+
+fft_field_operation!(
+    Fr,
+    MODULUS,
+    GENERATOR,
+    MULTIPLICATIVE_GENERATOR,
+    INV,
+    ROOT_OF_UNITY,
+    R,
+    R2,
+    R3,
+    S
+);
+
+use crate::fq::Fq;
+use crate::fqn::Fq2;
+
+impl From<Fq> for Fr {
+    fn from(_: Fq) -> Fr {
+        unimplemented!()
+    }
+}
+
+impl From<Fq2> for Fr {
+    fn from(_: Fq2) -> Fr {
+        unimplemented!()
     }
 }
 

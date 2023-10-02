@@ -7,7 +7,7 @@ mod twisted_edwards_points_tests {
     use rand_core::OsRng;
     use zkstd::{
         arithmetic::edwards::{add_projective_point, double_projective_point},
-        common::{Curve, CurveGroup},
+        common::CurveGroup,
     };
 
     #[test]

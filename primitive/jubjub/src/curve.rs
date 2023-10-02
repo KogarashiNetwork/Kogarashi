@@ -1,6 +1,6 @@
 use crate::Fp;
 
-use bls_12_381::Fr;
+pub use bls_12_381::Fr;
 use serde::{Deserialize, Serialize};
 use zkstd::arithmetic::edwards::*;
 use zkstd::common::*;

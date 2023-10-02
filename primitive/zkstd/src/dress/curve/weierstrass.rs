@@ -11,8 +11,8 @@ macro_rules! weierstrass_curve_operation {
         use zkstd::behave::*;
         use zkstd::common::*;
 
-        affine_group_operation!($affine, $projective, $range, $scalar, $x, $y);
-        projective_group_operation!($affine, $projective, $range, $scalar, $x, $y);
+        affine_group_operation!($affine, $projective, $range, $scalar, $x, $y, $a);
+        projective_group_operation!($affine, $projective, $range, $scalar, $x, $y, $a);
         mixed_curve_operations!($affine, $projective);
 
         impl ParityCmp for $affine {}
@@ -20,36 +20,12 @@ macro_rules! weierstrass_curve_operation {
         impl Basic for $affine {}
         impl Basic for $projective {}
 
-        impl Curve for $affine {
-            const PARAM_A: $range = $a;
-
-            fn double(self) -> $projective {
-                double_projective_point(self.to_extended())
-            }
-
-            fn is_on_curve(self) -> bool {
-                if self.is_infinity {
-                    true
-                } else {
-                    self.y.square() == self.x.square() * self.x + Self::PARAM_B
-                }
-            }
-
-            fn get_x(&self) -> Self::Range {
-                self.x
-            }
-
-            fn get_y(&self) -> Self::Range {
-                self.y
-            }
-        }
-
         impl WeierstrassCurve for $affine {
             const PARAM_B: $range = $b;
             const PARAM_3B: $range = $b3;
         }
 
-        impl Affine for $affine {
+        impl CurveAffine for $affine {
             fn to_extended(self) -> $projective {
                 if self.is_identity() {
                     $projective::ADDITIVE_IDENTITY
@@ -80,31 +56,6 @@ macro_rules! weierstrass_curve_operation {
 
             fn new_projective(x: Self::Range, y: Self::Range, z: Self::Range) -> Self::Projective {
                 $projective::new(x, y, z)
-            }
-        }
-
-        impl Curve for $projective {
-            const PARAM_A: $range = $a;
-
-            fn double(self) -> Self {
-                double_projective_point(self)
-            }
-
-            fn is_on_curve(self) -> bool {
-                if self.is_identity() {
-                    true
-                } else {
-                    self.y.square() * self.z
-                        == self.x.square() * self.x + Self::PARAM_B * self.z.square() * self.z
-                }
-            }
-
-            fn get_x(&self) -> Self::Range {
-                self.x
-            }
-
-            fn get_y(&self) -> Self::Range {
-                self.y
             }
         }
 

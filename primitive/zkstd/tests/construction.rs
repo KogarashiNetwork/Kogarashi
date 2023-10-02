@@ -135,6 +135,11 @@ pub mod jubjub_curve {
                 BLS_SCALAR_INV,
             )
         }
+
+        // dummy
+        pub(crate) const fn to_bytes(&self) -> [u8; 32] {
+            [0; 32]
+        }
     }
 
     #[derive(Clone, Copy, Debug, Encode, Decode)]
@@ -238,6 +243,7 @@ pub mod jubjub_curve {
             scalar_point(rhs, &self)
         }
     }
+
     fft_field_operation!(
         BlsScalar,
         BLS_SCALAR_MODULUS,

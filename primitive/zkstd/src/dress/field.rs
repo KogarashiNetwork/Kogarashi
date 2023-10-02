@@ -162,6 +162,10 @@ macro_rules! fft_field_operation {
                 d0 * Self($r2) + d1 * Self($r3)
             }
 
+            fn to_raw_bytes(&self) -> [u8; 32] {
+                self.to_bytes()
+            }
+
             fn reduce(&self) -> Self {
                 Self(mont(
                     [self.0[0], self.0[1], self.0[2], self.0[3], 0, 0, 0, 0],

@@ -1,6 +1,6 @@
 #[cfg(feature = "std")]
 use rayon::prelude::*;
-use zkstd::common::{vec, Curve, CurveGroup, Pairing, SigUtils, Vec};
+use zkstd::common::{vec, CurveGroup, Pairing, SigUtils, Vec};
 
 /// Performs a Variable Base Multiscalar Multiplication.
 pub fn msm_curve_addtion<P: Pairing>(
@@ -100,7 +100,7 @@ mod tests {
     use ec_pairing::TatePairing;
     use rand_core::OsRng;
     use zkstd::behave::{Group, WeierstrassProjective};
-    use zkstd::common::{Affine, CurveGroup};
+    use zkstd::common::{CurveAffine, CurveGroup};
 
     fn customized_scalar_point<P: WeierstrassProjective<Extended = P>>(point: P, scalar: &Fr) -> P {
         let mut res = P::ADDITIVE_IDENTITY;

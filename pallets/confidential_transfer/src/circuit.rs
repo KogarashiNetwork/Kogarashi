@@ -2,7 +2,7 @@ use ec_pairing::TatePairing;
 use jub_jub::{Fp as JubJubScalar, JubjubAffine};
 use she_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
 use zero_plonk::prelude::*;
-use zkstd::common::{Curve, CurveGroup, Decode, Encode, Group, Pairing};
+use zkstd::common::{CurveGroup, Decode, Encode, Group, Pairing};
 
 pub const BALANCE_BITS: usize = 16;
 pub const CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH: usize = 8;

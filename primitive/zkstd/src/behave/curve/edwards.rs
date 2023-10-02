@@ -1,20 +1,10 @@
-extern crate alloc;
-use alloc::boxed::Box;
+use crate::behave::{CurveAffine, CurveExtended, CurveGroup};
 
-use crate::{
-    behave::{Curve, CurveExtended},
-    common::CurveGroup,
-};
-
-use super::Affine;
-
-pub trait TwistedEdwardsCurve:
-    Curve + Into<<Self as CurveGroup>::Extended> + From<<Self as CurveGroup>::Extended>
-{
+pub trait TwistedEdwardsCurve: CurveGroup + Into<Self::Extended> + From<Self::Extended> {
     const PARAM_D: Self::Range;
 }
 
-pub trait TwistedEdwardsAffine: TwistedEdwardsCurve + Affine {
+pub trait TwistedEdwardsAffine: CurveAffine + TwistedEdwardsCurve {
     // TODO: Integrate Extended and Projective
     type Projective: TwistedEdwardsExtended<Range = Self::Range>;
     fn new_projective(
@@ -37,6 +27,4 @@ pub trait TwistedEdwardsExtended: TwistedEdwardsCurve + CurveExtended {
 
     // get t coordinate
     fn get_t(&self) -> Self::Range;
-
-    fn batch_normalize<'a>(y: &'a mut [Self]) -> Box<dyn Iterator<Item = Self::Affine> + 'a>;
 }
