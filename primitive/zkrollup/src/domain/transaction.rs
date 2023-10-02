@@ -18,7 +18,7 @@ pub(crate) struct RollupTransactionInfo<
     pub(crate) pre_receiver_proof: MerkleProof<P::ScalarField, H, N>,
     pub(crate) post_sender_proof: MerkleProof<P::ScalarField, H, N>,
     pub(crate) post_receiver_proof: MerkleProof<P::ScalarField, H, N>,
-    pub(crate) is_withdraw: bool,
+    pub(crate) is_withdrawal: bool,
 }
 
 #[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Decode, Encode)]

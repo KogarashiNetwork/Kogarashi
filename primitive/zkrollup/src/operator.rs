@@ -41,7 +41,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
     fn withdraw_info(&self) -> Vec<(u64, PublicKey<P>)> {
         self.transactions
             .iter()
-            .filter(|t| t.is_withdraw)
+            .filter(|t| t.is_withdrawal)
             .map(|t| (t.transaction.1.amount, t.transaction.1.sender_address))
             .collect()
     }
@@ -103,8 +103,6 @@ pub struct RollupOperator<
 impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
     RollupOperator<P, H, N, BATCH_SIZE>
 {
-    // const BATCH_SIZE: usize = 2;
-
     pub fn new(hasher: H, pp: KzgParams<P>) -> Self {
         Self {
             state_merkle: SparseMerkleTree::new_empty(&hasher, &[0; 64])
@@ -113,6 +111,19 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
             pp,
             ..Default::default()
         }
+        .add_withdraw_address()
+    }
+
+    pub fn add_withdraw_address(mut self) -> Self {
+        let user = UserData::new(self.index_counter, 0, PublicKey::zero());
+        self.db.insert(user.address, user);
+        self.index_counter += 1;
+
+        self.state_merkle
+            .update(user.index, user.to_field_element(), &self.hasher)
+            .expect("Failed to add withdrawal address");
+
+        self
     }
 
     #[allow(clippy::type_complexity)]
@@ -197,7 +208,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
             pre_receiver_proof,
             post_sender_proof,
             post_receiver_proof,
-            is_withdraw: pre_receiver.address == self.withdraw_address,
+            is_withdrawal: pre_receiver.address == PublicKey::zero(),
         });
 
         if self.transactions.len() >= BATCH_SIZE {
@@ -261,28 +272,14 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
         self.state_merkle.root()
     }
 
-    pub fn process_deposit(&mut self, t: Transaction<P>) {
-        let user = UserData::new(self.index_counter, t.1.amount, t.1.sender_address);
+    pub fn process_deposit(&mut self, amount: u64, address: PublicKey<P>) {
+        let user = UserData::new(self.index_counter, amount, address);
+        // TODO: check if user exist
         self.db.insert(user.address, user);
         self.index_counter += 1;
 
         self.state_merkle
             .update(user.index, user.to_field_element(), &self.hasher)
             .expect("Failed to update user info");
-
-        // Need to add deposits to the transactions vec as well
-        // skipped just for easier test implementation
-        // self.transactions.push((t, self.state_root()));
-    }
-
-    pub fn add_withdraw_address(&mut self, address: PublicKey<P>) {
-        let user = UserData::new(self.index_counter, 0, address);
-        self.withdraw_address = address;
-        self.db.insert(user.address, user);
-        self.index_counter += 1;
-
-        self.state_merkle
-            .update(user.index, user.to_field_element(), &self.hasher)
-            .expect("Failed to withdrawal address");
     }
 }
