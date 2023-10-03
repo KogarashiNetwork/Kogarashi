@@ -3443,6 +3443,7 @@ dependencies = [
 name = "zksnarks"
 version = "0.1.0"
 dependencies = [
+ "jub-jub 0.0.15",
  "merlin 3.0.0",
  "parity-scale-codec",
  "poly-commit",
