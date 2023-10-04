@@ -19,6 +19,8 @@ macro_rules! weierstrass_curve_operation {
         impl ParityCmp for $projective {}
         impl Basic for $affine {}
         impl Basic for $projective {}
+        impl ParallelCmp for $affine {}
+        impl ParallelCmp for $projective {}
 
         impl WeierstrassCurve for $affine {
             const PARAM_B: $range = $b;

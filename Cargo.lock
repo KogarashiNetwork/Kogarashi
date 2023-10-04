@@ -1645,6 +1645,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "zero-plonk",
+ "zksnarks",
  "zkstd 0.0.20",
 ]
 
@@ -1838,13 +1839,14 @@ dependencies = [
 
 [[package]]
 name = "poly-commit"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "bls-12-381 0.0.20",
  "ec-pairing",
  "parity-scale-codec",
  "rand_core 0.6.4",
  "rayon",
+ "zksnarks",
  "zkstd 0.0.20",
 ]
 
@@ -3373,6 +3375,7 @@ dependencies = [
  "sp-runtime",
  "zero-plonk",
  "zkrollup",
+ "zksnarks",
  "zkstd 0.0.20",
 ]
 

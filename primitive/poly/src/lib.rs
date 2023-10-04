@@ -26,8 +26,7 @@ mod witness;
 
 pub use commitment::Commitment;
 pub use fft::Fft;
-pub use kzg::Error as KzgError;
-pub use kzg::{EvaluationKey, KzgParams, Proof};
+pub use kzg::{CommitmentKey, EvaluationKey, Proof, PublicParameters};
 pub use msm::msm_curve_addtion;
 pub use poly::{Coefficients, PointsValue};
 pub use util::{batch_inversion, powers_of};

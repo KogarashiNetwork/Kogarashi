@@ -77,10 +77,11 @@ mod tests {
 
     use ec_pairing::TatePairing;
     use jub_jub::Fp;
-    use poly_commit::KzgParams;
+    use poly_commit::PublicParameters;
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
     use zero_plonk::prelude::*;
+    use zksnarks::plonk::PlonkParams;
     use zkstd::common::{Group, SigUtils};
 
     use red_jubjub::{sapling_hash, SecretKey};
@@ -93,7 +94,7 @@ mod tests {
         let label = b"verify";
         let mut rng = StdRng::seed_from_u64(8349u64);
 
-        let mut pp = KzgParams::setup(n, BlsScalar::random(&mut rng));
+        let mut pp = PlonkParams::setup(n, BlsScalar::random(&mut rng));
 
         let msg = b"test";
 

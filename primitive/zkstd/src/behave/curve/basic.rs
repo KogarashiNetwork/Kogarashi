@@ -1,5 +1,5 @@
 use crate::{
-    behave::{Basic, ParityCmp},
+    behave::{ParallelCmp, ParityCmp},
     common::CurveGroup,
 };
 use core::ops::{Add, AddAssign, MulAssign, Sub, SubAssign};
@@ -8,7 +8,7 @@ use core::ops::{Add, AddAssign, MulAssign, Sub, SubAssign};
 pub trait CurveAffine:
     CurveGroup<Affine = Self>
     + ParityCmp
-    + Basic
+    + ParallelCmp
     + From<Self::Extended>
     + Add<Self::Extended, Output = Self::Extended>
     + for<'a> Add<&'a Self::Extended, Output = Self::Extended>
@@ -26,6 +26,7 @@ pub trait CurveAffine:
 /// projective, jacobian and so on
 pub trait CurveExtended:
     CurveGroup<Extended = Self>
+    + ParallelCmp
     + AddAssign
     + AddAssign<Self::Affine>
     + for<'a> AddAssign<&'a Self::Affine>
