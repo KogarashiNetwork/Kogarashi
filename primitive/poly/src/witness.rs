@@ -9,9 +9,9 @@ pub struct Witness<P: Pairing> {
     // Quotient commitment, C = q(s)
     pub q_eval: P::G1Affine,
     // (s - a)_g2
-    pub(crate) denominator: P::G2PairngRepr,
+    pub denominator: P::G2PairngRepr,
     // H
-    pub(crate) h: P::G2PairngRepr,
+    pub h: P::G2PairngRepr,
 }
 
 impl<P: Pairing> Witness<P> {

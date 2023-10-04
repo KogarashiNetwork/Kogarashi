@@ -112,11 +112,12 @@ mod tests {
     use bls_12_381::Fr;
     use ec_pairing::TatePairing;
     use jub_jub::Fp;
-    use poly_commit::KzgParams;
+    use poly_commit::PublicParameters;
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
     use red_jubjub::{PublicKey, SecretKey};
     use zero_plonk::prelude::*;
+    use zksnarks::PlonkParams;
     use zkstd::common::{CurveGroup, Group};
 
     use crate::{
@@ -132,7 +133,7 @@ mod tests {
         let n = 15;
         let label = b"verify";
         let mut rng = StdRng::seed_from_u64(8349u64);
-        let mut pp = KzgParams::setup(n, BlsScalar::random(&mut rng));
+        let mut pp = PlonkParams::setup(n, BlsScalar::random(&mut rng));
 
         const ACCOUNT_LIMIT: usize = 3;
         const BATCH_SIZE: usize = 2;

@@ -4,7 +4,7 @@ use crate::{msm_curve_addtion, Coefficients, Commitment};
 
 #[derive(Clone, Debug, PartialEq, Decode, Encode, Default)]
 pub struct CommitmentKey<C: CurveAffine> {
-    pub(crate) bases: Vec<C>,
+    pub bases: Vec<C>,
 }
 
 impl<C: CurveAffine> CommitmentKey<C> {
@@ -46,30 +46,5 @@ impl<P: Pairing> EvaluationKey<P> {
             prepared_h,
             prepared_beta_h,
         }
-    }
-}
-
-#[cfg(feature = "std")]
-#[cfg(test)]
-mod test {
-    use crate::{Coefficients, KzgParams};
-    use bls_12_381::Fr as BlsScalar;
-    use ec_pairing::TatePairing;
-    use rand_core::OsRng;
-    use zkstd::common::Group;
-
-    #[test]
-    fn test_basic_commit() {
-        let degree = 2;
-        let r = BlsScalar::random(OsRng);
-        let keypair = KzgParams::<TatePairing>::setup(degree as u64, r);
-        let point = BlsScalar::from(10);
-
-        let z_poly = Coefficients::rand(degree, &mut OsRng);
-
-        let witness = keypair.create_witness(&z_poly, point);
-
-        let z_ok = witness.verify();
-        assert!(z_ok);
     }
 }

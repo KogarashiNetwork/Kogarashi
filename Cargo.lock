@@ -1645,6 +1645,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "zero-plonk",
+ "zksnarks",
  "zkstd 0.0.20",
 ]
 
@@ -1845,6 +1846,7 @@ dependencies = [
  "parity-scale-codec",
  "rand_core 0.6.4",
  "rayon",
+ "zksnarks",
  "zkstd 0.0.20",
 ]
 

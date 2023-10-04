@@ -7,9 +7,9 @@ use crate::{
     BatchCircuit,
 };
 use ark_std::rand::Rng;
-use poly_commit::KzgParams;
 use red_jubjub::PublicKey;
 use zero_plonk::{prelude::Compiler, proof_system::Proof};
+use zksnarks::PlonkParams;
 use zkstd::common::{vec, Decode, Encode, Pairing, SigUtils, Vec};
 
 pub trait BatchGetter<P: Pairing> {
@@ -97,7 +97,7 @@ pub struct RollupOperator<
     index_counter: u64,
     withdraw_address: PublicKey<P>,
     hasher: H,
-    pp: KzgParams<P>,
+    pp: PlonkParams<P>,
 }
 
 impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
@@ -105,7 +105,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
 {
     // const BATCH_SIZE: usize = 2;
 
-    pub fn new(hasher: H, pp: KzgParams<P>) -> Self {
+    pub fn new(hasher: H, pp: PlonkParams<P>) -> Self {
         Self {
             state_merkle: SparseMerkleTree::new_empty(&hasher, &[0; 64])
                 .expect("Failed to create state merkle tree"),

@@ -1,6 +1,5 @@
 use bls_12_381::{Fr, G1Affine};
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
-use ec_pairing::TatePairing;
 use poly_commit::msm_curve_addtion;
 use rand::rngs::OsRng;
 use zkstd::common::{CurveGroup, Group};
@@ -14,12 +13,7 @@ fn msm(c: &mut Criterion) {
 
         // 2^{8-14} points
         group.bench_function(BenchmarkId::new("msm_based", i), |b| {
-            b.iter(|| {
-                black_box(msm_curve_addtion::<TatePairing>(
-                    black_box(&p),
-                    black_box(&k),
-                ))
-            });
+            b.iter(|| black_box(msm_curve_addtion(black_box(&p), black_box(&k))));
         });
     }
 }

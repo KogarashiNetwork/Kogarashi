@@ -71,8 +71,9 @@ pub use types::*;
 use frame_support::dispatch::{DispatchErrorWithPostInfo, PostDispatchInfo};
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
-use poly_commit::KzgParams;
+use poly_commit::PublicParameters;
 use zero_plonk::prelude::Compiler;
+use zksnarks::PlonkParams;
 use zkstd::behave::Group;
 use zkstd::common::{Pairing, Vec};
 
@@ -95,14 +96,14 @@ pub mod pallet {
     #[pallet::storage]
     #[pallet::getter(fn keypair)]
     /// The setup parameter referred to as SRS
-    pub type Keypair<T: Config> = StorageValue<_, KzgParams<T::P>>;
+    pub type Keypair<T: Config> = StorageValue<_, PlonkParams<T::P>>;
 
     #[pallet::event]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     #[pallet::metadata(u32 = "Metadata")]
     pub enum Event<T: Config> {
         /// The event called when setup parameter
-        TrustedSetup(KzgParams<T::P>),
+        TrustedSetup(PlonkParams<T::P>),
     }
 
     #[pallet::error]
@@ -153,7 +154,7 @@ pub mod pallet {
 
 impl<T: Config> Pallet<T> {
     /// The RPC method to get public parameters
-    pub fn get_keypair() -> Option<KzgParams<T::P>> {
+    pub fn get_keypair() -> Option<PlonkParams<T::P>> {
         Keypair::<T>::get()
     }
 }
@@ -176,7 +177,7 @@ impl<T: Config> Plonk<T::P> for Pallet<T> {
                 error: DispatchError::Other("already setup"),
             }),
             None => {
-                let pp = KzgParams::<T::P>::setup(
+                let pp = PlonkParams::<T::P>::setup(
                     val as u64,
                     <T::P as Pairing>::ScalarField::random(&mut rng),
                 );

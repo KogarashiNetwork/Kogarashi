@@ -145,11 +145,12 @@ mod tests {
 
     use bls_12_381::Fr;
     use ec_pairing::TatePairing;
-    use poly_commit::KzgParams;
+    use poly_commit::PublicParameters;
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
     use red_jubjub::PublicKey;
     use zero_plonk::prelude::*;
+    use zksnarks::PlonkParams;
     use zkstd::common::{CurveGroup, Group};
 
     use crate::{domain::UserData, merkle_tree::SparseMerkleTree, poseidon::Poseidon};
@@ -161,7 +162,7 @@ mod tests {
         let n = 13;
         let label = b"verify";
         let mut rng = StdRng::seed_from_u64(8349u64);
-        let mut pp = KzgParams::setup(n, BlsScalar::random(&mut rng));
+        let mut pp = PlonkParams::setup(n, BlsScalar::random(&mut rng));
 
         let (prover, verifier) =
             Compiler::compile::<MerkleMembershipCircuit<3>, TatePairing>(&mut pp, label)
