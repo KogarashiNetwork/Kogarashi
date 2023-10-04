@@ -60,16 +60,8 @@ impl<P: Pairing> KzgParams<P> {
         }
     }
 
-    pub fn commit_key(&self) -> &Vec<P::G1Affine> {
-        &self.g1
-    }
-
-    pub fn opening_key(&self) -> P::G2Affine {
-        self.g2
-    }
-
-    pub fn beta_h(&self) -> P::G2Affine {
-        self.beta_h
+    pub fn verification_key(&self) -> EvaluationKey<P> {
+        EvaluationKey::new(self.g1[0], self.g2, self.beta_h)
     }
 
     pub fn max_degree(&self) -> usize {
