@@ -93,12 +93,12 @@ mod zkrollup_tests {
     use super::*;
     use crate::traits::Rollup;
     use frame_support::assert_ok;
-    use jub_jub::{Fp, JubjubExtended};
+    use jub_jub::Fp;
     use pallet_plonk::FullcodecRng;
     use rand::SeedableRng;
     use red_jubjub::SecretKey;
     use zkrollup::{BatchGetter, Poseidon, RollupOperator, TransactionData};
-    use zkstd::{behave::Group, common::CurveGroup};
+    use zkstd::behave::Group;
 
     // fn events() -> Vec<Event> {
     //     let evt = System::events()
@@ -130,9 +130,6 @@ mod zkrollup_tests {
         let bob_origin = Origin::signed(2);
         let alice_address = alice_secret.to_public_key();
         let bob_address = bob_secret.to_public_key();
-        let withdraw_address = PublicKey::new(JubjubExtended::random(&mut rng));
-        // Address to which we deposit funds as user
-        let main_contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
 
         new_test_ext().execute_with(|| {
             // 2. Generate trusted setup
@@ -153,17 +150,7 @@ mod zkrollup_tests {
             // Assures that null elements' hashes are correct
             assert_eq!(
                 operator.state_root(),
-                Fr::from_hex("0x0000000000000000000000000000000000000000000000000000000011a2197e")
-                    .unwrap()
-            );
-
-            // Decided by the operator
-            operator.add_withdraw_address(withdraw_address);
-
-            // State root will be changed here
-            assert_eq!(
-                operator.state_root(),
-                Fr::from_hex("0x4ac4ba7fd748d1dac2984fed7389b62860ab9f2b9feef22cbbb62ad02c4448fd")
+                Fr::from_hex("0x67289036dacea08e3f51549e382ee81b28b3206bf5053d8f2b723d73c73e06ab")
                     .unwrap()
             );
 
@@ -176,51 +163,45 @@ mod zkrollup_tests {
             assert_eq!(<ZkRollup as Rollup>::state_root(), operator.state_root());
 
             // 5. Create and sign deposit transactions
-            let deposit1 = TransactionData::new(alice_address, main_contract_address, 10)
-                .signed(alice_secret, &mut rng);
-            let deposit2 = TransactionData::new(bob_address, main_contract_address, 0)
-                .signed(bob_secret, &mut rng);
+            let deposit1 = (10, alice_address);
+            let deposit2 = (0, bob_address);
 
             // 6. Add them to the deposit pool on the L1
-            assert_ok!(ZkRollup::deposit(alice_origin, deposit1));
+            assert_ok!(ZkRollup::deposit(alice_origin, deposit1.0, deposit1.1));
 
             // let deposit = events();
             // assert_eq!(
             //     deposit,
-            //     [Event::main_contract(crate::Event::Deposit(deposit1)),]
+            //     [Event::main_contract(crate::Event::Deposit(deposit1.0, deposit1.1)),]
             // );
-            // if let Event::main_contract(crate::Event::Deposit(t)) = deposit.first().unwrap() {
+            // if let Event::main_contract(crate::Event::Deposit(amount, address)) = deposit.first().unwrap() {
 
             // 7. Explicitly process data on L2. Will be changed, when communication between layers will be decided.
-            operator.process_deposit(deposit1);
+            operator.process_deposit(deposit1.0, deposit1.1);
             // }
 
             assert_eq!(
                 operator.state_root(),
-                Fr::from_hex("0x6de0dc9479e61cefda6be0f704f077060d574e5322ef5546a5cb4f9802ca1c23")
+                Fr::from_hex("0x35e253ed42df14f4ec76ab96402adc4971e51d00403373354ba36414f26d4c08")
                     .unwrap()
             );
 
             // Same for the second deposit
-            assert_ok!(ZkRollup::deposit(bob_origin, deposit2));
+            assert_ok!(ZkRollup::deposit(bob_origin, deposit2.0, deposit2.1));
             // let deposit = events();
             // assert_eq!(
             //     deposit,
-            //     [Event::main_contract(crate::Event::Deposit(deposit2)),]
+            //     [Event::main_contract(crate::Event::Deposit(deposit2.0, deposit2.1)),]
             // );
-            // if let Event::main_contract(crate::Event::Deposit(t)) = deposit.first().unwrap() {
-            operator.process_deposit(deposit2);
+            // if let Event::main_contract(crate::Event::Deposit(amount, address)) = deposit.first().unwrap() {
+            operator.process_deposit(deposit2.0, deposit2.1);
             // }
 
             assert_eq!(
                 operator.state_root(),
-                Fr::from_hex("0x2613603990a71c155983132f0a2df05694f6dcedca646e2da307d451e6610a2f")
+                Fr::from_hex("0x4faf040d99b142bfd80ac803b5c2e6ad4eff898327f6f075b8efacbaa3283691")
                     .unwrap()
             );
-
-            // Need to implement balance verification for users through the contract
-            // assert!(contract.check_balance(MerkleProof::default()) == alice.balance());
-            // assert!(contract.check_balance(MerkleProof::default()) == bob.balance()));
 
             // 8. Prepared and sign transfer transactions
             let t1 =
@@ -233,7 +214,7 @@ mod zkrollup_tests {
 
             assert_eq!(
                 operator.state_root(),
-                Fr::from_hex("0x62b2341b616b111be03b16ffcb13724c849c5764538dd1074e742d6ace20a88e")
+                Fr::from_hex("0x178608320947801f4aa5159136664790fd7b68bdd0d2646794990fc075688f73")
                     .unwrap()
             );
 
@@ -241,7 +222,7 @@ mod zkrollup_tests {
             let ((proof, public_inputs), batch) = operator.execute_transaction(t2).unwrap();
             assert_eq!(
                 operator.state_root(),
-                Fr::from_hex("0x0d27ef4dd857ef830c23668ad14a2dff40038972e1dd26660c3240e6f0b2fd4e")
+                Fr::from_hex("0x454e8c44dcbc3b955ac320345cc23645bd0ba8638dfb1b02b00651896f218ed3")
                     .unwrap()
             );
 
@@ -267,10 +248,11 @@ mod zkrollup_tests {
 
             // 1. Burn funds on L2 by sending to a special address
             let alice_withdraw: Transaction<TatePairing> =
-                TransactionData::new(alice_address, withdraw_address, 5)
+                TransactionData::new(alice_address, PublicKey::zero(), 5)
                     .signed(alice_secret, &mut rng);
             let bob_withdraw: Transaction<TatePairing> =
-                TransactionData::new(bob_address, withdraw_address, 5).signed(bob_secret, &mut rng);
+                TransactionData::new(bob_address, PublicKey::zero(), 5)
+                    .signed(bob_secret, &mut rng);
 
             operator.execute_transaction(alice_withdraw);
             let (proof, batch) = operator.execute_transaction(bob_withdraw).unwrap();
@@ -279,24 +261,6 @@ mod zkrollup_tests {
                 batch.withdraw_info(),
                 [(5, alice_address), (5, bob_address)]
             );
-
-            // // 2. l2_burn_merkle_proof_alice and l2_burn_merkle_proof_bob should be generated with batch_tree
-            // // Will decide the process, while implementing the gadget
-
-            // // 3. Withdraw on L1
-            // contract.withdraw(
-            //     // l2_burn_merkle_proof_alice,
-            //     batch.final_root(),
-            //     alice_withdraw,
-            //     alice_address,
-            // );
-
-            // contract.withdraw(
-            //     // l2_burn_merkle_proof_bob,
-            //     batch.final_root(),
-            //     bob_withdraw,
-            //     bob_address,
-            // );
         });
     }
 }

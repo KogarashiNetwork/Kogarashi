@@ -47,7 +47,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
             pre_receiver_proof,
             post_sender_proof,
             post_receiver_proof,
-            is_withdraw,
+            is_withdrawal,
         } in self.batch.transactions.iter()
         {
             let Transaction(sig, t) = transaction;
@@ -115,10 +115,10 @@ mod tests {
     use poly_commit::PublicParameters;
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
-    use red_jubjub::{PublicKey, SecretKey};
+    use red_jubjub::SecretKey;
     use zero_plonk::prelude::*;
     use zksnarks::plonk::PlonkParams;
-    use zkstd::common::{CurveGroup, Group};
+    use zkstd::common::Group;
 
     use crate::{
         domain::{TransactionData, UserData},
@@ -143,7 +143,6 @@ mod tests {
                 Poseidon::<Fr, 2>::new(),
                 pp.clone(),
             );
-        let contract_address = PublicKey::new(JubjubExtended::random(&mut rng));
 
         let alice_secret = SecretKey::new(Fp::random(&mut rng));
         let bob_secret = SecretKey::new(Fp::random(&mut rng));
@@ -153,14 +152,9 @@ mod tests {
         let alice = UserData::new(0, 10, alice_address);
         let bob = UserData::new(1, 0, bob_address);
 
-        let deposit1 = TransactionData::new(alice_address, contract_address, 10)
-            .signed(alice_secret, &mut rng);
-        let deposit2 =
-            TransactionData::new(bob_address, contract_address, 0).signed(bob_secret, &mut rng);
-
         // Explicitly process data on L2. Will be changed, when communication between layers will be decided.
-        operator.process_deposit(deposit1);
-        operator.process_deposit(deposit2);
+        operator.process_deposit(10, alice_address);
+        operator.process_deposit(0, bob_address);
 
         // Prepared and sign transfer transactions
         let t1 =
