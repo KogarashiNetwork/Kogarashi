@@ -150,7 +150,7 @@ mod tests {
     use rand_core::SeedableRng;
     use red_jubjub::PublicKey;
     use zero_plonk::prelude::*;
-    use zksnarks::PlonkParams;
+    use zksnarks::plonk::PlonkParams;
     use zkstd::common::{CurveGroup, Group};
 
     use crate::{domain::UserData, merkle_tree::SparseMerkleTree, poseidon::Poseidon};

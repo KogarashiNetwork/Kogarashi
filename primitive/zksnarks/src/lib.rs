@@ -2,7 +2,7 @@
 #![doc = include_str!("../README.md")]
 
 mod circuit;
-mod plonk;
+pub mod groth16;
+pub mod plonk;
 
 pub use circuit::*;
-pub use plonk::*;

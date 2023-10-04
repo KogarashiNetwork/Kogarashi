@@ -1,5 +1,5 @@
 use crate::plonk::utils::{check_bit_consistency, extract_bit};
-use crate::Evaluations;
+use crate::plonk::Evaluations;
 use poly_commit::{Coefficients, Commitment, PointsValue};
 use zkstd::common::{vec, Pairing, PrimeField, Ring, TwistedEdwardsCurve, Vec};
 

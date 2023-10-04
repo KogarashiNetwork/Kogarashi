@@ -81,7 +81,7 @@ mod tests {
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
     use zero_plonk::prelude::*;
-    use zksnarks::PlonkParams;
+    use zksnarks::plonk::PlonkParams;
     use zkstd::common::{Group, SigUtils};
 
     use red_jubjub::{sapling_hash, SecretKey};

@@ -9,7 +9,7 @@ use crate::{
 use ark_std::rand::Rng;
 use red_jubjub::PublicKey;
 use zero_plonk::{prelude::Compiler, proof_system::Proof};
-use zksnarks::PlonkParams;
+use zksnarks::plonk::PlonkParams;
 use zkstd::common::{vec, Decode, Encode, Pairing, SigUtils, Vec};
 
 pub trait BatchGetter<P: Pairing> {

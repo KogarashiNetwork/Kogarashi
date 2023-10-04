@@ -6,7 +6,7 @@ use poly_commit::PublicParameters;
 use rand::{rngs::StdRng, SeedableRng};
 use she_elgamal::EncryptedNumber;
 use zero_plonk::prelude::*;
-use zksnarks::PlonkParams;
+use zksnarks::plonk::PlonkParams;
 use zkstd::common::{CurveGroup, Group};
 
 #[allow(unused_must_use)]

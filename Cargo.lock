@@ -3375,6 +3375,7 @@ dependencies = [
  "sp-runtime",
  "zero-plonk",
  "zkrollup",
+ "zksnarks",
  "zkstd 0.0.20",
 ]
 

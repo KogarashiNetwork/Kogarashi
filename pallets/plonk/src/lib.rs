@@ -73,7 +73,7 @@ use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
 use poly_commit::PublicParameters;
 use zero_plonk::prelude::Compiler;
-use zksnarks::PlonkParams;
+use zksnarks::plonk::PlonkParams;
 use zkstd::behave::Group;
 use zkstd::common::{Pairing, Vec};
 
