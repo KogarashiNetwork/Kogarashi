@@ -1,5 +1,11 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
+
+mod constraint;
+mod matrix;
+mod wire;
+mod wire_values;
+
 use zkstd::common::Field;
 
 struct Expression {}
@@ -44,6 +50,7 @@ impl<F: Field> From<F> for Expression {
         Self {}
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;

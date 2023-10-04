@@ -1,8 +1,12 @@
 #![no_std]
 #![doc = include_str!("../README.md")]
 
-mod circuit;
-mod plonk;
+extern crate alloc;
 
-pub use circuit::*;
+mod plonk;
+mod r1cs;
+mod witness;
+
 pub use plonk::*;
+pub use r1cs::*;
+pub use witness::*;
