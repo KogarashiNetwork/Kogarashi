@@ -122,7 +122,7 @@ pub trait Pairing:
         + SigUtils<32>;
 
     // g2 pairing representation
-    type G2PairngRepr: From<Self::G2Affine> + ParityCmp + Debug + Eq + PartialEq + Clone;
+    type G2PairngRepr: From<Self::G2Affine> + ParityCmp + Debug + Eq + PartialEq + Clone + Default;
     // range of pairing function
     type PairingRange: PairingRange + Debug + Eq + PartialEq;
     type Gt: Group + Debug + Eq + PartialEq;

@@ -17,6 +17,8 @@ macro_rules! twisted_edwards_curve_operation {
         impl ParityCmp for $extended {}
         impl Basic for $affine {}
         impl Basic for $extended {}
+        impl ParallelCmp for $affine {}
+        impl ParallelCmp for $extended {}
 
         impl TwistedEdwardsCurve for $affine {
             // d param

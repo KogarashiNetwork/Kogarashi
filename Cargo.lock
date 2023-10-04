@@ -1838,7 +1838,7 @@ dependencies = [
 
 [[package]]
 name = "poly-commit"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "bls-12-381 0.0.20",
  "ec-pairing",

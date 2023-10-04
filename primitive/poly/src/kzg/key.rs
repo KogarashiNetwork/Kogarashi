@@ -1,8 +1,27 @@
-use zkstd::common::{Decode, Encode, Pairing};
+use zkstd::common::{CurveAffine, Decode, Encode, Pairing};
+
+use crate::{msm_curve_addtion, Coefficients, Commitment};
+
+#[derive(Clone, Debug, PartialEq, Decode, Encode, Default)]
+pub struct CommitmentKey<C: CurveAffine> {
+    pub(crate) bases: Vec<C>,
+}
+
+impl<C: CurveAffine> CommitmentKey<C> {
+    pub fn trim(&self, truncated_degree: usize) -> Self {
+        Self {
+            bases: self.bases[..=truncated_degree].to_vec(),
+        }
+    }
+
+    pub fn commit(&self, coeffs: &Coefficients<C::Scalar>) -> Commitment<C> {
+        Commitment::new(msm_curve_addtion(&self.bases, coeffs))
+    }
+}
 
 /// Evaluation Key is used to verify opening proofs made about a committed
 /// polynomial.
-#[derive(Clone, Debug, Eq, Decode, Encode, PartialEq)]
+#[derive(Clone, Debug, Eq, Decode, Encode, PartialEq, Default)]
 pub struct EvaluationKey<P: Pairing> {
     /// Kzg G1 generator
     pub g: P::G1Affine,

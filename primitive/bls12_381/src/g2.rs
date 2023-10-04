@@ -317,7 +317,7 @@ impl Mul<G2Projective> for Fr {
 pub struct PairingCoeff(pub(crate) Fq2, pub(crate) Fq2, pub(crate) Fq2);
 
 /// The pairing format coordinate
-#[derive(Debug, Clone, Eq, Decode, Encode)]
+#[derive(Debug, Clone, Eq, Decode, Encode, Default)]
 pub struct G2PairingAffine {
     pub coeffs: Vec<PairingCoeff>,
     is_infinity: bool,
