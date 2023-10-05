@@ -1,6 +1,6 @@
 use crate::{
     behave::{ParallelCmp, ParityCmp},
-    common::CurveGroup,
+    common::{CurveGroup, Vec},
 };
 use core::ops::{Add, AddAssign, MulAssign, Sub, SubAssign};
 
@@ -20,6 +20,8 @@ pub trait CurveAffine:
     + for<'a, 'b> Sub<&'b Self::Extended, Output = Self::Extended>
 {
     fn to_extended(self) -> Self::Extended;
+
+    fn to_raw_bytes(self) -> Vec<u8>;
 }
 
 /// extend curve point representation

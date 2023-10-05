@@ -34,6 +34,10 @@ macro_rules! twisted_edwards_curve_operation {
                     z: Self::Range::one(),
                 }
             }
+
+            fn to_raw_bytes(self) -> Vec<u8> {
+                self.to_bytes().to_vec()
+            }
         }
 
         impl TwistedEdwardsAffine for $affine {

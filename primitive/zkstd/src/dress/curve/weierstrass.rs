@@ -39,6 +39,10 @@ macro_rules! weierstrass_curve_operation {
                     }
                 }
             }
+
+            fn to_raw_bytes(self) -> Vec<u8> {
+                self.to_bytes().to_vec()
+            }
         }
 
         impl WeierstrassAffine for $affine {

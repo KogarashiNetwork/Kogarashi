@@ -297,7 +297,7 @@ dependencies = [
  "proptest",
  "rand_core 0.6.4",
  "serde",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -446,7 +446,7 @@ dependencies = [
  "sp-runtime",
  "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "zero-plonk",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -746,7 +746,7 @@ dependencies = [
  "jub-jub 0.0.15",
  "parity-scale-codec",
  "rand_core 0.6.4",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -1366,7 +1366,7 @@ dependencies = [
  "proptest",
  "rand_core 0.6.4",
  "serde",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -1624,7 +1624,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -1646,7 +1646,7 @@ dependencies = [
  "sp-runtime",
  "zero-plonk",
  "zksnarks",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -1687,7 +1687,7 @@ dependencies = [
  "sp-runtime",
  "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "zkrollup",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -1847,7 +1847,7 @@ dependencies = [
  "rand_core 0.6.4",
  "rayon",
  "zksnarks",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -2099,7 +2099,7 @@ dependencies = [
  "rand 0.8.5",
  "rand_core 0.6.4",
  "serde",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -2399,7 +2399,7 @@ dependencies = [
  "rand 0.8.5",
  "rand_core 0.6.4",
  "serde",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -3376,7 +3376,7 @@ dependencies = [
  "zero-plonk",
  "zkrollup",
  "zksnarks",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -3397,7 +3397,7 @@ dependencies = [
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tempdir",
  "zksnarks",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -3439,7 +3439,7 @@ dependencies = [
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "zero-plonk",
  "zksnarks",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -3449,7 +3449,7 @@ dependencies = [
  "merlin 3.0.0",
  "parity-scale-codec",
  "poly-commit",
- "zkstd 0.0.20",
+ "zkstd 0.0.21",
 ]
 
 [[package]]
@@ -3466,7 +3466,7 @@ dependencies = [
 
 [[package]]
 name = "zkstd"
-version = "0.0.20"
+version = "0.0.21"
 dependencies = [
  "bls-12-381 0.0.20",
  "jub-jub 0.0.15",

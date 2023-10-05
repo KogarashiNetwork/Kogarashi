@@ -118,6 +118,39 @@ pub mod jubjub_curve {
         0x0697235704b95be33,
     ]);
 
+    impl SigUtils<32> for BlsScalar {
+        fn to_bytes(self) -> [u8; Self::LENGTH] {
+            let tmp = self.montgomery_reduce();
+
+            let mut res = [0; Self::LENGTH];
+            res[0..8].copy_from_slice(&tmp[0].to_le_bytes());
+            res[8..16].copy_from_slice(&tmp[1].to_le_bytes());
+            res[16..24].copy_from_slice(&tmp[2].to_le_bytes());
+            res[24..32].copy_from_slice(&tmp[3].to_le_bytes());
+
+            res
+        }
+
+        fn from_bytes(bytes: [u8; Self::LENGTH]) -> Option<Self> {
+            // SBP-M1 review: apply proper error handling instead of `unwrap`
+            let l0 = u64::from_le_bytes(bytes[0..8].try_into().unwrap());
+            let l1 = u64::from_le_bytes(bytes[8..16].try_into().unwrap());
+            let l2 = u64::from_le_bytes(bytes[16..24].try_into().unwrap());
+            let l3 = u64::from_le_bytes(bytes[24..32].try_into().unwrap());
+
+            let (_, borrow) = sbb(l0, BLS_SCALAR_MODULUS[0], 0);
+            let (_, borrow) = sbb(l1, BLS_SCALAR_MODULUS[1], borrow);
+            let (_, borrow) = sbb(l2, BLS_SCALAR_MODULUS[2], borrow);
+            let (_, borrow) = sbb(l3, BLS_SCALAR_MODULUS[3], borrow);
+
+            if borrow & 1 == 1 {
+                Some(Self([l0, l1, l2, l3]) * Self(BLS_SCALAR_R2))
+            } else {
+                None
+            }
+        }
+    }
+
     impl BlsScalar {
         pub const fn to_mont_form(val: [u64; 4]) -> Self {
             Self(to_mont_form(
@@ -139,6 +172,70 @@ pub mod jubjub_curve {
         // dummy
         pub(crate) const fn to_bytes(&self) -> [u8; 32] {
             [0; 32]
+        }
+
+        pub fn pow_vartime(&self, by: &[u64; 4]) -> Self {
+            let mut res = Self::one();
+            for e in by.iter().rev() {
+                for i in (0..64).rev() {
+                    res = res.square();
+
+                    if ((*e >> i) & 1) == 1 {
+                        res.mul_assign(*self);
+                    }
+                }
+            }
+            res
+        }
+
+        pub fn sqrt(&self) -> Option<Self> {
+            let w = self.pow_vartime(&[
+                0x7fff2dff7fffffff,
+                0x04d0ec02a9ded201,
+                0x94cebea4199cec04,
+                0x39f6d3a9,
+            ]);
+
+            let mut v = Self::S;
+            let mut x = w * self;
+            let mut b = x * w;
+            let mut z = Self::ROOT_OF_UNITY;
+
+            for max_v in (1..=Self::S).rev() {
+                let mut k = 1;
+                let mut b2k = b.square();
+                let mut j_less_than_v = true;
+
+                for j in 2..max_v {
+                    j_less_than_v &= j != v;
+                    if b2k == Self::one() {
+                        if j_less_than_v {
+                            z.square_assign()
+                        };
+                    } else {
+                        b2k = b2k.square();
+                        k = j;
+                    };
+                }
+
+                if b != Self::one() {
+                    x.mul_assign(z)
+                };
+                z.square_assign();
+                b *= z;
+                v = k;
+            }
+
+            if &x.square() == self {
+                Some(x)
+            } else {
+                None
+            }
+        }
+
+        pub fn is_odd(self) -> bool {
+            let raw = self.montgomery_reduce();
+            (raw[0] % 2) != 0
         }
     }
 
@@ -244,6 +341,45 @@ pub mod jubjub_curve {
         }
     }
 
+    impl SigUtils<32> for JubjubAffine {
+        fn to_bytes(self) -> [u8; Self::LENGTH] {
+            let mut tmp = self.y.to_bytes();
+            let x = self.x.to_bytes();
+            tmp[31] |= x[0] << 7;
+
+            tmp
+        }
+
+        fn from_bytes(mut bytes: [u8; Self::LENGTH]) -> Option<Self> {
+            let sign = (bytes[31] >> 7) == 1;
+            bytes[31] &= 0b01111111;
+
+            match BlsScalar::from_bytes(bytes) {
+                Some(y) => {
+                    let y2 = y.square();
+                    let y2_p = y2 * EDWARDS_D + BlsScalar::one();
+                    let y2_n = y2 - BlsScalar::one();
+                    match y2_p.invert() {
+                        Some(y2_p) => {
+                            let y2_n = y2_n * y2_p;
+
+                            match y2_n.sqrt() {
+                                Some(mut x) => {
+                                    if x.is_odd() ^ sign {
+                                        x = -x;
+                                    }
+                                    Some(Self { x, y })
+                                }
+                                None => None,
+                            }
+                        }
+                        None => None,
+                    }
+                }
+                None => None,
+            }
+        }
+    }
     fft_field_operation!(
         BlsScalar,
         BLS_SCALAR_MODULUS,
