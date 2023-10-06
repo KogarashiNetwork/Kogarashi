@@ -1,4 +1,5 @@
 // trait resresenting abstract algebra concept
+use crate::common::Basic;
 use core::{
     fmt::Debug,
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
@@ -125,4 +126,4 @@ pub trait Ring: Group + Mul<Output = Self> + MulAssign + PartialOrd + Ord + Defa
 
 /// field trait which ensures the existence of inverse for both multiplicative and additive arithmetic
 /// hence field supports division for any element
-pub trait Field: Ring + Div<Output = Self> + DivAssign {}
+pub trait Field: Ring + Basic + Div<Output = Self> + DivAssign + 'static {}

@@ -64,6 +64,7 @@ impl<F: PrimeField> Default for Constraint<F> {
     }
 }
 
+#[allow(dead_code)]
 impl<F: PrimeField> Constraint<F> {
     fn from_external(mut constraint: Self) -> Self {
         constraint.q_range = F::zero();
