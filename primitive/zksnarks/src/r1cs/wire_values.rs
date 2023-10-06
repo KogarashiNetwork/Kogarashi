@@ -4,40 +4,40 @@ use alloc::collections::btree_map::BTreeMap;
 use std::collections::BTreeMap;
 use zkstd::common::Field;
 
-use crate::witness::Witness;
+use crate::wire::Wire;
 
 /// An assignment of wire values, where each value is an element of the field `F`.
 #[derive(Default, Debug)]
 pub struct WireValues<F: Field> {
-    values: BTreeMap<Witness, F>,
+    values: BTreeMap<Wire, F>,
 }
 
 impl<F: Field> WireValues<F> {
     pub fn new() -> Self {
         let mut values = BTreeMap::new();
-        values.insert(Witness::ONE, F::one());
+        values.insert(Wire::ONE, F::one());
         WireValues { values }
     }
 
-    pub fn as_map(&self) -> &BTreeMap<Witness, F> {
+    pub fn as_map(&self) -> &BTreeMap<Wire, F> {
         &self.values
     }
 
-    pub fn get(&self, wire: Witness) -> &F {
+    pub fn get(&self, wire: Wire) -> &F {
         assert!(self.values.contains_key(&wire), "No value for {}", wire);
         &self.values[&wire]
     }
 
-    pub fn set(&mut self, wire: Witness, value: F) {
+    pub fn set(&mut self, wire: Wire, value: F) {
         let old_value = self.values.insert(wire, value);
         assert!(old_value.is_none());
     }
 
-    pub fn contains(&self, wire: Witness) -> bool {
+    pub fn contains(&self, wire: Wire) -> bool {
         self.values.contains_key(&wire)
     }
 
-    pub fn contains_all(&self, wires: &[Witness]) -> bool {
+    pub fn contains_all(&self, wires: &[Wire]) -> bool {
         wires.iter().all(|&wire| self.contains(wire))
     }
 }

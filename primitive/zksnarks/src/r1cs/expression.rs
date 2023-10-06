@@ -1,6 +1,6 @@
 use crate::r1cs::util::join;
 use crate::r1cs::wire_values::WireValues;
-use crate::Witness;
+use crate::Wire;
 #[cfg(not(feature = "std"))]
 use alloc::collections::btree_map::BTreeMap;
 use alloc::format;
@@ -22,12 +22,12 @@ use zkstd::common::Field;
 #[derive(Debug, Eq, PartialEq)]
 pub struct Expression<F: Field> {
     /// The coefficient of each wire. Wires with a coefficient of zero are omitted.
-    coefficients: BTreeMap<Witness, F>,
+    coefficients: BTreeMap<Wire, F>,
 }
 
 impl<F: Field> Expression<F> {
     /// Creates a new expression with the given wire coefficients.
-    pub fn new(coefficients: BTreeMap<Witness, F>) -> Self {
+    pub fn new(coefficients: BTreeMap<Wire, F>) -> Self {
         let nonzero_coefficients = coefficients
             .into_iter()
             .filter(|(_k, v)| *v != F::zero())
@@ -37,12 +37,12 @@ impl<F: Field> Expression<F> {
         }
     }
 
-    pub fn coefficients(&self) -> &BTreeMap<Witness, F> {
+    pub fn coefficients(&self) -> &BTreeMap<Wire, F> {
         &self.coefficients
     }
 
     /// The sum of zero or more wires, each with an implied coefficient of 1.
-    pub fn sum_of_wires(wires: &[Witness]) -> Self {
+    pub fn sum_of_wires(wires: &[Wire]) -> Self {
         Expression {
             coefficients: wires.iter().map(|&v| (v, F::one())).collect(),
         }
@@ -82,14 +82,14 @@ impl<F: Field> Expression<F> {
     /// Return Some(c) if this is a constant c, otherwise None.
     pub fn as_constant(&self) -> Option<F> {
         if self.num_terms() == 1 {
-            self.coefficients.get(&Witness::ONE).cloned()
+            self.coefficients.get(&Wire::ONE).cloned()
         } else {
             None
         }
     }
 
     /// Return a vector of all wires that this expression depends on.
-    pub fn dependencies(&self) -> Vec<Witness> {
+    pub fn dependencies(&self) -> Vec<Wire> {
         self.coefficients.keys().copied().collect()
     }
 
@@ -110,21 +110,21 @@ impl<F: Field> Clone for Expression<F> {
     }
 }
 
-impl<F: Field> From<Witness> for Expression<F> {
-    fn from(wire: Witness) -> Self {
+impl<F: Field> From<Wire> for Expression<F> {
+    fn from(wire: Wire) -> Self {
         Expression::new([(wire, F::one())].iter().cloned().collect())
     }
 }
 
-impl<F: Field> From<&Witness> for Expression<F> {
-    fn from(wire: &Witness) -> Self {
+impl<F: Field> From<&Wire> for Expression<F> {
+    fn from(wire: &Wire) -> Self {
         Expression::from(*wire)
     }
 }
 
 impl<F: Field> From<F> for Expression<F> {
     fn from(value: F) -> Self {
-        Expression::new([(Witness::ONE, value)].iter().cloned().collect())
+        Expression::new([(Wire::ONE, value)].iter().cloned().collect())
     }
 }
 
@@ -354,7 +354,7 @@ impl<F: Field> fmt::Display for Expression<F> {
             .iter()
             .sorted_by(|(k1, _v1), (k2, _v2)| k1.cmp(k2))
             .map(|(k, v)| {
-                if *k == Witness::ONE {
+                if *k == Wire::ONE {
                     format!("{:?}", v)
                 } else if *v == F::one() {
                     format!("{}", k)

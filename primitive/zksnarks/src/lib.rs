@@ -4,10 +4,10 @@
 extern crate alloc;
 
 mod r1cs;
-mod witness;
+mod wire;
 
 pub use plonk::*;
 pub use r1cs::*;
-pub use witness::*;
+pub use wire::*;
 pub mod groth16;
 pub mod plonk;

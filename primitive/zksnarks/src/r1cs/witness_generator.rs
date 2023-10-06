@@ -5,12 +5,12 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use zkstd::common::Field;
 
-use crate::witness::Witness;
+use crate::wire::Wire;
 
 #[allow(clippy::type_complexity)]
 /// Generates some elements of the witness.
 pub struct WitnessGenerator<F: Field> {
-    inputs: Vec<Witness>,
+    inputs: Vec<Wire>,
     generator: Box<dyn Fn(&mut WireValues<F>)>,
 }
 
@@ -21,7 +21,7 @@ impl<F: Field> WitnessGenerator<F> {
     /// # Arguments
     /// * `inputs` - the wires whose values must be set before this generator can run
     /// * `generate` - a function which generates some elements of the witness
-    pub fn new<T>(inputs: Vec<Witness>, generate: T) -> Self
+    pub fn new<T>(inputs: Vec<Wire>, generate: T) -> Self
     where
         T: Fn(&mut WireValues<F>) + 'static,
     {
@@ -32,7 +32,7 @@ impl<F: Field> WitnessGenerator<F> {
     }
 
     /// The wires whose values must be set before this generator can run.
-    pub fn inputs(&self) -> &[Witness] {
+    pub fn inputs(&self) -> &[Wire] {
         &self.inputs
     }
 

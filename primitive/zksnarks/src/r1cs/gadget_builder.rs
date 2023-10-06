@@ -7,7 +7,7 @@ use crate::r1cs::expression::Expression;
 use crate::r1cs::gadget::Gadget;
 use crate::r1cs::wire_values::WireValues;
 use crate::r1cs::witness_generator::WitnessGenerator;
-use crate::witness::Witness;
+use crate::wire::Wire;
 
 pub struct GadgetBuilder<F: Field> {
     next_wire_index: u32,
@@ -29,14 +29,14 @@ impl<F: Field> GadgetBuilder<F> {
     }
 
     /// Add a wire to the gadget. It will start with no generator and no associated constraints.
-    pub fn wire(&mut self) -> Witness {
+    pub fn wire(&mut self) -> Wire {
         let index = self.next_wire_index;
         self.next_wire_index += 1;
-        Witness::new(index as usize)
+        Wire::new(index as usize)
     }
 
     /// Add a generator function for setting certain wire values.
-    pub fn generator<T>(&mut self, dependencies: Vec<Witness>, generate: T)
+    pub fn generator<T>(&mut self, dependencies: Vec<Wire>, generate: T)
     where
         T: Fn(&mut WireValues<F>) + 'static,
     {
