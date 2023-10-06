@@ -5,7 +5,7 @@ authors = [
 ]
 name = "poly-commit"
 description = 'polynomial commitment implementation'
-version = "0.0.11"
+version = "0.0.12"
 edition = "2021"
 license = "Apache-2.0"
 homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
@@ -25,6 +25,9 @@ bls-12-381 = { path = "../bls12_381", default-features = false }
 parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
 rand_core = { version = "0.6", default-features = false }
 rayon = { version = "1.5.1", optional = true }
+
+[dev-dependencies]
+zksnarks = { path = "../zksnarks" }
 
 [features]
 default = ["std"]

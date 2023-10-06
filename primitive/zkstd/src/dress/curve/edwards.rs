@@ -17,6 +17,8 @@ macro_rules! twisted_edwards_curve_operation {
         impl ParityCmp for $extended {}
         impl Basic for $affine {}
         impl Basic for $extended {}
+        impl ParallelCmp for $affine {}
+        impl ParallelCmp for $extended {}
 
         impl TwistedEdwardsCurve for $affine {
             // d param
@@ -31,6 +33,10 @@ macro_rules! twisted_edwards_curve_operation {
                     t: self.x * self.y,
                     z: Self::Range::one(),
                 }
+            }
+
+            fn to_raw_bytes(self) -> Vec<u8> {
+                self.to_bytes().to_vec()
             }
         }
 
