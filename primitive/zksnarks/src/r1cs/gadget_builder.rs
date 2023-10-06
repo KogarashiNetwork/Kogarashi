@@ -1,3 +1,4 @@
+use crate::Index;
 #[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 use zkstd::common::Field;
@@ -28,11 +29,18 @@ impl<F: Field> GadgetBuilder<F> {
         }
     }
 
-    /// Add a wire to the gadget. It will start with no generator and no associated constraints.
-    pub fn wire(&mut self) -> Wire {
+    /// Add a public wire to the gadget. It will start with no generator and no associated constraints.
+    pub fn public_wire(&mut self) -> Wire {
         let index = self.next_wire_index;
         self.next_wire_index += 1;
-        Wire::new(index as usize)
+        Wire::new_unchecked(Index::Input(index as usize))
+    }
+
+    /// Add a private wire to the gadget. It will start with no generator and no associated constraints.
+    pub fn private_wire(&mut self) -> Wire {
+        let index = self.next_wire_index;
+        self.next_wire_index += 1;
+        Wire::new_unchecked(Index::Aux(index as usize))
     }
 
     /// Add a generator function for setting certain wire values.

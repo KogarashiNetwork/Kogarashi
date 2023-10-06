@@ -65,7 +65,7 @@ mod tests {
     #[test]
     fn constraint_not_satisfied() {
         let mut builder = GadgetBuilder::<Fr>::new();
-        let (x, y) = (builder.wire(), builder.wire());
+        let (x, y) = (builder.public_wire(), builder.public_wire());
         builder.assert_equal(&Expression::from(x), &Expression::from(y));
         let gadget = builder.build();
 
@@ -78,7 +78,11 @@ mod tests {
     #[should_panic]
     fn missing_generator() {
         let mut builder = GadgetBuilder::<Fr>::new();
-        let (x, y, z) = (builder.wire(), builder.wire(), builder.wire());
+        let (x, y, z) = (
+            builder.public_wire(),
+            builder.public_wire(),
+            builder.public_wire(),
+        );
         builder.assert_product(
             &Expression::from(x),
             &Expression::from(y),
@@ -94,7 +98,7 @@ mod tests {
     #[should_panic]
     fn missing_input() {
         let mut builder = GadgetBuilder::<Fr>::new();
-        let x = builder.wire();
+        let x = builder.public_wire();
         builder.inverse(&Expression::from(x));
         let gadget = builder.build();
 

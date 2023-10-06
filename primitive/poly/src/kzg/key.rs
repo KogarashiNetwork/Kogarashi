@@ -1,4 +1,4 @@
-use zkstd::common::{CurveAffine, Decode, Encode, Pairing};
+use zkstd::common::{CurveAffine, Decode, Encode, Pairing, Vec};
 
 use crate::{msm_curve_addtion, Coefficients, Commitment};
 
