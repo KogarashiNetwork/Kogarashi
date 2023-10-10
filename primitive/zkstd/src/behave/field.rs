@@ -5,10 +5,7 @@ use core::{
     ops::{Add, AddAssign, BitAnd, BitXor, Mul, MulAssign, Sub, SubAssign},
 };
 
-use super::{
-    algebra::Field,
-    comp::{Basic, ParityCmp},
-};
+use super::{algebra::Field, comp::ParityCmp};
 use crate::arithmetic::utils::{Bits, Nafs};
 
 // TODO: should be right place
@@ -35,7 +32,7 @@ pub trait RefOps:
 }
 
 /// This is prime field trait
-pub trait PrimeField: Field + Basic + ParityCmp + From<u64> + RefOps {
+pub trait PrimeField: Field + ParityCmp + From<u64> + RefOps {
     // prime order of this field
     const MODULUS: Self;
 
