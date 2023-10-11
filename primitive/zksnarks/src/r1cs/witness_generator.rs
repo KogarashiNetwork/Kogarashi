@@ -5,7 +5,7 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use zkstd::common::Field;
 
-use crate::wire::Wire;
+use crate::r1cs::wire::Wire;
 
 #[allow(clippy::type_complexity)]
 /// Generates some elements of the witness.

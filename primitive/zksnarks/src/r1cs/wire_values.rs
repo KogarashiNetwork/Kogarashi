@@ -4,7 +4,7 @@ use alloc::collections::btree_map::BTreeMap;
 use std::collections::BTreeMap;
 use zkstd::common::Field;
 
-use crate::wire::Wire;
+use crate::r1cs::wire::Wire;
 
 /// An assignment of wire values, where each value is an element of the field `F`.
 #[derive(Default, Debug)]

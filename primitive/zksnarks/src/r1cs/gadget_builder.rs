@@ -1,4 +1,4 @@
-use crate::Index;
+use crate::r1cs::wire::Index;
 #[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 use zkstd::common::Field;
@@ -6,9 +6,9 @@ use zkstd::common::Field;
 use crate::r1cs::constraint::Constraint;
 use crate::r1cs::expression::Expression;
 use crate::r1cs::gadget::Gadget;
+use crate::r1cs::wire::Wire;
 use crate::r1cs::wire_values::WireValues;
 use crate::r1cs::witness_generator::WitnessGenerator;
-use crate::wire::Wire;
 
 pub struct GadgetBuilder<F: Field> {
     next_wire_index: u32,

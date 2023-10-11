@@ -1,4 +1,4 @@
-use crate::wire::Wire;
+use crate::plonk::wire::Wire;
 use zkstd::behave::PrimeField;
 
 /// Each gate expression

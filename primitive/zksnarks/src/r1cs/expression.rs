@@ -1,6 +1,6 @@
 use crate::r1cs::util::join;
+use crate::r1cs::wire::Wire;
 use crate::r1cs::wire_values::WireValues;
-use crate::Wire;
 #[cfg(not(feature = "std"))]
 use alloc::collections::btree_map::BTreeMap;
 use alloc::format;

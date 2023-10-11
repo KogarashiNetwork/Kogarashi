@@ -1,7 +1,7 @@
 use bls_12_381::Fr;
 use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
-use zksnarks::{Constraint, Wire};
+use zksnarks::{plonk::wire::Wire, Constraint};
 use zkstd::behave::Group;
 use zkstd::common::{vec, Pairing, Vec};
 
