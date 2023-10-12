@@ -120,7 +120,7 @@ pub struct TestCircuit {
 }
 
 impl Circuit<TatePairing> for TestCircuit {
-    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
+    fn synthesize(&self, composer: &mut ConstraintSystem<TatePairing>) -> Result<(), Error> {
         let a = composer.append_witness(self.a);
         let b = composer.append_witness(self.b);
 
@@ -248,7 +248,7 @@ fn main() {
             .expect("failed to compile circuit");
 
         let (proof, public_inputs) = prover
-            .prove(&mut rng, &test_circuit)
+            .create_proof(&mut rng, &test_circuit)
             .expect("failed to prove");
 
         assert_ok!(SumStorage::set_thing_1(

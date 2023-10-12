@@ -204,7 +204,7 @@ fn main() {
             Compiler::compile::<TestCircuit>(&pp, label).expect("failed to compile circuit");
 
         let (proof, public_inputs) = prover
-            .prove(&mut rng, &test_circuit)
+            .create_proof(&mut rng, &test_circuit)
             .expect("failed to prove");
 
         assert_ok!(SumStorage::set_thing_1(

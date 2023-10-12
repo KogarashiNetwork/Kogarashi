@@ -10,7 +10,7 @@ use zksnarks::plonk::PlonkParams;
 use zkstd::common::{CurveGroup, Group};
 
 #[allow(unused_must_use)]
-fn circuit(c: &mut Criterion) {
+fn synthesize(c: &mut Criterion) {
     let mut group = c.benchmark_group("circuit");
 
     let mut rng = StdRng::seed_from_u64(8349u64);
@@ -54,11 +54,13 @@ fn circuit(c: &mut Criterion) {
         randomness,
     );
 
-    let (proof, public_inputs) = prover.prove(&mut rng, &circuit).expect("failed to prove");
+    let (proof, public_inputs) = prover
+        .create_proof(&mut rng, &circuit)
+        .expect("failed to prove");
 
     group.bench_function("gen_proof", |b| {
         b.iter(|| {
-            black_box(prover.prove(&mut rng, black_box(&circuit)));
+            black_box(prover.create_proof(&mut rng, black_box(&circuit)));
         })
     });
 

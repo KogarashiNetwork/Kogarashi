@@ -8,7 +8,7 @@ use crate::{
 };
 use ark_std::rand::Rng;
 use red_jubjub::PublicKey;
-use zero_plonk::{prelude::Compiler, proof_system::Proof};
+use zero_plonk::prelude::{Compiler, Proof};
 use zksnarks::plonk::PlonkParams;
 use zkstd::common::{vec, Decode, Encode, Pairing, SigUtils, Vec};
 
@@ -264,7 +264,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
             .expect("failed to compile circuit");
         prover
             .0
-            .prove(&mut get_rng(), &batch_circuit)
+            .create_proof(&mut get_rng(), &batch_circuit)
             .expect("failed to prove")
     }
 

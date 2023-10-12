@@ -35,7 +35,10 @@ impl<const N: usize> MerkleMembershipCircuit<N> {
     }
 }
 
-fn hash<P: Pairing>(composer: &mut Builder<P>, inputs: (PrivateWire, PrivateWire)) -> PrivateWire {
+fn hash<P: Pairing>(
+    composer: &mut ConstraintSystem<P>,
+    inputs: (PrivateWire, PrivateWire),
+) -> PrivateWire {
     let sum = Constraint::default()
         .left(1)
         .constant(P::ScalarField::ADDITIVE_GENERATOR)
@@ -74,7 +77,7 @@ fn hash<P: Pairing>(composer: &mut Builder<P>, inputs: (PrivateWire, PrivateWire
 }
 
 fn calculate_root<P: Pairing, const N: usize>(
-    composer: &mut Builder<P>,
+    composer: &mut ConstraintSystem<P>,
     leaf: P::ScalarField,
     path: &[(P::ScalarField, P::ScalarField)],
     path_pos: &[u64],
@@ -113,7 +116,7 @@ fn calculate_root<P: Pairing, const N: usize>(
 }
 
 pub(crate) fn check_membership<P: Pairing, const N: usize>(
-    composer: &mut Builder<P>,
+    composer: &mut ConstraintSystem<P>,
     leaf: P::ScalarField,
     root: P::ScalarField,
     path: &[(P::ScalarField, P::ScalarField)],
@@ -129,7 +132,7 @@ pub(crate) fn check_membership<P: Pairing, const N: usize>(
 }
 
 impl<const N: usize> Circuit<TatePairing> for MerkleMembershipCircuit<N> {
-    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
+    fn synthesize(&self, composer: &mut ConstraintSystem<TatePairing>) -> Result<(), Error> {
         check_membership::<TatePairing, N>(
             composer,
             self.leaf,
@@ -188,7 +191,7 @@ mod tests {
         );
 
         // Should fail
-        assert!(prover.prove(&mut rng, &merkle_circuit).is_err());
+        assert!(prover.create_proof(&mut rng, &merkle_circuit).is_err());
 
         merkle_tree
             .update(0, user.to_field_element(), &poseidon)
@@ -204,7 +207,7 @@ mod tests {
         );
 
         let (proof, public_inputs) = prover
-            .prove(&mut rng, &merkle_circuit)
+            .create_proof(&mut rng, &merkle_circuit)
             .expect("failed to prove");
         verifier
             .verify(&proof, &public_inputs)
