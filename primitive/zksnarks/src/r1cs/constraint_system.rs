@@ -25,6 +25,7 @@ pub struct ConstraintSystem<F: Field> {
     next_wire_index: u32,
     constraints: Vec<Constraint<F>>,
     witness_generators: Vec<WitnessGenerator<F>>,
+    wire_values: WireValues<F>,
 }
 
 #[allow(dead_code)]
@@ -37,7 +38,14 @@ impl<F: Field> ConstraintSystem<F> {
             next_wire_index: 1,
             constraints: Vec::new(),
             witness_generators: Vec::new(),
+            wire_values: WireValues::new(),
         }
+    }
+
+    pub fn alloc_public<P: Into<F>>(&mut self, public: P) -> Wire {
+        let wire = self.public_wire();
+        self.wire_values.set(wire, public.into());
+        wire
     }
 
     /// Add a public wire to the gadget. It will start with no generator and no associated constraints.
@@ -47,8 +55,14 @@ impl<F: Field> ConstraintSystem<F> {
         Wire::new_unchecked(Index::Input(index as usize))
     }
 
+    pub fn alloc_private<P: Into<F>>(&mut self, private: P) -> Wire {
+        let wire = self.private_wire();
+        self.wire_values.set(wire, private.into());
+        wire
+    }
+
     /// Add a private wire to the gadget. It will start with no generator and no associated constraints.
-    pub fn private_wire(&mut self) -> Wire {
+    fn private_wire(&mut self) -> Wire {
         let index = self.next_wire_index;
         self.next_wire_index += 1;
         Wire::new_unchecked(Index::Aux(index as usize))
