@@ -54,55 +54,52 @@ impl<F: Field> Gadget<F> {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use crate::r1cs::expression::Expression;
-//     use crate::r1cs::gadget_builder::GadgetBuilder;
-//     use crate::r1cs::wire_values::WireValues;
-//     use crate::values;
-//     use jub_jub::Fr;
-//
-//     #[test]
-//     fn constraint_not_satisfied() {
-//         let mut builder = GadgetBuilder::<Fr>::new();
-//         let (x, y) = (builder.public_wire(), builder.public_wire());
-//         builder.assert_equal(&Expression::from(x), &Expression::from(y));
-//         let gadget = builder.build();
-//
-//         let mut values = values!(x => 42u64.into(), y => 43u64.into());
-//         let constraints_satisfied = gadget.execute(&mut values);
-//         assert!(!constraints_satisfied);
-//     }
-//
-//     #[test]
-//     #[should_panic]
-//     fn missing_generator() {
-//         let mut builder = GadgetBuilder::<Fr>::new();
-//         let (x, y, z) = (
-//             builder.public_wire(),
-//             builder.public_wire(),
-//             builder.public_wire(),
-//         );
-//         builder.assert_product(
-//             &Expression::from(x),
-//             &Expression::from(y),
-//             &Expression::from(z),
-//         );
-//         let gadget = builder.build();
-//
-//         let mut values = values!(x => 2u64.into(), y => 3u64.into());
-//         gadget.execute(&mut values);
-//     }
-//
-//     #[test]
-//     #[should_panic]
-//     fn missing_input() {
-//         let mut builder = GadgetBuilder::<Fr>::new();
-//         let x = builder.public_wire();
-//         builder.inverse(&Expression::from(x));
-//         let gadget = builder.build();
-//
-//         let mut values = WireValues::new();
-//         gadget.execute(&mut values);
-//     }
-// }
+#[cfg(test)]
+mod tests {
+    use crate::r1cs::error::R1CSError;
+    use crate::r1cs::expression::Expression;
+    use crate::r1cs::gadget_builder::{Circuit, GadgetBuilder};
+    use crate::r1cs::wire_values::WireValues;
+    use bls_12_381::Fr as BlsScalar;
+    use zkstd::common::Field;
+
+    #[test]
+    fn constraint_not_satisfied() {
+        #[allow(dead_code)]
+        #[derive(Debug)]
+        pub struct DummyCircuit<F: Field> {
+            x: F,
+            y: F,
+        }
+
+        impl DummyCircuit<BlsScalar> {
+            pub fn new(x: BlsScalar, y: BlsScalar) -> Self {
+                Self { x, y }
+            }
+        }
+
+        impl Default for DummyCircuit<BlsScalar> {
+            fn default() -> Self {
+                Self::new(0.into(), 0.into())
+            }
+        }
+
+        impl Circuit<BlsScalar> for DummyCircuit<BlsScalar> {
+            fn circuit(&self, composer: &mut GadgetBuilder<BlsScalar>) -> Result<(), R1CSError> {
+                let (x, y) = (composer.public_wire(), composer.public_wire());
+                composer.assert_equal(&Expression::from(x), &Expression::from(y));
+
+                Ok(())
+            }
+        }
+
+        let builder = GadgetBuilder::<BlsScalar>::new();
+        let circuit = DummyCircuit::new(42u64.into(), 43u64.into());
+
+        let gadget = builder.build(&circuit);
+
+        // let mut values = values!(x => 42u64.into(), y => 43u64.into());
+        let constraints_satisfied = gadget.execute(&mut WireValues::new());
+        assert!(!constraints_satisfied);
+    }
+}
