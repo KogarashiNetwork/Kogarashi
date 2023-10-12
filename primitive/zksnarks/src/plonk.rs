@@ -4,6 +4,7 @@ mod proof;
 mod transcript;
 
 mod constraint;
+pub mod wire;
 
 pub use constraint::*;
 pub use key::*;

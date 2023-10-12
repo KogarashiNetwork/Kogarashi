@@ -17,7 +17,7 @@ impl<F: Field> GadgetBuilder<F> {
             return x * c;
         }
 
-        let product = self.wire();
+        let product = self.public_wire();
         let product_exp = Expression::from(product);
         self.assert_product(x, y, &product_exp);
 
@@ -39,7 +39,7 @@ impl<F: Field> GadgetBuilder<F> {
     /// Returns `1 / x`, assuming `x` is non-zero. If `x` is zero, the gadget will not be
     /// satisfiable.
     pub fn inverse(&mut self, x: &Expression<F>) -> Expression<F> {
-        let x_inv = self.wire();
+        let x_inv = self.public_wire();
         self.assert_product(x, &Expression::from(x_inv), &Expression::one());
 
         let x = x.clone();

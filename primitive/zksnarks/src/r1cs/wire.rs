@@ -2,15 +2,29 @@ use core::cmp::Ordering;
 use core::fmt;
 use core::fmt::Formatter;
 
+/// Represents the index of either an input variable or
+/// auxiliary variable.
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Ord, PartialOrd)]
+pub enum Index {
+    Input(usize),
+    Aux(usize),
+}
+
+impl Default for Index {
+    fn default() -> Self {
+        Self::Aux(0)
+    }
+}
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Default)]
-pub struct Wire(usize);
+pub struct Wire(Index);
 
 impl Wire {
-    pub const fn new(index: usize) -> Self {
+    pub const fn new_unchecked(index: Index) -> Self {
         Self(index)
     }
 
-    pub const fn index(self) -> usize {
+    pub const fn get_unchecked(self) -> Index {
         self.0
     }
 }
@@ -18,7 +32,7 @@ impl Wire {
 impl Wire {
     /// A special wire whose value is always set to 1. This is used to create `Expression`s with
     /// constant terms.
-    pub const ONE: Wire = Wire(0);
+    pub const ONE: Wire = Wire(Index::Aux(1));
 }
 
 impl Ord for Wire {
@@ -44,10 +58,10 @@ impl PartialOrd for Wire {
 
 impl fmt::Display for Wire {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        if self.0 == 0 {
+        if let Index::Aux(1) = self.0 {
             write!(f, "1")
         } else {
-            write!(f, "wire_{}", self.0)
+            write!(f, "wire_{:?}", self.0)
         }
     }
 }

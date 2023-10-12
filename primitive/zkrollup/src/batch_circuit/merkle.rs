@@ -1,7 +1,7 @@
 use bls_12_381::Fr;
 use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
-use zksnarks::{Constraint, Wire};
+use zksnarks::{plonk::wire::PrivateWire, Constraint};
 use zkstd::behave::Group;
 use zkstd::common::{vec, Pairing, Vec};
 
@@ -35,7 +35,7 @@ impl<const N: usize> MerkleMembershipCircuit<N> {
     }
 }
 
-fn hash<P: Pairing>(composer: &mut Builder<P>, inputs: (Wire, Wire)) -> Wire {
+fn hash<P: Pairing>(composer: &mut Builder<P>, inputs: (PrivateWire, PrivateWire)) -> PrivateWire {
     let sum = Constraint::default()
         .left(1)
         .constant(P::ScalarField::ADDITIVE_GENERATOR)
@@ -78,10 +78,10 @@ fn calculate_root<P: Pairing, const N: usize>(
     leaf: P::ScalarField,
     path: &[(P::ScalarField, P::ScalarField)],
     path_pos: &[u64],
-) -> Result<Wire, Error> {
+) -> Result<PrivateWire, Error> {
     let mut prev = composer.append_witness(leaf);
 
-    let path: Vec<(Wire, Wire)> = path
+    let path: Vec<(PrivateWire, PrivateWire)> = path
         .iter()
         .map(|(node_l, node_r)| {
             (
@@ -91,7 +91,7 @@ fn calculate_root<P: Pairing, const N: usize>(
         })
         .collect();
 
-    let path_pos: Vec<Wire> = path_pos
+    let path_pos: Vec<PrivateWire> = path_pos
         .iter()
         .map(|pos| composer.append_witness(P::JubjubScalar::from(*pos)))
         .collect();

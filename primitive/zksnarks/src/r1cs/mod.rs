@@ -5,5 +5,6 @@ mod field_arithmetic;
 mod gadget;
 mod gadget_builder;
 mod util;
+pub mod wire;
 mod wire_values;
 mod witness_generator;

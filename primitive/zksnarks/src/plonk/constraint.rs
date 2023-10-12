@@ -1,4 +1,4 @@
-use crate::wire::Wire;
+use crate::plonk::wire::PrivateWire;
 use zkstd::behave::PrimeField;
 
 /// Each gate expression
@@ -29,13 +29,13 @@ pub struct Constraint<Selector: PrimeField> {
     pub q_variable_group_add: Selector,
 
     /// Left
-    pub w_a: Wire,
+    pub w_a: PrivateWire,
     /// Right
-    pub w_b: Wire,
+    pub w_b: PrivateWire,
     /// Fourth
-    pub w_d: Wire,
+    pub w_d: PrivateWire,
     /// Output
-    pub w_o: Wire,
+    pub w_o: PrivateWire,
 
     /// Public input
     pub public_input: Option<Selector>,
@@ -55,10 +55,10 @@ impl<F: PrimeField> Default for Constraint<F> {
             q_logic: F::zero(),
             q_fixed_group_add: F::zero(),
             q_variable_group_add: F::zero(),
-            w_a: Wire::default(),
-            w_b: Wire::default(),
-            w_d: Wire::default(),
-            w_o: Wire::default(),
+            w_a: PrivateWire::default(),
+            w_b: PrivateWire::default(),
+            w_d: PrivateWire::default(),
+            w_o: PrivateWire::default(),
             public_input: None,
         }
     }
@@ -116,25 +116,25 @@ impl<F: PrimeField> Constraint<F> {
     }
 
     /// Set witness `a` wired to `qM` and `qL`
-    pub fn a(mut self, w: Wire) -> Self {
+    pub fn a(mut self, w: PrivateWire) -> Self {
         self.w_a = w;
         self
     }
 
     /// Set witness `b` wired to `qM` and `qR`
-    pub fn b(mut self, w: Wire) -> Self {
+    pub fn b(mut self, w: PrivateWire) -> Self {
         self.w_b = w;
         self
     }
 
     /// Set witness `o` wired to `qO`
-    pub fn o(mut self, w: Wire) -> Self {
+    pub fn o(mut self, w: PrivateWire) -> Self {
         self.w_o = w;
         self
     }
 
     /// Set witness `d` wired to the fourth/advice `q4` coefficient
-    pub fn d(mut self, w: Wire) -> Self {
+    pub fn d(mut self, w: PrivateWire) -> Self {
         self.w_d = w;
         self
     }

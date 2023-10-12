@@ -1,3 +1,4 @@
+use crate::r1cs::wire::Index;
 #[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 use zkstd::common::Field;
@@ -5,9 +6,9 @@ use zkstd::common::Field;
 use crate::r1cs::constraint::Constraint;
 use crate::r1cs::expression::Expression;
 use crate::r1cs::gadget::Gadget;
+use crate::r1cs::wire::Wire;
 use crate::r1cs::wire_values::WireValues;
 use crate::r1cs::witness_generator::WitnessGenerator;
-use crate::wire::Wire;
 
 pub struct GadgetBuilder<F: Field> {
     next_wire_index: u32,
@@ -28,11 +29,18 @@ impl<F: Field> GadgetBuilder<F> {
         }
     }
 
-    /// Add a wire to the gadget. It will start with no generator and no associated constraints.
-    pub fn wire(&mut self) -> Wire {
+    /// Add a public wire to the gadget. It will start with no generator and no associated constraints.
+    pub fn public_wire(&mut self) -> Wire {
         let index = self.next_wire_index;
         self.next_wire_index += 1;
-        Wire::new(index as usize)
+        Wire::new_unchecked(Index::Input(index as usize))
+    }
+
+    /// Add a private wire to the gadget. It will start with no generator and no associated constraints.
+    pub fn private_wire(&mut self) -> Wire {
+        let index = self.next_wire_index;
+        self.next_wire_index += 1;
+        Wire::new_unchecked(Index::Aux(index as usize))
     }
 
     /// Add a generator function for setting certain wire values.
