@@ -79,7 +79,7 @@ impl Default for DummyCircuit {
 }
 
 impl Circuit<TatePairing> for DummyCircuit {
-    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), CircuitError> {
+    fn synthesize(&self, composer: &mut ConstraintSystem<TatePairing>) -> Result<(), CircuitError> {
         let w_a = composer.append_witness(self.a);
         let w_b = composer.append_point(self.b);
 

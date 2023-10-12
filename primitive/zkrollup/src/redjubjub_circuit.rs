@@ -31,7 +31,7 @@ impl RedJubjubCircuit {
 }
 
 pub(crate) fn check_signature<P: Pairing>(
-    composer: &mut Builder<P>,
+    composer: &mut ConstraintSystem<P>,
     public_key: P::JubjubAffine,
     signature: Signature,
     msg_hash: P::JubjubScalar,
@@ -67,7 +67,7 @@ pub(crate) fn check_signature<P: Pairing>(
 }
 
 impl Circuit<TatePairing> for RedJubjubCircuit {
-    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
+    fn synthesize(&self, composer: &mut ConstraintSystem<TatePairing>) -> Result<(), Error> {
         check_signature(composer, self.public_key, self.signature, self.msg_hash)
     }
 }

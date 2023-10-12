@@ -10,7 +10,7 @@ use zksnarks::plonk::PlonkParams;
 use zkstd::common::{CurveGroup, Group};
 
 #[allow(unused_must_use)]
-fn circuit(c: &mut Criterion) {
+fn synthesize(c: &mut Criterion) {
     let mut group = c.benchmark_group("circuit");
 
     let mut rng = StdRng::seed_from_u64(8349u64);

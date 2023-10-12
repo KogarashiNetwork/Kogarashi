@@ -36,7 +36,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
 impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
     Circuit<P> for BatchCircuit<P, H, N, BATCH_SIZE>
 {
-    fn circuit(&self, composer: &mut Builder<P>) -> Result<(), Error> {
+    fn synthesize(&self, composer: &mut ConstraintSystem<P>) -> Result<(), Error> {
         for RollupTransactionInfo {
             transaction,
             pre_root,

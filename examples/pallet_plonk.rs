@@ -120,7 +120,7 @@ pub struct TestCircuit {
 }
 
 impl Circuit<TatePairing> for TestCircuit {
-    fn circuit(&self, composer: &mut Builder<TatePairing>) -> Result<(), Error> {
+    fn synthesize(&self, composer: &mut ConstraintSystem<TatePairing>) -> Result<(), Error> {
         let a = composer.append_witness(self.a);
         let b = composer.append_witness(self.b);
 
