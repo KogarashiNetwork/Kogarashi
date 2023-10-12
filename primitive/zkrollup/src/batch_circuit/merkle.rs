@@ -191,7 +191,7 @@ mod tests {
         );
 
         // Should fail
-        assert!(prover.prove(&mut rng, &merkle_circuit).is_err());
+        assert!(prover.create_proof(&mut rng, &merkle_circuit).is_err());
 
         merkle_tree
             .update(0, user.to_field_element(), &poseidon)
@@ -207,7 +207,7 @@ mod tests {
         );
 
         let (proof, public_inputs) = prover
-            .prove(&mut rng, &merkle_circuit)
+            .create_proof(&mut rng, &merkle_circuit)
             .expect("failed to prove");
         verifier
             .verify(&proof, &public_inputs)

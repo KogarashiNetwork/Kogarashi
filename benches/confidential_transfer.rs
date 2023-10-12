@@ -54,11 +54,13 @@ fn synthesize(c: &mut Criterion) {
         randomness,
     );
 
-    let (proof, public_inputs) = prover.prove(&mut rng, &circuit).expect("failed to prove");
+    let (proof, public_inputs) = prover
+        .create_proof(&mut rng, &circuit)
+        .expect("failed to prove");
 
     group.bench_function("gen_proof", |b| {
         b.iter(|| {
-            black_box(prover.prove(&mut rng, black_box(&circuit)));
+            black_box(prover.create_proof(&mut rng, black_box(&circuit)));
         })
     });
 

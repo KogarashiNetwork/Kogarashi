@@ -172,7 +172,7 @@ fn main() {
             .expect("failed to compile circuit");
         let proof = prover
             .0
-            .prove(&mut rng, &confidential_transfer_circuit)
+            .create_proof(&mut rng, &confidential_transfer_circuit)
             .expect("failed to prove");
 
         // confidential transfer check

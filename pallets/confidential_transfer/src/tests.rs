@@ -58,7 +58,7 @@ mod plonk_test {
             let proof_generation = start_timer!(|| "proof generation");
             let proof = prover
                 .0
-                .prove(&mut rng, &confidential_transfer_circuit)
+                .create_proof(&mut rng, &confidential_transfer_circuit)
                 .expect("failed to prove");
             end_timer!(proof_generation);
 

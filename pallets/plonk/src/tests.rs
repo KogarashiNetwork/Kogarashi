@@ -113,7 +113,7 @@ mod plonk_test {
                 .expect("failed to compile circuit");
 
             let (proof, public_inputs) = prover
-                .prove(&mut rng, &DummyCircuit::new(a))
+                .create_proof(&mut rng, &DummyCircuit::new(a))
                 .expect("failed to prove");
 
             verifier

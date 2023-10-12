@@ -110,7 +110,7 @@ mod tests {
         let (prover, verifier) = Compiler::compile::<RedJubjubCircuit, TatePairing>(&mut pp, label)
             .expect("failed to compile circuit");
         let (proof, public_inputs) = prover
-            .prove(&mut rng, &redjubjub_circuit)
+            .create_proof(&mut rng, &redjubjub_circuit)
             .expect("failed to prove");
         verifier
             .verify(&proof, &public_inputs)
