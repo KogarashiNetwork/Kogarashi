@@ -74,6 +74,6 @@ fn synthesize(c: &mut Criterion) {
 criterion_group!(
     name = bench_confidential_transfer;
     config = Criterion::default().sample_size(10);
-    targets = circuit
+    targets = synthesize
 );
 criterion_main!(bench_confidential_transfer);
