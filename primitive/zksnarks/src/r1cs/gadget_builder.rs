@@ -1,14 +1,25 @@
 use crate::r1cs::wire::Index;
 #[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
-use zkstd::common::Field;
+use core::fmt::Debug;
+use zkstd::common::{Field, TwistedEdwardsAffine};
 
 use crate::r1cs::constraint::Constraint;
+use crate::r1cs::curves::EdwardsExpression;
+use crate::r1cs::error::R1CSError;
 use crate::r1cs::expression::Expression;
 use crate::r1cs::gadget::Gadget;
 use crate::r1cs::wire::Wire;
 use crate::r1cs::wire_values::WireValues;
 use crate::r1cs::witness_generator::WitnessGenerator;
+
+/// Circuit implementation that can be proved by a Composer
+///
+/// The default implementation will be used to generate the proving arguments.
+pub trait Circuit<F: Field>: Default + Debug {
+    /// Circuit definition
+    fn circuit(&self, composer: &mut GadgetBuilder<F>) -> Result<(), R1CSError>;
+}
 
 pub struct GadgetBuilder<F: Field> {
     next_wire_index: u32,
@@ -43,6 +54,23 @@ impl<F: Field> GadgetBuilder<F> {
         Wire::new_unchecked(Index::Aux(index as usize))
     }
 
+    pub fn append_edwards_expression<C: TwistedEdwardsAffine<Range = F>>(
+        &mut self,
+        x: Expression<F>,
+        y: Expression<F>,
+    ) -> EdwardsExpression<F, C> {
+        let x_squared = self.product(&x, &x);
+        let y_squared = self.product(&y, &y);
+        let x_squared_y_squared = self.product(&x_squared, &y_squared);
+
+        self.assert_equal(
+            &y_squared,
+            &(Expression::one() + x_squared_y_squared * C::PARAM_D + &x_squared),
+        );
+
+        EdwardsExpression::new_unsafe(x, y)
+    }
+
     /// Add a generator function for setting certain wire values.
     pub fn generator<T>(&mut self, dependencies: Vec<Wire>, generate: T)
     where
@@ -67,7 +95,11 @@ impl<F: Field> GadgetBuilder<F> {
     }
 
     /// Builds the gadget.
-    pub fn build(self) -> Gadget<F> {
+    pub fn build<C>(mut self, circuit: &C) -> Gadget<F>
+    where
+        C: Circuit<F>,
+    {
+        circuit.circuit(&mut self).unwrap();
         Gadget {
             constraints: self.constraints,
             witness_generators: self.witness_generators,
