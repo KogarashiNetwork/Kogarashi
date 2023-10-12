@@ -8,7 +8,7 @@ use crate::r1cs::constraint::Constraint;
 use crate::r1cs::curves::EdwardsExpression;
 use crate::r1cs::error::R1CSError;
 use crate::r1cs::expression::Expression;
-use crate::r1cs::gadget::Gadget;
+use crate::r1cs::prover::Prover;
 use crate::r1cs::wire::Wire;
 use crate::r1cs::wire_values::WireValues;
 use crate::r1cs::witness_generator::WitnessGenerator;
@@ -18,10 +18,10 @@ use crate::r1cs::witness_generator::WitnessGenerator;
 /// The default implementation will be used to generate the proving arguments.
 pub trait Circuit<F: Field>: Default + Debug {
     /// Circuit definition
-    fn circuit(&self, composer: &mut GadgetBuilder<F>) -> Result<(), R1CSError>;
+    fn synthesize(&self, composer: &mut ConstraintSystem<F>) -> Result<(), R1CSError>;
 }
 
-pub struct GadgetBuilder<F: Field> {
+pub struct ConstraintSystem<F: Field> {
     next_wire_index: u32,
     constraints: Vec<Constraint<F>>,
     witness_generators: Vec<WitnessGenerator<F>>,
@@ -30,10 +30,10 @@ pub struct GadgetBuilder<F: Field> {
 #[allow(dead_code)]
 /// A utility for building `Gadget`s. See the readme for examples.
 #[allow(clippy::new_without_default)]
-impl<F: Field> GadgetBuilder<F> {
+impl<F: Field> ConstraintSystem<F> {
     /// Creates a new `GadgetBuilder`, starting with no constraints or generators.
     pub fn new() -> Self {
-        GadgetBuilder {
+        ConstraintSystem {
             next_wire_index: 1,
             constraints: Vec::new(),
             witness_generators: Vec::new(),
@@ -95,12 +95,12 @@ impl<F: Field> GadgetBuilder<F> {
     }
 
     /// Builds the gadget.
-    pub fn build<C>(mut self, circuit: &C) -> Gadget<F>
+    pub fn build<C>(mut self, circuit: &C) -> Prover<F>
     where
         C: Circuit<F>,
     {
-        circuit.circuit(&mut self).unwrap();
-        Gadget {
+        circuit.synthesize(&mut self).unwrap();
+        Prover {
             constraints: self.constraints,
             witness_generators: self.witness_generators,
         }

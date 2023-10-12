@@ -1,13 +1,13 @@
 //! This module extends GadgetBuilder with native field arithmetic methods.
 
+use crate::r1cs::constraint_system::ConstraintSystem;
 use crate::r1cs::expression::Expression;
-use crate::r1cs::gadget_builder::GadgetBuilder;
 use crate::r1cs::util::concat;
 use crate::r1cs::wire_values::WireValues;
 use zkstd::common::Field;
 
 #[allow(dead_code)]
-impl<F: Field> GadgetBuilder<F> {
+impl<F: Field> ConstraintSystem<F> {
     /// The product of two `Expression`s `x` and `y`, i.e. `x * y`.
     pub fn product(&mut self, x: &Expression<F>, y: &Expression<F>) -> Expression<F> {
         if let Some(c) = x.as_constant() {

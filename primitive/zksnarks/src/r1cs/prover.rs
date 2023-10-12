@@ -7,7 +7,7 @@ use zkstd::common::Field;
 
 #[allow(dead_code)]
 /// An R1CS gadget.
-pub struct Gadget<F: Field> {
+pub struct Prover<F: Field> {
     /// The set of rank-1 constraints which define the R1CS instance.
     pub constraints: Vec<Constraint<F>>,
     /// The set of generators used to generate a complete witness from inputs.
@@ -15,9 +15,9 @@ pub struct Gadget<F: Field> {
 }
 
 #[allow(dead_code)]
-impl<F: Field> Gadget<F> {
+impl<F: Field> Prover<F> {
     /// Execute the gadget, and return whether all constraints were satisfied.
-    pub fn execute(&self, wire_values: &mut WireValues<F>) -> bool {
+    pub fn prove(&self, wire_values: &mut WireValues<F>) -> bool {
         let mut pending_generators: Vec<&WitnessGenerator<F>> =
             self.witness_generators.iter().collect();
 
@@ -56,9 +56,9 @@ impl<F: Field> Gadget<F> {
 
 #[cfg(test)]
 mod tests {
+    use crate::r1cs::constraint_system::{Circuit, ConstraintSystem};
     use crate::r1cs::error::R1CSError;
     use crate::r1cs::expression::Expression;
-    use crate::r1cs::gadget_builder::{Circuit, GadgetBuilder};
     use crate::r1cs::wire_values::WireValues;
     use bls_12_381::Fr as BlsScalar;
     use zkstd::common::Field;
@@ -85,7 +85,10 @@ mod tests {
         }
 
         impl Circuit<BlsScalar> for DummyCircuit<BlsScalar> {
-            fn circuit(&self, composer: &mut GadgetBuilder<BlsScalar>) -> Result<(), R1CSError> {
+            fn synthesize(
+                &self,
+                composer: &mut ConstraintSystem<BlsScalar>,
+            ) -> Result<(), R1CSError> {
                 let (x, y) = (composer.public_wire(), composer.public_wire());
                 composer.assert_equal(&Expression::from(x), &Expression::from(y));
 
@@ -93,13 +96,13 @@ mod tests {
             }
         }
 
-        let builder = GadgetBuilder::<BlsScalar>::new();
+        let builder = ConstraintSystem::<BlsScalar>::new();
         let circuit = DummyCircuit::new(42u64.into(), 43u64.into());
 
-        let gadget = builder.build(&circuit);
+        let prover = builder.build(&circuit);
 
         // let mut values = values!(x => 42u64.into(), y => 43u64.into());
-        let constraints_satisfied = gadget.execute(&mut WireValues::new());
+        let constraints_satisfied = prover.prove(&mut WireValues::new());
         assert!(!constraints_satisfied);
     }
 }

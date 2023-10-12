@@ -1,10 +1,10 @@
 mod constraint;
+mod constraint_system;
 pub(crate) mod curves;
 mod error;
 mod expression;
 mod field_arithmetic;
-mod gadget;
-mod gadget_builder;
+mod prover;
 mod util;
 pub mod wire;
 mod wire_values;
@@ -12,9 +12,9 @@ mod witness_generator;
 
 #[cfg(test)]
 mod tests {
+    use crate::r1cs::constraint_system::{Circuit, ConstraintSystem};
     use crate::r1cs::error::R1CSError;
     use crate::r1cs::expression::Expression;
-    use crate::r1cs::gadget_builder::{Circuit, GadgetBuilder};
     use crate::r1cs::wire_values::WireValues;
     use bls_12_381::Fr as BlsScalar;
     use jub_jub::JubjubAffine;
@@ -41,7 +41,10 @@ mod tests {
         }
 
         impl Circuit<BlsScalar> for DummyCircuit<BlsScalar> {
-            fn circuit(&self, composer: &mut GadgetBuilder<BlsScalar>) -> Result<(), R1CSError> {
+            fn synthesize(
+                &self,
+                composer: &mut ConstraintSystem<BlsScalar>,
+            ) -> Result<(), R1CSError> {
                 let x_exp = Expression::from(self.x);
                 let y_exp = Expression::from(self.y);
 
@@ -60,10 +63,10 @@ mod tests {
         )
         .unwrap();
 
-        let builder = GadgetBuilder::<BlsScalar>::new();
+        let builder = ConstraintSystem::<BlsScalar>::new();
         let circuit = DummyCircuit::new(x, y);
 
-        let gadget = builder.build(&circuit);
-        assert!(gadget.execute(&mut WireValues::new()));
+        let prover = builder.build(&circuit);
+        assert!(prover.prove(&mut WireValues::new()));
     }
 }
