@@ -2,11 +2,8 @@
 
 use crate::r1cs::constraint_system::ConstraintSystem;
 use crate::r1cs::expression::Expression;
-use crate::r1cs::util::concat;
-use crate::r1cs::wire_values::WireValues;
 use zkstd::common::Field;
 
-#[allow(dead_code)]
 impl<F: Field> ConstraintSystem<F> {
     /// The product of two `Expression`s `x` and `y`, i.e. `x * y`.
     pub fn product(&mut self, x: &Expression<F>, y: &Expression<F>) -> Expression<F> {
@@ -17,21 +14,10 @@ impl<F: Field> ConstraintSystem<F> {
             return x * c;
         }
 
-        let product = self.public_wire();
+        let product_value = x.evaluate(&self.wire_values) * y.evaluate(&self.wire_values);
+        let product = self.alloc_public(product_value);
         let product_exp = Expression::from(product);
         self.assert_product(x, y, &product_exp);
-
-        {
-            let x = x.clone();
-            let y = y.clone();
-            self.generator(
-                concat(&[x.dependencies(), y.dependencies()]),
-                move |values: &mut WireValues<F>| {
-                    let product_value = x.evaluate(values) * y.evaluate(values);
-                    values.set(product, product_value);
-                },
-            );
-        }
 
         product_exp
     }
@@ -39,16 +25,13 @@ impl<F: Field> ConstraintSystem<F> {
     /// Returns `1 / x`, assuming `x` is non-zero. If `x` is zero, the gadget will not be
     /// satisfiable.
     pub fn inverse(&mut self, x: &Expression<F>) -> Expression<F> {
-        let x_inv = self.public_wire();
-        self.assert_product(x, &Expression::from(x_inv), &Expression::one());
+        let x_value = x.evaluate(&self.wire_values);
+        let inverse_value = x_value.invert().expect("Can't find an inverse element");
+        let x_inv = self.alloc_public(inverse_value);
 
-        let x = x.clone();
-        self.generator(x.dependencies(), move |values: &mut WireValues<F>| {
-            let x_value = x.evaluate(values);
-            let inverse_value = x_value.invert().expect("Can't find an inverse element");
-            values.set(x_inv, inverse_value);
-        });
+        let x_inv_expression = Expression::from(x_inv);
+        self.assert_product(x, &x_inv_expression, &Expression::one());
 
-        x_inv.into()
+        x_inv_expression
     }
 }

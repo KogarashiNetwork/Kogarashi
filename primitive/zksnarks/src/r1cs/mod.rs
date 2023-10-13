@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 mod constraint;
 mod constraint_system;
 pub(crate) mod curves;
@@ -8,14 +9,12 @@ mod prover;
 mod util;
 pub mod wire;
 mod wire_values;
-mod witness_generator;
 
 #[cfg(test)]
 mod tests {
     use crate::r1cs::constraint_system::{Circuit, ConstraintSystem};
     use crate::r1cs::error::R1CSError;
     use crate::r1cs::expression::Expression;
-    use crate::r1cs::wire_values::WireValues;
     use bls_12_381::Fr as BlsScalar;
     use jub_jub::JubjubAffine;
     use zkstd::common::Field;
@@ -45,10 +44,13 @@ mod tests {
                 &self,
                 composer: &mut ConstraintSystem<BlsScalar>,
             ) -> Result<(), R1CSError> {
-                let x_exp = Expression::from(self.x);
-                let y_exp = Expression::from(self.y);
+                let x = composer.alloc_private(self.x);
+                let y = composer.alloc_private(self.y);
 
-                composer.append_edwards_expression::<JubjubAffine>(x_exp, y_exp);
+                composer.append_edwards_expression::<JubjubAffine>(
+                    Expression::from(x),
+                    Expression::from(y),
+                );
 
                 Ok(())
             }
@@ -66,7 +68,7 @@ mod tests {
         let builder = ConstraintSystem::<BlsScalar>::new();
         let circuit = DummyCircuit::new(x, y);
 
-        let prover = builder.build(&circuit);
-        assert!(prover.prove(&mut WireValues::new()));
+        let mut prover = builder.build(&circuit);
+        assert!(prover.prove());
     }
 }

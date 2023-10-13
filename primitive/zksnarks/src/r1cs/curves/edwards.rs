@@ -20,7 +20,6 @@ pub struct EdwardsExpression<F: Field, C: TwistedEdwardsAffine<Range = F>> {
     marker: PhantomData<C>,
 }
 
-#[allow(dead_code)]
 impl<F: Field, C: TwistedEdwardsAffine<Range = F>> EdwardsExpression<F, C> {
     /// Creates an `EdwardsExpression` from two arbitrary coordinates of type `Expression`.
     /// This method is unsafe and should only be used when the coordinates are proven

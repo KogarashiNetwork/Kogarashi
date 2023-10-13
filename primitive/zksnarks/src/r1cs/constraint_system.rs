@@ -11,7 +11,6 @@ use crate::r1cs::expression::Expression;
 use crate::r1cs::prover::Prover;
 use crate::r1cs::wire::Wire;
 use crate::r1cs::wire_values::WireValues;
-use crate::r1cs::witness_generator::WitnessGenerator;
 
 /// Circuit implementation that can be proved by a Composer
 ///
@@ -24,11 +23,10 @@ pub trait Circuit<F: Field>: Default + Debug {
 pub struct ConstraintSystem<F: Field> {
     next_wire_index: u32,
     constraints: Vec<Constraint<F>>,
-    witness_generators: Vec<WitnessGenerator<F>>,
-    wire_values: WireValues<F>,
+    // witness_generators: Vec<WitnessGenerator<F>>,
+    pub(crate) wire_values: WireValues<F>,
 }
 
-#[allow(dead_code)]
 /// A utility for building `Gadget`s. See the readme for examples.
 #[allow(clippy::new_without_default)]
 impl<F: Field> ConstraintSystem<F> {
@@ -37,7 +35,6 @@ impl<F: Field> ConstraintSystem<F> {
         ConstraintSystem {
             next_wire_index: 1,
             constraints: Vec::new(),
-            witness_generators: Vec::new(),
             wire_values: WireValues::new(),
         }
     }
@@ -85,15 +82,6 @@ impl<F: Field> ConstraintSystem<F> {
         EdwardsExpression::new_unsafe(x, y)
     }
 
-    /// Add a generator function for setting certain wire values.
-    pub fn generator<T>(&mut self, dependencies: Vec<Wire>, generate: T)
-    where
-        T: Fn(&mut WireValues<F>) + 'static,
-    {
-        self.witness_generators
-            .push(WitnessGenerator::new(dependencies, generate));
-    }
-
     /// Assert that x * y = z;
     pub fn assert_product(&mut self, x: &Expression<F>, y: &Expression<F>, z: &Expression<F>) {
         self.constraints.push(Constraint {
@@ -116,7 +104,7 @@ impl<F: Field> ConstraintSystem<F> {
         circuit.synthesize(&mut self).unwrap();
         Prover {
             constraints: self.constraints,
-            witness_generators: self.witness_generators,
+            wire_values: self.wire_values,
         }
     }
 }
