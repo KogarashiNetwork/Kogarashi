@@ -11,7 +11,6 @@ pub struct Constraint<F: Field> {
     pub c: Expression<F>,
 }
 
-#[allow(dead_code)]
 impl<F: Field> Constraint<F> {
     pub fn evaluate(&self, wire_values: &WireValues<F>) -> bool {
         let a_value = self.a.evaluate(wire_values);

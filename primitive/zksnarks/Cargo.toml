@@ -12,6 +12,7 @@ rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "katex-header.html"]
 [dependencies]
 zkstd = { path = "../zkstd", default-features = false }
 jub-jub = { path = "../jubjub", default-features = false }
+bls-12-381 = { path = "../bls12_381", default-features = false }
 poly-commit = { path = "../poly", default-features = false }
 parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
 merlin = { version = "3.0", default-features = false }
