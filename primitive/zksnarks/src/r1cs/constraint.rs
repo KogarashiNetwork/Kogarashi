@@ -1,6 +1,6 @@
 use crate::r1cs::expression::Expression;
-use crate::r1cs::wire_values::WireValues;
-
+use crate::r1cs::wire::Wire;
+use hashbrown::HashMap;
 use zkstd::common::Field;
 
 /// An rank-1 constraint of the form a * b = c, where a, b, and c are linear combinations of wires.
@@ -12,10 +12,10 @@ pub struct Constraint<F: Field> {
 }
 
 impl<F: Field> Constraint<F> {
-    pub fn evaluate(&self, wire_values: &WireValues<F>) -> bool {
-        let a_value = self.a.evaluate(wire_values);
-        let b_value = self.b.evaluate(wire_values);
-        let c_value = self.c.evaluate(wire_values);
+    pub fn evaluate(&self, instance: &HashMap<Wire, F>, witness: &HashMap<Wire, F>) -> bool {
+        let a_value = self.a.evaluate(instance, witness);
+        let b_value = self.b.evaluate(instance, witness);
+        let c_value = self.c.evaluate(instance, witness);
         a_value * b_value == c_value
     }
 }

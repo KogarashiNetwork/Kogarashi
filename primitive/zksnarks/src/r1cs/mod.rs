@@ -8,7 +8,6 @@ mod field_arithmetic;
 mod prover;
 mod util;
 pub mod wire;
-mod wire_values;
 
 #[cfg(test)]
 mod tests {

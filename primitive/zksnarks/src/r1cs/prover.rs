@@ -1,16 +1,14 @@
 use crate::r1cs::constraint::Constraint;
-use crate::r1cs::wire_values::WireValues;
-#[cfg(not(feature = "std"))]
-use alloc::vec::Vec;
-use zkstd::common::Field;
+use crate::r1cs::wire::Wire;
+use hashbrown::HashMap;
+use zkstd::common::{Field, Vec};
 
 /// An R1CS gadget.
 pub struct Prover<F: Field> {
     /// The set of rank-1 constraints which define the R1CS instance.
     pub constraints: Vec<Constraint<F>>,
-    /// The set of generators used to generate a complete witness from inputs.
-    // pub witness_generators: Vec<WitnessGenerator<F>>,
-    pub wire_values: WireValues<F>,
+    pub(crate) instance: HashMap<Wire, F>,
+    pub(crate) witness: HashMap<Wire, F>,
 }
 
 impl<F: Field> Prover<F> {
@@ -18,7 +16,7 @@ impl<F: Field> Prover<F> {
     pub fn prove(&mut self) -> bool {
         self.constraints
             .iter()
-            .all(|constraint| constraint.evaluate(&self.wire_values))
+            .all(|constraint| constraint.evaluate(&self.instance, &self.witness))
     }
 }
 

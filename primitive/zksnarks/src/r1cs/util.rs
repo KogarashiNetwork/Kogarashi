@@ -1,10 +1,7 @@
 #[cfg(not(feature = "std"))]
-use alloc::vec::Vec;
-
-#[cfg(not(feature = "std"))]
 use alloc::string::String;
-
 use core::borrow::Borrow;
+use zkstd::common::Vec;
 
 /// Like SliceConcatExt::concat, but works in stable with no_std.
 /// See https://github.com/rust-lang/rust/issues/27747

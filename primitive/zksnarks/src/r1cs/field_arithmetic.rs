@@ -14,7 +14,8 @@ impl<F: Field> ConstraintSystem<F> {
             return x * c;
         }
 
-        let product_value = x.evaluate(&self.wire_values) * y.evaluate(&self.wire_values);
+        let product_value =
+            x.evaluate(&self.instance, &self.witness) * y.evaluate(&self.instance, &self.witness);
         let product = self.alloc_public(product_value);
         let product_exp = Expression::from(product);
         self.assert_product(x, y, &product_exp);
@@ -25,7 +26,7 @@ impl<F: Field> ConstraintSystem<F> {
     /// Returns `1 / x`, assuming `x` is non-zero. If `x` is zero, the gadget will not be
     /// satisfiable.
     pub fn inverse(&mut self, x: &Expression<F>) -> Expression<F> {
-        let x_value = x.evaluate(&self.wire_values);
+        let x_value = x.evaluate(&self.instance, &self.witness);
         let inverse_value = x_value.invert().expect("Can't find an inverse element");
         let x_inv = self.alloc_public(inverse_value);
 
