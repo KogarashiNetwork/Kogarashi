@@ -1,33 +1,29 @@
 use crate::r1cs::util::join;
-use crate::r1cs::wire::Wire;
-use crate::r1cs::wire_values::WireValues;
-#[cfg(not(feature = "std"))]
-use alloc::collections::btree_map::BTreeMap;
+use crate::r1cs::wire::{Index, Wire};
 use alloc::format;
 #[cfg(not(feature = "std"))]
 use alloc::string::String;
-#[cfg(not(feature = "std"))]
-use alloc::vec::Vec;
 use core::fmt;
 use core::fmt::Formatter;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use hashbrown::HashMap;
 use itertools::Itertools;
-#[cfg(feature = "std")]
-use std::collections::BTreeMap;
-#[cfg(feature = "std")]
-use std::collections::BTreeSet;
-use zkstd::common::Field;
+use zkstd::common::{Field, Vec};
+
+pub trait Evaluable<F: Field, R> {
+    fn evaluate(&self, instance: &HashMap<Wire, F>, witness: &HashMap<Wire, F>) -> R;
+}
 
 /// A linear combination of wires.
 #[derive(Debug, Eq, PartialEq)]
 pub struct Expression<F: Field> {
     /// The coefficient of each wire. Wires with a coefficient of zero are omitted.
-    coefficients: BTreeMap<Wire, F>,
+    coefficients: HashMap<Wire, F>,
 }
 
 impl<F: Field> Expression<F> {
     /// Creates a new expression with the given wire coefficients.
-    pub fn new(coefficients: BTreeMap<Wire, F>) -> Self {
+    pub fn new(coefficients: HashMap<Wire, F>) -> Self {
         let nonzero_coefficients = coefficients
             .into_iter()
             .filter(|(_k, v)| *v != F::zero())
@@ -37,7 +33,7 @@ impl<F: Field> Expression<F> {
         }
     }
 
-    pub fn coefficients(&self) -> &BTreeMap<Wire, F> {
+    pub fn coefficients(&self) -> &HashMap<Wire, F> {
         &self.coefficients
     }
 
@@ -51,7 +47,7 @@ impl<F: Field> Expression<F> {
     /// The collectivization of all existing Expression’s Wires with each destination Wire’s
     /// coefficient the sum of each source’s coefficients.
     pub fn sum_of_expressions(expressions: &[Expression<F>]) -> Self {
-        let mut merged_coefficients = BTreeMap::new();
+        let mut merged_coefficients = HashMap::new();
         for exp in expressions {
             for (&wire, coefficient) in &exp.coefficients {
                 *merged_coefficients.entry(wire).or_insert_with(F::zero) += *coefficient
@@ -62,7 +58,7 @@ impl<F: Field> Expression<F> {
 
     pub fn zero() -> Self {
         Expression {
-            coefficients: BTreeMap::new(),
+            coefficients: HashMap::new(),
         }
     }
 
@@ -93,11 +89,16 @@ impl<F: Field> Expression<F> {
         self.coefficients.keys().copied().collect()
     }
 
-    pub fn evaluate(&self, wire_values: &WireValues<F>) -> F {
+    pub fn evaluate(&self, instance: &HashMap<Wire, F>, witness: &HashMap<Wire, F>) -> F {
         self.coefficients
             .iter()
             .fold(F::zero(), |sum, (wire, coefficient)| {
-                sum + (*wire_values.get(*wire) * *coefficient)
+                let wire_value = match wire.get_unchecked() {
+                    Index::Input(_) => instance.get(wire),
+                    Index::Aux(_) => witness.get(wire),
+                }
+                .expect("No value for the wire was found");
+                sum + (*wire_value * *coefficient)
             })
     }
 }

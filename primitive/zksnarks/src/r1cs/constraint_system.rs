@@ -1,16 +1,13 @@
-use crate::r1cs::wire::Index;
-#[cfg(not(feature = "std"))]
-use alloc::vec::Vec;
-use core::fmt::Debug;
-use zkstd::common::{Field, TwistedEdwardsAffine};
-
 use crate::r1cs::constraint::Constraint;
 use crate::r1cs::curves::EdwardsExpression;
 use crate::r1cs::error::R1CSError;
 use crate::r1cs::expression::Expression;
 use crate::r1cs::prover::Prover;
+use crate::r1cs::wire::Index;
 use crate::r1cs::wire::Wire;
-use crate::r1cs::wire_values::WireValues;
+use core::fmt::Debug;
+use hashbrown::HashMap;
+use zkstd::common::{Field, TwistedEdwardsAffine, Vec};
 
 /// Circuit implementation that can be proved by a Composer
 ///
@@ -21,10 +18,9 @@ pub trait Circuit<F: Field>: Default + Debug {
 }
 
 pub struct ConstraintSystem<F: Field> {
-    next_wire_index: u32,
     constraints: Vec<Constraint<F>>,
-    // witness_generators: Vec<WitnessGenerator<F>>,
-    pub(crate) wire_values: WireValues<F>,
+    pub(crate) instance: HashMap<Wire, F>,
+    pub(crate) witness: HashMap<Wire, F>,
 }
 
 /// A utility for building `Gadget`s. See the readme for examples.
@@ -33,36 +29,34 @@ impl<F: Field> ConstraintSystem<F> {
     /// Creates a new `GadgetBuilder`, starting with no constraints or generators.
     pub fn new() -> Self {
         ConstraintSystem {
-            next_wire_index: 1,
             constraints: Vec::new(),
-            wire_values: WireValues::new(),
+            instance: HashMap::new(),
+            witness: [(Wire::ONE, F::one())].into_iter().collect(),
         }
     }
 
     pub fn alloc_public<P: Into<F>>(&mut self, public: P) -> Wire {
         let wire = self.public_wire();
-        self.wire_values.set(wire, public.into());
+        self.instance.insert(wire, public.into());
         wire
     }
 
     /// Add a public wire to the gadget. It will start with no generator and no associated constraints.
     pub fn public_wire(&mut self) -> Wire {
-        let index = self.next_wire_index;
-        self.next_wire_index += 1;
-        Wire::new_unchecked(Index::Input(index as usize))
+        let index = self.instance.len();
+        Wire::new_unchecked(Index::Input(index))
     }
 
     pub fn alloc_private<P: Into<F>>(&mut self, private: P) -> Wire {
         let wire = self.private_wire();
-        self.wire_values.set(wire, private.into());
+        self.witness.insert(wire, private.into());
         wire
     }
 
     /// Add a private wire to the gadget. It will start with no generator and no associated constraints.
     fn private_wire(&mut self) -> Wire {
-        let index = self.next_wire_index;
-        self.next_wire_index += 1;
-        Wire::new_unchecked(Index::Aux(index as usize))
+        let index = self.witness.len();
+        Wire::new_unchecked(Index::Aux(index))
     }
 
     pub fn append_edwards_expression<C: TwistedEdwardsAffine<Range = F>>(
@@ -102,9 +96,11 @@ impl<F: Field> ConstraintSystem<F> {
         C: Circuit<F>,
     {
         circuit.synthesize(&mut self).unwrap();
+
         Prover {
             constraints: self.constraints,
-            wire_values: self.wire_values,
+            instance: self.instance,
+            witness: self.witness,
         }
     }
 }

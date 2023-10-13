@@ -1,8 +1,8 @@
+use crate::r1cs::expression::{Evaluable, Expression};
+use crate::r1cs::wire::Wire;
 use core::marker::PhantomData;
+use hashbrown::HashMap;
 use zkstd::common::{Field, TwistedEdwardsAffine};
-
-use crate::r1cs::expression::Expression;
-use crate::r1cs::wire_values::{Evaluable, WireValues};
 
 impl<F: Field, C: TwistedEdwardsAffine<Range = F>> Clone for EdwardsExpression<F, C> {
     fn clone(&self) -> Self {
@@ -34,7 +34,10 @@ impl<F: Field, C: TwistedEdwardsAffine<Range = F>> EdwardsExpression<F, C> {
 }
 
 impl<F: Field, C: TwistedEdwardsAffine<Range = F>> Evaluable<F, C> for EdwardsExpression<F, C> {
-    fn evaluate(&self, wire_values: &WireValues<F>) -> C {
-        C::from_raw_unchecked(self.x.evaluate(wire_values), self.y.evaluate(wire_values))
+    fn evaluate(&self, instance: &HashMap<Wire, F>, witness: &HashMap<Wire, F>) -> C {
+        C::from_raw_unchecked(
+            self.x.evaluate(instance, witness),
+            self.y.evaluate(instance, witness),
+        )
     }
 }
