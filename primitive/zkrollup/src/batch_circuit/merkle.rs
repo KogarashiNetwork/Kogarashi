@@ -2,7 +2,7 @@ use bls_12_381::Fr;
 use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
 use zksnarks::{plonk::wire::PrivateWire, Constraint};
-use zkstd::behave::Group;
+use zkstd::common::Group;
 use zkstd::common::{vec, Pairing, Vec};
 
 #[derive(Debug, PartialEq)]
@@ -36,7 +36,7 @@ impl<const N: usize> MerkleMembershipCircuit<N> {
 }
 
 fn hash<P: Pairing>(
-    composer: &mut ConstraintSystem<P>,
+    composer: &mut ConstraintSystem<P::JubjubAffine>,
     inputs: (PrivateWire, PrivateWire),
 ) -> PrivateWire {
     let sum = Constraint::default()
@@ -77,7 +77,7 @@ fn hash<P: Pairing>(
 }
 
 fn calculate_root<P: Pairing, const N: usize>(
-    composer: &mut ConstraintSystem<P>,
+    composer: &mut ConstraintSystem<P::JubjubAffine>,
     leaf: P::ScalarField,
     path: &[(P::ScalarField, P::ScalarField)],
     path_pos: &[u64],
@@ -109,14 +109,14 @@ fn calculate_root<P: Pairing, const N: usize>(
         let check = composer.append_logic_and(w1, w2, 256);
         composer.assert_equal_constant(check, 0, None);
 
-        prev = hash(composer, (left, right));
+        prev = hash::<P>(composer, (left, right));
     }
 
     Ok(prev)
 }
 
 pub(crate) fn check_membership<P: Pairing, const N: usize>(
-    composer: &mut ConstraintSystem<P>,
+    composer: &mut ConstraintSystem<P::JubjubAffine>,
     leaf: P::ScalarField,
     root: P::ScalarField,
     path: &[(P::ScalarField, P::ScalarField)],
@@ -131,8 +131,8 @@ pub(crate) fn check_membership<P: Pairing, const N: usize>(
     Ok(())
 }
 
-impl<const N: usize> Circuit<TatePairing> for MerkleMembershipCircuit<N> {
-    fn synthesize(&self, composer: &mut ConstraintSystem<TatePairing>) -> Result<(), Error> {
+impl<const N: usize> Circuit<JubjubAffine> for MerkleMembershipCircuit<N> {
+    fn synthesize(&self, composer: &mut ConstraintSystem<JubjubAffine>) -> Result<(), Error> {
         check_membership::<TatePairing, N>(
             composer,
             self.leaf,

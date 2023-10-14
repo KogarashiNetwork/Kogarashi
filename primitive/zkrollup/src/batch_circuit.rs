@@ -34,9 +34,9 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
 }
 
 impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
-    Circuit<P> for BatchCircuit<P, H, N, BATCH_SIZE>
+    Circuit<P::JubjubAffine> for BatchCircuit<P, H, N, BATCH_SIZE>
 {
-    fn synthesize(&self, composer: &mut ConstraintSystem<P>) -> Result<(), Error> {
+    fn synthesize(&self, composer: &mut ConstraintSystem<P::JubjubAffine>) -> Result<(), Error> {
         for RollupTransactionInfo {
             transaction,
             pre_root,
@@ -68,7 +68,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
                 &pre_receiver_proof.path_pos,
             )?;
 
-            check_signature(
+            check_signature::<P>(
                 composer,
                 t.sender_address.inner().into(),
                 *sig,

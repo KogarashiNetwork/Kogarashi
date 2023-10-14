@@ -1,9 +1,11 @@
-use zkstd::common::{Debug, Field};
+use zkstd::common::{Debug, TwistedEdwardsAffine};
 
+use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
-use crate::r1cs::constraint_system::ConstraintSystem;
 
-/// circuit implementation
-pub trait Circuit<F: Field>: Default + Debug {
-    fn synthesize(&self, composer: &mut ConstraintSystem<F>) -> Result<(), Error>;
+/// circuit trait
+pub trait Circuit<C: TwistedEdwardsAffine>: Default + Debug {
+    type ConstraintSystem: ConstraintSystem<C>;
+
+    fn synthesize(&self, composer: &mut Self::ConstraintSystem) -> Result<(), Error>;
 }

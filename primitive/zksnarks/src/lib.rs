@@ -3,11 +3,10 @@
 
 extern crate alloc;
 
-mod r1cs;
-
 pub mod circuit;
+pub mod constraint_system;
 pub mod error;
 pub use plonk::*;
-pub use r1cs::*;
 pub mod groth16;
 pub mod plonk;
+mod prover;

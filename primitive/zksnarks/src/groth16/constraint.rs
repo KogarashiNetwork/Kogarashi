@@ -1,5 +1,6 @@
-use crate::r1cs::expression::Expression;
-use crate::r1cs::wire::Wire;
+use super::expression::Expression;
+use super::wire::Wire;
+
 use hashbrown::HashMap;
 use zkstd::common::Field;
 

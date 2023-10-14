@@ -6,7 +6,7 @@ pub use group::*;
 #[macro_export]
 macro_rules! twisted_edwards_curve_operation {
     ($scalar:ident, $range:ident, $d:ident, $affine:ident, $extended:ident, $x:ident, $y:ident, $t:ident) => {
-        use zkstd::behave::*;
+        use zkstd::common::*;
         use zkstd::common::*;
 
         twisted_edwards_affine_group_operation!($affine, $extended, $range, $scalar, $x, $y);
@@ -50,6 +50,7 @@ macro_rules! twisted_edwards_curve_operation {
             ) -> Self::Extended {
                 Self::Projective { x, y, t, z }
             }
+
             fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self {
                 Self { x, y }
             }
@@ -61,6 +62,10 @@ macro_rules! twisted_edwards_curve_operation {
                 z: Self::Range,
             ) -> Self::Extended {
                 Self::Extended { x, y, t, z }
+            }
+
+            fn scalar_to_range(x: Self::Scalar) -> Self::Range {
+                x.into()
             }
         }
 

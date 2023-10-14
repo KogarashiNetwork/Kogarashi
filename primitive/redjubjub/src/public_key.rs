@@ -3,7 +3,7 @@ use super::hash::sapling_hash;
 use super::signature::Signature;
 
 use serde::{Deserialize, Serialize};
-use zkstd::behave::SigUtils;
+use zkstd::common::SigUtils;
 use zkstd::common::*;
 
 /// RedJubjub public key struct used for signature verification

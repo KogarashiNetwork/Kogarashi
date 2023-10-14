@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use zkstd::behave::SigUtils;
+use zkstd::common::SigUtils;
 use zkstd::common::*;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, Decode, Encode)]

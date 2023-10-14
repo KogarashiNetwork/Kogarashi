@@ -74,7 +74,7 @@ use frame_system::pallet_prelude::*;
 use poly_commit::PublicParameters;
 use zero_plonk::prelude::Compiler;
 use zksnarks::plonk::PlonkParams;
-use zkstd::behave::Group;
+use zkstd::common::Group;
 use zkstd::common::{Pairing, Vec};
 
 #[frame_support::pallet]
@@ -87,7 +87,7 @@ pub mod pallet {
     pub trait Config: frame_system::Config {
         type P: Pairing;
         /// The circuit customized by developer
-        type CustomCircuit: Circuit<Self::P>;
+        type CustomCircuit: Circuit<<<Self as pallet::Config>::P as Pairing>::JubjubAffine>;
 
         /// The overarching event type
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;

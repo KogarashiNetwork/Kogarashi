@@ -51,16 +51,10 @@ impl<P: Pairing> PlonkParams<P> {
         &self,
         poly: &Coefficients<P::ScalarField>,
     ) -> Result<Commitment<P::G1Affine>, PlonkError> {
-        self.check_commit_degree_is_within_bounds(poly.degree())?;
-
-        Ok(self.commitment_key.commit(poly))
-    }
-
-    fn check_commit_degree_is_within_bounds(&self, poly_degree: usize) -> Result<(), PlonkError> {
-        match (poly_degree == 0, poly_degree > self.max_degree()) {
-            (true, _) => Err(PlonkError::CoefficientsDegreeIsZero),
-            (false, true) => Err(PlonkError::CoefficientsDegreeTooLarge),
-            (false, false) => Ok(()),
+        if poly.degree() > self.max_degree() {
+            Err(PlonkError::CoefficientsDegreeTooLarge)
+        } else {
+            Ok(self.commitment_key.commit(poly))
         }
     }
 

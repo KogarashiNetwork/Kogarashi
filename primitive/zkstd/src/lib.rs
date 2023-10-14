@@ -17,6 +17,6 @@
 #![doc = include_str!("../README.md")]
 
 pub mod arithmetic;
-pub mod behave;
 pub mod common;
-pub mod dress;
+pub mod macros;
+mod traits;

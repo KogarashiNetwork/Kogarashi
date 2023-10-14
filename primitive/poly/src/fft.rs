@@ -299,8 +299,8 @@ mod tests {
     use super::Fft;
     use bls_12_381::Fr;
     use rand_core::OsRng;
-    use zkstd::behave::{Group, PrimeField};
     use zkstd::common::Vec;
+    use zkstd::common::{Group, PrimeField};
 
     fn arb_poly(k: u32) -> Vec<Fr> {
         (0..(1 << k))

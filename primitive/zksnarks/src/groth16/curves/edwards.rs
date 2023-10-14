@@ -1,5 +1,5 @@
-use crate::r1cs::expression::{Evaluable, Expression};
-use crate::r1cs::wire::Wire;
+use crate::groth16::expression::{Evaluable, Expression};
+use crate::groth16::wire::Wire;
 use core::marker::PhantomData;
 use hashbrown::HashMap;
 use zkstd::common::{Field, TwistedEdwardsAffine};

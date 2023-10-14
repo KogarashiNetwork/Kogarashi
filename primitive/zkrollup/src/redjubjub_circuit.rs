@@ -1,13 +1,12 @@
 use ec_pairing::TatePairing;
 use jub_jub::JubjubAffine;
-use zero_plonk::prelude::*;
-use zkstd::behave::Ring;
-use zkstd::common::{CurveGroup, Pairing, SigUtils};
-
 use red_jubjub::{
     constant::{sapling_base_point, sapling_redjubjub_cofactor},
     Signature,
 };
+use zero_plonk::prelude::*;
+use zkstd::common::Ring;
+use zkstd::common::{CurveGroup, Pairing, SigUtils};
 
 /// Confidential transfer circuit
 #[derive(Debug, PartialEq, Default)]
@@ -31,7 +30,7 @@ impl RedJubjubCircuit {
 }
 
 pub(crate) fn check_signature<P: Pairing>(
-    composer: &mut ConstraintSystem<P>,
+    composer: &mut ConstraintSystem<P::JubjubAffine>,
     public_key: P::JubjubAffine,
     signature: Signature,
     msg_hash: P::JubjubScalar,
@@ -66,9 +65,9 @@ pub(crate) fn check_signature<P: Pairing>(
     Ok(())
 }
 
-impl Circuit<TatePairing> for RedJubjubCircuit {
-    fn synthesize(&self, composer: &mut ConstraintSystem<TatePairing>) -> Result<(), Error> {
-        check_signature(composer, self.public_key, self.signature, self.msg_hash)
+impl Circuit<JubjubAffine> for RedJubjubCircuit {
+    fn synthesize(&self, composer: &mut ConstraintSystem<JubjubAffine>) -> Result<(), Error> {
+        check_signature::<TatePairing>(composer, self.public_key, self.signature, self.msg_hash)
     }
 }
 

@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! bls12_g2_pairing {
     ($g2_projective:ident, $g2_affine:ident, $pairng_coeff:ident, $g2_pairing_affine:ident, $range_field:ident) => {
-        use zkstd::behave::{G2Pairing, PairingRange, ParityCmp};
+        use zkstd::common::{G2Pairing, PairingRange, ParityCmp};
 
         impl ParityCmp for $pairng_coeff {}
         impl ParityCmp for $g2_pairing_affine {}

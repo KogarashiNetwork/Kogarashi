@@ -1,4 +1,3 @@
-use ec_pairing::TatePairing;
 use jub_jub::{Fp as JubJubScalar, JubjubAffine};
 use she_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
 use zero_plonk::prelude::*;
@@ -69,8 +68,8 @@ impl Default for ConfidentialTransferCircuit {
     }
 }
 
-impl Circuit<TatePairing> for ConfidentialTransferCircuit {
-    fn synthesize(&self, composer: &mut ConstraintSystem<TatePairing>) -> Result<(), Error> {
+impl Circuit<JubjubAffine> for ConfidentialTransferCircuit {
+    fn synthesize(&self, composer: &mut ConstraintSystem<JubjubAffine>) -> Result<(), Error> {
         let (alice_t_balance, alice_s_balance) = self.sender_encrypted_balance.get();
         let (alice_t_transfer_amount, alice_s_transfer_amount) =
             self.sender_encrypted_transfer_amount.get();

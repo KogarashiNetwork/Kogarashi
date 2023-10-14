@@ -3,7 +3,7 @@ use bls_12_381::Fr;
 use serde::{Deserialize, Serialize};
 use zkstd::arithmetic::bits_256::*;
 use zkstd::common::*;
-use zkstd::dress::field::*;
+use zkstd::macros::field::*;
 
 const MODULUS: [u64; 4] = [
     0xd0970e5ed6f72cb7,

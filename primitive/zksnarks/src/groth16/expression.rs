@@ -1,5 +1,5 @@
-use crate::r1cs::util::join;
-use crate::r1cs::wire::{Index, Wire};
+use super::util::join;
+use super::wire::{Index, Wire};
 use alloc::format;
 #[cfg(not(feature = "std"))]
 use alloc::string::String;

@@ -1,18 +1,6 @@
 #[cfg(not(feature = "std"))]
 use alloc::string::String;
 use core::borrow::Borrow;
-use zkstd::common::Vec;
-
-/// Like SliceConcatExt::concat, but works in stable with no_std.
-/// See https://github.com/rust-lang/rust/issues/27747
-pub fn concat<T: Clone, V: Borrow<[T]>>(vecs: &[V]) -> Vec<T> {
-    let size = vecs.iter().map(|slice| slice.borrow().len()).sum();
-    let mut result = Vec::with_capacity(size);
-    for v in vecs {
-        result.extend_from_slice(v.borrow())
-    }
-    result
-}
 
 /// Like SliceConcatExt::join for strings, but works in stable with no_std.
 /// See https://github.com/rust-lang/rust/issues/27747

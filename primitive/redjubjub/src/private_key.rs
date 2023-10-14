@@ -4,10 +4,7 @@ use super::signature::Signature;
 use crate::constant::sapling_base_point;
 
 use rand_core::RngCore;
-use zkstd::{
-    behave::{FftField, SigUtils},
-    common::Pairing,
-};
+use zkstd::common::{FftField, Pairing, SigUtils};
 
 /// RedJubjub secret key struct used for signing transactions
 #[derive(Clone, Copy, Debug, PartialEq)]

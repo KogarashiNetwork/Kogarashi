@@ -130,6 +130,16 @@ impl<F: FftField> Coefficients<F> {
         tau.pow(n) - F::one()
     }
 
+    /// if hiding degree = 1: (b2*X^(n+1) + b1*X^n - b2*X - b1) + witnesses
+    /// if hiding degree = 2: (b3*X^(n+2) + b2*X^(n+1) + b1*X^n - b3*X^2 - b2*X
+    pub fn blind<R: RngCore>(&mut self, hiding_degree: usize, rng: &mut R) {
+        for i in 0..hiding_degree + 1 {
+            let blinding_scalar = F::random(&mut *rng);
+            self.0[i] -= blinding_scalar;
+            self.0.push(blinding_scalar);
+        }
+    }
+
     pub fn format_degree(mut self) -> Self {
         while self.0.last().map_or(false, |c| c == &F::zero()) {
             self.0.pop();
@@ -234,7 +244,7 @@ mod tests {
     use super::Coefficients;
     use bls_12_381::Fr;
     use rand_core::OsRng;
-    use zkstd::behave::{Group, PrimeField};
+    use zkstd::common::{Group, PrimeField};
 
     fn arb_fr() -> Fr {
         Fr::random(OsRng)
