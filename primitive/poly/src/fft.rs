@@ -129,11 +129,12 @@ impl<F: FftField> Fft<F> {
     }
 
     /// perform classic inverse discrete fourier transform
-    pub fn idft(&self, points: &mut PointsValue<F>) -> Coefficients<F> {
-        self.prepare_fft(&mut points.0);
-        classic_fft_arithmetic(&mut points.0, self.n, 1, &self.inv_twiddle_factors);
-        points.0.iter_mut().for_each(|coeff| *coeff *= self.n_inv);
-        Coefficients::new(points.0.clone())
+    pub fn idft(&self, points: PointsValue<F>) -> Coefficients<F> {
+        let mut coeffs = points.0.clone();
+        self.prepare_fft(&mut coeffs);
+        classic_fft_arithmetic(&mut coeffs, self.n, 1, &self.inv_twiddle_factors);
+        coeffs.iter_mut().for_each(|coeff| *coeff *= self.n_inv);
+        Coefficients::new(coeffs.clone())
     }
 
     /// perform discrete fourier transform on coset
@@ -147,7 +148,7 @@ impl<F: FftField> Fft<F> {
     }
 
     /// perform discrete fourier transform on coset
-    pub fn coset_idft(&self, points: &mut PointsValue<F>) -> Coefficients<F> {
+    pub fn coset_idft(&self, points: PointsValue<F>) -> Coefficients<F> {
         let mut points = self.idft(points);
         points
             .0
@@ -169,15 +170,14 @@ impl<F: FftField> Fft<F> {
     pub fn poly_mul(&self, rhs: Coefficients<F>, lhs: Coefficients<F>) -> Coefficients<F> {
         let rhs = self.dft(rhs);
         let lhs = self.dft(lhs);
-        let mut mul_poly = PointsValue::new(
+        let mul_poly = PointsValue::new(
             rhs.0
                 .iter()
                 .zip(lhs.0.iter())
                 .map(|(a, b)| *a * *b)
                 .collect(),
         );
-        self.idft(&mut mul_poly);
-        Coefficients::new(mul_poly.0)
+        self.idft(mul_poly)
     }
 
     /// Evaluate all the lagrange polynomials defined by this domain at the
@@ -336,8 +336,8 @@ mod tests {
         let poly_b = poly_a.clone();
         let classic_fft = Fft::new(10);
 
-        let mut evals_a = classic_fft.dft(poly_a);
-        let poly_a = classic_fft.idft(&mut evals_a);
+        let evals_a = classic_fft.dft(poly_a);
+        let poly_a = classic_fft.idft(evals_a);
 
         assert_eq!(poly_a, poly_b)
     }
@@ -358,8 +358,8 @@ mod tests {
 
         let evals_a = fft.dft(poly_a);
         let evals_b = fft.dft(poly_b);
-        let mut poly_f = point_mutiply(evals_a, evals_b);
-        let poly_f = fft.idft(&mut poly_f);
+        let poly_f = point_mutiply(evals_a, evals_b);
+        let poly_f = fft.idft(poly_f);
 
         let poly_i = fft.poly_mul(poly_g, poly_h);
 
