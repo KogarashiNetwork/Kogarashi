@@ -9,3 +9,4 @@ pub mod error;
 pub use plonk::*;
 pub mod groth16;
 pub mod plonk;
+mod prover;
