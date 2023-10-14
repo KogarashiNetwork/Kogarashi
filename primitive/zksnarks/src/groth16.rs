@@ -41,15 +41,15 @@ mod tests {
             }
         }
 
-        impl Circuit<BlsScalar> for DummyCircuit<BlsScalar> {
-            fn synthesize(&self, composer: &mut ConstraintSystem<BlsScalar>) -> Result<(), Error> {
+        impl Circuit<JubjubAffine> for DummyCircuit<BlsScalar> {
+            fn synthesize(
+                &self,
+                composer: &mut ConstraintSystem<JubjubAffine>,
+            ) -> Result<(), Error> {
                 let x = composer.alloc_private(self.x);
                 let y = composer.alloc_private(self.y);
 
-                composer.append_edwards_expression::<JubjubAffine>(
-                    Expression::from(x),
-                    Expression::from(y),
-                );
+                composer.append_edwards_expression(Expression::from(x), Expression::from(y));
 
                 Ok(())
             }
@@ -64,7 +64,7 @@ mod tests {
         )
         .unwrap();
 
-        let builder = ConstraintSystem::<BlsScalar>::new();
+        let builder = ConstraintSystem::<JubjubAffine>::new();
         let circuit = DummyCircuit::new(x, y);
 
         let mut prover = builder.build(&circuit);

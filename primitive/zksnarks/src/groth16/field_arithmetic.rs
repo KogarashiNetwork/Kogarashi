@@ -2,11 +2,15 @@
 
 use super::constraint_system::ConstraintSystem;
 use super::expression::Expression;
-use zkstd::common::Field;
+use zkstd::common::{Group, TwistedEdwardsAffine};
 
-impl<F: Field> ConstraintSystem<F> {
+impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
     /// The product of two `Expression`s `x` and `y`, i.e. `x * y`.
-    pub fn product(&mut self, x: &Expression<F>, y: &Expression<F>) -> Expression<F> {
+    pub fn product(
+        &mut self,
+        x: &Expression<C::Range>,
+        y: &Expression<C::Range>,
+    ) -> Expression<C::Range> {
         if let Some(c) = x.as_constant() {
             return y * c;
         }
@@ -25,7 +29,7 @@ impl<F: Field> ConstraintSystem<F> {
 
     /// Returns `1 / x`, assuming `x` is non-zero. If `x` is zero, the gadget will not be
     /// satisfiable.
-    pub fn inverse(&mut self, x: &Expression<F>) -> Expression<F> {
+    pub fn inverse(&mut self, x: &Expression<C::Range>) -> Expression<C::Range> {
         let x_value = x.evaluate(&self.instance, &self.witness);
         let inverse_value = x_value.invert().expect("Can't find an inverse element");
         let x_inv = self.alloc_public(inverse_value);

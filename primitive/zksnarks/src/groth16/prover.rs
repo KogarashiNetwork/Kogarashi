@@ -27,6 +27,7 @@ mod tests {
     use crate::groth16::constraint_system::ConstraintSystem;
     use crate::groth16::expression::Expression;
     use bls_12_381::Fr as BlsScalar;
+    use jub_jub::JubjubAffine;
     use zkstd::common::Field;
 
     #[test]
@@ -49,8 +50,11 @@ mod tests {
             }
         }
 
-        impl Circuit<BlsScalar> for DummyCircuit<BlsScalar> {
-            fn synthesize(&self, composer: &mut ConstraintSystem<BlsScalar>) -> Result<(), Error> {
+        impl Circuit<JubjubAffine> for DummyCircuit<BlsScalar> {
+            fn synthesize(
+                &self,
+                composer: &mut ConstraintSystem<JubjubAffine>,
+            ) -> Result<(), Error> {
                 let (x, y) = (composer.alloc_public(self.x), composer.alloc_public(self.y));
                 composer.assert_equal(&Expression::from(x), &Expression::from(y));
 
@@ -58,7 +62,7 @@ mod tests {
             }
         }
 
-        let builder = ConstraintSystem::<BlsScalar>::new();
+        let builder = ConstraintSystem::<JubjubAffine>::new();
         let circuit = DummyCircuit::new(43u64.into(), 43u64.into());
 
         let mut prover = builder.build(&circuit);
@@ -86,8 +90,11 @@ mod tests {
             }
         }
 
-        impl Circuit<BlsScalar> for DummyCircuit<BlsScalar> {
-            fn synthesize(&self, composer: &mut ConstraintSystem<BlsScalar>) -> Result<(), Error> {
+        impl Circuit<JubjubAffine> for DummyCircuit<BlsScalar> {
+            fn synthesize(
+                &self,
+                composer: &mut ConstraintSystem<JubjubAffine>,
+            ) -> Result<(), Error> {
                 let (x, y) = (composer.alloc_public(self.x), composer.alloc_public(self.y));
                 composer.assert_equal(&Expression::from(x), &Expression::from(y));
 
@@ -95,7 +102,7 @@ mod tests {
             }
         }
 
-        let builder = ConstraintSystem::<BlsScalar>::new();
+        let builder = ConstraintSystem::<JubjubAffine>::new();
         let circuit = DummyCircuit::new(42u64.into(), 43u64.into());
 
         let mut prover = builder.build(&circuit);
