@@ -147,7 +147,7 @@ impl<F: FftField> Coefficients<F> {
         tau.pow(n) - F::one()
     }
 
-    fn format_degree(mut self) -> Self {
+    pub(crate) fn format_degree(mut self) -> Self {
         while self.0.last().map_or(false, |c| c == &F::zero()) {
             self.0.pop();
         }
