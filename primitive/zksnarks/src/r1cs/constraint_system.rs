@@ -1,21 +1,12 @@
+use crate::circuit::Circuit;
 use crate::r1cs::constraint::Constraint;
 use crate::r1cs::curves::EdwardsExpression;
-use crate::r1cs::error::R1CSError;
 use crate::r1cs::expression::Expression;
 use crate::r1cs::prover::Prover;
 use crate::r1cs::wire::Index;
 use crate::r1cs::wire::Wire;
-use core::fmt::Debug;
 use hashbrown::HashMap;
 use zkstd::common::{Field, TwistedEdwardsAffine, Vec};
-
-/// Circuit implementation that can be proved by a Composer
-///
-/// The default implementation will be used to generate the proving arguments.
-pub trait Circuit<F: Field>: Default + Debug {
-    /// Circuit definition
-    fn synthesize(&self, composer: &mut ConstraintSystem<F>) -> Result<(), R1CSError>;
-}
 
 pub struct ConstraintSystem<F: Field> {
     constraints: Vec<Constraint<F>>,

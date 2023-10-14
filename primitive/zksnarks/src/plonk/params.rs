@@ -1,3 +1,5 @@
+use super::error::PlonkError;
+
 use poly_commit::{
     powers_of, Coefficients, Commitment, CommitmentKey, EvaluationKey, PublicParameters, Witness,
 };
@@ -134,10 +136,4 @@ impl<P: Pairing> PlonkParams<P> {
 
         numerator.divide(point)
     }
-}
-
-#[derive(Debug)]
-pub enum PlonkError {
-    CoefficientsDegreeIsZero,
-    CoefficientsDegreeTooLarge,
 }

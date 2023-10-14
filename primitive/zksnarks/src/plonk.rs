@@ -1,9 +1,10 @@
-pub mod key;
+mod constraint;
 mod params;
 mod proof;
 mod transcript;
 
-mod constraint;
+pub mod error;
+pub mod key;
 pub mod wire;
 
 pub use constraint::*;

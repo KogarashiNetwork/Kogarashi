@@ -58,42 +58,18 @@ impl<F: FftField> PointsValue<F> {
     pub fn new(coeffs: Vec<F>) -> Self {
         Self(coeffs)
     }
+
+    pub fn format_degree(mut self) -> Self {
+        while self.0.last().map_or(false, |c| c == &F::zero()) {
+            self.0.pop();
+        }
+        self
+    }
 }
 
 impl<F: FftField> Coefficients<F> {
     pub fn new(coeffs: Vec<F>) -> Self {
-        Self(coeffs)
-    }
-
-    #[allow(clippy::needless_borrow)]
-    pub fn rand<R: RngCore>(d: usize, mut rng: &mut R) -> Self {
-        let mut random_coeffs = Vec::with_capacity(d + 1);
-        for _ in 0..=d {
-            random_coeffs.push(F::random(&mut rng));
-        }
-        Self::from_vec(random_coeffs)
-    }
-
-    /// Constructs a new polynomial from a list of coefficients.
-    ///
-    /// # Panics
-    /// When the length of the coeffs is zero.
-    pub fn from_vec(coeffs: Vec<F>) -> Self {
-        let mut result = Self(coeffs);
-        // While there are zeros at the end of the coefficient vector, pop them
-        // off.
-        result.truncate_leading_zeros();
-        // Check that either the coefficients vec is empty or that the last
-        // coeff is non-zero.
-        assert!(result.0.last().map_or(true, |coeff| coeff != &F::zero()));
-
-        result
-    }
-
-    fn truncate_leading_zeros(&mut self) {
-        while self.0.last().map_or(false, |c| c == &F::zero()) {
-            self.0.pop();
-        }
+        Self(coeffs).format_degree()
     }
 
     // polynomial evaluation domain
@@ -154,7 +130,7 @@ impl<F: FftField> Coefficients<F> {
         tau.pow(n) - F::one()
     }
 
-    fn format_degree(mut self) -> Self {
+    pub fn format_degree(mut self) -> Self {
         while self.0.last().map_or(false, |c| c == &F::zero()) {
             self.0.pop();
         }
@@ -206,7 +182,7 @@ impl<F: FftField> Add for Coefficients<F> {
         } else {
             (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
         };
-        Self(left.zip(right).map(|(a, b)| *a + *b).collect()).format_degree()
+        Self::new(left.zip(right).map(|(a, b)| *a + *b).collect())
     }
 }
 
@@ -220,7 +196,7 @@ impl<'a, 'b, F: FftField> Add<&'a Coefficients<F>> for &'b Coefficients<F> {
         } else {
             (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
         };
-        Coefficients(left.zip(right).map(|(a, b)| *a + *b).collect()).format_degree()
+        Coefficients::new(left.zip(right).map(|(a, b)| *a + *b).collect())
     }
 }
 
@@ -234,7 +210,7 @@ impl<F: FftField> Sub for Coefficients<F> {
         } else {
             (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
         };
-        Self(left.zip(right).map(|(a, b)| *a - *b).collect()).format_degree()
+        Self::new(left.zip(right).map(|(a, b)| *a - *b).collect())
     }
 }
 
@@ -242,7 +218,7 @@ impl<'a, 'b, F: FftField> Mul<&'a F> for &'b Coefficients<F> {
     type Output = Coefficients<F>;
 
     fn mul(self, scalar: &'a F) -> Coefficients<F> {
-        Coefficients(self.0.iter().map(|coeff| *coeff * scalar).collect())
+        Coefficients::new(self.0.iter().map(|coeff| *coeff * scalar).collect())
     }
 }
 

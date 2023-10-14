@@ -22,8 +22,9 @@ impl<F: Field> Prover<F> {
 
 #[cfg(test)]
 mod tests {
-    use crate::r1cs::constraint_system::{Circuit, ConstraintSystem};
-    use crate::r1cs::error::R1CSError;
+    use crate::circuit::Circuit;
+    use crate::error::Error;
+    use crate::r1cs::constraint_system::ConstraintSystem;
     use crate::r1cs::expression::Expression;
     use bls_12_381::Fr as BlsScalar;
     use zkstd::common::Field;
@@ -49,10 +50,7 @@ mod tests {
         }
 
         impl Circuit<BlsScalar> for DummyCircuit<BlsScalar> {
-            fn synthesize(
-                &self,
-                composer: &mut ConstraintSystem<BlsScalar>,
-            ) -> Result<(), R1CSError> {
+            fn synthesize(&self, composer: &mut ConstraintSystem<BlsScalar>) -> Result<(), Error> {
                 let (x, y) = (composer.alloc_public(self.x), composer.alloc_public(self.y));
                 composer.assert_equal(&Expression::from(x), &Expression::from(y));
 
@@ -89,10 +87,7 @@ mod tests {
         }
 
         impl Circuit<BlsScalar> for DummyCircuit<BlsScalar> {
-            fn synthesize(
-                &self,
-                composer: &mut ConstraintSystem<BlsScalar>,
-            ) -> Result<(), R1CSError> {
+            fn synthesize(&self, composer: &mut ConstraintSystem<BlsScalar>) -> Result<(), Error> {
                 let (x, y) = (composer.alloc_public(self.x), composer.alloc_public(self.y));
                 composer.assert_equal(&Expression::from(x), &Expression::from(y));
 
