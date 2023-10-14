@@ -121,10 +121,11 @@ impl<F: FftField> Fft<F> {
     }
 
     /// perform discrete fourier transform
-    pub fn dft(&self, coeffs: &mut Coefficients<F>) -> PointsValue<F> {
-        self.prepare_fft(&mut coeffs.0);
-        classic_fft_arithmetic(&mut coeffs.0, self.n, 1, &self.twiddle_factors);
-        PointsValue::new(coeffs.0.clone())
+    pub fn dft(&self, coeffs: Coefficients<F>) -> PointsValue<F> {
+        let mut evals = coeffs.0.clone();
+        self.prepare_fft(&mut evals);
+        classic_fft_arithmetic(&mut evals, self.n, 1, &self.twiddle_factors);
+        PointsValue::new(evals.clone())
     }
 
     /// perform classic inverse discrete fourier transform
@@ -136,7 +137,7 @@ impl<F: FftField> Fft<F> {
     }
 
     /// perform discrete fourier transform on coset
-    pub fn coset_dft(&self, coeffs: &mut Coefficients<F>) -> PointsValue<F> {
+    pub fn coset_dft(&self, mut coeffs: Coefficients<F>) -> PointsValue<F> {
         coeffs
             .0
             .iter_mut()
@@ -165,9 +166,9 @@ impl<F: FftField> Fft<F> {
     }
 
     /// polynomial multiplication
-    pub fn poly_mul(&self, mut rhs: Coefficients<F>, mut lhs: Coefficients<F>) -> Coefficients<F> {
-        self.dft(&mut rhs);
-        self.dft(&mut lhs);
+    pub fn poly_mul(&self, rhs: Coefficients<F>, lhs: Coefficients<F>) -> Coefficients<F> {
+        let rhs = self.dft(rhs);
+        let lhs = self.dft(lhs);
         let mut mul_poly = PointsValue::new(
             rhs.0
                 .iter()
@@ -331,11 +332,11 @@ mod tests {
     #[test]
     fn fft_transformation_test() {
         let coeffs = arb_poly(10);
-        let mut poly_a = Coefficients(coeffs);
+        let poly_a = Coefficients(coeffs);
         let poly_b = poly_a.clone();
         let classic_fft = Fft::new(10);
 
-        let mut evals_a = classic_fft.dft(&mut poly_a);
+        let mut evals_a = classic_fft.dft(poly_a);
         let poly_a = classic_fft.idft(&mut evals_a);
 
         assert_eq!(poly_a, poly_b)
@@ -348,15 +349,15 @@ mod tests {
         let fft = Fft::new(5);
         let poly_c = coeffs_a.clone();
         let poly_d = coeffs_b.clone();
-        let mut poly_a = Coefficients(coeffs_a);
-        let mut poly_b = Coefficients(coeffs_b);
+        let poly_a = Coefficients(coeffs_a);
+        let poly_b = Coefficients(coeffs_b);
         let poly_g = poly_a.clone();
         let poly_h = poly_b.clone();
 
         let poly_e = Coefficients::new(naive_multiply(poly_c, poly_d));
 
-        let evals_a = fft.dft(&mut poly_a);
-        let evals_b = fft.dft(&mut poly_b);
+        let evals_a = fft.dft(poly_a);
+        let evals_b = fft.dft(poly_b);
         let mut poly_f = point_mutiply(evals_a, evals_b);
         let poly_f = fft.idft(&mut poly_f);
 
