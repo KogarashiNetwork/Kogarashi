@@ -74,18 +74,11 @@ impl<F: FftField> Coefficients<F> {
         Self::from_vec(random_coeffs)
     }
 
-    /// Constructs a new polynomial from a list of coefficients.
-    ///
-    /// # Panics
-    /// When the length of the coeffs is zero.
+    /// panics if the length of the coeffs is zero.
     pub fn from_vec(coeffs: Vec<F>) -> Self {
         let mut result = Self(coeffs);
-        // While there are zeros at the end of the coefficient vector, pop them
-        // off.
         result.truncate_leading_zeros();
-        // Check that either the coefficients vec is empty or that the last
-        // coeff is non-zero.
-        assert!(result.0.last().map_or(true, |coeff| coeff != &F::zero()));
+        assert!(result.0.len() != 0);
 
         result
     }

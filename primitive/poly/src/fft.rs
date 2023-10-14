@@ -121,20 +121,22 @@ impl<F: FftField> Fft<F> {
     }
 
     /// perform discrete fourier transform
-    pub fn dft(&self, coeffs: &mut Coefficients<F>) {
-        self.prepare_fft(coeffs);
-        classic_fft_arithmetic(&mut coeffs.0, self.n, 1, &self.twiddle_factors)
+    pub fn dft(&self, coeffs: &mut Coefficients<F>) -> PointsValue<F> {
+        self.prepare_fft(&mut coeffs.0);
+        classic_fft_arithmetic(&mut coeffs.0, self.n, 1, &self.twiddle_factors);
+        PointsValue::new(coeffs.0.clone())
     }
 
     /// perform classic inverse discrete fourier transform
-    pub fn idft(&self, coeffs: &mut Coefficients<F>) {
-        self.prepare_fft(coeffs);
-        classic_fft_arithmetic(&mut coeffs.0, self.n, 1, &self.inv_twiddle_factors);
-        coeffs.0.iter_mut().for_each(|coeff| *coeff *= self.n_inv)
+    pub fn idft(&self, points: &mut PointsValue<F>) -> Coefficients<F> {
+        self.prepare_fft(&mut points.0);
+        classic_fft_arithmetic(&mut points.0, self.n, 1, &self.inv_twiddle_factors);
+        points.0.iter_mut().for_each(|coeff| *coeff *= self.n_inv);
+        Coefficients::new(points.0.clone())
     }
 
     /// perform discrete fourier transform on coset
-    pub fn coset_dft(&self, coeffs: &mut Coefficients<F>) {
+    pub fn coset_dft(&self, coeffs: &mut Coefficients<F>) -> PointsValue<F> {
         coeffs
             .0
             .iter_mut()
@@ -144,28 +146,29 @@ impl<F: FftField> Fft<F> {
     }
 
     /// perform discrete fourier transform on coset
-    pub fn coset_idft(&self, coeffs: &mut Coefficients<F>) {
-        self.idft(coeffs);
+    pub fn coset_idft(&self, coeffs: &mut PointsValue<F>) -> Coefficients<F> {
+        let mut coeffs = self.idft(coeffs);
         coeffs
             .0
             .iter_mut()
             .zip(self.inv_cosets.iter())
-            .for_each(|(coeff, inv_coset)| *coeff *= *inv_coset)
+            .for_each(|(coeff, inv_coset)| *coeff *= *inv_coset);
+        Coefficients::new(coeffs.0)
     }
 
     /// resize polynomial and bit reverse swap
-    fn prepare_fft(&self, coeffs: &mut Coefficients<F>) {
-        coeffs.0.resize(self.n, F::zero());
+    fn prepare_fft(&self, coeffs: &mut Vec<F>) {
+        coeffs.resize(self.n, F::zero());
         self.bit_reverse
             .iter()
-            .for_each(|(i, ri)| coeffs.0.swap(*ri, *i));
+            .for_each(|(i, ri)| coeffs.swap(*ri, *i));
     }
 
     /// polynomial multiplication
     pub fn poly_mul(&self, mut rhs: Coefficients<F>, mut lhs: Coefficients<F>) -> Coefficients<F> {
         self.dft(&mut rhs);
         self.dft(&mut lhs);
-        let mut mul_poly = Coefficients::new(
+        let mut mul_poly = PointsValue::new(
             rhs.0
                 .iter()
                 .zip(lhs.0.iter())
@@ -173,7 +176,7 @@ impl<F: FftField> Fft<F> {
                 .collect(),
         );
         self.idft(&mut mul_poly);
-        mul_poly
+        Coefficients::new(mul_poly.0)
     }
 
     #[allow(clippy::needless_range_loop)]
@@ -291,6 +294,7 @@ fn butterfly_arithmetic<F: FftField>(
 #[cfg(test)]
 mod tests {
     use crate::poly::Coefficients;
+    use crate::PointsValue;
 
     use super::Fft;
     use bls_12_381::Fr;
@@ -315,9 +319,9 @@ mod tests {
         c
     }
 
-    fn point_mutiply<F: PrimeField>(a: Coefficients<F>, b: Coefficients<F>) -> Coefficients<F> {
+    fn point_mutiply<F: PrimeField>(a: PointsValue<F>, b: PointsValue<F>) -> PointsValue<F> {
         assert_eq!(a.0.len(), b.0.len());
-        Coefficients(
+        PointsValue(
             a.0.iter()
                 .zip(b.0.iter())
                 .map(|(coeff_a, coeff_b)| *coeff_a * *coeff_b)
@@ -332,8 +336,8 @@ mod tests {
         let poly_b = poly_a.clone();
         let classic_fft = Fft::new(10);
 
-        classic_fft.dft(&mut poly_a);
-        classic_fft.idft(&mut poly_a);
+        let mut evals_a = classic_fft.dft(&mut poly_a);
+        let poly_a = classic_fft.idft(&mut evals_a);
 
         assert_eq!(poly_a, poly_b)
     }
@@ -352,10 +356,10 @@ mod tests {
 
         let poly_e = Coefficients(naive_multiply(poly_c, poly_d));
 
-        fft.dft(&mut poly_a);
-        fft.dft(&mut poly_b);
-        let mut poly_f = point_mutiply(poly_a, poly_b);
-        fft.idft(&mut poly_f);
+        let evals_a = fft.dft(&mut poly_a);
+        let evals_b = fft.dft(&mut poly_b);
+        let mut poly_f = point_mutiply(evals_a, evals_b);
+        let poly_f = fft.idft(&mut poly_f);
 
         let poly_i = fft.poly_mul(poly_g, poly_h);
 
