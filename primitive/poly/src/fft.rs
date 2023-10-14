@@ -132,9 +132,6 @@ impl<F: FftField> Fft<F> {
         self.prepare_fft(&mut points.0);
         classic_fft_arithmetic(&mut points.0, self.n, 1, &self.inv_twiddle_factors);
         points.0.iter_mut().for_each(|coeff| *coeff *= self.n_inv);
-        while points.0.last().map_or(false, |c| c == &F::zero()) {
-            points.0.pop();
-        }
         Coefficients::new(points.0.clone())
     }
 
@@ -156,9 +153,6 @@ impl<F: FftField> Fft<F> {
             .iter_mut()
             .zip(self.inv_cosets.iter())
             .for_each(|(coeff, inv_coset)| *coeff *= *inv_coset);
-        while points.0.last().map_or(false, |c| c == &F::zero()) {
-            points.0.pop();
-        }
         Coefficients::new(points.0)
     }
 
@@ -359,14 +353,14 @@ mod tests {
         let poly_g = poly_a.clone();
         let poly_h = poly_b.clone();
 
-        let poly_e = Coefficients(naive_multiply(poly_c, poly_d)).format_degree();
+        let poly_e = Coefficients::new(naive_multiply(poly_c, poly_d));
 
         let evals_a = fft.dft(&mut poly_a);
         let evals_b = fft.dft(&mut poly_b);
         let mut poly_f = point_mutiply(evals_a, evals_b);
         let poly_f = fft.idft(&mut poly_f);
 
-        let poly_i = fft.poly_mul(poly_g, poly_h).format_degree();
+        let poly_i = fft.poly_mul(poly_g, poly_h);
 
         assert_eq!(poly_e, poly_f);
         assert_eq!(poly_e, poly_i)

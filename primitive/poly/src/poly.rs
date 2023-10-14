@@ -62,7 +62,7 @@ impl<F: FftField> PointsValue<F> {
 
 impl<F: FftField> Coefficients<F> {
     pub fn new(coeffs: Vec<F>) -> Self {
-        Self(coeffs)
+        Self(coeffs).format_degree()
     }
 
     // polynomial evaluation domain
@@ -175,7 +175,7 @@ impl<F: FftField> Add for Coefficients<F> {
         } else {
             (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
         };
-        Self(left.zip(right).map(|(a, b)| *a + *b).collect()).format_degree()
+        Self::new(left.zip(right).map(|(a, b)| *a + *b).collect())
     }
 }
 
@@ -189,7 +189,7 @@ impl<'a, 'b, F: FftField> Add<&'a Coefficients<F>> for &'b Coefficients<F> {
         } else {
             (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
         };
-        Self(left.zip(right).map(|(a, b)| *a + *b).collect()).format_degree()
+        Coefficients::new(left.zip(right).map(|(a, b)| *a + *b).collect())
     }
 }
 
@@ -203,7 +203,7 @@ impl<F: FftField> Sub for Coefficients<F> {
         } else {
             (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
         };
-        Self(left.zip(right).map(|(a, b)| *a - *b).collect()).format_degree()
+        Self::new(left.zip(right).map(|(a, b)| *a - *b).collect())
     }
 }
 
@@ -211,7 +211,7 @@ impl<'a, 'b, F: FftField> Mul<&'a F> for &'b Coefficients<F> {
     type Output = Coefficients<F>;
 
     fn mul(self, scalar: &'a F) -> Coefficients<F> {
-        Coefficients(self.0.iter().map(|coeff| *coeff * scalar).collect())
+        Coefficients::new(self.0.iter().map(|coeff| *coeff * scalar).collect())
     }
 }
 
