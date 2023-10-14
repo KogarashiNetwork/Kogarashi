@@ -1,10 +1,10 @@
+use super::constraint::Constraint;
+use super::curves::EdwardsExpression;
+use super::expression::Expression;
+use super::prover::Prover;
+use super::wire::Index;
+use super::wire::Wire;
 use crate::circuit::Circuit;
-use crate::r1cs::constraint::Constraint;
-use crate::r1cs::curves::EdwardsExpression;
-use crate::r1cs::expression::Expression;
-use crate::r1cs::prover::Prover;
-use crate::r1cs::wire::Index;
-use crate::r1cs::wire::Wire;
 use hashbrown::HashMap;
 use zkstd::common::{Field, TwistedEdwardsAffine, Vec};
 

@@ -1,7 +1,7 @@
 //! This module extends GadgetBuilder with native field arithmetic methods.
 
-use crate::r1cs::constraint_system::ConstraintSystem;
-use crate::r1cs::expression::Expression;
+use super::constraint_system::ConstraintSystem;
+use super::expression::Expression;
 use zkstd::common::Field;
 
 impl<F: Field> ConstraintSystem<F> {

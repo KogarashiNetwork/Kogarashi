@@ -1,5 +1,5 @@
-use crate::r1cs::constraint::Constraint;
-use crate::r1cs::wire::Wire;
+use super::constraint::Constraint;
+use super::wire::Wire;
 use hashbrown::HashMap;
 use zkstd::common::{Field, Vec};
 
@@ -24,8 +24,8 @@ impl<F: Field> Prover<F> {
 mod tests {
     use crate::circuit::Circuit;
     use crate::error::Error;
-    use crate::r1cs::constraint_system::ConstraintSystem;
-    use crate::r1cs::expression::Expression;
+    use crate::groth16::constraint_system::ConstraintSystem;
+    use crate::groth16::expression::Expression;
     use bls_12_381::Fr as BlsScalar;
     use zkstd::common::Field;
 
