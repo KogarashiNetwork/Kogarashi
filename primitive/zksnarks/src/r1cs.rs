@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 mod constraint;
-mod constraint_system;
+pub(crate) mod constraint_system;
 pub(crate) mod curves;
 pub(crate) mod error;
 mod expression;
@@ -11,8 +11,9 @@ pub mod wire;
 
 #[cfg(test)]
 mod tests {
-    use crate::r1cs::constraint_system::{Circuit, ConstraintSystem};
-    use crate::r1cs::error::R1CSError;
+    use crate::circuit::Circuit;
+    use crate::error::Error;
+    use crate::r1cs::constraint_system::ConstraintSystem;
     use crate::r1cs::expression::Expression;
     use bls_12_381::Fr as BlsScalar;
     use jub_jub::JubjubAffine;
@@ -39,10 +40,7 @@ mod tests {
         }
 
         impl Circuit<BlsScalar> for DummyCircuit<BlsScalar> {
-            fn synthesize(
-                &self,
-                composer: &mut ConstraintSystem<BlsScalar>,
-            ) -> Result<(), R1CSError> {
+            fn synthesize(&self, composer: &mut ConstraintSystem<BlsScalar>) -> Result<(), Error> {
                 let x = composer.alloc_private(self.x);
                 let y = composer.alloc_private(self.y);
 

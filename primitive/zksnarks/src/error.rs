@@ -1,5 +1,5 @@
 use crate::plonk::error::PlonkError;
-use crate::r1cs::error::R1CSError;
+use crate::r1cs::error::R1csError;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Error {
@@ -152,10 +152,10 @@ impl From<PlonkError> for Error {
     }
 }
 
-impl From<R1CSError> for Error {
-    fn from(err: R1CSError) -> Self {
+impl From<R1csError> for Error {
+    fn from(err: R1csError) -> Self {
         match err {
-            R1CSError::General => Self::ProofVerificationError,
+            R1csError::General => Self::ProofVerificationError,
         }
     }
 }
