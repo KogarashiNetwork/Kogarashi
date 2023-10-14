@@ -88,7 +88,7 @@ impl<F: FftField> Fft<F> {
             })
             .collect::<Vec<_>>();
 
-        Fft {
+        Self {
             n,
             twiddle_factors,
             inv_twiddle_factors,

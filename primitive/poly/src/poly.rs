@@ -65,30 +65,6 @@ impl<F: FftField> Coefficients<F> {
         Self(coeffs)
     }
 
-    #[allow(clippy::needless_borrow)]
-    pub fn rand<R: RngCore>(d: usize, mut rng: &mut R) -> Self {
-        let mut random_coeffs = Vec::with_capacity(d + 1);
-        for _ in 0..=d {
-            random_coeffs.push(F::random(&mut rng));
-        }
-        Self::from_vec(random_coeffs)
-    }
-
-    /// panics if the length of the coeffs is zero.
-    pub fn from_vec(coeffs: Vec<F>) -> Self {
-        let mut result = Self(coeffs);
-        result.truncate_leading_zeros();
-        assert!(result.0.len() != 0);
-
-        result
-    }
-
-    fn truncate_leading_zeros(&mut self) {
-        while self.0.last().map_or(false, |c| c == &F::zero()) {
-            self.0.pop();
-        }
-    }
-
     // polynomial evaluation domain
     // r^0, r^1, r^2, ..., r^n
     pub fn setup(k: usize, rng: impl RngCore) -> (F, Vec<F>) {
@@ -147,7 +123,7 @@ impl<F: FftField> Coefficients<F> {
         tau.pow(n) - F::one()
     }
 
-    pub(crate) fn format_degree(mut self) -> Self {
+    pub fn format_degree(mut self) -> Self {
         while self.0.last().map_or(false, |c| c == &F::zero()) {
             self.0.pop();
         }
@@ -213,7 +189,7 @@ impl<'a, 'b, F: FftField> Add<&'a Coefficients<F>> for &'b Coefficients<F> {
         } else {
             (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
         };
-        Coefficients(left.zip(right).map(|(a, b)| *a + *b).collect()).format_degree()
+        Self(left.zip(right).map(|(a, b)| *a + *b).collect()).format_degree()
     }
 }
 
