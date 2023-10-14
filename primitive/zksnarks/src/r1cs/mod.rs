@@ -2,7 +2,7 @@
 mod constraint;
 mod constraint_system;
 pub(crate) mod curves;
-mod error;
+pub(crate) mod error;
 mod expression;
 mod field_arithmetic;
 mod prover;
