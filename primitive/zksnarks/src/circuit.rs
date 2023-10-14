@@ -1,18 +1,11 @@
-use crate::groth16::constraint_system::ConstraintSystem;
-use zkstd::common::{Debug, TwistedEdwardsAffine, Vec};
+use zkstd::common::{Debug, TwistedEdwardsAffine};
 
+use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
 
 /// circuit trait
 pub trait Circuit<C: TwistedEdwardsAffine>: Default + Debug {
-    fn synthesize(&self, composer: &mut ConstraintSystem<C>) -> Result<(), Error>;
-}
+    type ConstraintSystem: ConstraintSystem<C>;
 
-/// constraint system trait
-pub trait AltConstraintSystem<C: TwistedEdwardsAffine> {
-    /// return constraints length
-    fn m(self) -> usize;
-
-    /// return public inputs and outputs
-    fn instance() -> Vec<C::Scalar>;
+    fn synthesize(&self, composer: &mut Self::ConstraintSystem) -> Result<(), Error>;
 }
