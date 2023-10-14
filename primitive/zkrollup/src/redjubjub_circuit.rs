@@ -5,8 +5,8 @@ use red_jubjub::{
     Signature,
 };
 use zero_plonk::prelude::*;
+use zkstd::common::Ring;
 use zkstd::common::{CurveGroup, Pairing, SigUtils};
-use zkstd::traits::Ring;
 
 /// Confidential transfer circuit
 #[derive(Debug, PartialEq, Default)]

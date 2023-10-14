@@ -18,7 +18,7 @@ use sp_runtime::{
 };
 use zero_plonk::prelude::Compiler;
 use zkstd::common::CurveGroup;
-use zkstd::traits::Group;
+use zkstd::common::Group;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;

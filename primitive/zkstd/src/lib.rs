@@ -19,4 +19,4 @@
 pub mod arithmetic;
 pub mod common;
 pub mod macros;
-pub mod traits;
+mod traits;

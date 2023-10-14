@@ -4,7 +4,7 @@ use core::mem;
 pub use merlin::Transcript;
 use poly_commit::Commitment;
 use zkstd::common::Pairing;
-use zkstd::traits::{FftField, SigUtils};
+use zkstd::common::{FftField, SigUtils};
 
 /// Transcript adds an abstraction over the Merlin transcript
 /// For convenience

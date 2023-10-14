@@ -71,7 +71,7 @@ mod plonk_test {
     use ec_pairing::TatePairing;
     use rand::SeedableRng;
     use zero_plonk::prelude::Compiler;
-    use zkstd::traits::Group;
+    use zkstd::common::Group;
 
     fn get_rng() -> FullcodecRng {
         FullcodecRng::from_seed([

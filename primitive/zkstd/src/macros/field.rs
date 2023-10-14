@@ -209,7 +209,7 @@ macro_rules! fft_field_operation {
 macro_rules! field_operation {
     ($field:ident, $p:ident, $g:ident, $e:ident, $inv:ident, $r:ident, $r2:ident, $r3:ident) => {
         use zkstd::common::*;
-        use zkstd::traits::*;
+        use zkstd::common::*;
 
         ring_operation!($field, $p, $g, $e, $r2, $r3, $inv);
 

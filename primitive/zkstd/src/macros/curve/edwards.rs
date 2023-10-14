@@ -7,7 +7,7 @@ pub use group::*;
 macro_rules! twisted_edwards_curve_operation {
     ($scalar:ident, $range:ident, $d:ident, $affine:ident, $extended:ident, $x:ident, $y:ident, $t:ident) => {
         use zkstd::common::*;
-        use zkstd::traits::*;
+        use zkstd::common::*;
 
         twisted_edwards_affine_group_operation!($affine, $extended, $range, $scalar, $x, $y);
         twisted_edwards_extend_group_operation!($affine, $extended, $range, $scalar, $x, $y, $t);

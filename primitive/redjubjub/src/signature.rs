@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
+use zkstd::common::SigUtils;
 use zkstd::common::*;
-use zkstd::traits::SigUtils;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, Decode, Encode)]
 pub struct Signature {

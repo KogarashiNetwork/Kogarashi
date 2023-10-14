@@ -1,5 +1,5 @@
 use crate::plonk::wire::PrivateWire;
-use zkstd::traits::PrimeField;
+use zkstd::common::PrimeField;
 
 /// Each gate expression
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

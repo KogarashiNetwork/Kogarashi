@@ -9,7 +9,7 @@ pub use test::*;
 macro_rules! weierstrass_curve_operation {
     ($scalar:ident, $range:ident, $a:ident, $b:ident, $b3:ident, $affine:ident, $projective:ident, $x:ident, $y:ident) => {
         use zkstd::common::*;
-        use zkstd::traits::*;
+        use zkstd::common::*;
 
         affine_group_operation!($affine, $projective, $range, $scalar, $x, $y, $a);
         projective_group_operation!($affine, $projective, $range, $scalar, $x, $y, $a);

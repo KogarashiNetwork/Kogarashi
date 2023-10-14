@@ -51,7 +51,7 @@ mod tests {
     use ec_pairing::TatePairing;
     use jub_jub::Fp;
     use rand_core::OsRng;
-    use zkstd::{common::SigUtils, traits::Group};
+    use zkstd::common::{Group, SigUtils};
 
     #[test]
     fn sig_utils() {

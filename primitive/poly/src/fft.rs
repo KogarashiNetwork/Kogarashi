@@ -300,7 +300,7 @@ mod tests {
     use bls_12_381::Fr;
     use rand_core::OsRng;
     use zkstd::common::Vec;
-    use zkstd::traits::{Group, PrimeField};
+    use zkstd::common::{Group, PrimeField};
 
     fn arb_poly(k: u32) -> Vec<Fr> {
         (0..(1 << k))
