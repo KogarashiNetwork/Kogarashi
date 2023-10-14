@@ -74,8 +74,8 @@ use frame_system::pallet_prelude::*;
 use poly_commit::PublicParameters;
 use zero_plonk::prelude::Compiler;
 use zksnarks::plonk::PlonkParams;
-use zkstd::behave::Group;
 use zkstd::common::{Pairing, Vec};
+use zkstd::traits::Group;
 
 #[frame_support::pallet]
 pub mod pallet {

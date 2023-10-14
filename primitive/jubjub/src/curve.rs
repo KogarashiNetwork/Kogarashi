@@ -4,7 +4,7 @@ pub use bls_12_381::Fr;
 use serde::{Deserialize, Serialize};
 use zkstd::arithmetic::edwards::*;
 use zkstd::common::*;
-use zkstd::dress::curve::edwards::*;
+use zkstd::macros::curve::edwards::*;
 
 /// Twisted Edwards curve Jubjub D params
 pub const EDWARDS_D: Fr = Fr::to_mont_form([
@@ -292,7 +292,7 @@ impl<'a, 'b> Mul<&'b Fp> for &'a JubjubExtended {
 mod tests {
     #[allow(unused_imports)]
     use super::*;
-    use zkstd::dress::curve::weierstrass::*;
+    use zkstd::macros::curve::weierstrass::*;
 
     curve_test!(jubjub, Fr, JubjubAffine, JubjubExtended, 100);
 

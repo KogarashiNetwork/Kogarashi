@@ -98,7 +98,7 @@ mod zkrollup_tests {
     use rand::SeedableRng;
     use red_jubjub::SecretKey;
     use zkrollup::{BatchGetter, Poseidon, RollupOperator, TransactionData};
-    use zkstd::behave::Group;
+    use zkstd::traits::Group;
 
     // fn events() -> Vec<Event> {
     //     let evt = System::events()

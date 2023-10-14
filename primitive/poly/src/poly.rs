@@ -244,7 +244,7 @@ mod tests {
     use super::Coefficients;
     use bls_12_381::Fr;
     use rand_core::OsRng;
-    use zkstd::behave::{Group, PrimeField};
+    use zkstd::traits::{Group, PrimeField};
 
     fn arb_fr() -> Fr {
         Fr::random(OsRng)

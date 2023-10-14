@@ -2,8 +2,8 @@ use bls_12_381::Fr;
 use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
 use zksnarks::{plonk::wire::PrivateWire, Constraint};
-use zkstd::behave::Group;
 use zkstd::common::{vec, Pairing, Vec};
+use zkstd::traits::Group;
 
 #[derive(Debug, PartialEq)]
 pub struct MerkleMembershipCircuit<const N: usize> {

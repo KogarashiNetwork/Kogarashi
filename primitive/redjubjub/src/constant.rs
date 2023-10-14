@@ -1,5 +1,5 @@
 use bls_12_381::Fr;
-use zkstd::behave::{CurveGroup, FftField, Pairing, TwistedEdwardsAffine};
+use zkstd::traits::{CurveGroup, FftField, Pairing, TwistedEdwardsAffine};
 
 pub(crate) const SAPLING_PERSONAL: &[u8; 16] = b"Zcash_RedJubjubH";
 

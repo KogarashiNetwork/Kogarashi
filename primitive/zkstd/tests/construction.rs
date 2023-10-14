@@ -3,7 +3,7 @@
 
 use zkstd::{
     common::{CurveExtended, CurveGroup},
-    dress::{curve::edwards::*, field::*},
+    macros::{curve::edwards::*, field::*},
 };
 
 macro_rules! field_test_data {

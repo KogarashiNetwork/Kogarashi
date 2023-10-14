@@ -17,8 +17,8 @@ use sp_runtime::{
     traits::{BlakeTwo256, IdentityLookup},
 };
 use zero_plonk::prelude::Compiler;
-use zkstd::behave::Group;
 use zkstd::common::CurveGroup;
+use zkstd::traits::Group;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;

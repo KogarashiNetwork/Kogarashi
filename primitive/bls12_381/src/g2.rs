@@ -6,7 +6,7 @@ use core::borrow::Borrow;
 use core::iter::Sum;
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
-use zkstd::dress::{curve::weierstrass::*, pairing::bls12_g2_pairing};
+use zkstd::macros::{curve::weierstrass::*, pairing::bls12_g2_pairing};
 
 const B: Fq2 = Fq2([
     Fq([

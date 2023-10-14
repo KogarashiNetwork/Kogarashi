@@ -1,7 +1,7 @@
 use rand_core::RngCore;
 use zkstd::arithmetic::bits_384::*;
 use zkstd::common::*;
-use zkstd::dress::field::*;
+use zkstd::macros::field::*;
 
 const MODULUS: [u64; 6] = [
     0xb9feffffffffaaab,

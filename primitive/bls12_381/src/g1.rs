@@ -6,7 +6,7 @@ use core::borrow::Borrow;
 use core::iter::Sum;
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
-use zkstd::dress::curve::weierstrass::*;
+use zkstd::macros::curve::weierstrass::*;
 
 pub const BETA: Fq = Fq([
     0x30f1361b798a64e8,

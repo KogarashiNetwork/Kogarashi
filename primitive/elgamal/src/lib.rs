@@ -150,7 +150,7 @@ mod tests {
     use jub_jub::Fp;
     use rand::{thread_rng, Rng};
     use rand_core::OsRng;
-    use zkstd::behave::*;
+    use zkstd::traits::*;
 
     use crate::EncryptedNumber;
 

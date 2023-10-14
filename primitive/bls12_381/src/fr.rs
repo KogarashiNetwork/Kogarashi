@@ -3,7 +3,7 @@ use core::iter::{Product, Sum};
 use serde::{Deserialize, Serialize};
 use zkstd::arithmetic::bits_256::*;
 use zkstd::common::*;
-use zkstd::dress::field::*;
+use zkstd::macros::field::*;
 
 use crate::error::Error;
 

@@ -1,4 +1,4 @@
-use crate::behave::{CurveAffine, CurveExtended, CurveGroup};
+use crate::traits::{CurveAffine, CurveExtended, CurveGroup};
 
 /// elliptic curve rational points group
 /// rational points group behaves as abelian group

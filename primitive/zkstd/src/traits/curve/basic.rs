@@ -1,6 +1,6 @@
 use crate::{
-    behave::{ParallelCmp, ParityCmp},
     common::{CurveGroup, Vec},
+    traits::{ParallelCmp, ParityCmp},
 };
 use core::ops::{Add, AddAssign, MulAssign, Sub, SubAssign};
 
