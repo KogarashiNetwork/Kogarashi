@@ -50,6 +50,7 @@ macro_rules! twisted_edwards_curve_operation {
             ) -> Self::Extended {
                 Self::Projective { x, y, t, z }
             }
+
             fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self {
                 Self { x, y }
             }
@@ -61,6 +62,10 @@ macro_rules! twisted_edwards_curve_operation {
                 z: Self::Range,
             ) -> Self::Extended {
                 Self::Extended { x, y, t, z }
+            }
+
+            fn scalar_to_range(x: Self::Scalar) -> Self::Range {
+                x.into()
             }
         }
 

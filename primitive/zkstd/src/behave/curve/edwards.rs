@@ -20,6 +20,7 @@ pub trait TwistedEdwardsAffine: CurveAffine + TwistedEdwardsCurve {
         t: Self::Range,
         z: Self::Range,
     ) -> Self::Extended;
+    fn scalar_to_range(x: Self::Scalar) -> Self::Range;
 }
 
 pub trait TwistedEdwardsExtended: TwistedEdwardsCurve + CurveExtended {
