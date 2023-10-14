@@ -2,6 +2,7 @@ use crate as plonk_pallet;
 use crate::*;
 use frame_support::parameter_types;
 use frame_system as system;
+use jub_jub::JubjubAffine;
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
@@ -78,8 +79,11 @@ impl Default for DummyCircuit {
     }
 }
 
-impl Circuit<TatePairing> for DummyCircuit {
-    fn synthesize(&self, composer: &mut ConstraintSystem<TatePairing>) -> Result<(), CircuitError> {
+impl Circuit<JubjubAffine> for DummyCircuit {
+    fn synthesize(
+        &self,
+        composer: &mut ConstraintSystem<JubjubAffine>,
+    ) -> Result<(), CircuitError> {
         let w_a = composer.append_witness(self.a);
         let w_b = composer.append_point(self.b);
 

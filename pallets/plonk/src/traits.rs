@@ -5,7 +5,7 @@ use zkstd::common::{Pairing, Vec};
 /// Abstraction over a plonk zk-SNARKs system
 pub trait Plonk<P: Pairing> {
     /// The plonk circuit customized by developer
-    type CustomCircuit: Circuit<P>;
+    type CustomCircuit: Circuit<P::JubjubAffine>;
 
     /// The public parameters generation function
     /// This is the dispatchable function and assumed to be called by other pallet as API

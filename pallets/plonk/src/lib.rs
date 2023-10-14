@@ -87,7 +87,7 @@ pub mod pallet {
     pub trait Config: frame_system::Config {
         type P: Pairing;
         /// The circuit customized by developer
-        type CustomCircuit: Circuit<Self::P>;
+        type CustomCircuit: Circuit<<<Self as pallet::Config>::P as Pairing>::JubjubAffine>;
 
         /// The overarching event type
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;

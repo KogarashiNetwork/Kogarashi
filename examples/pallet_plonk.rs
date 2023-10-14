@@ -119,8 +119,8 @@ pub struct TestCircuit {
     pub f: JubjubAffine,
 }
 
-impl Circuit<TatePairing> for TestCircuit {
-    fn synthesize(&self, composer: &mut ConstraintSystem<TatePairing>) -> Result<(), Error> {
+impl Circuit<JubjubAffine> for TestCircuit {
+    fn synthesize(&self, composer: &mut ConstraintSystem<JubjubAffine>) -> Result<(), Error> {
         let a = composer.append_witness(self.a);
         let b = composer.append_witness(self.b);
 
