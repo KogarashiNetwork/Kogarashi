@@ -108,32 +108,30 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
 
 #[cfg(test)]
 mod tests {
-
-    use bls_12_381::Fr;
-    use ec_pairing::TatePairing;
-    use jub_jub::Fp;
-    use poly_commit::PublicParameters;
-    use rand::rngs::StdRng;
-    use rand_core::SeedableRng;
-    use red_jubjub::SecretKey;
-    use zero_plonk::prelude::*;
-    use zksnarks::plonk::PlonkParams;
-    use zkstd::common::Group;
-
+    use super::BatchCircuit;
     use crate::{
         domain::{TransactionData, UserData},
         operator::RollupOperator,
         poseidon::Poseidon,
     };
 
-    use super::BatchCircuit;
+    use bls_12_381::Fr;
+    use ec_pairing::TatePairing;
+    use jub_jub::Fp;
+    use rand::rngs::StdRng;
+    use rand_core::SeedableRng;
+    use red_jubjub::SecretKey;
+    use zero_plonk::prelude::*;
+    use zksnarks::plonk::PlonkParams;
+    use zksnarks::public_params::PublicParameters;
+    use zkstd::common::Group;
 
     #[test]
     fn batch_circuit_test() {
         let n = 15;
         let label = b"verify";
         let mut rng = StdRng::seed_from_u64(8349u64);
-        let mut pp = PlonkParams::setup(n, BlsScalar::random(&mut rng));
+        let mut pp = PlonkParams::setup(n, &mut rng);
 
         const ACCOUNT_LIMIT: usize = 3;
         const BATCH_SIZE: usize = 2;

@@ -11,4 +11,4 @@ pub mod groth16;
 mod keypair;
 pub mod plonk;
 mod prover;
-mod public_params;
+pub mod public_params;

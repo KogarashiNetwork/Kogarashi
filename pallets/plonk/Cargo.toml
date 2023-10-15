@@ -17,7 +17,6 @@ codec = { version = '2.0.0', default-features = false, features = [
     'derive'
 ], package = 'parity-scale-codec' }
 rand_xorshift = { version = '0.2.0', default-features = false, package = 'fullcodec_rand_xorshift' }
-poly-commit = { path = '../../primitive/poly', default-features = false }
 zero-plonk = { path = '../../primitive/plonk', default-features = false }
 ec-pairing = { path = '../../primitive/pairing', default-features = false }
 jub-jub = { path = '../../primitive/jubjub', default-features = false }

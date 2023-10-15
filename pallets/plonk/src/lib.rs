@@ -71,10 +71,9 @@ pub use types::*;
 use frame_support::dispatch::{DispatchErrorWithPostInfo, PostDispatchInfo};
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
-use poly_commit::PublicParameters;
 use zero_plonk::prelude::Compiler;
 use zksnarks::plonk::PlonkParams;
-use zkstd::common::Group;
+use zksnarks::public_params::PublicParameters;
 use zkstd::common::{Pairing, Vec};
 
 #[frame_support::pallet]
@@ -177,10 +176,7 @@ impl<T: Config> Plonk<T::P> for Pallet<T> {
                 error: DispatchError::Other("already setup"),
             }),
             None => {
-                let pp = PlonkParams::<T::P>::setup(
-                    val as u64,
-                    <T::P as Pairing>::ScalarField::random(&mut rng),
-                );
+                let pp = PlonkParams::<T::P>::setup(val as u64, &mut rng);
                 Keypair::<T>::put(&pp);
                 Self::deposit_event(Event::<T>::TrustedSetup(pp));
                 Ok(().into())
