@@ -8,7 +8,7 @@ pub trait ConstraintSystem<C: TwistedEdwardsAffine> {
     /// init constraint system
     fn new() -> Self;
 
-    fn initialize(n: usize) -> Self;
+    fn initialize() -> Self;
 
     /// return constraints length
     fn m(&self) -> usize;

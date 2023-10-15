@@ -36,7 +36,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
         }
     }
 
-    fn initialize(_: usize) -> Self {
+    fn initialize() -> Self {
         Self {
             constraints: Vec::new(),
             instance: HashMap::new(),

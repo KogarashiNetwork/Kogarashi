@@ -7,5 +7,5 @@ use crate::error::Error;
 pub trait Circuit<C: TwistedEdwardsAffine>: Default + Debug {
     type ConstraintSystem: ConstraintSystem<C>;
 
-    fn synthesize(&self, composer: &mut Self::ConstraintSystem) -> Result<(), Error>;
+    fn synthesize(&self, constraint_system: &mut Self::ConstraintSystem) -> Result<(), Error>;
 }
