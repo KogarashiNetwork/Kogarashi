@@ -1,11 +1,14 @@
 use zkstd::common::{TwistedEdwardsAffine, Vec};
 
-use crate::groth16::wire::Wire;
-
 /// constraint system trait
 pub trait ConstraintSystem<C: TwistedEdwardsAffine> {
+    type Wire;
+    type Constraints: IntoIterator;
+
     /// init constraint system
     fn new() -> Self;
+
+    fn initialize(n: usize) -> Self;
 
     /// return constraints length
     fn m(&self) -> usize;
@@ -13,9 +16,11 @@ pub trait ConstraintSystem<C: TwistedEdwardsAffine> {
     /// return public inputs and outputs
     fn instance(&self) -> Vec<C::Range>;
 
+    fn constraints(&self) -> Self::Constraints;
+
     /// allocate instance
-    fn alloc_instance(&mut self, instance: C::Range) -> Wire;
+    fn alloc_instance(&mut self, instance: C::Range) -> Self::Wire;
 
     /// allocate witness
-    fn alloc_witness(&mut self, witness: C::Range) -> Wire;
+    fn alloc_witness(&mut self, witness: C::Range) -> Self::Wire;
 }

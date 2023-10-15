@@ -36,7 +36,7 @@ impl<const N: usize> MerkleMembershipCircuit<N> {
 }
 
 fn hash<P: Pairing>(
-    composer: &mut ConstraintSystem<P::JubjubAffine>,
+    composer: &mut Plonk<P::JubjubAffine>,
     inputs: (PrivateWire, PrivateWire),
 ) -> PrivateWire {
     let sum = Constraint::default()
@@ -77,7 +77,7 @@ fn hash<P: Pairing>(
 }
 
 fn calculate_root<P: Pairing, const N: usize>(
-    composer: &mut ConstraintSystem<P::JubjubAffine>,
+    composer: &mut Plonk<P::JubjubAffine>,
     leaf: P::ScalarField,
     path: &[(P::ScalarField, P::ScalarField)],
     path_pos: &[u64],
@@ -116,7 +116,7 @@ fn calculate_root<P: Pairing, const N: usize>(
 }
 
 pub(crate) fn check_membership<P: Pairing, const N: usize>(
-    composer: &mut ConstraintSystem<P::JubjubAffine>,
+    composer: &mut Plonk<P::JubjubAffine>,
     leaf: P::ScalarField,
     root: P::ScalarField,
     path: &[(P::ScalarField, P::ScalarField)],
@@ -132,7 +132,8 @@ pub(crate) fn check_membership<P: Pairing, const N: usize>(
 }
 
 impl<const N: usize> Circuit<JubjubAffine> for MerkleMembershipCircuit<N> {
-    fn synthesize(&self, composer: &mut ConstraintSystem<JubjubAffine>) -> Result<(), Error> {
+    type ConstraintSystem = Plonk<JubjubAffine>;
+    fn synthesize(&self, composer: &mut Plonk<JubjubAffine>) -> Result<(), Error> {
         check_membership::<TatePairing, N>(
             composer,
             self.leaf,
@@ -154,6 +155,7 @@ mod tests {
     use rand_core::SeedableRng;
     use red_jubjub::PublicKey;
     use zero_plonk::prelude::*;
+    use zksnarks::keypair::Keypair;
     use zksnarks::plonk::PlonkParams;
     use zksnarks::public_params::PublicParameters;
     use zkstd::common::CurveGroup;
@@ -165,9 +167,8 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(8349u64);
         let mut pp = PlonkParams::setup(n, &mut rng);
 
-        let (prover, verifier) =
-            Compiler::compile::<MerkleMembershipCircuit<3>, TatePairing>(&mut pp, label)
-                .expect("failed to compile circuit");
+        let (prover, verifier) = PlonkKey::<TatePairing, MerkleMembershipCircuit<3>>::new(&mut pp)
+            .expect("failed to compile circuit");
 
         let poseidon = Poseidon::<Fr, 2>::new();
 
@@ -181,7 +182,7 @@ mod tests {
         let user =
             UserData::<TatePairing>::new(0, 10, PublicKey::new(JubjubExtended::random(&mut rng)));
 
-        let merkle_circuit = MerkleMembershipCircuit::new(
+        let merkle_circuit = MerkleMembershipCircuit::<3>::new(
             user.to_field_element(),
             merkle_tree.root(),
             merkle_proof.path,
@@ -197,7 +198,7 @@ mod tests {
 
         let merkle_proof = merkle_tree.generate_membership_proof(0);
 
-        let merkle_circuit = MerkleMembershipCircuit::new(
+        let merkle_circuit = MerkleMembershipCircuit::<3>::new(
             user.to_field_element(),
             merkle_tree.root(),
             merkle_proof.path,

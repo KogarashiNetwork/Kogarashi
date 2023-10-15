@@ -16,7 +16,8 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zero_plonk::prelude::Compiler;
+use zero_plonk::prelude::PlonkKey;
+use zksnarks::keypair::Keypair;
 use zkstd::common::CurveGroup;
 use zkstd::common::Group;
 
@@ -162,7 +163,6 @@ fn get_rng() -> FullcodecRng {
 
 fn main() {
     let k = 14;
-    let label = b"verify";
     let mut rng = get_rng();
     let (
         alice_address,
@@ -204,7 +204,7 @@ fn main() {
         assert_ok!(result);
 
         // proof generation
-        let mut pp = Plonk::keypair().unwrap();
+        let mut pp = Plonk::public_params().unwrap();
         let alice_public_key = JubjubExtended::ADDITIVE_GENERATOR * alice_private_key;
         let bob_public_key = JubjubExtended::ADDITIVE_GENERATOR * bob_private_key;
         let transfer_amount_scalar = Fp::from(transfer_amount as u64);
@@ -237,7 +237,7 @@ fn main() {
             alice_after_balance_scalar,
             transfer_randomness,
         );
-        let prover = Compiler::compile::<ConfidentialTransferCircuit, TatePairing>(&mut pp, label)
+        let prover = PlonkKey::<TatePairing, ConfidentialTransferCircuit>::new(&mut pp)
             .expect("failed to compile circuit");
         let proof = prover
             .0

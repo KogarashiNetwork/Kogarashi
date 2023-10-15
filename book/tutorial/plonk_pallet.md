@@ -201,7 +201,7 @@ fn main() {
 
         let pp = Plonk::public_parameter().unwrap();
         let (prover, _) =
-            Compiler::compile::<TestCircuit>(&pp, label).expect("failed to compile circuit");
+            PlonkKey::new::<TestCircuit>(&pp, label).expect("failed to compile circuit");
 
         let (proof, public_inputs) = prover
             .create_proof(&mut rng, &test_circuit)

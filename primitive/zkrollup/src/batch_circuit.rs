@@ -36,7 +36,8 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
 impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
     Circuit<P::JubjubAffine> for BatchCircuit<P, H, N, BATCH_SIZE>
 {
-    fn synthesize(&self, composer: &mut ConstraintSystem<P::JubjubAffine>) -> Result<(), Error> {
+    type ConstraintSystem = Plonk<P::JubjubAffine>;
+    fn synthesize(&self, composer: &mut Plonk<P::JubjubAffine>) -> Result<(), Error> {
         for RollupTransactionInfo {
             transaction,
             pre_root,
@@ -122,6 +123,7 @@ mod tests {
     use rand_core::SeedableRng;
     use red_jubjub::SecretKey;
     use zero_plonk::prelude::*;
+    use zksnarks::keypair::Keypair;
     use zksnarks::plonk::PlonkParams;
     use zksnarks::public_params::PublicParameters;
     use zkstd::common::Group;
@@ -162,10 +164,10 @@ mod tests {
         assert!(operator.execute_transaction(t1).is_none());
         let ((proof, public_inputs), batch) = operator.execute_transaction(t2).unwrap();
 
-        let (_, verifier) = Compiler::compile::<
-            BatchCircuit<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>,
+        let (_, verifier) = PlonkKey::<
             TatePairing,
-        >(&mut pp, label)
+            BatchCircuit<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>,
+        >::new(&mut pp)
         .expect("failed to compile circuit");
 
         verifier

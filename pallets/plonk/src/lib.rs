@@ -71,9 +71,10 @@ pub use types::*;
 use frame_support::dispatch::{DispatchErrorWithPostInfo, PostDispatchInfo};
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
-use zero_plonk::prelude::Compiler;
+use zero_plonk::prelude::{Plonk as ConstraintPlonk, PlonkKey};
+use zksnarks::keypair::Keypair;
 use zksnarks::plonk::PlonkParams;
-use zksnarks::public_params::PublicParameters;
+use zksnarks::public_params::PublicParameters as PublicParametersTrait;
 use zkstd::common::{Pairing, Vec};
 
 #[frame_support::pallet]
@@ -86,16 +87,21 @@ pub mod pallet {
     pub trait Config: frame_system::Config {
         type P: Pairing;
         /// The circuit customized by developer
-        type CustomCircuit: Circuit<<<Self as pallet::Config>::P as Pairing>::JubjubAffine>;
+        type CustomCircuit: Circuit<
+            <<Self as pallet::Config>::P as Pairing>::JubjubAffine,
+            ConstraintSystem = ConstraintPlonk<
+                <<Self as pallet::Config>::P as Pairing>::JubjubAffine,
+            >,
+        >;
 
         /// The overarching event type
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
     }
 
     #[pallet::storage]
-    #[pallet::getter(fn keypair)]
+    #[pallet::getter(fn public_params)]
     /// The setup parameter referred to as SRS
-    pub type Keypair<T: Config> = StorageValue<_, PlonkParams<T::P>>;
+    pub type PublicParameters<T: Config> = StorageValue<_, PlonkParams<T::P>>;
 
     #[pallet::event]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -153,8 +159,8 @@ pub mod pallet {
 
 impl<T: Config> Pallet<T> {
     /// The RPC method to get public parameters
-    pub fn get_keypair() -> Option<PlonkParams<T::P>> {
-        Keypair::<T>::get()
+    pub fn get_public_params() -> Option<PlonkParams<T::P>> {
+        PublicParameters::<T>::get()
     }
 }
 
@@ -169,7 +175,7 @@ impl<T: Config> Plonk<T::P> for Pallet<T> {
         val: u32,
         mut rng: FullcodecRng,
     ) -> DispatchResultWithPostInfo {
-        match Self::keypair() {
+        match Self::public_params() {
             Some(_) => Err(DispatchErrorWithPostInfo {
                 post_info: PostDispatchInfo::from(()),
                 // SBP-M1 review: define proper error type
@@ -177,7 +183,7 @@ impl<T: Config> Plonk<T::P> for Pallet<T> {
             }),
             None => {
                 let pp = PlonkParams::<T::P>::setup(val as u64, &mut rng);
-                Keypair::<T>::put(&pp);
+                PublicParameters::<T>::put(&pp);
                 Self::deposit_event(Event::<T>::TrustedSetup(pp));
                 Ok(().into())
             }
@@ -191,10 +197,9 @@ impl<T: Config> Plonk<T::P> for Pallet<T> {
         proof: Proof<T::P>,
         public_inputs: Vec<<T::P as Pairing>::ScalarField>,
     ) -> DispatchResultWithPostInfo {
-        match Self::keypair() {
+        match Self::public_params() {
             Some(mut pp) => {
-                let label = b"verify";
-                let (_, verifier) = Compiler::compile::<T::CustomCircuit, T::P>(&mut pp, label)
+                let (_, verifier) = PlonkKey::<T::P, T::CustomCircuit>::new(&mut pp)
                     // SBP-M1 review: use proper error handling in extrinsics' code instead of `expect`/`unwrap`
                     .expect("failed to compile circuit");
                 match verifier.verify(&proof, &public_inputs) {

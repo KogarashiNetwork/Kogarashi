@@ -70,7 +70,8 @@ mod plonk_test {
     use crate::types::JubjubScalar;
     use ec_pairing::TatePairing;
     use rand::SeedableRng;
-    use zero_plonk::prelude::Compiler;
+    use zero_plonk::prelude::PlonkKey;
+    use zksnarks::keypair::Keypair;
     use zkstd::common::Group;
 
     fn get_rng() -> FullcodecRng {
@@ -101,15 +102,14 @@ mod plonk_test {
     fn default_test() {
         let rng = get_rng();
         let a = JubjubScalar::random(rng.clone());
-        let label = b"demo";
 
         new_test_ext().execute_with(|| {
             assert_ok!(Plonk::trusted_setup(Origin::signed(1), 12, rng));
 
             let mut rng = get_rng();
-            let mut pp = Plonk::keypair().unwrap();
+            let mut pp = Plonk::public_params().unwrap();
 
-            let (prover, verifier) = Compiler::compile::<DummyCircuit, TatePairing>(&mut pp, label)
+            let (prover, verifier) = PlonkKey::<TatePairing, DummyCircuit>::new(&mut pp)
                 .expect("failed to compile circuit");
 
             let (proof, public_inputs) = prover

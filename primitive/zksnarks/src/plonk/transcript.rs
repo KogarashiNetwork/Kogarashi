@@ -1,4 +1,4 @@
-use crate::plonk::key::VerificationKey;
+use crate::plonk::keypair::VerificationKey;
 
 use core::mem;
 pub use merlin::Transcript;

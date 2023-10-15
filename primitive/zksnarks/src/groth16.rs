@@ -26,7 +26,17 @@ pub struct Groth16<C: TwistedEdwardsAffine> {
 }
 
 impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
+    type Wire = Wire;
+    type Constraints = Vec<Constraint<C::Range>>;
     fn new() -> Self {
+        Self {
+            constraints: Vec::new(),
+            instance: HashMap::new(),
+            witness: [(Wire::ONE, C::Range::one())].into_iter().collect(),
+        }
+    }
+
+    fn initialize(_: usize) -> Self {
         Self {
             constraints: Vec::new(),
             instance: HashMap::new(),
@@ -40,6 +50,10 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
 
     fn instance(&self) -> Vec<<C>::Range> {
         Vec::new()
+    }
+
+    fn constraints(&self) -> Self::Constraints {
+        self.constraints.clone()
     }
 
     fn alloc_instance(&mut self, instance: C::Range) -> Wire {

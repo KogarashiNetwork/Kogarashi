@@ -6,16 +6,17 @@ use jub_jub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
 use pallet::*;
 use pallet_plonk::{BlsScalar, Circuit, FullcodecRng, Proof};
 use zero_plonk::prelude::*;
+use zero_plonk::Plonk as PlonkConstraint;
 use zkstd::common::{CurveGroup, Pairing};
 
 use frame_support::{assert_ok, construct_runtime, parameter_types};
+use rand_core::SeedableRng;
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-
-use rand_core::SeedableRng;
+use zksnarks::keypair::Keypair;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -120,7 +121,8 @@ pub struct TestCircuit {
 }
 
 impl Circuit<JubjubAffine> for TestCircuit {
-    fn synthesize(&self, composer: &mut ConstraintSystem<JubjubAffine>) -> Result<(), Error> {
+    type ConstraintSystem = PlonkConstraint<JubjubAffine>;
+    fn synthesize(&self, composer: &mut PlonkConstraint<JubjubAffine>) -> Result<(), Error> {
         let a = composer.append_witness(self.a);
         let b = composer.append_witness(self.b);
 
@@ -229,7 +231,6 @@ fn get_rng() -> FullcodecRng {
 
 fn main() {
     let mut rng = get_rng();
-    let label = b"verify";
     let test_circuit = TestCircuit {
         a: BlsScalar::from(20u64),
         b: BlsScalar::from(5u64),
@@ -243,9 +244,9 @@ fn main() {
         assert_eq!(SumStorage::get_sum(), 0);
         assert_ok!(Plonk::trusted_setup(Origin::signed(1), 12, rng.clone()));
 
-        let mut pp = Plonk::keypair().unwrap();
-        let (prover, _) = Compiler::compile::<TestCircuit, TatePairing>(&mut pp, label)
-            .expect("failed to compile circuit");
+        let mut pp = Plonk::public_params().unwrap();
+        let (prover, _) =
+            PlonkKey::<TatePairing, TestCircuit>::new(&mut pp).expect("failed to compile circuit");
 
         let (proof, public_inputs) = prover
             .create_proof(&mut rng, &test_circuit)

@@ -8,6 +8,7 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
+use zero_plonk::Plonk as PlonkConstraint;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -80,10 +81,8 @@ impl Default for DummyCircuit {
 }
 
 impl Circuit<JubjubAffine> for DummyCircuit {
-    fn synthesize(
-        &self,
-        composer: &mut ConstraintSystem<JubjubAffine>,
-    ) -> Result<(), CircuitError> {
+    type ConstraintSystem = PlonkConstraint<JubjubAffine>;
+    fn synthesize(&self, composer: &mut PlonkConstraint<JubjubAffine>) -> Result<(), CircuitError> {
         let w_a = composer.append_witness(self.a);
         let w_b = composer.append_point(self.b);
 
