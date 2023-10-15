@@ -116,6 +116,24 @@ impl Sub for JubjubAffine {
     }
 }
 
+impl Mul<JubjubAffine> for Fp {
+    type Output = JubjubExtended;
+
+    #[inline]
+    fn mul(self, rhs: JubjubAffine) -> JubjubExtended {
+        scalar_point(rhs.to_extended(), &self)
+    }
+}
+
+impl Mul<Fp> for JubjubAffine {
+    type Output = JubjubExtended;
+
+    #[inline]
+    fn mul(self, rhs: Fp) -> JubjubExtended {
+        scalar_point(self.to_extended(), &rhs)
+    }
+}
+
 /// Twisted Edwards curve Jubjub extended coordinate
 #[derive(Clone, Copy, Debug, Encode, Decode, Deserialize, Serialize, PartialOrd, Ord)]
 pub struct JubjubExtended {
@@ -164,57 +182,12 @@ impl Sub for JubjubExtended {
     }
 }
 
-impl Mul<JubjubAffine> for Fp {
-    type Output = JubjubExtended;
-
-    #[inline]
-    fn mul(self, rhs: JubjubAffine) -> JubjubExtended {
-        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
-        for &naf in self.to_nafs().iter() {
-            res = double_projective_point(res);
-            if naf == Naf::Plus {
-                res += rhs;
-            } else if naf == Naf::Minus {
-                res -= rhs;
-            }
-        }
-        res
-    }
-}
-
 impl Mul<JubjubExtended> for Fp {
     type Output = JubjubExtended;
 
     #[inline]
     fn mul(self, rhs: JubjubExtended) -> JubjubExtended {
-        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
-        for &naf in self.to_nafs().iter() {
-            res = double_projective_point(res);
-            if naf == Naf::Plus {
-                res += rhs;
-            } else if naf == Naf::Minus {
-                res -= rhs;
-            }
-        }
-        res
-    }
-}
-
-impl Mul<Fp> for JubjubAffine {
-    type Output = JubjubExtended;
-
-    #[inline]
-    fn mul(self, rhs: Fp) -> JubjubExtended {
-        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
-        for &naf in rhs.to_nafs().iter() {
-            res = double_projective_point(res);
-            if naf == Naf::Plus {
-                res += self;
-            } else if naf == Naf::Minus {
-                res -= self;
-            }
-        }
-        res
+        scalar_point(rhs, &self)
     }
 }
 
@@ -223,16 +196,7 @@ impl Mul<Fp> for JubjubExtended {
 
     #[inline]
     fn mul(self, rhs: Fp) -> JubjubExtended {
-        let mut res = JubjubExtended::ADDITIVE_IDENTITY;
-        for &naf in rhs.to_nafs().iter() {
-            res = double_projective_point(res);
-            if naf == Naf::Plus {
-                res += self;
-            } else if naf == Naf::Minus {
-                res -= self;
-            }
-        }
-        res
+        scalar_point(self, &rhs)
     }
 }
 
