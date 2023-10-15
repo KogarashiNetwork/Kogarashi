@@ -446,6 +446,7 @@ dependencies = [
  "sp-runtime",
  "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
  "zero-plonk",
+ "zksnarks",
  "zkstd 0.0.21",
 ]
 
@@ -1647,7 +1648,6 @@ dependencies = [
  "fullcodec_rand_xorshift",
  "jub-jub 0.0.15",
  "parity-scale-codec",
- "poly-commit",
  "rand 0.8.5",
  "serde",
  "sp-core",
@@ -3440,7 +3440,6 @@ dependencies = [
  "fullcodec_rand_xorshift",
  "jub-jub 0.0.15",
  "parity-scale-codec",
- "poly-commit",
  "rand 0.8.5",
  "rand_core 0.6.4",
  "red-jubjub 0.0.15",

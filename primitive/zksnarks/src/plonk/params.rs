@@ -1,8 +1,7 @@
 use super::error::PlonkError;
+use crate::public_params::PublicParameters;
 
-use poly_commit::{
-    powers_of, Coefficients, Commitment, CommitmentKey, EvaluationKey, PublicParameters, Witness,
-};
+use poly_commit::{powers_of, Coefficients, Commitment, CommitmentKey, EvaluationKey, Witness};
 use zkstd::common::*;
 
 /// Kate polynomial commitment params used for prover polynomial domain and proof verification
@@ -17,7 +16,8 @@ impl<P: Pairing> PublicParameters<P> for PlonkParams<P> {
     const ADDITIONAL_DEGREE: usize = 6;
 
     /// setup polynomial evaluation domain
-    fn setup(k: u64, r: P::ScalarField) -> Self {
+    fn setup(k: u64, r: impl RngCore) -> Self {
+        let r = P::ScalarField::random(r);
         // G1, r * G1, r^2 * G1, ..., r^n-1 * G1
         let g1 = (0..=((1 << k) + Self::ADDITIONAL_DEGREE as u64))
             .map(|i| {
@@ -38,10 +38,6 @@ impl<P: Pairing> PublicParameters<P> for PlonkParams<P> {
                 prepared_beta_h: P::G2PairngRepr::from(beta_h),
             },
         }
-    }
-
-    fn key_pair(self) -> (EvaluationKey<P>, CommitmentKey<<P as Pairing>::G1Affine>) {
-        (self.evaluation_key, self.commitment_key)
     }
 }
 

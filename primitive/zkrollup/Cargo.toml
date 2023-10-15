@@ -3,8 +3,6 @@ name = "zkrollup"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 anyhow = "1.0.75"
 zkstd = { path = "../zkstd", default-features = false }
@@ -16,7 +14,6 @@ ec-pairing = { path = "../pairing", default-features = false }
 red-jubjub = { path = "../redjubjub", default-features = false}
 rand_core = { version="0.6.4", features = ["getrandom"] }
 bls-12-381 = { path = '../bls12_381', default-features = false }
-poly-commit = { path = "../poly", default-features = false }
 sp-std = { version = '3.0.0', default-features = false }
 serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }

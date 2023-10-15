@@ -138,7 +138,7 @@ mod zkrollup_tests {
                 15,
                 rng.clone()
             ));
-            let pp = Plonk::keypair().unwrap();
+            let pp = Plonk::public_params().unwrap();
 
             // 3. Create an operator
             let mut operator =

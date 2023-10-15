@@ -36,7 +36,8 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
 impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
     Circuit<P::JubjubAffine> for BatchCircuit<P, H, N, BATCH_SIZE>
 {
-    fn synthesize(&self, composer: &mut ConstraintSystem<P::JubjubAffine>) -> Result<(), Error> {
+    type ConstraintSystem = Plonk<P::JubjubAffine>;
+    fn synthesize(&self, composer: &mut Plonk<P::JubjubAffine>) -> Result<(), Error> {
         for RollupTransactionInfo {
             transaction,
             pre_root,
@@ -108,32 +109,31 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
 
 #[cfg(test)]
 mod tests {
-
-    use bls_12_381::Fr;
-    use ec_pairing::TatePairing;
-    use jub_jub::Fp;
-    use poly_commit::PublicParameters;
-    use rand::rngs::StdRng;
-    use rand_core::SeedableRng;
-    use red_jubjub::SecretKey;
-    use zero_plonk::prelude::*;
-    use zksnarks::plonk::PlonkParams;
-    use zkstd::common::Group;
-
+    use super::BatchCircuit;
     use crate::{
         domain::{TransactionData, UserData},
         operator::RollupOperator,
         poseidon::Poseidon,
     };
 
-    use super::BatchCircuit;
+    use bls_12_381::Fr;
+    use ec_pairing::TatePairing;
+    use jub_jub::Fp;
+    use rand::rngs::StdRng;
+    use rand_core::SeedableRng;
+    use red_jubjub::SecretKey;
+    use zero_plonk::prelude::*;
+    use zksnarks::keypair::Keypair;
+    use zksnarks::plonk::PlonkParams;
+    use zksnarks::public_params::PublicParameters;
+    use zkstd::common::Group;
 
     #[test]
     fn batch_circuit_test() {
         let n = 15;
         let label = b"verify";
         let mut rng = StdRng::seed_from_u64(8349u64);
-        let mut pp = PlonkParams::setup(n, BlsScalar::random(&mut rng));
+        let mut pp = PlonkParams::setup(n, &mut rng);
 
         const ACCOUNT_LIMIT: usize = 3;
         const BATCH_SIZE: usize = 2;
@@ -164,10 +164,10 @@ mod tests {
         assert!(operator.execute_transaction(t1).is_none());
         let ((proof, public_inputs), batch) = operator.execute_transaction(t2).unwrap();
 
-        let (_, verifier) = Compiler::compile::<
-            BatchCircuit<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>,
+        let (_, verifier) = PlonkKey::<
             TatePairing,
-        >(&mut pp, label)
+            BatchCircuit<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>,
+        >::new(&mut pp)
         .expect("failed to compile circuit");
 
         verifier

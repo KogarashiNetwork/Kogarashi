@@ -168,7 +168,7 @@ fn main() {
             alice_after_balance_scalar,
             transfer_randomness,
         );
-        let prover = Compiler::compile::<ConfidentialTransferCircuit>(&pp, label)
+        let prover = PlonkKey::new::<ConfidentialTransferCircuit>(&pp, label)
             .expect("failed to compile circuit");
         let proof = prover
             .0

@@ -8,7 +8,8 @@ use crate::{
 };
 use ark_std::rand::Rng;
 use red_jubjub::PublicKey;
-use zero_plonk::prelude::{Compiler, Proof};
+use zero_plonk::prelude::{PlonkKey, Proof};
+use zksnarks::keypair::Keypair;
 use zksnarks::plonk::PlonkParams;
 use zkstd::common::{vec, Decode, Encode, Pairing, SigUtils, Vec};
 
@@ -260,7 +261,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
     ) -> (Proof<P>, Vec<P::ScalarField>) {
         let label = b"verify";
         let batch_circuit = BatchCircuit::new(batch);
-        let prover = Compiler::compile::<BatchCircuit<P, H, N, BATCH_SIZE>, P>(&mut self.pp, label)
+        let prover = PlonkKey::<P, BatchCircuit<P, H, N, BATCH_SIZE>>::new(&mut self.pp)
             .expect("failed to compile circuit");
         prover
             .0

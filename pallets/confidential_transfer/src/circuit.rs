@@ -69,7 +69,8 @@ impl Default for ConfidentialTransferCircuit {
 }
 
 impl Circuit<JubjubAffine> for ConfidentialTransferCircuit {
-    fn synthesize(&self, composer: &mut ConstraintSystem<JubjubAffine>) -> Result<(), Error> {
+    type ConstraintSystem = Plonk<JubjubAffine>;
+    fn synthesize(&self, composer: &mut Plonk<JubjubAffine>) -> Result<(), Error> {
         let (alice_t_balance, alice_s_balance) = self.sender_encrypted_balance.get();
         let (alice_t_transfer_amount, alice_s_transfer_amount) =
             self.sender_encrypted_transfer_amount.get();

@@ -2,11 +2,12 @@ use confidential_transfer::ConfidentialTransferCircuit;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use ec_pairing::TatePairing;
 use jub_jub::*;
-use poly_commit::PublicParameters;
 use rand::{rngs::StdRng, SeedableRng};
 use she_elgamal::EncryptedNumber;
 use zero_plonk::prelude::*;
+use zksnarks::keypair::Keypair;
 use zksnarks::plonk::PlonkParams;
+use zksnarks::public_params::PublicParameters;
 use zkstd::common::{CurveGroup, Group};
 
 #[allow(unused_must_use)]
@@ -15,15 +16,13 @@ fn circuit(c: &mut Criterion) {
 
     let mut rng = StdRng::seed_from_u64(8349u64);
     let n = 14;
-    let label = b"bench";
     group.bench_function("setup", |b| {
-        b.iter(|| PlonkParams::<TatePairing>::setup(n, BlsScalar::random(&mut rng)));
+        b.iter(|| PlonkParams::<TatePairing>::setup(n, &mut rng));
     });
 
-    let mut pp = PlonkParams::<TatePairing>::setup(n, BlsScalar::random(&mut rng));
-    let (prover, verifier) =
-        Compiler::compile::<ConfidentialTransferCircuit, TatePairing>(&mut pp, label)
-            .expect("failed to compile circuit");
+    let mut pp = PlonkParams::<TatePairing>::setup(n, &mut rng);
+    let (prover, verifier) = PlonkKey::<TatePairing, ConfidentialTransferCircuit>::new(&mut pp)
+        .expect("failed to compile circuit");
     let generator = JubjubExtended::ADDITIVE_GENERATOR;
     let alice_private_key = JubjubScalar::random(&mut rng);
     let bob_private_key = JubjubScalar::random(&mut rng);

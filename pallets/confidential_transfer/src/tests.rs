@@ -8,13 +8,13 @@ mod plonk_test {
     };
     use crate::traits::ConfidentialTransfer as TraitConfidentialTransfer;
 
+    use ark_std::{end_timer, start_timer};
     use ec_pairing::TatePairing;
     use frame_support::assert_ok;
     use pallet_plonk::FullcodecRng;
-    use zero_plonk::prelude::Compiler;
-
-    use ark_std::{end_timer, start_timer};
     use rand::SeedableRng;
+    use zero_plonk::prelude::PlonkKey;
+    use zksnarks::keypair::Keypair;
 
     fn get_rng() -> FullcodecRng {
         FullcodecRng::from_seed([
@@ -26,7 +26,6 @@ mod plonk_test {
     #[test]
     fn confidential_transfer_test() {
         let k = 14;
-        let label = b"verify";
         let mut rng = get_rng();
 
         let (confidential_transfer_circuit, confidential_transfer_transaction) =
@@ -50,10 +49,9 @@ mod plonk_test {
             assert_ok!(result);
 
             // proof generation
-            let mut pp = Plonk::keypair().unwrap();
-            let prover =
-                Compiler::compile::<ConfidentialTransferCircuit, TatePairing>(&mut pp, label)
-                    .expect("failed to compile circuit");
+            let mut pp = Plonk::public_params().unwrap();
+            let prover = PlonkKey::<TatePairing, ConfidentialTransferCircuit>::new(&mut pp)
+                .expect("failed to compile circuit");
 
             let proof_generation = start_timer!(|| "proof generation");
             let proof = prover

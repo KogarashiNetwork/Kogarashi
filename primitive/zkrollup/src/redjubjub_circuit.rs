@@ -30,7 +30,7 @@ impl RedJubjubCircuit {
 }
 
 pub(crate) fn check_signature<P: Pairing>(
-    composer: &mut ConstraintSystem<P::JubjubAffine>,
+    composer: &mut Plonk<P::JubjubAffine>,
     public_key: P::JubjubAffine,
     signature: Signature,
     msg_hash: P::JubjubScalar,
@@ -66,26 +66,26 @@ pub(crate) fn check_signature<P: Pairing>(
 }
 
 impl Circuit<JubjubAffine> for RedJubjubCircuit {
-    fn synthesize(&self, composer: &mut ConstraintSystem<JubjubAffine>) -> Result<(), Error> {
+    type ConstraintSystem = Plonk<JubjubAffine>;
+    fn synthesize(&self, composer: &mut Plonk<JubjubAffine>) -> Result<(), Error> {
         check_signature::<TatePairing>(composer, self.public_key, self.signature, self.msg_hash)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::RedJubjubCircuit;
 
     use ec_pairing::TatePairing;
     use jub_jub::Fp;
-    use poly_commit::PublicParameters;
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
-    use zero_plonk::prelude::*;
-    use zksnarks::plonk::PlonkParams;
-    use zkstd::common::{Group, SigUtils};
-
     use red_jubjub::{sapling_hash, SecretKey};
-
-    use super::RedJubjubCircuit;
+    use zero_plonk::prelude::*;
+    use zksnarks::keypair::Keypair;
+    use zksnarks::plonk::PlonkParams;
+    use zksnarks::public_params::PublicParameters;
+    use zkstd::common::{Group, SigUtils};
 
     #[test]
     fn redjubjub_verification() {
@@ -93,7 +93,7 @@ mod tests {
         let label = b"verify";
         let mut rng = StdRng::seed_from_u64(8349u64);
 
-        let mut pp = PlonkParams::setup(n, BlsScalar::random(&mut rng));
+        let mut pp = PlonkParams::setup(n, &mut rng);
 
         let msg = b"test";
 
@@ -106,7 +106,7 @@ mod tests {
             sig,
             sapling_hash(&sig.r(), &pub_key.to_bytes(), msg),
         );
-        let (prover, verifier) = Compiler::compile::<RedJubjubCircuit, TatePairing>(&mut pp, label)
+        let (prover, verifier) = PlonkKey::<TatePairing, RedJubjubCircuit>::new(&mut pp)
             .expect("failed to compile circuit");
         let (proof, public_inputs) = prover
             .create_proof(&mut rng, &redjubjub_circuit)
