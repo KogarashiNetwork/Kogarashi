@@ -104,7 +104,8 @@ pub trait Pairing:
     type JubjubAffine: TwistedEdwardsAffine<
             Affine = Self::JubjubAffine,
             Extended = Self::JubjubExtended,
-            Scalar = Self::ScalarField,
+            Range = Self::ScalarField,
+            Scalar = Self::JubjubScalar,
         > + PartialEq
         + Eq
         + SigUtils<32>;
@@ -113,7 +114,8 @@ pub trait Pairing:
     type JubjubExtended: CurveExtended<
             Affine = Self::JubjubAffine,
             Extended = Self::JubjubExtended,
-            Scalar = Self::ScalarField,
+            Range = Self::ScalarField,
+            Scalar = Self::JubjubScalar,
         > + TwistedEdwardsExtended
         + TwistedEdwardsCurve
         + PartialEq
