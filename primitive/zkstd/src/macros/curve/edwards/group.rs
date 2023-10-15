@@ -14,7 +14,7 @@ macro_rules! twisted_edwards_affine_group_operation {
             type Extended = $extended;
             type Scalar = $scalar;
 
-            const PARAM_A: $scalar = $scalar::one();
+            const PARAM_A: $range = $range::one();
 
             const ADDITIVE_GENERATOR: Self = Self { x: $x, y: $y };
 
@@ -55,7 +55,7 @@ macro_rules! twisted_edwards_affine_group_operation {
                 } else {
                     let xx = self.x.square();
                     let yy = self.y.square();
-                    yy == $scalar::one() + Self::PARAM_D * xx * yy + xx
+                    yy == $range::one() + Self::PARAM_D * xx * yy + xx
                 }
             }
 
@@ -88,7 +88,7 @@ macro_rules! twisted_edwards_extend_group_operation {
             type Extended = $extended;
             type Scalar = $scalar;
 
-            const PARAM_A: $scalar = $scalar::one();
+            const PARAM_A: $range = $range::one();
 
             const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
