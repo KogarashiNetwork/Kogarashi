@@ -8,5 +8,7 @@ pub mod constraint_system;
 pub mod error;
 pub use plonk::*;
 pub mod groth16;
+mod keypair;
 pub mod plonk;
 mod prover;
+mod public_params;
