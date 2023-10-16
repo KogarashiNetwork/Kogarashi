@@ -6,6 +6,7 @@ mod util;
 
 pub(crate) mod curves;
 pub(crate) mod error;
+mod key;
 pub mod wire;
 
 use crate::circuit::Circuit;
@@ -28,20 +29,9 @@ pub struct Groth16<C: TwistedEdwardsAffine> {
 impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     type Wire = Wire;
     type Constraints = Vec<Constraint<C::Range>>;
-    fn new() -> Self {
-        Self {
-            constraints: Vec::new(),
-            instance: HashMap::new(),
-            witness: [(Wire::ONE, C::Range::one())].into_iter().collect(),
-        }
-    }
 
     fn initialize() -> Self {
-        Self {
-            constraints: Vec::new(),
-            instance: HashMap::new(),
-            witness: [(Wire::ONE, C::Range::one())].into_iter().collect(),
-        }
+        Self::new()
     }
 
     fn m(&self) -> usize {
@@ -70,6 +60,14 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
 }
 
 impl<C: TwistedEdwardsAffine> Groth16<C> {
+    fn new() -> Self {
+        Self {
+            constraints: Vec::new(),
+            instance: HashMap::new(),
+            witness: [(Wire::ONE, C::Range::one())].into_iter().collect(),
+        }
+    }
+
     /// Add a public wire to the gadget. It will start with no generator and no associated constraints.
     pub fn public_wire(&mut self) -> Wire {
         let index = self.instance.len();
