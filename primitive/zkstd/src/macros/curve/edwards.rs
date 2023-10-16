@@ -63,10 +63,6 @@ macro_rules! twisted_edwards_curve_operation {
             ) -> Self::Extended {
                 Self::Extended { x, y, t, z }
             }
-
-            fn scalar_to_range(x: Self::Scalar) -> Self::Range {
-                x.into()
-            }
         }
 
         impl TwistedEdwardsCurve for $extended {

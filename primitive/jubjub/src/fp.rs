@@ -204,26 +204,13 @@ impl From<i8> for Fp {
     }
 }
 
-impl From<Fp> for Fr {
-    fn from(scalar: Fp) -> Fr {
-        let bls_scalar = Fr::from_bytes(scalar.to_bytes());
-
-        assert!(
-            bls_scalar.is_some(),
-            "Failed to convert a Scalar from JubJub to BLS"
-        );
-
-        bls_scalar.unwrap()
-    }
-}
-
 impl From<Fr> for Fp {
     fn from(scalar: Fr) -> Fp {
         let bls_scalar = Fp::from_bytes(scalar.to_bytes());
 
         assert!(
             bls_scalar.is_some(),
-            "Failed to convert a Scalar from JubJub to BLS"
+            "Failed to convert a Scalar from Bls to Jubjub"
         );
 
         bls_scalar.unwrap()
