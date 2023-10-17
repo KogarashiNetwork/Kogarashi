@@ -237,7 +237,7 @@ fn main() {
             alice_after_balance_scalar,
             transfer_randomness,
         );
-        let prover = PlonkKey::<TatePairing, ConfidentialTransferCircuit>::new(&mut pp)
+        let prover = PlonkKey::<TatePairing, ConfidentialTransferCircuit>::compile(&mut pp)
             .expect("failed to compile circuit");
         let proof = prover
             .0

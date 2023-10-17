@@ -199,7 +199,7 @@ impl<T: Config> Plonk<T::P> for Pallet<T> {
     ) -> DispatchResultWithPostInfo {
         match Self::public_params() {
             Some(mut pp) => {
-                let (_, verifier) = PlonkKey::<T::P, T::CustomCircuit>::new(&mut pp)
+                let (_, verifier) = PlonkKey::<T::P, T::CustomCircuit>::compile(&mut pp)
                     // SBP-M1 review: use proper error handling in extrinsics' code instead of `expect`/`unwrap`
                     .expect("failed to compile circuit");
                 match verifier.verify(&proof, &public_inputs) {

@@ -50,7 +50,7 @@ mod plonk_test {
 
             // proof generation
             let mut pp = Plonk::public_params().unwrap();
-            let prover = PlonkKey::<TatePairing, ConfidentialTransferCircuit>::new(&mut pp)
+            let prover = PlonkKey::<TatePairing, ConfidentialTransferCircuit>::compile(&mut pp)
                 .expect("failed to compile circuit");
 
             let proof_generation = start_timer!(|| "proof generation");

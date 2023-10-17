@@ -7,29 +7,32 @@ use crate::groth16::prover::Prover;
 use crate::groth16::Groth16;
 use crate::keypair::Keypair;
 use core::marker::PhantomData;
-use zkstd::common::{vec, CurveGroup, FftField, Group, OsRng, Pairing, Ring, RngCore, Vec};
+use rand::rngs::OsRng;
+use zkstd::common::{
+    vec, CurveGroup, FftField, Group, Pairing, Ring, RngCore, TwistedEdwardsAffine, Vec,
+};
 
 /// Generate the arguments to prove and verify a circuit
-pub struct PlonkKey<P: Pairing, C: Circuit<P::JubjubAffine>> {
+pub struct Groth16Key<P: Pairing, C: Circuit<P::JubjubAffine>> {
     c: PhantomData<C>,
     p: PhantomData<P>,
 }
 
 impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::JubjubAffine>>>
-    Keypair<P, C> for PlonkKey<P, C>
+    Keypair<P, C> for Groth16Key<P, C>
 {
     type PublicParameters = Groth16Params<P>;
-    type Prover = Prover<P::ScalarField>;
+    type Prover = Prover<P>;
     type Verifier = ();
     type ConstraintSystem = Groth16<P::JubjubAffine>;
 
-    fn new(pp: &Self::PublicParameters) -> Result<(Self::Prover, Self::Verifier), Error> {
+    fn compile(pp: &Self::PublicParameters) -> Result<(Self::Prover, Self::Verifier), Error> {
         Self::compile_with_circuit(pp, b"groth16", &C::default())
     }
 }
 
 impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::JubjubAffine>>>
-    PlonkKey<P, C>
+    Groth16Key<P, C>
 {
     /// Create a new arguments set from a given circuit instance
     ///
@@ -69,7 +72,14 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
             ic: vec![],
         };
 
-        todo!()
+        Ok((
+            Prover::<P> {
+                constraints: cs.constraints,
+                instance: cs.instance,
+                witness: cs.witness,
+            },
+            (),
+        ))
     }
 }
 
@@ -118,12 +128,12 @@ impl<P: Pairing> PowersOfTau<P> {
             current_pow_of_tau *= tau;
         }
 
-        let g1: Vec<P::G1Affine> = powers_of_tau[..=2 * m - 1]
+        let g1: Vec<P::G1Affine> = powers_of_tau[..2 * m - 1]
             .iter()
             .map(|t| (P::G1Affine::ADDITIVE_GENERATOR * t).into())
             .collect();
 
-        let g2: Vec<P::G2Affine> = powers_of_tau[..=m]
+        let g2: Vec<P::G2Affine> = powers_of_tau[..m]
             .iter()
             .map(|t| (P::G2Affine::ADDITIVE_GENERATOR * t).into())
             .collect();
