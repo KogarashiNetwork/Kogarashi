@@ -12,7 +12,7 @@ pub enum Index {
 
 impl Default for Index {
     fn default() -> Self {
-        Self::Aux(0)
+        Self::Input(0)
     }
 }
 
@@ -32,7 +32,7 @@ impl Wire {
 impl Wire {
     /// A special wire whose value is always set to 1. This is used to create `Expression`s with
     /// constant terms.
-    pub const ONE: Wire = Wire(Index::Aux(0));
+    pub const ONE: Wire = Wire(Index::Input(0));
 }
 
 impl Ord for Wire {
@@ -58,7 +58,7 @@ impl PartialOrd for Wire {
 
 impl fmt::Display for Wire {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        if let Index::Aux(0) = self.0 {
+        if let Index::Input(0) = self.0 {
             write!(f, "1")
         } else {
             write!(f, "wire_{:?}", self.0)

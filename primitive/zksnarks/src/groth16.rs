@@ -64,8 +64,8 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     fn new() -> Self {
         Self {
             constraints: Vec::new(),
-            instance: HashMap::new(),
-            witness: [(Wire::ONE, C::Range::one())].into_iter().collect(),
+            instance: [(Wire::ONE, C::Range::one())].into_iter().collect(),
+            witness: HashMap::new(),
         }
     }
 
