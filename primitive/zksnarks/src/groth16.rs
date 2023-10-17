@@ -68,6 +68,13 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         }
     }
 
+    fn instance_len(&self) -> usize {
+        self.instance.len()
+    }
+    fn witness_len(&self) -> usize {
+        self.witness.len()
+    }
+
     /// Add a public wire to the gadget. It will start with no generator and no associated constraints.
     pub fn public_wire(&mut self) -> Wire {
         let index = self.instance.len();
