@@ -1,6 +1,6 @@
 use crate::arithmetic::utils::Naf;
 use crate::common::{
-    CurveExtended, CurveGroup, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsExtended,
+    PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve, TwistedEdwardsExtended,
 };
 
 /// twisted edwards coordinate addition
@@ -23,7 +23,7 @@ pub fn add_affine_point<P: TwistedEdwardsAffine>(lhs: P, rhs: P) -> P::Extended 
     let t = e * h;
     let z = f * g;
 
-    P::new_extended(x, y, t, z)
+    P::Extended::new(x, y, t, z)
 }
 
 /// twisted edwards extended coordinate doubling
@@ -32,25 +32,26 @@ pub fn add_affine_point<P: TwistedEdwardsAffine>(lhs: P, rhs: P) -> P::Extended 
 pub fn double_affine_point<P: TwistedEdwardsAffine>(lhs: P) -> P::Extended {
     let (x, y) = (lhs.get_x(), lhs.get_y());
 
-    let a = -x.square();
+    let a = x.square();
     let b = y.square();
-    let c = P::Range::one().double();
-    let d = a + b;
-    let e = (x + y).square() - d;
-    let f = d - c;
+    let c = P::PARAM_D * a * b;
+    let h = a + b;
+    let e = (x + y).square() - h;
+    let f = P::Range::one() - c;
+    let g = P::Range::one() + c;
 
     let x = e * f;
-    let y = d.square();
-    let t = e * d;
-    let z = f * d;
+    let y = g * h;
+    let t = e * h;
+    let z = f * g;
 
-    P::new_extended(x, y, t, z)
+    P::Extended::new(x, y, t, z)
 }
 
 /// twisted edwards mixed coordinate addition
 /// 10M + 4A + 2B
 #[inline(always)]
-pub fn add_mixed_point<P: TwistedEdwardsAffine>(lhs: P, rhs: P::Projective) -> P::Projective {
+pub fn add_mixed_point<P: TwistedEdwardsAffine>(lhs: P, rhs: P::Extended) -> P::Extended {
     let (x0, y0) = (lhs.get_x(), lhs.get_y());
     let (x1, y1, z1, t1) = (rhs.get_x(), rhs.get_y(), rhs.get_z(), rhs.get_t());
 
@@ -67,7 +68,7 @@ pub fn add_mixed_point<P: TwistedEdwardsAffine>(lhs: P, rhs: P::Projective) -> P
     let t = e * h;
     let z = f * g;
 
-    P::new_projective(x, y, t, z)
+    P::Extended::new(x, y, t, z)
 }
 
 /// twisted edwards extended coordinate addition
@@ -118,7 +119,7 @@ pub fn double_projective_point<P: TwistedEdwardsExtended>(lhs: P) -> P {
 
 /// coordinate scalar
 #[inline(always)]
-pub fn scalar_point<P: TwistedEdwardsExtended>(point: P, scalar: &<P as CurveGroup>::Scalar) -> P {
+pub fn scalar_point<P: TwistedEdwardsExtended>(point: P, scalar: &P::Scalar) -> P {
     let mut res = P::ADDITIVE_IDENTITY;
     for &naf in scalar.to_nafs().iter() {
         res = double_projective_point(res);

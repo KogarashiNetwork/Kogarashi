@@ -8,7 +8,7 @@ use zero_plonk::prelude::*;
 use zksnarks::keypair::Keypair;
 use zksnarks::plonk::PlonkParams;
 use zksnarks::public_params::PublicParameters;
-use zkstd::common::{CurveGroup, Group};
+use zkstd::common::{Group, TwistedEdwardsCurve};
 
 #[allow(unused_must_use)]
 fn circuit(c: &mut Criterion) {

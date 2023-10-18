@@ -158,7 +158,7 @@ mod tests {
     use zksnarks::keypair::Keypair;
     use zksnarks::plonk::PlonkParams;
     use zksnarks::public_params::PublicParameters;
-    use zkstd::common::CurveGroup;
+    use zkstd::common::TwistedEdwardsCurve;
 
     #[test]
     fn merkle_check_membership() {

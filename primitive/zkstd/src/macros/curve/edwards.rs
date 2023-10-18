@@ -9,8 +9,10 @@ macro_rules! twisted_edwards_curve_operation {
         use zkstd::common::*;
         use zkstd::common::*;
 
-        twisted_edwards_affine_group_operation!($affine, $extended, $range, $scalar, $x, $y);
-        twisted_edwards_extend_group_operation!($affine, $extended, $range, $scalar, $x, $y, $t);
+        twisted_edwards_affine_group_operation!($affine, $extended, $range, $scalar, $x, $y, $d);
+        twisted_edwards_extend_group_operation!(
+            $affine, $extended, $range, $scalar, $x, $y, $t, $d
+        );
         mixed_curve_operations!($affine, $extended);
 
         impl ParityCmp for $affine {}
@@ -20,12 +22,12 @@ macro_rules! twisted_edwards_curve_operation {
         impl ParallelCmp for $affine {}
         impl ParallelCmp for $extended {}
 
-        impl TwistedEdwardsCurve for $affine {
-            // d param
-            const PARAM_D: $range = $d;
-        }
+        impl TwistedEdwardsAffine for $affine {
+            type Extended = $extended;
+            fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self {
+                Self { x, y }
+            }
 
-        impl CurveAffine for $affine {
             fn to_extended(self) -> Self::Extended {
                 Self::Extended {
                     x: self.x,
@@ -38,43 +40,22 @@ macro_rules! twisted_edwards_curve_operation {
             fn to_raw_bytes(self) -> Vec<u8> {
                 self.to_bytes().to_vec()
             }
-        }
 
-        impl TwistedEdwardsAffine for $affine {
-            type Projective = $extended;
-            fn new_projective(
-                x: Self::Range,
-                y: Self::Range,
-                t: Self::Range,
-                z: Self::Range,
-            ) -> Self::Extended {
-                Self::Projective { x, y, t, z }
-            }
-
-            fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self {
-                Self { x, y }
-            }
-
-            fn new_extended(
-                x: Self::Range,
-                y: Self::Range,
-                t: Self::Range,
-                z: Self::Range,
-            ) -> Self::Extended {
-                Self::Extended { x, y, t, z }
-            }
-
-            fn scalar_to_range(x: Self::Scalar) -> Self::Range {
-                x.into()
+            fn double(self) -> Self::Extended {
+                double_affine_point(self)
             }
         }
 
-        impl TwistedEdwardsCurve for $extended {
-            // d param
-            const PARAM_D: $range = $d;
-        }
+        impl TwistedEdwardsExtended for $extended {
+            type Affine = $affine;
+            fn new(x: Self::Range, y: Self::Range, t: Self::Range, z: Self::Range) -> Self {
+                Self { x, y, t, z }
+            }
 
-        impl CurveExtended for $extended {
+            fn get_t(&self) -> Self::Range {
+                self.t
+            }
+
             fn get_z(&self) -> Self::Range {
                 self.z
             }
@@ -86,15 +67,9 @@ macro_rules! twisted_edwards_curve_operation {
                     y: self.y * z_inv,
                 }
             }
-        }
 
-        impl TwistedEdwardsExtended for $extended {
-            fn new(x: Self::Range, y: Self::Range, t: Self::Range, z: Self::Range) -> Self {
-                Self { x, y, t, z }
-            }
-
-            fn get_t(&self) -> Self::Range {
-                self.t
+            fn double(self) -> Self {
+                double_projective_point(self)
             }
         }
 

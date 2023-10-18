@@ -61,14 +61,14 @@ impl<P: Pairing> PublicKey<P> {
             Some(R) => R,
             None => return false,
         };
-        let S = match P::ScalarField::from_bytes(sig.s) {
+        let S = match P::JubjubScalar::from_bytes(sig.s) {
             Some(S) => S,
             None => return false,
         };
 
         // h_G(-S * P_G + R + c * vk)
-        ((-(sapling_base_point::<P>() * S) + R + self.0 * c.into())
-            * sapling_redjubjub_cofactor::<P::ScalarField>())
+        ((-(sapling_base_point::<P>() * S) + R + self.0 * c)
+            * sapling_redjubjub_cofactor::<P::JubjubScalar>())
         .is_identity()
     }
 
@@ -82,6 +82,6 @@ impl<P: Pairing> PublicKey<P> {
     }
 
     pub fn randomize_public(&self, r: P::JubjubScalar) -> Self {
-        Self(self.0 * r.into())
+        Self(self.0 * r)
     }
 }

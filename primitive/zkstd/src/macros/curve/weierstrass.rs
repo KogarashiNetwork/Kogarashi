@@ -59,10 +59,6 @@ macro_rules! weierstrass_curve_operation {
                     }
                 }
             }
-
-            fn new_projective(x: Self::Range, y: Self::Range, z: Self::Range) -> Self::Projective {
-                $projective::new(x, y, z)
-            }
         }
 
         impl WeierstrassCurve for $projective {

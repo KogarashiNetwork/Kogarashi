@@ -16,7 +16,6 @@ pub trait WeierstrassCurve:
 pub trait WeierstrassAffine: WeierstrassCurve + CurveAffine {
     type Projective: WeierstrassProjective<Range = Self::Range>;
     fn to_projective(self) -> Self::Projective;
-    fn new_projective(x: Self::Range, y: Self::Range, z: Self::Range) -> Self::Projective;
 }
 
 /// rational point projective representation

@@ -1,10 +1,7 @@
 #![allow(clippy::suspicious_arithmetic_impl)]
 #![allow(clippy::suspicious_op_assign_impl)]
 
-use zkstd::{
-    common::{CurveExtended, CurveGroup},
-    macros::{curve::edwards::*, field::*},
-};
+use zkstd::macros::{curve::edwards::*, field::*};
 
 macro_rules! field_test_data {
     ($test_data_name:ident, $test_bits:ident, $limbs_type:ident, $modulus:ident, $inv:ident, $r2:ident, $r3:ident) => {
