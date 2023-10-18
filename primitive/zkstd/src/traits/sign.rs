@@ -1,6 +1,7 @@
-use parity_scale_codec::{Decode, EncodeLike};
-
 use super::{FftField, TwistedEdwardsAffine, TwistedEdwardsExtended};
+
+use core::fmt::Debug;
+use parity_scale_codec::{Decode, EncodeLike};
 
 pub trait SigUtils<const L: usize>: Sized {
     const LENGTH: usize = L;
@@ -10,7 +11,7 @@ pub trait SigUtils<const L: usize>: Sized {
     fn from_bytes(bytes: [u8; L]) -> Option<Self>;
 }
 
-pub trait RedDSA: Copy {
+pub trait RedDSA: Copy + Debug + Default + Ord + PartialEq {
     type ScalarField: FftField + Eq + PartialEq + EncodeLike + Decode + SigUtils<32>;
 
     type JubjubScalar: FftField + Eq + PartialEq + SigUtils<32> + Into<Self::ScalarField>;

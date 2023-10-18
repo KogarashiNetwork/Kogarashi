@@ -2,17 +2,17 @@ use crate::get_rng;
 
 use super::{FftField, PublicKey, SigUtils};
 use ark_std::rand::Rng;
-use zkstd::common::{Decode, Encode, Pairing};
+use zkstd::common::{Decode, Encode, RedDSA};
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Encode, Decode)]
-pub(crate) struct UserData<P: Pairing> {
+pub(crate) struct UserData<P: RedDSA> {
     pub(crate) index: u64,
     pub(crate) balance: u64,
     pub(crate) address: PublicKey<P>,
     pub(crate) nonce: u64,
 }
 
-impl<P: Pairing> SigUtils<56> for UserData<P> {
+impl<P: RedDSA> SigUtils<56> for UserData<P> {
     fn from_bytes(bytes: [u8; 56]) -> Option<Self> {
         let mut index = [0_u8; 8];
         let mut balance = [0_u8; 8];
@@ -41,7 +41,7 @@ impl<P: Pairing> SigUtils<56> for UserData<P> {
     }
 }
 
-impl<P: Pairing> UserData<P> {
+impl<P: RedDSA> UserData<P> {
     pub fn new(index: u64, balance: u64, address: PublicKey<P>) -> Self {
         Self {
             index,

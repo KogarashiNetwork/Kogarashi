@@ -30,8 +30,8 @@ pub use public_key::PublicKey;
 pub use signature::Signature;
 use zkstd::common::RedDSA;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-struct RedJubjub {}
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Default, PartialOrd, Ord)]
+pub struct RedJubjub {}
 
 impl RedDSA for RedJubjub {
     type ScalarField = Fr;
