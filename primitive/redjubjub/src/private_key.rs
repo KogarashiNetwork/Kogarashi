@@ -49,7 +49,7 @@ impl<P: Pairing> SecretKey<P> {
         let r = sapling_hash::<P::JubjubScalar>(&T, &pk.to_bytes(), m);
 
         // R = r * P_G
-        let R = ((sapling_base_point::<P>() * r.into()) as P::JubjubExtended).to_bytes();
+        let R = (sapling_base_point::<P>() * r).to_bytes();
 
         // S = r + H(R||m) * sk
         let S = (r + sapling_hash::<P::JubjubScalar>(&R, &pk.to_bytes(), m) * self.0).to_bytes();
@@ -58,7 +58,7 @@ impl<P: Pairing> SecretKey<P> {
     }
 
     pub fn to_public_key(&self) -> PublicKey<P> {
-        PublicKey(sapling_base_point::<P>() * self.0.into())
+        PublicKey(sapling_base_point::<P>() * self.0)
     }
 
     pub fn randomize_private(&self, r: P::JubjubScalar) -> Self {

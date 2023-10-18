@@ -6,7 +6,7 @@ use crate::{
 use jub_jub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
 use pallet_encrypted_balance::{Account, AccountData};
 use she_elgamal::EncryptedNumber;
-use zkstd::common::CurveGroup;
+use zkstd::common::TwistedEdwardsCurve;
 
 use ec_pairing::TatePairing;
 use frame_support::traits::StorageMapShim;

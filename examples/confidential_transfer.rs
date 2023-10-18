@@ -18,8 +18,7 @@ use sp_runtime::{
 };
 use zero_plonk::prelude::PlonkKey;
 use zksnarks::keypair::Keypair;
-use zkstd::common::CurveGroup;
-use zkstd::common::Group;
+use zkstd::common::{Group, TwistedEdwardsCurve};
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;

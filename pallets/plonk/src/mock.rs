@@ -57,7 +57,7 @@ impl system::Config for Test {
 
 use ec_pairing::TatePairing;
 use zero_plonk::prelude::{Error as CircuitError, *};
-use zkstd::common::CurveGroup;
+use zkstd::common::TwistedEdwardsCurve;
 
 #[derive(Debug)]
 pub struct DummyCircuit {
