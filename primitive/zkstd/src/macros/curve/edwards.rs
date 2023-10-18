@@ -42,15 +42,6 @@ macro_rules! twisted_edwards_curve_operation {
 
         impl TwistedEdwardsAffine for $affine {
             type Projective = $extended;
-            fn new_projective(
-                x: Self::Range,
-                y: Self::Range,
-                t: Self::Range,
-                z: Self::Range,
-            ) -> Self::Extended {
-                Self::Projective { x, y, t, z }
-            }
-
             fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self {
                 Self { x, y }
             }

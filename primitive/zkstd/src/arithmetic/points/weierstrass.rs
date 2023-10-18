@@ -34,7 +34,7 @@ pub fn add_affine_point<A: WeierstrassAffine>(lhs: A, rhs: A) -> A::Projective {
     let y = s * (x0 * uu - w) - y0 * uuu;
     let z = uuu;
 
-    A::new_projective(x, y, z)
+    A::Projective::new(x, y, z)
 }
 
 /// weierstrass affine coordinate doubling
@@ -61,7 +61,7 @@ pub fn double_affine_point<A: WeierstrassAffine>(point: A) -> A::Projective {
         let x3 = t0 * t1;
         let x3 = x3.double();
 
-        A::new_projective(x3, y3, z3)
+        A::Projective::new(x3, y3, z3)
     }
 }
 
@@ -100,7 +100,7 @@ pub fn add_mixed_point<A: WeierstrassAffine>(lhs: A, rhs: A::Projective) -> A::P
     let y = u * (r - a) - vvv * y1;
     let z = vvv * z1;
 
-    A::new_projective(x, y, z)
+    A::Projective::new(x, y, z)
 }
 
 /// weierstrass projective coordinate addition

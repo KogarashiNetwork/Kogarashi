@@ -67,7 +67,7 @@ pub fn add_mixed_point<P: TwistedEdwardsAffine>(lhs: P, rhs: P::Projective) -> P
     let t = e * h;
     let z = f * g;
 
-    P::new_projective(x, y, t, z)
+    P::Projective::new(x, y, t, z)
 }
 
 /// twisted edwards extended coordinate addition

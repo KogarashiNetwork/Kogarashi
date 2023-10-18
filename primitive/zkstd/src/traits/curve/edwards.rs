@@ -7,12 +7,6 @@ pub trait TwistedEdwardsCurve: CurveGroup + Into<Self::Extended> + From<Self::Ex
 pub trait TwistedEdwardsAffine: CurveAffine + TwistedEdwardsCurve {
     // TODO: Integrate Extended and Projective
     type Projective: TwistedEdwardsExtended<Range = Self::Range>;
-    fn new_projective(
-        x: Self::Range,
-        y: Self::Range,
-        t: Self::Range,
-        z: Self::Range,
-    ) -> Self::Projective;
     fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self;
     fn new_extended(
         x: Self::Range,
