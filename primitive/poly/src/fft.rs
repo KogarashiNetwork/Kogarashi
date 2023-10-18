@@ -122,7 +122,7 @@ impl<F: FftField> Fft<F> {
 
     /// perform discrete fourier transform
     pub fn dft(&self, coeffs: Coefficients<F>) -> PointsValue<F> {
-        let mut evals = coeffs.0.clone();
+        let mut evals = coeffs.0;
         self.prepare_fft(&mut evals);
         classic_fft_arithmetic(&mut evals, self.n, 1, &self.twiddle_factors);
         PointsValue::new(evals.clone())
@@ -130,7 +130,7 @@ impl<F: FftField> Fft<F> {
 
     /// perform classic inverse discrete fourier transform
     pub fn idft(&self, points: PointsValue<F>) -> Coefficients<F> {
-        let mut coeffs = points.0.clone();
+        let mut coeffs = points.0;
         self.prepare_fft(&mut coeffs);
         classic_fft_arithmetic(&mut coeffs, self.n, 1, &self.inv_twiddle_factors);
         coeffs.iter_mut().for_each(|coeff| *coeff *= self.n_inv);
@@ -190,9 +190,9 @@ impl<F: FftField> Fft<F> {
         if t_size == F::one() {
             let mut u = vec![F::zero(); size];
             let mut omega_i = one;
-            for i in 0..size {
+            for x in u.iter_mut().take(size) {
                 if omega_i == tau {
-                    u[i] = one;
+                    *x = one;
                     break;
                 }
                 omega_i *= &self.generator();

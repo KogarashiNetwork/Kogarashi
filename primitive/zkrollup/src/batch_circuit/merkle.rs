@@ -167,8 +167,9 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(8349u64);
         let mut pp = PlonkParams::setup(n, &mut rng);
 
-        let (prover, verifier) = PlonkKey::<TatePairing, MerkleMembershipCircuit<3>>::new(&mut pp)
-            .expect("failed to compile circuit");
+        let (prover, verifier) =
+            PlonkKey::<TatePairing, MerkleMembershipCircuit<3>>::compile(&mut pp)
+                .expect("failed to compile circuit");
 
         let poseidon = Poseidon::<Fr, 2>::new();
 

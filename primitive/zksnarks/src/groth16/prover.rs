@@ -1,20 +1,29 @@
 use super::constraint::Constraint;
-use super::wire::Wire;
-use hashbrown::HashMap;
-use zkstd::common::{Field, Vec};
+use crate::circuit::Circuit;
+use crate::constraint_system::ConstraintSystem;
+use crate::error::Error;
+use crate::groth16::Groth16;
+use zkstd::common::{Pairing, TwistedEdwardsCurve, Vec};
 
-pub struct Prover<F: Field> {
-    /// The set of rank-1 constraints which define the R1CS instance.
-    pub constraints: Vec<Constraint<F>>,
-    pub(crate) instance: HashMap<Wire, F>,
-    pub(crate) witness: HashMap<Wire, F>,
+#[derive(Debug)]
+pub struct Prover<P: Pairing> {
+    pub constraints: Vec<Constraint<<P::JubjubAffine as TwistedEdwardsCurve>::Range>>,
 }
 
-impl<F: Field> Prover<F> {
+impl<P: Pairing> Prover<P> {
     /// Execute the gadget, and return whether all constraints were satisfied.
-    pub fn create_proof(&mut self) -> bool {
-        self.constraints
-            .iter()
-            .all(|constraint| constraint.evaluate(&self.instance, &self.witness))
+    pub fn create_proof<C>(&mut self, circuit: C) -> Result<bool, Error>
+    where
+        C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::JubjubAffine>>,
+    {
+        let mut cs = Groth16::<P::JubjubAffine>::initialize();
+        circuit.synthesize(&mut cs)?;
+
+        cs.eval_constraints(); // -> a, b, c
+
+        Ok(cs.constraints.iter().all(|constraint| {
+            let (a, b, c) = constraint.evaluate(&cs.instance, &cs.witness);
+            a * b == c
+        }))
     }
 }

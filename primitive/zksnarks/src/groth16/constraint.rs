@@ -13,10 +13,11 @@ pub struct Constraint<F: Field> {
 }
 
 impl<F: Field> Constraint<F> {
-    pub fn evaluate(&self, instance: &HashMap<Wire, F>, witness: &HashMap<Wire, F>) -> bool {
+    pub fn evaluate(&self, instance: &HashMap<Wire, F>, witness: &HashMap<Wire, F>) -> (F, F, F) {
         let a_value = self.a.evaluate(instance, witness);
         let b_value = self.b.evaluate(instance, witness);
         let c_value = self.c.evaluate(instance, witness);
-        a_value * b_value == c_value
+
+        (a_value, b_value, c_value)
     }
 }

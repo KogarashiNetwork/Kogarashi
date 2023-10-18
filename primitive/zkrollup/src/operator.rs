@@ -261,7 +261,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
     ) -> (Proof<P>, Vec<P::ScalarField>) {
         let label = b"verify";
         let batch_circuit = BatchCircuit::new(batch);
-        let prover = PlonkKey::<P, BatchCircuit<P, H, N, BATCH_SIZE>>::new(&mut self.pp)
+        let prover = PlonkKey::<P, BatchCircuit<P, H, N, BATCH_SIZE>>::compile(&mut self.pp)
             .expect("failed to compile circuit");
         prover
             .0

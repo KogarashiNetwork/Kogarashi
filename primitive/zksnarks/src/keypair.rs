@@ -13,5 +13,5 @@ pub trait Keypair<P: Pairing, C: Circuit<P::JubjubAffine>> {
     type Verifier;
     type ConstraintSystem: ConstraintSystem<P::JubjubAffine>;
 
-    fn new(pp: &Self::PublicParameters) -> Result<(Self::Prover, Self::Verifier), Error>;
+    fn compile(pp: &Self::PublicParameters) -> Result<(Self::Prover, Self::Verifier), Error>;
 }

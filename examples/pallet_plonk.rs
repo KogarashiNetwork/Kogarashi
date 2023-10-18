@@ -244,8 +244,8 @@ fn main() {
         assert_ok!(Plonk::trusted_setup(Origin::signed(1), 12, rng.clone()));
 
         let mut pp = Plonk::public_params().unwrap();
-        let (prover, _) =
-            PlonkKey::<TatePairing, TestCircuit>::new(&mut pp).expect("failed to compile circuit");
+        let (prover, _) = PlonkKey::<TatePairing, TestCircuit>::compile(&mut pp)
+            .expect("failed to compile circuit");
 
         let (proof, public_inputs) = prover
             .create_proof(&mut rng, &test_circuit)
