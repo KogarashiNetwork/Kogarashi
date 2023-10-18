@@ -1,8 +1,4 @@
-use core::{
-    fmt::Debug,
-    iter::{Product, Sum},
-    ops::Add,
-};
+use core::{fmt::Debug, iter::Sum, ops::Add};
 
 use parity_scale_codec::{Decode, Encode, EncodeLike};
 
@@ -11,7 +7,7 @@ use super::{
     comp::{Basic, ParityCmp},
     curve::CurveAffine,
     sign::SigUtils,
-    CurveExtended, CurveGroup, FftField, Group, TwistedEdwardsAffine, TwistedEdwardsCurve,
+    CurveExtended, FftField, Group, TwistedEdwardsAffine, TwistedEdwardsCurve,
     TwistedEdwardsExtended, WeierstrassAffine, WeierstrassProjective,
 };
 
@@ -102,7 +98,6 @@ pub trait Pairing:
         + Eq;
     // Jubjub affine point
     type JubjubAffine: TwistedEdwardsAffine<
-            Affine = Self::JubjubAffine,
             Extended = Self::JubjubExtended,
             Range = Self::ScalarField,
             Scalar = Self::JubjubScalar,
@@ -129,18 +124,7 @@ pub trait Pairing:
     type PairingRange: PairingRange + Debug + Eq + PartialEq;
     type Gt: Group + Debug + Eq + PartialEq;
     // Used for commitment
-    type ScalarField: FftField
-        + Sum
-        + Product
-        + From<<Self::JubjubExtended as CurveGroup>::Range>
-        + From<<Self::JubjubAffine as CurveGroup>::Range>
-        + Into<<Self::JubjubExtended as CurveGroup>::Range>
-        + Into<<Self::JubjubAffine as CurveGroup>::Range>
-        + EncodeLike
-        + Decode
-        + Eq
-        + PartialEq
-        + SigUtils<32>;
+    type ScalarField: FftField + EncodeLike + Decode + Eq + PartialEq + SigUtils<32>;
     type JubjubScalar: FftField + Eq + PartialEq + SigUtils<32>;
 
     const X: u64;
