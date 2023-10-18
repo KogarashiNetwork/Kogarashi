@@ -5,9 +5,9 @@ use ec_pairing::TatePairing;
 use jub_jub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
 use pallet::*;
 use pallet_plonk::{BlsScalar, Circuit, FullcodecRng, Proof};
-use zero_plonk::prelude::*;
-use zero_plonk::Plonk as PlonkConstraint;
-use zkstd::common::{CurveGroup, Pairing};
+use zero_plonk::{prelude::*, Plonk as PlonkConstraint};
+use zksnarks::keypair::Keypair;
+use zkstd::common::{Pairing, TwistedEdwardsCurve};
 
 use frame_support::{assert_ok, construct_runtime, parameter_types};
 use rand_core::SeedableRng;
@@ -16,7 +16,6 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zksnarks::keypair::Keypair;
 
 #[frame_support::pallet]
 pub mod pallet {

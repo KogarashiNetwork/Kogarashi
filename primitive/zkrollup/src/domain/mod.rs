@@ -16,7 +16,7 @@ mod tests {
     use jub_jub::{Fp, JubjubExtended};
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
-    use zkstd::common::{CurveGroup, Group};
+    use zkstd::common::{Group, TwistedEdwardsCurve};
 
     #[test]
     fn sig_utils() {

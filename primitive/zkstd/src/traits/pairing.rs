@@ -7,8 +7,8 @@ use super::{
     comp::{Basic, ParityCmp},
     curve::CurveAffine,
     sign::SigUtils,
-    CurveExtended, FftField, Group, TwistedEdwardsAffine, TwistedEdwardsCurve,
-    TwistedEdwardsExtended, WeierstrassAffine, WeierstrassProjective,
+    FftField, Group, TwistedEdwardsAffine, TwistedEdwardsExtended, WeierstrassAffine,
+    WeierstrassProjective,
 };
 
 /// extension field
@@ -106,14 +106,11 @@ pub trait Pairing:
         + SigUtils<32>;
 
     // Jubjub extend point
-    type JubjubExtended: CurveExtended<
+    type JubjubExtended: TwistedEdwardsExtended<
             Affine = Self::JubjubAffine,
-            Extended = Self::JubjubExtended,
             Range = Self::ScalarField,
             Scalar = Self::JubjubScalar,
-        > + TwistedEdwardsExtended
-        + TwistedEdwardsCurve
-        + PartialEq
+        > + PartialEq
         + Eq
         + Ord
         + SigUtils<32>;
@@ -124,8 +121,8 @@ pub trait Pairing:
     type PairingRange: PairingRange + Debug + Eq + PartialEq;
     type Gt: Group + Debug + Eq + PartialEq;
     // Used for commitment
-    type ScalarField: FftField + EncodeLike + Decode + Eq + PartialEq + SigUtils<32>;
-    type JubjubScalar: FftField + Eq + PartialEq + SigUtils<32>;
+    type ScalarField: FftField + EncodeLike + Decode + Eq + PartialEq + SigUtils<32> + Sum;
+    type JubjubScalar: FftField + Eq + PartialEq + SigUtils<32> + Into<Self::ScalarField>;
 
     const X: u64;
     const X_IS_NEGATIVE: bool;

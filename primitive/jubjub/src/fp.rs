@@ -217,6 +217,19 @@ impl From<Fr> for Fp {
     }
 }
 
+impl From<Fp> for Fr {
+    fn from(scalar: Fp) -> Fr {
+        let bls_scalar = Fr::from_bytes(scalar.to_bytes());
+
+        assert!(
+            bls_scalar.is_some(),
+            "Failed to convert a Scalar from JubJub to BLS"
+        );
+
+        bls_scalar.unwrap()
+    }
+}
+
 /// wNAF expression computation over field
 pub fn compute_windowed_naf<F: FftField>(scalar: F, width: u8) -> [i8; 256] {
     let mut k = scalar.reduce();
