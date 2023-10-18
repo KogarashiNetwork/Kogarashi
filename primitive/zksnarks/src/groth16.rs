@@ -176,9 +176,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         let sum_value =
             x.evaluate(&self.instance, &self.witness) + y.evaluate(&self.instance, &self.witness);
         let sum = self.alloc_witness(sum_value);
-        let sum_exp = Expression::from(sum);
-
-        sum_exp
+        Expression::from(sum)
     }
 
     /// Returns `1 / x`, assuming `x` is non-zero. If `x` is zero, the gadget will not be

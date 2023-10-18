@@ -3,11 +3,11 @@ use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
 use crate::groth16::Groth16;
-use zkstd::common::{CurveGroup, Pairing, Vec};
+use zkstd::common::{Pairing, TwistedEdwardsCurve, Vec};
 
 #[derive(Debug)]
 pub struct Prover<P: Pairing> {
-    pub constraints: Vec<Constraint<<P::JubjubAffine as CurveGroup>::Range>>,
+    pub constraints: Vec<Constraint<<P::JubjubAffine as TwistedEdwardsCurve>::Range>>,
 }
 
 impl<P: Pairing> Prover<P> {
