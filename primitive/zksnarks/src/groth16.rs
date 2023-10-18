@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 mod constraint;
 mod expression;
 mod params;
@@ -9,20 +10,21 @@ pub(crate) mod error;
 mod key;
 pub mod wire;
 
-use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 
 use constraint::Constraint;
 use curves::EdwardsExpression;
 use expression::Expression;
 use hashbrown::HashMap;
-use prover::Prover;
 use wire::{Index, Wire};
-use zkstd::common::{Group, Ring, TwistedEdwardsAffine, Vec};
+use zkstd::common::{vec, Group, Ring, TwistedEdwardsAffine, Vec};
 
 #[derive(Debug)]
 pub struct Groth16<C: TwistedEdwardsAffine> {
     constraints: Vec<Constraint<C::Range>>,
+    a: Vec<C::Range>,
+    b: Vec<C::Range>,
+    c: Vec<C::Range>,
     pub(crate) instance: HashMap<Wire, C::Range>,
     pub(crate) witness: HashMap<Wire, C::Range>,
 }
@@ -64,8 +66,20 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     fn new() -> Self {
         Self {
             constraints: Vec::new(),
+            a: vec![],
+            b: vec![],
+            c: vec![],
             instance: [(Wire::ONE, C::Range::one())].into_iter().collect(),
             witness: HashMap::new(),
+        }
+    }
+
+    fn eval_constraints(&mut self) {
+        for x in self.constraints.iter() {
+            let (a, b, c) = x.evaluate(&self.instance, &self.witness);
+            self.a.push(a);
+            self.b.push(b);
+            self.c.push(c);
         }
     }
 
@@ -139,11 +153,32 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
 
         let product_value =
             x.evaluate(&self.instance, &self.witness) * y.evaluate(&self.instance, &self.witness);
-        let product = self.alloc_instance(product_value);
+        let product = self.alloc_witness(product_value);
         let product_exp = Expression::from(product);
         self.assert_product(x, y, &product_exp);
 
         product_exp
+    }
+
+    /// The product of two `Expression`s `x` and `y`, i.e. `x * y`.
+    pub fn sum(
+        &mut self,
+        x: &Expression<C::Range>,
+        y: &Expression<C::Range>,
+    ) -> Expression<C::Range> {
+        if let Some(c) = x.as_constant() {
+            return y * c;
+        }
+        if let Some(c) = y.as_constant() {
+            return x * c;
+        }
+
+        let sum_value =
+            x.evaluate(&self.instance, &self.witness) + y.evaluate(&self.instance, &self.witness);
+        let sum = self.alloc_witness(sum_value);
+        let sum_exp = Expression::from(sum);
+
+        sum_exp
     }
 
     /// Returns `1 / x`, assuming `x` is non-zero. If `x` is zero, the gadget will not be
@@ -151,7 +186,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     pub fn inverse(&mut self, x: &Expression<C::Range>) -> Expression<C::Range> {
         let x_value = x.evaluate(&self.instance, &self.witness);
         let inverse_value = x_value.invert().expect("Can't find an inverse element");
-        let x_inv = self.alloc_instance(inverse_value);
+        let x_inv = self.alloc_witness(inverse_value);
 
         let x_inv_expression = Expression::from(x_inv);
         self.assert_product(x, &x_inv_expression, &Expression::one());
@@ -221,7 +256,57 @@ mod tests {
 
         let circuit = DummyCircuit::new(x, y);
 
-        let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
+        let (mut prover, _verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
+            .expect("Failed to compile circuit");
+        assert!(prover.create_proof(circuit).expect("Failed to prove"));
+    }
+
+    #[test]
+    fn r1cs_qap() {
+        #[derive(Debug)]
+        pub struct DummyCircuit {
+            x: BlsScalar,
+            o: BlsScalar,
+        }
+
+        impl DummyCircuit {
+            pub fn new(x: BlsScalar, o: BlsScalar) -> Self {
+                Self { x, o }
+            }
+        }
+
+        impl Default for DummyCircuit {
+            fn default() -> Self {
+                Self::new(0.into(), 0.into())
+            }
+        }
+
+        impl Circuit<JubjubAffine> for DummyCircuit {
+            type ConstraintSystem = Groth16<JubjubAffine>;
+            fn synthesize(&self, composer: &mut Groth16<JubjubAffine>) -> Result<(), Error> {
+                let x = Expression::from(composer.alloc_instance(self.x));
+                let o = composer.alloc_instance(self.o);
+
+                let sym1 = composer.product(&x, &x);
+                let y = composer.product(&sym1, &x);
+                let sym2 = composer.sum(&y, &x);
+
+                composer.assert_equal(
+                    &(sym2 + Expression::from(BlsScalar::from(5))),
+                    &Expression::from(o),
+                );
+
+                Ok(())
+            }
+        }
+
+        let k = 9;
+        let pp = Groth16Params::<TatePairing>::setup(k, OsRng);
+        let x = BlsScalar::from(3);
+        let o = BlsScalar::from(35);
+        let circuit = DummyCircuit::new(x, o);
+
+        let (mut prover, _verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
             .expect("Failed to compile circuit");
         assert!(prover.create_proof(circuit).expect("Failed to prove"));
     }

@@ -41,9 +41,9 @@ impl Ord for Wire {
         if *self == Wire::ONE && *other == Wire::ONE {
             Ordering::Equal
         } else if *self == Wire::ONE {
-            Ordering::Greater
-        } else if *other == Wire::ONE {
             Ordering::Less
+        } else if *other == Wire::ONE {
+            Ordering::Greater
         } else {
             self.0.cmp(&other.0)
         }

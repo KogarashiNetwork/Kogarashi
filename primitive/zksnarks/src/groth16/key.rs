@@ -8,9 +8,7 @@ use crate::groth16::Groth16;
 use crate::keypair::Keypair;
 use core::marker::PhantomData;
 use rand::rngs::OsRng;
-use zkstd::common::{
-    vec, CurveGroup, FftField, Group, Pairing, Ring, RngCore, TwistedEdwardsAffine, Vec,
-};
+use zkstd::common::{vec, CurveGroup, FftField, Group, Pairing, Ring, RngCore, Vec};
 
 /// Generate the arguments to prove and verify a circuit
 pub struct Groth16Key<P: Pairing, C: Circuit<P::JubjubAffine>> {
@@ -39,7 +37,7 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
     /// Use the provided circuit instead of the default implementation
     pub fn compile_with_circuit(
         pp: &Groth16Params<P>,
-        label: &[u8],
+        _label: &[u8],
         circuit: &C,
     ) -> Result<
         (
@@ -55,28 +53,34 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
         let (alpha, beta, gamma, delta, tau) =
             generate_random_parameters::<P::ScalarField, OsRng>(&mut OsRng);
 
-        let g1 = pp.commitment_key.bases[0];
-        let g2 = pp.evaluation_key.h;
-        let powers_of_tau = PowersOfTau::<P>::new(cs.m(), alpha, beta, tau);
+        let _g1 = pp.commitment_key.bases[0];
+        let _g2 = pp.evaluation_key.h;
+        let mut powers_of_tau = vec![P::ScalarField::zero(); cs.m()];
 
-        let gamma_inverse = gamma.invert().ok_or(Groth16Error::General)?;
-        let delta_inverse = delta.invert().ok_or(Groth16Error::General)?;
+        let _gamma_inverse = gamma.invert().ok_or(Groth16Error::General)?;
+        let _delta_inverse = delta.invert().ok_or(Groth16Error::General)?;
 
-        let vk = VerifyingKey::<P> {
-            alpha_g1: powers_of_tau.alpha_g1[1],
-            beta_g1: powers_of_tau.beta_g1[1],
-            beta_g2: powers_of_tau.beta_g2_shift,
-            gamma_g2: (g2 * gamma).into(),
-            delta_g1: (g1 * delta).into(),
-            delta_g2: (g2 * delta).into(),
+        let _h = vec![P::G1Affine::ADDITIVE_IDENTITY; powers_of_tau.len() - 1];
+
+        let mut current_pow_of_tau = P::ScalarField::one();
+        for x in powers_of_tau.iter_mut() {
+            *x = current_pow_of_tau;
+            current_pow_of_tau *= tau;
+        }
+
+        let _vk = VerifyingKey::<P> {
+            alpha_g1: (P::G1Affine::ADDITIVE_GENERATOR * alpha).into(),
+            beta_g1: (P::G1Affine::ADDITIVE_GENERATOR * beta).into(),
+            beta_g2: (P::G2Affine::ADDITIVE_GENERATOR * beta).into(),
+            gamma_g2: (P::G2Affine::ADDITIVE_GENERATOR * gamma).into(),
+            delta_g1: (P::G1Affine::ADDITIVE_GENERATOR * delta).into(),
+            delta_g2: (P::G2Affine::ADDITIVE_GENERATOR * delta).into(),
             ic: vec![],
         };
 
         Ok((
             Prover::<P> {
                 constraints: cs.constraints,
-                instance: cs.instance,
-                witness: cs.witness,
             },
             (),
         ))
