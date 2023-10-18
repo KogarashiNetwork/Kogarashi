@@ -1,5 +1,5 @@
 use bls_12_381::Fr;
-use zkstd::common::{FftField, Pairing, TwistedEdwardsAffine};
+use zkstd::common::{FftField, RedDSA, TwistedEdwardsAffine};
 
 pub(crate) const SAPLING_PERSONAL: &[u8; 16] = b"Zcash_RedJubjubH";
 
@@ -32,12 +32,12 @@ fn sapling_base_point_y<F: FftField>() -> F {
     F::from(SAPLING_BASE_POINT_Y.inner())
 }
 
-pub fn sapling_base_point<P: Pairing>() -> P::JubjubAffine {
+pub fn sapling_base_point<P: RedDSA>() -> P::JubjubAffine {
     let x = sapling_base_point_x();
     let y = sapling_base_point_y();
     P::JubjubAffine::from_raw_unchecked(x, y)
 }
 
-pub fn sapling_redjubjub_cofactor<SF: FftField>() -> SF {
-    SF::from(SAPLING_REDJUBJUB_COFACTOR.inner())
+pub fn sapling_redjubjub_cofactor<F: FftField>() -> F {
+    F::from(SAPLING_REDJUBJUB_COFACTOR.inner())
 }

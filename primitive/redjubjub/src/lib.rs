@@ -22,23 +22,37 @@ mod private_key;
 mod public_key;
 mod signature;
 
+use bls_12_381::Fr;
 pub use hash::sapling_hash;
+use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 pub use private_key::SecretKey;
 pub use public_key::PublicKey;
 pub use signature::Signature;
-use zkstd::common::Pairing;
+use zkstd::common::RedDSA;
 
-// TODO fix pairing dependency
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+struct RedJubjub {}
+
+impl RedDSA for RedJubjub {
+    type ScalarField = Fr;
+
+    type JubjubScalar = Fp;
+
+    type JubjubAffine = JubjubAffine;
+
+    type JubjubExtended = JubjubExtended;
+}
+
 /// An redjubjub secret key and public key pair.
 #[derive(Copy, Clone, Debug)]
-pub struct Keypair<P: Pairing> {
+pub struct Keypair<P: RedDSA> {
     /// secret key
     pub secret: SecretKey<P>,
     /// public key
     pub public: PublicKey<P>,
 }
 
-impl<P: Pairing> Keypair<P> {
+impl<P: RedDSA> Keypair<P> {
     pub fn new(secret: SecretKey<P>) -> Self {
         let public = secret.to_public_key();
         Self { secret, public }
@@ -48,7 +62,6 @@ impl<P: Pairing> Keypair<P> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ec_pairing::TatePairing;
     use jub_jub::Fp;
     use rand_core::OsRng;
     use zkstd::common::{Group, SigUtils};
@@ -57,7 +70,7 @@ mod tests {
     fn sig_utils() {
         let randomness = OsRng;
         let msg = b"test";
-        let secret = SecretKey::<TatePairing>(Fp::random(OsRng));
+        let secret = SecretKey::<RedJubjub>(Fp::random(OsRng));
         let sig = secret.sign(msg, randomness);
         let pub_key = secret.to_public_key();
 
@@ -81,7 +94,7 @@ mod tests {
             let wrong_msg = b"tes";
             let randomness = OsRng;
 
-            let priv_key = SecretKey::<TatePairing>(Fp::random(OsRng));
+            let priv_key = SecretKey::<RedJubjub>(Fp::random(OsRng));
             let sig = priv_key.sign(msg, randomness);
             let pub_key = priv_key.to_public_key();
 
@@ -96,7 +109,7 @@ mod tests {
             let msg = b"test";
             let wrong_msg = b"tes";
 
-            let priv_key = SecretKey::<TatePairing>(Fp::random(OsRng));
+            let priv_key = SecretKey::<RedJubjub>(Fp::random(OsRng));
             let pub_key = priv_key.to_public_key();
 
             // randomization

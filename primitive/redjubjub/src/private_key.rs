@@ -4,13 +4,13 @@ use super::signature::Signature;
 use crate::constant::sapling_base_point;
 
 use rand_core::RngCore;
-use zkstd::common::{FftField, Pairing, SigUtils};
+use zkstd::common::{FftField, RedDSA, SigUtils};
 
 /// RedJubjub secret key struct used for signing transactions
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct SecretKey<P: Pairing>(pub(crate) P::JubjubScalar);
+pub struct SecretKey<P: RedDSA>(pub(crate) P::JubjubScalar);
 
-impl<P: Pairing> SigUtils<32> for SecretKey<P> {
+impl<P: RedDSA> SigUtils<32> for SecretKey<P> {
     fn from_bytes(bytes: [u8; 32]) -> Option<Self> {
         P::JubjubScalar::from_bytes(bytes).map(Self::new)
     }
@@ -20,7 +20,7 @@ impl<P: Pairing> SigUtils<32> for SecretKey<P> {
     }
 }
 
-impl<P: Pairing> SecretKey<P> {
+impl<P: RedDSA> SecretKey<P> {
     pub fn new(key: P::JubjubScalar) -> Self {
         Self(key)
     }

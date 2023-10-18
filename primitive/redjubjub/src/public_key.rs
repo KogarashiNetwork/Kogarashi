@@ -21,9 +21,9 @@ use zkstd::common::*;
     Decode,
     Encode,
 )]
-pub struct PublicKey<P: Pairing>(pub(crate) P::JubjubExtended);
+pub struct PublicKey<P: RedDSA>(pub(crate) P::JubjubExtended);
 
-impl<P: Pairing> SigUtils<32> for PublicKey<P> {
+impl<P: RedDSA> SigUtils<32> for PublicKey<P> {
     fn to_bytes(self) -> [u8; 32] {
         self.0.to_bytes()
     }
@@ -33,7 +33,7 @@ impl<P: Pairing> SigUtils<32> for PublicKey<P> {
     }
 }
 
-impl<P: Pairing> PublicKey<P> {
+impl<P: RedDSA> PublicKey<P> {
     pub fn new(raw: P::JubjubExtended) -> Self {
         PublicKey(raw)
     }

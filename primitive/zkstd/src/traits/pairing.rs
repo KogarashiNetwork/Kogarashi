@@ -121,7 +121,7 @@ pub trait Pairing:
     type PairingRange: PairingRange + Debug + Eq + PartialEq;
     type Gt: Group + Debug + Eq + PartialEq;
     // Used for commitment
-    type ScalarField: FftField + EncodeLike + Decode + Eq + PartialEq + SigUtils<32> + Sum;
+    type ScalarField: FftField + Eq + PartialEq + EncodeLike + Decode + SigUtils<32> + Sum;
     type JubjubScalar: FftField + Eq + PartialEq + SigUtils<32> + Into<Self::ScalarField>;
 
     const X: u64;
