@@ -133,6 +133,20 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         });
     }
 
+    // Assert that x + y = z;
+    pub fn assert_sum(
+        &mut self,
+        x: &Expression<C::Range>,
+        y: &Expression<C::Range>,
+        z: &Expression<C::Range>,
+    ) {
+        self.constraints.push(Constraint {
+            a: x + y,
+            b: Expression::from(Wire::ONE),
+            c: z.clone(),
+        });
+    }
+
     /// Assert that x == y.
     pub fn assert_equal(&mut self, x: &Expression<C::Range>, y: &Expression<C::Range>) {
         self.assert_product(x, &Expression::one(), y);
@@ -176,7 +190,9 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         let sum_value =
             x.evaluate(&self.instance, &self.witness) + y.evaluate(&self.instance, &self.witness);
         let sum = self.alloc_witness(sum_value);
-        Expression::from(sum)
+        let sum_exp = Expression::from(sum);
+        self.assert_sum(x, y, &sum_exp);
+        sum_exp
     }
 
     /// Returns `1 / x`, assuming `x` is non-zero. If `x` is zero, the gadget will not be
