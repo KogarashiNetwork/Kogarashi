@@ -158,6 +158,24 @@ impl<F: FftField> Fft<F> {
         Coefficients::new(points.0)
     }
 
+    /// This evaluates t(tau) for this domain, which is
+    /// tau^m - 1 for these radix-2 domains.
+    pub fn z(&self, tau: &F) -> F {
+        let mut tmp = tau.pow(self.n as u64);
+        tmp.sub_assign(&F::one());
+
+        tmp
+    }
+
+    /// The target polynomial is the zero polynomial in our
+    /// evaluation domain, so we must perform division over
+    /// a coset.
+    pub fn divide_by_z_on_coset(&self, points: PointsValue<F>) -> PointsValue<F> {
+        let i = self.z(&F::MULTIPLICATIVE_GENERATOR).invert().unwrap();
+
+        PointsValue(points.0.into_iter().map(|v| v * i).collect())
+    }
+
     /// resize polynomial and bit reverse swap
     fn prepare_fft(&self, coeffs: &mut Vec<F>) {
         coeffs.resize(self.n, F::zero());
@@ -178,6 +196,17 @@ impl<F: FftField> Fft<F> {
                 .collect(),
         );
         self.idft(mul_poly)
+    }
+
+    /// points value multiplication
+    pub fn points_mul(&self, rhs: PointsValue<F>, lhs: PointsValue<F>) -> PointsValue<F> {
+        PointsValue::new(
+            rhs.0
+                .iter()
+                .zip(lhs.0.iter())
+                .map(|(a, b)| *a * *b)
+                .collect(),
+        )
     }
 
     /// Evaluate all the lagrange polynomials defined by this domain at the

@@ -7,6 +7,8 @@ use crate::groth16::prover::Prover;
 use crate::groth16::Groth16;
 use crate::keypair::Keypair;
 use core::marker::PhantomData;
+use core::ops::MulAssign;
+use poly_commit::{Fft, PointsValue};
 use rand::rngs::OsRng;
 use zkstd::common::{vec, CurveGroup, FftField, Group, Pairing, Ring, RngCore, Vec};
 
@@ -49,25 +51,58 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
     > {
         let mut cs = Groth16::initialize();
 
+        let size = cs.m().next_power_of_two();
+        let k = size.trailing_zeros();
+
+        let fft = Fft::<P::ScalarField>::new(k as usize);
+
         circuit.synthesize(&mut cs)?;
 
         let (alpha, beta, gamma, delta, tau) =
             generate_random_parameters::<P::ScalarField, OsRng>(&mut OsRng);
 
-        let _g1 = pp.commitment_key.bases[0];
-        let _g2 = pp.evaluation_key.h;
-        let mut powers_of_tau = vec![P::ScalarField::zero(); cs.m()];
+        let g1 = pp.commitment_key.bases[0];
+        let g2 = pp.evaluation_key.h;
+        let mut powers_of_tau = PointsValue(vec![P::ScalarField::zero(); cs.m()]);
 
         let _gamma_inverse = gamma.invert().ok_or(Groth16Error::General)?;
-        let _delta_inverse = delta.invert().ok_or(Groth16Error::General)?;
+        let delta_inverse = delta.invert().ok_or(Groth16Error::General)?;
 
-        let _h = vec![P::G1Affine::ADDITIVE_IDENTITY; powers_of_tau.len() - 1];
+        let h = vec![P::G1Affine::ADDITIVE_IDENTITY; powers_of_tau.0.len() - 1];
 
         let mut current_pow_of_tau = P::ScalarField::one();
-        for x in powers_of_tau.iter_mut() {
+        for x in powers_of_tau.0.iter_mut() {
             *x = current_pow_of_tau;
             current_pow_of_tau *= tau;
         }
+
+        let mut coeff = fft.z(&tau);
+        coeff.mul_assign(&delta_inverse);
+
+        // // Set values of the H query to g1^{(tau^i * t(tau)) / delta}
+        // let h_proj: Vec<_> = p[..h.len()]
+        //     .iter()
+        //     .map(|p| {
+        //         // Compute final exponent
+        //         let mut exp = p.0;
+        //         exp.mul_assign(&coeff);
+        //
+        //         // Exponentiate
+        //         g1_wnaf.scalar(&exp)
+        //     })
+        //     .collect();
+        //
+        // // Batch normalize
+        // E::G1::batch_normalize(&h_proj, h);
+
+        // Use inverse FFT to convert powers of tau to Lagrange coefficients
+        let powers_of_tau = fft.idft(powers_of_tau);
+
+        let mut a = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
+        let mut b_g1 = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
+        let mut b_g2 = vec![P::G2Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
+        let mut ic = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len()];
+        let mut l = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.witness_len()];
 
         let _vk = VerifyingKey::<P> {
             alpha_g1: (P::G1Affine::ADDITIVE_GENERATOR * alpha).into(),

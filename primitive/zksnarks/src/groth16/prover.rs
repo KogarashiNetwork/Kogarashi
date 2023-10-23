@@ -3,7 +3,7 @@ use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
 use crate::groth16::Groth16;
-use poly_commit::{Coefficients, Fft, PointsValue};
+use poly_commit::{Fft, PointsValue};
 use zkstd::common::{vec, Pairing, PrimeField, TwistedEdwardsCurve, Vec};
 
 #[derive(Debug)]
@@ -38,15 +38,48 @@ impl<P: Pairing> Prover<P> {
 
         let fft = Fft::<P::ScalarField>::new(k as usize);
 
-        let a_poly = fft.idft(PointsValue(cs.a.clone()));
-        let b_poly = fft.idft(PointsValue(cs.b.clone()));
-        let c_poly = fft.idft(PointsValue(cs.c.clone()));
-        let t_poly = fft.idft(PointsValue(
-            (1..=cs.m())
-                .map(|i| P::ScalarField::from(i as u64))
-                .collect(),
-        ));
+        let h = {
+            let a = fft.idft(PointsValue(cs.a.clone()));
+            let b = fft.idft(PointsValue(cs.b.clone()));
+            let c = fft.idft(PointsValue(cs.c.clone()));
 
+            let mut a = fft.coset_dft(a);
+            let b = fft.coset_dft(b);
+            let c = fft.coset_dft(c);
+
+            // println!("A = {:?}", a);
+            // println!("B = {:?}", b);
+            // println!("C = {:?}", c);
+
+            a = fft.points_mul(a, b);
+            a = &a - &c;
+
+            a = fft.divide_by_z_on_coset(a);
+
+            let mut a = fft.coset_idft(a);
+            a.0.truncate(a.len() - 1);
+
+            // println!("A = {:?}", a);
+            // println!("B = {:?}", b);
+            // println!("C = {:?}", c);
+
+            a
+            // a.mul_assign(&b);
+            // drop(b);
+            // a.sub_assign(&worker, &c);
+            // drop(c);
+            // a.divide_by_z_on_coset(&worker);
+            // a.icoset_fft(&worker);
+            // let mut a = a.into_coeffs();
+            // let a_len = a.len() - 1;
+            // a.truncate(a_len);
+            // // TODO: parallelize if it's even helpful
+            // let a = Arc::new(a.into_iter().map(|s| s.0.into()).collect::<Vec<_>>());
+            //
+            // multiexp(&worker, params.get_h(a.len())?, FullDensity, a)
+        };
+
+        // println!("H = {:?}", h);
         // println!("Constr = {:#?}", cs.constraints);
         // println!("A = {:?}", cs.a);
         // println!("B = {:?}", cs.b);
@@ -54,27 +87,6 @@ impl<P: Pairing> Prover<P> {
         // println!("A_poly = {:?}", a_poly);
         // println!("B_poly = {:?}", b_poly);
         // println!("C_poly = {:?}", c_poly);
-
-        for i in 1..=cs.m() {
-            let x = P::ScalarField::from(i as u64);
-            let a_val = a_poly.evaluate(&x);
-            let b_val = b_poly.evaluate(&x);
-            let c_val = c_poly.evaluate(&x);
-            // println! {"{:?} * {:?} == {:?}", a_val, b_val, c_val};
-        }
-
-        let left = Coefficients::new(naive_multiply(a_poly.0, b_poly.0)) - c_poly;
-        // println!("Left = {left:?}");
-        let mut h = left;
-
-        for at in (1..=cs.m()).map(|i| P::ScalarField::from(i as u64)) {
-            // println!("H = {h:?}");
-            h = h.divide(&at); // (x - at) 1..n
-        }
-
-        // Ok((1..=cs.m())
-        //     .map(|i| P::ScalarField::from(i as u64))
-        //     .all(|at| left.evaluate(&at) == h.evaluate(&at) * t_poly.evaluate(&at)))
 
         Ok(cs.constraints.iter().all(|constraint| {
             let (a, b, c) = constraint.evaluate(&cs.instance, &cs.witness);

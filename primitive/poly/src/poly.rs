@@ -196,6 +196,20 @@ impl<F: FftField> Add for Coefficients<F> {
     }
 }
 
+impl<'a, 'b, F: FftField> Sub<&'a PointsValue<F>> for &'b PointsValue<F> {
+    type Output = PointsValue<F>;
+
+    fn sub(self, rhs: &'a PointsValue<F>) -> Self::Output {
+        let zero = F::zero();
+        let (left, right) = if self.0.len() > rhs.0.len() {
+            (self.0.iter(), rhs.0.iter().chain(iter::repeat(&zero)))
+        } else {
+            (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
+        };
+        PointsValue::new(left.zip(right).map(|(a, b)| *a - *b).collect())
+    }
+}
+
 impl<'a, 'b, F: FftField> Add<&'a Coefficients<F>> for &'b Coefficients<F> {
     type Output = Coefficients<F>;
 
