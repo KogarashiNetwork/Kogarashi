@@ -4,7 +4,7 @@ use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
 use crate::groth16::Groth16;
 use poly_commit::{Fft, PointsValue};
-use zkstd::common::{vec, Pairing, PrimeField, TwistedEdwardsCurve, Vec};
+use zkstd::common::{vec, Pairing, PrimeField, Ring, TwistedEdwardsCurve, Vec};
 
 #[derive(Debug)]
 pub struct Prover<P: Pairing> {
@@ -38,46 +38,60 @@ impl<P: Pairing> Prover<P> {
 
         let fft = Fft::<P::ScalarField>::new(k as usize);
 
-        let h = {
+        println!("A = {:?}", cs.a);
+        println!("B = {:?}", cs.b);
+        println!("C = {:?}", cs.c);
+
+        println!("inputs = {:#?}", cs.instance);
+        println!("aux = {:#?}", cs.witness);
+
+        let (left, h) = {
             let a = fft.idft(PointsValue(cs.a.clone()));
             let b = fft.idft(PointsValue(cs.b.clone()));
             let c = fft.idft(PointsValue(cs.c.clone()));
+            println!("A = {:?}", a);
+            println!("B = {:?}", b);
+            println!("C = {:?}", c);
 
             let mut a = fft.coset_dft(a);
             let b = fft.coset_dft(b);
             let c = fft.coset_dft(c);
 
-            // println!("A = {:?}", a);
-            // println!("B = {:?}", b);
-            // println!("C = {:?}", c);
+            println!("A_coset = {:?}", a);
+            println!("B_coset = {:?}", b);
+            println!("C_coset = {:?}", c);
 
             a = fft.points_mul(a, b);
             a = &a - &c;
+
+            let left = fft.coset_idft(a.clone());
 
             a = fft.divide_by_z_on_coset(a);
 
             let mut a = fft.coset_idft(a);
             a.0.truncate(a.len() - 1);
 
-            // println!("A = {:?}", a);
-            // println!("B = {:?}", b);
-            // println!("C = {:?}", c);
-
-            a
-            // a.mul_assign(&b);
-            // drop(b);
-            // a.sub_assign(&worker, &c);
-            // drop(c);
-            // a.divide_by_z_on_coset(&worker);
-            // a.icoset_fft(&worker);
-            // let mut a = a.into_coeffs();
-            // let a_len = a.len() - 1;
-            // a.truncate(a_len);
-            // // TODO: parallelize if it's even helpful
-            // let a = Arc::new(a.into_iter().map(|s| s.0.into()).collect::<Vec<_>>());
-            //
-            // multiexp(&worker, params.get_h(a.len())?, FullDensity, a)
+            (left, a)
         };
+
+        println!("H = {:?}", h);
+        println!("Left_coeff = {:?}", left);
+
+        let point = P::ScalarField::from(35);
+        let a_eval = left.evaluate(&point);
+        let h_eval = h.evaluate(&point);
+        let t_eval = fft.z_on_coset();
+
+        let right: P::ScalarField = h_eval * t_eval;
+
+        println!("Left = {:?}", a_eval);
+        println!("H = {:?}", h_eval);
+        println!("T = {:?}", t_eval);
+        println!("Right = {:?}", right);
+        assert_eq!(a_eval, right);
+        // assert!(left.evaluate(&point) == h.evaluate(&point) * fft.z_on_coset());
+
+        // A, B, C - > x = 1..cs.m() -> R1CS_Eval(instance, witness)
 
         // println!("H = {:?}", h);
         // println!("Constr = {:#?}", cs.constraints);

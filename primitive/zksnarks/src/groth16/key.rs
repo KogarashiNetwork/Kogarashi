@@ -51,12 +51,12 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
     > {
         let mut cs = Groth16::initialize();
 
+        circuit.synthesize(&mut cs)?;
+
         let size = cs.m().next_power_of_two();
         let k = size.trailing_zeros();
 
         let fft = Fft::<P::ScalarField>::new(k as usize);
-
-        circuit.synthesize(&mut cs)?;
 
         let (alpha, beta, gamma, delta, tau) =
             generate_random_parameters::<P::ScalarField, OsRng>(&mut OsRng);

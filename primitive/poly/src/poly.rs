@@ -101,10 +101,11 @@ impl<F: FftField> Coefficients<F> {
 
     // evaluate polynomial at
     pub fn evaluate(&self, at: &F) -> F {
-        self.0
-            .iter()
-            .rev()
-            .fold(F::zero(), |acc, coeff| acc * at + coeff)
+        self.0.iter().rev().fold(F::zero(), |acc, coeff| {
+            let tmp = acc * at + coeff;
+            println!("Acc = {acc:?}, at = {at:?}, v = {coeff:?}");
+            tmp
+        })
     }
 
     // no remainder polynomial division with at
@@ -201,12 +202,14 @@ impl<'a, 'b, F: FftField> Sub<&'a PointsValue<F>> for &'b PointsValue<F> {
 
     fn sub(self, rhs: &'a PointsValue<F>) -> Self::Output {
         let zero = F::zero();
-        let (left, right) = if self.0.len() > rhs.0.len() {
-            (self.0.iter(), rhs.0.iter().chain(iter::repeat(&zero)))
+
+        PointsValue::new(if self.0.len() > rhs.0.len() {
+            let (left, right) = (self.0.iter(), rhs.0.iter().chain(iter::repeat(&zero)));
+            left.zip(right).map(|(a, b)| *a - *b).collect()
         } else {
-            (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
-        };
-        PointsValue::new(left.zip(right).map(|(a, b)| *a - *b).collect())
+            let (left, right) = (self.0.iter().chain(iter::repeat(&zero)), rhs.0.iter());
+            left.zip(right).map(|(a, b)| *a - *b).collect()
+        })
     }
 }
 

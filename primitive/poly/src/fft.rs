@@ -167,11 +167,21 @@ impl<F: FftField> Fft<F> {
         tmp
     }
 
+    /// This evaluates t(tau) for this domain, which is
+    /// tau^m - 1 for these radix-2 domains.
+    pub fn z_on_coset(&self) -> F {
+        println!("Gen = {:?}", F::MULTIPLICATIVE_GENERATOR);
+        let mut tmp = F::MULTIPLICATIVE_GENERATOR.pow(self.n as u64);
+        tmp.sub_assign(&F::one());
+
+        tmp
+    }
+
     /// The target polynomial is the zero polynomial in our
     /// evaluation domain, so we must perform division over
     /// a coset.
     pub fn divide_by_z_on_coset(&self, points: PointsValue<F>) -> PointsValue<F> {
-        let i = self.z(&F::MULTIPLICATIVE_GENERATOR).invert().unwrap();
+        let i = self.z_on_coset().invert().unwrap();
 
         PointsValue(points.0.into_iter().map(|v| v * i).collect())
     }
