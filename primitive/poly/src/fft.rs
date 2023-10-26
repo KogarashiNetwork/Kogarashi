@@ -207,17 +207,6 @@ impl<F: FftField> Fft<F> {
         self.idft(mul_poly)
     }
 
-    /// points value multiplication
-    pub fn points_mul(&self, rhs: PointsValue<F>, lhs: PointsValue<F>) -> PointsValue<F> {
-        PointsValue::new(
-            rhs.0
-                .iter()
-                .zip(lhs.0.iter())
-                .map(|(a, b)| *a * *b)
-                .collect(),
-        )
-    }
-
     /// Evaluate all the lagrange polynomials defined by this domain at the
     /// point `tau`.
     pub fn evaluate_all_lagrange_coefficients(&self, tau: F) -> Vec<F> {
