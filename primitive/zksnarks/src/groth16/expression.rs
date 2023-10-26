@@ -4,7 +4,7 @@ use alloc::format;
 #[cfg(not(feature = "std"))]
 use alloc::string::String;
 use core::fmt;
-use core::fmt::Formatter;
+use core::fmt::{Debug, Formatter};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use hashbrown::HashMap;
 use itertools::Itertools;
@@ -15,10 +15,26 @@ pub trait Evaluable<F: Field, R> {
 }
 
 /// A linear combination of wires.
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Eq, PartialEq)]
 pub struct Expression<F: Field> {
     /// The coefficient of each wire. Wires with a coefficient of zero are omitted.
     coefficients: HashMap<Wire, F>,
+}
+
+impl<F: Field> Debug for Expression<F> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_list()
+            .entries(
+                self.coefficients
+                    .keys()
+                    .map(|w| match w.get_unchecked() {
+                        Index::Input(i) => format!("{i}_i"),
+                        Index::Aux(i) => format!("{i}_a"),
+                    })
+                    .zip(self.coefficients.values()),
+            )
+            .finish()
+    }
 }
 
 impl<F: Field> Expression<F> {

@@ -85,11 +85,11 @@ pub mod pallet {
 
     #[pallet::config]
     pub trait Config: frame_system::Config {
-        /// < HB SBP M2 review
-        ///
-        /// Usually Config items are named more descriptively. In this case i would suggest to rename it to `type Pairing: Paring;`
-        ///
-        /// >
+        // < HB SBP M2 review
+        //
+        // Usually Config items are named more descriptively. In this case i would suggest to rename it to `type Pairing: Paring;`
+        //
+        // >
         type P: Pairing;
         /// The circuit customized by developer
         type CustomCircuit: Circuit<

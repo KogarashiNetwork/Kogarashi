@@ -30,7 +30,7 @@ impl<F: FftField> Fft<F> {
     pub fn new(k: usize) -> Self {
         assert!(k >= 1);
         let n = 1 << k;
-        let half_n = n / 2;
+        let half_n = n >> 1;
         let offset = 64 - k;
 
         // precompute twiddle factors
@@ -55,7 +55,7 @@ impl<F: FftField> Fft<F> {
 
         // precompute cosets
         let mul_g = F::MULTIPLICATIVE_GENERATOR;
-        let cosets = (0..half_n)
+        let cosets = (0..n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= mul_g;
@@ -156,6 +156,33 @@ impl<F: FftField> Fft<F> {
             .zip(self.inv_cosets.iter())
             .for_each(|(coeff, inv_coset)| *coeff *= *inv_coset);
         Coefficients::new(points.0)
+    }
+
+    /// This evaluates t(tau) for this domain, which is
+    /// tau^m - 1 for these radix-2 domains.
+    pub fn z(&self, tau: &F) -> F {
+        let mut tmp = tau.pow(self.n as u64);
+        tmp.sub_assign(&F::one());
+
+        tmp
+    }
+
+    /// This evaluates t(tau) for this domain, which is
+    /// tau^m - 1 for these radix-2 domains.
+    pub fn z_on_coset(&self) -> F {
+        let mut tmp = F::MULTIPLICATIVE_GENERATOR.pow(self.n as u64);
+        tmp.sub_assign(&F::one());
+
+        tmp
+    }
+
+    /// The target polynomial is the zero polynomial in our
+    /// evaluation domain, so we must perform division over
+    /// a coset.
+    pub fn divide_by_z_on_coset(&self, points: PointsValue<F>) -> PointsValue<F> {
+        let i = self.z_on_coset().invert().unwrap();
+
+        PointsValue(points.0.into_iter().map(|v| v * i).collect())
     }
 
     /// resize polynomial and bit reverse swap
@@ -294,7 +321,6 @@ fn butterfly_arithmetic<F: FftField>(
 #[cfg(test)]
 mod tests {
     use crate::poly::Coefficients;
-    use crate::PointsValue;
 
     use super::Fft;
     use bls_12_381::Fr;
@@ -317,16 +343,6 @@ mod tests {
             })
         });
         c
-    }
-
-    fn point_mutiply<F: PrimeField>(a: PointsValue<F>, b: PointsValue<F>) -> PointsValue<F> {
-        assert_eq!(a.0.len(), b.0.len());
-        PointsValue(
-            a.0.iter()
-                .zip(b.0.iter())
-                .map(|(coeff_a, coeff_b)| *coeff_a * *coeff_b)
-                .collect::<Vec<F>>(),
-        )
     }
 
     #[test]
@@ -358,7 +374,7 @@ mod tests {
 
         let evals_a = fft.dft(poly_a);
         let evals_b = fft.dft(poly_b);
-        let poly_f = point_mutiply(evals_a, evals_b);
+        let poly_f = &evals_a * &evals_b;
         let poly_f = fft.idft(poly_f);
 
         let poly_i = fft.poly_mul(poly_g, poly_h);
