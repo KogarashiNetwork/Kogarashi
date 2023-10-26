@@ -1,3 +1,8 @@
+/// < HB SBP M2 review:
+///
+/// generally these kind of definitions are contained in a types.rs, leaving the implementations to impls.rs
+///
+/// >
 use frame_support::pallet_prelude::DispatchResultWithPostInfo;
 use pallet_plonk::FullcodecRng;
 
