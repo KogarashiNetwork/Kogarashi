@@ -47,13 +47,13 @@ pub mod pallet {
     pub trait Config:
         frame_system::Config + pallet_plonk::Config + pallet_encrypted_balance::Config
     {
-        /// < HB SBP M2 review
-        ///
-        ///  type Plonk: Plonk<<Self as pallet_plonk::Config>::Pairing>;
-        ///
-        ///  has better readibility.
-        ///
-        /// >
+        // < HB SBP M2 review
+        //
+        //  type Plonk: Plonk<<Self as pallet_plonk::Config>::Pairing>;
+        //
+        //  has better readibility.
+        //
+        // >
         type Plonk: Plonk<<Self as pallet_encrypted_balance::Config>::P>;
         type EncryptedCurrency: EncryptedCurrency<Self::AccountId, Self::EncryptedBalance>;
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
@@ -72,11 +72,11 @@ pub mod pallet {
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         // SBP-M1 review: missing proper benchmarking
-        /// < HB SBP M2 review
-        ///
-        /// Usually Config items are named more descriptively. In this case i would suggest to rename it to `type Pairing: Paring;`
-        ///
-        /// >
+        // < HB SBP M2 review
+        //
+        // Usually Config items are named more descriptively. In this case i would suggest to rename it to `type Pairing: Paring;`
+        //
+        // >
         #[pallet::weight(10_000)]
         pub fn trusted_setup(
             origin: OriginFor<T>,
@@ -88,11 +88,11 @@ pub mod pallet {
         }
 
         // SBP-M1 review: missing proper benchmarking
-        /// < HB SBP M2 review
-        ///
-        /// Usually Config items are named more descriptively. In this case i would suggest to rename it to `type Pairing: Paring;`
-        ///
-        /// >
+        // < HB SBP M2 review
+        //
+        // Usually Config items are named more descriptively. In this case i would suggest to rename it to `type Pairing: Paring;`
+        //
+        // >
         #[pallet::weight(10_000)]
         pub fn confidential_transfer(
             origin: OriginFor<T>,
