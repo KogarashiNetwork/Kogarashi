@@ -53,7 +53,12 @@ pub mod jubjub_curve {
         0x351332208fc5a8c4,
     ];
 
-    pub const BLS_SCALAR_MULTIPLICATIVE_GENERATOR: BlsScalar = BlsScalar([7, 0, 0, 0]);
+    pub const BLS_SCALAR_MULTIPLICATIVE_GENERATOR: BlsScalar = BlsScalar([
+        0x0000000efffffff1,
+        0x17e363d300189c0f,
+        0xff9c57876f8457b0,
+        0x351332208fc5a8c4,
+    ]);
 
     pub const BLS_SCALAR_R: [u64; 4] = [
         0x00000001fffffffe,

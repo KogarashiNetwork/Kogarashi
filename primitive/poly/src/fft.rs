@@ -30,11 +30,12 @@ impl<F: FftField> Fft<F> {
     pub fn new(k: usize) -> Self {
         assert!(k >= 1);
         let n = 1 << k;
+        let half_n = n >> 1;
         let offset = 64 - k;
 
         // precompute twiddle factors
         let g = (0..F::S - k).fold(F::ROOT_OF_UNITY, |acc, _| acc.square());
-        let twiddle_factors = (0..n)
+        let twiddle_factors = (0..half_n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= g;
@@ -44,7 +45,7 @@ impl<F: FftField> Fft<F> {
 
         // precompute inverse twiddle factors
         let g_inv = g.invert().unwrap();
-        let inv_twiddle_factors = (0..n)
+        let inv_twiddle_factors = (0..half_n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= g_inv;
@@ -331,7 +332,6 @@ fn butterfly_arithmetic<F: FftField>(
 #[cfg(test)]
 mod tests {
     use crate::poly::Coefficients;
-    use crate::PointsValue;
 
     use super::Fft;
     use bls_12_381::Fr;
@@ -354,16 +354,6 @@ mod tests {
             })
         });
         c
-    }
-
-    fn point_mutiply<F: PrimeField>(a: PointsValue<F>, b: PointsValue<F>) -> PointsValue<F> {
-        assert_eq!(a.0.len(), b.0.len());
-        PointsValue(
-            a.0.iter()
-                .zip(b.0.iter())
-                .map(|(coeff_a, coeff_b)| *coeff_a * *coeff_b)
-                .collect::<Vec<F>>(),
-        )
     }
 
     #[test]
@@ -395,7 +385,7 @@ mod tests {
 
         let evals_a = fft.dft(poly_a);
         let evals_b = fft.dft(poly_b);
-        let poly_f = point_mutiply(evals_a, evals_b);
+        let poly_f = &evals_a * &evals_b;
         let poly_f = fft.idft(poly_f);
 
         let poly_i = fft.poly_mul(poly_g, poly_h);

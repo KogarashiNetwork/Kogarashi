@@ -37,7 +37,7 @@ impl<P: Pairing> Prover<P> {
             let b = fft.coset_dft(b);
             let c = fft.coset_dft(c);
 
-            a = fft.points_mul(a, b);
+            a = &a * &b;
             a = &a - &c;
 
             let left = fft.coset_idft(a.clone());
