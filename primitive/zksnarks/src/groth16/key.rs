@@ -35,6 +35,7 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
     Groth16Key<P, C>
 {
     #[allow(clippy::type_complexity)]
+    #[allow(unused_variables)]
     /// Create a new arguments set from a given circuit instance
     ///
     /// Use the provided circuit instead of the default implementation
@@ -98,11 +99,11 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
         // Use inverse FFT to convert powers of tau to Lagrange coefficients
         let powers_of_tau = fft.idft(powers_of_tau);
 
-        let mut a = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
-        let mut b_g1 = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
-        let mut b_g2 = vec![P::G2Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
-        let mut ic = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len()];
-        let mut l = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.witness_len()];
+        let a = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
+        let b_g1 = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
+        let b_g2 = vec![P::G2Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
+        let ic = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len()];
+        let l = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.witness_len()];
 
         let _vk = VerifyingKey::<P> {
             alpha_g1: (P::G1Affine::ADDITIVE_GENERATOR * alpha).into(),

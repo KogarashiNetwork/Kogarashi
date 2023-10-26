@@ -101,11 +101,10 @@ impl<F: FftField> Coefficients<F> {
 
     // evaluate polynomial at
     pub fn evaluate(&self, at: &F) -> F {
-        self.0.iter().rev().fold(F::zero(), |acc, coeff| {
-            let tmp = acc * at + coeff;
-            println!("Acc = {acc:?}, at = {at:?}, v = {coeff:?}");
-            tmp
-        })
+        self.0
+            .iter()
+            .rev()
+            .fold(F::zero(), |acc, coeff| acc * at + coeff)
     }
 
     // no remainder polynomial division with at

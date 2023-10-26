@@ -30,12 +30,11 @@ impl<F: FftField> Fft<F> {
     pub fn new(k: usize) -> Self {
         assert!(k >= 1);
         let n = 1 << k;
-        let half_n = n / 2;
         let offset = 64 - k;
 
         // precompute twiddle factors
         let g = (0..F::S - k).fold(F::ROOT_OF_UNITY, |acc, _| acc.square());
-        let twiddle_factors = (0..half_n)
+        let twiddle_factors = (0..n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= g;
@@ -45,7 +44,7 @@ impl<F: FftField> Fft<F> {
 
         // precompute inverse twiddle factors
         let g_inv = g.invert().unwrap();
-        let inv_twiddle_factors = (0..half_n)
+        let inv_twiddle_factors = (0..n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= g_inv;
@@ -55,7 +54,7 @@ impl<F: FftField> Fft<F> {
 
         // precompute cosets
         let mul_g = F::MULTIPLICATIVE_GENERATOR;
-        let cosets = (0..half_n)
+        let cosets = (0..n)
             .scan(F::one(), |w, _| {
                 let tw = *w;
                 *w *= mul_g;
@@ -170,7 +169,6 @@ impl<F: FftField> Fft<F> {
     /// This evaluates t(tau) for this domain, which is
     /// tau^m - 1 for these radix-2 domains.
     pub fn z_on_coset(&self) -> F {
-        println!("Gen = {:?}", F::MULTIPLICATIVE_GENERATOR);
         let mut tmp = F::MULTIPLICATIVE_GENERATOR.pow(self.n as u64);
         tmp.sub_assign(&F::one());
 

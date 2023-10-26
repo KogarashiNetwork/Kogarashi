@@ -22,7 +22,12 @@ const GENERATOR: [u64; 4] = [
 ];
 
 /// generator of the scalar field
-pub const MULTIPLICATIVE_GENERATOR: Fr = Fr([7, 0, 0, 0]);
+pub const MULTIPLICATIVE_GENERATOR: Fr = Fr([
+    0x0000_000e_ffff_fff1,
+    0x17e3_63d3_0018_9c0f,
+    0xff9c_5787_6f84_57b0,
+    0x3513_3220_8fc5_a8c4,
+]);
 
 /// R = 2^256 mod r
 const R: [u64; 4] = [
