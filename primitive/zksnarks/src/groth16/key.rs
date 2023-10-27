@@ -118,6 +118,7 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
         Ok((
             Prover::<P> {
                 constraints: cs.constraints,
+                keypair: pp.clone(),
             },
             (),
         ))

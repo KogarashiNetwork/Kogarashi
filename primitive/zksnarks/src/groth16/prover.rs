@@ -2,14 +2,16 @@ use super::constraint::Constraint;
 use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
+use crate::groth16::params::Groth16Params;
 use crate::groth16::Groth16;
 use poly_commit::{Fft, PointsValue};
 use rand::rngs::OsRng;
-use zkstd::common::{Group, Pairing, TwistedEdwardsCurve, Vec};
+use zkstd::common::{Group, Pairing, PairingRange, TwistedEdwardsCurve, Vec};
 
 #[derive(Debug)]
 pub struct Prover<P: Pairing> {
     pub constraints: Vec<Constraint<<P::JubjubAffine as TwistedEdwardsCurve>::Range>>,
+    pub(crate) keypair: Groth16Params<P>,
 }
 
 impl<P: Pairing> Prover<P> {
@@ -49,12 +51,26 @@ impl<P: Pairing> Prover<P> {
         };
 
         let point = P::ScalarField::random(OsRng);
-        let a_eval = left.evaluate(&point);
+        let left_eval = left.evaluate(&point);
         let h_eval = h.evaluate(&point);
         let t_eval = fft.z_on_coset();
         let right: P::ScalarField = h_eval * t_eval;
 
-        assert_eq!(a_eval, right);
+        let left_com = self.keypair.commitment_key.commit(&left);
+        let h_com = self.keypair.commitment_key.commit(&h);
+        let t_g2 = P::G2PairngRepr::from((self.keypair.evaluation_key.h * t_eval).into());
+
+        let pairing = P::multi_miller_loop(&[
+            (h_com.0, t_g2),
+            (-left_com.0, self.keypair.evaluation_key.prepared_h.clone()),
+        ])
+        .final_exp();
+
+        assert_eq!(
+            pairing,
+            <<P as Pairing>::PairingRange as PairingRange>::Gt::ADDITIVE_IDENTITY
+        );
+        assert_eq!(left_eval, right);
 
         Ok(cs.constraints.iter().all(|constraint| {
             let (a, b, c) = constraint.evaluate(&cs.instance, &cs.witness);
