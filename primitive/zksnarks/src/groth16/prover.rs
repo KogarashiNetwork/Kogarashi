@@ -1,20 +1,25 @@
+mod proof;
+
 use super::constraint::Constraint;
 use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
+use crate::groth16::params::Groth16Params;
 use crate::groth16::Groth16;
 use poly_commit::{Fft, PointsValue};
+pub use proof::Proof;
 use rand::rngs::OsRng;
 use zkstd::common::{Group, Pairing, TwistedEdwardsCurve, Vec};
 
 #[derive(Debug)]
 pub struct Prover<P: Pairing> {
     pub constraints: Vec<Constraint<<P::JubjubAffine as TwistedEdwardsCurve>::Range>>,
+    pub(crate) keypair: Groth16Params<P>,
 }
 
 impl<P: Pairing> Prover<P> {
     /// Execute the gadget, and return whether all constraints were satisfied.
-    pub fn create_proof<C>(&mut self, circuit: C) -> Result<bool, Error>
+    pub fn create_proof<C>(&mut self, circuit: C) -> Result<Proof<P>, Error>
     where
         C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::JubjubAffine>>,
     {
@@ -49,16 +54,21 @@ impl<P: Pairing> Prover<P> {
         };
 
         let point = P::ScalarField::random(OsRng);
-        let a_eval = left.evaluate(&point);
+        let left_eval = left.evaluate(&point);
         let h_eval = h.evaluate(&point);
         let t_eval = fft.z_on_coset();
         let right: P::ScalarField = h_eval * t_eval;
 
-        assert_eq!(a_eval, right);
+        let left_com = self.keypair.commitment_key.commit(&left);
+        let h_com = self.keypair.commitment_key.commit(&h);
+        let t_g2 = self.keypair.evaluation_key.h * t_eval;
 
-        Ok(cs.constraints.iter().all(|constraint| {
-            let (a, b, c) = constraint.evaluate(&cs.instance, &cs.witness);
-            a * b == c
-        }))
+        assert_eq!(left_eval, right);
+
+        Ok(Proof::<P> {
+            a: h_com.0,
+            b: t_g2.into(),
+            c: left_com.0,
+        })
     }
 }
