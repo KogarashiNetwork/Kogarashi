@@ -1,3 +1,5 @@
+mod proof;
+
 use super::constraint::Constraint;
 use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
@@ -5,8 +7,9 @@ use crate::error::Error;
 use crate::groth16::params::Groth16Params;
 use crate::groth16::Groth16;
 use poly_commit::{Fft, PointsValue};
+pub use proof::Proof;
 use rand::rngs::OsRng;
-use zkstd::common::{Group, Pairing, PairingRange, TwistedEdwardsCurve, Vec};
+use zkstd::common::{Group, Pairing, TwistedEdwardsCurve, Vec};
 
 #[derive(Debug)]
 pub struct Prover<P: Pairing> {
@@ -16,7 +19,7 @@ pub struct Prover<P: Pairing> {
 
 impl<P: Pairing> Prover<P> {
     /// Execute the gadget, and return whether all constraints were satisfied.
-    pub fn create_proof<C>(&mut self, circuit: C) -> Result<bool, Error>
+    pub fn create_proof<C>(&mut self, circuit: C) -> Result<Proof<P>, Error>
     where
         C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::JubjubAffine>>,
     {
@@ -58,23 +61,14 @@ impl<P: Pairing> Prover<P> {
 
         let left_com = self.keypair.commitment_key.commit(&left);
         let h_com = self.keypair.commitment_key.commit(&h);
-        let t_g2 = P::G2PairngRepr::from((self.keypair.evaluation_key.h * t_eval).into());
+        let t_g2 = self.keypair.evaluation_key.h * t_eval;
 
-        let pairing = P::multi_miller_loop(&[
-            (h_com.0, t_g2),
-            (-left_com.0, self.keypair.evaluation_key.prepared_h.clone()),
-        ])
-        .final_exp();
-
-        assert_eq!(
-            pairing,
-            <<P as Pairing>::PairingRange as PairingRange>::Gt::ADDITIVE_IDENTITY
-        );
         assert_eq!(left_eval, right);
 
-        Ok(cs.constraints.iter().all(|constraint| {
-            let (a, b, c) = constraint.evaluate(&cs.instance, &cs.witness);
-            a * b == c
-        }))
+        Ok(Proof::<P> {
+            a: h_com.0,
+            b: t_g2.into(),
+            c: left_com.0,
+        })
     }
 }

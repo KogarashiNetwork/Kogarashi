@@ -4,6 +4,7 @@ use crate::error::Error;
 use crate::groth16::error::Groth16Error;
 use crate::groth16::params::Groth16Params;
 use crate::groth16::prover::Prover;
+use crate::groth16::verifier::Verifier;
 use crate::groth16::Groth16;
 use crate::keypair::Keypair;
 use core::marker::PhantomData;
@@ -23,7 +24,7 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
 {
     type PublicParameters = Groth16Params<P>;
     type Prover = Prover<P>;
-    type Verifier = ();
+    type Verifier = Verifier<P>;
     type ConstraintSystem = Groth16<P::JubjubAffine>;
 
     fn compile(pp: &Self::PublicParameters) -> Result<(Self::Prover, Self::Verifier), Error> {
@@ -120,7 +121,9 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
                 constraints: cs.constraints,
                 keypair: pp.clone(),
             },
-            (),
+            Verifier::<P> {
+                opening_key: pp.evaluation_key.clone(),
+            },
         ))
     }
 }

@@ -4,6 +4,7 @@ mod expression;
 mod params;
 mod prover;
 mod util;
+mod verifier;
 
 pub(crate) mod curves;
 pub(crate) mod error;
@@ -270,9 +271,10 @@ mod tests {
 
         let circuit = DummyCircuit::new(x, y);
 
-        let (mut prover, _verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
+        let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
             .expect("Failed to compile circuit");
-        assert!(prover.create_proof(circuit).expect("Failed to prove"));
+        let proof = prover.create_proof(circuit).expect("Failed to prove");
+        verifier.verify(&proof).expect("Failed to verify the proof");
     }
 
     #[test]
@@ -320,8 +322,9 @@ mod tests {
         let o = BlsScalar::from(35);
         let circuit = DummyCircuit::new(x, o);
 
-        let (mut prover, _verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
+        let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
             .expect("Failed to compile circuit");
-        assert!(prover.create_proof(circuit).expect("Failed to prove"));
+        let proof = prover.create_proof(circuit).expect("Failed to prove");
+        verifier.verify(&proof).expect("Failed to verify the proof");
     }
 }
