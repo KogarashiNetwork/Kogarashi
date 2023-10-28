@@ -239,11 +239,10 @@ impl<F: FftField> Fft<F> {
 
             batch_inversion(u.as_mut_slice());
 
-            u.iter_mut().zip(ls).for_each(|(tau_minus_r, l)| {
-                *tau_minus_r = l * *tau_minus_r;
-            });
-
-            u
+            u.iter()
+                .zip(ls)
+                .map(|(tau_minus_r, l)| l * *tau_minus_r)
+                .collect()
         }
     }
 
