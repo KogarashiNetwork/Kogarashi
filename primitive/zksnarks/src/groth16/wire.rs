@@ -1,6 +1,7 @@
 use core::cmp::Ordering;
 use core::fmt;
 use core::fmt::Formatter;
+use std::ops::Deref;
 
 /// Represents the index of either an input variable or
 /// auxiliary variable.
@@ -10,6 +11,16 @@ pub enum Index {
     Aux(usize),
 }
 
+impl Deref for Index {
+    type Target = usize;
+
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Index::Input(i) => i,
+            Index::Aux(i) => i,
+        }
+    }
+}
 impl Default for Index {
     fn default() -> Self {
         Self::Input(0)
