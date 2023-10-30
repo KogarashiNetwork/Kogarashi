@@ -11,8 +11,10 @@ use core::marker::PhantomData;
 use core::ops::MulAssign;
 use poly_commit::{Coefficients, Fft, PointsValue};
 use rand::rngs::OsRng;
+use std::ops::Neg;
 use zkstd::common::{
-    vec, CurveGroup, FftField, Group, Pairing, PrimeField, Ring, RngCore, Vec, WeierstrassAffine,
+    vec, CurveGroup, FftField, Group, Pairing, PairingRange, PrimeField, Ring, RngCore, Vec,
+    WeierstrassAffine,
 };
 
 /// Generate the arguments to prove and verify a circuit
@@ -57,8 +59,6 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
 
         circuit.synthesize(&mut cs)?;
 
-        // println!("Cs = {cs:#?}");
-
         let size = cs.m().next_power_of_two();
         let k = size.trailing_zeros();
 
@@ -68,7 +68,6 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
             generate_random_parameters::<P::ScalarField, OsRng>(&mut OsRng);
 
         let g1 = pp.commitment_key.bases[0];
-        println!("G1 = {g1:#?}");
         let g2 = pp.evaluation_key.h;
         let mut powers_of_tau = PointsValue(vec![P::ScalarField::zero(); cs.m()]);
 
@@ -134,19 +133,11 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
             &mut a[cs.instance_len()..],
             &mut b_g1[cs.instance_len()..],
             &mut b_g2[cs.instance_len()..],
-            &mut ic,
+            &mut l,
             &delta_inverse,
             &alpha,
             &beta,
         );
-
-        // // Don't allow any elements be unconstrained, so that
-        // // the L query is always fully dense.
-        // for e in l.iter() {
-        //     if e.is_identity() {
-        //         return Err(Groth16Error::General.into());
-        //     }
-        // }
 
         let vk = VerifyingKey::<P> {
             alpha_g1: (P::G1Affine::ADDITIVE_GENERATOR * alpha).into(),
@@ -158,25 +149,18 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
             ic,
         };
 
-        println!("Vk = {vk:#?}");
-
-        println!("H = {h:#?}");
-        println!("L = {l:#?}");
-        println!(
-            "A = {:#?}",
-            a.iter().filter(|e| !e.is_identity()).collect::<Vec<_>>()
-        );
-        println!(
-            "B_G1 = {:#?}",
-            b_g1.iter().filter(|e| !e.is_identity()).collect::<Vec<_>>()
-        );
-        println!(
-            "B_G2 = {:#?}",
-            b_g2.iter().filter(|e| !e.is_identity()).collect::<Vec<_>>()
-        );
+        let params = Parameters {
+            vk,
+            h,
+            l,
+            a,
+            b_g1,
+            b_g2,
+        };
 
         Ok((
             Prover::<P> {
+                params,
                 constraints: cs.constraints,
                 keypair: pp.clone(),
             },
@@ -222,6 +206,7 @@ fn eval<P: Pairing>(
         .zip(bt.iter())
         .zip(ct.iter())
     {
+        // println!("At = {at:?}\nbt = {bt:?}\nct = {ct:?}");
         // Evaluate QAP polynomials at tau
         let mut at = eval_at_tau(powers_of_tau, at);
         let mut bt = eval_at_tau(powers_of_tau, bt);
@@ -242,9 +227,6 @@ fn eval<P: Pairing>(
 
         at *= beta;
         bt *= alpha;
-
-        // let point = g1 * ((at + bt + ct) * inv);
-        println!("E = {:?}", ((at + bt + ct) * inv));
 
         *ext = (g1 * ((at + bt + ct) * inv)).into();
     }
@@ -310,6 +292,30 @@ pub struct VerifyingKey<P: Pairing> {
     // this is the same size as the number of inputs, and never contains points
     // at infinity.
     pub ic: Vec<P::G1Affine>,
+}
+
+pub struct PreparedVerifyingKey<P: Pairing> {
+    /// Pairing result of alpha*beta
+    pub(crate) alpha_g1_beta_g2: <P::PairingRange as PairingRange>::Gt,
+    /// -gamma in G2
+    pub(crate) neg_gamma_g2: P::G2PairngRepr,
+    /// -delta in G2
+    pub(crate) neg_delta_g2: P::G2PairngRepr,
+    /// Copy of IC from `VerifiyingKey`.
+    pub(crate) ic: Vec<P::G1Affine>,
+}
+
+pub fn prepare_verifying_key<P: Pairing>(vk: &VerifyingKey<P>) -> PreparedVerifyingKey<P> {
+    let gamma = vk.gamma_g2.neg();
+    let delta = vk.delta_g2.neg();
+
+    PreparedVerifyingKey {
+        alpha_g1_beta_g2: P::multi_miller_loop(&[(vk.alpha_g1, P::G2PairngRepr::from(vk.beta_g2))])
+            .final_exp(),
+        neg_gamma_g2: P::G2PairngRepr::from(gamma),
+        neg_delta_g2: P::G2PairngRepr::from(delta),
+        ic: vk.ic.clone(),
+    }
 }
 
 /// Generates a random common reference string for

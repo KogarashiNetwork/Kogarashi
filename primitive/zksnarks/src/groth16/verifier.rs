@@ -1,4 +1,5 @@
 use crate::error::Error;
+use crate::groth16::key::PreparedVerifyingKey;
 use crate::groth16::prover::Proof;
 use poly_commit::EvaluationKey;
 use zkstd::common::Pairing;
@@ -14,7 +15,12 @@ impl<P: Pairing> Verifier<P> {
     }
 
     /// Verify a generated proof
-    pub fn verify(&self, proof: &Proof<P>) -> Result<(), Error> {
-        proof.verify(&self.opening_key)
+    pub fn verify(
+        &self,
+        vk: PreparedVerifyingKey<P>,
+        proof: &Proof<P>,
+        public_inputs: &[P::ScalarField],
+    ) -> Result<(), Error> {
+        proof.verify(vk, public_inputs)
     }
 }

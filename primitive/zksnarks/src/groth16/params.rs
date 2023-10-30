@@ -15,7 +15,8 @@ impl<P: Pairing> PublicParameters<P> for Groth16Params<P> {
 
     /// setup polynomial evaluation domain
     fn setup(k: u64, r: impl RngCore) -> Self {
-        let r = P::ScalarField::random(r);
+        // let r = P::ScalarField::random(r);
+        let r = P::ScalarField::one();
         // G1, r * G1, r^2 * G1, ..., r^n-1 * G1
         let g1 = (0..=((1 << k) + Self::ADDITIONAL_DEGREE as u64))
             .map(|i| {
