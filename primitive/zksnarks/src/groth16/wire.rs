@@ -21,6 +21,7 @@ impl Deref for Index {
         }
     }
 }
+
 impl Default for Index {
     fn default() -> Self {
         Self::Input(0)
