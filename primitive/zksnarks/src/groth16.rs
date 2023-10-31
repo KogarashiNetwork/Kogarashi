@@ -85,20 +85,20 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
             a.coefficients()
                 .iter()
-                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Input(_)))
-                .for_each(|(&w, coeff)| {
+                .filter(|(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
+                .for_each(|(w, coeff)| {
                     at[*w.get_unchecked()].push((*coeff, i));
                 });
             b.coefficients()
                 .iter()
-                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Input(_)))
-                .for_each(|(&w, coeff)| {
+                .filter(|(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
+                .for_each(|(w, coeff)| {
                     bt[*w.get_unchecked()].push((*coeff, i));
                 });
             c.coefficients()
                 .iter()
-                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Input(_)))
-                .for_each(|(&w, coeff)| {
+                .filter(|(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
+                .for_each(|(w, coeff)| {
                     ct[*w.get_unchecked()].push((*coeff, i));
                 });
         }
@@ -119,20 +119,20 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
             a.coefficients()
                 .iter()
-                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
-                .for_each(|(&w, coeff)| {
+                .filter(|(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
+                .for_each(|(w, coeff)| {
                     at[*w.get_unchecked()].push((*coeff, i));
                 });
             b.coefficients()
                 .iter()
-                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
-                .for_each(|(&w, coeff)| {
+                .filter(|(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
+                .for_each(|(w, coeff)| {
                     bt[*w.get_unchecked()].push((*coeff, i));
                 });
             c.coefficients()
                 .iter()
-                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
-                .for_each(|(&w, coeff)| {
+                .filter(|(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
+                .for_each(|(w, coeff)| {
                     ct[*w.get_unchecked()].push((*coeff, i));
                 });
         }

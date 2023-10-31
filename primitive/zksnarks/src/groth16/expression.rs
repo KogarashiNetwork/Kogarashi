@@ -80,15 +80,6 @@ impl<F: Field> Expression<F> {
     }
 }
 
-fn get_value_from_wire<F: Field>(index: Index, vectors: &Vec<(Wire, F)>) -> Option<F> {
-    for vector in vectors {
-        if index == vector.0.get_unchecked() {
-            return Some(vector.1);
-        }
-    }
-    None
-}
-
 impl<F: Field> From<Wire> for Expression<F> {
     fn from(wire: Wire) -> Self {
         Expression::new([(wire, F::one())].iter().cloned().collect())
@@ -136,20 +127,39 @@ impl<F: Field> Add<&Expression<F>> for &Expression<F> {
 
     fn add(self, rhs: &Expression<F>) -> Expression<F> {
         let mut res = Vec::new();
-        for (wire, coefficient) in rhs.coefficients.clone() {
-            match self.coefficients.get(&wire) {
-                Some(coeff) => res.push((wire, *coeff + coefficient)),
+        let pallas = rhs
+            .coefficients
+            .iter()
+            .map(|element| (*element.0, *element.1))
+            .collect::<Vec<_>>();
+        let velles = self
+            .coefficients
+            .iter()
+            .map(|element| (*element.0, *element.1))
+            .collect::<Vec<_>>();
+        for (wire, coefficient) in pallas.clone() {
+            match get_value_from_wire(wire.get_unchecked(), &velles) {
+                Some(coeff) => res.push((wire, coeff + coefficient)),
                 None => res.push((wire, coefficient)),
             }
         }
-        for (wire, coefficient) in self.coefficients.clone() {
-            match rhs.coefficients.get(&wire) {
+        for (wire, coefficient) in velles {
+            match get_value_from_wire(wire.get_unchecked(), &pallas) {
                 Some(_) => {}
                 None => res.push((wire, coefficient)),
             }
         }
         Expression::new(res)
     }
+}
+
+fn get_value_from_wire<F: Field>(index: Index, vectors: &Vec<(Wire, F)>) -> Option<F> {
+    for vector in vectors {
+        if index == vector.0.get_unchecked() {
+            return Some(vector.1);
+        }
+    }
+    None
 }
 
 #[allow(clippy::op_ref)]
