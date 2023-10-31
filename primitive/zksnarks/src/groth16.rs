@@ -1,14 +1,16 @@
 #![allow(dead_code)]
 mod constraint;
 mod expression;
+mod key;
+mod matrix;
 mod params;
 mod prover;
 mod util;
 mod verifier;
+pub(crate) mod wire_alt;
 
 pub(crate) mod curves;
 pub(crate) mod error;
-mod key;
 pub mod wire;
 
 use crate::constraint_system::ConstraintSystem;
@@ -34,7 +36,14 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     type Constraints = Vec<Constraint<C::Range>>;
 
     fn initialize() -> Self {
-        Self::new()
+        Self {
+            constraints: Vec::new(),
+            a: vec![],
+            b: vec![],
+            c: vec![],
+            instance: [(Wire::ONE, C::Range::one())].into_iter().collect(),
+            witness: vec![],
+        }
     }
 
     fn m(&self) -> usize {
@@ -63,17 +72,6 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
 }
 
 impl<C: TwistedEdwardsAffine> Groth16<C> {
-    fn new() -> Self {
-        Self {
-            constraints: Vec::new(),
-            a: vec![],
-            b: vec![],
-            c: vec![],
-            instance: [(Wire::ONE, C::Range::one())].into_iter().collect(),
-            witness: vec![],
-        }
-    }
-
     fn inputs_iter(
         &self,
     ) -> (
