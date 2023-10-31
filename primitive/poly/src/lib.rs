@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #![doc = include_str!("../README.md")]
-// #![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 mod commitment;
 mod fft;
@@ -27,7 +27,7 @@ mod witness;
 pub use commitment::Commitment;
 pub use fft::Fft;
 pub use kzg::{CommitmentKey, EvaluationKey, Proof};
-pub use msm::msm_curve_addtion;
+pub use msm::msm_curve_addition;
 pub use poly::{Coefficients, PointsValue};
 pub use util::{batch_inversion, powers_of};
 pub use witness::Witness;

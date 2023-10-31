@@ -53,6 +53,9 @@ pub enum Error {
     /// Identity point.
     PairingCheckFailure,
 
+    /// This error occurs when we can't find an inverse element
+    UnexpectedIdentity,
+
     /// This error occurs when there are not enough bytes to read out of a
     /// slice during deserialization.
     NotEnoughBytes,
@@ -126,6 +129,7 @@ impl core::fmt::Display for Error {
                 write!(f, "cannot commit to polynomial of zero degree")
             }
             Self::PairingCheckFailure => write!(f, "pairing check failed"),
+            Self::UnexpectedIdentity => write!(f, "failed to find an inverse element"),
             Self::NotEnoughBytes => write!(f, "not enough bytes left to read"),
             Self::PointMalformed => write!(f, "BLS point bytes malformed"),
             Self::BlsScalarMalformed => write!(f, "BLS scalar bytes malformed"),

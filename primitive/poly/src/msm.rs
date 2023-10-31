@@ -3,7 +3,7 @@ use rayon::prelude::*;
 use zkstd::common::{vec, CurveAffine, CurveGroup, FftField, Vec};
 
 /// Performs a Variable Base Multiscalar Multiplication.
-pub fn msm_curve_addtion<C: CurveAffine>(bases: &[C], coeffs: &[C::Scalar]) -> C::Extended {
+pub fn msm_curve_addition<C: CurveAffine>(bases: &[C], coeffs: &[C::Scalar]) -> C::Extended {
     let c = if bases.len() < 4 {
         1
     } else if bases.len() < 32 {
@@ -92,7 +92,7 @@ fn get_at(segment: usize, c: usize, bytes: [u8; 32]) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::msm_curve_addtion;
+    use super::msm_curve_addition;
     use bls_12_381::{Fr, G1Affine, G1Projective};
     use rand_core::OsRng;
     use zkstd::common::{CurveAffine, CurveGroup};
@@ -123,7 +123,7 @@ mod tests {
             .map(|_| G1Affine::from(G1Affine::random(OsRng)))
             .collect::<Vec<_>>();
         let scalars = (0..n).map(|_| Fr::random(OsRng)).collect::<Vec<_>>();
-        let msm = msm_curve_addtion(&points[..], &scalars[..]);
+        let msm = msm_curve_addition(&points[..], &scalars[..]);
         let naive = points
             .iter()
             .rev()
