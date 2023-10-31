@@ -1,6 +1,6 @@
 mod proof;
 
-use super::constraint::Constraint;
+use super::{constraint::Constraint, matrix::Element};
 use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
@@ -39,39 +39,35 @@ impl<P: Pairing> Prover<P> {
 
         let fft = Fft::<P::ScalarField>::new(k as usize);
 
-        let h = {
-            let a = fft.idft(PointsValue(cs.a.clone()));
-            let b = fft.idft(PointsValue(cs.b.clone()));
-            let c = fft.idft(PointsValue(cs.c.clone()));
+        let a = fft.idft(PointsValue(cs.a.clone()));
+        let a = fft.coset_dft(a);
+        let b = fft.idft(PointsValue(cs.b.clone()));
+        let b = fft.coset_dft(b);
+        let c = fft.idft(PointsValue(cs.c.clone()));
+        let c = fft.coset_dft(c);
 
-            let mut a = fft.coset_dft(a);
-            let b = fft.coset_dft(b);
-            let c = fft.coset_dft(c);
+        let mut h = &a * &b;
+        h = &h - &c;
 
-            a = &a * &b;
-            a = &a - &c;
+        let q = fft.divide_by_z_on_coset(h);
+        let mut q = fft.coset_idft(q);
+        q.0.truncate(fft.size() - 1);
 
-            a = fft.divide_by_z_on_coset(a);
-            let mut a = fft.coset_idft(a);
-            a.0.truncate(fft.size() - 1);
-
-            a
-        };
-
-        let h = msm_curve_addtion(&self.params.h, &h);
+        let q = msm_curve_addtion(&self.params.h, &q);
 
         let input_assignment = cs
             .instance
             .iter()
             .sorted()
-            .map(|(_, x)| *x)
+            .map(|Element(_, x)| *x)
             .collect::<Vec<_>>();
         let aux_assignment = cs
             .witness
             .iter()
             .sorted()
-            .map(|(_, x)| *x)
+            .map(|Element(_, x)| *x)
             .collect::<Vec<_>>();
+
         let l = msm_curve_addtion(&self.params.l, &aux_assignment);
 
         let a_inputs = msm_curve_addtion(&self.params.a, &input_assignment);
@@ -103,7 +99,7 @@ impl<P: Pairing> Prover<P> {
 
         g_b += b2_answer;
         g_c += b1_answer * r;
-        g_c += h + l;
+        g_c += q + l;
 
         Ok(Proof::<P> {
             a: g_a.into(),

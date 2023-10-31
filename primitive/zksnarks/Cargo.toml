@@ -17,7 +17,6 @@ poly-commit = { path = "../poly", default-features = false }
 parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
 merlin = { version = "3.0", default-features = false }
 itertools = "0.11.0"
-hashbrown = {version = "0.9", default-features=false, features = ["ahash"]}
 ec-pairing = { path = "../pairing", default-features = false }
 rand = { version = "0.8.5", default-features = false, features = ["getrandom"]}
 
