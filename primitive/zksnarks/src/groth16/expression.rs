@@ -35,7 +35,7 @@ impl<F: Field> Debug for Expression<F> {
 
 impl<F: Field> Expression<F> {
     /// Creates a new expression with the given wire coefficients.
-    pub fn new(coefficients: HashMap<Wire, F>) -> Self {
+    pub fn new(coefficients: Vec<(Wire, F)>) -> Self {
         let nonzero_coefficients = coefficients
             .into_iter()
             .filter(|(_k, v)| *v != F::zero())
@@ -135,12 +135,20 @@ impl<F: Field> Add<&Expression<F>> for &Expression<F> {
     type Output = Expression<F>;
 
     fn add(self, rhs: &Expression<F>) -> Expression<F> {
-        // TODO: Use Expression::sum_of_expressions
-        let mut merged_coefficients = self.coefficients.clone();
+        let mut res = Vec::new();
         for (wire, coefficient) in rhs.coefficients.clone() {
-            *merged_coefficients.entry(wire).or_insert_with(F::zero) += coefficient
+            match self.coefficients.get(&wire) {
+                Some(coeff) => res.push((wire, *coeff + coefficient)),
+                None => res.push((wire, coefficient)),
+            }
         }
-        Expression::new(merged_coefficients)
+        for (wire, coefficient) in self.coefficients.clone() {
+            match rhs.coefficients.get(&wire) {
+                Some(_) => {}
+                None => res.push((wire, coefficient)),
+            }
+        }
+        Expression::new(res)
     }
 }
 
