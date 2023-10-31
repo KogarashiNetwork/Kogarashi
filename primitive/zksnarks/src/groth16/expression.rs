@@ -1,9 +1,6 @@
 use super::wire::{Index, Wire};
-use alloc::format;
-use core::fmt;
-use core::fmt::{Debug, Formatter};
+use core::fmt::Debug;
 use core::ops::{Add, Mul};
-use hashbrown::HashMap;
 use zkstd::common::Field;
 
 pub trait Evaluable<F: Field, R> {
@@ -11,26 +8,10 @@ pub trait Evaluable<F: Field, R> {
 }
 
 /// A linear combination of wires.
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Expression<F: Field> {
     /// The coefficient of each wire. Wires with a coefficient of zero are omitted.
-    coefficients: HashMap<Wire, F>,
-}
-
-impl<F: Field> Debug for Expression<F> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.debug_list()
-            .entries(
-                self.coefficients
-                    .keys()
-                    .map(|w| match w.get_unchecked() {
-                        Index::Input(i) => format!("{i}_i"),
-                        Index::Aux(i) => format!("{i}_a"),
-                    })
-                    .zip(self.coefficients.values()),
-            )
-            .finish()
-    }
+    coefficients: Vec<(Wire, F)>,
 }
 
 impl<F: Field> Expression<F> {
@@ -45,7 +26,7 @@ impl<F: Field> Expression<F> {
         }
     }
 
-    pub fn coefficients(&self) -> &HashMap<Wire, F> {
+    pub fn coefficients(&self) -> &Vec<(Wire, F)> {
         &self.coefficients
     }
 
@@ -60,7 +41,7 @@ impl<F: Field> Expression<F> {
     /// Return Some(c) if this is a constant c, otherwise None.
     pub fn as_constant(&self) -> Option<F> {
         if self.num_terms() == 1 {
-            self.coefficients.get(&Wire::ONE).cloned()
+            get_value_from_wire(Wire::ONE.get_unchecked(), &self.coefficients)
         } else {
             None
         }
@@ -127,16 +108,8 @@ impl<F: Field> Add<&Expression<F>> for &Expression<F> {
 
     fn add(self, rhs: &Expression<F>) -> Expression<F> {
         let mut res = Vec::new();
-        let pallas = rhs
-            .coefficients
-            .iter()
-            .map(|element| (*element.0, *element.1))
-            .collect::<Vec<_>>();
-        let velles = self
-            .coefficients
-            .iter()
-            .map(|element| (*element.0, *element.1))
-            .collect::<Vec<_>>();
+        let pallas = rhs.coefficients.clone();
+        let velles = self.coefficients.clone();
         for (wire, coefficient) in pallas.clone() {
             match get_value_from_wire(wire.get_unchecked(), &velles) {
                 Some(coeff) => res.push((wire, coeff + coefficient)),
