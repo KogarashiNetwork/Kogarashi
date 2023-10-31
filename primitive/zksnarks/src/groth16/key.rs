@@ -9,9 +9,12 @@ use crate::groth16::Groth16;
 use crate::keypair::Keypair;
 use core::marker::PhantomData;
 use core::ops::MulAssign;
-use poly_commit::{Fft, PointsValue};
+use poly_commit::{Coefficients, Fft, PointsValue};
 use rand::rngs::OsRng;
-use zkstd::common::{vec, CurveGroup, FftField, Group, Pairing, Ring, RngCore, Vec};
+use std::ops::Neg;
+use zkstd::common::{
+    vec, CurveGroup, FftField, Group, Pairing, PairingRange, PrimeField, Ring, RngCore, Vec,
+};
 
 /// Generate the arguments to prove and verify a circuit
 pub struct Groth16Key<P: Pairing, C: Circuit<P::JubjubAffine>> {
@@ -67,10 +70,12 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
         let g2 = pp.evaluation_key.h;
         let mut powers_of_tau = PointsValue(vec![P::ScalarField::zero(); cs.m()]);
 
-        let _gamma_inverse = gamma.invert().ok_or(Groth16Error::General)?;
+        // TODO: Proper error
+        let gamma_inverse = gamma.invert().ok_or(Groth16Error::General)?;
         let delta_inverse = delta.invert().ok_or(Groth16Error::General)?;
 
-        let h = vec![P::G1Affine::ADDITIVE_IDENTITY; powers_of_tau.0.len() - 1];
+        let mut h: Vec<P::G1Affine> =
+            vec![P::G1Affine::ADDITIVE_IDENTITY; powers_of_tau.0.len() - 1];
 
         let mut current_pow_of_tau = P::ScalarField::one();
         for x in powers_of_tau.0.iter_mut() {
@@ -81,54 +86,183 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
         let mut coeff = fft.z(&tau);
         coeff.mul_assign(&delta_inverse);
 
-        // // Set values of the H query to g1^{(tau^i * t(tau)) / delta}
-        // let h_proj: Vec<_> = p[..h.len()]
-        //     .iter()
-        //     .map(|p| {
-        //         // Compute final exponent
-        //         let mut exp = p.0;
-        //         exp.mul_assign(&coeff);
-        //
-        //         // Exponentiate
-        //         g1_wnaf.scalar(&exp)
-        //     })
-        //     .collect();
-        //
-        // // Batch normalize
-        // E::G1::batch_normalize(&h_proj, h);
+        for (h, p) in h.iter_mut().zip(powers_of_tau.0.iter()) {
+            *h = (g1 * (*p * coeff)).into();
+        }
 
         // Use inverse FFT to convert powers of tau to Lagrange coefficients
         let powers_of_tau = fft.idft(powers_of_tau);
 
-        let a = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
-        let b_g1 = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
-        let b_g2 = vec![P::G2Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
-        let ic = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len()];
-        let l = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.witness_len()];
+        let mut a: Vec<P::G1Affine> =
+            vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
+        let mut b_g1: Vec<P::G1Affine> =
+            vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
+        let mut b_g2: Vec<P::G2Affine> =
+            vec![P::G2Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
+        let mut ic: Vec<P::G1Affine> = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len()];
+        let mut l: Vec<P::G1Affine> = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.witness_len()];
 
-        let _vk = VerifyingKey::<P> {
+        let (at_inputs, bt_inputs, ct_inputs) = cs.inputs_iter();
+        let (at_aux, bt_aux, ct_aux) = cs.aux_iter();
+
+        // Evaluate for inputs.
+        eval::<P>(
+            g1,
+            g2,
+            &powers_of_tau,
+            &at_inputs,
+            &bt_inputs,
+            &ct_inputs,
+            &mut a[0..cs.instance_len()],
+            &mut b_g1[0..cs.instance_len()],
+            &mut b_g2[0..cs.instance_len()],
+            &mut ic,
+            &gamma_inverse,
+            &alpha,
+            &beta,
+        );
+
+        // Evaluate for auxiliary variables.
+        eval::<P>(
+            g1,
+            g2,
+            &powers_of_tau,
+            &at_aux,
+            &bt_aux,
+            &ct_aux,
+            &mut a[cs.instance_len()..],
+            &mut b_g1[cs.instance_len()..],
+            &mut b_g2[cs.instance_len()..],
+            &mut l,
+            &delta_inverse,
+            &alpha,
+            &beta,
+        );
+
+        let vk = VerifyingKey::<P> {
             alpha_g1: (P::G1Affine::ADDITIVE_GENERATOR * alpha).into(),
             beta_g1: (P::G1Affine::ADDITIVE_GENERATOR * beta).into(),
             beta_g2: (P::G2Affine::ADDITIVE_GENERATOR * beta).into(),
             gamma_g2: (P::G2Affine::ADDITIVE_GENERATOR * gamma).into(),
             delta_g1: (P::G1Affine::ADDITIVE_GENERATOR * delta).into(),
             delta_g2: (P::G2Affine::ADDITIVE_GENERATOR * delta).into(),
-            ic: vec![],
+            ic,
         };
+
+        let params = Parameters {
+            vk,
+            h,
+            l,
+            a,
+            b_g1,
+            b_g2,
+        };
+
+        let pvk = prepare_verifying_key(&params.vk);
 
         Ok((
             Prover::<P> {
+                params,
                 constraints: cs.constraints,
-                keypair: pp.clone(),
             },
-            Verifier::<P> {
-                opening_key: pp.evaluation_key.clone(),
-            },
+            Verifier::<P> { vk: pvk },
         ))
     }
 }
 
-#[derive(Clone)]
+#[allow(clippy::too_many_arguments)]
+fn eval<P: Pairing>(
+    g1: P::G1Affine,
+    g2: P::G2Affine,
+
+    // Lagrange coefficients for tau
+    powers_of_tau: &Coefficients<P::ScalarField>,
+
+    // QAP polynomials
+    at: &[Vec<(P::ScalarField, usize)>],
+    bt: &[Vec<(P::ScalarField, usize)>],
+    ct: &[Vec<(P::ScalarField, usize)>],
+
+    // Resulting evaluated QAP polynomials
+    a: &mut [P::G1Affine],
+    b_g1: &mut [P::G1Affine],
+    b_g2: &mut [P::G2Affine],
+    ext: &mut [P::G1Affine],
+
+    // Inverse coefficient for ext elements
+    inv: &P::ScalarField,
+
+    // Trapdoors
+    alpha: &P::ScalarField,
+    beta: &P::ScalarField,
+) {
+    for ((((((a, b_g1), b_g2), ext), at), bt), ct) in a
+        .iter_mut()
+        .zip(b_g1.iter_mut())
+        .zip(b_g2.iter_mut())
+        .zip(ext.iter_mut())
+        .zip(at.iter())
+        .zip(bt.iter())
+        .zip(ct.iter())
+    {
+        // Evaluate QAP polynomials at tau
+        let mut at = eval_at_tau(powers_of_tau, at);
+        let mut bt = eval_at_tau(powers_of_tau, bt);
+        let ct = eval_at_tau(powers_of_tau, ct);
+
+        // Compute A query (in G1)
+        if !at.is_zero() {
+            *a = (g1 * at).into();
+        }
+
+        // Compute B query (in G1/G2)
+        if !bt.is_zero() {
+            *b_g1 = (g1 * bt).into();
+            *b_g2 = (g2 * bt).into();
+        }
+
+        at *= beta;
+        bt *= alpha;
+
+        *ext = (g1 * ((at + bt + ct) * inv)).into();
+    }
+}
+
+fn eval_at_tau<F: FftField>(powers_of_tau: &[F], p: &[(F, usize)]) -> F {
+    let mut acc = F::zero();
+
+    for &(ref coeff, index) in p {
+        acc += powers_of_tau[index] * coeff;
+    }
+    acc
+}
+
+#[derive(Clone, Debug)]
+pub struct Parameters<P: Pairing> {
+    pub vk: VerifyingKey<P>,
+
+    // Elements of the form ((tau^i * t(tau)) / delta) for i between 0 and
+    // m-2 inclusive. Never contains points at infinity.
+    pub h: Vec<P::G1Affine>,
+
+    // Elements of the form (beta * u_i(tau) + alpha v_i(tau) + w_i(tau)) / delta
+    // for all auxiliary inputs. Variables can never be unconstrained, so this
+    // never contains points at infinity.
+    pub l: Vec<P::G1Affine>,
+
+    // QAP "A" polynomials evaluated at tau in the Lagrange basis. Never contains
+    // points at infinity: polynomials that evaluate to zero are omitted from
+    // the CRS and the prover can deterministically skip their evaluation.
+    pub a: Vec<P::G1Affine>,
+
+    // QAP "B" polynomials evaluated at tau in the Lagrange basis. Needed in
+    // G1 and G2 for C/B queries, respectively. Never contains points at
+    // infinity for the same reason as the "A" polynomials.
+    pub b_g1: Vec<P::G1Affine>,
+    pub b_g2: Vec<P::G2Affine>,
+}
+
+#[derive(Clone, Debug)]
 pub struct VerifyingKey<P: Pairing> {
     // alpha in g1 for verifying and for creating A/C elements of
     // proof. Never the point at infinity.
@@ -156,43 +290,28 @@ pub struct VerifyingKey<P: Pairing> {
     pub ic: Vec<P::G1Affine>,
 }
 
-pub struct PowersOfTau<P: Pairing> {
-    g1: Vec<P::G1Affine>,
-    g2: Vec<P::G2Affine>,
-    alpha_g1: Vec<P::G1Affine>,
-    beta_g1: Vec<P::G1Affine>,
-    beta_g2_shift: P::G2Affine,
+#[derive(Debug)]
+pub struct PreparedVerifyingKey<P: Pairing> {
+    /// Pairing result of alpha*beta
+    pub(crate) alpha_g1_beta_g2: <P::PairingRange as PairingRange>::Gt,
+    /// -gamma in G2
+    pub(crate) neg_gamma_g2: P::G2PairngRepr,
+    /// -delta in G2
+    pub(crate) neg_delta_g2: P::G2PairngRepr,
+    /// Copy of IC from `VerifiyingKey`.
+    pub(crate) ic: Vec<P::G1Affine>,
 }
 
-impl<P: Pairing> PowersOfTau<P> {
-    pub fn new(m: usize, alpha: P::ScalarField, beta: P::ScalarField, tau: P::ScalarField) -> Self {
-        let mut powers_of_tau = vec![P::ScalarField::zero(); 2 * m - 1];
-        let mut current_pow_of_tau = P::ScalarField::one();
-        for x in powers_of_tau.iter_mut() {
-            *x = current_pow_of_tau;
-            current_pow_of_tau *= tau;
-        }
+pub fn prepare_verifying_key<P: Pairing>(vk: &VerifyingKey<P>) -> PreparedVerifyingKey<P> {
+    let gamma = vk.gamma_g2.neg();
+    let delta = vk.delta_g2.neg();
 
-        let g1: Vec<P::G1Affine> = powers_of_tau[..2 * m - 1]
-            .iter()
-            .map(|t| (P::G1Affine::ADDITIVE_GENERATOR * t).into())
-            .collect();
-
-        let g2: Vec<P::G2Affine> = powers_of_tau[..m]
-            .iter()
-            .map(|t| (P::G2Affine::ADDITIVE_GENERATOR * t).into())
-            .collect();
-
-        let alpha_g1 = g1.iter().take(m).map(|x| (*x * alpha).into()).collect();
-        let beta_g1 = g1.iter().take(m).map(|x| (*x * beta).into()).collect();
-
-        Self {
-            g1,
-            g2,
-            alpha_g1,
-            beta_g1,
-            beta_g2_shift: (P::G2Affine::ADDITIVE_GENERATOR * beta).into(),
-        }
+    PreparedVerifyingKey {
+        alpha_g1_beta_g2: P::multi_miller_loop(&[(vk.alpha_g1, P::G2PairngRepr::from(vk.beta_g2))])
+            .final_exp(),
+        neg_gamma_g2: P::G2PairngRepr::from(gamma),
+        neg_delta_g2: P::G2PairngRepr::from(delta),
+        ic: vk.ic.clone(),
     }
 }
 

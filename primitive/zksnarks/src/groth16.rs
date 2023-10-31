@@ -75,6 +75,74 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         }
     }
 
+    fn inputs_iter(
+        &self,
+    ) -> (
+        Vec<Vec<(C::Range, usize)>>,
+        Vec<Vec<(C::Range, usize)>>,
+        Vec<Vec<(C::Range, usize)>>,
+    ) {
+        let mut at = vec![vec![]; self.instance_len()];
+        let mut bt = vec![vec![]; self.instance_len()];
+        let mut ct = vec![vec![]; self.instance_len()];
+        for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
+            a.coefficients()
+                .iter()
+                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Input(_)))
+                .for_each(|(&w, coeff)| {
+                    at[*w.get_unchecked()].push((*coeff, i));
+                });
+            b.coefficients()
+                .iter()
+                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Input(_)))
+                .for_each(|(&w, coeff)| {
+                    bt[*w.get_unchecked()].push((*coeff, i));
+                });
+            c.coefficients()
+                .iter()
+                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Input(_)))
+                .for_each(|(&w, coeff)| {
+                    ct[*w.get_unchecked()].push((*coeff, i));
+                });
+        }
+
+        (at, bt, ct)
+    }
+
+    fn aux_iter(
+        &self,
+    ) -> (
+        Vec<Vec<(C::Range, usize)>>,
+        Vec<Vec<(C::Range, usize)>>,
+        Vec<Vec<(C::Range, usize)>>,
+    ) {
+        let mut at = vec![vec![]; self.witness_len()];
+        let mut bt = vec![vec![]; self.witness_len()];
+        let mut ct = vec![vec![]; self.witness_len()];
+        for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
+            a.coefficients()
+                .iter()
+                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
+                .for_each(|(&w, coeff)| {
+                    at[*w.get_unchecked()].push((*coeff, i));
+                });
+            b.coefficients()
+                .iter()
+                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
+                .for_each(|(&w, coeff)| {
+                    bt[*w.get_unchecked()].push((*coeff, i));
+                });
+            c.coefficients()
+                .iter()
+                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
+                .for_each(|(&w, coeff)| {
+                    ct[*w.get_unchecked()].push((*coeff, i));
+                });
+        }
+
+        (at, bt, ct)
+    }
+
     fn eval_constraints(&mut self) {
         for x in self.constraints.iter() {
             let (a, b, c) = x.evaluate(&self.instance, &self.witness);
@@ -274,7 +342,9 @@ mod tests {
         let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
             .expect("Failed to compile circuit");
         let proof = prover.create_proof(circuit).expect("Failed to prove");
-        verifier.verify(&proof).expect("Failed to verify the proof");
+        verifier
+            .verify(&proof, &[])
+            .expect("Failed to verify the proof");
     }
 
     #[test]
@@ -325,6 +395,8 @@ mod tests {
         let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
             .expect("Failed to compile circuit");
         let proof = prover.create_proof(circuit).expect("Failed to prove");
-        verifier.verify(&proof).expect("Failed to verify the proof");
+        verifier
+            .verify(&proof, &[x, o])
+            .expect("Failed to verify the proof");
     }
 }

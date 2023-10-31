@@ -4,17 +4,19 @@ use super::constraint::Constraint;
 use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
-use crate::groth16::params::Groth16Params;
+use crate::groth16::error::Groth16Error;
+use crate::groth16::key::Parameters;
 use crate::groth16::Groth16;
-use poly_commit::{Fft, PointsValue};
+use itertools::Itertools;
+use poly_commit::{msm_curve_addtion, Fft, PointsValue};
 pub use proof::Proof;
 use rand::rngs::OsRng;
-use zkstd::common::{Group, Pairing, TwistedEdwardsCurve, Vec};
+use zkstd::common::{CurveGroup, Group, Pairing, TwistedEdwardsCurve, Vec};
 
 #[derive(Debug)]
 pub struct Prover<P: Pairing> {
+    pub params: Parameters<P>,
     pub constraints: Vec<Constraint<<P::JubjubAffine as TwistedEdwardsCurve>::Range>>,
-    pub(crate) keypair: Groth16Params<P>,
 }
 
 impl<P: Pairing> Prover<P> {
@@ -30,10 +32,14 @@ impl<P: Pairing> Prover<P> {
 
         let size = cs.m().next_power_of_two();
         let k = size.trailing_zeros();
+        let vk = self.params.vk.clone();
+
+        let r = P::ScalarField::random(OsRng);
+        let s = P::ScalarField::random(OsRng);
 
         let fft = Fft::<P::ScalarField>::new(k as usize);
 
-        let (left, h) = {
+        let h = {
             let a = fft.idft(PointsValue(cs.a.clone()));
             let b = fft.idft(PointsValue(cs.b.clone()));
             let c = fft.idft(PointsValue(cs.c.clone()));
@@ -45,30 +51,64 @@ impl<P: Pairing> Prover<P> {
             a = &a * &b;
             a = &a - &c;
 
-            let left = fft.coset_idft(a.clone());
             a = fft.divide_by_z_on_coset(a);
             let mut a = fft.coset_idft(a);
             a.0.truncate(fft.size() - 1);
 
-            (left, a)
+            a
         };
 
-        let point = P::ScalarField::random(OsRng);
-        let left_eval = left.evaluate(&point);
-        let h_eval = h.evaluate(&point);
-        let t_eval = fft.z_on_coset();
-        let right: P::ScalarField = h_eval * t_eval;
+        let h = msm_curve_addtion(&self.params.h, &h);
 
-        let left_com = self.keypair.commitment_key.commit(&left);
-        let h_com = self.keypair.commitment_key.commit(&h);
-        let t_g2 = self.keypair.evaluation_key.h * t_eval;
+        let input_assignment = cs
+            .instance
+            .iter()
+            .sorted()
+            .map(|(_, x)| *x)
+            .collect::<Vec<_>>();
+        let aux_assignment = cs
+            .witness
+            .iter()
+            .sorted()
+            .map(|(_, x)| *x)
+            .collect::<Vec<_>>();
+        let l = msm_curve_addtion(&self.params.l, &aux_assignment);
 
-        assert_eq!(left_eval, right);
+        let a_inputs = msm_curve_addtion(&self.params.a, &input_assignment);
+        let a_aux = msm_curve_addtion(&self.params.a[cs.instance_len()..], &aux_assignment);
+
+        let b_g1_inputs = msm_curve_addtion(&self.params.b_g1, &input_assignment);
+        let b_g1_aux = msm_curve_addtion(&self.params.b_g1[cs.instance_len()..], &aux_assignment);
+
+        let b_g2_inputs = msm_curve_addtion(&self.params.b_g2, &input_assignment);
+        let b_g2_aux = msm_curve_addtion(&self.params.b_g2[cs.instance_len()..], &aux_assignment);
+
+        if vk.delta_g1.is_identity() || vk.delta_g2.is_identity() {
+            // If this element is zero, someone is trying to perform a
+            // subversion-CRS attack.
+            // TODO: proper error
+            return Err(Groth16Error::General.into());
+        }
+
+        let mut g_a = vk.delta_g1 * r + vk.alpha_g1;
+        let mut g_b = vk.delta_g2 * s + vk.beta_g2;
+        let mut g_c = vk.delta_g1 * r * s + (vk.alpha_g1 * s) + (vk.beta_g1 * r);
+
+        let a_answer = a_inputs + a_aux;
+        g_a += a_answer;
+        g_c += a_answer * s;
+
+        let b1_answer = b_g1_inputs + b_g1_aux;
+        let b2_answer = b_g2_inputs + b_g2_aux;
+
+        g_b += b2_answer;
+        g_c += b1_answer * r;
+        g_c += h + l;
 
         Ok(Proof::<P> {
-            a: h_com.0,
-            b: t_g2.into(),
-            c: left_com.0,
+            a: g_a.into(),
+            b: g_b.into(),
+            c: g_c.into(),
         })
     }
 }
