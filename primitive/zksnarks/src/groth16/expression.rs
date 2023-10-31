@@ -7,7 +7,7 @@ use hashbrown::HashMap;
 use zkstd::common::Field;
 
 pub trait Evaluable<F: Field, R> {
-    fn evaluate(&self, instance: &HashMap<Wire, F>, witness: &HashMap<Wire, F>) -> R;
+    fn evaluate(&self, instance: &Vec<(Wire, F)>, witness: &Vec<(Wire, F)>) -> R;
 }
 
 /// A linear combination of wires.
@@ -66,18 +66,27 @@ impl<F: Field> Expression<F> {
         }
     }
 
-    pub fn evaluate(&self, instance: &HashMap<Wire, F>, witness: &HashMap<Wire, F>) -> F {
+    pub fn evaluate(&self, instance: &Vec<(Wire, F)>, witness: &Vec<(Wire, F)>) -> F {
         self.coefficients
             .iter()
             .fold(F::zero(), |sum, (wire, coefficient)| {
                 let wire_value = match wire.get_unchecked() {
-                    Index::Input(_) => instance.get(wire),
-                    Index::Aux(_) => witness.get(wire),
+                    Index::Input(_) => get_value_from_wire(wire.get_unchecked(), instance),
+                    Index::Aux(_) => get_value_from_wire(wire.get_unchecked(), witness),
                 }
                 .expect("No value for the wire was found");
-                sum + (*wire_value * *coefficient)
+                sum + (wire_value * *coefficient)
             })
     }
+}
+
+fn get_value_from_wire<F: Field>(index: Index, vectors: &Vec<(Wire, F)>) -> Option<F> {
+    for vector in vectors {
+        if index == vector.0.get_unchecked() {
+            return Some(vector.1);
+        }
+    }
+    None
 }
 
 impl<F: Field> From<Wire> for Expression<F> {

@@ -1,7 +1,6 @@
 use crate::groth16::expression::{Evaluable, Expression};
 use crate::groth16::wire::Wire;
 use core::marker::PhantomData;
-use hashbrown::HashMap;
 use zkstd::common::{Field, TwistedEdwardsAffine};
 
 impl<F: Field, C: TwistedEdwardsAffine<Range = F>> Clone for EdwardsExpression<F, C> {
@@ -34,7 +33,7 @@ impl<F: Field, C: TwistedEdwardsAffine<Range = F>> EdwardsExpression<F, C> {
 }
 
 impl<F: Field, C: TwistedEdwardsAffine<Range = F>> Evaluable<F, C> for EdwardsExpression<F, C> {
-    fn evaluate(&self, instance: &HashMap<Wire, F>, witness: &HashMap<Wire, F>) -> C {
+    fn evaluate(&self, instance: &Vec<(Wire, F)>, witness: &Vec<(Wire, F)>) -> C {
         C::from_raw_unchecked(
             self.x.evaluate(instance, witness),
             self.y.evaluate(instance, witness),

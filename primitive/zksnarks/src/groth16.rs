@@ -16,7 +16,6 @@ use crate::constraint_system::ConstraintSystem;
 use constraint::Constraint;
 use curves::EdwardsExpression;
 use expression::Expression;
-use hashbrown::HashMap;
 use wire::{Index, Wire};
 use zkstd::common::{vec, Group, Ring, TwistedEdwardsAffine, Vec};
 
@@ -26,8 +25,8 @@ pub struct Groth16<C: TwistedEdwardsAffine> {
     a: Vec<C::Range>,
     b: Vec<C::Range>,
     c: Vec<C::Range>,
-    pub(crate) instance: HashMap<Wire, C::Range>,
-    pub(crate) witness: HashMap<Wire, C::Range>,
+    pub(crate) instance: Vec<(Wire, C::Range)>,
+    pub(crate) witness: Vec<(Wire, C::Range)>,
 }
 
 impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
@@ -52,13 +51,13 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
 
     fn alloc_instance(&mut self, instance: C::Range) -> Wire {
         let wire = self.public_wire();
-        self.instance.insert(wire, instance);
+        self.instance.push((wire, instance));
         wire
     }
 
     fn alloc_witness(&mut self, witness: C::Range) -> Wire {
         let wire = self.private_wire();
-        self.witness.insert(wire, witness);
+        self.witness.push((wire, witness));
         wire
     }
 }
@@ -71,7 +70,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
             b: vec![],
             c: vec![],
             instance: [(Wire::ONE, C::Range::one())].into_iter().collect(),
-            witness: HashMap::new(),
+            witness: vec![],
         }
     }
 
