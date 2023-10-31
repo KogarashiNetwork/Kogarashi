@@ -1,32 +1,34 @@
+use super::matrix::Element;
 use super::wire::{Index, Wire};
+
 use core::fmt::Debug;
 use core::ops::{Add, Mul};
-use zkstd::common::Field;
+use zkstd::common::PrimeField;
 
-pub trait Evaluable<F: Field, R> {
-    fn evaluate(&self, instance: &Vec<(Wire, F)>, witness: &Vec<(Wire, F)>) -> R;
+pub trait Evaluable<F: PrimeField, R> {
+    fn evaluate(&self, instance: &Vec<Element<F>>, witness: &Vec<Element<F>>) -> R;
 }
 
 /// A linear combination of wires.
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Expression<F: Field> {
+pub struct Expression<F: PrimeField> {
     /// The coefficient of each wire. Wires with a coefficient of zero are omitted.
-    coefficients: Vec<(Wire, F)>,
+    coefficients: Vec<Element<F>>,
 }
 
-impl<F: Field> Expression<F> {
+impl<F: PrimeField> Expression<F> {
     /// Creates a new expression with the given wire coefficients.
-    pub fn new(coefficients: Vec<(Wire, F)>) -> Self {
+    pub fn new(coefficients: Vec<Element<F>>) -> Self {
         let nonzero_coefficients = coefficients
             .into_iter()
-            .filter(|(_k, v)| *v != F::zero())
+            .filter(|element| element.1 != F::zero())
             .collect();
         Expression {
             coefficients: nonzero_coefficients,
         }
     }
 
-    pub fn coefficients(&self) -> &Vec<(Wire, F)> {
+    pub fn coefficients(&self) -> &Vec<Element<F>> {
         &self.coefficients
     }
 
@@ -47,10 +49,10 @@ impl<F: Field> Expression<F> {
         }
     }
 
-    pub fn evaluate(&self, instance: &Vec<(Wire, F)>, witness: &Vec<(Wire, F)>) -> F {
+    pub fn evaluate(&self, instance: &Vec<Element<F>>, witness: &Vec<Element<F>>) -> F {
         self.coefficients
             .iter()
-            .fold(F::zero(), |sum, (wire, coefficient)| {
+            .fold(F::zero(), |sum, Element(wire, coefficient)| {
                 let wire_value = match wire.get_unchecked() {
                     Index::Input(_) => get_value_from_wire(wire.get_unchecked(), instance),
                     Index::Aux(_) => get_value_from_wire(wire.get_unchecked(), witness),
@@ -61,25 +63,25 @@ impl<F: Field> Expression<F> {
     }
 }
 
-impl<F: Field> From<Wire> for Expression<F> {
+impl<F: PrimeField> From<Wire> for Expression<F> {
     fn from(wire: Wire) -> Self {
-        Expression::new([(wire, F::one())].iter().cloned().collect())
+        Expression::new([Element(wire, F::one())].iter().cloned().collect())
     }
 }
 
-impl<F: Field> From<&Wire> for Expression<F> {
+impl<F: PrimeField> From<&Wire> for Expression<F> {
     fn from(wire: &Wire) -> Self {
         Expression::from(*wire)
     }
 }
 
-impl<F: Field> From<F> for Expression<F> {
+impl<F: PrimeField> From<F> for Expression<F> {
     fn from(value: F) -> Self {
-        Expression::new([(Wire::ONE, value)].iter().cloned().collect())
+        Expression::new([Element(Wire::ONE, value)].iter().cloned().collect())
     }
 }
 
-impl<F: Field> Add<Expression<F>> for Expression<F> {
+impl<F: PrimeField> Add<Expression<F>> for Expression<F> {
     type Output = Expression<F>;
 
     fn add(self, rhs: Expression<F>) -> Expression<F> {
@@ -87,7 +89,7 @@ impl<F: Field> Add<Expression<F>> for Expression<F> {
     }
 }
 
-impl<F: Field> Add<&Expression<F>> for Expression<F> {
+impl<F: PrimeField> Add<&Expression<F>> for Expression<F> {
     type Output = Expression<F>;
 
     fn add(self, rhs: &Expression<F>) -> Expression<F> {
@@ -95,7 +97,7 @@ impl<F: Field> Add<&Expression<F>> for Expression<F> {
     }
 }
 
-impl<F: Field> Add<Expression<F>> for &Expression<F> {
+impl<F: PrimeField> Add<Expression<F>> for &Expression<F> {
     type Output = Expression<F>;
 
     fn add(self, rhs: Expression<F>) -> Expression<F> {
@@ -103,30 +105,30 @@ impl<F: Field> Add<Expression<F>> for &Expression<F> {
     }
 }
 
-impl<F: Field> Add<&Expression<F>> for &Expression<F> {
+impl<F: PrimeField> Add<&Expression<F>> for &Expression<F> {
     type Output = Expression<F>;
 
     fn add(self, rhs: &Expression<F>) -> Expression<F> {
         let mut res = Vec::new();
         let pallas = rhs.coefficients.clone();
         let velles = self.coefficients.clone();
-        for (wire, coefficient) in pallas.clone() {
+        for Element(wire, coefficient) in pallas.clone() {
             match get_value_from_wire(wire.get_unchecked(), &velles) {
-                Some(coeff) => res.push((wire, coeff + coefficient)),
-                None => res.push((wire, coefficient)),
+                Some(coeff) => res.push(Element(wire, coeff + coefficient)),
+                None => res.push(Element(wire, coefficient)),
             }
         }
-        for (wire, coefficient) in velles {
+        for Element(wire, coefficient) in velles {
             match get_value_from_wire(wire.get_unchecked(), &pallas) {
                 Some(_) => {}
-                None => res.push((wire, coefficient)),
+                None => res.push(Element(wire, coefficient)),
             }
         }
         Expression::new(res)
     }
 }
 
-fn get_value_from_wire<F: Field>(index: Index, vectors: &Vec<(Wire, F)>) -> Option<F> {
+fn get_value_from_wire<F: PrimeField>(index: Index, vectors: &Vec<Element<F>>) -> Option<F> {
     for vector in vectors {
         if index == vector.0.get_unchecked() {
             return Some(vector.1);
@@ -136,7 +138,7 @@ fn get_value_from_wire<F: Field>(index: Index, vectors: &Vec<(Wire, F)>) -> Opti
 }
 
 #[allow(clippy::op_ref)]
-impl<F: Field> Mul<F> for Expression<F> {
+impl<F: PrimeField> Mul<F> for Expression<F> {
     type Output = Expression<F>;
 
     fn mul(self, rhs: F) -> Expression<F> {
@@ -144,7 +146,7 @@ impl<F: Field> Mul<F> for Expression<F> {
     }
 }
 
-impl<F: Field> Mul<&F> for Expression<F> {
+impl<F: PrimeField> Mul<&F> for Expression<F> {
     type Output = Expression<F>;
 
     fn mul(self, rhs: &F) -> Expression<F> {
@@ -153,7 +155,7 @@ impl<F: Field> Mul<&F> for Expression<F> {
 }
 
 #[allow(clippy::op_ref)]
-impl<F: Field> Mul<F> for &Expression<F> {
+impl<F: PrimeField> Mul<F> for &Expression<F> {
     type Output = Expression<F>;
 
     fn mul(self, rhs: F) -> Expression<F> {
@@ -161,14 +163,14 @@ impl<F: Field> Mul<F> for &Expression<F> {
     }
 }
 
-impl<F: Field> Mul<&F> for &Expression<F> {
+impl<F: PrimeField> Mul<&F> for &Expression<F> {
     type Output = Expression<F>;
 
     fn mul(self, rhs: &F) -> Expression<F> {
         Expression::new(
             self.coefficients
                 .iter()
-                .map(|(k, v)| (*k, *v * *rhs))
+                .map(|Element(k, v)| Element(*k, *v * *rhs))
                 .collect(),
         )
     }

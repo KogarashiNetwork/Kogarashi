@@ -1,6 +1,6 @@
 mod proof;
 
-use super::constraint::Constraint;
+use super::{constraint::Constraint, matrix::Element};
 use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
@@ -59,13 +59,13 @@ impl<P: Pairing> Prover<P> {
             .instance
             .iter()
             .sorted()
-            .map(|(_, x)| *x)
+            .map(|Element(_, x)| *x)
             .collect::<Vec<_>>();
         let aux_assignment = cs
             .witness
             .iter()
             .sorted()
-            .map(|(_, x)| *x)
+            .map(|Element(_, x)| *x)
             .collect::<Vec<_>>();
 
         let l = msm_curve_addtion(&self.params.l, &aux_assignment);

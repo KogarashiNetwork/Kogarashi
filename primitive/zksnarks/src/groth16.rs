@@ -21,14 +21,16 @@ use expression::Expression;
 use wire::{Index, Wire};
 use zkstd::common::{vec, Group, Ring, TwistedEdwardsAffine, Vec};
 
+use self::matrix::Element;
+
 #[derive(Debug)]
 pub struct Groth16<C: TwistedEdwardsAffine> {
     constraints: Vec<Constraint<C::Range>>,
     a: Vec<C::Range>,
     b: Vec<C::Range>,
     c: Vec<C::Range>,
-    pub(crate) instance: Vec<(Wire, C::Range)>,
-    pub(crate) witness: Vec<(Wire, C::Range)>,
+    pub(crate) instance: Vec<Element<C::Range>>,
+    pub(crate) witness: Vec<Element<C::Range>>,
 }
 
 impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
@@ -41,7 +43,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
             a: vec![],
             b: vec![],
             c: vec![],
-            instance: [(Wire::ONE, C::Range::one())].into_iter().collect(),
+            instance: [Element(Wire::ONE, C::Range::one())].into_iter().collect(),
             witness: vec![],
         }
     }
@@ -60,13 +62,13 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
 
     fn alloc_instance(&mut self, instance: C::Range) -> Wire {
         let wire = self.public_wire();
-        self.instance.push((wire, instance));
+        self.instance.push(Element(wire, instance));
         wire
     }
 
     fn alloc_witness(&mut self, witness: C::Range) -> Wire {
         let wire = self.private_wire();
-        self.witness.push((wire, witness));
+        self.witness.push(Element(wire, witness));
         wire
     }
 }
@@ -85,20 +87,20 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
             a.coefficients()
                 .iter()
-                .filter(|(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
-                .for_each(|(w, coeff)| {
+                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
+                .for_each(|Element(w, coeff)| {
                     at[*w.get_unchecked()].push((*coeff, i));
                 });
             b.coefficients()
                 .iter()
-                .filter(|(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
-                .for_each(|(w, coeff)| {
+                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
+                .for_each(|Element(w, coeff)| {
                     bt[*w.get_unchecked()].push((*coeff, i));
                 });
             c.coefficients()
                 .iter()
-                .filter(|(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
-                .for_each(|(w, coeff)| {
+                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
+                .for_each(|Element(w, coeff)| {
                     ct[*w.get_unchecked()].push((*coeff, i));
                 });
         }
@@ -119,20 +121,20 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
             a.coefficients()
                 .iter()
-                .filter(|(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
-                .for_each(|(w, coeff)| {
+                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
+                .for_each(|Element(w, coeff)| {
                     at[*w.get_unchecked()].push((*coeff, i));
                 });
             b.coefficients()
                 .iter()
-                .filter(|(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
-                .for_each(|(w, coeff)| {
+                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
+                .for_each(|Element(w, coeff)| {
                     bt[*w.get_unchecked()].push((*coeff, i));
                 });
             c.coefficients()
                 .iter()
-                .filter(|(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
-                .for_each(|(w, coeff)| {
+                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
+                .for_each(|Element(w, coeff)| {
                     ct[*w.get_unchecked()].push((*coeff, i));
                 });
         }

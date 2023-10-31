@@ -1,6 +1,6 @@
 mod element;
 
-use element::Element;
+pub(crate) use element::Element;
 use zkstd::common::PrimeField;
 
 #[derive(Clone, Debug, Default)]

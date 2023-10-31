@@ -1,18 +1,18 @@
 use super::expression::Expression;
-use super::wire::Wire;
+use super::matrix::Element;
 
-use zkstd::common::Field;
+use zkstd::common::PrimeField;
 
 /// An rank-1 constraint of the form a * b = c, where a, b, and c are linear combinations of wires.
 #[derive(Clone, Debug)]
-pub struct Constraint<F: Field> {
+pub struct Constraint<F: PrimeField> {
     pub a: Expression<F>,
     pub b: Expression<F>,
     pub c: Expression<F>,
 }
 
-impl<F: Field> Constraint<F> {
-    pub fn evaluate(&self, instance: &Vec<(Wire, F)>, witness: &Vec<(Wire, F)>) -> (F, F, F) {
+impl<F: PrimeField> Constraint<F> {
+    pub fn evaluate(&self, instance: &Vec<Element<F>>, witness: &Vec<Element<F>>) -> (F, F, F) {
         let a_value = self.a.evaluate(instance, witness);
         let b_value = self.b.evaluate(instance, witness);
         let c_value = self.c.evaluate(instance, witness);
