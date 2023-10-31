@@ -1,7 +1,7 @@
 use core::cmp::Ordering;
 use core::fmt;
 use core::fmt::Formatter;
-use std::ops::Deref;
+use core::ops::Deref;
 
 /// Represents the index of either an input variable or
 /// auxiliary variable.
