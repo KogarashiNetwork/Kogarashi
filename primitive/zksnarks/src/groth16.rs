@@ -116,9 +116,9 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         Vec<Vec<(C::Range, usize)>>,
         Vec<Vec<(C::Range, usize)>>,
     ) {
-        let mut at = vec![vec![]; self.instance_len()];
-        let mut bt = vec![vec![]; self.instance_len()];
-        let mut ct = vec![vec![]; self.instance_len()];
+        let mut at = vec![vec![]; self.witness_len()];
+        let mut bt = vec![vec![]; self.witness_len()];
+        let mut ct = vec![vec![]; self.witness_len()];
         for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
             a.coefficients()
                 .iter()
@@ -342,7 +342,9 @@ mod tests {
         let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
             .expect("Failed to compile circuit");
         let proof = prover.create_proof(circuit).expect("Failed to prove");
-        verifier.verify(&proof).expect("Failed to verify the proof");
+        verifier
+            .verify(&proof, &[])
+            .expect("Failed to verify the proof");
     }
 
     #[test]
@@ -393,6 +395,8 @@ mod tests {
         let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
             .expect("Failed to compile circuit");
         let proof = prover.create_proof(circuit).expect("Failed to prove");
-        verifier.verify(&proof).expect("Failed to verify the proof");
+        verifier
+            .verify(&proof, &[x, o])
+            .expect("Failed to verify the proof");
     }
 }

@@ -1,7 +1,6 @@
 use crate::error::Error;
-use crate::groth16::key::{PreparedVerifyingKey, VerifyingKey};
-use poly_commit::EvaluationKey;
-use zkstd::common::{CurveExtended, Group, Pairing, PairingRange, WeierstrassAffine};
+use crate::groth16::key::PreparedVerifyingKey;
+use zkstd::common::{CurveExtended, Pairing, PairingRange};
 
 pub struct Proof<P: Pairing> {
     pub(crate) a: P::G1Affine,
@@ -12,26 +11,25 @@ pub struct Proof<P: Pairing> {
 impl<P: Pairing> Proof<P> {
     pub(crate) fn verify(
         &self,
-        vk: PreparedVerifyingKey<P>,
-        // opening_key: &EvaluationKey<P>,
+        vk: &PreparedVerifyingKey<P>,
         public_inputs: &[P::ScalarField],
     ) -> Result<(), Error> {
+        if (public_inputs.len() + 1) != vk.ic.len() {
+            return Err(Error::InconsistentPublicInputsLen {
+                expected: vk.ic.len() - 1,
+                provided: public_inputs.len(),
+            });
+        }
         let mut acc = P::G1Projective::from(vk.ic[0]);
 
         for (&i, &b) in public_inputs.iter().zip(vk.ic.iter().skip(1)) {
             acc += b * i;
         }
 
-        // let pairing = P::multi_miller_loop(&[
-        //     (self.a, P::G2PairngRepr::from(self.b)),
-        //     (-self.c, opening_key.prepared_h.clone()),
-        // ])
-        // .final_exp();
-
         let pairing = P::multi_miller_loop(&[
             (self.a, P::G2PairngRepr::from(self.b)),
-            (acc.to_affine(), vk.neg_gamma_g2),
-            (self.c, vk.neg_delta_g2),
+            (acc.to_affine(), vk.neg_gamma_g2.clone()),
+            (self.c, vk.neg_delta_g2.clone()),
         ])
         .final_exp();
 

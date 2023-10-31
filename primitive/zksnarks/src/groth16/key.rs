@@ -14,7 +14,6 @@ use rand::rngs::OsRng;
 use std::ops::Neg;
 use zkstd::common::{
     vec, CurveGroup, FftField, Group, Pairing, PairingRange, PrimeField, Ring, RngCore, Vec,
-    WeierstrassAffine,
 };
 
 /// Generate the arguments to prove and verify a circuit
@@ -71,6 +70,7 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
         let g2 = pp.evaluation_key.h;
         let mut powers_of_tau = PointsValue(vec![P::ScalarField::zero(); cs.m()]);
 
+        // TODO: Proper error
         let gamma_inverse = gamma.invert().ok_or(Groth16Error::General)?;
         let delta_inverse = delta.invert().ok_or(Groth16Error::General)?;
 
@@ -158,15 +158,14 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
             b_g2,
         };
 
+        let pvk = prepare_verifying_key(&params.vk);
+
         Ok((
             Prover::<P> {
                 params,
                 constraints: cs.constraints,
-                keypair: pp.clone(),
             },
-            Verifier::<P> {
-                opening_key: pp.evaluation_key.clone(),
-            },
+            Verifier::<P> { vk: pvk },
         ))
     }
 }
@@ -206,13 +205,10 @@ fn eval<P: Pairing>(
         .zip(bt.iter())
         .zip(ct.iter())
     {
-        // println!("At = {at:?}\nbt = {bt:?}\nct = {ct:?}");
         // Evaluate QAP polynomials at tau
         let mut at = eval_at_tau(powers_of_tau, at);
         let mut bt = eval_at_tau(powers_of_tau, bt);
         let ct = eval_at_tau(powers_of_tau, ct);
-
-        // println!("At = {at:?}\nbt = {bt:?}\nct = {ct:?}");
 
         // Compute A query (in G1)
         if !at.is_zero() {
@@ -294,6 +290,7 @@ pub struct VerifyingKey<P: Pairing> {
     pub ic: Vec<P::G1Affine>,
 }
 
+#[derive(Debug)]
 pub struct PreparedVerifyingKey<P: Pairing> {
     /// Pairing result of alpha*beta
     pub(crate) alpha_g1_beta_g2: <P::PairingRange as PairingRange>::Gt,
@@ -324,19 +321,11 @@ pub fn generate_random_parameters<F: FftField, R>(mut rng: &mut R) -> (F, F, F, 
 where
     R: RngCore,
 {
-    // let alpha = F::random(&mut rng);
-    // let beta = F::random(&mut rng);
-    // let gamma = F::random(&mut rng);
-    // let delta = F::random(&mut rng);
-    // let tau = F::random(&mut rng);
-
-    // let g1 = E::G1::generator();
-    // let g2 = E::G2::generator();
-    let alpha = F::from(5);
-    let beta = F::from(6);
-    let gamma = F::from(7);
-    let delta = F::from(8);
-    let tau = F::from(9);
+    let alpha = F::random(&mut rng);
+    let beta = F::random(&mut rng);
+    let gamma = F::random(&mut rng);
+    let delta = F::random(&mut rng);
+    let tau = F::random(&mut rng);
 
     (alpha, beta, gamma, delta, tau)
 }
