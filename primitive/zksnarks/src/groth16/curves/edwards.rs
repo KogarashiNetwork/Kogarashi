@@ -1,5 +1,4 @@
-use crate::groth16::expression::{Evaluable, SparseRow};
-use crate::groth16::matrix::Element;
+use crate::groth16::matrix::{Element, Evaluable, SparseRow};
 use core::marker::PhantomData;
 use zkstd::common::{PrimeField, TwistedEdwardsAffine};
 

@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 mod constraint;
-mod expression;
 mod key;
 mod matrix;
 mod params;
@@ -17,7 +16,7 @@ use crate::constraint_system::ConstraintSystem;
 
 use constraint::Constraint;
 use curves::EdwardsExpression;
-use expression::SparseRow;
+use matrix::SparseRow;
 use wire::{Index, Wire};
 use zkstd::common::{vec, Group, Ring, TwistedEdwardsAffine, Vec};
 
@@ -287,8 +286,8 @@ mod tests {
     use crate::public_params::PublicParameters;
     use bls_12_381::Fr as BlsScalar;
     use ec_pairing::TatePairing;
-    use expression::SparseRow;
     use jub_jub::JubjubAffine;
+    use matrix::SparseRow;
     use rand::rngs::OsRng;
 
     #[test]

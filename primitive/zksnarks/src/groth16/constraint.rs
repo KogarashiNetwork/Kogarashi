@@ -1,5 +1,4 @@
-use super::expression::SparseRow;
-use super::matrix::Element;
+use super::matrix::{Element, SparseRow};
 
 use zkstd::common::PrimeField;
 
