@@ -1,14 +1,16 @@
 #![allow(dead_code)]
 mod constraint;
 mod expression;
+mod key;
+mod matrix;
 mod params;
 mod prover;
 mod util;
 mod verifier;
+pub(crate) mod wire_alt;
 
 pub(crate) mod curves;
 pub(crate) mod error;
-mod key;
 pub mod wire;
 
 use crate::constraint_system::ConstraintSystem;
@@ -16,9 +18,10 @@ use crate::constraint_system::ConstraintSystem;
 use constraint::Constraint;
 use curves::EdwardsExpression;
 use expression::Expression;
-use hashbrown::HashMap;
 use wire::{Index, Wire};
 use zkstd::common::{vec, Group, Ring, TwistedEdwardsAffine, Vec};
+
+use self::matrix::Element;
 
 #[derive(Debug)]
 pub struct Groth16<C: TwistedEdwardsAffine> {
@@ -26,8 +29,8 @@ pub struct Groth16<C: TwistedEdwardsAffine> {
     a: Vec<C::Range>,
     b: Vec<C::Range>,
     c: Vec<C::Range>,
-    pub(crate) instance: HashMap<Wire, C::Range>,
-    pub(crate) witness: HashMap<Wire, C::Range>,
+    pub(crate) instance: Vec<Element<C::Range>>,
+    pub(crate) witness: Vec<Element<C::Range>>,
 }
 
 impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
@@ -35,7 +38,14 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     type Constraints = Vec<Constraint<C::Range>>;
 
     fn initialize() -> Self {
-        Self::new()
+        Self {
+            constraints: Vec::new(),
+            a: vec![],
+            b: vec![],
+            c: vec![],
+            instance: [Element(Wire::ONE, C::Range::one())].into_iter().collect(),
+            witness: vec![],
+        }
     }
 
     fn m(&self) -> usize {
@@ -52,29 +62,18 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
 
     fn alloc_instance(&mut self, instance: C::Range) -> Wire {
         let wire = self.public_wire();
-        self.instance.insert(wire, instance);
+        self.instance.push(Element(wire, instance));
         wire
     }
 
     fn alloc_witness(&mut self, witness: C::Range) -> Wire {
         let wire = self.private_wire();
-        self.witness.insert(wire, witness);
+        self.witness.push(Element(wire, witness));
         wire
     }
 }
 
 impl<C: TwistedEdwardsAffine> Groth16<C> {
-    fn new() -> Self {
-        Self {
-            constraints: Vec::new(),
-            a: vec![],
-            b: vec![],
-            c: vec![],
-            instance: [(Wire::ONE, C::Range::one())].into_iter().collect(),
-            witness: HashMap::new(),
-        }
-    }
-
     fn inputs_iter(
         &self,
     ) -> (
@@ -88,20 +87,20 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
             a.coefficients()
                 .iter()
-                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Input(_)))
-                .for_each(|(&w, coeff)| {
+                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
+                .for_each(|Element(w, coeff)| {
                     at[*w.get_unchecked()].push((*coeff, i));
                 });
             b.coefficients()
                 .iter()
-                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Input(_)))
-                .for_each(|(&w, coeff)| {
+                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
+                .for_each(|Element(w, coeff)| {
                     bt[*w.get_unchecked()].push((*coeff, i));
                 });
             c.coefficients()
                 .iter()
-                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Input(_)))
-                .for_each(|(&w, coeff)| {
+                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
+                .for_each(|Element(w, coeff)| {
                     ct[*w.get_unchecked()].push((*coeff, i));
                 });
         }
@@ -122,20 +121,20 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
             a.coefficients()
                 .iter()
-                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
-                .for_each(|(&w, coeff)| {
+                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
+                .for_each(|Element(w, coeff)| {
                     at[*w.get_unchecked()].push((*coeff, i));
                 });
             b.coefficients()
                 .iter()
-                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
-                .for_each(|(&w, coeff)| {
+                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
+                .for_each(|Element(w, coeff)| {
                     bt[*w.get_unchecked()].push((*coeff, i));
                 });
             c.coefficients()
                 .iter()
-                .filter(|(&w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
-                .for_each(|(&w, coeff)| {
+                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
+                .for_each(|Element(w, coeff)| {
                     ct[*w.get_unchecked()].push((*coeff, i));
                 });
         }
