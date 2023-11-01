@@ -43,7 +43,7 @@ impl<F: PrimeField> SparseRow<F> {
     /// Return Some(c) if this is a constant c, otherwise None.
     pub fn as_constant(&self) -> Option<F> {
         if self.num_terms() == 1 {
-            get_value_from_wire(Wire::ONE.get_unchecked(), &self.0)
+            get_value_from_wire(Wire::ONE, &self.0)
         } else {
             None
         }
@@ -53,9 +53,9 @@ impl<F: PrimeField> SparseRow<F> {
         self.0
             .iter()
             .fold(F::zero(), |sum, Element(wire, coefficient)| {
-                let wire_value = match wire.get_unchecked() {
-                    Index::Input(_) => get_value_from_wire(wire.get_unchecked(), instance),
-                    Index::Aux(_) => get_value_from_wire(wire.get_unchecked(), witness),
+                let wire_value = match wire {
+                    Wire(Index::Input(_)) => get_value_from_wire(*wire, instance),
+                    Wire(Index::Aux(_)) => get_value_from_wire(*wire, witness),
                 }
                 .expect("No value for the wire was found");
                 sum + (wire_value * *coefficient)
@@ -111,13 +111,13 @@ impl<F: PrimeField> Add<&SparseRow<F>> for &SparseRow<F> {
     fn add(self, rhs: &SparseRow<F>) -> SparseRow<F> {
         let mut res = Vec::new();
         for Element(wire, coefficient) in rhs.0.clone() {
-            match get_value_from_wire(wire.get_unchecked(), &self.0) {
+            match get_value_from_wire(wire, &self.0) {
                 Some(coeff) => res.push(Element(wire, coeff + coefficient)),
                 None => res.push(Element(wire, coefficient)),
             }
         }
         for Element(wire, coefficient) in self.0.clone() {
-            match get_value_from_wire(wire.get_unchecked(), &rhs.0) {
+            match get_value_from_wire(wire, &rhs.0) {
                 Some(_) => {}
                 None => res.push(Element(wire, coefficient)),
             }
@@ -126,9 +126,9 @@ impl<F: PrimeField> Add<&SparseRow<F>> for &SparseRow<F> {
     }
 }
 
-fn get_value_from_wire<F: PrimeField>(index: Index, vectors: &[Element<F>]) -> Option<F> {
+fn get_value_from_wire<F: PrimeField>(index: Wire, vectors: &[Element<F>]) -> Option<F> {
     for vector in vectors {
-        if index == vector.0.get_unchecked() {
+        if index.get_unchecked() == vector.0.get_unchecked() {
             return Some(vector.1);
         }
     }

@@ -29,13 +29,9 @@ impl Default for Index {
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Default)]
-pub struct Wire(Index);
+pub struct Wire(pub(crate) Index);
 
 impl Wire {
-    pub const fn new_unchecked(index: Index) -> Self {
-        Self(index)
-    }
-
     pub const fn get_unchecked(self) -> Index {
         self.0
     }
