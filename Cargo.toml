@@ -53,6 +53,7 @@ members = [
     "primitive/elgamal",
     "primitive/jubjub",
     "primitive/pairing",
+    "primitive/pasta_curves",
     "primitive/plonk",
     "primitive/poly",
     "primitive/redjubjub",

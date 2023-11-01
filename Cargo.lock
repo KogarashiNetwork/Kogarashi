@@ -1783,6 +1783,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "pasta_curves"
+version = "0.1.0"
+dependencies = [
+ "bls-12-381 0.0.20",
+ "jub-jub 0.0.15",
+ "parity-scale-codec",
+ "paste",
+ "rand_core 0.6.4",
+ "serde",
+ "zkstd 0.0.21",
+]
+
+[[package]]
 name = "paste"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"

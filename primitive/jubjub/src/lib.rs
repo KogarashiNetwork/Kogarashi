@@ -23,5 +23,6 @@ mod error;
 mod fp;
 
 pub use curve::*;
+pub use error::Error;
 pub use fp::compute_windowed_naf;
 pub use fp::Fp;
