@@ -1,14 +1,13 @@
-use super::expression::Expression;
-use super::matrix::Element;
+use super::matrix::{Element, SparseRow};
 
 use zkstd::common::PrimeField;
 
 /// An rank-1 constraint of the form a * b = c, where a, b, and c are linear combinations of wires.
 #[derive(Clone, Debug)]
 pub struct Constraint<F: PrimeField> {
-    pub a: Expression<F>,
-    pub b: Expression<F>,
-    pub c: Expression<F>,
+    pub a: SparseRow<F>,
+    pub b: SparseRow<F>,
+    pub c: SparseRow<F>,
 }
 
 impl<F: PrimeField> Constraint<F> {

@@ -1,50 +1,22 @@
 use core::cmp::Ordering;
 use core::fmt;
 use core::fmt::Formatter;
-use core::ops::Deref;
 
-/// Represents the index of either an input variable or
-/// auxiliary variable.
-#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Ord, PartialOrd)]
-pub enum Index {
-    Input(usize),
-    Aux(usize),
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub enum Wire {
+    Instance(usize),
+    Witness(usize),
 }
 
-impl Deref for Index {
-    type Target = usize;
+impl Wire {
+    pub const ONE: Wire = Wire::Instance(0);
 
-    fn deref(&self) -> &Self::Target {
+    pub const fn deref_i(&self) -> &usize {
         match self {
-            Index::Input(i) => i,
-            Index::Aux(i) => i,
+            Wire::Instance(i) => i,
+            Wire::Witness(i) => i,
         }
     }
-}
-
-impl Default for Index {
-    fn default() -> Self {
-        Self::Input(0)
-    }
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Default)]
-pub struct Wire(Index);
-
-impl Wire {
-    pub const fn new_unchecked(index: Index) -> Self {
-        Self(index)
-    }
-
-    pub const fn get_unchecked(self) -> Index {
-        self.0
-    }
-}
-
-impl Wire {
-    /// A special wire whose value is always set to 1. This is used to create `Expression`s with
-    /// constant terms.
-    pub const ONE: Wire = Wire(Index::Input(0));
 }
 
 impl Ord for Wire {
@@ -57,7 +29,7 @@ impl Ord for Wire {
         } else if *other == Wire::ONE {
             Ordering::Greater
         } else {
-            self.0.cmp(&other.0)
+            self.deref_i().cmp(&other.deref_i())
         }
     }
 }
@@ -70,10 +42,9 @@ impl PartialOrd for Wire {
 
 impl fmt::Display for Wire {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        if let Index::Input(0) = self.0 {
-            write!(f, "1")
-        } else {
-            write!(f, "wire_{:?}", self.0)
+        match self {
+            Self::Instance(i) => write!(f, "instance {:?}", i),
+            Self::Witness(i) => write!(f, "witness {:?}", i),
         }
     }
 }
