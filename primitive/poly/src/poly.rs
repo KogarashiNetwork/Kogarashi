@@ -232,7 +232,9 @@ impl<'a, 'b, F: FftField> Mul<&'a F> for &'b Coefficients<F> {
 #[cfg(test)]
 mod tests {
     use super::Coefficients;
+    use crate::PointsValue;
     use bls_12_381::Fr;
+    use core::iter;
     use rand_core::OsRng;
     use zkstd::common::{Group, PrimeField};
 
@@ -242,6 +244,14 @@ mod tests {
 
     fn arb_poly(k: u32) -> Coefficients<Fr> {
         Coefficients(
+            (0..(1 << k))
+                .map(|_| Fr::random(OsRng))
+                .collect::<Vec<Fr>>(),
+        )
+    }
+
+    fn arb_points(k: u32) -> PointsValue<Fr> {
+        PointsValue(
             (0..(1 << k))
                 .map(|_| Fr::random(OsRng))
                 .collect::<Vec<Fr>>(),
@@ -284,5 +294,27 @@ mod tests {
         let original = Coefficients(naive_multiply(quotient.0, factor_poly));
 
         assert_eq!(poly_a.0, original.0);
+    }
+
+    #[test]
+    fn polynomial_subtraction_test() {
+        let a = arb_points(9);
+        let b = arb_points(10);
+
+        let sub = &a - &b;
+
+        let ans: Vec<Fr> = if a.0.len() > b.0.len() {
+            a.0.iter()
+                .zip(b.0.iter().chain(iter::repeat(&Fr::zero())))
+                .map(|(a, b)| *a - *b)
+                .collect()
+        } else {
+            a.0.iter()
+                .chain(iter::repeat(&Fr::zero()))
+                .zip(b.0.iter())
+                .map(|(a, b)| *a - *b)
+                .collect()
+        };
+        assert_eq!(sub.0, ans);
     }
 }

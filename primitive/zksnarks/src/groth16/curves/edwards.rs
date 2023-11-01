@@ -35,7 +35,7 @@ impl<F: PrimeField, C: TwistedEdwardsAffine<Range = F>> EdwardsExpression<F, C> 
 impl<F: PrimeField, C: TwistedEdwardsAffine<Range = F>> Evaluable<F, C>
     for EdwardsExpression<F, C>
 {
-    fn evaluate(&self, instance: &Vec<Element<F>>, witness: &Vec<Element<F>>) -> C {
+    fn evaluate(&self, instance: &[Element<F>], witness: &[Element<F>]) -> C {
         C::from_raw_unchecked(
             self.x.evaluate(instance, witness),
             self.y.evaluate(instance, witness),

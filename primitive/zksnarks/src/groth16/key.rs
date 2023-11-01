@@ -1,19 +1,16 @@
 use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
-use crate::groth16::error::Groth16Error;
 use crate::groth16::params::Groth16Params;
 use crate::groth16::prover::Prover;
 use crate::groth16::verifier::Verifier;
 use crate::groth16::Groth16;
 use crate::keypair::Keypair;
 use core::marker::PhantomData;
-use core::ops::MulAssign;
+use core::ops::{MulAssign, Neg};
 use poly_commit::{Coefficients, Fft, PointsValue};
-use rand::rngs::OsRng;
-use std::ops::Neg;
 use zkstd::common::{
-    vec, CurveGroup, FftField, Group, Pairing, PairingRange, PrimeField, Ring, RngCore, Vec,
+    vec, CurveGroup, FftField, Group, Pairing, PairingRange, PrimeField, Ring, Vec,
 };
 
 /// Generate the arguments to prove and verify a circuit
@@ -63,20 +60,19 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
 
         let fft = Fft::<P::ScalarField>::new(k as usize);
 
-        let (alpha, beta, gamma, delta, tau) =
-            generate_random_parameters::<P::ScalarField, OsRng>(&mut OsRng);
+        let (alpha, beta, gamma, delta, tau) = pp.toxic_waste;
 
-        let g1 = pp.commitment_key.bases[0];
-        let g2 = pp.evaluation_key.h;
+        let g1 = pp.generators.0;
+        let g2 = pp.generators.1;
         let mut powers_of_tau = PointsValue(vec![P::ScalarField::zero(); cs.m()]);
 
-        // TODO: Proper error
-        let gamma_inverse = gamma.invert().ok_or(Groth16Error::General)?;
-        let delta_inverse = delta.invert().ok_or(Groth16Error::General)?;
+        let gamma_inverse = gamma.invert().ok_or(Error::UnexpectedIdentity)?;
+        let delta_inverse = delta.invert().ok_or(Error::UnexpectedIdentity)?;
 
         let mut h: Vec<P::G1Affine> =
             vec![P::G1Affine::ADDITIVE_IDENTITY; powers_of_tau.0.len() - 1];
 
+        // Compute (1, tau, tau^2, ...)
         let mut current_pow_of_tau = P::ScalarField::one();
         for x in powers_of_tau.0.iter_mut() {
             *x = current_pow_of_tau;
@@ -84,8 +80,10 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
         }
 
         let mut coeff = fft.z(&tau);
+        // (tau^m - 1) / delta
         coeff.mul_assign(&delta_inverse);
 
+        // Hide original values by converting to the curve points
         for (h, p) in h.iter_mut().zip(powers_of_tau.0.iter()) {
             *h = (g1 * (*p * coeff)).into();
         }
@@ -205,17 +203,17 @@ fn eval<P: Pairing>(
         .zip(bt.iter())
         .zip(ct.iter())
     {
-        // Evaluate QAP polynomials at tau
+        // Evaluate QAP polynomials at tau without
         let mut at = eval_at_tau(powers_of_tau, at);
         let mut bt = eval_at_tau(powers_of_tau, bt);
         let ct = eval_at_tau(powers_of_tau, ct);
 
-        // Compute A query (in G1)
+        // Compute A query (in G1). Hiding the original values
         if !at.is_zero() {
             *a = (g1 * at).into();
         }
 
-        // Compute B query (in G1/G2)
+        // Compute B query (in G1/G2). Hiding the original value
         if !bt.is_zero() {
             *b_g1 = (g1 * bt).into();
             *b_g2 = (g2 * bt).into();
@@ -224,6 +222,8 @@ fn eval<P: Pairing>(
         at *= beta;
         bt *= alpha;
 
+        // Compute (beta * u_i(x)+ alpha * v_i(x)+ w_i(x)) / gamma for inputs
+        // or  (beta * u_i(x)+ alpha * v_i(x)+ w_i(x)) / delta for aux
         *ext = (g1 * ((at + bt + ct) * inv)).into();
     }
 }
@@ -313,19 +313,4 @@ pub fn prepare_verifying_key<P: Pairing>(vk: &VerifyingKey<P>) -> PreparedVerify
         neg_delta_g2: P::G2PairngRepr::from(delta),
         ic: vk.ic.clone(),
     }
-}
-
-/// Generates a random common reference string for
-/// a circuit.
-pub fn generate_random_parameters<F: FftField, R>(mut rng: &mut R) -> (F, F, F, F, F)
-where
-    R: RngCore,
-{
-    let alpha = F::random(&mut rng);
-    let beta = F::random(&mut rng);
-    let gamma = F::random(&mut rng);
-    let delta = F::random(&mut rng);
-    let tau = F::random(&mut rng);
-
-    (alpha, beta, gamma, delta, tau)
 }

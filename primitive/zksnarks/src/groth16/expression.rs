@@ -3,10 +3,10 @@ use super::wire::{Index, Wire};
 
 use core::fmt::Debug;
 use core::ops::{Add, Mul};
-use zkstd::common::PrimeField;
+use zkstd::common::{PrimeField, Vec};
 
 pub trait Evaluable<F: PrimeField, R> {
-    fn evaluate(&self, instance: &Vec<Element<F>>, witness: &Vec<Element<F>>) -> R;
+    fn evaluate(&self, instance: &[Element<F>], witness: &[Element<F>]) -> R;
 }
 
 /// A linear combination of wires.
@@ -49,7 +49,7 @@ impl<F: PrimeField> Expression<F> {
         }
     }
 
-    pub fn evaluate(&self, instance: &Vec<Element<F>>, witness: &Vec<Element<F>>) -> F {
+    pub fn evaluate(&self, instance: &[Element<F>], witness: &[Element<F>]) -> F {
         self.coefficients
             .iter()
             .fold(F::zero(), |sum, Element(wire, coefficient)| {
@@ -65,7 +65,7 @@ impl<F: PrimeField> Expression<F> {
 
 impl<F: PrimeField> From<Wire> for Expression<F> {
     fn from(wire: Wire) -> Self {
-        Expression::new([Element(wire, F::one())].iter().cloned().collect())
+        Expression::new([Element(wire, F::one())].to_vec())
     }
 }
 
@@ -77,7 +77,7 @@ impl<F: PrimeField> From<&Wire> for Expression<F> {
 
 impl<F: PrimeField> From<F> for Expression<F> {
     fn from(value: F) -> Self {
-        Expression::new([Element(Wire::ONE, value)].iter().cloned().collect())
+        Expression::new([Element(Wire::ONE, value)].to_vec())
     }
 }
 
@@ -128,7 +128,7 @@ impl<F: PrimeField> Add<&Expression<F>> for &Expression<F> {
     }
 }
 
-fn get_value_from_wire<F: PrimeField>(index: Index, vectors: &Vec<Element<F>>) -> Option<F> {
+fn get_value_from_wire<F: PrimeField>(index: Index, vectors: &[Element<F>]) -> Option<F> {
     for vector in vectors {
         if index == vector.0.get_unchecked() {
             return Some(vector.1);

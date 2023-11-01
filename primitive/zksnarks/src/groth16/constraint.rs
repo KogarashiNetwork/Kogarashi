@@ -12,7 +12,7 @@ pub struct Constraint<F: PrimeField> {
 }
 
 impl<F: PrimeField> Constraint<F> {
-    pub fn evaluate(&self, instance: &Vec<Element<F>>, witness: &Vec<Element<F>>) -> (F, F, F) {
+    pub fn evaluate(&self, instance: &[Element<F>], witness: &[Element<F>]) -> (F, F, F) {
         let a_value = self.a.evaluate(instance, witness);
         let b_value = self.b.evaluate(instance, witness);
         let c_value = self.c.evaluate(instance, witness);
