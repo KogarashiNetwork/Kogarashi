@@ -1,7 +1,7 @@
 use crate::groth16::expression::{Evaluable, Expression};
 use crate::groth16::matrix::Element;
 use core::marker::PhantomData;
-use zkstd::common::{PrimeField, TwistedEdwardsAffine, Vec};
+use zkstd::common::{PrimeField, TwistedEdwardsAffine};
 
 impl<F: PrimeField, C: TwistedEdwardsAffine<Range = F>> Clone for EdwardsExpression<F, C> {
     fn clone(&self) -> Self {
@@ -35,7 +35,7 @@ impl<F: PrimeField, C: TwistedEdwardsAffine<Range = F>> EdwardsExpression<F, C> 
 impl<F: PrimeField, C: TwistedEdwardsAffine<Range = F>> Evaluable<F, C>
     for EdwardsExpression<F, C>
 {
-    fn evaluate(&self, instance: &Vec<Element<F>>, witness: &Vec<Element<F>>) -> C {
+    fn evaluate(&self, instance: &[Element<F>], witness: &[Element<F>]) -> C {
         C::from_raw_unchecked(
             self.x.evaluate(instance, witness),
             self.y.evaluate(instance, witness),

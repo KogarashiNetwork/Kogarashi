@@ -74,6 +74,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
 }
 
 impl<C: TwistedEdwardsAffine> Groth16<C> {
+    #[allow(clippy::type_complexity)]
     fn inputs_iter(
         &self,
     ) -> (
@@ -108,6 +109,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         (at, bt, ct)
     }
 
+    #[allow(clippy::type_complexity)]
     fn aux_iter(
         &self,
     ) -> (
