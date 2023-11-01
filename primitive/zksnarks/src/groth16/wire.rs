@@ -22,25 +22,15 @@ impl Deref for Index {
     }
 }
 
-impl Default for Index {
-    fn default() -> Self {
-        Self::Input(0)
-    }
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Default)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Wire(pub(crate) Index);
 
 impl Wire {
+    pub const ONE: Wire = Wire(Index::Input(0));
+
     pub const fn get_unchecked(self) -> Index {
         self.0
     }
-}
-
-impl Wire {
-    /// A special wire whose value is always set to 1. This is used to create `Expression`s with
-    /// constant terms.
-    pub const ONE: Wire = Wire(Index::Input(0));
 }
 
 impl Ord for Wire {
@@ -53,7 +43,7 @@ impl Ord for Wire {
         } else if *other == Wire::ONE {
             Ordering::Greater
         } else {
-            self.0.cmp(&other.0)
+            self.get_unchecked().cmp(&other.get_unchecked())
         }
     }
 }
