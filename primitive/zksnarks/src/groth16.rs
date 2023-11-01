@@ -172,6 +172,16 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         Wire::new_unchecked(Index::Aux(index))
     }
 
+    /// Appends a point in affine form as [`WitnessPoint`]
+    pub fn append_point<A: Into<C>>(&mut self, affine: A) -> EdwardsExpression<C::Range, C> {
+        let affine = affine.into();
+
+        let x = self.alloc_witness(affine.get_x());
+        let y = self.alloc_witness(affine.get_y());
+
+        self.append_edwards_expression(Expression::from(x), Expression::from(y))
+    }
+
     pub fn append_edwards_expression(
         &mut self,
         x: Expression<C::Range>,
@@ -187,6 +197,49 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         );
 
         EdwardsExpression::new_unsafe(x, y)
+    }
+
+    /// Adds two points on an `EdwardsCurve` using the standard algorithm for Twisted Edwards
+    /// Curves.
+    fn add_points(
+        &mut self,
+        _lhs: &EdwardsExpression<C::Range, C>,
+        _rhs: &EdwardsExpression<C::Range, C>,
+    ) -> EdwardsExpression<C::Range, C> {
+        // let a = C::zero();
+        // let d = C::PARAM_D;
+        // let EdwardsExpression { x: x1, y: y1, .. } = lhs;
+        // let EdwardsExpression { x: x2, y: y2, .. } = rhs;
+        // let x1y2 = self.product(&x1, &y2);
+        // let x2y1 = self.product(&y1, &x2);
+        // let x1x2 = self.product(&x1, &x2);
+        // let x1x2y1y2 = self.product(&x1y2, &x2y1);
+        // let y1y2 = self.product(&y1, &y2);
+        // let x3 = self.quotient_unsafe(&(x1y2 + x2y1), &(&x1x2y1y2 * &d + Expression::one()));
+        // let y3 = self.quotient_unsafe(&(y1y2 - &x1x2 * &a), &(&x1x2y1y2 * -&d + Expression::one()));
+        // EdwardsExpression::new_unsafe(x3, y3)
+        todo!()
+    }
+
+    /// Performs scalar multiplication in constraints by first splitting up a scalar into
+    /// a binary representation, and then performing the naive double-or-add algorithm. This
+    /// implementation is generic for all groups.
+    pub fn mul_point(
+        &mut self,
+        scalar: Wire,
+        expression: &EdwardsExpression<C::Range, C>,
+    ) -> EdwardsExpression<C::Range, C> {
+        // let scalar_binary = self.split_allowing_ambiguity(&scalar);
+        //
+        // let mut sum = Self::identity_expression();
+        // let mut current = expression.clone();
+        // for bit in scalar_binary.bits {
+        //     let boolean_product = Self::mul_boolean_expression(builder, &current, &bit);
+        //     sum = Self::add_points(&self, &sum, &boolean_product);
+        //     current = Self::double_expression(&self, &current);
+        // }
+        // sum
+        todo!();
     }
 
     /// Assert that x * y = z;
