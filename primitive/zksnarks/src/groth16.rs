@@ -17,7 +17,7 @@ use crate::constraint_system::ConstraintSystem;
 
 use constraint::Constraint;
 use curves::EdwardsExpression;
-use expression::Expression;
+use expression::SparseRow;
 use wire::{Index, Wire};
 use zkstd::common::{vec, Group, Ring, TwistedEdwardsAffine, Vec};
 
@@ -174,8 +174,8 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
 
     pub fn append_edwards_expression(
         &mut self,
-        x: Expression<C::Range>,
-        y: Expression<C::Range>,
+        x: SparseRow<C::Range>,
+        y: SparseRow<C::Range>,
     ) -> EdwardsExpression<C::Range, C> {
         let x_squared = self.product(&x, &x);
         let y_squared = self.product(&y, &y);
@@ -183,7 +183,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
 
         self.assert_equal(
             &y_squared,
-            &(Expression::one() + x_squared_y_squared * C::PARAM_D + &x_squared),
+            &(SparseRow::one() + x_squared_y_squared * C::PARAM_D + &x_squared),
         );
 
         EdwardsExpression::new_unsafe(x, y)
@@ -192,9 +192,9 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     /// Assert that x * y = z;
     pub fn assert_product(
         &mut self,
-        x: &Expression<C::Range>,
-        y: &Expression<C::Range>,
-        z: &Expression<C::Range>,
+        x: &SparseRow<C::Range>,
+        y: &SparseRow<C::Range>,
+        z: &SparseRow<C::Range>,
     ) {
         self.constraints.push(Constraint {
             a: x.clone(),
@@ -206,28 +206,28 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     // Assert that x + y = z;
     pub fn assert_sum(
         &mut self,
-        x: &Expression<C::Range>,
-        y: &Expression<C::Range>,
-        z: &Expression<C::Range>,
+        x: &SparseRow<C::Range>,
+        y: &SparseRow<C::Range>,
+        z: &SparseRow<C::Range>,
     ) {
         self.constraints.push(Constraint {
             a: x + y,
-            b: Expression::from(Wire::ONE),
+            b: SparseRow::from(Wire::ONE),
             c: z.clone(),
         });
     }
 
     /// Assert that x == y.
-    pub fn assert_equal(&mut self, x: &Expression<C::Range>, y: &Expression<C::Range>) {
-        self.assert_product(x, &Expression::one(), y);
+    pub fn assert_equal(&mut self, x: &SparseRow<C::Range>, y: &SparseRow<C::Range>) {
+        self.assert_product(x, &SparseRow::one(), y);
     }
 
     /// The product of two `Expression`s `x` and `y`, i.e. `x * y`.
     pub fn product(
         &mut self,
-        x: &Expression<C::Range>,
-        y: &Expression<C::Range>,
-    ) -> Expression<C::Range> {
+        x: &SparseRow<C::Range>,
+        y: &SparseRow<C::Range>,
+    ) -> SparseRow<C::Range> {
         if let Some(c) = x.as_constant() {
             return y * c;
         }
@@ -238,18 +238,14 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         let product_value =
             x.evaluate(&self.instance, &self.witness) * y.evaluate(&self.instance, &self.witness);
         let product = self.alloc_witness(product_value);
-        let product_exp = Expression::from(product);
+        let product_exp = SparseRow::from(product);
         self.assert_product(x, y, &product_exp);
 
         product_exp
     }
 
     /// The product of two `Expression`s `x` and `y`, i.e. `x * y`.
-    pub fn sum(
-        &mut self,
-        x: &Expression<C::Range>,
-        y: &Expression<C::Range>,
-    ) -> Expression<C::Range> {
+    pub fn sum(&mut self, x: &SparseRow<C::Range>, y: &SparseRow<C::Range>) -> SparseRow<C::Range> {
         if let Some(c) = x.as_constant() {
             return y * c;
         }
@@ -260,20 +256,20 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         let sum_value =
             x.evaluate(&self.instance, &self.witness) + y.evaluate(&self.instance, &self.witness);
         let sum = self.alloc_witness(sum_value);
-        let sum_exp = Expression::from(sum);
+        let sum_exp = SparseRow::from(sum);
         self.assert_sum(x, y, &sum_exp);
         sum_exp
     }
 
     /// Returns `1 / x`, assuming `x` is non-zero. If `x` is zero, the gadget will not be
     /// satisfiable.
-    pub fn inverse(&mut self, x: &Expression<C::Range>) -> Expression<C::Range> {
+    pub fn inverse(&mut self, x: &SparseRow<C::Range>) -> SparseRow<C::Range> {
         let x_value = x.evaluate(&self.instance, &self.witness);
         let inverse_value = x_value.invert().expect("Can't find an inverse element");
         let x_inv = self.alloc_witness(inverse_value);
 
-        let x_inv_expression = Expression::from(x_inv);
-        self.assert_product(x, &x_inv_expression, &Expression::one());
+        let x_inv_expression = SparseRow::from(x_inv);
+        self.assert_product(x, &x_inv_expression, &SparseRow::one());
 
         x_inv_expression
     }
@@ -291,7 +287,7 @@ mod tests {
     use crate::public_params::PublicParameters;
     use bls_12_381::Fr as BlsScalar;
     use ec_pairing::TatePairing;
-    use expression::Expression;
+    use expression::SparseRow;
     use jub_jub::JubjubAffine;
     use rand::rngs::OsRng;
 
@@ -321,7 +317,7 @@ mod tests {
                 let x = composer.alloc_witness(self.x);
                 let y = composer.alloc_witness(self.y);
 
-                composer.append_edwards_expression(Expression::from(x), Expression::from(y));
+                composer.append_edwards_expression(SparseRow::from(x), SparseRow::from(y));
 
                 Ok(())
             }
@@ -371,7 +367,7 @@ mod tests {
         impl Circuit<JubjubAffine> for DummyCircuit {
             type ConstraintSystem = Groth16<JubjubAffine>;
             fn synthesize(&self, composer: &mut Groth16<JubjubAffine>) -> Result<(), Error> {
-                let x = Expression::from(composer.alloc_instance(self.x));
+                let x = SparseRow::from(composer.alloc_instance(self.x));
                 let o = composer.alloc_instance(self.o);
 
                 let sym1 = composer.product(&x, &x);
@@ -379,8 +375,8 @@ mod tests {
                 let sym2 = composer.sum(&y, &x);
 
                 composer.assert_equal(
-                    &(sym2 + Expression::from(BlsScalar::from(5))),
-                    &Expression::from(o),
+                    &(sym2 + SparseRow::from(BlsScalar::from(5))),
+                    &SparseRow::from(o),
                 );
 
                 Ok(())
