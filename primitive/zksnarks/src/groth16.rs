@@ -6,7 +6,6 @@ mod params;
 mod prover;
 mod util;
 mod verifier;
-pub(crate) mod wire_alt;
 
 pub(crate) mod curves;
 pub(crate) mod error;
@@ -17,7 +16,7 @@ use crate::constraint_system::ConstraintSystem;
 use constraint::Constraint;
 use curves::EdwardsExpression;
 use matrix::SparseRow;
-use wire::{Index, Wire};
+use wire::Wire;
 use zkstd::common::{vec, Group, Ring, TwistedEdwardsAffine, Vec};
 
 use self::matrix::Element;
@@ -87,21 +86,21 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
             a.coefficients()
                 .iter()
-                .filter(|Element(w, _)| matches!(w, Wire(Index::Input(_))))
+                .filter(|Element(w, _)| matches!(w, Wire::Instance(_)))
                 .for_each(|Element(w, coeff)| {
-                    at[*w.get_unchecked()].push((*coeff, i));
+                    at[*w.deref_i()].push((*coeff, i));
                 });
             b.coefficients()
                 .iter()
-                .filter(|Element(w, _)| matches!(w, Wire(Index::Input(_))))
+                .filter(|Element(w, _)| matches!(w, Wire::Instance(_)))
                 .for_each(|Element(w, coeff)| {
-                    bt[*w.get_unchecked()].push((*coeff, i));
+                    bt[*w.deref_i()].push((*coeff, i));
                 });
             c.coefficients()
                 .iter()
-                .filter(|Element(w, _)| matches!(w, Wire(Index::Input(_))))
+                .filter(|Element(w, _)| matches!(w, Wire::Instance(_)))
                 .for_each(|Element(w, coeff)| {
-                    ct[*w.get_unchecked()].push((*coeff, i));
+                    ct[*w.deref_i()].push((*coeff, i));
                 });
         }
 
@@ -122,21 +121,21 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
             a.coefficients()
                 .iter()
-                .filter(|Element(w, _)| matches!(w, Wire(Index::Aux(_))))
+                .filter(|Element(w, _)| matches!(w, Wire::Witness(_)))
                 .for_each(|Element(w, coeff)| {
-                    at[*w.get_unchecked()].push((*coeff, i));
+                    at[*w.deref_i()].push((*coeff, i));
                 });
             b.coefficients()
                 .iter()
-                .filter(|Element(w, _)| matches!(w, Wire(Index::Aux(_))))
+                .filter(|Element(w, _)| matches!(w, Wire::Witness(_)))
                 .for_each(|Element(w, coeff)| {
-                    bt[*w.get_unchecked()].push((*coeff, i));
+                    bt[*w.deref_i()].push((*coeff, i));
                 });
             c.coefficients()
                 .iter()
-                .filter(|Element(w, _)| matches!(w, Wire(Index::Aux(_))))
+                .filter(|Element(w, _)| matches!(w, Wire::Witness(_)))
                 .for_each(|Element(w, coeff)| {
-                    ct[*w.get_unchecked()].push((*coeff, i));
+                    ct[*w.deref_i()].push((*coeff, i));
                 });
         }
 
@@ -162,13 +161,13 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     /// Add a public wire to the gadget. It will start with no generator and no associated constraints.
     pub fn public_wire(&mut self) -> Wire {
         let index = self.instance.len();
-        Wire(Index::Input(index))
+        Wire::Instance(index)
     }
 
     /// Add a private wire to the gadget. It will start with no generator and no associated constraints.
     fn private_wire(&mut self) -> Wire {
         let index = self.witness.len();
-        Wire(Index::Aux(index))
+        Wire::Witness(index)
     }
 
     pub fn append_edwards_expression(

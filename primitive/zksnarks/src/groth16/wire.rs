@@ -1,35 +1,21 @@
 use core::cmp::Ordering;
 use core::fmt;
 use core::fmt::Formatter;
-use core::ops::Deref;
-
-/// Represents the index of either an input variable or
-/// auxiliary variable.
-#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Ord, PartialOrd)]
-pub enum Index {
-    Input(usize),
-    Aux(usize),
-}
-
-impl Deref for Index {
-    type Target = usize;
-
-    fn deref(&self) -> &Self::Target {
-        match self {
-            Index::Input(i) => i,
-            Index::Aux(i) => i,
-        }
-    }
-}
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct Wire(pub(crate) Index);
+pub enum Wire {
+    Instance(usize),
+    Witness(usize),
+}
 
 impl Wire {
-    pub const ONE: Wire = Wire(Index::Input(0));
+    pub const ONE: Wire = Wire::Instance(0);
 
-    pub const fn get_unchecked(self) -> Index {
-        self.0
+    pub const fn deref_i(&self) -> &usize {
+        match self {
+            Wire::Instance(i) => i,
+            Wire::Witness(i) => i,
+        }
     }
 }
 
@@ -43,7 +29,7 @@ impl Ord for Wire {
         } else if *other == Wire::ONE {
             Ordering::Greater
         } else {
-            self.get_unchecked().cmp(&other.get_unchecked())
+            self.deref_i().cmp(&other.deref_i())
         }
     }
 }
@@ -56,10 +42,9 @@ impl PartialOrd for Wire {
 
 impl fmt::Display for Wire {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        if let Index::Input(0) = self.0 {
-            write!(f, "1")
-        } else {
-            write!(f, "wire_{:?}", self.0)
+        match self {
+            Self::Instance(i) => write!(f, "instance {:?}", i),
+            Self::Witness(i) => write!(f, "witness {:?}", i),
         }
     }
 }

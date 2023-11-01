@@ -1,5 +1,5 @@
 mod element;
-use super::wire::{Index, Wire};
+use super::wire::Wire;
 
 pub(crate) use element::Element;
 
@@ -54,8 +54,8 @@ impl<F: PrimeField> SparseRow<F> {
             .iter()
             .fold(F::zero(), |sum, Element(wire, coefficient)| {
                 let wire_value = match wire {
-                    Wire(Index::Input(_)) => get_value_from_wire(*wire, instance),
-                    Wire(Index::Aux(_)) => get_value_from_wire(*wire, witness),
+                    Wire::Instance(_) => get_value_from_wire(*wire, instance),
+                    Wire::Witness(_) => get_value_from_wire(*wire, witness),
                 }
                 .expect("No value for the wire was found");
                 sum + (wire_value * *coefficient)
@@ -128,7 +128,7 @@ impl<F: PrimeField> Add<&SparseRow<F>> for &SparseRow<F> {
 
 fn get_value_from_wire<F: PrimeField>(index: Wire, vectors: &[Element<F>]) -> Option<F> {
     for vector in vectors {
-        if index.get_unchecked() == vector.0.get_unchecked() {
+        if index == vector.0 {
             return Some(vector.1);
         }
     }
