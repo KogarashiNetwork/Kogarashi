@@ -194,6 +194,12 @@ fn eval<P: Pairing>(
     alpha: &P::ScalarField,
     beta: &P::ScalarField,
 ) {
+    assert_eq!(a.len(), at.len());
+    assert_eq!(a.len(), bt.len());
+    assert_eq!(a.len(), ct.len());
+    assert_eq!(a.len(), b_g1.len());
+    assert_eq!(a.len(), b_g2.len());
+    assert_eq!(a.len(), ext.len());
     for ((((((a, b_g1), b_g2), ext), at), bt), ct) in a
         .iter_mut()
         .zip(b_g1.iter_mut())

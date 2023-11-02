@@ -89,45 +89,46 @@ impl Circuit<JubjubAffine> for ConfidentialTransferCircuit {
         let neg = composer.alloc_witness((-JubJubScalar::one()).into());
 
         // Alice left encrypted transfer check
-        let g_pow_balance = composer
-            .component_mul_generator(transfer_amount, JubjubExtended::ADDITIVE_GENERATOR)?;
+        let g_pow_balance =
+            composer.mul_generator(transfer_amount, JubjubExtended::ADDITIVE_GENERATOR)?;
         let alice_pk_powered_by_randomness = composer.mul_point(randomness, &sender_public_key);
-        let s_alice_transfer = composer.add_point(g_pow_balance, alice_pk_powered_by_randomness);
-        composer.assert_equal_public_point(s_alice_transfer, alice_t_transfer_amount);
+        let s_alice_transfer = composer.add_points(&g_pow_balance, &alice_pk_powered_by_randomness);
+        composer.assert_equal_public_point(&s_alice_transfer, alice_t_transfer_amount);
 
         // Bob left encrypted transfer check
         let bob_pk_powered_by_randomness = composer.mul_point(randomness, &recipient_public_key);
-        let s_bob_transfer = composer.add_point(g_pow_balance, bob_pk_powered_by_randomness);
+        let s_bob_transfer = composer.add_points(&g_pow_balance, &bob_pk_powered_by_randomness);
         composer
-            .assert_equal_public_point(s_bob_transfer, self.recipient_encrypted_transfer_amount);
+            .assert_equal_public_point(&s_bob_transfer, self.recipient_encrypted_transfer_amount);
 
         // Alice right encrypted transfer check
         let g_pow_randomness =
-            composer.component_mul_generator(randomness, JubjubExtended::ADDITIVE_GENERATOR)?;
-        composer.assert_equal_public_point(g_pow_randomness, alice_s_transfer_amount);
+            composer.mul_generator(randomness, JubjubExtended::ADDITIVE_GENERATOR)?;
+        composer.assert_equal_public_point(&g_pow_randomness, alice_s_transfer_amount);
 
         // Alice after balance check
-        let g_pow_after_balance = composer
-            .component_mul_generator(sender_after_balance, JubjubExtended::ADDITIVE_GENERATOR)?;
+        let g_pow_after_balance =
+            composer.mul_generator(sender_after_balance, JubjubExtended::ADDITIVE_GENERATOR)?;
         let alice_t_transfer_neg = composer.mul_point(neg, &alice_t_encrypted_transfer_amount);
         let alice_s_transfer_neg = composer.mul_point(neg, &alice_s_encrypted_transfer_amount);
-        let s_after_balance = composer.add_point(alice_t_encrypted_balance, alice_t_transfer_neg);
+        let s_after_balance =
+            composer.add_points(&alice_t_encrypted_balance, &alice_t_transfer_neg);
         let right_after_balance = {
             let right_after_balance =
-                composer.add_point(alice_s_encrypted_balance, alice_s_transfer_neg);
-            composer.mul_point(sender_private_key, right_after_balance)
+                composer.add_points(&alice_s_encrypted_balance, &alice_s_transfer_neg);
+            composer.mul_point(sender_private_key, &right_after_balance)
         };
-        let x = composer.add_point(g_pow_after_balance, right_after_balance);
-        composer.assert_equal_point(s_after_balance, x);
+        let x = composer.add_points(&g_pow_after_balance, &right_after_balance);
+        composer.assert_equal_point(&s_after_balance, &x);
 
         // Public key calculation check
-        let calculated_pk = composer
-            .component_mul_generator(sender_private_key, JubjubExtended::ADDITIVE_GENERATOR)?;
-        composer.assert_equal_public_point(calculated_pk, self.sender_public_key);
+        let calculated_pk =
+            composer.mul_generator(sender_private_key, JubjubExtended::ADDITIVE_GENERATOR)?;
+        composer.assert_equal_public_point(&calculated_pk, self.sender_public_key);
 
         // Transfer amount and ramaining balance range check
-        composer.component_range(transfer_amount, self.bits);
-        composer.component_range(sender_after_balance, self.bits);
+        composer.range(transfer_amount, self.bits);
+        composer.range(sender_after_balance, self.bits);
 
         Ok(())
     }

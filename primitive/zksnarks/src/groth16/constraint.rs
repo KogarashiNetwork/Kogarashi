@@ -4,7 +4,7 @@ use super::matrix::Element;
 use zkstd::common::PrimeField;
 
 /// An rank-1 constraint of the form a * b = c, where a, b, and c are linear combinations of wires.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Constraint<F: PrimeField> {
     pub a: Expression<F>,
     pub b: Expression<F>,

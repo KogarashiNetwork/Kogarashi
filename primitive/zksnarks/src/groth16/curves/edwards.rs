@@ -20,11 +20,18 @@ pub struct EdwardsExpression<F: PrimeField, C: TwistedEdwardsAffine<Range = F>> 
 }
 
 impl<F: PrimeField, C: TwistedEdwardsAffine<Range = F>> EdwardsExpression<F, C> {
+    pub fn identity() -> Self {
+        Self::new_unsafe(
+            Expression::from(C::Range::zero()),
+            Expression::from(C::Range::one()),
+        )
+    }
+
     /// Creates an `EdwardsExpression` from two arbitrary coordinates of type `Expression`.
     /// This method is unsafe and should only be used when the coordinates are proven
     /// to exist on the curve.
-    pub fn new_unsafe(x: Expression<C::Range>, y: Expression<C::Range>) -> EdwardsExpression<F, C> {
-        EdwardsExpression {
+    pub fn new_unsafe(x: Expression<C::Range>, y: Expression<C::Range>) -> Self {
+        Self {
             x,
             y,
             marker: Default::default(),

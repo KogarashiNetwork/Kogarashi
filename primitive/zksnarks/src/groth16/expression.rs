@@ -3,6 +3,7 @@ use super::wire::{Index, Wire};
 
 use core::fmt::Debug;
 use core::ops::{Add, Mul};
+use std::ops::{Neg, Sub};
 use zkstd::common::{PrimeField, Vec};
 
 pub trait Evaluable<F: PrimeField, R> {
@@ -10,7 +11,7 @@ pub trait Evaluable<F: PrimeField, R> {
 }
 
 /// A linear combination of wires.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Default)]
 pub struct Expression<F: PrimeField> {
     /// The coefficient of each wire. Wires with a coefficient of zero are omitted.
     coefficients: Vec<Element<F>>,
@@ -125,6 +126,54 @@ impl<F: PrimeField> Add<&Expression<F>> for &Expression<F> {
             }
         }
         Expression::new(res)
+    }
+}
+
+impl<F: PrimeField> Sub<Expression<F>> for Expression<F> {
+    type Output = Expression<F>;
+
+    fn sub(self, rhs: Expression<F>) -> Self::Output {
+        &self - &rhs
+    }
+}
+
+impl<F: PrimeField> Sub<&Expression<F>> for Expression<F> {
+    type Output = Expression<F>;
+
+    fn sub(self, rhs: &Expression<F>) -> Self::Output {
+        &self - rhs
+    }
+}
+
+impl<F: PrimeField> Sub<Expression<F>> for &Expression<F> {
+    type Output = Expression<F>;
+
+    fn sub(self, rhs: Expression<F>) -> Self::Output {
+        self - &rhs
+    }
+}
+
+impl<F: PrimeField> Sub<&Expression<F>> for &Expression<F> {
+    type Output = Expression<F>;
+
+    fn sub(self, rhs: &Expression<F>) -> Self::Output {
+        self + -rhs
+    }
+}
+
+impl<F: PrimeField> Neg for &Expression<F> {
+    type Output = Expression<F>;
+
+    fn neg(self) -> Expression<F> {
+        self * -F::one()
+    }
+}
+
+impl<F: PrimeField> Neg for Expression<F> {
+    type Output = Expression<F>;
+
+    fn neg(self) -> Expression<F> {
+        -&self
     }
 }
 
