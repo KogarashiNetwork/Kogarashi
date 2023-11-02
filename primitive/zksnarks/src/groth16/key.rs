@@ -100,8 +100,7 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
         let mut ic: Vec<P::G1Affine> = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len()];
         let mut l: Vec<P::G1Affine> = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.witness_len()];
 
-        let (at_inputs, bt_inputs, ct_inputs) = cs.inputs_iter();
-        let (at_aux, bt_aux, ct_aux) = cs.aux_iter();
+        let ((at_inputs, bt_inputs, ct_inputs), (at_aux, bt_aux, ct_aux)) = cs.inputs_iter();
 
         // Evaluate for inputs.
         eval::<P>(
@@ -229,12 +228,9 @@ fn eval<P: Pairing>(
 }
 
 fn eval_at_tau<F: FftField>(powers_of_tau: &[F], p: &[(F, usize)]) -> F {
-    let mut acc = F::zero();
-
-    for &(ref coeff, index) in p {
-        acc += powers_of_tau[index] * coeff;
-    }
-    acc
+    p.iter().fold(F::zero(), |acc, (coeff, index)| {
+        acc + powers_of_tau[*index] * coeff
+    })
 }
 
 #[derive(Clone, Debug)]

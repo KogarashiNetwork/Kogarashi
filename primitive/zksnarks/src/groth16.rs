@@ -15,11 +15,9 @@ use crate::constraint_system::ConstraintSystem;
 
 use constraint::R1csStruct;
 use curves::EdwardsExpression;
-use matrix::SparseRow;
+use matrix::{Element, SparseRow};
 use wire::Wire;
-use zkstd::common::{vec, Group, Ring, TwistedEdwardsAffine, Vec};
-
-use self::matrix::Element;
+use zkstd::common::{vec, Group, TwistedEdwardsAffine, Vec};
 
 #[derive(Debug)]
 pub struct Groth16<C: TwistedEdwardsAffine> {
@@ -41,7 +39,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
             a: vec![],
             b: vec![],
             c: vec![],
-            instance: [Element(Wire::ONE, C::Range::one())].into_iter().collect(),
+            instance: [Element::one()].into_iter().collect(),
             witness: vec![],
         }
     }
@@ -76,13 +74,23 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     fn inputs_iter(
         &self,
     ) -> (
-        Vec<Vec<(C::Range, usize)>>,
-        Vec<Vec<(C::Range, usize)>>,
-        Vec<Vec<(C::Range, usize)>>,
+        (
+            Vec<Vec<(C::Range, usize)>>,
+            Vec<Vec<(C::Range, usize)>>,
+            Vec<Vec<(C::Range, usize)>>,
+        ),
+        (
+            Vec<Vec<(C::Range, usize)>>,
+            Vec<Vec<(C::Range, usize)>>,
+            Vec<Vec<(C::Range, usize)>>,
+        ),
     ) {
-        let mut at = vec![vec![]; self.instance_len()];
-        let mut bt = vec![vec![]; self.instance_len()];
-        let mut ct = vec![vec![]; self.instance_len()];
+        let mut a_instance = vec![vec![]; self.instance_len()];
+        let mut b_instance = vec![vec![]; self.instance_len()];
+        let mut c_instance = vec![vec![]; self.instance_len()];
+        let mut a_witness = vec![vec![]; self.witness_len()];
+        let mut b_witness = vec![vec![]; self.witness_len()];
+        let mut c_witness = vec![vec![]; self.witness_len()];
         for (i, ((a, b), c)) in self
             .constraints
             .a
@@ -94,68 +102,28 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         {
             a.coefficients()
                 .iter()
-                .filter(|Element(w, _)| matches!(w, Wire::Instance(_)))
-                .for_each(|Element(w, coeff)| {
-                    at[*w.deref_i()].push((*coeff, i));
+                .for_each(|Element(w, coeff)| match w {
+                    Wire::Instance(k) => a_instance[*k].push((*coeff, i)),
+                    Wire::Witness(k) => a_witness[*k].push((*coeff, i)),
                 });
             b.coefficients()
                 .iter()
-                .filter(|Element(w, _)| matches!(w, Wire::Instance(_)))
-                .for_each(|Element(w, coeff)| {
-                    bt[*w.deref_i()].push((*coeff, i));
+                .for_each(|Element(w, coeff)| match w {
+                    Wire::Instance(k) => b_instance[*k].push((*coeff, i)),
+                    Wire::Witness(k) => b_witness[*k].push((*coeff, i)),
                 });
             c.coefficients()
                 .iter()
-                .filter(|Element(w, _)| matches!(w, Wire::Instance(_)))
-                .for_each(|Element(w, coeff)| {
-                    ct[*w.deref_i()].push((*coeff, i));
+                .for_each(|Element(w, coeff)| match w {
+                    Wire::Instance(k) => c_instance[*k].push((*coeff, i)),
+                    Wire::Witness(k) => c_witness[*k].push((*coeff, i)),
                 });
         }
 
-        (at, bt, ct)
-    }
-
-    #[allow(clippy::type_complexity)]
-    fn aux_iter(
-        &self,
-    ) -> (
-        Vec<Vec<(C::Range, usize)>>,
-        Vec<Vec<(C::Range, usize)>>,
-        Vec<Vec<(C::Range, usize)>>,
-    ) {
-        let mut at = vec![vec![]; self.witness_len()];
-        let mut bt = vec![vec![]; self.witness_len()];
-        let mut ct = vec![vec![]; self.witness_len()];
-        for (i, ((a, b), c)) in self
-            .constraints
-            .a
-            .0
-            .iter()
-            .zip(self.constraints.b.0.iter())
-            .zip(self.constraints.c.0.iter())
-            .enumerate()
-        {
-            a.coefficients()
-                .iter()
-                .filter(|Element(w, _)| matches!(w, Wire::Witness(_)))
-                .for_each(|Element(w, coeff)| {
-                    at[*w.deref_i()].push((*coeff, i));
-                });
-            b.coefficients()
-                .iter()
-                .filter(|Element(w, _)| matches!(w, Wire::Witness(_)))
-                .for_each(|Element(w, coeff)| {
-                    bt[*w.deref_i()].push((*coeff, i));
-                });
-            c.coefficients()
-                .iter()
-                .filter(|Element(w, _)| matches!(w, Wire::Witness(_)))
-                .for_each(|Element(w, coeff)| {
-                    ct[*w.deref_i()].push((*coeff, i));
-                });
-        }
-
-        (at, bt, ct)
+        (
+            (a_instance, b_instance, c_instance),
+            (a_witness, b_witness, c_witness),
+        )
     }
 
     fn eval_constraints(&mut self) {
@@ -168,6 +136,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     fn instance_len(&self) -> usize {
         self.instance.len()
     }
+
     fn witness_len(&self) -> usize {
         self.witness.len()
     }
