@@ -34,11 +34,7 @@ impl<P: Pairing> Prover<P> {
         let k = size.trailing_zeros();
         let vk = self.params.vk.clone();
 
-        let r = P::ScalarField::random(&mut *rng);
-        let s = P::ScalarField::random(&mut *rng);
-
         let fft = Fft::<P::ScalarField>::new(k as usize);
-
         let (a, b, c) = cs.eval_constraints();
 
         // Do the calculation of H(X): A(X) * B(X) - C(X) == H(X) * T(X)
@@ -87,6 +83,9 @@ impl<P: Pairing> Prover<P> {
             // TODO: proper error
             return Err(Groth16Error::General.into());
         }
+
+        let r = P::ScalarField::random(&mut *rng);
+        let s = P::ScalarField::random(&mut *rng);
 
         // Setup shift parameters r * delta and s * delta in A, B and C computations.
         let mut g_a = vk.delta_g1 * r + vk.alpha_g1;
