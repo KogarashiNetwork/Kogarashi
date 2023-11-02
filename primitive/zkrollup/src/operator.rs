@@ -88,7 +88,7 @@ impl<P: RedDSA, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_S
 #[derive(Default)]
 pub struct RollupOperator<
     R: RedDSA,
-    P: Pairing<ScalarField = R::ScalarField, JubjubAffine = R::JubjubAffine>,
+    P: Pairing<ScalarField = R::ScalarField>,
     H: FieldHasher<R::ScalarField, 2>,
     const N: usize,
     const BATCH_SIZE: usize,
@@ -104,7 +104,7 @@ pub struct RollupOperator<
 
 impl<
         R: RedDSA,
-        P: Pairing<ScalarField = R::ScalarField, JubjubAffine = R::JubjubAffine>,
+        P: Pairing<ScalarField = R::ScalarField>,
         H: FieldHasher<R::ScalarField, 2>,
         const N: usize,
         const BATCH_SIZE: usize,
@@ -267,7 +267,7 @@ impl<
     ) -> (Proof<P>, Vec<P::ScalarField>) {
         let label = b"verify";
         let batch_circuit = BatchCircuit::new(batch);
-        let prover = PlonkKey::<P, BatchCircuit<R, H, N, BATCH_SIZE>>::compile(&self.pp)
+        let prover = PlonkKey::<P, R::JubjubAffine, BatchCircuit<R, H, N, BATCH_SIZE>>::compile(&self.pp)
             .expect("failed to compile circuit");
         prover
             .0

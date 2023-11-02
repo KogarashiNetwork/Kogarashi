@@ -173,6 +173,7 @@ mod tests {
 
         let (_, verifier) = PlonkKey::<
             TatePairing,
+            JubjubAffine,
             BatchCircuit<RedJubjub, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>,
         >::compile(&mut pp)
         .expect("failed to compile circuit");
