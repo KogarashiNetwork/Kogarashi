@@ -3,7 +3,7 @@ use zkstd::common::{TwistedEdwardsAffine, Vec};
 /// constraint system trait
 pub trait ConstraintSystem<C: TwistedEdwardsAffine> {
     type Wire;
-    type Constraints: IntoIterator;
+    type Constraints;
 
     /// init constraint system
 

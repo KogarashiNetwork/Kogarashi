@@ -1,6 +1,21 @@
 use super::matrix::{Element, SparseRow};
 
-use zkstd::common::PrimeField;
+use zkstd::common::{PrimeField, Vec};
+
+#[derive(Clone, Debug, Default)]
+pub struct R1csStruct<F: PrimeField> {
+    // matrix size
+    m: usize,
+    // public input size
+    l: usize,
+    pub(crate) constraints: Vec<Constraint<F>>,
+}
+
+impl<F: PrimeField> R1csStruct<F> {
+    pub(crate) fn m(&self) -> usize {
+        self.constraints.len()
+    }
+}
 
 /// An rank-1 constraint of the form a * b = c, where a, b, and c are linear combinations of wires.
 #[derive(Clone, Debug)]

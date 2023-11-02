@@ -13,7 +13,7 @@ pub mod wire;
 
 use crate::constraint_system::ConstraintSystem;
 
-use constraint::Constraint;
+use constraint::{Constraint, R1csStruct};
 use curves::EdwardsExpression;
 use matrix::SparseRow;
 use wire::Wire;
@@ -23,7 +23,7 @@ use self::matrix::Element;
 
 #[derive(Debug)]
 pub struct Groth16<C: TwistedEdwardsAffine> {
-    constraints: Vec<Constraint<C::Range>>,
+    constraints: R1csStruct<C::Range>,
     a: Vec<C::Range>,
     b: Vec<C::Range>,
     c: Vec<C::Range>,
@@ -33,11 +33,11 @@ pub struct Groth16<C: TwistedEdwardsAffine> {
 
 impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     type Wire = Wire;
-    type Constraints = Vec<Constraint<C::Range>>;
+    type Constraints = R1csStruct<C::Range>;
 
     fn initialize() -> Self {
         Self {
-            constraints: Vec::new(),
+            constraints: R1csStruct::default(),
             a: vec![],
             b: vec![],
             c: vec![],
@@ -47,7 +47,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     }
 
     fn m(&self) -> usize {
-        self.constraints.len()
+        self.constraints().m()
     }
 
     fn instance(&self) -> Vec<<C>::Range> {
@@ -83,7 +83,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         let mut at = vec![vec![]; self.instance_len()];
         let mut bt = vec![vec![]; self.instance_len()];
         let mut ct = vec![vec![]; self.instance_len()];
-        for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
+        for (i, Constraint { a, b, c }) in self.constraints.constraints.iter().enumerate() {
             a.coefficients()
                 .iter()
                 .filter(|Element(w, _)| matches!(w, Wire::Instance(_)))
@@ -118,7 +118,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         let mut at = vec![vec![]; self.witness_len()];
         let mut bt = vec![vec![]; self.witness_len()];
         let mut ct = vec![vec![]; self.witness_len()];
-        for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
+        for (i, Constraint { a, b, c }) in self.constraints.constraints.iter().enumerate() {
             a.coefficients()
                 .iter()
                 .filter(|Element(w, _)| matches!(w, Wire::Witness(_)))
@@ -143,7 +143,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     }
 
     fn eval_constraints(&mut self) {
-        for x in self.constraints.iter() {
+        for x in self.constraints.constraints.iter() {
             let (a, b, c) = x.evaluate(&self.instance, &self.witness);
             self.a.push(a);
             self.b.push(b);
@@ -194,7 +194,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         y: &SparseRow<C::Range>,
         z: &SparseRow<C::Range>,
     ) {
-        self.constraints.push(Constraint {
+        self.constraints.constraints.push(Constraint {
             a: x.clone(),
             b: y.clone(),
             c: z.clone(),
@@ -208,7 +208,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         y: &SparseRow<C::Range>,
         z: &SparseRow<C::Range>,
     ) {
-        self.constraints.push(Constraint {
+        self.constraints.constraints.push(Constraint {
             a: x + y,
             b: SparseRow::from(Wire::ONE),
             c: z.clone(),
