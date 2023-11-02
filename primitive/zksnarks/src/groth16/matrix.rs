@@ -5,6 +5,7 @@ pub(crate) use element::Element;
 
 use core::fmt::Debug;
 use core::ops::{Add, Mul};
+use std::ops::{Neg, Sub};
 use zkstd::common::{PrimeField, Vec};
 
 #[derive(Clone, Debug, Default)]
@@ -120,6 +121,54 @@ impl<F: PrimeField> Add<&SparseRow<F>> for &SparseRow<F> {
     }
 }
 
+impl<F: PrimeField> Sub<SparseRow<F>> for SparseRow<F> {
+    type Output = SparseRow<F>;
+
+    fn sub(self, rhs: SparseRow<F>) -> Self::Output {
+        &self - &rhs
+    }
+}
+
+impl<F: PrimeField> Sub<&SparseRow<F>> for SparseRow<F> {
+    type Output = SparseRow<F>;
+
+    fn sub(self, rhs: &SparseRow<F>) -> Self::Output {
+        &self - rhs
+    }
+}
+
+impl<F: PrimeField> Sub<SparseRow<F>> for &SparseRow<F> {
+    type Output = SparseRow<F>;
+
+    fn sub(self, rhs: SparseRow<F>) -> Self::Output {
+        self - &rhs
+    }
+}
+
+impl<F: PrimeField> Sub<&SparseRow<F>> for &SparseRow<F> {
+    type Output = SparseRow<F>;
+
+    fn sub(self, rhs: &SparseRow<F>) -> Self::Output {
+        self + -rhs
+    }
+}
+
+impl<F: PrimeField> Neg for &SparseRow<F> {
+    type Output = SparseRow<F>;
+
+    fn neg(self) -> SparseRow<F> {
+        self * -F::one()
+    }
+}
+
+impl<F: PrimeField> Neg for SparseRow<F> {
+    type Output = SparseRow<F>;
+
+    fn neg(self) -> SparseRow<F> {
+        -&self
+    }
+}
+
 fn get_value_from_wire<F: PrimeField>(index: Wire, vectors: &[Element<F>]) -> Option<F> {
     for vector in vectors {
         if index == vector.0 {
@@ -129,6 +178,7 @@ fn get_value_from_wire<F: PrimeField>(index: Wire, vectors: &[Element<F>]) -> Op
     None
 }
 
+#[allow(clippy::op_ref)]
 impl<F: PrimeField> Mul<F> for SparseRow<F> {
     type Output = SparseRow<F>;
 
@@ -145,6 +195,7 @@ impl<F: PrimeField> Mul<&F> for SparseRow<F> {
     }
 }
 
+#[allow(clippy::op_ref)]
 impl<F: PrimeField> Mul<F> for &SparseRow<F> {
     type Output = SparseRow<F>;
 

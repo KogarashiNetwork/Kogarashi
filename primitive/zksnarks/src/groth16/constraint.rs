@@ -27,8 +27,8 @@ impl<F: PrimeField> R1csStruct<F> {
 
     pub(crate) fn evaluate(
         &self,
-        instance: &Vec<Element<F>>,
-        witness: &Vec<Element<F>>,
+        instance: &[Element<F>],
+        witness: &[Element<F>],
     ) -> (Vec<F>, Vec<F>, Vec<F>) {
         let (mut a_evals, mut b_evals, mut c_evals) = (Vec::new(), Vec::new(), Vec::new());
         self.a
@@ -37,9 +37,9 @@ impl<F: PrimeField> R1csStruct<F> {
             .zip(self.b.0.iter())
             .zip(self.c.0.iter())
             .for_each(|((a, b), c)| {
-                a_evals.push(a.evaluate(&instance, &witness));
-                b_evals.push(b.evaluate(&instance, &witness));
-                c_evals.push(c.evaluate(&instance, &witness));
+                a_evals.push(a.evaluate(instance, witness));
+                b_evals.push(b.evaluate(instance, witness));
+                c_evals.push(c.evaluate(instance, witness));
             });
         (a_evals, b_evals, c_evals)
     }

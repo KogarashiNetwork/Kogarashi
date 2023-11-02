@@ -25,6 +25,9 @@ mod tests;
 mod mock;
 
 mod circuit;
+#[allow(unused_variables)]
+#[allow(dead_code)]
+mod groth16_circuit;
 mod traits;
 
 pub use circuit::{ConfidentialTransferCircuit, ConfidentialTransferTransaction};

@@ -26,6 +26,14 @@ impl<P: Pairing> Proof<P> {
             acc += b * i;
         }
 
+        // The original verification equation is:
+        // A * B = alpha * beta + inputs * gamma + C * delta
+        // ... however, we rearrange it so that it is:
+        // A * B - inputs * gamma - C * delta = alpha * beta
+        // or equivalently:
+        // A * B + inputs * (-gamma) + C * (-delta) = alpha * beta
+        // which allows us to do a single final exponentiation.
+
         let pairing = P::multi_miller_loop(&[
             (self.a, P::G2PairngRepr::from(self.b)),
             (acc.to_affine(), vk.neg_gamma_g2.clone()),

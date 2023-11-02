@@ -19,6 +19,13 @@ pub struct EdwardsExpression<F: PrimeField, C: TwistedEdwardsAffine<Range = F>> 
 }
 
 impl<F: PrimeField, C: TwistedEdwardsAffine<Range = F>> EdwardsExpression<F, C> {
+    pub fn identity() -> Self {
+        Self::new_unsafe(
+            SparseRow::from(C::Range::zero()),
+            SparseRow::from(C::Range::one()),
+        )
+    }
+
     /// Creates an `EdwardsExpression` from two arbitrary coordinates of type `Expression`.
     /// This method is unsafe and should only be used when the coordinates are proven
     /// to exist on the curve.
