@@ -1,7 +1,8 @@
 mod merkle;
+use core::fmt::Debug;
 
 use zero_plonk::prelude::*;
-use zkstd::common::{Pairing, SigUtils};
+use zkstd::common::{RedDSA, SigUtils};
 
 use crate::{
     domain::{RollupTransactionInfo, Transaction, UserData},
@@ -15,7 +16,7 @@ use self::merkle::check_membership;
 
 #[derive(Debug, PartialEq, Default)]
 pub struct BatchCircuit<
-    P: Pairing,
+    P: RedDSA,
     H: FieldHasher<P::ScalarField, 2>,
     const N: usize,
     const BATCH_SIZE: usize,
@@ -23,7 +24,7 @@ pub struct BatchCircuit<
     batch: Batch<P, H, N, BATCH_SIZE>,
 }
 
-impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
+impl<P: RedDSA, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
     BatchCircuit<P, H, N, BATCH_SIZE>
 {
     #[allow(dead_code)]
@@ -33,8 +34,12 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
     }
 }
 
-impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
-    Circuit<P::JubjubAffine> for BatchCircuit<P, H, N, BATCH_SIZE>
+impl<
+        P: RedDSA + Debug + Default,
+        H: FieldHasher<P::ScalarField, 2>,
+        const N: usize,
+        const BATCH_SIZE: usize,
+    > Circuit<P::JubjubAffine> for BatchCircuit<P, H, N, BATCH_SIZE>
 {
     type ConstraintSystem = Plonk<P::JubjubAffine>;
     fn synthesize(&self, composer: &mut Plonk<P::JubjubAffine>) -> Result<(), Error> {
@@ -53,7 +58,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
         {
             let Transaction(sig, t) = transaction;
 
-            check_membership::<P, N>(
+            check_membership::<P::JubjubAffine, N>(
                 composer,
                 pre_sender.to_field_element(),
                 *pre_root,
@@ -61,7 +66,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
                 &pre_sender_proof.path_pos,
             )?;
 
-            check_membership::<P, N>(
+            check_membership::<P::JubjubAffine, N>(
                 composer,
                 pre_receiver.to_field_element(),
                 *pre_root,
@@ -86,7 +91,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
                 ..*pre_receiver
             };
 
-            check_membership::<P, N>(
+            check_membership::<P::JubjubAffine, N>(
                 composer,
                 post_sender.to_field_element(),
                 *post_root,
@@ -94,7 +99,7 @@ impl<P: Pairing, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_
                 &post_sender_proof.path_pos,
             )?;
 
-            check_membership::<P, N>(
+            check_membership::<P::JubjubAffine, N>(
                 composer,
                 post_receiver.to_field_element(),
                 *post_root,
@@ -121,7 +126,7 @@ mod tests {
     use jub_jub::Fp;
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
-    use red_jubjub::SecretKey;
+    use red_jubjub::{RedJubjub, SecretKey};
     use zero_plonk::prelude::*;
     use zksnarks::keypair::Keypair;
     use zksnarks::plonk::PlonkParams;
@@ -138,11 +143,13 @@ mod tests {
         const ACCOUNT_LIMIT: usize = 3;
         const BATCH_SIZE: usize = 2;
         // Create an operator and contract
-        let mut operator =
-            RollupOperator::<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>::new(
-                Poseidon::<Fr, 2>::new(),
-                pp.clone(),
-            );
+        let mut operator = RollupOperator::<
+            RedJubjub,
+            TatePairing,
+            Poseidon<Fr, 2>,
+            ACCOUNT_LIMIT,
+            BATCH_SIZE,
+        >::new(Poseidon::<Fr, 2>::new(), pp.clone());
 
         let alice_secret = SecretKey::new(Fp::random(&mut rng));
         let bob_secret = SecretKey::new(Fp::random(&mut rng));
@@ -166,7 +173,7 @@ mod tests {
 
         let (_, verifier) = PlonkKey::<
             TatePairing,
-            BatchCircuit<TatePairing, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>,
+            BatchCircuit<RedJubjub, Poseidon<Fr, 2>, ACCOUNT_LIMIT, BATCH_SIZE>,
         >::compile(&mut pp)
         .expect("failed to compile circuit");
 

@@ -1,12 +1,12 @@
-use ec_pairing::TatePairing;
 use jub_jub::JubjubAffine;
+use red_jubjub::RedJubjub;
 use red_jubjub::{
     constant::{sapling_base_point, sapling_redjubjub_cofactor},
     Signature,
 };
 use zero_plonk::prelude::*;
-use zkstd::common::Ring;
-use zkstd::common::{Pairing, SigUtils, TwistedEdwardsCurve};
+use zkstd::common::{RedDSA, Ring};
+use zkstd::common::{SigUtils, TwistedEdwardsCurve};
 
 /// Confidential transfer circuit
 #[derive(Debug, PartialEq, Default)]
@@ -29,7 +29,7 @@ impl RedJubjubCircuit {
     }
 }
 
-pub(crate) fn check_signature<P: Pairing>(
+pub(crate) fn check_signature<P: RedDSA>(
     composer: &mut Plonk<P::JubjubAffine>,
     public_key: P::JubjubAffine,
     signature: Signature,
@@ -68,7 +68,7 @@ pub(crate) fn check_signature<P: Pairing>(
 impl Circuit<JubjubAffine> for RedJubjubCircuit {
     type ConstraintSystem = Plonk<JubjubAffine>;
     fn synthesize(&self, composer: &mut Plonk<JubjubAffine>) -> Result<(), Error> {
-        check_signature::<TatePairing>(composer, self.public_key, self.signature, self.msg_hash)
+        check_signature::<RedJubjub>(composer, self.public_key, self.signature, self.msg_hash)
     }
 }
 
@@ -80,7 +80,7 @@ mod tests {
     use jub_jub::Fp;
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
-    use red_jubjub::{sapling_hash, SecretKey};
+    use red_jubjub::{sapling_hash, RedJubjub, SecretKey};
     use zero_plonk::prelude::*;
     use zksnarks::keypair::Keypair;
     use zksnarks::plonk::PlonkParams;
@@ -97,7 +97,7 @@ mod tests {
 
         let msg = b"test";
 
-        let priv_key = SecretKey::<TatePairing>::new(Fp::random(&mut rng));
+        let priv_key = SecretKey::<RedJubjub>::new(Fp::random(&mut rng));
         let sig = priv_key.sign(msg, &mut rng);
         let pub_key = priv_key.to_public_key();
 

@@ -1,58 +1,55 @@
 mod proof;
 
-use super::{constraint::Constraint, matrix::Element};
 use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
 use crate::groth16::error::Groth16Error;
 use crate::groth16::key::Parameters;
 use crate::groth16::Groth16;
-use itertools::Itertools;
-use poly_commit::{msm_curve_addition, Fft, PointsValue};
 pub use proof::Proof;
-use rand::rngs::OsRng;
-use zkstd::common::{CurveGroup, Group, Pairing, TwistedEdwardsCurve, Vec};
+
+use poly_commit::{msm_curve_addition, Fft, PointsValue};
+use rand::RngCore;
+use zkstd::common::{CurveGroup, Group, Pairing, Vec};
 
 #[derive(Debug)]
 pub struct Prover<P: Pairing> {
     pub params: Parameters<P>,
-    pub constraints: Vec<Constraint<<P::JubjubAffine as TwistedEdwardsCurve>::Range>>,
 }
 
 impl<P: Pairing> Prover<P> {
     /// Execute the gadget, and return whether all constraints were satisfied.
-    pub fn create_proof<C>(&mut self, circuit: C) -> Result<Proof<P>, Error>
+    pub fn create_proof<C, R: RngCore>(
+        &mut self,
+        rng: &mut R,
+        circuit: C,
+    ) -> Result<Proof<P>, Error>
     where
         C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::JubjubAffine>>,
     {
         let mut cs = Groth16::<P::JubjubAffine>::initialize();
         circuit.synthesize(&mut cs)?;
 
-        cs.eval_constraints();
-
         let size = cs.m().next_power_of_two();
         let k = size.trailing_zeros();
         let vk = self.params.vk.clone();
 
-        let r = P::ScalarField::random(OsRng);
-        let s = P::ScalarField::random(OsRng);
-
         let fft = Fft::<P::ScalarField>::new(k as usize);
+        let (a, b, c) = cs.eval_constraints();
 
         // Do the calculation of H(X): A(X) * B(X) - C(X) == H(X) * T(X)
-        let a = fft.idft(PointsValue(cs.a.clone()));
+        let a = fft.idft(PointsValue(a));
         let a = fft.coset_dft(a);
-        let b = fft.idft(PointsValue(cs.b.clone()));
+        let b = fft.idft(PointsValue(b));
         let b = fft.coset_dft(b);
-        let c = fft.idft(PointsValue(cs.c.clone()));
+        let c = fft.idft(PointsValue(c));
         let c = fft.coset_dft(c);
 
         let mut h = &a * &b;
         h = &h - &c;
 
         let q = fft.divide_by_z_on_coset(h);
-        let mut q = fft.coset_idft(q);
-        q.0.truncate(fft.size() - 1);
+        let q = fft.coset_idft(q);
 
         // Blind evaluation at precalculated points.
         // From here we do all evaluations with `msm_curve_addition` to not give access to original values.
@@ -61,14 +58,12 @@ impl<P: Pairing> Prover<P> {
         let input_assignment = cs
             .instance
             .iter()
-            .sorted()
-            .map(|Element(_, x)| *x)
+            .map(|element| element.1)
             .collect::<Vec<_>>();
         let aux_assignment = cs
             .witness
             .iter()
-            .sorted()
-            .map(|Element(_, x)| *x)
+            .map(|element| element.1)
             .collect::<Vec<_>>();
 
         let l = msm_curve_addition(&self.params.l, &aux_assignment);
@@ -88,6 +83,9 @@ impl<P: Pairing> Prover<P> {
             // TODO: proper error
             return Err(Groth16Error::General.into());
         }
+
+        let r = P::ScalarField::random(&mut *rng);
+        let s = P::ScalarField::random(&mut *rng);
 
         // Setup shift parameters r * delta and s * delta in A, B and C computations.
         let mut g_a = vk.delta_g1 * r + vk.alpha_g1;

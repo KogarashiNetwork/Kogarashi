@@ -1,16 +1,16 @@
 use sp_std::collections::btree_map::BTreeMap;
 
 use red_jubjub::PublicKey;
-use zkstd::common::Pairing;
+use zkstd::common::RedDSA;
 
 use crate::domain::UserData;
 
 #[derive(Default)]
-pub(crate) struct Db<P: Pairing> {
+pub(crate) struct Db<P: RedDSA> {
     users: BTreeMap<PublicKey<P>, UserData<P>>,
 }
 
-impl<P: Pairing> Db<P> {
+impl<P: RedDSA> Db<P> {
     pub fn get(&self, k: &PublicKey<P>) -> &UserData<P> {
         self.users
             .get(k)

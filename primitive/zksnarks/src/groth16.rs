@@ -1,14 +1,11 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 mod constraint;
-mod expression;
 mod key;
 mod matrix;
 mod params;
 mod prover;
-mod util;
 mod verifier;
-pub(crate) mod wire_alt;
 
 pub(crate) mod curves;
 pub(crate) mod error;
@@ -20,49 +17,38 @@ use std::ops::Neg;
 
 use crate::bit_iterator::BitIterator8;
 use crate::error::Error;
-use constraint::Constraint;
-use curves::EdwardsExpression;
-use expression::Expression;
 use jub_jub::compute_windowed_naf;
-use wire::{Index, Wire};
 use zkstd::common::{
     vec, FftField, Group, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve,
     TwistedEdwardsExtended, Vec,
 };
 
-use self::matrix::Element;
+use constraint::R1csStruct;
+use curves::EdwardsExpression;
+use matrix::{Element, SparseRow};
+use wire::Wire;
 
 #[derive(Debug)]
 pub struct Groth16<C: TwistedEdwardsAffine> {
-    constraints: Vec<Constraint<C::Range>>,
-    a: Vec<C::Range>,
-    b: Vec<C::Range>,
-    c: Vec<C::Range>,
+    constraints: R1csStruct<C::Range>,
     pub(crate) instance: Vec<Element<C::Range>>,
     pub(crate) witness: Vec<Element<C::Range>>,
 }
 
 impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     type Wire = Wire;
-    type Constraints = Vec<Constraint<C::Range>>;
+    type Constraints = R1csStruct<C::Range>;
 
     fn initialize() -> Self {
         Self {
-            constraints: Vec::new(),
-            a: vec![],
-            b: vec![],
-            c: vec![],
-            instance: [Element(Wire::ONE, C::Range::one())].to_vec(),
+            constraints: R1csStruct::default(),
+            instance: [Element::one()].to_vec(),
             witness: vec![],
         }
     }
 
     fn m(&self) -> usize {
-        self.constraints.len()
-    }
-
-    fn instance(&self) -> Vec<<C>::Range> {
-        Vec::new()
+        self.constraints().m()
     }
 
     fn constraints(&self) -> Self::Constraints {
@@ -86,9 +72,9 @@ impl<C: TwistedEdwardsAffine> ops::Index<Wire> for Groth16<C> {
     type Output = C::Range;
 
     fn index(&self, w: Wire) -> &Self::Output {
-        match w.get_unchecked() {
-            Index::Input(i) => &self.instance[i].1,
-            Index::Aux(i) => &self.witness[i].1,
+        match w {
+            Wire::Instance(i) => &self.instance[i].1,
+            Wire::Witness(i) => &self.witness[i].1,
         }
     }
 }
@@ -98,84 +84,68 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     fn inputs_iter(
         &self,
     ) -> (
-        Vec<Vec<(C::Range, usize)>>,
-        Vec<Vec<(C::Range, usize)>>,
-        Vec<Vec<(C::Range, usize)>>,
+        (
+            Vec<Vec<(C::Range, usize)>>,
+            Vec<Vec<(C::Range, usize)>>,
+            Vec<Vec<(C::Range, usize)>>,
+        ),
+        (
+            Vec<Vec<(C::Range, usize)>>,
+            Vec<Vec<(C::Range, usize)>>,
+            Vec<Vec<(C::Range, usize)>>,
+        ),
     ) {
-        let mut at = vec![vec![]; self.instance_len()];
-        let mut bt = vec![vec![]; self.instance_len()];
-        let mut ct = vec![vec![]; self.instance_len()];
-        for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
+        let mut a_instance = vec![vec![]; self.instance_len()];
+        let mut b_instance = vec![vec![]; self.instance_len()];
+        let mut c_instance = vec![vec![]; self.instance_len()];
+        let mut a_witness = vec![vec![]; self.witness_len()];
+        let mut b_witness = vec![vec![]; self.witness_len()];
+        let mut c_witness = vec![vec![]; self.witness_len()];
+        for (i, ((a, b), c)) in self
+            .constraints
+            .a
+            .0
+            .iter()
+            .zip(self.constraints.b.0.iter())
+            .zip(self.constraints.c.0.iter())
+            .enumerate()
+        {
             a.coefficients()
                 .iter()
-                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
-                .for_each(|Element(w, coeff)| {
-                    at[*w.get_unchecked()].push((*coeff, i));
+                .for_each(|Element(w, coeff)| match w {
+                    Wire::Instance(k) => a_instance[*k].push((*coeff, i)),
+                    Wire::Witness(k) => a_witness[*k].push((*coeff, i)),
                 });
             b.coefficients()
                 .iter()
-                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
-                .for_each(|Element(w, coeff)| {
-                    bt[*w.get_unchecked()].push((*coeff, i));
+                .for_each(|Element(w, coeff)| match w {
+                    Wire::Instance(k) => b_instance[*k].push((*coeff, i)),
+                    Wire::Witness(k) => b_witness[*k].push((*coeff, i)),
                 });
             c.coefficients()
                 .iter()
-                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Input(_)))
-                .for_each(|Element(w, coeff)| {
-                    ct[*w.get_unchecked()].push((*coeff, i));
+                .for_each(|Element(w, coeff)| match w {
+                    Wire::Instance(k) => c_instance[*k].push((*coeff, i)),
+                    Wire::Witness(k) => c_witness[*k].push((*coeff, i)),
                 });
         }
 
-        (at, bt, ct)
+        (
+            (a_instance, b_instance, c_instance),
+            (a_witness, b_witness, c_witness),
+        )
     }
 
-    #[allow(clippy::type_complexity)]
-    fn aux_iter(
-        &self,
-    ) -> (
-        Vec<Vec<(C::Range, usize)>>,
-        Vec<Vec<(C::Range, usize)>>,
-        Vec<Vec<(C::Range, usize)>>,
-    ) {
-        let mut at = vec![vec![]; self.witness_len()];
-        let mut bt = vec![vec![]; self.witness_len()];
-        let mut ct = vec![vec![]; self.witness_len()];
-        for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
-            a.coefficients()
-                .iter()
-                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
-                .for_each(|Element(w, coeff)| {
-                    at[*w.get_unchecked()].push((*coeff, i));
-                });
-            b.coefficients()
-                .iter()
-                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
-                .for_each(|Element(w, coeff)| {
-                    bt[*w.get_unchecked()].push((*coeff, i));
-                });
-            c.coefficients()
-                .iter()
-                .filter(|Element(w, _)| matches!(w.get_unchecked(), Index::Aux(_)))
-                .for_each(|Element(w, coeff)| {
-                    ct[*w.get_unchecked()].push((*coeff, i));
-                });
-        }
-
-        (at, bt, ct)
-    }
-
-    fn eval_constraints(&mut self) {
-        for x in self.constraints.iter() {
-            let (a, b, c) = x.evaluate(&self.instance, &self.witness);
-            self.a.push(a);
-            self.b.push(b);
-            self.c.push(c);
-        }
+    fn eval_constraints(&mut self) -> (Vec<C::Range>, Vec<C::Range>, Vec<C::Range>) {
+        self.instance.sort();
+        self.witness.sort();
+        self.constraints.evaluate(&self.instance, &self.witness)
     }
 
     fn instance_len(&self) -> usize {
         self.instance.len()
     }
+
     fn witness_len(&self) -> usize {
         self.witness.len()
     }
@@ -183,13 +153,13 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     /// Add a public wire to the gadget. It will start with no generator and no associated constraints.
     pub fn public_wire(&mut self) -> Wire {
         let index = self.instance.len();
-        Wire::new_unchecked(Index::Input(index))
+        Wire::Instance(index)
     }
 
     /// Add a private wire to the gadget. It will start with no generator and no associated constraints.
     fn private_wire(&mut self) -> Wire {
         let index = self.witness.len();
-        Wire::new_unchecked(Index::Aux(index))
+        Wire::Witness(index)
     }
 
     /// Appends a point in affine form as [`WitnessPoint`]
@@ -199,13 +169,13 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         let x = self.alloc_witness(affine.get_x());
         let y = self.alloc_witness(affine.get_y());
 
-        self.append_edwards_expression(Expression::from(x), Expression::from(y))
+        self.append_edwards_expression(SparseRow::from(x), SparseRow::from(y))
     }
 
     pub fn append_edwards_expression(
         &mut self,
-        x: Expression<C::Range>,
-        y: Expression<C::Range>,
+        x: SparseRow<C::Range>,
+        y: SparseRow<C::Range>,
     ) -> EdwardsExpression<C::Range, C> {
         let x_squared = self.product(&x, &x);
         let y_squared = self.product(&y, &y);
@@ -213,7 +183,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
 
         self.assert_equal(
             &y_squared,
-            &(Expression::one() + x_squared_y_squared * C::PARAM_D + &x_squared),
+            &(SparseRow::one() + x_squared_y_squared * C::PARAM_D + &x_squared),
         );
 
         EdwardsExpression::new_unsafe(x, y)
@@ -260,7 +230,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         //
         // self.append_custom_gate(constraint);
 
-        EdwardsExpression::new_unsafe(Expression::from(x_3), Expression::from(y_3))
+        EdwardsExpression::new_unsafe(SparseRow::from(x_3), SparseRow::from(y_3))
     }
 
     /// Performs scalar multiplication in constraints by first splitting up a scalar into
@@ -377,14 +347,11 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
             // the point accumulator must start from identity and its scalar
             // from zero
             if i == 0 {
+                self.assert_equal(&SparseRow::from(acc_x), &SparseRow::from(C::Range::zero()));
+                self.assert_equal(&SparseRow::from(acc_y), &SparseRow::from(Wire::ONE));
                 self.assert_equal(
-                    &Expression::from(acc_x),
-                    &Expression::from(C::Range::zero()),
-                );
-                self.assert_equal(&Expression::from(acc_y), &Expression::from(Wire::ONE));
-                self.assert_equal(
-                    &Expression::from(accumulated_bit),
-                    &Expression::from(C::Range::zero()),
+                    &SparseRow::from(accumulated_bit),
+                    &SparseRow::from(C::Range::zero()),
                 );
             }
 
@@ -439,13 +406,13 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         // constrain the last element in the accumulator to be equal to the
         // input jubjub scalar
         self.assert_equal(
-            &Expression::from(last_accumulated_bit),
-            &Expression::from(jubjub),
+            &SparseRow::from(last_accumulated_bit),
+            &SparseRow::from(jubjub),
         );
 
         Ok(EdwardsExpression::new_unsafe(
-            Expression::from(acc_x),
-            Expression::from(acc_y),
+            SparseRow::from(acc_x),
+            SparseRow::from(acc_y),
         ))
     }
 
@@ -462,8 +429,8 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         bit: Wire,
         a: &EdwardsExpression<C::Range, C>,
     ) -> EdwardsExpression<C::Range, C> {
-        let x = Expression::from(self.component_select_zero(bit, &a.x));
-        let y = Expression::from(self.component_select_one(bit, &a.y));
+        let x = SparseRow::from(self.component_select_zero(bit, &a.x));
+        let y = SparseRow::from(self.component_select_one(bit, &a.y));
 
         EdwardsExpression::new_unsafe(x, y)
     }
@@ -475,8 +442,8 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     ///
     /// `bit` is expected to be constrained by
     /// [`Composer::component_boolean`]
-    pub fn component_select_zero(&mut self, bit: Wire, value: &Expression<C::Range>) -> Wire {
-        let mul = self.product(&Expression::from(bit), value);
+    pub fn component_select_zero(&mut self, bit: Wire, value: &SparseRow<C::Range>) -> Wire {
+        let mul = self.product(&SparseRow::from(bit), value);
         self.alloc_witness(mul.evaluate(&self.instance, &self.witness))
     }
 
@@ -487,11 +454,11 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     ///
     /// `bit` is expected to be constrained by
     /// [`Composer::component_boolean`]
-    pub fn component_select_one(&mut self, bit: Wire, value: &Expression<C::Range>) -> Wire {
-        let b = Expression::from(bit);
+    pub fn component_select_one(&mut self, bit: Wire, value: &SparseRow<C::Range>) -> Wire {
+        let b = SparseRow::from(bit);
         let mul = self.product(&b, value);
 
-        let f_x = Expression::from(C::Range::one()) - &b + mul;
+        let f_x = SparseRow::from(C::Range::one()) - &b + mul;
         self.assert_product(&-b, &-value, &f_x);
         self.alloc_witness(f_x.evaluate(&self.instance, &self.witness))
     }
@@ -506,7 +473,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         assert!(0 < N && N <= 256);
 
         let mut decomposition = [Wire::ONE; N];
-        let scalar = Expression::<C::Range>::from(scalar);
+        let scalar = SparseRow::<C::Range>::from(scalar);
 
         let acc = Wire::ONE;
         let acc = scalar
@@ -521,17 +488,17 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
                 *d = self.alloc_witness(C::Range::from(*w as u64));
 
                 let left = self.product(
-                    &Expression::from(*d),
-                    &Expression::from(C::Range::pow_of_2(i as u64)),
+                    &SparseRow::from(*d),
+                    &SparseRow::from(C::Range::pow_of_2(i as u64)),
                 );
-                let right = Expression::from(acc);
+                let right = SparseRow::from(acc);
 
                 self.assert_equal(&left, &right);
 
                 self.alloc_witness((left + right).evaluate(&self.instance, &self.witness))
             });
 
-        self.assert_equal(&Expression::from(acc), &scalar);
+        self.assert_equal(&SparseRow::from(acc), &scalar);
 
         decomposition
     }
@@ -539,34 +506,27 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     /// Assert that x * y = z;
     pub fn assert_product(
         &mut self,
-        x: &Expression<C::Range>,
-        y: &Expression<C::Range>,
-        z: &Expression<C::Range>,
+        x: &SparseRow<C::Range>,
+        y: &SparseRow<C::Range>,
+        z: &SparseRow<C::Range>,
     ) {
-        self.constraints.push(Constraint {
-            a: x.clone(),
-            b: y.clone(),
-            c: z.clone(),
-        });
+        self.constraints.append(x.clone(), y.clone(), z.clone());
     }
 
     // Assert that x + y = z;
     pub fn assert_sum(
         &mut self,
-        x: &Expression<C::Range>,
-        y: &Expression<C::Range>,
-        z: &Expression<C::Range>,
+        x: &SparseRow<C::Range>,
+        y: &SparseRow<C::Range>,
+        z: &SparseRow<C::Range>,
     ) {
-        self.constraints.push(Constraint {
-            a: x + y,
-            b: Expression::from(Wire::ONE),
-            c: z.clone(),
-        });
+        self.constraints
+            .append(x + y, SparseRow::from(Wire::ONE), z.clone());
     }
 
     /// Assert that x == y.
-    pub fn assert_equal(&mut self, x: &Expression<C::Range>, y: &Expression<C::Range>) {
-        self.assert_product(x, &Expression::one(), y);
+    pub fn assert_equal(&mut self, x: &SparseRow<C::Range>, y: &SparseRow<C::Range>) {
+        self.assert_product(x, &SparseRow::one(), y);
     }
 
     /// Asserts `a == b` by appending two gates
@@ -589,8 +549,8 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     ) {
         let public = public.into();
 
-        self.assert_equal(&point.x, &Expression::from(public.get_x()));
-        self.assert_equal(&point.y, &Expression::from(public.get_y()));
+        self.assert_equal(&point.x, &SparseRow::from(public.get_x()));
+        self.assert_equal(&point.y, &SparseRow::from(public.get_y()));
     }
 
     /// Adds a range-constraint gate that checks and constrains a
@@ -697,16 +657,16 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         // witness because this computation is bound to the constant bits count
         // alone.
         if let Some(accumulator) = accumulators.last() {
-            self.assert_equal(&Expression::from(accumulator), &Expression::from(witness));
+            self.assert_equal(&SparseRow::from(accumulator), &SparseRow::from(witness));
         }
     }
 
-    /// The product of two `Expression`s `x` and `y`, i.e. `x * y`.
+    /// The product of two `SparseRow`s `x` and `y`, i.e. `x * y`.
     pub fn product(
         &mut self,
-        x: &Expression<C::Range>,
-        y: &Expression<C::Range>,
-    ) -> Expression<C::Range> {
+        x: &SparseRow<C::Range>,
+        y: &SparseRow<C::Range>,
+    ) -> SparseRow<C::Range> {
         if let Some(c) = x.as_constant() {
             return y * c;
         }
@@ -717,18 +677,14 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         let product_value =
             x.evaluate(&self.instance, &self.witness) * y.evaluate(&self.instance, &self.witness);
         let product = self.alloc_witness(product_value);
-        let product_exp = Expression::from(product);
+        let product_exp = SparseRow::from(product);
         self.assert_product(x, y, &product_exp);
 
         product_exp
     }
 
-    /// The product of two `Expression`s `x` and `y`, i.e. `x * y`.
-    pub fn sum(
-        &mut self,
-        x: &Expression<C::Range>,
-        y: &Expression<C::Range>,
-    ) -> Expression<C::Range> {
+    /// The product of two `SparseRow`s `x` and `y`, i.e. `x * y`.
+    pub fn sum(&mut self, x: &SparseRow<C::Range>, y: &SparseRow<C::Range>) -> SparseRow<C::Range> {
         if let Some(c) = x.as_constant() {
             return y * c;
         }
@@ -739,20 +695,20 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         let sum_value =
             x.evaluate(&self.instance, &self.witness) + y.evaluate(&self.instance, &self.witness);
         let sum = self.alloc_witness(sum_value);
-        let sum_exp = Expression::from(sum);
+        let sum_exp = SparseRow::from(sum);
         self.assert_sum(x, y, &sum_exp);
         sum_exp
     }
 
     /// Returns `1 / x`, assuming `x` is non-zero. If `x` is zero, the gadget will not be
     /// satisfiable.
-    pub fn inverse(&mut self, x: &Expression<C::Range>) -> Expression<C::Range> {
+    pub fn inverse(&mut self, x: &SparseRow<C::Range>) -> SparseRow<C::Range> {
         let x_value = x.evaluate(&self.instance, &self.witness);
         let inverse_value = x_value.invert().expect("Can't find an inverse element");
         let x_inv = self.alloc_witness(inverse_value);
 
-        let x_inv_expression = Expression::from(x_inv);
-        self.assert_product(x, &x_inv_expression, &Expression::one());
+        let x_inv_expression = SparseRow::from(x_inv);
+        self.assert_product(x, &x_inv_expression, &SparseRow::one());
 
         x_inv_expression
     }
@@ -770,8 +726,8 @@ mod tests {
     use crate::public_params::PublicParameters;
     use bls_12_381::Fr as BlsScalar;
     use ec_pairing::TatePairing;
-    use expression::Expression;
     use jub_jub::JubjubAffine;
+    use matrix::SparseRow;
     use rand::rngs::OsRng;
 
     #[test]
@@ -800,7 +756,7 @@ mod tests {
                 let x = composer.alloc_witness(self.x);
                 let y = composer.alloc_witness(self.y);
 
-                composer.append_edwards_expression(Expression::from(x), Expression::from(y));
+                composer.append_edwards_expression(SparseRow::from(x), SparseRow::from(y));
 
                 Ok(())
             }
@@ -821,7 +777,9 @@ mod tests {
 
         let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
             .expect("Failed to compile circuit");
-        let proof = prover.create_proof(circuit).expect("Failed to prove");
+        let proof = prover
+            .create_proof(&mut OsRng, circuit)
+            .expect("Failed to prove");
         verifier
             .verify(&proof, &[])
             .expect("Failed to verify the proof");
@@ -850,7 +808,7 @@ mod tests {
         impl Circuit<JubjubAffine> for DummyCircuit {
             type ConstraintSystem = Groth16<JubjubAffine>;
             fn synthesize(&self, composer: &mut Groth16<JubjubAffine>) -> Result<(), Error> {
-                let x = Expression::from(composer.alloc_instance(self.x));
+                let x = SparseRow::from(composer.alloc_instance(self.x));
                 let o = composer.alloc_instance(self.o);
 
                 let sym1 = composer.product(&x, &x);
@@ -858,8 +816,8 @@ mod tests {
                 let sym2 = composer.sum(&y, &x);
 
                 composer.assert_equal(
-                    &(sym2 + Expression::from(BlsScalar::from(5))),
-                    &Expression::from(o),
+                    &(sym2 + SparseRow::from(BlsScalar::from(5))),
+                    &SparseRow::from(o),
                 );
 
                 Ok(())
@@ -874,7 +832,9 @@ mod tests {
 
         let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
             .expect("Failed to compile circuit");
-        let proof = prover.create_proof(circuit).expect("Failed to prove");
+        let proof = prover
+            .create_proof(&mut OsRng, circuit)
+            .expect("Failed to prove");
         verifier
             .verify(&proof, &[x, o])
             .expect("Failed to verify the proof");

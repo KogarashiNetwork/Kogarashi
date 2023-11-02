@@ -1,5 +1,4 @@
-use crate::groth16::expression::{Evaluable, Expression};
-use crate::groth16::matrix::Element;
+use crate::groth16::matrix::{Element, Evaluable, SparseRow};
 use core::marker::PhantomData;
 use zkstd::common::{PrimeField, TwistedEdwardsAffine};
 
@@ -14,24 +13,24 @@ impl<F: PrimeField, C: TwistedEdwardsAffine<Range = F>> Clone for EdwardsExpress
 }
 
 pub struct EdwardsExpression<F: PrimeField, C: TwistedEdwardsAffine<Range = F>> {
-    pub x: Expression<F>,
-    pub y: Expression<F>,
+    pub x: SparseRow<F>,
+    pub y: SparseRow<F>,
     marker: PhantomData<C>,
 }
 
 impl<F: PrimeField, C: TwistedEdwardsAffine<Range = F>> EdwardsExpression<F, C> {
     pub fn identity() -> Self {
         Self::new_unsafe(
-            Expression::from(C::Range::zero()),
-            Expression::from(C::Range::one()),
+            SparseRow::from(C::Range::zero()),
+            SparseRow::from(C::Range::one()),
         )
     }
 
     /// Creates an `EdwardsExpression` from two arbitrary coordinates of type `Expression`.
     /// This method is unsafe and should only be used when the coordinates are proven
     /// to exist on the curve.
-    pub fn new_unsafe(x: Expression<C::Range>, y: Expression<C::Range>) -> Self {
-        Self {
+    pub fn new_unsafe(x: SparseRow<C::Range>, y: SparseRow<C::Range>) -> EdwardsExpression<F, C> {
+        EdwardsExpression {
             x,
             y,
             marker: Default::default(),

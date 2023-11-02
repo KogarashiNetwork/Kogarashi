@@ -5,7 +5,7 @@ use zkstd::common::*;
 
 #[derive(Clone, Debug, PartialEq, Eq, Default, Encode, Decode)]
 pub(crate) struct RollupTransactionInfo<
-    P: Pairing,
+    P: RedDSA,
     H: FieldHasher<P::ScalarField, 2>,
     const N: usize,
 > {
@@ -22,9 +22,9 @@ pub(crate) struct RollupTransactionInfo<
 }
 
 #[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Decode, Encode)]
-pub struct Transaction<P: Pairing>(pub(crate) Signature, pub(crate) TransactionData<P>);
+pub struct Transaction<P: RedDSA>(pub(crate) Signature, pub(crate) TransactionData<P>);
 
-impl<P: Pairing> Transaction<P> {
+impl<P: RedDSA> Transaction<P> {
     pub fn to_field_element(self) -> P::ScalarField {
         let mut field = [0_u8; 64];
         field.copy_from_slice(&self.to_bytes()[0..64]);
@@ -33,13 +33,13 @@ impl<P: Pairing> Transaction<P> {
 }
 
 #[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Decode, Encode)]
-pub struct TransactionData<P: Pairing> {
+pub struct TransactionData<P: RedDSA> {
     pub(crate) sender_address: PublicKey<P>,
     pub(crate) receiver_address: PublicKey<P>,
     pub(crate) amount: u64,
 }
 
-impl<P: Pairing> TransactionData<P> {
+impl<P: RedDSA> TransactionData<P> {
     pub fn new(sender_address: PublicKey<P>, receiver_address: PublicKey<P>, amount: u64) -> Self {
         Self {
             sender_address,
@@ -54,7 +54,7 @@ impl<P: Pairing> TransactionData<P> {
     }
 }
 
-impl<P: Pairing> SigUtils<136> for Transaction<P> {
+impl<P: RedDSA> SigUtils<136> for Transaction<P> {
     fn from_bytes(bytes: [u8; 136]) -> Option<Self> {
         let mut signature = [0_u8; 64];
         let mut transaction_data = [0_u8; 72];
@@ -75,7 +75,7 @@ impl<P: Pairing> SigUtils<136> for Transaction<P> {
     }
 }
 
-impl<P: Pairing> SigUtils<72> for TransactionData<P> {
+impl<P: RedDSA> SigUtils<72> for TransactionData<P> {
     fn from_bytes(bytes: [u8; 72]) -> Option<Self> {
         let mut sender_address = [0_u8; 32];
         let mut receiver_address = [0_u8; 32];

@@ -11,7 +11,7 @@ ark-std = "0.4.0"
 zero-plonk = { path = "../plonk", default-features = false }
 zksnarks = { path = "../zksnarks", default-features = false }
 ec-pairing = { path = "../pairing", default-features = false }
-red-jubjub = { path = "../redjubjub", default-features = false}
+red-jubjub = { path = "../redjubjub", default-features = false }
 rand_core = { version="0.6.4", features = ["getrandom"] }
 bls-12-381 = { path = '../bls12_381', default-features = false }
 sp-std = { version = '3.0.0', default-features = false }
