@@ -1,9 +1,10 @@
 mod proof;
 
-use super::{constraint::Constraint, matrix::Element};
+use super::matrix::Element;
 use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
+use crate::groth16::constraint::R1csStruct;
 use crate::groth16::error::Groth16Error;
 use crate::groth16::key::Parameters;
 use crate::groth16::Groth16;
@@ -16,7 +17,7 @@ use zkstd::common::{CurveGroup, Group, Pairing, TwistedEdwardsCurve, Vec};
 #[derive(Debug)]
 pub struct Prover<P: Pairing> {
     pub params: Parameters<P>,
-    pub constraints: Vec<Constraint<<P::JubjubAffine as TwistedEdwardsCurve>::Range>>,
+    pub constraints: R1csStruct<<P::JubjubAffine as TwistedEdwardsCurve>::Range>,
 }
 
 impl<P: Pairing> Prover<P> {

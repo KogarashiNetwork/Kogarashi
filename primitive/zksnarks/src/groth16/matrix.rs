@@ -11,7 +11,7 @@ use zkstd::common::{PrimeField, Vec};
 pub(crate) struct SparseMatrix<F: PrimeField>(pub(crate) Vec<SparseRow<F>>);
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct SparseRow<F: PrimeField>(Vec<Element<F>>);
+pub struct SparseRow<F: PrimeField>(pub(crate) Vec<Element<F>>);
 
 pub trait Evaluable<F: PrimeField, R> {
     fn evaluate(&self, instance: &[Element<F>], witness: &[Element<F>]) -> R;
@@ -109,17 +109,11 @@ impl<F: PrimeField> Add<&SparseRow<F>> for &SparseRow<F> {
     type Output = SparseRow<F>;
 
     fn add(self, rhs: &SparseRow<F>) -> SparseRow<F> {
-        let mut res = Vec::new();
-        for Element(wire, coefficient) in rhs.0.clone() {
+        let mut res = self.0.clone();
+        for Element(wire, coeff_b) in rhs.0.clone() {
             match get_value_from_wire(wire, &self.0) {
-                Some(coeff) => res.push(Element(wire, coeff + coefficient)),
-                None => res.push(Element(wire, coefficient)),
-            }
-        }
-        for Element(wire, coefficient) in self.0.clone() {
-            match get_value_from_wire(wire, &rhs.0) {
-                Some(_) => {}
-                None => res.push(Element(wire, coefficient)),
+                Some(coeff_a) => res.push(Element(wire, coeff_a + coeff_b)),
+                None => res.push(Element(wire, coeff_b)),
             }
         }
         SparseRow::new(res)

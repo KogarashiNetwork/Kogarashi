@@ -13,7 +13,7 @@ pub mod wire;
 
 use crate::constraint_system::ConstraintSystem;
 
-use constraint::Constraint;
+use constraint::R1csStruct;
 use curves::EdwardsExpression;
 use matrix::SparseRow;
 use wire::Wire;
@@ -23,7 +23,7 @@ use self::matrix::Element;
 
 #[derive(Debug)]
 pub struct Groth16<C: TwistedEdwardsAffine> {
-    constraints: Vec<Constraint<C::Range>>,
+    constraints: R1csStruct<C::Range>,
     a: Vec<C::Range>,
     b: Vec<C::Range>,
     c: Vec<C::Range>,
@@ -33,11 +33,11 @@ pub struct Groth16<C: TwistedEdwardsAffine> {
 
 impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     type Wire = Wire;
-    type Constraints = Vec<Constraint<C::Range>>;
+    type Constraints = R1csStruct<C::Range>;
 
     fn initialize() -> Self {
         Self {
-            constraints: Vec::new(),
+            constraints: R1csStruct::default(),
             a: vec![],
             b: vec![],
             c: vec![],
@@ -47,7 +47,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     }
 
     fn m(&self) -> usize {
-        self.constraints.len()
+        self.constraints().m()
     }
 
     fn instance(&self) -> Vec<<C>::Range> {
@@ -83,7 +83,15 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         let mut at = vec![vec![]; self.instance_len()];
         let mut bt = vec![vec![]; self.instance_len()];
         let mut ct = vec![vec![]; self.instance_len()];
-        for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
+        for (i, ((a, b), c)) in self
+            .constraints
+            .a
+            .0
+            .iter()
+            .zip(self.constraints.b.0.iter())
+            .zip(self.constraints.c.0.iter())
+            .enumerate()
+        {
             a.coefficients()
                 .iter()
                 .filter(|Element(w, _)| matches!(w, Wire::Instance(_)))
@@ -118,7 +126,15 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         let mut at = vec![vec![]; self.witness_len()];
         let mut bt = vec![vec![]; self.witness_len()];
         let mut ct = vec![vec![]; self.witness_len()];
-        for (i, Constraint { a, b, c }) in self.constraints.iter().enumerate() {
+        for (i, ((a, b), c)) in self
+            .constraints
+            .a
+            .0
+            .iter()
+            .zip(self.constraints.b.0.iter())
+            .zip(self.constraints.c.0.iter())
+            .enumerate()
+        {
             a.coefficients()
                 .iter()
                 .filter(|Element(w, _)| matches!(w, Wire::Witness(_)))
@@ -143,12 +159,10 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     }
 
     fn eval_constraints(&mut self) {
-        for x in self.constraints.iter() {
-            let (a, b, c) = x.evaluate(&self.instance, &self.witness);
-            self.a.push(a);
-            self.b.push(b);
-            self.c.push(c);
-        }
+        let (a, b, c) = self.constraints.evaluate(&self.instance, &self.witness);
+        self.a = a;
+        self.b = b;
+        self.c = c;
     }
 
     fn instance_len(&self) -> usize {
@@ -194,11 +208,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         y: &SparseRow<C::Range>,
         z: &SparseRow<C::Range>,
     ) {
-        self.constraints.push(Constraint {
-            a: x.clone(),
-            b: y.clone(),
-            c: z.clone(),
-        });
+        self.constraints.append(x.clone(), y.clone(), z.clone());
     }
 
     // Assert that x + y = z;
@@ -208,11 +218,8 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         y: &SparseRow<C::Range>,
         z: &SparseRow<C::Range>,
     ) {
-        self.constraints.push(Constraint {
-            a: x + y,
-            b: SparseRow::from(Wire::ONE),
-            c: z.clone(),
-        });
+        self.constraints
+            .append(x + y, SparseRow::from(Wire::ONE), z.clone());
     }
 
     /// Assert that x == y.
