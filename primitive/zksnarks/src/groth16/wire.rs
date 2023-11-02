@@ -10,27 +10,19 @@ pub enum Wire {
 
 impl Wire {
     pub const ONE: Wire = Wire::Instance(0);
-
-    pub const fn deref_i(&self) -> &usize {
-        match self {
-            Wire::Instance(i) => i,
-            Wire::Witness(i) => i,
-        }
-    }
 }
 
 impl Ord for Wire {
     fn cmp(&self, other: &Self) -> Ordering {
-        // For presentation, we want the 1 wire to be last. Otherwise use ascending index order.
-        if *self == Wire::ONE && *other == Wire::ONE {
-            Ordering::Equal
-        } else if *self == Wire::ONE {
-            Ordering::Less
-        } else if *other == Wire::ONE {
-            Ordering::Greater
-        } else {
-            self.deref_i().cmp(&other.deref_i())
-        }
+        let rhs = match self {
+            Wire::Instance(i) => i,
+            Wire::Witness(i) => i,
+        };
+        let lhs = match other {
+            Wire::Instance(i) => i,
+            Wire::Witness(i) => i,
+        };
+        rhs.cmp(&lhs)
     }
 }
 
