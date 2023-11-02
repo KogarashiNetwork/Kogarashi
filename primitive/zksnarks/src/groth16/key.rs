@@ -10,30 +10,38 @@ use core::marker::PhantomData;
 use core::ops::{MulAssign, Neg};
 use poly_commit::{Coefficients, Fft, PointsValue};
 use zkstd::common::{
-    vec, CurveGroup, FftField, Group, Pairing, PairingRange, PrimeField, Ring, Vec,
+    vec, CurveGroup, FftField, Group, Pairing, PairingRange, PrimeField, Ring,
+    TwistedEdwardsAffine, Vec,
 };
 
 /// Generate the arguments to prove and verify a circuit
-pub struct Groth16Key<P: Pairing, C: Circuit<P::JubjubAffine>> {
+pub struct Groth16Key<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>, C: Circuit<A>> {
     c: PhantomData<C>,
     p: PhantomData<P>,
+    a: PhantomData<A>,
 }
 
-impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::JubjubAffine>>>
-    Keypair<P, C> for Groth16Key<P, C>
+impl<
+        P: Pairing,
+        A: TwistedEdwardsAffine<Range = P::ScalarField>,
+        C: Circuit<A, ConstraintSystem = Groth16<A>>,
+    > Keypair<P, A, C> for Groth16Key<P, A, C>
 {
     type PublicParameters = Groth16Params<P>;
-    type Prover = Prover<P>;
+    type Prover = Prover<P, A>;
     type Verifier = Verifier<P>;
-    type ConstraintSystem = Groth16<P::JubjubAffine>;
+    type ConstraintSystem = Groth16<A>;
 
     fn compile(pp: &Self::PublicParameters) -> Result<(Self::Prover, Self::Verifier), Error> {
         Self::compile_with_circuit(pp, b"groth16", &C::default())
     }
 }
 
-impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::JubjubAffine>>>
-    Groth16Key<P, C>
+impl<
+        P: Pairing,
+        A: TwistedEdwardsAffine<Range = P::ScalarField>,
+        C: Circuit<A, ConstraintSystem = Groth16<A>>,
+    > Groth16Key<P, A, C>
 {
     #[allow(clippy::type_complexity)]
     /// Create a new arguments set from a given circuit instance
@@ -45,8 +53,8 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
         circuit: &C,
     ) -> Result<
         (
-            <Self as Keypair<P, C>>::Prover,
-            <Self as Keypair<P, C>>::Verifier,
+            <Self as Keypair<P, A, C>>::Prover,
+            <Self as Keypair<P, A, C>>::Verifier,
         ),
         Error,
     > {
@@ -152,7 +160,13 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
 
         let pvk = prepare_verifying_key(&params.vk);
 
-        Ok((Prover::<P> { params }, Verifier::<P> { vk: pvk }))
+        Ok((
+            Prover::<P, A> {
+                params,
+                _mark: PhantomData,
+            },
+            Verifier::<P> { vk: pvk },
+        ))
     }
 }
 

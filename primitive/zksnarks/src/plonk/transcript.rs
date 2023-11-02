@@ -3,8 +3,7 @@ use crate::plonk::keypair::VerificationKey;
 use core::mem;
 pub use merlin::Transcript;
 use poly_commit::Commitment;
-use zkstd::common::Pairing;
-use zkstd::common::{FftField, SigUtils};
+use zkstd::common::{FftField, Pairing, SigUtils};
 
 /// Transcript adds an abstraction over the Merlin transcript
 /// For convenience

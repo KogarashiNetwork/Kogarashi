@@ -1,7 +1,7 @@
 use crate::plonk::utils::{check_bit_consistency, extract_bit};
 use crate::plonk::Evaluations;
 use poly_commit::{Coefficients, Commitment, PointsValue};
-use zkstd::common::{vec, Pairing, PrimeField, Ring, TwistedEdwardsCurve, Vec};
+use zkstd::common::{vec, Pairing, PrimeField, Ring, Vec};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct VerificationKey<P: Pairing> {
@@ -47,23 +47,13 @@ impl<P: Pairing> VerificationKey<P> {
 
         // x accumulator consistency check
         let x_3 = acc_x_next;
-        let lhs = x_3
-            + (x_3
-                * xy_alpha
-                * acc_x
-                * acc_y
-                * Into::<P::ScalarField>::into(P::JubjubAffine::PARAM_D));
+        let lhs = x_3 + (x_3 * xy_alpha * acc_x * acc_y * P::PARAM_D);
         let rhs = (x_alpha * acc_y) + (y_alpha * acc_x);
         let x_acc_consistency = (lhs - rhs) * kappa_sq;
 
         // y accumulator consistency check
         let y_3 = acc_y_next;
-        let lhs = y_3
-            - (y_3
-                * xy_alpha
-                * acc_x
-                * acc_y
-                * Into::<P::ScalarField>::into(P::JubjubAffine::PARAM_D));
+        let lhs = y_3 - (y_3 * xy_alpha * acc_x * acc_y * P::PARAM_D);
         let rhs = (x_alpha * acc_x) + (y_alpha * acc_y);
         let y_acc_consistency = (lhs - rhs) * kappa_cu;
 
@@ -133,23 +123,13 @@ impl<P: Pairing> ProvingKey<P> {
 
         // x accumulator consistency check
         let x_3 = acc_x_next;
-        let lhs: P::ScalarField = *x_3
-            + (*x_3
-                * xy_alpha
-                * acc_x
-                * acc_y
-                * Into::<P::ScalarField>::into(P::JubjubAffine::PARAM_D));
+        let lhs: P::ScalarField = *x_3 + (*x_3 * xy_alpha * acc_x * acc_y * P::PARAM_D);
         let rhs = (*acc_x * y_alpha) + (*acc_y * x_alpha);
         let x_acc_consistency = (lhs - rhs) * kappa_sq;
 
         // y accumulator consistency check
         let y_3 = acc_y_next;
-        let lhs: P::ScalarField = *y_3
-            - (*y_3
-                * xy_alpha
-                * acc_x
-                * acc_y
-                * Into::<P::ScalarField>::into(P::JubjubAffine::PARAM_D));
+        let lhs: P::ScalarField = *y_3 - (*y_3 * xy_alpha * acc_x * acc_y * P::PARAM_D);
         let rhs = (*acc_y * y_alpha) + (*acc_x * x_alpha);
         let y_acc_consistency = (lhs - rhs) * kappa_cu;
 
@@ -205,23 +185,13 @@ impl<P: Pairing> ProvingKey<P> {
 
         // x accumulator consistency check
         let x_3 = acc_x_next;
-        let lhs = *x_3
-            + (*x_3
-                * xy_alpha
-                * acc_x
-                * acc_y
-                * Into::<P::ScalarField>::into(P::JubjubAffine::PARAM_D));
+        let lhs = *x_3 + (*x_3 * xy_alpha * acc_x * acc_y * P::PARAM_D);
         let rhs = (x_alpha * acc_y) + (y_alpha * acc_x);
         let x_acc_consistency = (lhs - rhs) * kappa_sq;
 
         // y accumulator consistency check
         let y_3 = acc_y_next;
-        let lhs = *y_3
-            - (*y_3
-                * xy_alpha
-                * acc_x
-                * acc_y
-                * Into::<P::ScalarField>::into(P::JubjubAffine::PARAM_D));
+        let lhs = *y_3 - (*y_3 * xy_alpha * acc_x * acc_y * P::PARAM_D);
         let rhs = (x_alpha * acc_x) + (y_alpha * acc_y);
         let y_acc_consistency = (lhs - rhs) * kappa_cu;
 
