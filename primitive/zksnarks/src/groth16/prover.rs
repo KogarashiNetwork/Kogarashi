@@ -6,9 +6,10 @@ use crate::error::Error;
 use crate::groth16::error::Groth16Error;
 use crate::groth16::key::Parameters;
 use crate::groth16::Groth16;
-use poly_commit::{msm_curve_addition, Fft, PointsValue};
 pub use proof::Proof;
-use rand::rngs::OsRng;
+
+use poly_commit::{msm_curve_addition, Fft, PointsValue};
+use rand::RngCore;
 use zkstd::common::{CurveGroup, Group, Pairing, Vec};
 
 #[derive(Debug)]
@@ -18,29 +19,34 @@ pub struct Prover<P: Pairing> {
 
 impl<P: Pairing> Prover<P> {
     /// Execute the gadget, and return whether all constraints were satisfied.
-    pub fn create_proof<C>(&mut self, circuit: C) -> Result<Proof<P>, Error>
+    pub fn create_proof<C, R: RngCore>(
+        &mut self,
+        rng: &mut R,
+        circuit: C,
+    ) -> Result<Proof<P>, Error>
     where
         C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::JubjubAffine>>,
     {
         let mut cs = Groth16::<P::JubjubAffine>::initialize();
         circuit.synthesize(&mut cs)?;
-        cs.eval_constraints();
 
         let size = cs.m().next_power_of_two();
         let k = size.trailing_zeros();
         let vk = self.params.vk.clone();
 
-        let r = P::ScalarField::random(OsRng);
-        let s = P::ScalarField::random(OsRng);
+        let r = P::ScalarField::random(&mut *rng);
+        let s = P::ScalarField::random(&mut *rng);
 
         let fft = Fft::<P::ScalarField>::new(k as usize);
 
+        let (a, b, c) = cs.eval_constraints();
+
         // Do the calculation of H(X): A(X) * B(X) - C(X) == H(X) * T(X)
-        let a = fft.idft(PointsValue(cs.a.clone()));
+        let a = fft.idft(PointsValue(a));
         let a = fft.coset_dft(a);
-        let b = fft.idft(PointsValue(cs.b.clone()));
+        let b = fft.idft(PointsValue(b));
         let b = fft.coset_dft(b);
-        let c = fft.idft(PointsValue(cs.c.clone()));
+        let c = fft.idft(PointsValue(c));
         let c = fft.coset_dft(c);
 
         let mut h = &a * &b;

@@ -21,9 +21,6 @@ use zkstd::common::{vec, Group, TwistedEdwardsAffine, Vec};
 #[derive(Debug)]
 pub struct Groth16<C: TwistedEdwardsAffine> {
     constraints: R1csStruct<C::Range>,
-    a: Vec<C::Range>,
-    b: Vec<C::Range>,
-    c: Vec<C::Range>,
     pub(crate) instance: Vec<Element<C::Range>>,
     pub(crate) witness: Vec<Element<C::Range>>,
 }
@@ -35,9 +32,6 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     fn initialize() -> Self {
         Self {
             constraints: R1csStruct::default(),
-            a: vec![],
-            b: vec![],
-            c: vec![],
             instance: [Element::one()].into_iter().collect(),
             witness: vec![],
         }
@@ -45,10 +39,6 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
 
     fn m(&self) -> usize {
         self.constraints().m()
-    }
-
-    fn instance(&self) -> Vec<<C>::Range> {
-        Vec::new()
     }
 
     fn constraints(&self) -> Self::Constraints {
@@ -125,13 +115,10 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         )
     }
 
-    fn eval_constraints(&mut self) {
-        let (a, b, c) = self.constraints.evaluate(&self.instance, &self.witness);
-        self.a = a;
-        self.b = b;
-        self.c = c;
+    fn eval_constraints(&mut self) -> (Vec<C::Range>, Vec<C::Range>, Vec<C::Range>) {
         self.instance.sort();
         self.witness.sort();
+        self.constraints.evaluate(&self.instance, &self.witness)
     }
 
     fn instance_len(&self) -> usize {
@@ -313,7 +300,9 @@ mod tests {
 
         let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
             .expect("Failed to compile circuit");
-        let proof = prover.create_proof(circuit).expect("Failed to prove");
+        let proof = prover
+            .create_proof(&mut OsRng, circuit)
+            .expect("Failed to prove");
         verifier
             .verify(&proof, &[])
             .expect("Failed to verify the proof");
@@ -366,7 +355,9 @@ mod tests {
 
         let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
             .expect("Failed to compile circuit");
-        let proof = prover.create_proof(circuit).expect("Failed to prove");
+        let proof = prover
+            .create_proof(&mut OsRng, circuit)
+            .expect("Failed to prove");
         verifier
             .verify(&proof, &[x, o])
             .expect("Failed to verify the proof");

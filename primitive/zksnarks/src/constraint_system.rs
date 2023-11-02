@@ -1,4 +1,4 @@
-use zkstd::common::{TwistedEdwardsAffine, Vec};
+use zkstd::common::TwistedEdwardsAffine;
 
 /// constraint system trait
 pub trait ConstraintSystem<C: TwistedEdwardsAffine> {
@@ -6,14 +6,10 @@ pub trait ConstraintSystem<C: TwistedEdwardsAffine> {
     type Constraints;
 
     /// init constraint system
-
     fn initialize() -> Self;
 
     /// return constraints length
     fn m(&self) -> usize;
-
-    /// return public inputs and outputs
-    fn instance(&self) -> Vec<C::Range>;
 
     fn constraints(&self) -> Self::Constraints;
 
