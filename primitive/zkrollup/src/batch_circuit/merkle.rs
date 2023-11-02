@@ -1,9 +1,8 @@
 use bls_12_381::Fr;
-use ec_pairing::TatePairing;
 use zero_plonk::prelude::*;
 use zksnarks::{plonk::wire::PrivateWire, Constraint};
-use zkstd::common::Group;
-use zkstd::common::{vec, Pairing, Vec};
+use zkstd::common::{vec, Vec};
+use zkstd::common::{Group, TwistedEdwardsAffine};
 
 #[derive(Debug, PartialEq)]
 pub struct MerkleMembershipCircuit<const N: usize> {
@@ -35,13 +34,13 @@ impl<const N: usize> MerkleMembershipCircuit<N> {
     }
 }
 
-fn hash<P: Pairing>(
-    composer: &mut Plonk<P::JubjubAffine>,
+fn hash<C: TwistedEdwardsAffine>(
+    composer: &mut Plonk<C>,
     inputs: (PrivateWire, PrivateWire),
 ) -> PrivateWire {
     let sum = Constraint::default()
         .left(1)
-        .constant(P::ScalarField::ADDITIVE_GENERATOR)
+        .constant(C::Range::ADDITIVE_GENERATOR)
         .a(inputs.0);
     let gen_plus_first = composer.gate_add(sum);
 
@@ -50,14 +49,14 @@ fn hash<P: Pairing>(
 
     let sum = Constraint::default()
         .left(1)
-        .constant(P::ScalarField::ADDITIVE_GENERATOR)
+        .constant(C::Range::ADDITIVE_GENERATOR)
         .a(inputs.1);
 
     let gen_plus_second = composer.gate_add(sum);
 
     let sum_plus_42 = Constraint::default()
         .left(1)
-        .constant(P::ScalarField::from(42))
+        .constant(C::Range::from(42))
         .a(first_hash);
     let sum_plus_42 = composer.gate_add(sum_plus_42);
 
@@ -76,10 +75,10 @@ fn hash<P: Pairing>(
     )
 }
 
-fn calculate_root<P: Pairing, const N: usize>(
-    composer: &mut Plonk<P::JubjubAffine>,
-    leaf: P::ScalarField,
-    path: &[(P::ScalarField, P::ScalarField)],
+fn calculate_root<C: TwistedEdwardsAffine, const N: usize>(
+    composer: &mut Plonk<C>,
+    leaf: C::Range,
+    path: &[(C::Range, C::Range)],
     path_pos: &[u64],
 ) -> Result<PrivateWire, Error> {
     let mut prev = composer.append_witness(leaf);
@@ -96,7 +95,7 @@ fn calculate_root<P: Pairing, const N: usize>(
 
     let path_pos: Vec<PrivateWire> = path_pos
         .iter()
-        .map(|pos| composer.append_witness(P::JubjubScalar::from(*pos)))
+        .map(|pos| composer.append_witness(C::Range::from(*pos)))
         .collect();
 
     for ((left, right), pos) in path.into_iter().zip(path_pos) {
@@ -109,24 +108,24 @@ fn calculate_root<P: Pairing, const N: usize>(
         let check = composer.append_logic_and(w1, w2, 256);
         composer.assert_equal_constant(check, 0, None);
 
-        prev = hash::<P>(composer, (left, right));
+        prev = hash::<C>(composer, (left, right));
     }
 
     Ok(prev)
 }
 
-pub(crate) fn check_membership<P: Pairing, const N: usize>(
-    composer: &mut Plonk<P::JubjubAffine>,
-    leaf: P::ScalarField,
-    root: P::ScalarField,
-    path: &[(P::ScalarField, P::ScalarField)],
+pub(crate) fn check_membership<C: TwistedEdwardsAffine, const N: usize>(
+    composer: &mut Plonk<C>,
+    leaf: C::Range,
+    root: C::Range,
+    path: &[(C::Range, C::Range)],
     path_pos: &[u64],
 ) -> Result<(), Error> {
     assert_eq!(path.len(), path_pos.len());
 
     let precomputed_root = composer.append_witness(root);
 
-    let root = calculate_root::<P, N>(composer, leaf, path, path_pos)?;
+    let root = calculate_root::<C, N>(composer, leaf, path, path_pos)?;
     composer.assert_equal(root, precomputed_root);
     Ok(())
 }
@@ -134,7 +133,7 @@ pub(crate) fn check_membership<P: Pairing, const N: usize>(
 impl<const N: usize> Circuit<JubjubAffine> for MerkleMembershipCircuit<N> {
     type ConstraintSystem = Plonk<JubjubAffine>;
     fn synthesize(&self, composer: &mut Plonk<JubjubAffine>) -> Result<(), Error> {
-        check_membership::<TatePairing, N>(
+        check_membership::<JubjubAffine, N>(
             composer,
             self.leaf,
             self.root,
@@ -153,7 +152,7 @@ mod tests {
     use ec_pairing::TatePairing;
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
-    use red_jubjub::PublicKey;
+    use red_jubjub::{PublicKey, RedJubjub};
     use zero_plonk::prelude::*;
     use zksnarks::keypair::Keypair;
     use zksnarks::plonk::PlonkParams;
@@ -181,7 +180,7 @@ mod tests {
 
         // New leaf data
         let user =
-            UserData::<TatePairing>::new(0, 10, PublicKey::new(JubjubExtended::random(&mut rng)));
+            UserData::<RedJubjub>::new(0, 10, PublicKey::new(JubjubExtended::random(&mut rng)));
 
         let merkle_circuit = MerkleMembershipCircuit::<3>::new(
             user.to_field_element(),
