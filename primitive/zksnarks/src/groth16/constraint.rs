@@ -27,8 +27,8 @@ impl<F: PrimeField> R1csStruct<F> {
 
     pub(crate) fn evaluate(
         &self,
-        instance: &Vec<Element<F>>,
-        witness: &Vec<Element<F>>,
+        instance: &[Element<F>],
+        witness: &[Element<F>],
     ) -> (Vec<F>, Vec<F>, Vec<F>) {
         let (mut a_evals, mut b_evals, mut c_evals) = (Vec::new(), Vec::new(), Vec::new());
         self.a

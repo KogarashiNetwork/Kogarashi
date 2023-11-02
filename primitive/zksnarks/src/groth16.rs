@@ -136,6 +136,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         )
     }
 
+    #[allow(clippy::type_complexity)]
     fn eval_constraints(&mut self) -> (Vec<C::Range>, Vec<C::Range>, Vec<C::Range>) {
         self.instance.sort();
         self.witness.sort();

@@ -22,7 +22,7 @@ impl Ord for Wire {
             Wire::Instance(i) => i,
             Wire::Witness(i) => i,
         };
-        rhs.cmp(&lhs)
+        rhs.cmp(lhs)
     }
 }
 
