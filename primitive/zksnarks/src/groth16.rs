@@ -4,7 +4,6 @@ mod key;
 mod matrix;
 mod params;
 mod prover;
-mod util;
 mod verifier;
 
 pub(crate) mod curves;
@@ -131,6 +130,8 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         self.a = a;
         self.b = b;
         self.c = c;
+        self.instance.sort();
+        self.witness.sort();
     }
 
     fn instance_len(&self) -> usize {

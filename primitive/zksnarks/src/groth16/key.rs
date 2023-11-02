@@ -157,13 +157,7 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
 
         let pvk = prepare_verifying_key(&params.vk);
 
-        Ok((
-            Prover::<P> {
-                params,
-                constraints: cs.constraints,
-            },
-            Verifier::<P> { vk: pvk },
-        ))
+        Ok((Prover::<P> { params }, Verifier::<P> { vk: pvk }))
     }
 }
 

@@ -1,23 +1,19 @@
 mod proof;
 
-use super::matrix::Element;
 use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
-use crate::groth16::constraint::R1csStruct;
 use crate::groth16::error::Groth16Error;
 use crate::groth16::key::Parameters;
 use crate::groth16::Groth16;
-use itertools::Itertools;
 use poly_commit::{msm_curve_addition, Fft, PointsValue};
 pub use proof::Proof;
 use rand::rngs::OsRng;
-use zkstd::common::{CurveGroup, Group, Pairing, TwistedEdwardsCurve, Vec};
+use zkstd::common::{CurveGroup, Group, Pairing, Vec};
 
 #[derive(Debug)]
 pub struct Prover<P: Pairing> {
     pub params: Parameters<P>,
-    pub constraints: R1csStruct<<P::JubjubAffine as TwistedEdwardsCurve>::Range>,
 }
 
 impl<P: Pairing> Prover<P> {
@@ -28,7 +24,6 @@ impl<P: Pairing> Prover<P> {
     {
         let mut cs = Groth16::<P::JubjubAffine>::initialize();
         circuit.synthesize(&mut cs)?;
-
         cs.eval_constraints();
 
         let size = cs.m().next_power_of_two();
@@ -52,8 +47,7 @@ impl<P: Pairing> Prover<P> {
         h = &h - &c;
 
         let q = fft.divide_by_z_on_coset(h);
-        let mut q = fft.coset_idft(q);
-        q.0.truncate(fft.size() - 1);
+        let q = fft.coset_idft(q);
 
         // Blind evaluation at precalculated points.
         // From here we do all evaluations with `msm_curve_addition` to not give access to original values.
@@ -62,14 +56,12 @@ impl<P: Pairing> Prover<P> {
         let input_assignment = cs
             .instance
             .iter()
-            .sorted()
-            .map(|Element(_, x)| *x)
+            .map(|element| element.1)
             .collect::<Vec<_>>();
         let aux_assignment = cs
             .witness
             .iter()
-            .sorted()
-            .map(|Element(_, x)| *x)
+            .map(|element| element.1)
             .collect::<Vec<_>>();
 
         let l = msm_curve_addition(&self.params.l, &aux_assignment);
