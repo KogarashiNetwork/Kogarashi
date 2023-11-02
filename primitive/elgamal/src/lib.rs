@@ -18,12 +18,11 @@
 #![deny(missing_docs)]
 
 use core::ops::{Add, Sub};
-use ec_pairing::TatePairing;
 use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 use num_traits::{CheckedAdd, CheckedSub};
 use parity_scale_codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
-use zkstd::common::{Pairing, TwistedEdwardsCurve};
+use zkstd::common::{TwistedEdwardsAffine, TwistedEdwardsCurve};
 
 /// ElGamal encryption number encrypted supports additive homomorphism.
 /// allows perform Enc(a) + Enc(b) = Enc(a + b)
@@ -127,15 +126,15 @@ impl CheckedSub for EncryptedNumber {
 }
 
 /// interface for circuit public inputs
-pub trait ConfidentialTransferPublicInputs<P: Pairing> {
+pub trait ConfidentialTransferPublicInputs<A: TwistedEdwardsAffine> {
     /// init transfer amount public
-    fn init(s: P::JubjubAffine, t: P::JubjubAffine) -> Self;
+    fn init(s: A, t: A) -> Self;
 
     /// get s and t cypher text
-    fn get(self) -> (P::JubjubAffine, P::JubjubAffine);
+    fn get(self) -> (A, A);
 }
 
-impl ConfidentialTransferPublicInputs<TatePairing> for EncryptedNumber {
+impl ConfidentialTransferPublicInputs<JubjubAffine> for EncryptedNumber {
     fn init(s: JubjubAffine, t: JubjubAffine) -> Self {
         Self::new(s, t)
     }
