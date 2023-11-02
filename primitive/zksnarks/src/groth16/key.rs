@@ -35,8 +35,6 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
 impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::JubjubAffine>>>
     Groth16Key<P, C>
 {
-    #[allow(clippy::type_complexity)]
-    #[allow(unused_variables)]
     /// Create a new arguments set from a given circuit instance
     ///
     /// Use the provided circuit instead of the default implementation
@@ -57,22 +55,20 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
 
         let size = cs.m().next_power_of_two();
         let k = size.trailing_zeros();
-
         let fft = Fft::<P::ScalarField>::new(k as usize);
 
         let (alpha, beta, gamma, delta, tau) = pp.toxic_waste;
 
         let g1 = pp.generators.0;
         let g2 = pp.generators.1;
-        let mut powers_of_tau = PointsValue(vec![P::ScalarField::zero(); cs.m()]);
 
         let gamma_inverse = gamma.invert().ok_or(Error::UnexpectedIdentity)?;
         let delta_inverse = delta.invert().ok_or(Error::UnexpectedIdentity)?;
 
-        let mut h: Vec<P::G1Affine> =
-            vec![P::G1Affine::ADDITIVE_IDENTITY; powers_of_tau.0.len() - 1];
+        let mut h = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.m() - 1];
 
         // Compute (1, tau, tau^2, ...)
+        let mut powers_of_tau = PointsValue(vec![P::ScalarField::zero(); cs.m()]);
         let mut current_pow_of_tau = P::ScalarField::one();
         for x in powers_of_tau.0.iter_mut() {
             *x = current_pow_of_tau;
@@ -91,17 +87,14 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
         // Use inverse FFT to convert powers of tau to Lagrange coefficients
         let powers_of_tau = fft.idft(powers_of_tau);
 
-        let mut a: Vec<P::G1Affine> =
-            vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
-        let mut b_g1: Vec<P::G1Affine> =
-            vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
+        let mut a = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
+        let mut b_g1 = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
         let mut b_g2: Vec<P::G2Affine> =
             vec![P::G2Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
-        let mut ic: Vec<P::G1Affine> = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len()];
-        let mut l: Vec<P::G1Affine> = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.witness_len()];
+        let mut ic = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len()];
+        let mut l = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.witness_len()];
 
-        let (at_inputs, bt_inputs, ct_inputs) = cs.inputs_iter();
-        let (at_aux, bt_aux, ct_aux) = cs.aux_iter();
+        let ((at_inputs, bt_inputs, ct_inputs), (at_aux, bt_aux, ct_aux)) = cs.inputs_iter();
 
         // Evaluate for inputs.
         eval::<P>(
@@ -158,13 +151,7 @@ impl<P: Pairing, C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::Jubju
 
         let pvk = prepare_verifying_key(&params.vk);
 
-        Ok((
-            Prover::<P> {
-                params,
-                constraints: cs.constraints,
-            },
-            Verifier::<P> { vk: pvk },
-        ))
+        Ok((Prover::<P> { params }, Verifier::<P> { vk: pvk }))
     }
 }
 
@@ -229,12 +216,9 @@ fn eval<P: Pairing>(
 }
 
 fn eval_at_tau<F: FftField>(powers_of_tau: &[F], p: &[(F, usize)]) -> F {
-    let mut acc = F::zero();
-
-    for &(ref coeff, index) in p {
-        acc += powers_of_tau[index] * coeff;
-    }
-    acc
+    p.iter().fold(F::zero(), |acc, (coeff, index)| {
+        acc + powers_of_tau[*index] * coeff
+    })
 }
 
 #[derive(Clone, Debug)]

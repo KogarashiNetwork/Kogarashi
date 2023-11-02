@@ -129,7 +129,6 @@ fn get_value_from_wire<F: PrimeField>(index: Wire, vectors: &[Element<F>]) -> Op
     None
 }
 
-#[allow(clippy::op_ref)]
 impl<F: PrimeField> Mul<F> for SparseRow<F> {
     type Output = SparseRow<F>;
 
@@ -146,7 +145,6 @@ impl<F: PrimeField> Mul<&F> for SparseRow<F> {
     }
 }
 
-#[allow(clippy::op_ref)]
 impl<F: PrimeField> Mul<F> for &SparseRow<F> {
     type Output = SparseRow<F>;
 
