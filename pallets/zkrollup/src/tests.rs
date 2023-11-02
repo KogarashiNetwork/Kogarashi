@@ -5,7 +5,7 @@ use crate::{self as zkrollup_pallet};
 use bls_12_381::Fr;
 use ec_pairing::TatePairing;
 use frame_support::{construct_runtime, parameter_types};
-use red_jubjub::PublicKey;
+use red_jubjub::{PublicKey, RedJubjub};
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
@@ -14,9 +14,6 @@ use sp_runtime::{
 use zkrollup::{Batch, BatchCircuit, Poseidon, Transaction};
 use zkstd::common::Pairing;
 
-// let last_level_size = leaves.len().next_power_of_two();
-// let tree_size = 2 * last_level_size - 1;
-// let tree_height = tree_height(tree_size as u64);
 const TREE_HEIGH: usize = 3;
 // Need to specify the size of tree as well
 const BATCH_SIZE: usize = 2;
@@ -69,23 +66,22 @@ impl frame_system::Config for TestRuntime {
 
 impl pallet_plonk::Config for TestRuntime {
     type P = TatePairing;
-    type CustomCircuit = BatchCircuit<TatePairing, Poseidon<Fr, 2>, TREE_HEIGH, BATCH_SIZE>;
+    type CustomCircuit = BatchCircuit<RedJubjub, Poseidon<Fr, 2>, TREE_HEIGH, BATCH_SIZE>;
     type Event = Event;
 }
 
 impl Config for TestRuntime {
-    type Transaction = Transaction<<Self as pallet_plonk::Config>::P>;
-
+    type Transaction = Transaction<Self::RedDsa>;
+    type PublicKey = PublicKey<Self::RedDsa>;
+    type Event = Event;
+    type Plonk = Plonk;
+    type RedDsa = RedJubjub;
     type Batch = Batch<
-        <Self as pallet_plonk::Config>::P,
+        Self::RedDsa,
         Poseidon<<<Self as pallet_plonk::Config>::P as Pairing>::ScalarField, 2>,
         TREE_HEIGH,
         BATCH_SIZE,
     >;
-
-    type PublicKey = PublicKey<<Self as pallet_plonk::Config>::P>;
-    type Event = Event;
-    type Plonk = Plonk;
 }
 
 #[cfg(test)]
@@ -99,17 +95,6 @@ mod zkrollup_tests {
     use red_jubjub::SecretKey;
     use zkrollup::{BatchGetter, Poseidon, RollupOperator, TransactionData};
     use zkstd::common::Group;
-
-    // fn events() -> Vec<Event> {
-    //     let evt = System::events()
-    //         .into_iter()
-    //         .map(|evt| evt.event)
-    //         .collect::<Vec<_>>();
-
-    //     System::reset_events();
-
-    //     evt
-    // }
 
     fn get_rng() -> FullcodecRng {
         FullcodecRng::from_seed([
@@ -141,11 +126,13 @@ mod zkrollup_tests {
             let pp = Plonk::public_params().unwrap();
 
             // 3. Create an operator
-            let mut operator =
-                RollupOperator::<TatePairing, Poseidon<Fr, 2>, TREE_HEIGH, BATCH_SIZE>::new(
-                    Poseidon::<Fr, 2>::new(),
-                    pp,
-                );
+            let mut operator = RollupOperator::<
+                RedJubjub,
+                TatePairing,
+                Poseidon<Fr, 2>,
+                TREE_HEIGH,
+                BATCH_SIZE,
+            >::new(Poseidon::<Fr, 2>::new(), pp);
 
             // Assures that null elements' hashes are correct
             assert_eq!(
@@ -169,13 +156,6 @@ mod zkrollup_tests {
             // 6. Add them to the deposit pool on the L1
             assert_ok!(ZkRollup::deposit(alice_origin, deposit1.0, deposit1.1));
 
-            // let deposit = events();
-            // assert_eq!(
-            //     deposit,
-            //     [Event::main_contract(crate::Event::Deposit(deposit1.0, deposit1.1)),]
-            // );
-            // if let Event::main_contract(crate::Event::Deposit(amount, address)) = deposit.first().unwrap() {
-
             // 7. Explicitly process data on L2. Will be changed, when communication between layers will be decided.
             operator.process_deposit(deposit1.0, deposit1.1);
             // }
@@ -188,14 +168,7 @@ mod zkrollup_tests {
 
             // Same for the second deposit
             assert_ok!(ZkRollup::deposit(bob_origin, deposit2.0, deposit2.1));
-            // let deposit = events();
-            // assert_eq!(
-            //     deposit,
-            //     [Event::main_contract(crate::Event::Deposit(deposit2.0, deposit2.1)),]
-            // );
-            // if let Event::main_contract(crate::Event::Deposit(amount, address)) = deposit.first().unwrap() {
             operator.process_deposit(deposit2.0, deposit2.1);
-            // }
 
             assert_eq!(
                 operator.state_root(),
@@ -234,12 +207,6 @@ mod zkrollup_tests {
                 public_inputs,
                 batch
             ));
-            // assert_eq!(
-            //     events(),
-            //     [Event::main_contract(crate::Event::StateUpdated(
-            //         root_after_tx
-            //     )),]
-            // );
 
             // 11. Check that state root on L1 changed.
             assert_eq!(<ZkRollup as Rollup>::state_root(), operator.state_root());
@@ -247,10 +214,10 @@ mod zkrollup_tests {
             // Withdraw
 
             // 1. Burn funds on L2 by sending to a special address
-            let alice_withdraw: Transaction<TatePairing> =
+            let alice_withdraw: Transaction<RedJubjub> =
                 TransactionData::new(alice_address, PublicKey::zero(), 5)
                     .signed(alice_secret, &mut rng);
-            let bob_withdraw: Transaction<TatePairing> =
+            let bob_withdraw: Transaction<RedJubjub> =
                 TransactionData::new(bob_address, PublicKey::zero(), 5)
                     .signed(bob_secret, &mut rng);
 

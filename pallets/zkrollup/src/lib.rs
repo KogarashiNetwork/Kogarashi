@@ -33,7 +33,7 @@ use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
 use pallet_plonk::{FullcodecRng, Plonk, Proof};
 use traits::Rollup;
-use zkstd::common::Pairing;
+use zkstd::common::{Pairing, RedDSA};
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -52,8 +52,11 @@ pub mod pallet {
         //
         // >
         type Plonk: Plonk<<Self as pallet_plonk::Config>::P>;
+        type RedDsa: RedDSA<
+            ScalarField = <<Self as pallet_plonk::Config>::P as Pairing>::ScalarField,
+        >;
         type Transaction: Parameter + Member + Default + Copy;
-        type Batch: BatchGetter<<Self as pallet_plonk::Config>::P>
+        type Batch: BatchGetter<<Self as pallet::Config>::RedDsa>
             + Parameter
             + Member
             + Default
@@ -179,12 +182,6 @@ pub mod pallet {
             Self::deposit_event(Event::StateUpdated(new_root));
             Ok(().into())
         }
-
-        // pub fn check_balance(&self, merkle_proof: MerkleProof<F, H, N>) -> u64 {
-        //     // merkle_verify(merkle_proof, self.rollup_state_root);
-        //     // get_balance()
-        //     0
-        // }
     }
 
     #[pallet::event]

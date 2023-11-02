@@ -3,7 +3,7 @@ use bls_12_381::Fr;
 use ec_pairing::TatePairing;
 use frame_support::parameter_types;
 use frame_system as system;
-use red_jubjub::PublicKey;
+use red_jubjub::{PublicKey, RedJubjub};
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
@@ -60,25 +60,22 @@ impl system::Config for Test {
 
 impl pallet_plonk::Config for Test {
     type P = TatePairing;
-    type CustomCircuit = BatchCircuit<TatePairing, Poseidon<Fr, 2>, 2, 2>;
+    type CustomCircuit = BatchCircuit<RedJubjub, Poseidon<Fr, 2>, 2, 2>;
     type Event = Event;
 }
 
 impl zkrollup_pallet::Config for Test {
     type Event = Event;
-
-    type Transaction = Transaction<<Self as pallet_plonk::Config>::P>;
-
+    type Transaction = Transaction<Self::RedDsa>;
+    type PublicKey = PublicKey<Self::RedDsa>;
+    type Plonk = Plonk;
+    type RedDsa = RedJubjub;
     type Batch = Batch<
-        <Self as pallet_plonk::Config>::P,
+        Self::RedDsa,
         Poseidon<<<Self as pallet_plonk::Config>::P as Pairing>::ScalarField, 2>,
         2,
         2,
     >;
-
-    type PublicKey = PublicKey<<Self as pallet_plonk::Config>::P>;
-
-    type Plonk = Plonk;
 }
 
 // Build genesis storage according to the mock runtime.
