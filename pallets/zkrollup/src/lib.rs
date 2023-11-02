@@ -44,6 +44,13 @@ pub mod pallet {
 
     #[pallet::config]
     pub trait Config: frame_system::Config + pallet_plonk::Config {
+        // < HB SBP M2 review
+        //
+        //  type Plonk: Plonk<<Self as pallet_plonk::Config>::Pairing>;
+        //
+        //  has better readibility.
+        //
+        // >
         type Plonk: Plonk<<Self as pallet_plonk::Config>::P>;
         type Transaction: Parameter + Member + Default + Copy;
         type Batch: BatchGetter<<Self as pallet_plonk::Config>::P>
@@ -72,9 +79,19 @@ pub mod pallet {
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
+        // < HB SBP M2 review:
+        //
+        // Missing weight from benchmarking and inline code from extrinsic
+        //
+        // >
         #[pallet::weight(10_000)]
         pub fn trusted_setup(
             origin: OriginFor<T>,
+            // < HB SBP M2 review
+            //
+            // Why don't declaring a Degree type?
+            //
+            // >
             degree: u32,
             rng: pallet_plonk::FullcodecRng,
         ) -> DispatchResultWithPostInfo {
@@ -82,6 +99,11 @@ pub mod pallet {
             Ok(().into())
         }
 
+        // < HB SBP M2 review:
+        //
+        // Missing weight from benchmarking and inline code from extrinsic
+        //
+        // >
         #[pallet::weight(10_000)]
         pub(super) fn deposit(
             origin: OriginFor<T>,
@@ -94,6 +116,11 @@ pub mod pallet {
             Ok(().into())
         }
 
+        // < HB SBP M2 review:
+        //
+        // Missing weight from benchmarking and inline code from extrinsic
+        //
+        // >
         #[pallet::weight(10_000)]
         pub(super) fn withdraw(
             origin: OriginFor<T>,
@@ -108,6 +135,11 @@ pub mod pallet {
             Ok(().into())
         }
 
+        // < HB SBP M2 review:
+        //
+        // Missing weight from benchmarking and inline code from extrinsic
+        //
+        // >
         #[pallet::weight(10_000)]
         pub fn set_initial_root(
             origin: OriginFor<T>,
@@ -121,6 +153,11 @@ pub mod pallet {
             Ok(().into())
         }
 
+        // < HB SBP M2 review:
+        //
+        // Missing weight from benchmarking and inline code from extrinsic
+        //
+        // >
         #[pallet::weight(10_000)]
         pub fn update_state(
             origin: OriginFor<T>,

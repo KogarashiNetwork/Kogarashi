@@ -1,6 +1,6 @@
 use zkstd::common::{CurveAffine, Decode, Encode, Pairing, Vec};
 
-use crate::{msm_curve_addtion, Coefficients, Commitment};
+use crate::{msm_curve_addition, Coefficients, Commitment};
 
 #[derive(Clone, Debug, PartialEq, Decode, Encode, Default)]
 pub struct CommitmentKey<C: CurveAffine> {
@@ -15,7 +15,7 @@ impl<C: CurveAffine> CommitmentKey<C> {
     }
 
     pub fn commit(&self, coeffs: &Coefficients<C::Scalar>) -> Commitment<C> {
-        Commitment::new(msm_curve_addtion(&self.bases, coeffs))
+        Commitment::new(msm_curve_addition(&self.bases, coeffs))
     }
 }
 

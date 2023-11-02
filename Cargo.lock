@@ -3454,12 +3454,13 @@ name = "zksnarks"
 version = "0.1.0"
 dependencies = [
  "bls-12-381 0.0.20",
- "hashbrown 0.9.1",
+ "ec-pairing",
  "itertools 0.11.0",
  "jub-jub 0.0.15",
  "merlin 3.0.0",
  "parity-scale-codec",
  "poly-commit",
+ "rand 0.8.5",
  "zkstd 0.0.21",
 ]
 

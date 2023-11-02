@@ -185,8 +185,8 @@ impl<E: ConfidentialTransferPublicInputs<P>, P: Pairing> ConfidentialTransferTra
         .enumerate()
         {
             let (x, y) = (-public_point.get_x(), -public_point.get_y());
-            public_inputs[i * 2] = x.into();
-            public_inputs[i * 2 + 1] = y.into();
+            public_inputs[i * 2] = x;
+            public_inputs[i * 2 + 1] = y;
         }
         public_inputs
     }

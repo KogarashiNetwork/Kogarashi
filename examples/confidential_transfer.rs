@@ -203,7 +203,7 @@ fn main() {
         assert_ok!(result);
 
         // proof generation
-        let mut pp = Plonk::public_params().unwrap();
+        let pp = Plonk::public_params().unwrap();
         let alice_public_key = JubjubExtended::ADDITIVE_GENERATOR * alice_private_key;
         let bob_public_key = JubjubExtended::ADDITIVE_GENERATOR * bob_private_key;
         let transfer_amount_scalar = Fp::from(transfer_amount as u64);
@@ -236,7 +236,7 @@ fn main() {
             alice_after_balance_scalar,
             transfer_randomness,
         );
-        let prover = PlonkKey::<TatePairing, ConfidentialTransferCircuit>::new(&mut pp)
+        let prover = PlonkKey::<TatePairing, ConfidentialTransferCircuit>::compile(&pp)
             .expect("failed to compile circuit");
         let proof = prover
             .0

@@ -109,7 +109,7 @@ mod plonk_test {
             let mut rng = get_rng();
             let mut pp = Plonk::public_params().unwrap();
 
-            let (prover, verifier) = PlonkKey::<TatePairing, DummyCircuit>::new(&mut pp)
+            let (prover, verifier) = PlonkKey::<TatePairing, DummyCircuit>::compile(&mut pp)
                 .expect("failed to compile circuit");
 
             let (proof, public_inputs) = prover

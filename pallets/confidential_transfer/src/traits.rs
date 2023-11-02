@@ -1,3 +1,8 @@
+// < HB SBP M2 review:
+//
+// generally these kind of definitions are contained in a types.rs, leaving the implementations to impls.rs
+//
+// >
 use crate::circuit::ConfidentialTransferTransaction;
 use frame_support::pallet_prelude::DispatchResultWithPostInfo;
 use pallet_plonk::FullcodecRng;
@@ -12,7 +17,12 @@ pub trait ConfidentialTransfer<AccountId, P: Pairing> {
     /// get account balance
     fn total_balance(who: &AccountId) -> Self::EncryptedBalance;
 
-    /// trusted setup
+    // trusted setup
+    // < HB SBP M2 review:
+    //
+    // I would avoid using rust primitives as parameter types. I would suggest to define a proper type for val.
+    //
+    // >
     fn trusted_setup(val: u32, rng: FullcodecRng) -> DispatchResultWithPostInfo;
 
     /// run confidential transfer transaction

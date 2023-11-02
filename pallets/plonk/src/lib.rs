@@ -85,6 +85,11 @@ pub mod pallet {
 
     #[pallet::config]
     pub trait Config: frame_system::Config {
+        // < HB SBP M2 review
+        //
+        // Usually Config items are named more descriptively. In this case i would suggest to rename it to `type Pairing: Paring;`
+        //
+        // >
         type P: Pairing;
         /// The circuit customized by developer
         type CustomCircuit: Circuit<
@@ -198,8 +203,8 @@ impl<T: Config> Plonk<T::P> for Pallet<T> {
         public_inputs: Vec<<T::P as Pairing>::ScalarField>,
     ) -> DispatchResultWithPostInfo {
         match Self::public_params() {
-            Some(mut pp) => {
-                let (_, verifier) = PlonkKey::<T::P, T::CustomCircuit>::new(&mut pp)
+            Some(pp) => {
+                let (_, verifier) = PlonkKey::<T::P, T::CustomCircuit>::compile(&pp)
                     // SBP-M1 review: use proper error handling in extrinsics' code instead of `expect`/`unwrap`
                     .expect("failed to compile circuit");
                 match verifier.verify(&proof, &public_inputs) {

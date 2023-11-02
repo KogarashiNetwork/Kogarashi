@@ -267,7 +267,7 @@ impl<
     ) -> (Proof<P>, Vec<P::ScalarField>) {
         let label = b"verify";
         let batch_circuit = BatchCircuit::new(batch);
-        let prover = PlonkKey::<P, BatchCircuit<R, H, N, BATCH_SIZE>>::new(&mut self.pp)
+        let prover = PlonkKey::<P, BatchCircuit<P, H, N, BATCH_SIZE>>::new(&self.pp)
             .expect("failed to compile circuit");
         prover
             .0

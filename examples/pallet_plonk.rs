@@ -243,9 +243,9 @@ fn main() {
         assert_eq!(SumStorage::get_sum(), 0);
         assert_ok!(Plonk::trusted_setup(Origin::signed(1), 12, rng.clone()));
 
-        let mut pp = Plonk::public_params().unwrap();
+        let pp = Plonk::public_params().unwrap();
         let (prover, _) =
-            PlonkKey::<TatePairing, TestCircuit>::new(&mut pp).expect("failed to compile circuit");
+            PlonkKey::<TatePairing, TestCircuit>::compile(&pp).expect("failed to compile circuit");
 
         let (proof, public_inputs) = prover
             .create_proof(&mut rng, &test_circuit)

@@ -6,7 +6,6 @@ pub trait ConstraintSystem<C: TwistedEdwardsAffine> {
     type Constraints: IntoIterator;
 
     /// init constraint system
-    fn new() -> Self;
 
     fn initialize() -> Self;
 

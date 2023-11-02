@@ -12,13 +12,6 @@ pub struct Coefficients<F: PrimeField>(pub Vec<F>);
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct PointsValue<F: PrimeField>(pub Vec<F>);
 
-pub struct Witness<F> {
-    s_eval: F,
-    a_eval: F,
-    q_eval: F,
-    denominator: F,
-}
-
 impl<F: PrimeField> Deref for Coefficients<F> {
     type Target = [F];
 
@@ -46,11 +39,7 @@ impl<F: FftField> Sum for Coefficients<F> {
     where
         I: Iterator<Item = Self>,
     {
-        let sum: Coefficients<F> = iter.fold(Coefficients::default(), |mut res, val| {
-            res = &res + &val;
-            res
-        });
-        sum
+        iter.fold(Coefficients::default(), |res, val| &res + &val)
     }
 }
 
@@ -159,27 +148,6 @@ impl<F: FftField> Coefficients<F> {
     pub(crate) fn is_zero(&self) -> bool {
         self.0.is_empty() || self.0.iter().all(|coeff| coeff == &F::zero())
     }
-
-    // create witness for f(a)
-    pub fn create_witness(self, at: &F, s: &F, domain: Vec<F>) -> Witness<F> {
-        // p(x) - p(at) / x - at
-        let quotient = self.divide(at);
-        // p(s)
-        let s_eval = self.commit(&domain);
-        // p(at)
-        let a_eval = self.evaluate(at);
-        // p(s) - p(at) / s - at
-        let q_eval = quotient.evaluate(s);
-        // s - at
-        let denominator = *s - *at;
-
-        Witness {
-            s_eval,
-            a_eval,
-            q_eval,
-            denominator,
-        }
-    }
 }
 
 impl<F: FftField> Add for Coefficients<F> {
@@ -193,6 +161,35 @@ impl<F: FftField> Add for Coefficients<F> {
             (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
         };
         Self::new(left.zip(right).map(|(a, b)| *a + *b).collect())
+    }
+}
+
+impl<'a, 'b, F: FftField> Sub<&'a PointsValue<F>> for &'b PointsValue<F> {
+    type Output = PointsValue<F>;
+
+    fn sub(self, rhs: &'a PointsValue<F>) -> Self::Output {
+        let zero = F::zero();
+        PointsValue::new(if self.0.len() > rhs.0.len() {
+            let (left, right) = (self.0.iter(), rhs.0.iter().chain(iter::repeat(&zero)));
+            left.zip(right).map(|(a, b)| *a - *b).collect()
+        } else {
+            let (left, right) = (self.0.iter().chain(iter::repeat(&zero)), rhs.0.iter());
+            left.zip(right).map(|(a, b)| *a - *b).collect()
+        })
+    }
+}
+
+impl<'a, 'b, F: FftField> Mul<&'a PointsValue<F>> for &'b PointsValue<F> {
+    type Output = PointsValue<F>;
+
+    fn mul(self, rhs: &'a PointsValue<F>) -> Self::Output {
+        let zero = F::zero();
+        let (left, right) = if self.0.len() > rhs.0.len() {
+            (self.0.iter(), rhs.0.iter().chain(iter::repeat(&zero)))
+        } else {
+            (rhs.0.iter(), self.0.iter().chain(iter::repeat(&zero)))
+        };
+        PointsValue::new(left.zip(right).map(|(a, b)| *a * *b).collect())
     }
 }
 
@@ -232,17 +229,12 @@ impl<'a, 'b, F: FftField> Mul<&'a F> for &'b Coefficients<F> {
     }
 }
 
-impl<F: FftField> Witness<F> {
-    // verify witness
-    pub fn verify_eval(self) -> bool {
-        self.q_eval * self.denominator == self.s_eval - self.a_eval
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::Coefficients;
+    use crate::PointsValue;
     use bls_12_381::Fr;
+    use core::iter;
     use rand_core::OsRng;
     use zkstd::common::{Group, PrimeField};
 
@@ -252,6 +244,14 @@ mod tests {
 
     fn arb_poly(k: u32) -> Coefficients<Fr> {
         Coefficients(
+            (0..(1 << k))
+                .map(|_| Fr::random(OsRng))
+                .collect::<Vec<Fr>>(),
+        )
+    }
+
+    fn arb_points(k: u32) -> PointsValue<Fr> {
+        PointsValue(
             (0..(1 << k))
                 .map(|_| Fr::random(OsRng))
                 .collect::<Vec<Fr>>(),
@@ -294,5 +294,27 @@ mod tests {
         let original = Coefficients(naive_multiply(quotient.0, factor_poly));
 
         assert_eq!(poly_a.0, original.0);
+    }
+
+    #[test]
+    fn polynomial_subtraction_test() {
+        let a = arb_points(9);
+        let b = arb_points(10);
+
+        let sub = &a - &b;
+
+        let ans: Vec<Fr> = if a.0.len() > b.0.len() {
+            a.0.iter()
+                .zip(b.0.iter().chain(iter::repeat(&Fr::zero())))
+                .map(|(a, b)| *a - *b)
+                .collect()
+        } else {
+            a.0.iter()
+                .chain(iter::repeat(&Fr::zero()))
+                .zip(b.0.iter())
+                .map(|(a, b)| *a - *b)
+                .collect()
+        };
+        assert_eq!(sub.0, ans);
     }
 }
