@@ -11,7 +11,7 @@ use zkstd::common::{PrimeField, Vec};
 pub(crate) struct SparseMatrix<F: PrimeField>(pub(crate) Vec<SparseRow<F>>);
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct SparseRow<F: PrimeField>(Vec<Element<F>>);
+pub struct SparseRow<F: PrimeField>(pub(crate) Vec<Element<F>>);
 
 pub trait Evaluable<F: PrimeField, R> {
     fn evaluate(&self, instance: &[Element<F>], witness: &[Element<F>]) -> R;

@@ -1,4 +1,4 @@
-use super::matrix::{Element, SparseRow};
+use super::matrix::{Element, SparseMatrix, SparseRow};
 
 use zkstd::common::{PrimeField, Vec};
 
@@ -8,29 +8,39 @@ pub struct R1csStruct<F: PrimeField> {
     m: usize,
     // public input size
     l: usize,
-    pub(crate) constraints: Vec<Constraint<F>>,
+    pub(crate) a: SparseMatrix<F>,
+    pub(crate) b: SparseMatrix<F>,
+    pub(crate) c: SparseMatrix<F>,
 }
 
 impl<F: PrimeField> R1csStruct<F> {
     pub(crate) fn m(&self) -> usize {
-        self.constraints.len()
+        self.m
     }
-}
 
-/// An rank-1 constraint of the form a * b = c, where a, b, and c are linear combinations of wires.
-#[derive(Clone, Debug)]
-pub struct Constraint<F: PrimeField> {
-    pub a: SparseRow<F>,
-    pub b: SparseRow<F>,
-    pub c: SparseRow<F>,
-}
+    pub(crate) fn append(&mut self, a: SparseRow<F>, b: SparseRow<F>, c: SparseRow<F>) {
+        self.a.0.push(a);
+        self.b.0.push(b);
+        self.c.0.push(c);
+        self.m += 1;
+    }
 
-impl<F: PrimeField> Constraint<F> {
-    pub fn evaluate(&self, instance: &[Element<F>], witness: &[Element<F>]) -> (F, F, F) {
-        let a_value = self.a.evaluate(instance, witness);
-        let b_value = self.b.evaluate(instance, witness);
-        let c_value = self.c.evaluate(instance, witness);
-
-        (a_value, b_value, c_value)
+    pub(crate) fn evaluate(
+        &self,
+        instance: &Vec<Element<F>>,
+        witness: &Vec<Element<F>>,
+    ) -> (Vec<F>, Vec<F>, Vec<F>) {
+        let (mut a_evals, mut b_evals, mut c_evals) = (Vec::new(), Vec::new(), Vec::new());
+        self.a
+            .0
+            .iter()
+            .zip(self.b.0.iter())
+            .zip(self.c.0.iter())
+            .for_each(|((a, b), c)| {
+                a_evals.push(a.evaluate(&instance, &witness));
+                b_evals.push(b.evaluate(&instance, &witness));
+                c_evals.push(c.evaluate(&instance, &witness));
+            });
+        (a_evals, b_evals, c_evals)
     }
 }
