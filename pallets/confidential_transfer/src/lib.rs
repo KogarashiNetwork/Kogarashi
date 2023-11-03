@@ -48,16 +48,14 @@ pub mod pallet {
     // SBP-M1 review: Just a note,
     // I would suggest showing how to loosely couple `Pallet Plonk`
     pub trait Config:
-        frame_system::Config + pallet_plonk::Config + pallet_encrypted_balance::Config
+        frame_system::Config
+        + pallet_plonk::Config
+        + pallet_encrypted_balance::Config<Affine = <Self as pallet_plonk::Config>::Affine>
     {
-        // < HB SBP M2 review
-        //
-        //  type Plonk: Plonk<<Self as pallet_plonk::Config>::Pairing>;
-        //
-        //  has better readibility.
-        //
-        // >
-        type Plonk: Plonk<<Self as pallet_encrypted_balance::Config>::P>;
+        type Plonk: Plonk<
+            <Self as pallet_plonk::Config>::Pairing,
+            <Self as pallet_plonk::Config>::Affine,
+        >;
         type EncryptedCurrency: EncryptedCurrency<Self::AccountId, Self::EncryptedBalance>;
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
     }
@@ -100,27 +98,30 @@ pub mod pallet {
         pub fn confidential_transfer(
             origin: OriginFor<T>,
             dest: <T::Lookup as StaticLookup>::Source,
-            proof: Proof<<T as pallet_encrypted_balance::Config>::P>,
+            proof: Proof<<T as pallet_plonk::Config>::Pairing>,
             transaction_params: ConfidentialTransferTransaction<
                 <T as pallet_encrypted_balance::Config>::EncryptedBalance,
-                <T as pallet_encrypted_balance::Config>::P,
+                <T as pallet_encrypted_balance::Config>::Affine,
             >,
         ) -> DispatchResultWithPostInfo {
             let transactor = ensure_signed(origin)?;
             let dest = T::Lookup::lookup(dest)?;
-            <Self as ConfidentialTransfer<_, <T as pallet_encrypted_balance::Config>::P>>::confidential_transfer(
-                &transactor,
-                &dest,
-                proof,
-                transaction_params,
-            )?;
+            <Self as ConfidentialTransfer<
+                _,
+                <T as pallet_plonk::Config>::Pairing,
+                <T as pallet_plonk::Config>::Affine,
+            >>::confidential_transfer(&transactor, &dest, proof, transaction_params)?;
             Ok(().into())
         }
     }
 }
 
-impl<T: Config> ConfidentialTransfer<T::AccountId, <T as pallet_encrypted_balance::Config>::P>
-    for Pallet<T>
+impl<T: Config>
+    ConfidentialTransfer<
+        T::AccountId,
+        <T as pallet_plonk::Config>::Pairing,
+        <T as pallet_plonk::Config>::Affine,
+    > for Pallet<T>
 {
     type EncryptedBalance = T::EncryptedBalance;
 
@@ -135,10 +136,10 @@ impl<T: Config> ConfidentialTransfer<T::AccountId, <T as pallet_encrypted_balanc
     fn confidential_transfer(
         who: &T::AccountId,
         dest: &T::AccountId,
-        proof: pallet_plonk::Proof<<T as pallet_encrypted_balance::Config>::P>,
+        proof: pallet_plonk::Proof<<T as pallet_plonk::Config>::Pairing>,
         transaction_params: ConfidentialTransferTransaction<
             Self::EncryptedBalance,
-            <T as pallet_encrypted_balance::Config>::P,
+            <T as pallet_encrypted_balance::Config>::Affine,
         >,
     ) -> DispatchResultWithPostInfo {
         let public_inputs = transaction_params.clone().public_inputs();

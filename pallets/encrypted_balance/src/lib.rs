@@ -175,13 +175,16 @@ pub mod pallet {
     use frame_support::pallet_prelude::*;
     use frame_system::pallet_prelude::*;
     use she_elgamal::ConfidentialTransferPublicInputs;
-    use zkstd::common::Pairing;
+    use zkstd::common::TwistedEdwardsAffine;
 
     #[pallet::config]
     pub trait Config<I: 'static = ()>: frame_system::Config {
-        type P: Pairing;
+        type Affine: TwistedEdwardsAffine;
+
         /// The balance of an account.
         type EncryptedBalance: Parameter
+            + Eq
+            + PartialEq
             + CheckedAdd
             + CheckedSub
             + Member
@@ -189,7 +192,7 @@ pub mod pallet {
             + Copy
             + MaybeSerializeDeserialize
             + Debug
-            + ConfidentialTransferPublicInputs<Self::P>;
+            + ConfidentialTransferPublicInputs<Self::Affine>;
 
         /// The overarching event type.
         type Event: From<Event<Self, I>> + IsType<<Self as frame_system::Config>::Event>;

@@ -75,29 +75,22 @@ use zero_plonk::prelude::{Plonk as ConstraintPlonk, PlonkKey};
 use zksnarks::keypair::Keypair;
 use zksnarks::plonk::PlonkParams;
 use zksnarks::public_params::PublicParameters as PublicParametersTrait;
-use zkstd::common::{Pairing, Vec};
+use zkstd::common::{Pairing, TwistedEdwardsAffine, Vec};
 
 #[frame_support::pallet]
 pub mod pallet {
-    use zkstd::common::Pairing;
-
     use super::*;
 
     #[pallet::config]
     pub trait Config: frame_system::Config {
-        // < HB SBP M2 review
-        //
-        // Usually Config items are named more descriptively. In this case i would suggest to rename it to `type Pairing: Paring;`
-        //
-        // >
-        type P: Pairing;
-        /// The circuit customized by developer
-        type CustomCircuit: Circuit<
-            <<Self as pallet::Config>::P as Pairing>::JubjubAffine,
-            ConstraintSystem = ConstraintPlonk<
-                <<Self as pallet::Config>::P as Pairing>::JubjubAffine,
-            >,
+        /// The verification pairing domain
+        type Pairing: Pairing;
+
+        type Affine: TwistedEdwardsAffine<
+            Range = <<Self as pallet::Config>::Pairing as Pairing>::ScalarField,
         >;
+        /// The circuit customized by developer
+        type CustomCircuit: Circuit<Self::Affine, ConstraintSystem = ConstraintPlonk<Self::Affine>>;
 
         /// The overarching event type
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
@@ -106,14 +99,14 @@ pub mod pallet {
     #[pallet::storage]
     #[pallet::getter(fn public_params)]
     /// The setup parameter referred to as SRS
-    pub type PublicParameters<T: Config> = StorageValue<_, PlonkParams<T::P>>;
+    pub type PublicParameters<T: Config> = StorageValue<_, PlonkParams<T::Pairing>>;
 
     #[pallet::event]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     #[pallet::metadata(u32 = "Metadata")]
     pub enum Event<T: Config> {
         /// The event called when setup parameter
-        TrustedSetup(PlonkParams<T::P>),
+        TrustedSetup(PlonkParams<T::Pairing>),
     }
 
     #[pallet::error]
@@ -142,7 +135,7 @@ pub mod pallet {
             rng: FullcodecRng,
         ) -> DispatchResultWithPostInfo {
             ensure_signed(origin)?;
-            <Self as Plonk<T::P>>::trusted_setup(val, rng)?;
+            <Self as Plonk<T::Pairing, T::Affine>>::trusted_setup(val, rng)?;
             Ok(().into())
         }
 
@@ -151,12 +144,12 @@ pub mod pallet {
         #[pallet::weight(10_000)]
         pub fn verify(
             origin: OriginFor<T>,
-            proof: Proof<T::P>,
+            proof: Proof<T::Pairing>,
             // SBP-M1 review: use BoundedVec instead of Vec
-            public_inputs: Vec<<T::P as Pairing>::ScalarField>,
+            public_inputs: Vec<<T::Pairing as Pairing>::ScalarField>,
         ) -> DispatchResultWithPostInfo {
             ensure_signed(origin)?;
-            <Self as Plonk<T::P>>::verify(proof, public_inputs)?;
+            <Self as Plonk<T::Pairing, T::Affine>>::verify(proof, public_inputs)?;
             Ok(().into())
         }
     }
@@ -164,12 +157,12 @@ pub mod pallet {
 
 impl<T: Config> Pallet<T> {
     /// The RPC method to get public parameters
-    pub fn get_public_params() -> Option<PlonkParams<T::P>> {
+    pub fn get_public_params() -> Option<PlonkParams<T::Pairing>> {
         PublicParameters::<T>::get()
     }
 }
 
-impl<T: Config> Plonk<T::P> for Pallet<T> {
+impl<T: Config> Plonk<T::Pairing, T::Affine> for Pallet<T> {
     /// The circuit customized by developer
     type CustomCircuit = T::CustomCircuit;
 
@@ -187,7 +180,7 @@ impl<T: Config> Plonk<T::P> for Pallet<T> {
                 error: DispatchError::Other("already setup"),
             }),
             None => {
-                let pp = PlonkParams::<T::P>::setup(val as u64, &mut rng);
+                let pp = PlonkParams::<T::Pairing>::setup(val as u64, &mut rng);
                 PublicParameters::<T>::put(&pp);
                 Self::deposit_event(Event::<T>::TrustedSetup(pp));
                 Ok(().into())
@@ -199,14 +192,15 @@ impl<T: Config> Plonk<T::P> for Pallet<T> {
     fn verify(
         // SBP-M1 review: why do you pass unused parameter?
         // Remove if redundant
-        proof: Proof<T::P>,
-        public_inputs: Vec<<T::P as Pairing>::ScalarField>,
+        proof: Proof<T::Pairing>,
+        public_inputs: Vec<<T::Pairing as Pairing>::ScalarField>,
     ) -> DispatchResultWithPostInfo {
         match Self::public_params() {
             Some(pp) => {
-                let (_, verifier) = PlonkKey::<T::P, T::CustomCircuit>::compile(&pp)
-                    // SBP-M1 review: use proper error handling in extrinsics' code instead of `expect`/`unwrap`
-                    .expect("failed to compile circuit");
+                let (_, verifier) =
+                    PlonkKey::<T::Pairing, T::Affine, T::CustomCircuit>::compile(&pp)
+                        // SBP-M1 review: use proper error handling in extrinsics' code instead of `expect`/`unwrap`
+                        .expect("failed to compile circuit");
                 match verifier.verify(&proof, &public_inputs) {
                     Ok(_) => Ok(().into()),
                     Err(_) => Err(DispatchErrorWithPostInfo {

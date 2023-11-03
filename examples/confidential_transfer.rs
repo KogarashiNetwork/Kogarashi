@@ -68,13 +68,14 @@ impl frame_system::Config for TestRuntime {
 }
 
 impl pallet_plonk::Config for TestRuntime {
-    type P = TatePairing;
+    type Pairing = TatePairing;
+    type Affine = JubjubAffine;
     type CustomCircuit = ConfidentialTransferCircuit;
     type Event = Event;
 }
 
 impl pallet_encrypted_balance::Config for TestRuntime {
-    type P = TatePairing;
+    type Affine = JubjubAffine;
     type EncryptedBalance = EncryptedNumber;
     type Event = Event;
     type AccountStore = StorageMapShim<
@@ -236,8 +237,9 @@ fn main() {
             alice_after_balance_scalar,
             transfer_randomness,
         );
-        let prover = PlonkKey::<TatePairing, ConfidentialTransferCircuit>::compile(&pp)
-            .expect("failed to compile circuit");
+        let prover =
+            PlonkKey::<TatePairing, JubjubAffine, ConfidentialTransferCircuit>::compile(&pp)
+                .expect("failed to compile circuit");
         let proof = prover
             .0
             .create_proof(&mut rng, &confidential_transfer_circuit)

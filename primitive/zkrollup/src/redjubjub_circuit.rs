@@ -106,8 +106,9 @@ mod tests {
             sig,
             sapling_hash(&sig.r(), &pub_key.to_bytes(), msg),
         );
-        let (prover, verifier) = PlonkKey::<TatePairing, RedJubjubCircuit>::compile(&mut pp)
-            .expect("failed to compile circuit");
+        let (prover, verifier) =
+            PlonkKey::<TatePairing, JubjubAffine, RedJubjubCircuit>::compile(&mut pp)
+                .expect("failed to compile circuit");
         let (proof, public_inputs) = prover
             .create_proof(&mut rng, &redjubjub_circuit)
             .expect("failed to prove");

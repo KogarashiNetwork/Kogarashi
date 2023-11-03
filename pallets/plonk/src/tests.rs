@@ -58,7 +58,8 @@ impl frame_system::Config for TestRuntime {
 }
 
 impl Config for TestRuntime {
-    type P = TatePairing;
+    type Pairing = TatePairing;
+    type Affine = JubjubAffine;
     type CustomCircuit = DummyCircuit;
     type Event = Event;
 }
@@ -109,8 +110,9 @@ mod plonk_test {
             let mut rng = get_rng();
             let mut pp = Plonk::public_params().unwrap();
 
-            let (prover, verifier) = PlonkKey::<TatePairing, DummyCircuit>::compile(&mut pp)
-                .expect("failed to compile circuit");
+            let (prover, verifier) =
+                PlonkKey::<TatePairing, JubjubAffine, DummyCircuit>::compile(&mut pp)
+                    .expect("failed to compile circuit");
 
             let (proof, public_inputs) = prover
                 .create_proof(&mut rng, &DummyCircuit::new(a))

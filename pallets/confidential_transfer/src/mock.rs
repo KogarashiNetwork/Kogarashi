@@ -65,13 +65,14 @@ impl frame_system::Config for TestRuntime {
 }
 
 impl pallet_plonk::Config for TestRuntime {
-    type P = TatePairing;
+    type Pairing = TatePairing;
+    type Affine = JubjubAffine;
     type CustomCircuit = ConfidentialTransferCircuit;
     type Event = Event;
 }
 
 impl pallet_encrypted_balance::Config for TestRuntime {
-    type P = TatePairing;
+    type Affine = JubjubAffine;
     type EncryptedBalance = EncryptedNumber;
     type Event = Event;
     type AccountStore = StorageMapShim<
@@ -126,7 +127,7 @@ pub(crate) fn new_test_ext() -> sp_io::TestExternalities {
 
 pub(crate) fn generate_confidential_transfer_params() -> (
     ConfidentialTransferCircuit,
-    ConfidentialTransferTransaction<EncryptedNumber, TatePairing>,
+    ConfidentialTransferTransaction<EncryptedNumber, JubjubAffine>,
 ) {
     let alice_public_key = JubjubExtended::ADDITIVE_GENERATOR * ALICE_PRIVATE_KEY;
     let bob_public_key = JubjubExtended::ADDITIVE_GENERATOR * BOB_PRIVATE_KEY;

@@ -18,7 +18,7 @@
 
 use bls_12_381::params::{BLS_X, BLS_X_IS_NEGATIVE};
 use bls_12_381::{Fq12, Fr, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective, Gt};
-use jub_jub::{Fp, JubjubAffine, JubjubExtended};
+use jub_jub::EDWARDS_D;
 use zkstd::common::Vec;
 use zkstd::common::*;
 
@@ -33,13 +33,11 @@ impl Pairing for TatePairing {
     type G2Affine = G2Affine;
     type G1Projective = G1Projective;
     type G2Projective = G2Projective;
-    type JubjubAffine = JubjubAffine;
-    type JubjubExtended = JubjubExtended;
     type G2PairngRepr = G2PairingAffine;
     type PairingRange = Fq12;
     type Gt = Gt;
     type ScalarField = Fr;
-    type JubjubScalar = Fp;
+    const PARAM_D: Fr = EDWARDS_D;
     const X: u64 = BLS_X;
     const X_IS_NEGATIVE: bool = BLS_X_IS_NEGATIVE;
 

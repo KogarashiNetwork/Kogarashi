@@ -1,8 +1,7 @@
 use bls_12_381::Fr;
 use zero_plonk::prelude::*;
 use zksnarks::{plonk::wire::PrivateWire, Constraint};
-use zkstd::common::{vec, Vec};
-use zkstd::common::{Group, TwistedEdwardsAffine};
+use zkstd::common::{vec, Group, TwistedEdwardsAffine, Vec};
 
 #[derive(Debug, PartialEq)]
 pub struct MerkleMembershipCircuit<const N: usize> {
@@ -167,7 +166,7 @@ mod tests {
         let mut pp = PlonkParams::setup(n, &mut rng);
 
         let (prover, verifier) =
-            PlonkKey::<TatePairing, MerkleMembershipCircuit<3>>::compile(&mut pp)
+            PlonkKey::<TatePairing, JubjubAffine, MerkleMembershipCircuit<3>>::compile(&mut pp)
                 .expect("failed to compile circuit");
 
         let poseidon = Poseidon::<Fr, 2>::new();

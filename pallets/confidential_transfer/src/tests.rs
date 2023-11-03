@@ -11,6 +11,7 @@ mod plonk_test {
     use ark_std::{end_timer, start_timer};
     use ec_pairing::TatePairing;
     use frame_support::assert_ok;
+    use jub_jub::JubjubAffine;
     use pallet_plonk::FullcodecRng;
     use rand::SeedableRng;
     use zero_plonk::prelude::PlonkKey;
@@ -50,7 +51,10 @@ mod plonk_test {
 
             // proof generation
             let mut pp = Plonk::public_params().unwrap();
-            let prover = PlonkKey::<TatePairing, ConfidentialTransferCircuit>::compile(&mut pp)
+            let prover =
+                PlonkKey::<TatePairing, JubjubAffine, ConfidentialTransferCircuit>::compile(
+                    &mut pp,
+                )
                 .expect("failed to compile circuit");
 
             let proof_generation = start_timer!(|| "proof generation");

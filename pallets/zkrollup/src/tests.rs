@@ -5,6 +5,7 @@ use crate::{self as zkrollup_pallet};
 use bls_12_381::Fr;
 use ec_pairing::TatePairing;
 use frame_support::{construct_runtime, parameter_types};
+use jub_jub::JubjubAffine;
 use red_jubjub::{PublicKey, RedJubjub};
 use sp_core::H256;
 use sp_runtime::{
@@ -65,7 +66,8 @@ impl frame_system::Config for TestRuntime {
 }
 
 impl pallet_plonk::Config for TestRuntime {
-    type P = TatePairing;
+    type Pairing = TatePairing;
+    type Affine = JubjubAffine;
     type CustomCircuit = BatchCircuit<RedJubjub, Poseidon<Fr, 2>, TREE_HEIGH, BATCH_SIZE>;
     type Event = Event;
 }
@@ -78,7 +80,7 @@ impl Config for TestRuntime {
     type RedDsa = RedJubjub;
     type Batch = Batch<
         Self::RedDsa,
-        Poseidon<<<Self as pallet_plonk::Config>::P as Pairing>::ScalarField, 2>,
+        Poseidon<<<Self as pallet_plonk::Config>::Pairing as Pairing>::ScalarField, 2>,
         TREE_HEIGH,
         BATCH_SIZE,
     >;

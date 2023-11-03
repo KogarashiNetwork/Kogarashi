@@ -71,8 +71,8 @@ pub mod pallet {
         pub fn set_thing_1(
             origin: OriginFor<T>,
             val: u32,
-            proof: Proof<T::P>,
-            public_inputs: Vec<<T::P as Pairing>::ScalarField>,
+            proof: Proof<T::Pairing>,
+            public_inputs: Vec<<T::Pairing as Pairing>::ScalarField>,
         ) -> DispatchResultWithPostInfo {
             // Define the proof verification
             pallet_plonk::Pallet::<T>::verify(origin, proof, public_inputs)?;
@@ -205,7 +205,8 @@ impl frame_system::Config for TestRuntime {
 }
 
 impl pallet_plonk::Config for TestRuntime {
-    type P = TatePairing;
+    type Pairing = TatePairing;
+    type Affine = JubjubAffine;
     type CustomCircuit = TestCircuit;
     type Event = Event;
 }
@@ -244,8 +245,8 @@ fn main() {
         assert_ok!(Plonk::trusted_setup(Origin::signed(1), 12, rng.clone()));
 
         let pp = Plonk::public_params().unwrap();
-        let (prover, _) =
-            PlonkKey::<TatePairing, TestCircuit>::compile(&pp).expect("failed to compile circuit");
+        let (prover, _) = PlonkKey::<TatePairing, JubjubAffine, TestCircuit>::compile(&pp)
+            .expect("failed to compile circuit");
 
         let (proof, public_inputs) = prover
             .create_proof(&mut rng, &test_circuit)

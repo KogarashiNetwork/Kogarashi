@@ -1,5 +1,7 @@
 mod proof;
 
+use core::marker::PhantomData;
+
 use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
@@ -10,14 +12,15 @@ pub use proof::Proof;
 
 use poly_commit::{msm_curve_addition, Fft, PointsValue};
 use rand::RngCore;
-use zkstd::common::{CurveGroup, Group, Pairing, Vec};
+use zkstd::common::{CurveGroup, Group, Pairing, TwistedEdwardsAffine, Vec};
 
 #[derive(Debug)]
-pub struct Prover<P: Pairing> {
+pub struct Prover<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> {
     pub params: Parameters<P>,
+    pub(crate) _mark: PhantomData<A>,
 }
 
-impl<P: Pairing> Prover<P> {
+impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
     /// Execute the gadget, and return whether all constraints were satisfied.
     pub fn create_proof<C, R: RngCore>(
         &mut self,
@@ -25,9 +28,9 @@ impl<P: Pairing> Prover<P> {
         circuit: C,
     ) -> Result<Proof<P>, Error>
     where
-        C: Circuit<P::JubjubAffine, ConstraintSystem = Groth16<P::JubjubAffine>>,
+        C: Circuit<A, ConstraintSystem = Groth16<A>>,
     {
-        let mut cs = Groth16::<P::JubjubAffine>::initialize();
+        let mut cs = Groth16::<A>::initialize();
         circuit.synthesize(&mut cs)?;
 
         let size = cs.m().next_power_of_two();

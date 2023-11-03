@@ -776,8 +776,9 @@ mod tests {
 
         let circuit = DummyCircuit::new(x, y);
 
-        let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
-            .expect("Failed to compile circuit");
+        let (mut prover, verifier) =
+            Groth16Key::<TatePairing, JubjubAffine, DummyCircuit>::compile(&pp)
+                .expect("Failed to compile circuit");
         let proof = prover
             .create_proof(&mut OsRng, circuit)
             .expect("Failed to prove");
@@ -831,8 +832,9 @@ mod tests {
         let o = BlsScalar::from(35);
         let circuit = DummyCircuit::new(x, o);
 
-        let (mut prover, verifier) = Groth16Key::<TatePairing, DummyCircuit>::compile(&pp)
-            .expect("Failed to compile circuit");
+        let (mut prover, verifier) =
+            Groth16Key::<TatePairing, JubjubAffine, DummyCircuit>::compile(&pp)
+                .expect("Failed to compile circuit");
         let proof = prover
             .create_proof(&mut OsRng, circuit)
             .expect("Failed to prove");

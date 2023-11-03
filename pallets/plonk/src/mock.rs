@@ -95,7 +95,8 @@ impl Circuit<JubjubAffine> for DummyCircuit {
 }
 
 impl plonk_pallet::Config for Test {
-    type P = TatePairing;
+    type Pairing = TatePairing;
+    type Affine = JubjubAffine;
     type Event = Event;
     type CustomCircuit = DummyCircuit;
 }
