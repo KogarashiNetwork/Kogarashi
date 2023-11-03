@@ -1,7 +1,7 @@
 use jub_jub::{Fp as JubJubScalar, JubjubAffine};
 use she_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
 use zero_plonk::prelude::*;
-use zkstd::common::{Decode, Encode, Group, Pairing, TwistedEdwardsCurve};
+use zkstd::common::{Decode, Encode, Group, TwistedEdwardsAffine, TwistedEdwardsCurve};
 
 pub const BALANCE_BITS: usize = 16;
 pub const CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH: usize = 8;
@@ -140,27 +140,32 @@ impl Circuit<JubjubAffine> for ConfidentialTransferCircuit {
 
 /// confidential transfer transaction input
 #[derive(Clone, Debug, Decode, Encode, Eq, PartialEq)]
-pub struct ConfidentialTransferTransaction<E: ConfidentialTransferPublicInputs<P>, P: Pairing> {
+pub struct ConfidentialTransferTransaction<
+    E: ConfidentialTransferPublicInputs<A>,
+    A: TwistedEdwardsAffine,
+> {
     /// sender public key
-    pub sender_public_key: P::JubjubAffine,
+    pub sender_public_key: A,
     /// recipient public key
-    pub recipient_public_key: P::JubjubAffine,
+    pub recipient_public_key: A,
     /// encrypted transfer amount by sender
     pub sender_encrypted_transfer_amount: E,
     /// encrypted transfer amount by recipient
-    pub recipient_encrypted_transfer_amount: P::JubjubAffine,
+    pub recipient_encrypted_transfer_amount: A,
     /// the other encrypted transfer amount by recipient
-    pub recipient_encrypted_transfer_amount_other: P::JubjubAffine,
+    pub recipient_encrypted_transfer_amount_other: A,
 }
 
-impl<E: ConfidentialTransferPublicInputs<P>, P: Pairing> ConfidentialTransferTransaction<E, P> {
+impl<E: ConfidentialTransferPublicInputs<A>, A: TwistedEdwardsAffine>
+    ConfidentialTransferTransaction<E, A>
+{
     /// init confidential transfer transaction
     pub fn new(
-        sender_public_key: P::JubjubAffine,
-        recipient_public_key: P::JubjubAffine,
+        sender_public_key: A,
+        recipient_public_key: A,
         sender_encrypted_transfer_amount: E,
-        recipient_encrypted_transfer_amount: P::JubjubAffine,
-        recipient_encrypted_transfer_amount_other: P::JubjubAffine,
+        recipient_encrypted_transfer_amount: A,
+        recipient_encrypted_transfer_amount_other: A,
     ) -> Self {
         Self {
             sender_public_key,
@@ -172,8 +177,8 @@ impl<E: ConfidentialTransferPublicInputs<P>, P: Pairing> ConfidentialTransferTra
     }
 
     /// output public inputs for confidential transfer transaction
-    pub fn public_inputs(self) -> [P::ScalarField; CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH] {
-        let mut public_inputs = [P::ScalarField::zero(); CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH];
+    pub fn public_inputs(self) -> [A::Range; CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH] {
+        let mut public_inputs = [A::Range::zero(); CONFIDENTIAL_TRANSFER_PUBLIC_INPUT_LENGTH];
         let (sender_t, sender_s) = self.sender_encrypted_transfer_amount.get();
         for (i, public_point) in [
             sender_t,
