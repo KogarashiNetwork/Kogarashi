@@ -164,7 +164,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     }
 
     /// Appends a point in affine form as [`WitnessPoint`]
-    pub fn append_point<A: Into<C>>(&mut self, affine: A) -> EdwardsExpression<C::Range, C> {
+    pub fn append_point<A: Into<C>>(&mut self, affine: A) -> EdwardsExpression<C> {
         let affine = affine.into();
 
         let x = self.alloc_witness(affine.get_x());
@@ -177,7 +177,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         &mut self,
         x: SparseRow<C::Range>,
         y: SparseRow<C::Range>,
-    ) -> EdwardsExpression<C::Range, C> {
+    ) -> EdwardsExpression<C> {
         let x_squared = self.product(&x, &x);
         let y_squared = self.product(&y, &y);
         let x_squared_y_squared = self.product(&x_squared, &y_squared);
@@ -194,9 +194,9 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     /// Curves.
     pub fn add_points(
         &mut self,
-        a: &EdwardsExpression<C::Range, C>,
-        b: &EdwardsExpression<C::Range, C>,
-    ) -> EdwardsExpression<C::Range, C> {
+        a: &EdwardsExpression<C>,
+        b: &EdwardsExpression<C>,
+    ) -> EdwardsExpression<C> {
         // In order to verify that two points were correctly added
         // without going over a degree 4 polynomial, we will need
         // x_1, y_1, x_2, y_2
@@ -240,8 +240,8 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     pub fn mul_point(
         &mut self,
         scalar: Wire,
-        point: &EdwardsExpression<C::Range, C>,
-    ) -> EdwardsExpression<C::Range, C> {
+        point: &EdwardsExpression<C>,
+    ) -> EdwardsExpression<C> {
         let scalar_bits = self.component_decomposition::<252>(scalar);
 
         let mut result = EdwardsExpression::identity();
@@ -265,7 +265,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         &mut self,
         jubjub: Wire,
         generator: A,
-    ) -> Result<EdwardsExpression<C::Range, C>, Error> {
+    ) -> Result<EdwardsExpression<C>, Error> {
         let generator = generator.into();
 
         // the number of bits is truncated to the maximum possible. however, we
@@ -428,8 +428,8 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     pub fn component_select_identity(
         &mut self,
         bit: Wire,
-        a: &EdwardsExpression<C::Range, C>,
-    ) -> EdwardsExpression<C::Range, C> {
+        a: &EdwardsExpression<C>,
+    ) -> EdwardsExpression<C> {
         let x = SparseRow::from(self.component_select_zero(bit, &a.x));
         let y = SparseRow::from(self.component_select_one(bit, &a.y));
 
@@ -531,11 +531,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     }
 
     /// Asserts `a == b` by appending two gates
-    pub fn assert_equal_point(
-        &mut self,
-        a: &EdwardsExpression<C::Range, C>,
-        b: &EdwardsExpression<C::Range, C>,
-    ) {
+    pub fn assert_equal_point(&mut self, a: &EdwardsExpression<C>, b: &EdwardsExpression<C>) {
         self.assert_equal(&a.x, &b.x);
         self.assert_equal(&a.y, &b.y);
     }
@@ -545,7 +541,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     /// Will add `public` affine coordinates `(x,y)` as public inputs
     pub fn assert_equal_public_point<A: Into<C>>(
         &mut self,
-        point: &EdwardsExpression<C::Range, C>,
+        point: &EdwardsExpression<C>,
         public: A,
     ) {
         let public = public.into();

@@ -4,8 +4,7 @@ use super::wire::Wire;
 pub(crate) use element::Element;
 
 use core::fmt::Debug;
-use core::ops::{Add, Mul};
-use std::ops::{Neg, Sub};
+use core::ops::{Add, Mul, Neg, Sub};
 use zkstd::common::{PrimeField, Vec};
 
 #[derive(Clone, Debug, Default)]
