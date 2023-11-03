@@ -1,10 +1,10 @@
 #![cfg(test)]
 
 use crate::{self as pallet_balances, decl_tests, Config};
-use ec_pairing::TatePairing;
 use frame_support::parameter_types;
 use frame_support::traits::StorageMapShim;
 use frame_system as system;
+use jub_jub::JubjubAffine;
 use she_elgamal::EncryptedNumber;
 use sp_core::H256;
 use sp_runtime::{testing::Header, traits::IdentityLookup};
@@ -60,7 +60,7 @@ parameter_types! {
 }
 
 impl Config for Test {
-    type P = TatePairing;
+    type Affine = JubjubAffine;
     type EncryptedBalance = EncryptedNumber;
     type Event = Event;
     type AccountStore = StorageMapShim<
