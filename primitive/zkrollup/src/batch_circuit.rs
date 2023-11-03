@@ -17,14 +17,14 @@ use self::merkle::check_membership;
 #[derive(Debug, PartialEq, Default)]
 pub struct BatchCircuit<
     P: RedDSA,
-    H: FieldHasher<P::ScalarField, 2>,
+    H: FieldHasher<P::Range, 2>,
     const N: usize,
     const BATCH_SIZE: usize,
 > {
     batch: Batch<P, H, N, BATCH_SIZE>,
 }
 
-impl<P: RedDSA, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
+impl<P: RedDSA, H: FieldHasher<P::Range, 2>, const N: usize, const BATCH_SIZE: usize>
     BatchCircuit<P, H, N, BATCH_SIZE>
 {
     #[allow(dead_code)]
@@ -36,13 +36,13 @@ impl<P: RedDSA, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_S
 
 impl<
         P: RedDSA + Debug + Default,
-        H: FieldHasher<P::ScalarField, 2>,
+        H: FieldHasher<P::Range, 2>,
         const N: usize,
         const BATCH_SIZE: usize,
-    > Circuit<P::JubjubAffine> for BatchCircuit<P, H, N, BATCH_SIZE>
+    > Circuit<P::Affine> for BatchCircuit<P, H, N, BATCH_SIZE>
 {
-    type ConstraintSystem = Plonk<P::JubjubAffine>;
-    fn synthesize(&self, composer: &mut Plonk<P::JubjubAffine>) -> Result<(), Error> {
+    type ConstraintSystem = Plonk<P::Affine>;
+    fn synthesize(&self, composer: &mut Plonk<P::Affine>) -> Result<(), Error> {
         for RollupTransactionInfo {
             transaction,
             pre_root,
@@ -58,7 +58,7 @@ impl<
         {
             let Transaction(sig, t) = transaction;
 
-            check_membership::<P::JubjubAffine, N>(
+            check_membership::<P::Affine, N>(
                 composer,
                 pre_sender.to_field_element(),
                 *pre_root,
@@ -66,7 +66,7 @@ impl<
                 &pre_sender_proof.path_pos,
             )?;
 
-            check_membership::<P::JubjubAffine, N>(
+            check_membership::<P::Affine, N>(
                 composer,
                 pre_receiver.to_field_element(),
                 *pre_root,
@@ -91,7 +91,7 @@ impl<
                 ..*pre_receiver
             };
 
-            check_membership::<P::JubjubAffine, N>(
+            check_membership::<P::Affine, N>(
                 composer,
                 post_sender.to_field_element(),
                 *post_root,
@@ -99,7 +99,7 @@ impl<
                 &post_sender_proof.path_pos,
             )?;
 
-            check_membership::<P::JubjubAffine, N>(
+            check_membership::<P::Affine, N>(
                 composer,
                 post_receiver.to_field_element(),
                 *post_root,

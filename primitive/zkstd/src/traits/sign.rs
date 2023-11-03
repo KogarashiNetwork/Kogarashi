@@ -12,25 +12,19 @@ pub trait SigUtils<const L: usize>: Sized {
 }
 
 pub trait RedDSA: Copy + Debug + Default + Ord + PartialEq {
-    type ScalarField: FftField + Eq + PartialEq + EncodeLike + Decode + SigUtils<32>;
+    type Range: FftField + Eq + PartialEq + SigUtils<32> + EncodeLike + Decode;
 
-    type JubjubScalar: FftField + Eq + PartialEq + SigUtils<32> + Into<Self::ScalarField>;
+    type Scalar: FftField + Eq + PartialEq + SigUtils<32> + Into<Self::Range>;
 
-    // Jubjub affine point
-    type JubjubAffine: TwistedEdwardsAffine<
-            Extended = Self::JubjubExtended,
-            Range = Self::ScalarField,
-            Scalar = Self::JubjubScalar,
-        > + PartialEq
+    // affine point
+    type Affine: TwistedEdwardsAffine<Extended = Self::Extended, Range = Self::Range, Scalar = Self::Scalar>
+        + PartialEq
         + Eq
         + SigUtils<32>;
 
-    // Jubjub extend point
-    type JubjubExtended: TwistedEdwardsExtended<
-            Affine = Self::JubjubAffine,
-            Range = Self::ScalarField,
-            Scalar = Self::JubjubScalar,
-        > + PartialEq
+    // extend point
+    type Extended: TwistedEdwardsExtended<Affine = Self::Affine, Range = Self::Range, Scalar = Self::Scalar>
+        + PartialEq
         + Eq
         + Ord
         + SigUtils<32>;

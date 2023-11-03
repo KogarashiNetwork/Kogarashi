@@ -59,9 +59,9 @@ impl<P: RedDSA> UserData<P> {
         self.address
     }
 
-    pub fn to_field_element(self) -> P::ScalarField {
+    pub fn to_field_element(self) -> P::Range {
         let mut field = [0_u8; 64];
         field[0..56].copy_from_slice(&self.to_bytes()[0..56]);
-        P::ScalarField::from_bytes_wide(&field)
+        P::Range::from_bytes_wide(&field)
     }
 }

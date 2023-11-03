@@ -46,10 +46,10 @@ pub mod pallet {
     pub trait Config: frame_system::Config + pallet_plonk::Config {
         type Plonk: Plonk<
             <Self as pallet_plonk::Config>::Pairing,
-            <<Self as pallet::Config>::RedDsa as RedDSA>::JubjubAffine,
+            <<Self as pallet::Config>::RedDsa as RedDSA>::Affine,
         >;
         type RedDsa: RedDSA<
-            ScalarField = <<Self as pallet_plonk::Config>::Pairing as Pairing>::ScalarField,
+            Range = <<Self as pallet_plonk::Config>::Pairing as Pairing>::ScalarField,
         >;
         type Transaction: Parameter + Member + Default + Copy;
         type Batch: BatchGetter<<Self as pallet::Config>::RedDsa>

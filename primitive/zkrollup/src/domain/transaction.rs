@@ -4,20 +4,16 @@ use super::{FftField, PublicKey, RngCore, SecretKey, SigUtils, Signature, UserDa
 use zkstd::common::*;
 
 #[derive(Clone, Debug, PartialEq, Eq, Default, Encode, Decode)]
-pub(crate) struct RollupTransactionInfo<
-    P: RedDSA,
-    H: FieldHasher<P::ScalarField, 2>,
-    const N: usize,
-> {
+pub(crate) struct RollupTransactionInfo<P: RedDSA, H: FieldHasher<P::Range, 2>, const N: usize> {
     pub(crate) transaction: Transaction<P>,
-    pub(crate) pre_root: P::ScalarField,
-    pub(crate) post_root: P::ScalarField,
+    pub(crate) pre_root: P::Range,
+    pub(crate) post_root: P::Range,
     pub(crate) pre_sender: UserData<P>,
     pub(crate) pre_receiver: UserData<P>,
-    pub(crate) pre_sender_proof: MerkleProof<P::ScalarField, H, N>,
-    pub(crate) pre_receiver_proof: MerkleProof<P::ScalarField, H, N>,
-    pub(crate) post_sender_proof: MerkleProof<P::ScalarField, H, N>,
-    pub(crate) post_receiver_proof: MerkleProof<P::ScalarField, H, N>,
+    pub(crate) pre_sender_proof: MerkleProof<P::Range, H, N>,
+    pub(crate) pre_receiver_proof: MerkleProof<P::Range, H, N>,
+    pub(crate) post_sender_proof: MerkleProof<P::Range, H, N>,
+    pub(crate) post_receiver_proof: MerkleProof<P::Range, H, N>,
     pub(crate) is_withdrawal: bool,
 }
 
@@ -25,10 +21,10 @@ pub(crate) struct RollupTransactionInfo<
 pub struct Transaction<P: RedDSA>(pub(crate) Signature, pub(crate) TransactionData<P>);
 
 impl<P: RedDSA> Transaction<P> {
-    pub fn to_field_element(self) -> P::ScalarField {
+    pub fn to_field_element(self) -> P::Range {
         let mut field = [0_u8; 64];
         field.copy_from_slice(&self.to_bytes()[0..64]);
-        P::ScalarField::from_bytes_wide(&field)
+        P::Range::from_bytes_wide(&field)
     }
 }
 

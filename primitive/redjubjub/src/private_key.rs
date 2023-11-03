@@ -8,11 +8,11 @@ use zkstd::common::{FftField, RedDSA, SigUtils};
 
 /// RedJubjub secret key struct used for signing transactions
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct SecretKey<P: RedDSA>(pub(crate) P::JubjubScalar);
+pub struct SecretKey<P: RedDSA>(pub(crate) P::Scalar);
 
 impl<P: RedDSA> SigUtils<32> for SecretKey<P> {
     fn from_bytes(bytes: [u8; 32]) -> Option<Self> {
-        P::JubjubScalar::from_bytes(bytes).map(Self::new)
+        P::Scalar::from_bytes(bytes).map(Self::new)
     }
 
     fn to_bytes(self) -> [u8; 32] {
@@ -21,7 +21,7 @@ impl<P: RedDSA> SigUtils<32> for SecretKey<P> {
 }
 
 impl<P: RedDSA> SecretKey<P> {
-    pub fn new(key: P::JubjubScalar) -> Self {
+    pub fn new(key: P::Scalar) -> Self {
         Self(key)
     }
 
@@ -35,7 +35,7 @@ impl<P: RedDSA> SecretKey<P> {
             raw_bytes.resize(64, 0);
         }
         let bytes: [u8; 64] = raw_bytes[..64].try_into().unwrap();
-        Some(Self(P::JubjubScalar::from_bytes_wide(&bytes)))
+        Some(Self(P::Scalar::from_bytes_wide(&bytes)))
     }
 
     #[allow(non_snake_case)]
@@ -46,13 +46,13 @@ impl<P: RedDSA> SecretKey<P> {
 
         // r = H(T||vk||M)
         let pk = self.to_public_key();
-        let r = sapling_hash::<P::JubjubScalar>(&T, &pk.to_bytes(), m);
+        let r = sapling_hash::<P::Scalar>(&T, &pk.to_bytes(), m);
 
         // R = r * P_G
         let R = (sapling_base_point::<P>() * r).to_bytes();
 
         // S = r + H(R||m) * sk
-        let S = (r + sapling_hash::<P::JubjubScalar>(&R, &pk.to_bytes(), m) * self.0).to_bytes();
+        let S = (r + sapling_hash::<P::Scalar>(&R, &pk.to_bytes(), m) * self.0).to_bytes();
 
         Signature::new(R, S)
     }
@@ -61,7 +61,7 @@ impl<P: RedDSA> SecretKey<P> {
         PublicKey(sapling_base_point::<P>() * self.0)
     }
 
-    pub fn randomize_private(&self, r: P::JubjubScalar) -> Self {
+    pub fn randomize_private(&self, r: P::Scalar) -> Self {
         Self(r * self.0)
     }
 }
