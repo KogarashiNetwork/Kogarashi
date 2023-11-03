@@ -21,8 +21,9 @@ fn circuit(c: &mut Criterion) {
     });
 
     let pp = PlonkParams::<TatePairing>::setup(n, &mut rng);
-    let (prover, verifier) = PlonkKey::<TatePairing, ConfidentialTransferCircuit>::compile(&pp)
-        .expect("failed to compile circuit");
+    let (prover, verifier) =
+        PlonkKey::<TatePairing, JubjubAffine, ConfidentialTransferCircuit>::compile(&pp)
+            .expect("failed to compile circuit");
     let generator = JubjubExtended::ADDITIVE_GENERATOR;
     let alice_private_key = JubjubScalar::random(&mut rng);
     let bob_private_key = JubjubScalar::random(&mut rng);

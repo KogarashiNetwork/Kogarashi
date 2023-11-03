@@ -1,7 +1,7 @@
 use bls_12_381::Fr;
 use zero_plonk::prelude::*;
 use zksnarks::{plonk::wire::PrivateWire, Constraint};
-use zkstd::common::{vec, Vec, Group, TwistedEdwardsAffine};
+use zkstd::common::{vec, Group, TwistedEdwardsAffine, Vec};
 
 #[derive(Debug, PartialEq)]
 pub struct MerkleMembershipCircuit<const N: usize> {

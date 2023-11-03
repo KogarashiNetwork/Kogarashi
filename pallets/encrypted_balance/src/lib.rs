@@ -183,6 +183,8 @@ pub mod pallet {
 
         /// The balance of an account.
         type EncryptedBalance: Parameter
+            + Eq
+            + PartialEq
             + CheckedAdd
             + CheckedSub
             + Member

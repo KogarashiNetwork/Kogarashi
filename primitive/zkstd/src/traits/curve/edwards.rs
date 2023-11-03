@@ -1,4 +1,4 @@
-use crate::traits::{Basic, FftField, PrimeField};
+use crate::traits::{Basic, FftField, PrimeField, RuntimeCmp};
 use crate::{
     common::Vec,
     traits::{ParallelCmp, ParityCmp},
@@ -6,7 +6,7 @@ use crate::{
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use rand_core::RngCore;
 
-pub trait TwistedEdwardsCurve: ParityCmp + ParallelCmp + Basic {
+pub trait TwistedEdwardsCurve: ParityCmp + RuntimeCmp + ParallelCmp + Basic {
     const PARAM_D: Self::Range;
 
     // generator of group

@@ -267,8 +267,9 @@ impl<
     ) -> (Proof<P>, Vec<P::ScalarField>) {
         let label = b"verify";
         let batch_circuit = BatchCircuit::new(batch);
-        let prover = PlonkKey::<P, R::JubjubAffine, BatchCircuit<R, H, N, BATCH_SIZE>>::compile(&self.pp)
-            .expect("failed to compile circuit");
+        let prover =
+            PlonkKey::<P, R::JubjubAffine, BatchCircuit<R, H, N, BATCH_SIZE>>::compile(&self.pp)
+                .expect("failed to compile circuit");
         prover
             .0
             .create_proof(&mut get_rng(), &batch_circuit)
