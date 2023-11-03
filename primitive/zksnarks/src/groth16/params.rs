@@ -5,7 +5,6 @@ use zkstd::common::*;
 #[derive(Clone, Debug, PartialEq, Decode, Encode, Default)]
 pub struct Groth16Params<P: Pairing> {
     pub(crate) generators: (P::G1Affine, P::G2Affine),
-    #[allow(clippy::type_complexity)]
     pub(crate) toxic_waste: (
         P::ScalarField,
         P::ScalarField,

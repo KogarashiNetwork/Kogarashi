@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 #![allow(unused_variables)]
 mod constraint;
 mod key;
@@ -6,17 +5,18 @@ mod matrix;
 mod params;
 mod prover;
 mod verifier;
+mod wire;
+
+use crate::bit_iterator::BitIterator8;
+use crate::constraint_system::ConstraintSystem;
+use crate::error::Error;
 
 pub(crate) mod curves;
 pub(crate) mod error;
-pub mod wire;
+pub use prover::Prover;
+pub use verifier::Verifier;
 
-use crate::constraint_system::ConstraintSystem;
-use core::ops;
-use std::ops::Neg;
-
-use crate::bit_iterator::BitIterator8;
-use crate::error::Error;
+use core::ops::{Index, Neg};
 use jub_jub::compute_windowed_naf;
 use zkstd::common::{
     vec, FftField, Group, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve,
@@ -68,7 +68,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     }
 }
 
-impl<C: TwistedEdwardsAffine> ops::Index<Wire> for Groth16<C> {
+impl<C: TwistedEdwardsAffine> Index<Wire> for Groth16<C> {
     type Output = C::Range;
 
     fn index(&self, w: Wire) -> &Self::Output {
@@ -80,69 +80,6 @@ impl<C: TwistedEdwardsAffine> ops::Index<Wire> for Groth16<C> {
 }
 
 impl<C: TwistedEdwardsAffine> Groth16<C> {
-    #[allow(clippy::type_complexity)]
-    fn inputs_iter(
-        &self,
-    ) -> (
-        (
-            Vec<Vec<(C::Range, usize)>>,
-            Vec<Vec<(C::Range, usize)>>,
-            Vec<Vec<(C::Range, usize)>>,
-        ),
-        (
-            Vec<Vec<(C::Range, usize)>>,
-            Vec<Vec<(C::Range, usize)>>,
-            Vec<Vec<(C::Range, usize)>>,
-        ),
-    ) {
-        let mut a_instance = vec![vec![]; self.instance_len()];
-        let mut b_instance = vec![vec![]; self.instance_len()];
-        let mut c_instance = vec![vec![]; self.instance_len()];
-        let mut a_witness = vec![vec![]; self.witness_len()];
-        let mut b_witness = vec![vec![]; self.witness_len()];
-        let mut c_witness = vec![vec![]; self.witness_len()];
-        for (i, ((a, b), c)) in self
-            .constraints
-            .a
-            .0
-            .iter()
-            .zip(self.constraints.b.0.iter())
-            .zip(self.constraints.c.0.iter())
-            .enumerate()
-        {
-            a.coefficients()
-                .iter()
-                .for_each(|Element(w, coeff)| match w {
-                    Wire::Instance(k) => a_instance[*k].push((*coeff, i)),
-                    Wire::Witness(k) => a_witness[*k].push((*coeff, i)),
-                });
-            b.coefficients()
-                .iter()
-                .for_each(|Element(w, coeff)| match w {
-                    Wire::Instance(k) => b_instance[*k].push((*coeff, i)),
-                    Wire::Witness(k) => b_witness[*k].push((*coeff, i)),
-                });
-            c.coefficients()
-                .iter()
-                .for_each(|Element(w, coeff)| match w {
-                    Wire::Instance(k) => c_instance[*k].push((*coeff, i)),
-                    Wire::Witness(k) => c_witness[*k].push((*coeff, i)),
-                });
-        }
-
-        (
-            (a_instance, b_instance, c_instance),
-            (a_witness, b_witness, c_witness),
-        )
-    }
-
-    #[allow(clippy::type_complexity)]
-    fn eval_constraints(&mut self) -> (Vec<C::Range>, Vec<C::Range>, Vec<C::Range>) {
-        self.instance.sort();
-        self.witness.sort();
-        self.constraints.evaluate(&self.instance, &self.witness)
-    }
-
     fn instance_len(&self) -> usize {
         self.instance.len()
     }

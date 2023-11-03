@@ -10,8 +10,7 @@ use core::marker::PhantomData;
 use core::ops::{MulAssign, Neg};
 use poly_commit::{Coefficients, Fft, PointsValue};
 use zkstd::common::{
-    vec, CurveGroup, FftField, Group, Pairing, PairingRange, PrimeField, Ring,
-    TwistedEdwardsAffine, Vec,
+    vec, CurveGroup, Group, Pairing, PairingRange, PrimeField, Ring, TwistedEdwardsAffine, Vec,
 };
 
 /// Generate the arguments to prove and verify a circuit
@@ -103,7 +102,9 @@ impl<
         let mut ic = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len()];
         let mut l = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.witness_len()];
 
-        let ((at_inputs, bt_inputs, ct_inputs), (at_aux, bt_aux, ct_aux)) = cs.inputs_iter();
+        let ((at_inputs, bt_inputs, ct_inputs), (at_aux, bt_aux, ct_aux)) = cs
+            .constraints
+            .z_vectors(cs.instance_len(), cs.witness_len());
 
         // Evaluate for inputs.
         eval::<P>(
@@ -158,7 +159,7 @@ impl<
             b_g2,
         };
 
-        let pvk = prepare_verifying_key(&params.vk);
+        let pvk = params.vk.prepare();
 
         Ok((
             Prover::<P, A> {
@@ -236,7 +237,7 @@ fn eval<P: Pairing>(
     }
 }
 
-fn eval_at_tau<F: FftField>(powers_of_tau: &[F], p: &[(F, usize)]) -> F {
+fn eval_at_tau<F: PrimeField>(powers_of_tau: &[F], p: &[(F, usize)]) -> F {
     p.iter().fold(F::zero(), |acc, (coeff, index)| {
         acc + powers_of_tau[*index] * coeff
     })
@@ -295,6 +296,24 @@ pub struct VerifyingKey<P: Pairing> {
     pub ic: Vec<P::G1Affine>,
 }
 
+impl<P: Pairing> VerifyingKey<P> {
+    pub(crate) fn prepare(&self) -> PreparedVerifyingKey<P> {
+        let gamma = self.gamma_g2.neg();
+        let delta = self.delta_g2.neg();
+
+        PreparedVerifyingKey {
+            alpha_g1_beta_g2: P::multi_miller_loop(&[(
+                self.alpha_g1,
+                P::G2PairngRepr::from(self.beta_g2),
+            )])
+            .final_exp(),
+            neg_gamma_g2: P::G2PairngRepr::from(gamma),
+            neg_delta_g2: P::G2PairngRepr::from(delta),
+            ic: self.ic.clone(),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct PreparedVerifyingKey<P: Pairing> {
     /// Pairing result of alpha*beta
@@ -305,17 +324,4 @@ pub struct PreparedVerifyingKey<P: Pairing> {
     pub(crate) neg_delta_g2: P::G2PairngRepr,
     /// Copy of IC from `VerifiyingKey`.
     pub(crate) ic: Vec<P::G1Affine>,
-}
-
-pub fn prepare_verifying_key<P: Pairing>(vk: &VerifyingKey<P>) -> PreparedVerifyingKey<P> {
-    let gamma = vk.gamma_g2.neg();
-    let delta = vk.delta_g2.neg();
-
-    PreparedVerifyingKey {
-        alpha_g1_beta_g2: P::multi_miller_loop(&[(vk.alpha_g1, P::G2PairngRepr::from(vk.beta_g2))])
-            .final_exp(),
-        neg_gamma_g2: P::G2PairngRepr::from(gamma),
-        neg_delta_g2: P::G2PairngRepr::from(delta),
-        ic: vk.ic.clone(),
-    }
 }
