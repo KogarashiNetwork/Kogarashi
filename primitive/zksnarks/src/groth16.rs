@@ -48,11 +48,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     }
 
     fn m(&self) -> usize {
-        self.constraints().m()
-    }
-
-    fn constraints(&self) -> Self::Constraints {
-        self.constraints.clone()
+        self.constraints.m()
     }
 
     fn alloc_instance(&mut self, instance: C::Range) -> Wire {

@@ -11,8 +11,6 @@ pub trait ConstraintSystem<C: TwistedEdwardsAffine> {
     /// return constraints length
     fn m(&self) -> usize;
 
-    fn constraints(&self) -> Self::Constraints;
-
     /// allocate instance
     fn alloc_instance(&mut self, instance: C::Range) -> Self::Wire;
 
