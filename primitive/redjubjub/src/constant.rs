@@ -32,10 +32,10 @@ fn sapling_base_point_y<F: FftField>() -> F {
     F::from(SAPLING_BASE_POINT_Y.inner())
 }
 
-pub fn sapling_base_point<P: RedDSA>() -> P::JubjubAffine {
+pub fn sapling_base_point<P: RedDSA>() -> P::Affine {
     let x = sapling_base_point_x();
     let y = sapling_base_point_y();
-    P::JubjubAffine::from_raw_unchecked(x, y)
+    P::Affine::from_raw_unchecked(x, y)
 }
 
 pub fn sapling_redjubjub_cofactor<F: FftField>() -> F {

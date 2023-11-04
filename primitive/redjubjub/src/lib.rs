@@ -34,13 +34,13 @@ use zkstd::common::RedDSA;
 pub struct RedJubjub {}
 
 impl RedDSA for RedJubjub {
-    type ScalarField = Fr;
+    type Range = Fr;
 
-    type JubjubScalar = Fp;
+    type Scalar = Fp;
 
-    type JubjubAffine = JubjubAffine;
+    type Affine = JubjubAffine;
 
-    type JubjubExtended = JubjubExtended;
+    type Extended = JubjubExtended;
 }
 
 /// An redjubjub secret key and public key pair.

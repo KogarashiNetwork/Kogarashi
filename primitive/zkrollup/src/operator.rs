@@ -14,24 +14,19 @@ use zksnarks::plonk::PlonkParams;
 use zkstd::common::{vec, Decode, Encode, Pairing, RedDSA, SigUtils, Vec};
 
 pub trait BatchGetter<P: RedDSA> {
-    fn final_root(&self) -> P::ScalarField;
+    fn final_root(&self) -> P::Range;
     fn withdraw_info(&self) -> Vec<(u64, PublicKey<P>)>;
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Encode, Decode)]
-pub struct Batch<
-    P: RedDSA,
-    H: FieldHasher<P::ScalarField, 2>,
-    const N: usize,
-    const BATCH_SIZE: usize,
-> {
+pub struct Batch<P: RedDSA, H: FieldHasher<P::Range, 2>, const N: usize, const BATCH_SIZE: usize> {
     pub(crate) transactions: Vec<RollupTransactionInfo<P, H, N>>,
 }
 
-impl<P: RedDSA, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
-    BatchGetter<P> for Batch<P, H, N, BATCH_SIZE>
+impl<P: RedDSA, H: FieldHasher<P::Range, 2>, const N: usize, const BATCH_SIZE: usize> BatchGetter<P>
+    for Batch<P, H, N, BATCH_SIZE>
 {
-    fn final_root(&self) -> P::ScalarField {
+    fn final_root(&self) -> P::Range {
         self.transactions
             .iter()
             .last()
@@ -48,7 +43,7 @@ impl<P: RedDSA, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_S
     }
 }
 
-impl<P: RedDSA, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize> Default
+impl<P: RedDSA, H: FieldHasher<P::Range, 2>, const N: usize, const BATCH_SIZE: usize> Default
     for Batch<P, H, N, BATCH_SIZE>
 {
     fn default() -> Self {
@@ -58,25 +53,25 @@ impl<P: RedDSA, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_S
     }
 }
 
-impl<P: RedDSA, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_SIZE: usize>
+impl<P: RedDSA, H: FieldHasher<P::Range, 2>, const N: usize, const BATCH_SIZE: usize>
     Batch<P, H, N, BATCH_SIZE>
 {
     pub fn raw_transactions(&self) -> impl Iterator<Item = &Transaction<P>> {
         self.transactions.iter().map(|info| &info.transaction)
     }
 
-    pub fn intermediate_roots(&self) -> Vec<(P::ScalarField, P::ScalarField)> {
+    pub fn intermediate_roots(&self) -> Vec<(P::Range, P::Range)> {
         self.transactions
             .iter()
             .map(|data| (data.pre_root, data.post_root))
             .collect()
     }
 
-    pub fn border_roots(&self) -> (P::ScalarField, P::ScalarField) {
+    pub fn border_roots(&self) -> (P::Range, P::Range) {
         (self.first_root(), self.final_root())
     }
 
-    pub(crate) fn first_root(&self) -> P::ScalarField {
+    pub(crate) fn first_root(&self) -> P::Range {
         self.transactions
             .iter()
             .last()
@@ -88,12 +83,12 @@ impl<P: RedDSA, H: FieldHasher<P::ScalarField, 2>, const N: usize, const BATCH_S
 #[derive(Default)]
 pub struct RollupOperator<
     R: RedDSA,
-    P: Pairing<ScalarField = R::ScalarField>,
-    H: FieldHasher<R::ScalarField, 2>,
+    P: Pairing<ScalarField = R::Range>,
+    H: FieldHasher<R::Range, 2>,
     const N: usize,
     const BATCH_SIZE: usize,
 > {
-    state_merkle: SparseMerkleTree<R::ScalarField, H, N>,
+    state_merkle: SparseMerkleTree<R::Range, H, N>,
     db: Db<R>,
     transactions: Vec<RollupTransactionInfo<R, H, N>>,
     index_counter: u64,
@@ -104,8 +99,8 @@ pub struct RollupOperator<
 
 impl<
         R: RedDSA,
-        P: Pairing<ScalarField = R::ScalarField>,
-        H: FieldHasher<R::ScalarField, 2>,
+        P: Pairing<ScalarField = R::Range>,
+        H: FieldHasher<R::Range, 2>,
         const N: usize,
         const BATCH_SIZE: usize,
     > RollupOperator<R, P, H, N, BATCH_SIZE>
@@ -137,7 +132,7 @@ impl<
     pub fn execute_transaction(
         &mut self,
         transaction: Transaction<R>,
-    ) -> Option<((Proof<P>, Vec<R::ScalarField>), Batch<R, H, N, BATCH_SIZE>)> {
+    ) -> Option<((Proof<P>, Vec<R::Range>), Batch<R, H, N, BATCH_SIZE>)> {
         let Transaction(signature, transaction_data) = transaction;
         let pre_root = self.state_root();
 
@@ -267,16 +262,15 @@ impl<
     ) -> (Proof<P>, Vec<P::ScalarField>) {
         let label = b"verify";
         let batch_circuit = BatchCircuit::new(batch);
-        let prover =
-            PlonkKey::<P, R::JubjubAffine, BatchCircuit<R, H, N, BATCH_SIZE>>::compile(&self.pp)
-                .expect("failed to compile circuit");
+        let prover = PlonkKey::<P, R::Affine, BatchCircuit<R, H, N, BATCH_SIZE>>::compile(&self.pp)
+            .expect("failed to compile circuit");
         prover
             .0
             .create_proof(&mut get_rng(), &batch_circuit)
             .expect("failed to prove")
     }
 
-    pub fn state_root(&self) -> R::ScalarField {
+    pub fn state_root(&self) -> R::Range {
         self.state_merkle.root()
     }
 

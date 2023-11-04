@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 #![allow(unused_variables)]
 mod constraint;
 mod key;
@@ -6,17 +5,18 @@ mod matrix;
 mod params;
 mod prover;
 mod verifier;
+mod wire;
+
+use crate::bit_iterator::BitIterator8;
+use crate::constraint_system::ConstraintSystem;
+use crate::error::Error;
 
 pub(crate) mod curves;
 pub(crate) mod error;
-pub mod wire;
+pub use prover::Prover;
+pub use verifier::Verifier;
 
-use crate::constraint_system::ConstraintSystem;
-use core::ops;
-use std::ops::Neg;
-
-use crate::bit_iterator::BitIterator8;
-use crate::error::Error;
+use core::ops::{Index, Neg};
 use jub_jub::compute_windowed_naf;
 use zkstd::common::{
     vec, FftField, Group, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve,
@@ -48,11 +48,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     }
 
     fn m(&self) -> usize {
-        self.constraints().m()
-    }
-
-    fn constraints(&self) -> Self::Constraints {
-        self.constraints.clone()
+        self.constraints.m()
     }
 
     fn alloc_instance(&mut self, instance: C::Range) -> Wire {
@@ -68,7 +64,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     }
 }
 
-impl<C: TwistedEdwardsAffine> ops::Index<Wire> for Groth16<C> {
+impl<C: TwistedEdwardsAffine> Index<Wire> for Groth16<C> {
     type Output = C::Range;
 
     fn index(&self, w: Wire) -> &Self::Output {
@@ -80,69 +76,6 @@ impl<C: TwistedEdwardsAffine> ops::Index<Wire> for Groth16<C> {
 }
 
 impl<C: TwistedEdwardsAffine> Groth16<C> {
-    #[allow(clippy::type_complexity)]
-    fn inputs_iter(
-        &self,
-    ) -> (
-        (
-            Vec<Vec<(C::Range, usize)>>,
-            Vec<Vec<(C::Range, usize)>>,
-            Vec<Vec<(C::Range, usize)>>,
-        ),
-        (
-            Vec<Vec<(C::Range, usize)>>,
-            Vec<Vec<(C::Range, usize)>>,
-            Vec<Vec<(C::Range, usize)>>,
-        ),
-    ) {
-        let mut a_instance = vec![vec![]; self.instance_len()];
-        let mut b_instance = vec![vec![]; self.instance_len()];
-        let mut c_instance = vec![vec![]; self.instance_len()];
-        let mut a_witness = vec![vec![]; self.witness_len()];
-        let mut b_witness = vec![vec![]; self.witness_len()];
-        let mut c_witness = vec![vec![]; self.witness_len()];
-        for (i, ((a, b), c)) in self
-            .constraints
-            .a
-            .0
-            .iter()
-            .zip(self.constraints.b.0.iter())
-            .zip(self.constraints.c.0.iter())
-            .enumerate()
-        {
-            a.coefficients()
-                .iter()
-                .for_each(|Element(w, coeff)| match w {
-                    Wire::Instance(k) => a_instance[*k].push((*coeff, i)),
-                    Wire::Witness(k) => a_witness[*k].push((*coeff, i)),
-                });
-            b.coefficients()
-                .iter()
-                .for_each(|Element(w, coeff)| match w {
-                    Wire::Instance(k) => b_instance[*k].push((*coeff, i)),
-                    Wire::Witness(k) => b_witness[*k].push((*coeff, i)),
-                });
-            c.coefficients()
-                .iter()
-                .for_each(|Element(w, coeff)| match w {
-                    Wire::Instance(k) => c_instance[*k].push((*coeff, i)),
-                    Wire::Witness(k) => c_witness[*k].push((*coeff, i)),
-                });
-        }
-
-        (
-            (a_instance, b_instance, c_instance),
-            (a_witness, b_witness, c_witness),
-        )
-    }
-
-    #[allow(clippy::type_complexity)]
-    fn eval_constraints(&mut self) -> (Vec<C::Range>, Vec<C::Range>, Vec<C::Range>) {
-        self.instance.sort();
-        self.witness.sort();
-        self.constraints.evaluate(&self.instance, &self.witness)
-    }
-
     fn instance_len(&self) -> usize {
         self.instance.len()
     }
@@ -164,7 +97,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     }
 
     /// Appends a point in affine form as [`WitnessPoint`]
-    pub fn append_point<A: Into<C>>(&mut self, affine: A) -> EdwardsExpression<C::Range, C> {
+    pub fn append_point<A: Into<C>>(&mut self, affine: A) -> EdwardsExpression<C> {
         let affine = affine.into();
 
         let x = self.alloc_witness(affine.get_x());
@@ -177,7 +110,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         &mut self,
         x: SparseRow<C::Range>,
         y: SparseRow<C::Range>,
-    ) -> EdwardsExpression<C::Range, C> {
+    ) -> EdwardsExpression<C> {
         let x_squared = self.product(&x, &x);
         let y_squared = self.product(&y, &y);
         let x_squared_y_squared = self.product(&x_squared, &y_squared);
@@ -194,9 +127,9 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     /// Curves.
     pub fn add_points(
         &mut self,
-        a: &EdwardsExpression<C::Range, C>,
-        b: &EdwardsExpression<C::Range, C>,
-    ) -> EdwardsExpression<C::Range, C> {
+        a: &EdwardsExpression<C>,
+        b: &EdwardsExpression<C>,
+    ) -> EdwardsExpression<C> {
         // In order to verify that two points were correctly added
         // without going over a degree 4 polynomial, we will need
         // x_1, y_1, x_2, y_2
@@ -240,8 +173,8 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     pub fn mul_point(
         &mut self,
         scalar: Wire,
-        point: &EdwardsExpression<C::Range, C>,
-    ) -> EdwardsExpression<C::Range, C> {
+        point: &EdwardsExpression<C>,
+    ) -> EdwardsExpression<C> {
         let scalar_bits = self.component_decomposition::<252>(scalar);
 
         let mut result = EdwardsExpression::identity();
@@ -265,7 +198,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         &mut self,
         jubjub: Wire,
         generator: A,
-    ) -> Result<EdwardsExpression<C::Range, C>, Error> {
+    ) -> Result<EdwardsExpression<C>, Error> {
         let generator = generator.into();
 
         // the number of bits is truncated to the maximum possible. however, we
@@ -428,8 +361,8 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     pub fn component_select_identity(
         &mut self,
         bit: Wire,
-        a: &EdwardsExpression<C::Range, C>,
-    ) -> EdwardsExpression<C::Range, C> {
+        a: &EdwardsExpression<C>,
+    ) -> EdwardsExpression<C> {
         let x = SparseRow::from(self.component_select_zero(bit, &a.x));
         let y = SparseRow::from(self.component_select_one(bit, &a.y));
 
@@ -531,11 +464,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     }
 
     /// Asserts `a == b` by appending two gates
-    pub fn assert_equal_point(
-        &mut self,
-        a: &EdwardsExpression<C::Range, C>,
-        b: &EdwardsExpression<C::Range, C>,
-    ) {
+    pub fn assert_equal_point(&mut self, a: &EdwardsExpression<C>, b: &EdwardsExpression<C>) {
         self.assert_equal(&a.x, &b.x);
         self.assert_equal(&a.y, &b.y);
     }
@@ -545,7 +474,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     /// Will add `public` affine coordinates `(x,y)` as public inputs
     pub fn assert_equal_public_point<A: Into<C>>(
         &mut self,
-        point: &EdwardsExpression<C::Range, C>,
+        point: &EdwardsExpression<C>,
         public: A,
     ) {
         let public = public.into();

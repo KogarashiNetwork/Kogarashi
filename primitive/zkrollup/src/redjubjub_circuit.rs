@@ -30,16 +30,16 @@ impl RedJubjubCircuit {
 }
 
 pub(crate) fn check_signature<P: RedDSA>(
-    composer: &mut Plonk<P::JubjubAffine>,
-    public_key: P::JubjubAffine,
+    composer: &mut Plonk<P::Affine>,
+    public_key: P::Affine,
     signature: Signature,
-    msg_hash: P::JubjubScalar,
+    msg_hash: P::Scalar,
 ) -> Result<(), Error> {
-    let r = match P::JubjubAffine::from_bytes(signature.r()) {
+    let r = match P::Affine::from_bytes(signature.r()) {
         Some(r) => composer.append_point(r),
         None => return Err(Error::ProofVerificationError),
     };
-    let s = match P::JubjubScalar::from_bytes(signature.s()) {
+    let s = match P::Scalar::from_bytes(signature.s()) {
         Some(s) => composer.append_witness(s),
         None => return Err(Error::ProofVerificationError),
     };
@@ -49,8 +49,8 @@ pub(crate) fn check_signature<P: RedDSA>(
 
     let sapling_base_point = composer.append_constant_point(sapling_base_point::<P>());
     let sapling_redjubjub_cofactor =
-        composer.append_constant(sapling_redjubjub_cofactor::<P::ScalarField>());
-    let neg = composer.append_witness(-P::JubjubScalar::one());
+        composer.append_constant(sapling_redjubjub_cofactor::<P::Range>());
+    let neg = composer.append_witness(-P::Scalar::one());
 
     let s_bp = composer.component_mul_point(s, sapling_base_point);
     let hash_pub_key = composer.component_mul_point(msg_hash, public_key);
@@ -60,7 +60,7 @@ pub(crate) fn check_signature<P: RedDSA>(
     let finalized =
         composer.component_mul_point(sapling_redjubjub_cofactor, s_bp_neg_r_hash_pub_key);
 
-    composer.assert_equal_public_point(finalized, P::JubjubExtended::ADDITIVE_IDENTITY);
+    composer.assert_equal_public_point(finalized, P::Extended::ADDITIVE_IDENTITY);
 
     Ok(())
 }
