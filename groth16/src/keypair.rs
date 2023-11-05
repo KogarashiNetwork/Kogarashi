@@ -2,14 +2,14 @@ use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
 use crate::prover::Prover;
-use crate::public_parameters::PublicParameters;
 use crate::verifier::Verifier;
 
 use core::marker::PhantomData;
 use core::ops::{MulAssign, Neg};
 use poly_commit::{Coefficients, Fft, PointsValue};
 use zkstd::common::{
-    vec, CurveGroup, Group, Pairing, PairingRange, PrimeField, Ring, TwistedEdwardsAffine, Vec,
+    vec, CurveGroup, Group, Pairing, PairingRange, PrimeField, Ring, RngCore, TwistedEdwardsAffine,
+    Vec,
 };
 
 /// Generate the arguments to prove and verify a circuit
@@ -20,18 +20,8 @@ pub struct KeyPair<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>, 
 }
 
 impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>, C: Circuit<A>> KeyPair<P, A, C> {
-    pub(crate) fn compile(pp: &PublicParameters<P>) -> Result<(Prover<P, A>, Verifier<P>), Error> {
-        Self::compile_with_circuit(pp, b"groth16", &C::default())
-    }
-
-    /// Create a new arguments set from a given circuit instance
-    ///
-    /// Use the provided circuit instead of the default implementation
-    pub fn compile_with_circuit(
-        pp: &PublicParameters<P>,
-        _label: &[u8],
-        circuit: &C,
-    ) -> Result<(Prover<P, A>, Verifier<P>), Error> {
+    pub fn setup(mut r: impl RngCore) -> Result<(Prover<P, A>, Verifier<P>), Error> {
+        let circuit = C::default();
         let mut cs = ConstraintSystem::initialize();
 
         circuit.synthesize(&mut cs)?;
@@ -40,10 +30,15 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>, C: Circuit<A>>
         let k = size.trailing_zeros();
         let fft = Fft::<P::ScalarField>::new(k as usize);
 
-        let (alpha, beta, gamma, delta, tau) = pp.toxic_waste;
+        // toxic waste
+        let alpha = P::ScalarField::random(&mut r);
+        let beta = P::ScalarField::random(&mut r);
+        let gamma = P::ScalarField::random(&mut r);
+        let delta = P::ScalarField::random(&mut r);
+        let tau = P::ScalarField::random(&mut r);
 
-        let g1 = pp.generators.0;
-        let g2 = pp.generators.1;
+        let g1 = P::G1Affine::ADDITIVE_GENERATOR;
+        let g2 = P::G2Affine::ADDITIVE_GENERATOR;
 
         let gamma_inverse = gamma.invert().ok_or(Error::ProverInversionFailed)?;
         let delta_inverse = delta.invert().ok_or(Error::ProverInversionFailed)?;

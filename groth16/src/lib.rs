@@ -8,13 +8,14 @@ mod curves;
 mod error;
 mod keypair;
 mod matrix;
+mod proof;
 mod prover;
-mod public_parameters;
 mod r1cs;
 mod verifier;
 mod wire;
 
 pub use constraint_system::ConstraintSystem;
 pub use keypair::KeyPair;
-pub use prover::{Proof, Prover};
+pub use proof::Proof;
+pub use prover::Prover;
 pub use verifier::Verifier;

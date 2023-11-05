@@ -1,11 +1,8 @@
-mod proof;
-
-pub use proof::Proof;
-
 use crate::circuit::Circuit;
 use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
 use crate::keypair::Parameters;
+use crate::proof::Proof;
 
 use core::marker::PhantomData;
 use poly_commit::{msm_curve_addition, Fft, PointsValue};
