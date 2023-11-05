@@ -323,7 +323,7 @@ mod tests {
     use crate::poly::Coefficients;
 
     use bls_12_381::Fr;
-    use zkstd::common::{vec, Group, OsRng, PrimeField, Vec};
+    use zkstd::common::{vec, GroupParams, OsRng, PrimeField, Vec};
 
     fn arb_poly(k: u32) -> Vec<Fr> {
         (0..(1 << k))

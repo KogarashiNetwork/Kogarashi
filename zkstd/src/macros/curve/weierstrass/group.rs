@@ -18,8 +18,6 @@ macro_rules! affine_group_operation {
             type Extended = $projective;
             type Scalar = $scalar;
 
-            const PARAM_A: $range = $a;
-
             const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
                 y: $y,
@@ -98,8 +96,6 @@ macro_rules! projective_group_operation {
             type Affine = $affine;
             type Extended = $projective;
             type Scalar = $scalar;
-
-            const PARAM_A: $range = $a;
 
             const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,

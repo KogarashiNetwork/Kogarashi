@@ -8,13 +8,27 @@ use rand_core::RngCore;
 
 use super::{CurveAffine, CurveExtended, FftField, PrimeField};
 
+pub trait GroupParams: Eq + PartialEq + Sized {
+    // generator of group
+    const ADDITIVE_GENERATOR: Self;
+
+    // additive identity of group
+    // a * e = a for any a
+    const ADDITIVE_IDENTITY: Self;
+
+    // return inverse of element
+    fn invert(self) -> Option<Self>;
+
+    // return random element
+    fn random(rand: impl RngCore) -> Self;
+}
+
 /// group trait which supports additive and scalar arithmetic
 /// additive and scalar arithmetic hold associative and distributive property
 /// any element has its inverse and these is the identity in group
 /// existence of inverse is ensured for only additive arithmetic
 pub trait Group:
-    PartialEq
-    + Eq
+    GroupParams
     + Add<Output = Self>
     + AddAssign
     + Neg<Output = Self>
@@ -28,22 +42,8 @@ pub trait Group:
     // scalar domain
     type Scalar: PrimeField;
 
-    // generator of group
-    const ADDITIVE_GENERATOR: Self;
-    // additive identity of group
-    // a * e = a for any a
-    const ADDITIVE_IDENTITY: Self;
-
     // return zero element
     fn zero() -> Self;
-
-    // get inverse of group element
-    fn invert(self) -> Option<Self>
-    where
-        Self: Sized;
-
-    // get randome element
-    fn random(rand: impl RngCore) -> Self;
 }
 
 pub trait CurveGroup:
@@ -76,9 +76,6 @@ pub trait CurveGroup:
     // curve group
     type Affine: CurveAffine<Range = Self::Range, Scalar = Self::Scalar, Extended = Self::Extended>;
     type Extended: CurveExtended<Range = Self::Range, Scalar = Self::Scalar, Affine = Self::Affine>;
-
-    // a param
-    const PARAM_A: Self::Range;
 
     // generator of group
     const ADDITIVE_GENERATOR: Self;

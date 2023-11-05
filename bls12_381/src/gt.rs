@@ -5,15 +5,9 @@ use zkstd::common::*;
 #[derive(Debug, Clone, Copy)]
 pub struct Gt(pub Fq12);
 
-impl Group for Gt {
-    type Scalar = Fr;
-
+impl GroupParams for Gt {
     const ADDITIVE_GENERATOR: Self = Self(Fq12::generator());
     const ADDITIVE_IDENTITY: Self = Self(Fq12::one());
-
-    fn zero() -> Self {
-        Self(Fq12::zero())
-    }
 
     fn invert(self) -> Option<Self> {
         unimplemented!()
@@ -21,6 +15,14 @@ impl Group for Gt {
 
     fn random(rand: impl RngCore) -> Self {
         Self(Fq12::random(rand))
+    }
+}
+
+impl Group for Gt {
+    type Scalar = Fr;
+
+    fn zero() -> Self {
+        Self(Fq12::zero())
     }
 }
 

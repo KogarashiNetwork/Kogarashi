@@ -1,4 +1,4 @@
-use zkstd::common::{Group, Pairing, PairingRange};
+use zkstd::common::{GroupParams, Pairing, PairingRange};
 
 /// witness for Kate polynomial commitment
 #[allow(dead_code)]

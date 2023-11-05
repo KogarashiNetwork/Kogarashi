@@ -235,7 +235,7 @@ mod tests {
 
     use bls_12_381::Fr;
     use core::iter;
-    use zkstd::common::{vec, Group, OsRng, PrimeField, Vec};
+    use zkstd::common::{vec, GroupParams, OsRng, PrimeField, Vec};
 
     fn arb_fr() -> Fr {
         Fr::random(OsRng)
