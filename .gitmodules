@@ -1,3 +1,0 @@
-[submodule "primitive/plonk"]
-	path = primitive/plonk
-	url = git@github.com:KogarashiNetwork/dusk-plonk.git
