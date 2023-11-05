@@ -5,7 +5,7 @@ authors = [
 ]
 name = "poly-commit"
 description = 'polynomial commitment implementation'
-version = "0.0.12"
+version = "0.0.13"
 edition = "2021"
 license = "Apache-2.0"
 homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'

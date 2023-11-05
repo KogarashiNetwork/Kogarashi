@@ -1,6 +1,6 @@
 use jub_jub::{Fp as JubJubScalar, JubjubAffine};
 use she_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
-use zero_plonk::prelude::*;
+use zkplonk::prelude::*;
 use zksnarks::constraint_system::ConstraintSystem;
 use zksnarks::groth16::Groth16;
 use zkstd::common::{Decode, Encode, Group, TwistedEdwardsAffine, TwistedEdwardsCurve};

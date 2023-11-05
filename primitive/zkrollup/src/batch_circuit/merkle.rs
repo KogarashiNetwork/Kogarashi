@@ -1,5 +1,5 @@
 use bls_12_381::Fr;
-use zero_plonk::prelude::*;
+use zkplonk::prelude::*;
 use zksnarks::{plonk::wire::PrivateWire, Constraint};
 use zkstd::common::{vec, Group, TwistedEdwardsAffine, Vec};
 
@@ -152,7 +152,7 @@ mod tests {
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
     use red_jubjub::{PublicKey, RedJubjub};
-    use zero_plonk::prelude::*;
+    use zkplonk::prelude::*;
     use zksnarks::keypair::Keypair;
     use zksnarks::plonk::PlonkParams;
     use zksnarks::public_params::PublicParameters;

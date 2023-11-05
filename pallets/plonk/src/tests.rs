@@ -71,7 +71,7 @@ mod plonk_test {
     use crate::types::JubjubScalar;
     use ec_pairing::TatePairing;
     use rand::SeedableRng;
-    use zero_plonk::prelude::PlonkKey;
+    use zkplonk::prelude::PlonkKey;
     use zksnarks::keypair::Keypair;
     use zkstd::common::Group;
 

@@ -20,7 +20,7 @@ she-elgamal = { path = "./primitive/elgamal", default-features = false }
 jub-jub = { path = "./primitive/jubjub", default-features = false }
 poly-commit = { path = "./primitive/poly", default-features = false }
 ec-pairing = { path = "./primitive/pairing", default-features = false }
-zero-plonk = { path = "./primitive/plonk", default-features = false }
+zkplonk = { path = "./primitive/plonk", default-features = false }
 zkrollup = { path = "./primitive/zkrollup", default-features = false }
 zksnarks = { path = "./primitive/zksnarks", default-features = false }
 # pallet

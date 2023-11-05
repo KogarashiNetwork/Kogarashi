@@ -4,7 +4,7 @@ use red_jubjub::{
     constant::{sapling_base_point, sapling_redjubjub_cofactor},
     Signature,
 };
-use zero_plonk::prelude::*;
+use zkplonk::prelude::*;
 use zkstd::common::{RedDSA, Ring};
 use zkstd::common::{SigUtils, TwistedEdwardsCurve};
 
@@ -81,7 +81,7 @@ mod tests {
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
     use red_jubjub::{sapling_hash, RedJubjub, SecretKey};
-    use zero_plonk::prelude::*;
+    use zkplonk::prelude::*;
     use zksnarks::keypair::Keypair;
     use zksnarks::plonk::PlonkParams;
     use zksnarks::public_params::PublicParameters;

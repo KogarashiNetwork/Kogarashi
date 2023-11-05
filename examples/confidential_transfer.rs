@@ -16,7 +16,7 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zero_plonk::prelude::PlonkKey;
+use zkplonk::prelude::PlonkKey;
 use zksnarks::keypair::Keypair;
 use zkstd::common::{Group, TwistedEdwardsCurve};
 

@@ -17,7 +17,7 @@ frame-support = { branch = 'v3.0.0', default-features = false, git = "https://gi
 sp-std = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 sp-runtime = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 # primitive
-zero-plonk = { path = "../../primitive/plonk", default-features = false }
+zkplonk = { path = "../../primitive/plonk", default-features = false }
 ec-pairing = { path = "../../primitive/pairing", default-features = false }
 jub-jub = { path = "../../primitive/jubjub", default-features = false }
 zkstd = { path = "../../primitive/zkstd", default-features = false }

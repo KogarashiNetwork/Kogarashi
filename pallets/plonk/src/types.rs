@@ -1,7 +1,7 @@
 pub use bls_12_381::Fr;
 use codec::{Decode, Encode};
 pub use rand_xorshift::XorShiftRng as FullcodecRng;
-pub use zero_plonk::prelude::{
+pub use zkplonk::prelude::{
     BlsScalar, Circuit, Constraint, Error as PlonkError, JubjubAffine, JubjubScalar, Proof,
 };
 

@@ -8,7 +8,7 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zero_plonk::Plonk as PlonkConstraint;
+use zkplonk::Plonk as PlonkConstraint;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -56,7 +56,7 @@ impl system::Config for Test {
 }
 
 use ec_pairing::TatePairing;
-use zero_plonk::prelude::{Error as CircuitError, *};
+use zkplonk::prelude::{Error as CircuitError, *};
 use zkstd::common::TwistedEdwardsCurve;
 
 #[derive(Debug)]
