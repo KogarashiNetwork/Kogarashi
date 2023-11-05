@@ -20,9 +20,9 @@
 use core::ops::{Add, Sub};
 use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 use num_traits::{CheckedAdd, CheckedSub};
-use parity_scale_codec::{Decode, Encode};
-use serde::{Deserialize, Serialize};
-use zkstd::common::{TwistedEdwardsAffine, TwistedEdwardsCurve};
+use zkstd::common::{
+    Decode, Deserialize, Encode, Serialize, TwistedEdwardsAffine, TwistedEdwardsCurve,
+};
 
 /// ElGamal encryption number encrypted supports additive homomorphism.
 /// allows perform Enc(a) + Enc(b) = Enc(a + b)
@@ -147,8 +147,6 @@ impl ConfidentialTransferPublicInputs<JubjubAffine> for EncryptedNumber {
 #[cfg(test)]
 mod tests {
     use jub_jub::Fp;
-    use rand::{thread_rng, Rng};
-    use rand_core::OsRng;
     use zkstd::common::*;
 
     use crate::EncryptedNumber;
@@ -161,7 +159,7 @@ mod tests {
     fn test_encrypt_decrypt() {
         let priv_k = arb_fr();
         let random = arb_fr();
-        let balance = thread_rng().gen::<u16>();
+        let balance = 5;
         let enc_balance = EncryptedNumber::encrypt(priv_k, balance as u32, random);
 
         let dec_balance = enc_balance.decrypt(priv_k);
@@ -173,8 +171,8 @@ mod tests {
         let priv_k = arb_fr();
         let random1 = arb_fr();
         let random2 = arb_fr();
-        let balance1 = thread_rng().gen::<u16>();
-        let balance2 = thread_rng().gen::<u16>();
+        let balance1 = 5;
+        let balance2 = 5;
         let (balance1, balance2) = if balance1 > balance2 {
             (balance1 as u32, balance2 as u32)
         } else {
@@ -197,12 +195,12 @@ mod tests {
     fn test_elgamal() {
         let alice_pk = arb_fr();
         let bob_pk = arb_fr();
-        let alice_balance = thread_rng().gen::<u16>();
-        let bob_balance = thread_rng().gen::<u16>();
-        let transfer_amount = thread_rng().gen::<u16>();
-        let alice_randomness = thread_rng().gen::<u64>();
-        let bob_randomness = thread_rng().gen::<u64>();
-        let alice_transfer_randomness = thread_rng().gen::<u64>();
+        let alice_balance = 5;
+        let bob_balance = 5;
+        let transfer_amount = 5;
+        let alice_randomness = 5;
+        let bob_randomness = 5;
+        let alice_transfer_randomness = 5;
 
         let (alice_balance, transfer_amount) = if alice_balance > transfer_amount {
             (alice_balance as u32, transfer_amount as u32)
@@ -218,9 +216,9 @@ mod tests {
             } else {
                 (alice_transfer_randomness, alice_randomness)
             };
-        let alice_randomness = Fp::from(alice_randomness);
-        let bob_randomness = Fp::from(bob_randomness);
-        let alice_transfer_randomness = Fp::from(alice_transfer_randomness);
+        let alice_randomness = Fp::from(alice_randomness as u64);
+        let bob_randomness = Fp::from(bob_randomness as u64);
+        let alice_transfer_randomness = Fp::from(alice_transfer_randomness as u64);
 
         let alice_balance_enc = EncryptedNumber::encrypt(alice_pk, alice_balance, alice_randomness);
         let bob_balance_enc = EncryptedNumber::encrypt(bob_pk, bob_balance, bob_randomness);

@@ -131,7 +131,6 @@ peculiar_extension_field_operation!(
 mod tests {
     use super::*;
     use paste::paste;
-    use rand_core::OsRng;
     use zkstd::macros::field::field_test;
 
     field_test!(fq2_field, Fq2, 1000);

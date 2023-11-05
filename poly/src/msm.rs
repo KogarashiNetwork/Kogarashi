@@ -93,10 +93,9 @@ fn get_at(segment: usize, c: usize, bytes: [u8; 32]) -> usize {
 #[cfg(test)]
 mod tests {
     use super::msm_curve_addition;
+
     use bls_12_381::{Fr, G1Affine, G1Projective};
-    use rand_core::OsRng;
-    use zkstd::common::{CurveAffine, CurveGroup};
-    use zkstd::common::{Group, WeierstrassProjective};
+    use zkstd::common::{CurveAffine, CurveGroup, Group, OsRng, Vec, WeierstrassProjective};
 
     fn customized_scalar_point<P: WeierstrassProjective<Extended = P>>(point: P, scalar: &Fr) -> P {
         let mut res = P::ADDITIVE_IDENTITY;

@@ -73,10 +73,7 @@ version = "0.0.23"
 dependencies = [
  "criterion",
  "parity-scale-codec",
- "paste",
  "proptest",
- "rand",
- "rand_core",
  "serde",
  "zkstd",
 ]
@@ -230,8 +227,6 @@ dependencies = [
  "criterion",
  "jub-jub",
  "parity-scale-codec",
- "rand",
- "rand_core",
  "zkstd",
 ]
 
@@ -369,9 +364,7 @@ dependencies = [
  "bls-12-381",
  "criterion",
  "parity-scale-codec",
- "paste",
  "proptest",
- "rand",
  "rand_core",
  "serde",
  "zkstd",
@@ -516,8 +509,6 @@ dependencies = [
  "criterion",
  "ec-pairing",
  "parity-scale-codec",
- "rand",
- "rand_core",
  "rayon",
  "zkstd",
 ]
@@ -769,8 +760,6 @@ dependencies = [
  "jub-jub",
  "num-traits",
  "parity-scale-codec",
- "rand",
- "rand_core",
  "serde",
  "zkstd",
 ]
@@ -1064,7 +1053,6 @@ dependencies = [
  "ec-pairing",
  "jub-jub",
  "poly-commit",
- "rand",
  "zkstd",
 ]
 

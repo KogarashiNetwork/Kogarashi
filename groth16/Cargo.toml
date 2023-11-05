@@ -15,13 +15,8 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "katex-header.html"]
 
 [dependencies]
-rand = { version = "0.8.5", default-features = false }
 zkstd = { path = "../zkstd", default-features = false }
 jub-jub = { path = "../jubjub", default-features = false }
 bls-12-381 = { path = "../bls12_381", default-features = false }
 poly-commit = { path = "../poly", default-features = false }
 ec-pairing = { path = "../pairing", default-features = false }
-
-[features]
-default = ["std"]
-std = ["rand/getrandom"]
