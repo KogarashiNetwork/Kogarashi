@@ -1,6 +1,6 @@
 use crate::arithmetic::utils::Naf;
 use crate::common::{
-    CurveExtended, CurveGroup, PrimeField, WeierstrassAffine, WeierstrassCurve,
+    CurveExtended, CurveGroup, GroupParams, PrimeField, WeierstrassAffine, WeierstrassCurve,
     WeierstrassProjective,
 };
 
@@ -80,7 +80,7 @@ pub fn add_mixed_point<A: WeierstrassAffine>(lhs: A, rhs: A::Projective) -> A::P
         if s1 == y1 {
             return double_affine_point(lhs);
         } else {
-            return <A as CurveGroup>::ADDITIVE_IDENTITY.to_projective();
+            return A::ADDITIVE_IDENTITY.to_projective();
         }
     }
 
@@ -120,7 +120,7 @@ pub fn add_projective_point<P: WeierstrassProjective>(lhs: P, rhs: P) -> P {
         if s1 == s2 {
             return double_projective_point(lhs);
         } else {
-            return <P as CurveGroup>::ADDITIVE_IDENTITY;
+            return P::ADDITIVE_IDENTITY;
         }
     }
 

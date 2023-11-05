@@ -384,8 +384,8 @@ mod tests {
     #[test]
     #[allow(clippy::op_ref)]
     fn bls_operations() {
-        let aff1 = G1Affine::random(OsRng).to_affine();
-        let aff2 = G1Affine::random(OsRng).to_affine();
+        let aff1 = G1Affine::random(OsRng);
+        let aff2 = G1Affine::random(OsRng);
         let mut ext1 = G1Projective::random(OsRng);
         let ext2 = G1Projective::random(OsRng);
         let scalar = Fr::from(42);

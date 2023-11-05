@@ -36,7 +36,6 @@ pub trait Group:
     + SubAssign
     + Mul<Self::Scalar, Output = Self>
     + MulAssign<Self::Scalar>
-    + Sized
     + Copy
 {
     // scalar domain
@@ -47,9 +46,7 @@ pub trait Group:
 }
 
 pub trait CurveGroup:
-    PartialEq
-    + Eq
-    + Sized
+    GroupParams
     + Copy
     + Debug
     + Default
@@ -77,26 +74,11 @@ pub trait CurveGroup:
     type Affine: CurveAffine<Range = Self::Range, Scalar = Self::Scalar, Extended = Self::Extended>;
     type Extended: CurveExtended<Range = Self::Range, Scalar = Self::Scalar, Affine = Self::Affine>;
 
-    // generator of group
-    const ADDITIVE_GENERATOR: Self;
-
-    // additive identity of group
-    // a * e = a for any a
-    const ADDITIVE_IDENTITY: Self;
-
     // return zero element
     fn zero() -> Self;
 
     // check that point is on curve
     fn is_identity(&self) -> bool;
-
-    // get inverse of group element
-    fn invert(self) -> Option<Self>
-    where
-        Self: Sized;
-
-    // get randome element
-    fn random(rand: impl RngCore) -> Self::Extended;
 
     // check that point is on curve
     fn is_on_curve(self) -> bool;

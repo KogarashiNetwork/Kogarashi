@@ -12,12 +12,7 @@ macro_rules! affine_group_operation {
             }
         }
 
-        impl CurveGroup for $affine {
-            type Range = $range;
-            type Affine = $affine;
-            type Extended = $projective;
-            type Scalar = $scalar;
-
+        impl GroupParams for $affine {
             const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
                 y: $y,
@@ -30,14 +25,6 @@ macro_rules! affine_group_operation {
                 is_infinity: true,
             };
 
-            fn is_identity(&self) -> bool {
-                self.is_infinity
-            }
-
-            fn zero() -> Self {
-                Self::ADDITIVE_IDENTITY
-            }
-
             fn invert(self) -> Option<Self> {
                 match self.is_infinity {
                     true => None,
@@ -49,8 +36,23 @@ macro_rules! affine_group_operation {
                 }
             }
 
-            fn random(rand: impl RngCore) -> $projective {
-                Self::ADDITIVE_GENERATOR * $scalar::random(rand)
+            fn random(rand: impl RngCore) -> $affine {
+                $affine::from(Self::ADDITIVE_GENERATOR * $scalar::random(rand))
+            }
+        }
+
+        impl CurveGroup for $affine {
+            type Range = $range;
+            type Affine = $affine;
+            type Extended = $projective;
+            type Scalar = $scalar;
+
+            fn is_identity(&self) -> bool {
+                self.is_infinity
+            }
+
+            fn zero() -> Self {
+                Self::ADDITIVE_IDENTITY
             }
 
             fn double(self) -> $projective {
@@ -91,12 +93,7 @@ macro_rules! projective_group_operation {
             }
         }
 
-        impl CurveGroup for $projective {
-            type Range = $range;
-            type Affine = $affine;
-            type Extended = $projective;
-            type Scalar = $scalar;
-
+        impl GroupParams for $projective {
             const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
                 y: $y,
@@ -108,14 +105,6 @@ macro_rules! projective_group_operation {
                 y: $range::one(),
                 z: $range::zero(),
             };
-
-            fn is_identity(&self) -> bool {
-                self.z == $range::zero()
-            }
-
-            fn zero() -> Self {
-                Self::ADDITIVE_IDENTITY
-            }
 
             fn invert(self) -> Option<Self> {
                 match self.z.is_zero() {
@@ -130,6 +119,21 @@ macro_rules! projective_group_operation {
 
             fn random(rand: impl RngCore) -> Self {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
+            }
+        }
+
+        impl CurveGroup for $projective {
+            type Range = $range;
+            type Affine = $affine;
+            type Extended = $projective;
+            type Scalar = $scalar;
+
+            fn is_identity(&self) -> bool {
+                self.z == $range::zero()
+            }
+
+            fn zero() -> Self {
+                Self::ADDITIVE_IDENTITY
             }
 
             fn double(self) -> Self {
