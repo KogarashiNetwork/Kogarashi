@@ -1,13 +1,10 @@
-mod proof;
+use crate::circuit::Circuit;
+use crate::constraint_system::ConstraintSystem;
+use crate::error::Error;
+use crate::proof::Proof;
+use crate::zksnark::Parameters;
 
 use core::marker::PhantomData;
-
-use crate::circuit::Circuit;
-use crate::constraint_system::{ConstraintSystem, Groth16};
-use crate::error::Error;
-use crate::key::Parameters;
-pub use proof::Proof;
-
 use poly_commit::{msm_curve_addition, Fft, PointsValue};
 use zkstd::common::{CurveGroup, Group, Pairing, RngCore, TwistedEdwardsAffine, Vec};
 
@@ -25,9 +22,9 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
         circuit: C,
     ) -> Result<Proof<P>, Error>
     where
-        C: Circuit<A, ConstraintSystem = Groth16<A>>,
+        C: Circuit<A>,
     {
-        let mut cs = Groth16::<A>::initialize();
+        let mut cs = ConstraintSystem::initialize();
         circuit.synthesize(&mut cs)?;
 
         let size = cs.m().next_power_of_two();

@@ -1,5 +1,5 @@
 use crate::error::Error;
-use crate::key::PreparedVerifyingKey;
+use crate::zksnark::PreparedVerifyingKey;
 
 use zkstd::common::{CurveExtended, Pairing, PairingRange};
 

@@ -1,6 +1,4 @@
-use crate::params::{
-    BLS_X, BLS_X_IS_NEGATIVE, G1_GENERATOR_X, G1_GENERATOR_Y, G1_PARAM_A, G1_PARAM_B,
-};
+use crate::params::{BLS_X, BLS_X_IS_NEGATIVE, G1_GENERATOR_X, G1_GENERATOR_Y, G1_PARAM_B};
 use crate::{Fq, Fr};
 use core::borrow::Borrow;
 use core::iter::Sum;
@@ -386,8 +384,8 @@ mod tests {
     #[test]
     #[allow(clippy::op_ref)]
     fn bls_operations() {
-        let aff1 = G1Affine::random(OsRng).to_affine();
-        let aff2 = G1Affine::random(OsRng).to_affine();
+        let aff1 = G1Affine::random(OsRng);
+        let aff2 = G1Affine::random(OsRng);
         let mut ext1 = G1Projective::random(OsRng);
         let ext2 = G1Projective::random(OsRng);
         let scalar = Fr::from(42);

@@ -1,8 +1,6 @@
 use crate::circuit::Circuit;
-use crate::constraint_system::{ConstraintSystem, Groth16};
+use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
-use crate::keypair::Keypair;
-use crate::params::Groth16Params;
 use crate::prover::Prover;
 use crate::verifier::Verifier;
 
@@ -10,54 +8,20 @@ use core::marker::PhantomData;
 use core::ops::{MulAssign, Neg};
 use poly_commit::{Coefficients, Fft, PointsValue};
 use zkstd::common::{
-    vec, CurveGroup, Group, Pairing, PairingRange, PrimeField, Ring, TwistedEdwardsAffine, Vec,
+    vec, Group, IntGroup, Pairing, PairingRange, PrimeField, Ring, RngCore, TwistedEdwardsAffine,
+    Vec,
 };
 
 /// Generate the arguments to prove and verify a circuit
-pub struct Groth16Key<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>, C: Circuit<A>> {
-    c: PhantomData<C>,
+pub struct ZkSnark<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> {
     p: PhantomData<P>,
     a: PhantomData<A>,
 }
 
-impl<
-        P: Pairing,
-        A: TwistedEdwardsAffine<Range = P::ScalarField>,
-        C: Circuit<A, ConstraintSystem = Groth16<A>>,
-    > Keypair<P, A, C> for Groth16Key<P, A, C>
-{
-    type PublicParameters = Groth16Params<P>;
-    type Prover = Prover<P, A>;
-    type Verifier = Verifier<P>;
-    type ConstraintSystem = Groth16<A>;
-
-    fn compile(pp: &Self::PublicParameters) -> Result<(Self::Prover, Self::Verifier), Error> {
-        Self::compile_with_circuit(pp, b"groth16", &C::default())
-    }
-}
-
-impl<
-        P: Pairing,
-        A: TwistedEdwardsAffine<Range = P::ScalarField>,
-        C: Circuit<A, ConstraintSystem = Groth16<A>>,
-    > Groth16Key<P, A, C>
-{
-    #[allow(clippy::type_complexity)]
-    /// Create a new arguments set from a given circuit instance
-    ///
-    /// Use the provided circuit instead of the default implementation
-    pub fn compile_with_circuit(
-        pp: &Groth16Params<P>,
-        _label: &[u8],
-        circuit: &C,
-    ) -> Result<
-        (
-            <Self as Keypair<P, A, C>>::Prover,
-            <Self as Keypair<P, A, C>>::Verifier,
-        ),
-        Error,
-    > {
-        let mut cs = Groth16::initialize();
+impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> ZkSnark<P, A> {
+    pub fn setup<C: Circuit<A>>(mut r: impl RngCore) -> Result<(Prover<P, A>, Verifier<P>), Error> {
+        let circuit = C::default();
+        let mut cs = ConstraintSystem::initialize();
 
         circuit.synthesize(&mut cs)?;
 
@@ -65,10 +29,15 @@ impl<
         let k = size.trailing_zeros();
         let fft = Fft::<P::ScalarField>::new(k as usize);
 
-        let (alpha, beta, gamma, delta, tau) = pp.toxic_waste;
+        // toxic waste
+        let alpha = P::ScalarField::random(&mut r);
+        let beta = P::ScalarField::random(&mut r);
+        let gamma = P::ScalarField::random(&mut r);
+        let delta = P::ScalarField::random(&mut r);
+        let tau = P::ScalarField::random(&mut r);
 
-        let g1 = pp.generators.0;
-        let g2 = pp.generators.1;
+        let g1 = P::G1Affine::ADDITIVE_GENERATOR;
+        let g2 = P::G2Affine::ADDITIVE_GENERATOR;
 
         let gamma_inverse = gamma.invert().ok_or(Error::ProverInversionFailed)?;
         let delta_inverse = delta.invert().ok_or(Error::ProverInversionFailed)?;

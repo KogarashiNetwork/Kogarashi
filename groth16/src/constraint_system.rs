@@ -1,5 +1,5 @@
 use crate::bit_iterator::BitIterator8;
-use crate::curves::EdwardsExpression;
+use crate::curves::CurveWitness;
 use crate::error::Error;
 use crate::matrix::{Element, SparseRow};
 use crate::r1cs::R1csStruct;
@@ -8,40 +8,30 @@ use crate::wire::Wire;
 use core::ops::{Index, Neg};
 use jub_jub::compute_windowed_naf;
 use zkstd::common::{
-    vec, FftField, Group, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve,
+    vec, FftField, Group, IntGroup, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve,
     TwistedEdwardsExtended, Vec,
 };
 
-/// constraint system trait
-pub trait ConstraintSystem<C: TwistedEdwardsAffine> {
-    type Wire;
-    type Constraints;
-
-    /// init constraint system
-    fn initialize() -> Self;
-
-    /// return constraints length
-    fn m(&self) -> usize;
-
-    /// allocate instance
-    fn alloc_instance(&mut self, instance: C::Range) -> Self::Wire;
-
-    /// allocate witness
-    fn alloc_witness(&mut self, witness: C::Range) -> Self::Wire;
-}
-
 #[derive(Debug)]
-pub struct Groth16<C: TwistedEdwardsAffine> {
+pub struct ConstraintSystem<C: TwistedEdwardsAffine> {
     pub(crate) constraints: R1csStruct<C::Range>,
     pub(crate) instance: Vec<Element<C::Range>>,
     pub(crate) witness: Vec<Element<C::Range>>,
 }
 
-impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
-    type Wire = Wire;
-    type Constraints = R1csStruct<C::Range>;
+impl<C: TwistedEdwardsAffine> Index<Wire> for ConstraintSystem<C> {
+    type Output = C::Range;
 
-    fn initialize() -> Self {
+    fn index(&self, w: Wire) -> &Self::Output {
+        match w {
+            Wire::Instance(i) => &self.instance[i].1,
+            Wire::Witness(i) => &self.witness[i].1,
+        }
+    }
+}
+
+impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
+    pub(crate) fn initialize() -> Self {
         Self {
             constraints: R1csStruct::default(),
             instance: [Element::one()].to_vec(),
@@ -49,7 +39,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
         }
     }
 
-    fn m(&self) -> usize {
+    pub(crate) fn m(&self) -> usize {
         self.constraints.m()
     }
 
@@ -64,20 +54,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
         self.witness.push(Element(wire, witness));
         wire
     }
-}
 
-impl<C: TwistedEdwardsAffine> Index<Wire> for Groth16<C> {
-    type Output = C::Range;
-
-    fn index(&self, w: Wire) -> &Self::Output {
-        match w {
-            Wire::Instance(i) => &self.instance[i].1,
-            Wire::Witness(i) => &self.witness[i].1,
-        }
-    }
-}
-
-impl<C: TwistedEdwardsAffine> Groth16<C> {
     pub(crate) fn instance_len(&self) -> usize {
         self.instance.len()
     }
@@ -99,7 +76,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     }
 
     /// Appends a point in affine form as [`WitnessPoint`]
-    pub fn append_point<A: Into<C>>(&mut self, affine: A) -> EdwardsExpression<C> {
+    pub fn append_point<A: Into<C>>(&mut self, affine: A) -> CurveWitness<C> {
         let affine = affine.into();
 
         let x = self.alloc_witness(affine.get_x());
@@ -112,7 +89,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         &mut self,
         x: SparseRow<C::Range>,
         y: SparseRow<C::Range>,
-    ) -> EdwardsExpression<C> {
+    ) -> CurveWitness<C> {
         let x_squared = self.product(&x, &x);
         let y_squared = self.product(&y, &y);
         let x_squared_y_squared = self.product(&x_squared, &y_squared);
@@ -122,16 +99,12 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
             &(SparseRow::one() + x_squared_y_squared * C::PARAM_D + &x_squared),
         );
 
-        EdwardsExpression::new_unsafe(x, y)
+        CurveWitness::new_unsafe(x, y)
     }
 
     /// Adds two points on an `EdwardsCurve` using the standard algorithm for Twisted Edwards
     /// Curves.
-    pub fn add_points(
-        &mut self,
-        a: &EdwardsExpression<C>,
-        b: &EdwardsExpression<C>,
-    ) -> EdwardsExpression<C> {
+    pub fn add_points(&mut self, a: &CurveWitness<C>, b: &CurveWitness<C>) -> CurveWitness<C> {
         // In order to verify that two points were correctly added
         // without going over a degree 4 polynomial, we will need
         // x_1, y_1, x_2, y_2
@@ -166,20 +139,16 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         //
         // self.append_custom_gate(constraint);
 
-        EdwardsExpression::new_unsafe(SparseRow::from(x_3), SparseRow::from(y_3))
+        CurveWitness::new_unsafe(SparseRow::from(x_3), SparseRow::from(y_3))
     }
 
     /// Performs scalar multiplication in constraints by first splitting up a scalar into
     /// a binary representation, and then performing the naive double-or-add algorithm. This
     /// implementation is generic for all groups.
-    pub fn mul_point(
-        &mut self,
-        scalar: Wire,
-        point: &EdwardsExpression<C>,
-    ) -> EdwardsExpression<C> {
+    pub fn mul_point(&mut self, scalar: Wire, point: &CurveWitness<C>) -> CurveWitness<C> {
         let scalar_bits = self.component_decomposition::<252>(scalar);
 
-        let mut result = EdwardsExpression::identity();
+        let mut result = CurveWitness::identity();
 
         for bit in scalar_bits.iter().rev() {
             result = self.add_points(&result, &result);
@@ -200,7 +169,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
         &mut self,
         jubjub: Wire,
         generator: A,
-    ) -> Result<EdwardsExpression<C>, Error> {
+    ) -> Result<CurveWitness<C>, Error> {
         let generator = generator.into();
 
         // the number of bits is truncated to the maximum possible. however, we
@@ -346,7 +315,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
             &SparseRow::from(jubjub),
         );
 
-        Ok(EdwardsExpression::new_unsafe(
+        Ok(CurveWitness::new_unsafe(
             SparseRow::from(acc_x),
             SparseRow::from(acc_y),
         ))
@@ -360,15 +329,11 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     ///
     /// `bit` is expected to be constrained by
     /// [`Composer::component_boolean`]
-    pub fn component_select_identity(
-        &mut self,
-        bit: Wire,
-        a: &EdwardsExpression<C>,
-    ) -> EdwardsExpression<C> {
+    pub fn component_select_identity(&mut self, bit: Wire, a: &CurveWitness<C>) -> CurveWitness<C> {
         let x = SparseRow::from(self.component_select_zero(bit, &a.x));
         let y = SparseRow::from(self.component_select_one(bit, &a.y));
 
-        EdwardsExpression::new_unsafe(x, y)
+        CurveWitness::new_unsafe(x, y)
     }
 
     /// Conditionally selects a [`PrivateWire`] based on an input bit.
@@ -466,7 +431,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     }
 
     /// Asserts `a == b` by appending two gates
-    pub fn assert_equal_point(&mut self, a: &EdwardsExpression<C>, b: &EdwardsExpression<C>) {
+    pub fn assert_equal_point(&mut self, a: &CurveWitness<C>, b: &CurveWitness<C>) {
         self.assert_equal(&a.x, &b.x);
         self.assert_equal(&a.y, &b.y);
     }
@@ -474,11 +439,7 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
     /// Asserts `point == public`.
     ///
     /// Will add `public` affine coordinates `(x,y)` as public inputs
-    pub fn assert_equal_public_point<A: Into<C>>(
-        &mut self,
-        point: &EdwardsExpression<C>,
-        public: A,
-    ) {
+    pub fn assert_equal_public_point<A: Into<C>>(&mut self, point: &CurveWitness<C>, public: A) {
         let public = public.into();
 
         self.assert_equal(&point.x, &SparseRow::from(public.get_x()));
@@ -648,15 +609,11 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::circuit::Circuit;
     use crate::constraint_system::ConstraintSystem;
     use crate::error::Error;
-    use crate::key::Groth16Key;
-    use crate::keypair::Keypair;
     use crate::matrix::SparseRow;
-    use crate::params::Groth16Params;
-    use crate::public_params::PublicParameters;
+    use crate::zksnark::ZkSnark;
     use bls_12_381::Fr as BlsScalar;
     use ec_pairing::TatePairing;
     use jub_jub::JubjubAffine;
@@ -683,8 +640,10 @@ mod tests {
         }
 
         impl Circuit<JubjubAffine> for DummyCircuit {
-            type ConstraintSystem = Groth16<JubjubAffine>;
-            fn synthesize(&self, composer: &mut Groth16<JubjubAffine>) -> Result<(), Error> {
+            fn synthesize(
+                &self,
+                composer: &mut ConstraintSystem<JubjubAffine>,
+            ) -> Result<(), Error> {
                 let x = composer.alloc_witness(self.x);
                 let y = composer.alloc_witness(self.y);
 
@@ -694,8 +653,6 @@ mod tests {
             }
         }
 
-        let k = 9;
-        let pp = Groth16Params::<TatePairing>::setup(k, OsRng);
         let x = BlsScalar::from_hex(
             "0x187d2619ff114316d237e86684fb6e3c6b15e9b924fa4e322764d3177508297a",
         )
@@ -708,7 +665,7 @@ mod tests {
         let circuit = DummyCircuit::new(x, y);
 
         let (mut prover, verifier) =
-            Groth16Key::<TatePairing, JubjubAffine, DummyCircuit>::compile(&pp)
+            ZkSnark::<TatePairing, JubjubAffine>::setup::<DummyCircuit>(OsRng)
                 .expect("Failed to compile circuit");
         let proof = prover
             .create_proof(&mut OsRng, circuit)
@@ -739,8 +696,10 @@ mod tests {
         }
 
         impl Circuit<JubjubAffine> for DummyCircuit {
-            type ConstraintSystem = Groth16<JubjubAffine>;
-            fn synthesize(&self, composer: &mut Groth16<JubjubAffine>) -> Result<(), Error> {
+            fn synthesize(
+                &self,
+                composer: &mut ConstraintSystem<JubjubAffine>,
+            ) -> Result<(), Error> {
                 let x = SparseRow::from(composer.alloc_instance(self.x));
                 let o = composer.alloc_instance(self.o);
 
@@ -757,14 +716,12 @@ mod tests {
             }
         }
 
-        let k = 9;
-        let pp = Groth16Params::<TatePairing>::setup(k, OsRng);
         let x = BlsScalar::from(3);
         let o = BlsScalar::from(35);
         let circuit = DummyCircuit::new(x, o);
 
         let (mut prover, verifier) =
-            Groth16Key::<TatePairing, JubjubAffine, DummyCircuit>::compile(&pp)
+            ZkSnark::<TatePairing, JubjubAffine>::setup::<DummyCircuit>(OsRng)
                 .expect("Failed to compile circuit");
         let proof = prover
             .create_proof(&mut OsRng, circuit)

@@ -2,16 +2,9 @@
 macro_rules! ext_field_group_operation {
     ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
         impl Group for $extension_field {
-            type Scalar = $extension_field;
-
-            // Todo: this is not actual generator
             const ADDITIVE_GENERATOR: Self = $extension_field::zero();
 
             const ADDITIVE_IDENTITY: Self = $extension_field::zero();
-
-            fn zero() -> Self {
-                Self::ADDITIVE_GENERATOR
-            }
 
             fn invert(self) -> Option<Self> {
                 self.get_invert()
@@ -23,6 +16,12 @@ macro_rules! ext_field_group_operation {
                     limbs[i] = $sub_field::random(&mut rand);
                 }
                 $extension_field(limbs)
+            }
+        }
+
+        impl IntGroup for $extension_field {
+            fn zero() -> Self {
+                $extension_field::zero()
             }
         }
 

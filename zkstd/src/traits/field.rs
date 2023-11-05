@@ -5,7 +5,7 @@ use core::{
     ops::{Add, AddAssign, BitAnd, BitXor, Mul, MulAssign, Sub, SubAssign},
 };
 
-use super::{algebra::Field, comp::ParityCmp};
+use super::{algebra::Field, primitive::ParityCmp};
 use crate::arithmetic::utils::{Bits, Nafs};
 
 // TODO: should be right place

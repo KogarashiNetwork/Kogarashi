@@ -3,14 +3,8 @@
 macro_rules! group_operation {
     ($field:ident, $p:ident, $g:ident, $r:ident, $r2:ident, $r3:ident, $inv:ident) => {
         impl Group for $field {
-            type Scalar = $field;
-
             const ADDITIVE_GENERATOR: Self = $field($g);
             const ADDITIVE_IDENTITY: Self = $field($r);
-
-            fn zero() -> Self {
-                Self(zero())
-            }
 
             fn invert(self) -> Option<Self> {
                 match invert(self.0, little_fermat($p), $r, $p, $inv) {
@@ -21,6 +15,12 @@ macro_rules! group_operation {
 
             fn random(rand: impl RngCore) -> Self {
                 Self(random_limbs(rand, $r2, $r3, $p, $inv))
+            }
+        }
+
+        impl IntGroup for $field {
+            fn zero() -> Self {
+                Self(zero())
             }
         }
 
