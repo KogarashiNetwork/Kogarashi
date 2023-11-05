@@ -1,8 +1,8 @@
 use crate::bit_iterator::BitIterator8;
-use crate::constraint::R1csStruct;
 use crate::curves::EdwardsExpression;
 use crate::error::Error;
 use crate::matrix::{Element, SparseRow};
+use crate::r1cs::R1csStruct;
 use crate::wire::Wire;
 
 use core::ops::{Index, Neg};

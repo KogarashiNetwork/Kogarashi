@@ -2,7 +2,7 @@ use crate::public_params::PublicParameters;
 use zkstd::common::*;
 
 /// Kate polynomial commitment params used for prover polynomial domain and proof verification
-#[derive(Clone, Debug, PartialEq, Decode, Encode, Default)]
+#[derive(Clone, Debug, PartialEq, Default)]
 pub struct Groth16Params<P: Pairing> {
     pub(crate) generators: (P::G1Affine, P::G2Affine),
     pub(crate) toxic_waste: (

@@ -81,9 +81,6 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
         let b_g2_aux = msm_curve_addition(&self.params.b_g2[cs.instance_len()..], &aux_assignment);
 
         if vk.delta_g1.is_identity() || vk.delta_g2.is_identity() {
-            // If this element is zero, someone is trying to perform a
-            // subversion-CRS attack.
-            // TODO: proper error
             return Err(Error::ProverSubVersionCrsAttack);
         }
 
