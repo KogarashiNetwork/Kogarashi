@@ -57,22 +57,6 @@ $ git submodule update --init --recursive
 $ cargo test --all --release
 ```
 
-## Documentation
-
-We describe technical stuff and how to use libraries in [here](https://kogarashinetwork.github.io/Kogarashi/).
-
-### Dev
-
-```
-$ mkdocs serve
-```
-
-### Build
-
-```
-$ mkdocs build
-```
-
 ## Status
 
 **We are in research and development phase and this is alpha quality software. Please use at your own risk**.
@@ -85,7 +69,7 @@ You can check more detail [here](./LICENSE).
 
 ## Follow Us
 
-[Website](https://kogarashi-network.com/) | [Twitter](https://twitter.com/KogarashiCrypto) | [Discord](https://discord.gg/g3q7tsHKTd) | [Github](https://github.com/KogarashiNetwork) | [Documentation](https://kogarashinetwork.github.io/Kogarashi/)
+[Website](https://kogarashi-network.com/) | [Twitter](https://twitter.com/KogarashiCrypto) | [Discord](https://discord.gg/g3q7tsHKTd) | [Github](https://github.com/KogarashiNetwork) | [Documentation](https://kogarashinetwork.github.io/)
 
 [//]: # (crypto primitives)
 
