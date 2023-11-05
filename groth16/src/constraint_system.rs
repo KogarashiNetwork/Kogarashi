@@ -612,8 +612,8 @@ mod tests {
     use crate::circuit::Circuit;
     use crate::constraint_system::ConstraintSystem;
     use crate::error::Error;
-    use crate::keypair::KeyPair;
     use crate::matrix::SparseRow;
+    use crate::zksnark::ZkSnark;
     use bls_12_381::Fr as BlsScalar;
     use ec_pairing::TatePairing;
     use jub_jub::JubjubAffine;
@@ -665,7 +665,7 @@ mod tests {
         let circuit = DummyCircuit::new(x, y);
 
         let (mut prover, verifier) =
-            KeyPair::<TatePairing, JubjubAffine, DummyCircuit>::setup(OsRng)
+            ZkSnark::<TatePairing, JubjubAffine>::setup::<DummyCircuit>(OsRng)
                 .expect("Failed to compile circuit");
         let proof = prover
             .create_proof(&mut OsRng, circuit)
@@ -716,13 +716,12 @@ mod tests {
             }
         }
 
-        let k = 9;
         let x = BlsScalar::from(3);
         let o = BlsScalar::from(35);
         let circuit = DummyCircuit::new(x, o);
 
         let (mut prover, verifier) =
-            KeyPair::<TatePairing, JubjubAffine, DummyCircuit>::setup(OsRng)
+            ZkSnark::<TatePairing, JubjubAffine>::setup::<DummyCircuit>(OsRng)
                 .expect("Failed to compile circuit");
         let proof = prover
             .create_proof(&mut OsRng, circuit)

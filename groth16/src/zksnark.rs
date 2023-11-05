@@ -13,14 +13,13 @@ use zkstd::common::{
 };
 
 /// Generate the arguments to prove and verify a circuit
-pub struct KeyPair<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>, C: Circuit<A>> {
-    c: PhantomData<C>,
+pub struct ZkSnark<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> {
     p: PhantomData<P>,
     a: PhantomData<A>,
 }
 
-impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>, C: Circuit<A>> KeyPair<P, A, C> {
-    pub fn setup(mut r: impl RngCore) -> Result<(Prover<P, A>, Verifier<P>), Error> {
+impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> ZkSnark<P, A> {
+    pub fn setup<C: Circuit<A>>(mut r: impl RngCore) -> Result<(Prover<P, A>, Verifier<P>), Error> {
         let circuit = C::default();
         let mut cs = ConstraintSystem::initialize();
 

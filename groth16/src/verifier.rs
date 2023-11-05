@@ -1,6 +1,6 @@
 use crate::error::Error;
-use crate::keypair::PreparedVerifyingKey;
 use crate::proof::Proof;
+use crate::zksnark::PreparedVerifyingKey;
 
 use zkstd::common::Pairing;
 
