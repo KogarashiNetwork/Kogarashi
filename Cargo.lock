@@ -73,7 +73,6 @@ version = "0.0.23"
 dependencies = [
  "criterion",
  "parity-scale-codec",
- "paste",
  "proptest",
  "serde",
  "zkstd",
@@ -365,9 +364,7 @@ dependencies = [
  "bls-12-381",
  "criterion",
  "parity-scale-codec",
- "paste",
  "proptest",
- "rand",
  "rand_core",
  "serde",
  "zkstd",

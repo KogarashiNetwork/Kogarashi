@@ -25,7 +25,6 @@ zkstd = { path = "../zkstd", default-features = false }
 
 [dev-dependencies]
 criterion = "0.4.0"
-paste = "1.0.11"
 proptest = "1"
 
 [[bench]]

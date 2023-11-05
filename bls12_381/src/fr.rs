@@ -1,6 +1,5 @@
 use core::borrow::Borrow;
 use core::iter::{Product, Sum};
-use serde::{Deserialize, Serialize};
 use zkstd::arithmetic::bits_256::*;
 use zkstd::common::*;
 use zkstd::macros::field::*;

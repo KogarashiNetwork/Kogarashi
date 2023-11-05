@@ -20,9 +20,9 @@
 use core::ops::{Add, Sub};
 use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 use num_traits::{CheckedAdd, CheckedSub};
-use parity_scale_codec::{Decode, Encode};
-use serde::{Deserialize, Serialize};
-use zkstd::common::{TwistedEdwardsAffine, TwistedEdwardsCurve};
+use zkstd::common::{
+    Decode, Deserialize, Encode, Serialize, TwistedEdwardsAffine, TwistedEdwardsCurve,
+};
 
 /// ElGamal encryption number encrypted supports additive homomorphism.
 /// allows perform Enc(a) + Enc(b) = Enc(a + b)

@@ -1,15 +1,13 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use rand::{rngs::OsRng, Rng};
 
 use jub_jub::Fp;
-use zkstd::common::{FftField, Group, PrimeField};
+use zkstd::common::{Group, OsRng, PrimeField};
 
 fn bench_fp(c: &mut Criterion) {
     let mut group = c.benchmark_group("jubjub_fp");
 
     let x = Fp::random(OsRng);
     let y = Fp::random(OsRng);
-    let p = rand::thread_rng().gen::<u64>();
 
     group.bench_function("add", |b| {
         b.iter(|| black_box(black_box(x) + black_box(y)));
@@ -25,9 +23,6 @@ fn bench_fp(c: &mut Criterion) {
     });
     group.bench_function("square", |b| {
         b.iter(|| black_box(black_box(x).square()));
-    });
-    group.bench_function("pow", |b| {
-        b.iter(|| black_box(black_box(x).pow(p)));
     });
     group.bench_function("invert", |b| {
         b.iter(|| black_box(black_box(x).invert()));
