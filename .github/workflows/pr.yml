@@ -4,20 +4,16 @@ on:
     branches: [ master, develop ]
 
 jobs:
-  format:
+  fmt:
     if: github.event.pull_request.draft == false
     name: Code Format Check
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Update submodules
-        id: update
-        run: git submodule update -i
       - uses: actions-rs/toolchain@v1
-      - run: rustup component add rustfmt
+        with:
+          components: rustfmt
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
@@ -30,14 +26,9 @@ jobs:
 
       steps:
         - uses: actions/checkout@v2
-          with:
-            submodules: recursive
-        - name: Update submodules
-          id: update
-          run: git submodule update -i
         - uses: actions-rs/toolchain@v1
-        - run: rustup component add clippy
-        - run: rustup target add wasm32-unknown-unknown
+          with:
+            components: clippy
         - uses: actions-rs/cargo@v1
           with:
             command: clippy
@@ -50,13 +41,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Update submodules
-        id: update
-        run: git submodule update -i
-      - uses: actions-rs/toolchain@v1
-      - run: rustup target add wasm32-unknown-unknown
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         with:

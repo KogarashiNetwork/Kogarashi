@@ -1,7 +1,7 @@
 use super::matrix::{Element, SparseMatrix, SparseRow};
 use super::wire::Wire;
 
-use zkstd::common::{PrimeField, Vec};
+use zkstd::common::{vec, PrimeField, Vec};
 
 #[derive(Clone, Debug, Default)]
 pub struct R1csStruct<F: PrimeField> {

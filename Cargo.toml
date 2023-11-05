@@ -2,10 +2,10 @@
 members = [
     "bls12_381",
     "elgamal",
+    "groth16",
     "jubjub",
     "pairing",
     "poly",
-    "zksnarks",
     "zkstd",
 ]
 

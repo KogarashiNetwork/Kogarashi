@@ -1,5 +1,6 @@
 use crate::error::Error;
-use crate::groth16::key::PreparedVerifyingKey;
+use crate::key::PreparedVerifyingKey;
+
 use zkstd::common::{CurveExtended, Pairing, PairingRange};
 
 pub struct Proof<P: Pairing> {

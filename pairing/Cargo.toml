@@ -19,10 +19,10 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "katex-header.html"]
 
 [dependencies]
+parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
 zkstd = { path = "../zkstd", default-features = false }
 bls-12-381 = { path = "../bls12_381", default-features = false }
 jub-jub = { path = "../jubjub", default-features = false }
-parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
 
 [dev-dependencies]
 criterion = "0.4.0"

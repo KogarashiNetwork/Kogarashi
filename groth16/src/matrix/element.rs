@@ -1,4 +1,4 @@
-use crate::groth16::wire::Wire;
+use crate::wire::Wire;
 
 use zkstd::common::PrimeField;
 

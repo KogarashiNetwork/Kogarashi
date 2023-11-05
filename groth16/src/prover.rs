@@ -3,11 +3,9 @@ mod proof;
 use core::marker::PhantomData;
 
 use crate::circuit::Circuit;
-use crate::constraint_system::ConstraintSystem;
+use crate::constraint_system::{ConstraintSystem, Groth16};
 use crate::error::Error;
-use crate::groth16::error::Groth16Error;
-use crate::groth16::key::Parameters;
-use crate::groth16::Groth16;
+use crate::key::Parameters;
 pub use proof::Proof;
 
 use poly_commit::{msm_curve_addition, Fft, PointsValue};
@@ -83,10 +81,7 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
         let b_g2_aux = msm_curve_addition(&self.params.b_g2[cs.instance_len()..], &aux_assignment);
 
         if vk.delta_g1.is_identity() || vk.delta_g2.is_identity() {
-            // If this element is zero, someone is trying to perform a
-            // subversion-CRS attack.
-            // TODO: proper error
-            return Err(Groth16Error::General.into());
+            return Err(Error::ProverSubVersionCrsAttack);
         }
 
         let r = P::ScalarField::random(&mut *rng);

@@ -1,6 +1,6 @@
 use crate::error::Error;
-use crate::groth16::key::PreparedVerifyingKey;
-use crate::groth16::prover::Proof;
+use crate::key::PreparedVerifyingKey;
+use crate::prover::Proof;
 use zkstd::common::Pairing;
 
 // Verify proofs of a given circuit

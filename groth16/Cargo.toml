@@ -1,6 +1,6 @@
 [package]
-name = "zksnarks"
-description = 'zksnaarks standard library'
+name = "zkgroth16"
+description = 'groth16 implementation'
 version = "0.0.1"
 edition = "2021"
 license = "Apache-2.0"
@@ -15,11 +15,13 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "katex-header.html"]
 
 [dependencies]
+rand = { version = "0.8.5", default-features = false }
 zkstd = { path = "../zkstd", default-features = false }
 jub-jub = { path = "../jubjub", default-features = false }
 bls-12-381 = { path = "../bls12_381", default-features = false }
 poly-commit = { path = "../poly", default-features = false }
 ec-pairing = { path = "../pairing", default-features = false }
-merlin = { version = "3.0", default-features = false }
-rand = { version = "0.8.5", default-features = false, features = ["getrandom"]}
-parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
+
+[features]
+default = ["std"]
+std = ["rand/getrandom"]
