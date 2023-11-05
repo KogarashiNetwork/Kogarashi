@@ -23,22 +23,6 @@ jobs:
           command: fmt
           args: --all -- --check
 
-  bench:
-      if: contains(github.event.pull_request.labels.*.name, 'performance')
-      name: Benchmark
-      runs-on: ubuntu-latest
-
-      steps:
-        - uses: actions/checkout@v2
-          with:
-            submodules: recursive
-        - name: Update submodules
-          id: update
-          run: git submodule update -i
-        - uses: actions-rs/cargo@v1
-          with:
-            command: bench
-
   clippy:
       if: github.event.pull_request.draft == false
       name: Clippy Check

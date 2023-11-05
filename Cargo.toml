@@ -1,30 +1,3 @@
-[package]
-authors = [
-    'ashWhiteHat<phantomofrotten@gmail.com>',
-    'KiriosK<KiriosK@yandex.ru>'
-]
-name = "kogarashi-network"
-description = 'Kogarashi Network hybrid smart contract blockchain'
-version = "0.1.0"
-edition = "2021"
-license = "Apache-2.0"
-homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
-repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
-readme = 'README.md'
-
-[dependencies]
-bls-12-381 = { path = "./bls12_381", default-features = false }
-zkstd = { path = "./zkstd", default-features = false }
-she-elgamal = { path = "./elgamal", default-features = false }
-jub-jub = { path = "./jubjub", default-features = false }
-poly-commit = { path = "./poly", default-features = false }
-ec-pairing = { path = "./pairing", default-features = false }
-zksnarks = { path = "./zksnarks", default-features = false }
-
-[dev-dependencies]
-criterion = "0.4.0"
-rand = { version = "0.8" }
-
 [workspace]
 members = [
     "bls12_381",
@@ -50,34 +23,3 @@ overflow-checks = false
 lto = true
 incremental = false
 codegen-units = 1
-
-[features]
-default = ["std"]
-std = [
-    'poly-commit/std',
-]
-
-[[bench]]
-name = "bls12_381_curve"
-harness = false
-
-[[bench]]
-name = "bls12_381_field"
-harness = false
-
-[[bench]]
-name = "jubjub_curve"
-harness = false
-
-[[bench]]
-name = "jubjub_field"
-harness = false
-
-[[bench]]
-name = "msm"
-harness = false
-required-features = ["std"]
-
-[[bench]]
-name = "pairing"
-harness = false

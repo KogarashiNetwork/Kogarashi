@@ -71,9 +71,11 @@ checksum = "630be753d4e58660abd17930c71b647fe46c27ea6b63cc59e1e3851406972e42"
 name = "bls-12-381"
 version = "0.0.23"
 dependencies = [
+ "criterion",
  "parity-scale-codec",
  "paste",
  "proptest",
+ "rand",
  "rand_core",
  "serde",
  "zkstd",
@@ -256,8 +258,10 @@ name = "ec-pairing"
 version = "0.0.14"
 dependencies = [
  "bls-12-381",
+ "criterion",
  "jub-jub",
  "parity-scale-codec",
+ "rand",
  "rand_core",
  "zkstd",
 ]
@@ -411,9 +415,11 @@ name = "jub-jub"
 version = "0.0.20"
 dependencies = [
  "bls-12-381",
+ "criterion",
  "parity-scale-codec",
  "paste",
  "proptest",
+ "rand",
  "rand_core",
  "serde",
  "zkstd",
@@ -426,21 +432,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f6d5ed8676d904364de097082f4e7d240b571b67989ced0240f08b7f966f940"
 dependencies = [
  "cpufeatures",
-]
-
-[[package]]
-name = "kogarashi-network"
-version = "0.1.0"
-dependencies = [
- "bls-12-381",
- "criterion",
- "ec-pairing",
- "jub-jub",
- "poly-commit",
- "rand",
- "she-elgamal",
- "zksnarks",
- "zkstd",
 ]
 
 [[package]]
@@ -601,8 +592,10 @@ name = "poly-commit"
 version = "0.0.13"
 dependencies = [
  "bls-12-381",
+ "criterion",
  "ec-pairing",
  "parity-scale-codec",
+ "rand",
  "rand_core",
  "rayon",
  "zksnarks",

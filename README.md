@@ -14,11 +14,7 @@ We supports following functionalities.
 3. Trustless Single Node Off-Chain Oracle
 4. IoT TEE Device Remote Attestation
 
-## Library
-
-All users balances are encrypted by the `homomorphic encryption` by default and all transactions executions are proved by the `non-interactive zero knowledge proof`. The blockchain runtime is optimized its structure and execution environment for improving encryption scheme. This blockchain supports the privacy and simplicity of use at the same time. Users balances are encrypted as default and transactions are verified by zero knowledge proof on chain.
-
-### [Crypto Primitives](https://github.com/KogarashiNetwork/Kogarashi/tree/master/primitive)
+## Crypto Primitives
 
 | Name        | Crates.io | Documentation | Description |
 |-------------|-----------|-----------|-----------|
@@ -28,20 +24,10 @@ All users balances are encrypted by the `homomorphic encryption` by default and 
 | [`ec-pairing`] | [![crates.io badge](https://img.shields.io/crates/v/ec-pairing.svg)](https://crates.io/crates/ec-pairing) | [![Documentation](https://docs.rs/ec-pairing/badge.svg)](https://docs.rs/ec-pairing) |`Tate Pairing` implementation. This includes the Miller loop algorithm and pairing construction with pairing-friendly curve.
 | [`she-elgamal`] | [![crates.io](https://img.shields.io/crates/v/she-elgamal.svg)](https://crates.io/crates/she-elgamal) | [![Documentation](https://docs.rs/she-elgamal/badge.svg)](https://docs.rs/she-elgamal) | `ElGamal Encryption` implementation. This includes a public key encryption interface that supports **additive homomorphism**.
 | [`poly-commit`] | [![crates.io](https://img.shields.io/crates/v/poly-commit.svg)](https://crates.io/crates/poly-commit) | [![Documentation](https://docs.rs/poly-commit/badge.svg)](https://docs.rs/poly-commit) | `Kate Polynomial Commitment` implementation. This includes polynomial commitment and operations used for **zero knowledge proof plonk**.
-| [`red-jubjub`] | [![crates.io](https://img.shields.io/crates/v/red-jubjub.svg)](https://crates.io/crates/red-jubjub) | [![Documentation](https://docs.rs/red-jubjub/badge.svg)](https://docs.rs/red-jubjub) | `Redjubjub` implementation. This includes **RedDSA** interfact and public key encryption algorithm.
-
-### [Pallet Functionalities](https://github.com/KogarashiNetwork/Kogarashi/tree/master/pallets)
-
-|Name|Documentation|Description|
-|----|-------------|-----------|
-| [`pallet-plonk`] | [Plonk Tutorial](https://kogarashinetwork.github.io/Kogarashi/plonk_pallet/) |$gen(d) \rightarrow srs,\ com(f, srs) \rightarrow commitment,\ V_{PC} \rightarrow acc\ or\ rej$|
-| [`pallet-encrypted-balance`] |-|$get(address) \rightarrow (g^{r + r'}, g^{a + c} * b^{r + r'})$|
-| [`confidential_transfer`] | [Confidential Transfer Tutorial](https://kogarashinetwork.github.io/Kogarashi/confidential_transfer/) |$C = g^{b^\star}y^r \land \hat C = g^{b^\star} \hat y^r \land D = g^r \land C_L/C = g^{b'}(C_R/D)^{sk} \land y = g^{sk} \land b^\star \in [0, MAX] \land b' \in [0,MAX] $|
 
 ## Test
 
 ```shell
-$ git submodule update --init --recursive
 $ cargo test --all --release
 ```
 
@@ -61,16 +47,9 @@ You can check more detail [here](./LICENSE).
 
 [//]: # (crypto primitives)
 
-[`zkstd`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/primitive/zkstd
-[`jub-jub`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/primitive/jubjub
-[`bls-12-381`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/primitive/bls12_381
-[`ec-pairing`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/primitive/pairing
-[`she-elgamal`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/primitive/elgamal
-[`poly-commit`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/primitive/poly
-[`red-jubjub`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/primitive/redjubjub
-
-[//]: # (pallet functionalities)
-
-[`pallet-plonk`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/pallets/plonk
-[`pallet-encrypted-balance`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/pallets/encrypted_balance
-[`confidential_transfer`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/pallets/confidential_transfer
+[`zkstd`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/zkstd
+[`jub-jub`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/jubjub
+[`bls-12-381`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/bls12_381
+[`ec-pairing`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/pairing
+[`she-elgamal`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/elgamal
+[`poly-commit`]: https://github.com/KogarashiNetwork/Kogarashi/tree/master/poly
