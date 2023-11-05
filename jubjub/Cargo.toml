@@ -1,0 +1,40 @@
+[package]
+authors = [
+    'ashWhiteHat<phantomofrotten@gmail.com>',
+    'KiriosK<KiriosK@yandex.ru>'
+]
+name = "jub-jub"
+description = 'twisted edwards curve implementation'
+version = "0.0.20"
+edition = "2021"
+license = "Apache-2.0"
+homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
+repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
+readme = 'README.md'
+categories = ["cryptography"]
+keywords = ["zkp", "blockchain", "elliptic-curve"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "katex-header.html"]
+
+[dependencies]
+zkstd = { path = "../zkstd", default-features = false }
+bls-12-381 = { path = "../bls12_381", default-features = false }
+serde = { version = "1.0.102", default-features = false, features = ["derive"] }
+parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
+rand_core = { version="0.6.4", default-features = false }
+
+[dev-dependencies]
+criterion = "0.4.0"
+rand = { version = "0.8" }
+proptest = "1"
+paste = "1.0.11"
+
+[[bench]]
+name = "jubjub_curve"
+harness = false
+
+[[bench]]
+name = "jubjub_field"
+harness = false

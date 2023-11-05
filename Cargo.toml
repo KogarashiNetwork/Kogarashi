@@ -1,64 +1,12 @@
-[package]
-authors = [
-    'ashWhiteHat<phantomofrotten@gmail.com>',
-    'KiriosK<KiriosK@yandex.ru>'
-]
-name = "zero-network"
-description = 'Kogarashi Network privacy-preserving blockchain'
-version = "0.1.0"
-edition = "2021"
-license = "Apache-2.0"
-homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
-repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
-readme = 'README.md'
-
-[dependencies]
-# primitive
-bls-12-381 = { path = "./primitive/bls12_381", default-features = false }
-zkstd = { path = "./primitive/zkstd", default-features = false }
-she-elgamal = { path = "./primitive/elgamal", default-features = false }
-jub-jub = { path = "./primitive/jubjub", default-features = false }
-poly-commit = { path = "./primitive/poly", default-features = false }
-ec-pairing = { path = "./primitive/pairing", default-features = false }
-zkplonk = { path = "./primitive/plonk", default-features = false }
-zkrollup = { path = "./primitive/zkrollup", default-features = false }
-zksnarks = { path = "./primitive/zksnarks", default-features = false }
-# pallet
-pallet-plonk = { path = "./pallets/plonk", default-features = false }
-pallet-encrypted-balance = { path = "./pallets/encrypted_balance", default-features = false }
-pallet-zkrollup = { path = "./pallets/zkrollup", default-features = false }
-confidential_transfer = { path = "./pallets/confidential_transfer", default-features = false }
-
-[dev-dependencies]
-criterion = "0.4.0"
-rand = { version = "0.8" }
-rand_core = { version = "0.6.4", default-features = false }
-serde = { version = "1.0.102", default-features = false, features = ["derive"] }
-codec = { version = '2.0.0', default-features = false, features = [
-    'derive'
-], package = 'parity-scale-codec' }
-sp-io = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
-sp-core = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
-sp-runtime = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
-frame-system = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
-frame-support = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
-
 [workspace]
 members = [
-    "pallets/confidential_transfer",
-    "pallets/encrypted_balance",
-    "pallets/plonk",
-    "pallets/zkrollup",
-    "primitive/bls12_381",
-    "primitive/elgamal",
-    "primitive/jubjub",
-    "primitive/pairing",
-    "primitive/plonk",
-    "primitive/poly",
-    "primitive/redjubjub",
-    "primitive/zksnarks",
-    "primitive/zkrollup",
-    "primitive/zkstd",
+    "bls12_381",
+    "elgamal",
+    "jubjub",
+    "pairing",
+    "poly",
+    "zksnarks",
+    "zkstd",
 ]
 
 [profile.release]
@@ -75,43 +23,3 @@ overflow-checks = false
 lto = true
 incremental = false
 codegen-units = 1
-
-[features]
-default = ["std"]
-std = [
-    'poly-commit/std',
-    'confidential_transfer/std',
-    'pallet-plonk/std',
-    'pallet-encrypted-balance/std',
-    'pallet-zkrollup/std'
-]
-
-[[bench]]
-name = "bls12_381_curve"
-harness = false
-
-[[bench]]
-name = "bls12_381_field"
-harness = false
-
-[[bench]]
-name = "confidential_transfer"
-harness = false
-required-features = ["std"]
-
-[[bench]]
-name = "jubjub_curve"
-harness = false
-
-[[bench]]
-name = "jubjub_field"
-harness = false
-
-[[bench]]
-name = "msm"
-harness = false
-required-features = ["std"]
-
-[[bench]]
-name = "pairing"
-harness = false
