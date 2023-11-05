@@ -38,18 +38,6 @@ All users balances are encrypted by the `homomorphic encryption` by default and 
 | [`pallet-encrypted-balance`] |-|$get(address) \rightarrow (g^{r + r'}, g^{a + c} * b^{r + r'})$|
 | [`confidential_transfer`] | [Confidential Transfer Tutorial](https://kogarashinetwork.github.io/Kogarashi/confidential_transfer/) |$C = g^{b^\star}y^r \land \hat C = g^{b^\star} \hat y^r \land D = g^r \land C_L/C = g^{b'}(C_R/D)^{sk} \land y = g^{sk} \land b^\star \in [0, MAX] \land b' \in [0,MAX] $|
 
-## Setup Node
-
-```shell
-$ sh scripts/setup.sh
-```
-
-or
-
-```
-$ docker-compose up
-```
-
 ## Test
 
 ```shell

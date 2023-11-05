@@ -1,9 +1,0 @@
-[workspace]
-members = [
-    'kogarashi',
-    'client',
-    'zkruntime'
-]
-
-[profile.release]
-panic = 'unwind'
