@@ -1,7 +1,6 @@
 use core::iter::{self, Sum};
 use core::ops::{Add, Deref, DerefMut, Index, Mul, Sub};
-use rand_core::RngCore;
-use zkstd::common::{FftField, PrimeField, Vec};
+use zkstd::common::{FftField, PrimeField, RngCore, Vec};
 
 /// polynomial coefficients form expression
 /// a_n-1 , a_n-2, ... , a_0
@@ -233,10 +232,10 @@ impl<'a, 'b, F: FftField> Mul<&'a F> for &'b Coefficients<F> {
 mod tests {
     use super::Coefficients;
     use crate::PointsValue;
+
     use bls_12_381::Fr;
     use core::iter;
-    use rand_core::OsRng;
-    use zkstd::common::{Group, PrimeField};
+    use zkstd::common::{vec, Group, OsRng, PrimeField, Vec};
 
     fn arb_fr() -> Fr {
         Fr::random(OsRng)

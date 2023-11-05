@@ -9,8 +9,7 @@ use crate::key::Parameters;
 pub use proof::Proof;
 
 use poly_commit::{msm_curve_addition, Fft, PointsValue};
-use rand::RngCore;
-use zkstd::common::{CurveGroup, Group, Pairing, TwistedEdwardsAffine, Vec};
+use zkstd::common::{CurveGroup, Group, Pairing, RngCore, TwistedEdwardsAffine, Vec};
 
 #[derive(Debug)]
 pub struct Prover<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> {

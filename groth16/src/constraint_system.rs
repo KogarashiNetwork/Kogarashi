@@ -660,7 +660,7 @@ mod tests {
     use bls_12_381::Fr as BlsScalar;
     use ec_pairing::TatePairing;
     use jub_jub::JubjubAffine;
-    use rand::rngs::OsRng;
+    use zkstd::common::OsRng;
 
     #[test]
     fn circuit_to_r1cs() {

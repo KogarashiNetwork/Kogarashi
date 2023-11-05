@@ -344,7 +344,6 @@ impl From<Fq2> for Fr {
 mod tests {
     use super::*;
     use paste::paste;
-    use rand_core::OsRng;
 
     field_test!(bls12_381_scalar, Fr, 1000);
 

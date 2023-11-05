@@ -3,7 +3,6 @@ macro_rules! curve_test {
     ($test_name:ident, $field:ident, $affine:ident, $projective:ident, $iter_times:expr) => {
         use super::*;
         use paste::paste;
-        use rand_core::OsRng;
 
         curve_operation_test!($test_name, affine, $affine, $field, $iter_times);
         curve_operation_test!($test_name, projective, $projective, $field, $iter_times);

@@ -1,9 +1,8 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use rand::rngs::OsRng;
 
 use bls_12_381::{Fq12, Fr, G1Affine, G2Affine, G2PairingAffine};
 use ec_pairing::TatePairing;
-use zkstd::common::{CurveGroup, Group, Pairing, PairingRange};
+use zkstd::common::{CurveGroup, Group, OsRng, Pairing, PairingRange};
 
 fn pairing(c: &mut Criterion) {
     let mut group = c.benchmark_group("pairing");

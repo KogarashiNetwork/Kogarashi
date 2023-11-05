@@ -20,7 +20,6 @@ rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "katex-header.html"]
 
 [dependencies]
 parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
-rand_core = { version = "0.6", default-features = false }
 rayon = { version = "1.5.1", optional = true }
 zkstd = { path = "../zkstd", default-features = false }
 ec-pairing = { path = "../pairing", default-features = false }
@@ -28,11 +27,6 @@ bls-12-381 = { path = "../bls12_381", default-features = false }
 
 [dev-dependencies]
 criterion = "0.4.0"
-rand = { version = "0.8" }
-
-[features]
-default = ["std"]
-std = ["rand_core/getrandom", "rayon"]
 
 [[bench]]
 name = "msm"

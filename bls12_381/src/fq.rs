@@ -1,4 +1,3 @@
-use rand_core::RngCore;
 use zkstd::arithmetic::bits_384::*;
 use zkstd::common::*;
 use zkstd::macros::field::*;
