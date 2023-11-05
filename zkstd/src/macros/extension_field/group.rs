@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! ext_field_group_operation {
     ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
-        impl GroupParams for $extension_field {
+        impl Group for $extension_field {
             const ADDITIVE_GENERATOR: Self = $extension_field::zero();
 
             const ADDITIVE_IDENTITY: Self = $extension_field::zero();
@@ -19,7 +19,7 @@ macro_rules! ext_field_group_operation {
             }
         }
 
-        impl Group for $extension_field {
+        impl IntGroup for $extension_field {
             type Scalar = $extension_field;
 
             // Todo: this is not actual generator

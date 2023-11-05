@@ -2,7 +2,7 @@
 #[macro_export]
 macro_rules! group_operation {
     ($field:ident, $p:ident, $g:ident, $r:ident, $r2:ident, $r3:ident, $inv:ident) => {
-        impl GroupParams for $field {
+        impl Group for $field {
             const ADDITIVE_GENERATOR: Self = $field($g);
             const ADDITIVE_IDENTITY: Self = $field($r);
 
@@ -18,7 +18,7 @@ macro_rules! group_operation {
             }
         }
 
-        impl Group for $field {
+        impl IntGroup for $field {
             type Scalar = $field;
 
             fn zero() -> Self {

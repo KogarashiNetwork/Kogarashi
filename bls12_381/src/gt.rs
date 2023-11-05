@@ -5,7 +5,7 @@ use zkstd::common::*;
 #[derive(Debug, Clone, Copy)]
 pub struct Gt(pub Fq12);
 
-impl GroupParams for Gt {
+impl Group for Gt {
     const ADDITIVE_GENERATOR: Self = Self(Fq12::generator());
     const ADDITIVE_IDENTITY: Self = Self(Fq12::one());
 
@@ -18,7 +18,7 @@ impl GroupParams for Gt {
     }
 }
 
-impl Group for Gt {
+impl IntGroup for Gt {
     type Scalar = Fr;
 
     fn zero() -> Self {

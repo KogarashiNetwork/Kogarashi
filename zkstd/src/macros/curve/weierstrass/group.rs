@@ -12,7 +12,7 @@ macro_rules! affine_group_operation {
             }
         }
 
-        impl GroupParams for $affine {
+        impl Group for $affine {
             const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
                 y: $y,
@@ -49,10 +49,6 @@ macro_rules! affine_group_operation {
 
             fn is_identity(&self) -> bool {
                 self.is_infinity
-            }
-
-            fn zero() -> Self {
-                Self::ADDITIVE_IDENTITY
             }
 
             fn double(self) -> $projective {
@@ -93,7 +89,7 @@ macro_rules! projective_group_operation {
             }
         }
 
-        impl GroupParams for $projective {
+        impl Group for $projective {
             const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
                 y: $y,
@@ -130,10 +126,6 @@ macro_rules! projective_group_operation {
 
             fn is_identity(&self) -> bool {
                 self.z == $range::zero()
-            }
-
-            fn zero() -> Self {
-                Self::ADDITIVE_IDENTITY
             }
 
             fn double(self) -> Self {

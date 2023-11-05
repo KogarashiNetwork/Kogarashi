@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 use bls_12_381::{Fq, Fq12, Fq2, Fq6, Fr};
-use zkstd::common::{GroupParams, OsRng, PrimeField};
+use zkstd::common::{Group, OsRng, PrimeField};
 
 fn bench_bls12_381_fr(c: &mut Criterion) {
     let mut group = c.benchmark_group("bls12_381_fr");

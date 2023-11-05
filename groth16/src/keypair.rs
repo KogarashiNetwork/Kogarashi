@@ -8,8 +8,8 @@ use core::marker::PhantomData;
 use core::ops::{MulAssign, Neg};
 use poly_commit::{Coefficients, Fft, PointsValue};
 use zkstd::common::{
-    vec, CurveGroup, Group, GroupParams, Pairing, PairingRange, PrimeField, Ring, RngCore,
-    TwistedEdwardsAffine, Vec,
+    vec, Group, IntGroup, Pairing, PairingRange, PrimeField, Ring, RngCore, TwistedEdwardsAffine,
+    Vec,
 };
 
 /// Generate the arguments to prove and verify a circuit

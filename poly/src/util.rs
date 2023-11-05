@@ -47,7 +47,7 @@ pub fn batch_inversion<F: PrimeField>(v: &mut [F]) {
 #[cfg(test)]
 mod test {
     use bls_12_381::Fr as BlsScalar;
-    use zkstd::common::{vec, GroupParams};
+    use zkstd::common::{vec, Group};
 
     use super::*;
     #[test]

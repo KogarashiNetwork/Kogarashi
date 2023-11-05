@@ -7,7 +7,7 @@ use super::{
     comp::{Basic, ParityCmp},
     curve::CurveAffine,
     sign::SigUtils,
-    FftField, Group, WeierstrassAffine, WeierstrassProjective,
+    FftField, IntGroup, WeierstrassAffine, WeierstrassProjective,
 };
 
 /// extension field
@@ -20,7 +20,7 @@ pub trait PairingRange: ExtensionField {
     type G1Affine: CurveAffine;
     type G2Coeff: ParityCmp;
     type QuadraticField: ExtensionField;
-    type Gt: Group + Debug;
+    type Gt: IntGroup + Debug;
 
     fn mul_by_014(
         self,
@@ -58,8 +58,6 @@ pub trait Pairing:
         > + From<Self::G1Projective>
         + Add<Self::G1Projective, Output = Self::G1Projective>
         + SigUtils<48>
-        + PartialEq
-        + Eq
         + Sync
         + Send
         + Encode
@@ -70,8 +68,6 @@ pub trait Pairing:
             Extended = Self::G2Projective,
             Scalar = Self::ScalarField,
         > + From<Self::G2Projective>
-        + PartialEq
-        + Eq
         + Encode
         + Decode;
     // g1 group projective point
@@ -80,12 +76,9 @@ pub trait Pairing:
             Extended = Self::G1Projective,
             Scalar = Self::ScalarField,
         > + From<Self::G1Affine>
-        + Copy
         + Sum
         + Send
-        + Sync
-        + PartialEq
-        + Eq;
+        + Sync;
     // g2 group projective point
     type G2Projective: WeierstrassProjective<
             Affine = Self::G2Affine,
@@ -97,12 +90,12 @@ pub trait Pairing:
         + Eq;
 
     // g2 pairing representation
-    type G2PairngRepr: From<Self::G2Affine> + ParityCmp + Debug + Eq + PartialEq + Clone + Default;
+    type G2PairngRepr: From<Self::G2Affine> + ParityCmp + Clone + Default;
     // range of pairing function
-    type PairingRange: PairingRange + Debug + Eq + PartialEq;
-    type Gt: Group + Debug + Eq + PartialEq;
+    type PairingRange: PairingRange;
+    type Gt: IntGroup;
     // Used for commitment
-    type ScalarField: FftField + Eq + PartialEq + EncodeLike + Decode + SigUtils<32> + Sum;
+    type ScalarField: FftField + EncodeLike + Decode + SigUtils<32> + Sum;
 
     const PARAM_D: Self::ScalarField;
     const X: u64;

@@ -1,6 +1,6 @@
 use crate::matrix::{Element, Evaluable, SparseRow};
 
-use zkstd::common::{Group, Ring, TwistedEdwardsAffine};
+use zkstd::common::{IntGroup, Ring, TwistedEdwardsAffine};
 
 #[derive(Clone, Debug)]
 pub struct CurveWitness<C: TwistedEdwardsAffine> {

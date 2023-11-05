@@ -8,7 +8,9 @@ use rand_core::RngCore;
 
 use super::{CurveAffine, CurveExtended, FftField, PrimeField};
 
-pub trait GroupParams: Eq + PartialEq + Sized {
+/// any element has its inverse and these is the identity in group
+/// existence of inverse is ensured for only additive arithmetic
+pub trait Group: Copy + Debug + Eq + PartialEq + Sized {
     // generator of group
     const ADDITIVE_GENERATOR: Self;
 
@@ -25,10 +27,8 @@ pub trait GroupParams: Eq + PartialEq + Sized {
 
 /// group trait which supports additive and scalar arithmetic
 /// additive and scalar arithmetic hold associative and distributive property
-/// any element has its inverse and these is the identity in group
-/// existence of inverse is ensured for only additive arithmetic
-pub trait Group:
-    GroupParams
+pub trait IntGroup:
+    Group
     + Add<Output = Self>
     + AddAssign
     + Neg<Output = Self>
@@ -36,7 +36,6 @@ pub trait Group:
     + SubAssign
     + Mul<Self::Scalar, Output = Self>
     + MulAssign<Self::Scalar>
-    + Copy
 {
     // scalar domain
     type Scalar: PrimeField;
@@ -46,10 +45,7 @@ pub trait Group:
 }
 
 pub trait CurveGroup:
-    GroupParams
-    + Copy
-    + Debug
-    + Default
+    Group
     + Add<Self, Output = Self::Extended>
     + for<'a> Add<&'a Self, Output = Self::Extended>
     + for<'b> Add<&'b Self, Output = Self::Extended>
@@ -74,9 +70,6 @@ pub trait CurveGroup:
     type Affine: CurveAffine<Range = Self::Range, Scalar = Self::Scalar, Extended = Self::Extended>;
     type Extended: CurveExtended<Range = Self::Range, Scalar = Self::Scalar, Affine = Self::Affine>;
 
-    // return zero element
-    fn zero() -> Self;
-
     // check that point is on curve
     fn is_identity(&self) -> bool;
 
@@ -96,7 +89,7 @@ pub trait CurveGroup:
 /// ring trait which supports additive and multiplicative arithmetics
 /// both arithmetics hold associative and distributive property
 /// default element is multiplicative generator
-pub trait Ring: Group + Mul<Output = Self> + MulAssign + PartialOrd + Ord + Default {
+pub trait Ring: IntGroup + Mul<Output = Self> + MulAssign + PartialOrd + Ord + Default {
     const MULTIPLICATIVE_IDENTITY: Self;
 
     // return one element

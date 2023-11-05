@@ -1,6 +1,6 @@
 use crate::arithmetic::utils::Naf;
 use crate::common::{
-    CurveExtended, CurveGroup, GroupParams, PrimeField, WeierstrassAffine, WeierstrassCurve,
+    CurveExtended, CurveGroup, Group, PrimeField, WeierstrassAffine, WeierstrassCurve,
     WeierstrassProjective,
 };
 
