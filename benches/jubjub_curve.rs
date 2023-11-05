@@ -1,6 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 use rand::rngs::OsRng;
+
+use jub_jub::{Fp, JubjubAffine, JubjubExtended};
 use zkstd::common::{Group, TwistedEdwardsAffine, TwistedEdwardsCurve, TwistedEdwardsExtended};
 
 fn bench_jubjub_affine(c: &mut Criterion) {

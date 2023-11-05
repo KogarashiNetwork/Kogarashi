@@ -13,29 +13,17 @@ repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
 readme = 'README.md'
 
 [dependencies]
-# primitive
 bls-12-381 = { path = "./primitive/bls12_381", default-features = false }
 zkstd = { path = "./primitive/zkstd", default-features = false }
 she-elgamal = { path = "./primitive/elgamal", default-features = false }
 jub-jub = { path = "./primitive/jubjub", default-features = false }
 poly-commit = { path = "./primitive/poly", default-features = false }
 ec-pairing = { path = "./primitive/pairing", default-features = false }
-zkplonk = { path = "./primitive/plonk", default-features = false }
 zksnarks = { path = "./primitive/zksnarks", default-features = false }
 
 [dev-dependencies]
 criterion = "0.4.0"
 rand = { version = "0.8" }
-rand_core = { version = "0.6.4", default-features = false }
-serde = { version = "1.0.102", default-features = false, features = ["derive"] }
-codec = { version = '2.0.0', default-features = false, features = [
-    'derive'
-], package = 'parity-scale-codec' }
-sp-io = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
-sp-core = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
-sp-runtime = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
-frame-system = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
-frame-support = { default-features = false, branch = 'v3.0.0', git = "https://github.com/KogarashiNetwork/zksubstrate" }
 
 [workspace]
 members = [
@@ -43,7 +31,6 @@ members = [
     "primitive/elgamal",
     "primitive/jubjub",
     "primitive/pairing",
-    "primitive/plonk",
     "primitive/poly",
     "primitive/zksnarks",
     "primitive/zkstd",

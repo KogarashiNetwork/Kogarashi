@@ -1,7 +1,8 @@
-use bls_12_381::{Fq12, Fr, G1Affine, G2Affine, G2PairingAffine};
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use ec_pairing::TatePairing;
 use rand::rngs::OsRng;
+
+use bls_12_381::{Fq12, Fr, G1Affine, G2Affine, G2PairingAffine};
+use ec_pairing::TatePairing;
 use zkstd::common::{CurveGroup, Group, Pairing, PairingRange};
 
 fn pairing(c: &mut Criterion) {
