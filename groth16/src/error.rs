@@ -4,8 +4,5 @@ pub enum Error {
     ProverInversionFailed,
     UnsupportedWNAF2k,
     ProofVerificationError,
-    InconsistentPublicInputsLen {
-        expected: usize,
-        provided: usize,
-    }
+    InconsistentPublicInputsLen { expected: usize, provided: usize },
 }

@@ -1,20 +1,16 @@
-use zkstd::common::TwistedEdwardsAffine;
-
 use crate::bit_iterator::BitIterator8;
+use crate::constraint::R1csStruct;
+use crate::curves::EdwardsExpression;
 use crate::error::Error;
+use crate::matrix::{Element, SparseRow};
+use crate::wire::Wire;
 
 use core::ops::{Index, Neg};
 use jub_jub::compute_windowed_naf;
 use zkstd::common::{
-    vec, FftField, Group, PrimeField, Ring, TwistedEdwardsCurve,
+    vec, FftField, Group, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve,
     TwistedEdwardsExtended, Vec,
 };
-
-use crate::constraint::R1csStruct;
-use crate::curves::EdwardsExpression;
-use crate::matrix::{Element, SparseRow};
-use crate::wire::Wire;
-
 
 /// constraint system trait
 pub trait ConstraintSystem<C: TwistedEdwardsAffine> {
@@ -657,10 +653,10 @@ mod tests {
     use crate::constraint_system::ConstraintSystem;
     use crate::error::Error;
     use crate::key::Groth16Key;
-    use crate::params::Groth16Params;
     use crate::keypair::Keypair;
-    use crate::public_params::PublicParameters;
     use crate::matrix::SparseRow;
+    use crate::params::Groth16Params;
+    use crate::public_params::PublicParameters;
     use bls_12_381::Fr as BlsScalar;
     use ec_pairing::TatePairing;
     use jub_jub::JubjubAffine;
