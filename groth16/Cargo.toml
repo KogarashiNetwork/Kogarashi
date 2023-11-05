@@ -1,6 +1,6 @@
 [package]
-name = "zksnarks"
-description = 'zksnaarks standard library'
+name = "zkgroth16"
+description = 'groth16 implementation'
 version = "0.0.1"
 edition = "2021"
 license = "Apache-2.0"

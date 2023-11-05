@@ -1,10 +1,9 @@
 use crate::circuit::Circuit;
-use crate::constraint_system::ConstraintSystem;
+use crate::constraint_system::{ConstraintSystem, Groth16};
 use crate::error::Error;
-use crate::groth16::params::Groth16Params;
-use crate::groth16::prover::Prover;
-use crate::groth16::verifier::Verifier;
-use crate::groth16::Groth16;
+use crate::params::Groth16Params;
+use crate::prover::Prover;
+use crate::verifier::Verifier;
 use crate::keypair::Keypair;
 use core::marker::PhantomData;
 use core::ops::{MulAssign, Neg};
@@ -70,8 +69,8 @@ impl<
         let g1 = pp.generators.0;
         let g2 = pp.generators.1;
 
-        let gamma_inverse = gamma.invert().ok_or(Error::UnexpectedIdentity)?;
-        let delta_inverse = delta.invert().ok_or(Error::UnexpectedIdentity)?;
+        let gamma_inverse = gamma.invert().ok_or(Error::ProverInversionFailed)?;
+        let delta_inverse = delta.invert().ok_or(Error::ProverInversionFailed)?;
 
         let mut h = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.m() - 1];
 

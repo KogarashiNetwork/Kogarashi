@@ -1,4 +1,4 @@
-use crate::groth16::matrix::{Element, Evaluable, SparseRow};
+use crate::matrix::{Element, Evaluable, SparseRow};
 
 use core::marker::PhantomData;
 use zkstd::common::{Group, Ring, TwistedEdwardsAffine};

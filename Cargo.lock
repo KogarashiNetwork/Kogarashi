@@ -555,7 +555,6 @@ dependencies = [
  "rand",
  "rand_core",
  "rayon",
- "zksnarks",
  "zkstd",
 ]
 
@@ -1114,7 +1113,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zksnarks"
+name = "zkgroth16"
 version = "0.0.1"
 dependencies = [
  "bls-12-381",

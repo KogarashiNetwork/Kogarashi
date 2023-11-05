@@ -1,36 +1,42 @@
-#![allow(unused_variables)]
-mod constraint;
-mod key;
-mod matrix;
-mod params;
-mod prover;
-mod verifier;
-mod wire;
+use zkstd::common::TwistedEdwardsAffine;
 
 use crate::bit_iterator::BitIterator8;
-use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
-
-pub(crate) mod curves;
-pub(crate) mod error;
-pub use prover::Prover;
-pub use verifier::Verifier;
 
 use core::ops::{Index, Neg};
 use jub_jub::compute_windowed_naf;
 use zkstd::common::{
-    vec, FftField, Group, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve,
+    vec, FftField, Group, PrimeField, Ring, TwistedEdwardsCurve,
     TwistedEdwardsExtended, Vec,
 };
 
-use constraint::R1csStruct;
-use curves::EdwardsExpression;
-use matrix::{Element, SparseRow};
-use wire::Wire;
+use crate::constraint::R1csStruct;
+use crate::curves::EdwardsExpression;
+use crate::matrix::{Element, SparseRow};
+use crate::wire::Wire;
+
+
+/// constraint system trait
+pub trait ConstraintSystem<C: TwistedEdwardsAffine> {
+    type Wire;
+    type Constraints;
+
+    /// init constraint system
+    fn initialize() -> Self;
+
+    /// return constraints length
+    fn m(&self) -> usize;
+
+    /// allocate instance
+    fn alloc_instance(&mut self, instance: C::Range) -> Self::Wire;
+
+    /// allocate witness
+    fn alloc_witness(&mut self, witness: C::Range) -> Self::Wire;
+}
 
 #[derive(Debug)]
 pub struct Groth16<C: TwistedEdwardsAffine> {
-    constraints: R1csStruct<C::Range>,
+    pub(crate) constraints: R1csStruct<C::Range>,
     pub(crate) instance: Vec<Element<C::Range>>,
     pub(crate) witness: Vec<Element<C::Range>>,
 }
@@ -76,11 +82,11 @@ impl<C: TwistedEdwardsAffine> Index<Wire> for Groth16<C> {
 }
 
 impl<C: TwistedEdwardsAffine> Groth16<C> {
-    fn instance_len(&self) -> usize {
+    pub(crate) fn instance_len(&self) -> usize {
         self.instance.len()
     }
 
-    fn witness_len(&self) -> usize {
+    pub(crate) fn witness_len(&self) -> usize {
         self.witness.len()
     }
 
@@ -650,14 +656,14 @@ mod tests {
     use crate::circuit::Circuit;
     use crate::constraint_system::ConstraintSystem;
     use crate::error::Error;
-    use crate::groth16::key::Groth16Key;
-    use crate::groth16::params::Groth16Params;
+    use crate::key::Groth16Key;
+    use crate::params::Groth16Params;
     use crate::keypair::Keypair;
     use crate::public_params::PublicParameters;
+    use crate::matrix::SparseRow;
     use bls_12_381::Fr as BlsScalar;
     use ec_pairing::TatePairing;
     use jub_jub::JubjubAffine;
-    use matrix::SparseRow;
     use rand::rngs::OsRng;
 
     #[test]
