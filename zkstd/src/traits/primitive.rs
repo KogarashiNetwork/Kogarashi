@@ -12,4 +12,4 @@ pub trait ParityCmp: Decode + Encode {}
 pub trait RuntimeCmp: Send + Sync + Sized + Eq + PartialEq + Clone + 'static {}
 
 /// basic struct trait
-pub trait Basic: Clone + Copy + Debug + Default + Sized {}
+pub trait Basic: Clone + Copy + Debug + Sized {}

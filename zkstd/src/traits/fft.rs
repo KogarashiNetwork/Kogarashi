@@ -1,7 +1,7 @@
 // This trait resresents zkSNARKs trait
 
 use super::field::PrimeField;
-use super::{algebra::Field, comp::ParallelCmp};
+use super::{algebra::Field, primitive::ParallelCmp};
 
 // TODO: need to rethink fft and prime field method
 /// This is fft field

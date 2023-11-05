@@ -19,8 +19,6 @@ macro_rules! group_operation {
         }
 
         impl IntGroup for $field {
-            type Scalar = $field;
-
             fn zero() -> Self {
                 Self(zero())
             }

@@ -4,8 +4,8 @@ use parity_scale_codec::{Decode, Encode, EncodeLike};
 
 use super::{
     algebra::Field,
-    comp::{Basic, ParityCmp},
     curve::CurveAffine,
+    primitive::{Basic, ParityCmp},
     sign::SigUtils,
     FftField, IntGroup, WeierstrassAffine, WeierstrassProjective,
 };

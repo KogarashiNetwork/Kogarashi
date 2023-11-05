@@ -20,9 +20,6 @@ macro_rules! ext_field_group_operation {
         }
 
         impl IntGroup for $extension_field {
-            type Scalar = $extension_field;
-
-            // Todo: this is not actual generator
             fn zero() -> Self {
                 $extension_field::zero()
             }

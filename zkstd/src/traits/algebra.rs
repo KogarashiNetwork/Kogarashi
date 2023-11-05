@@ -1,16 +1,13 @@
 // trait resresenting abstract algebra concept
-use crate::common::Basic;
-use core::{
-    fmt::Debug,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
-};
+use crate::traits::primitive::Basic;
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use rand_core::RngCore;
 
 use super::{CurveAffine, CurveExtended, FftField, PrimeField};
 
 /// any element has its inverse and these is the identity in group
 /// existence of inverse is ensured for only additive arithmetic
-pub trait Group: Copy + Debug + Eq + PartialEq + Sized {
+pub trait Group: Basic + Eq + PartialEq {
     // generator of group
     const ADDITIVE_GENERATOR: Self;
 
@@ -28,18 +25,8 @@ pub trait Group: Copy + Debug + Eq + PartialEq + Sized {
 /// group trait which supports additive and scalar arithmetic
 /// additive and scalar arithmetic hold associative and distributive property
 pub trait IntGroup:
-    Group
-    + Add<Output = Self>
-    + AddAssign
-    + Neg<Output = Self>
-    + Sub<Output = Self>
-    + SubAssign
-    + Mul<Self::Scalar, Output = Self>
-    + MulAssign<Self::Scalar>
+    Group + Add<Output = Self> + AddAssign + Neg<Output = Self> + Sub<Output = Self> + SubAssign
 {
-    // scalar domain
-    type Scalar: PrimeField;
-
     // return zero element
     fn zero() -> Self;
 }
@@ -89,7 +76,7 @@ pub trait CurveGroup:
 /// ring trait which supports additive and multiplicative arithmetics
 /// both arithmetics hold associative and distributive property
 /// default element is multiplicative generator
-pub trait Ring: IntGroup + Mul<Output = Self> + MulAssign + PartialOrd + Ord + Default {
+pub trait Ring: IntGroup + PartialOrd + Ord + Default + Mul<Output = Self> + MulAssign {
     const MULTIPLICATIVE_IDENTITY: Self;
 
     // return one element
@@ -98,4 +85,4 @@ pub trait Ring: IntGroup + Mul<Output = Self> + MulAssign + PartialOrd + Ord + D
 
 /// field trait which ensures the existence of inverse for both multiplicative and additive arithmetic
 /// hence field supports division for any element
-pub trait Field: Ring + Basic + Div<Output = Self> + DivAssign + 'static {}
+pub trait Field: Ring + Div<Output = Self> + DivAssign {}

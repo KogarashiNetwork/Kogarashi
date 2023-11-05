@@ -1,9 +1,11 @@
-use crate::{Fq12, Fr};
+use crate::Fq12;
 use zkstd::common::*;
 
 /// pairing target group of 12 degree extension of field
 #[derive(Debug, Clone, Copy)]
 pub struct Gt(pub Fq12);
+
+impl Basic for Gt {}
 
 impl Group for Gt {
     const ADDITIVE_GENERATOR: Self = Self(Fq12::generator());
@@ -19,8 +21,6 @@ impl Group for Gt {
 }
 
 impl IntGroup for Gt {
-    type Scalar = Fr;
-
     fn zero() -> Self {
         Self(Fq12::zero())
     }
@@ -58,26 +58,16 @@ impl Sub for Gt {
     }
 }
 
-impl Mul<Fr> for Gt {
+impl Mul<Gt> for Gt {
     type Output = Gt;
 
-    fn mul(self, other: Fr) -> Self::Output {
-        let mut res = Self::Output::ADDITIVE_IDENTITY;
-        let mut acc = self;
-        for &naf in other.to_nafs().iter() {
-            if naf == Naf::Plus {
-                res += acc;
-            } else if naf == Naf::Minus {
-                res -= acc;
-            }
-            acc = acc.double();
-        }
-        res
+    fn mul(self, other: Gt) -> Self::Output {
+        Gt(self.0 * other.0)
     }
 }
 
-impl MulAssign<Fr> for Gt {
-    fn mul_assign(&mut self, rhs: Fr) {
+impl MulAssign for Gt {
+    fn mul_assign(&mut self, rhs: Gt) {
         *self = *self * rhs;
     }
 }
