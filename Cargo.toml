@@ -3,8 +3,8 @@ authors = [
     'ashWhiteHat<phantomofrotten@gmail.com>',
     'KiriosK<KiriosK@yandex.ru>'
 ]
-name = "zero-network"
-description = 'Kogarashi Network privacy-preserving blockchain'
+name = "kogarashi-network"
+description = 'Kogarashi Network hybrid smart contract blockchain'
 version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"
@@ -21,13 +21,7 @@ jub-jub = { path = "./primitive/jubjub", default-features = false }
 poly-commit = { path = "./primitive/poly", default-features = false }
 ec-pairing = { path = "./primitive/pairing", default-features = false }
 zkplonk = { path = "./primitive/plonk", default-features = false }
-zkrollup = { path = "./primitive/zkrollup", default-features = false }
 zksnarks = { path = "./primitive/zksnarks", default-features = false }
-# pallet
-pallet-plonk = { path = "./pallets/plonk", default-features = false }
-pallet-encrypted-balance = { path = "./pallets/encrypted_balance", default-features = false }
-pallet-zkrollup = { path = "./pallets/zkrollup", default-features = false }
-confidential_transfer = { path = "./pallets/confidential_transfer", default-features = false }
 
 [dev-dependencies]
 criterion = "0.4.0"
@@ -45,19 +39,13 @@ frame-support = { default-features = false, branch = 'v3.0.0', git = "https://gi
 
 [workspace]
 members = [
-    "pallets/confidential_transfer",
-    "pallets/encrypted_balance",
-    "pallets/plonk",
-    "pallets/zkrollup",
     "primitive/bls12_381",
     "primitive/elgamal",
     "primitive/jubjub",
     "primitive/pairing",
     "primitive/plonk",
     "primitive/poly",
-    "primitive/redjubjub",
     "primitive/zksnarks",
-    "primitive/zkrollup",
     "primitive/zkstd",
 ]
 
@@ -80,10 +68,6 @@ codegen-units = 1
 default = ["std"]
 std = [
     'poly-commit/std',
-    'confidential_transfer/std',
-    'pallet-plonk/std',
-    'pallet-encrypted-balance/std',
-    'pallet-zkrollup/std'
 ]
 
 [[bench]]
@@ -93,11 +77,6 @@ harness = false
 [[bench]]
 name = "bls12_381_field"
 harness = false
-
-[[bench]]
-name = "confidential_transfer"
-harness = false
-required-features = ["std"]
 
 [[bench]]
 name = "jubjub_curve"
