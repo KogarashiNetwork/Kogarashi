@@ -1,9 +1,8 @@
-use crate::public_params::PublicParameters;
 use zkstd::common::*;
 
 /// Kate polynomial commitment params used for prover polynomial domain and proof verification
 #[derive(Clone, Debug, PartialEq, Default)]
-pub struct Groth16Params<P: Pairing> {
+pub struct PublicParameters<P: Pairing> {
     pub(crate) generators: (P::G1Affine, P::G2Affine),
     pub(crate) toxic_waste: (
         P::ScalarField,
@@ -14,11 +13,11 @@ pub struct Groth16Params<P: Pairing> {
     ),
 }
 
-impl<P: Pairing> PublicParameters<P> for Groth16Params<P> {
+impl<P: Pairing> PublicParameters<P> {
     const ADDITIONAL_DEGREE: usize = 0;
 
     /// setup polynomial evaluation domain
-    fn setup(_k: u64, mut r: impl RngCore) -> Self {
+    pub(crate) fn setup(_k: u64, mut r: impl RngCore) -> Self {
         Self {
             generators: (
                 P::G1Affine::ADDITIVE_GENERATOR,

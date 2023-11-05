@@ -12,36 +12,15 @@ use zkstd::common::{
     TwistedEdwardsExtended, Vec,
 };
 
-/// constraint system trait
-pub trait ConstraintSystem<C: TwistedEdwardsAffine> {
-    type Wire;
-    type Constraints;
-
-    /// init constraint system
-    fn initialize() -> Self;
-
-    /// return constraints length
-    fn m(&self) -> usize;
-
-    /// allocate instance
-    fn alloc_instance(&mut self, instance: C::Range) -> Self::Wire;
-
-    /// allocate witness
-    fn alloc_witness(&mut self, witness: C::Range) -> Self::Wire;
-}
-
 #[derive(Debug)]
-pub struct Groth16<C: TwistedEdwardsAffine> {
+pub struct ConstraintSystem<C: TwistedEdwardsAffine> {
     pub(crate) constraints: R1csStruct<C::Range>,
     pub(crate) instance: Vec<Element<C::Range>>,
     pub(crate) witness: Vec<Element<C::Range>>,
 }
 
-impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
-    type Wire = Wire;
-    type Constraints = R1csStruct<C::Range>;
-
-    fn initialize() -> Self {
+impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
+    pub(crate) fn initialize() -> Self {
         Self {
             constraints: R1csStruct::default(),
             instance: [Element::one()].to_vec(),
@@ -49,7 +28,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
         }
     }
 
-    fn m(&self) -> usize {
+    pub(crate) fn m(&self) -> usize {
         self.constraints.m()
     }
 
@@ -66,7 +45,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> for Groth16<C> {
     }
 }
 
-impl<C: TwistedEdwardsAffine> Index<Wire> for Groth16<C> {
+impl<C: TwistedEdwardsAffine> Index<Wire> for ConstraintSystem<C> {
     type Output = C::Range;
 
     fn index(&self, w: Wire) -> &Self::Output {
@@ -77,7 +56,7 @@ impl<C: TwistedEdwardsAffine> Index<Wire> for Groth16<C> {
     }
 }
 
-impl<C: TwistedEdwardsAffine> Groth16<C> {
+impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
     pub(crate) fn instance_len(&self) -> usize {
         self.instance.len()
     }
@@ -648,15 +627,12 @@ impl<C: TwistedEdwardsAffine> Groth16<C> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::circuit::Circuit;
     use crate::constraint_system::ConstraintSystem;
     use crate::error::Error;
-    use crate::key::Groth16Key;
-    use crate::keypair::Keypair;
+    use crate::keypair::KeyPair;
     use crate::matrix::SparseRow;
-    use crate::params::Groth16Params;
-    use crate::public_params::PublicParameters;
+    use crate::public_parameters::PublicParameters;
     use bls_12_381::Fr as BlsScalar;
     use ec_pairing::TatePairing;
     use jub_jub::JubjubAffine;
@@ -683,8 +659,10 @@ mod tests {
         }
 
         impl Circuit<JubjubAffine> for DummyCircuit {
-            type ConstraintSystem = Groth16<JubjubAffine>;
-            fn synthesize(&self, composer: &mut Groth16<JubjubAffine>) -> Result<(), Error> {
+            fn synthesize(
+                &self,
+                composer: &mut ConstraintSystem<JubjubAffine>,
+            ) -> Result<(), Error> {
                 let x = composer.alloc_witness(self.x);
                 let y = composer.alloc_witness(self.y);
 
@@ -695,7 +673,7 @@ mod tests {
         }
 
         let k = 9;
-        let pp = Groth16Params::<TatePairing>::setup(k, OsRng);
+        let pp = PublicParameters::<TatePairing>::setup(k, OsRng);
         let x = BlsScalar::from_hex(
             "0x187d2619ff114316d237e86684fb6e3c6b15e9b924fa4e322764d3177508297a",
         )
@@ -708,7 +686,7 @@ mod tests {
         let circuit = DummyCircuit::new(x, y);
 
         let (mut prover, verifier) =
-            Groth16Key::<TatePairing, JubjubAffine, DummyCircuit>::compile(&pp)
+            KeyPair::<TatePairing, JubjubAffine, DummyCircuit>::compile(&pp)
                 .expect("Failed to compile circuit");
         let proof = prover
             .create_proof(&mut OsRng, circuit)
@@ -739,8 +717,10 @@ mod tests {
         }
 
         impl Circuit<JubjubAffine> for DummyCircuit {
-            type ConstraintSystem = Groth16<JubjubAffine>;
-            fn synthesize(&self, composer: &mut Groth16<JubjubAffine>) -> Result<(), Error> {
+            fn synthesize(
+                &self,
+                composer: &mut ConstraintSystem<JubjubAffine>,
+            ) -> Result<(), Error> {
                 let x = SparseRow::from(composer.alloc_instance(self.x));
                 let o = composer.alloc_instance(self.o);
 
@@ -758,13 +738,13 @@ mod tests {
         }
 
         let k = 9;
-        let pp = Groth16Params::<TatePairing>::setup(k, OsRng);
+        let pp = PublicParameters::<TatePairing>::setup(k, OsRng);
         let x = BlsScalar::from(3);
         let o = BlsScalar::from(35);
         let circuit = DummyCircuit::new(x, o);
 
         let (mut prover, verifier) =
-            Groth16Key::<TatePairing, JubjubAffine, DummyCircuit>::compile(&pp)
+            KeyPair::<TatePairing, JubjubAffine, DummyCircuit>::compile(&pp)
                 .expect("Failed to compile circuit");
         let proof = prover
             .create_proof(&mut OsRng, circuit)

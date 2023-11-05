@@ -1,5 +1,5 @@
 use crate::error::Error;
-use crate::key::PreparedVerifyingKey;
+use crate::keypair::PreparedVerifyingKey;
 use crate::prover::Proof;
 use zkstd::common::Pairing;
 
