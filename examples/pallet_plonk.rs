@@ -5,7 +5,7 @@ use ec_pairing::TatePairing;
 use jub_jub::{Fp as JubJubScalar, JubjubAffine, JubjubExtended};
 use pallet::*;
 use pallet_plonk::{BlsScalar, Circuit, FullcodecRng, Proof};
-use zero_plonk::{prelude::*, Plonk as PlonkConstraint};
+use zkplonk::{prelude::*, Plonk as PlonkConstraint};
 use zksnarks::keypair::Keypair;
 use zkstd::common::{Pairing, TwistedEdwardsCurve};
 

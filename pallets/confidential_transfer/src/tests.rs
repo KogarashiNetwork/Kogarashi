@@ -14,7 +14,7 @@ mod plonk_test {
     use jub_jub::JubjubAffine;
     use pallet_plonk::FullcodecRng;
     use rand::SeedableRng;
-    use zero_plonk::prelude::PlonkKey;
+    use zkplonk::prelude::PlonkKey;
     use zksnarks::keypair::Keypair;
 
     fn get_rng() -> FullcodecRng {

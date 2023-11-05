@@ -23,14 +23,14 @@ she-elgamal = { path = '../../primitive/elgamal', default-features = false }
 jub-jub = { path = '../../primitive/jubjub', default-features = false }
 ec-pairing = { path = '../../primitive/pairing', default-features = false }
 zkstd = { path = "../../primitive/zkstd", default-features = false }
+zkrollup = { path = "../../primitive/zkrollup", default-features = false }
+bls-12-381 = { path = '../../primitive/bls12_381', default-features = false }
+red-jubjub = { path = "../../primitive/redjubjub", default-features = false}
 sp-std = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 sp-runtime = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 sp-arithmetic = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 frame-support = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
 frame-system = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
-zkrollup = { path = "../../primitive/zkrollup", default-features = false }
-bls-12-381 = { path = '../../primitive/bls12_381', default-features = false }
-red-jubjub = { path = "../../primitive/redjubjub", default-features = false}
 pallet-plonk = { path = "../plonk", default-features = false }
 
 [dev-dependencies]

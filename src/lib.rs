@@ -17,6 +17,6 @@ use poly_commit::*;
 #[allow(unused_imports)]
 use she_elgamal::*;
 #[allow(unused_imports)]
-use zero_plonk::*;
+use zkplonk::*;
 #[allow(unused_imports)]
 use zkstd::*;

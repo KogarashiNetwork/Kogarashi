@@ -1,7 +1,12 @@
 [package]
 name = "zksnarks"
-version = "0.1.0"
+description = 'zksnaarks standard library'
+version = "0.0.1"
 edition = "2021"
+license = "Apache-2.0"
+homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
+repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
+readme = 'README.md'
 categories = ["cryptography"]
 keywords = ["zkp", "blockchain", "elliptic-curve"]
 
@@ -14,7 +19,7 @@ zkstd = { path = "../zkstd", default-features = false }
 jub-jub = { path = "../jubjub", default-features = false }
 bls-12-381 = { path = "../bls12_381", default-features = false }
 poly-commit = { path = "../poly", default-features = false }
-parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
-merlin = { version = "3.0", default-features = false }
 ec-pairing = { path = "../pairing", default-features = false }
+merlin = { version = "3.0", default-features = false }
 rand = { version = "0.8.5", default-features = false, features = ["getrandom"]}
+parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }

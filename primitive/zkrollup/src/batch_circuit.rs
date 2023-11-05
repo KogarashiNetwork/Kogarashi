@@ -1,7 +1,7 @@
 mod merkle;
 use core::fmt::Debug;
 
-use zero_plonk::prelude::*;
+use zkplonk::prelude::*;
 use zkstd::common::{RedDSA, SigUtils};
 
 use crate::{
@@ -127,7 +127,7 @@ mod tests {
     use rand::rngs::StdRng;
     use rand_core::SeedableRng;
     use red_jubjub::{RedJubjub, SecretKey};
-    use zero_plonk::prelude::*;
+    use zkplonk::prelude::*;
     use zksnarks::keypair::Keypair;
     use zksnarks::plonk::PlonkParams;
     use zksnarks::public_params::PublicParameters;

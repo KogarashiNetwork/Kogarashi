@@ -4,7 +4,7 @@ use ec_pairing::TatePairing;
 use jub_jub::*;
 use rand::{rngs::StdRng, SeedableRng};
 use she_elgamal::EncryptedNumber;
-use zero_plonk::prelude::*;
+use zkplonk::prelude::*;
 use zksnarks::keypair::Keypair;
 use zksnarks::plonk::PlonkParams;
 use zksnarks::public_params::PublicParameters;

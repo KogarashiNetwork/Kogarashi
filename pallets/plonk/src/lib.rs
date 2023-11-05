@@ -71,7 +71,7 @@ pub use types::*;
 use frame_support::dispatch::{DispatchErrorWithPostInfo, PostDispatchInfo};
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
-use zero_plonk::prelude::{Plonk as ConstraintPlonk, PlonkKey};
+use zkplonk::prelude::{Plonk as ConstraintPlonk, PlonkKey};
 use zksnarks::keypair::Keypair;
 use zksnarks::plonk::PlonkParams;
 use zksnarks::public_params::PublicParameters as PublicParametersTrait;

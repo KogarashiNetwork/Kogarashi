@@ -1,6 +1,6 @@
 use jub_jub::{Fp as JubJubScalar, JubjubAffine};
 use she_elgamal::{ConfidentialTransferPublicInputs, EncryptedNumber};
-use zero_plonk::prelude::*;
+use zkplonk::prelude::*;
 use zkstd::common::{Decode, Encode, Group, TwistedEdwardsAffine, TwistedEdwardsCurve};
 
 pub const BALANCE_BITS: usize = 16;

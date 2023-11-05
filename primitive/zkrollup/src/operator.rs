@@ -8,7 +8,7 @@ use crate::{
 };
 use ark_std::rand::Rng;
 use red_jubjub::PublicKey;
-use zero_plonk::prelude::{PlonkKey, Proof};
+use zkplonk::prelude::{PlonkKey, Proof};
 use zksnarks::keypair::Keypair;
 use zksnarks::plonk::PlonkParams;
 use zkstd::common::{vec, Decode, Encode, Pairing, RedDSA, SigUtils, Vec};
