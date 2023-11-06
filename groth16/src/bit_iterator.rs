@@ -46,6 +46,7 @@ macro_rules! bit_iterator {
         }
     };
 }
+
 bit_iterator!(u8, BitIterator8);
 
 #[cfg(test)]
@@ -53,7 +54,6 @@ mod test {
     use super::*;
     use bls_12_381::Fr as BlsScalar;
     use zkstd::common::SigUtils;
-    use zkstd::common::Vec;
 
     #[test]
     fn test_bit_iterator8() {
@@ -62,6 +62,5 @@ mod test {
         for e in expected.chars() {
             assert_eq!(a.next().unwrap(), (e == '1'));
         }
-        let _a_vec: Vec<_> = a.collect();
     }
 }

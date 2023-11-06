@@ -1,4 +1,4 @@
-use super::matrix::{Element, SparseMatrix, SparseRow};
+use super::matrix::{DenseVectors, SparseMatrix, SparseRow};
 use super::wire::Wire;
 
 use zkstd::common::{vec, PrimeField, Vec};
@@ -7,27 +7,27 @@ use zkstd::common::{vec, PrimeField, Vec};
 pub struct R1csStruct<F: PrimeField> {
     // matrix size
     m: usize,
-    pub(crate) a: SparseMatrix<F>,
-    pub(crate) b: SparseMatrix<F>,
-    pub(crate) c: SparseMatrix<F>,
+    pub a: SparseMatrix<F>,
+    pub b: SparseMatrix<F>,
+    pub c: SparseMatrix<F>,
 }
 
 impl<F: PrimeField> R1csStruct<F> {
-    pub(crate) fn m(&self) -> usize {
+    pub fn m(&self) -> usize {
         self.m
     }
 
-    pub(crate) fn append(&mut self, a: SparseRow<F>, b: SparseRow<F>, c: SparseRow<F>) {
+    pub fn append(&mut self, a: SparseRow<F>, b: SparseRow<F>, c: SparseRow<F>) {
         self.a.0.push(a);
         self.b.0.push(b);
         self.c.0.push(c);
         self.m += 1;
     }
 
-    pub(crate) fn evaluate(
+    pub fn evaluate(
         &self,
-        instance: &[Element<F>],
-        witness: &[Element<F>],
+        instance: &DenseVectors<F>,
+        witness: &DenseVectors<F>,
     ) -> (Vec<F>, Vec<F>, Vec<F>) {
         let (mut a_evals, mut b_evals, mut c_evals) = (Vec::new(), Vec::new(), Vec::new());
         self.a
@@ -43,7 +43,7 @@ impl<F: PrimeField> R1csStruct<F> {
         (a_evals, b_evals, c_evals)
     }
 
-    pub(crate) fn z_vectors(
+    pub fn z_vectors(
         &self,
         instance_size: usize,
         witness_size: usize,
@@ -73,24 +73,18 @@ impl<F: PrimeField> R1csStruct<F> {
             .zip(self.c.0.iter())
             .enumerate()
         {
-            a.coefficients()
-                .iter()
-                .for_each(|Element(w, coeff)| match w {
-                    Wire::Instance(k) => a_instance[*k].push((*coeff, i)),
-                    Wire::Witness(k) => a_witness[*k].push((*coeff, i)),
-                });
-            b.coefficients()
-                .iter()
-                .for_each(|Element(w, coeff)| match w {
-                    Wire::Instance(k) => b_instance[*k].push((*coeff, i)),
-                    Wire::Witness(k) => b_witness[*k].push((*coeff, i)),
-                });
-            c.coefficients()
-                .iter()
-                .for_each(|Element(w, coeff)| match w {
-                    Wire::Instance(k) => c_instance[*k].push((*coeff, i)),
-                    Wire::Witness(k) => c_witness[*k].push((*coeff, i)),
-                });
+            a.coefficients().iter().for_each(|(w, coeff)| match w {
+                Wire::Instance(k) => a_instance[*k].push((*coeff, i)),
+                Wire::Witness(k) => a_witness[*k].push((*coeff, i)),
+            });
+            b.coefficients().iter().for_each(|(w, coeff)| match w {
+                Wire::Instance(k) => b_instance[*k].push((*coeff, i)),
+                Wire::Witness(k) => b_witness[*k].push((*coeff, i)),
+            });
+            c.coefficients().iter().for_each(|(w, coeff)| match w {
+                Wire::Instance(k) => c_instance[*k].push((*coeff, i)),
+                Wire::Witness(k) => c_witness[*k].push((*coeff, i)),
+            });
         }
 
         (

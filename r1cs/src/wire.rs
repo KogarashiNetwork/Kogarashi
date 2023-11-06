@@ -1,5 +1,7 @@
-use core::cmp::Ordering;
-use core::fmt::{self, Formatter};
+use core::{
+    cmp::Ordering,
+    fmt::{self, Formatter},
+};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Wire {

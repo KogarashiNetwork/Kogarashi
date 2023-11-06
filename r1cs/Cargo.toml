@@ -1,0 +1,7 @@
+[package]
+name = "r1cs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+zkstd = { path = "../zkstd", default-features = false }
