@@ -1,5 +1,4 @@
-use crate::matrix::{Element, Evaluable, SparseRow};
-
+use r1cs::{Element, Evaluable, SparseRow};
 use zkstd::common::{IntGroup, Ring, TwistedEdwardsAffine};
 
 #[derive(Clone, Debug)]

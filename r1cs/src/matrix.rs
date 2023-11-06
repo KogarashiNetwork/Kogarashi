@@ -1,21 +1,17 @@
 mod element;
-use super::wire::Wire;
+use crate::wire::Wire;
 
-pub(crate) use element::Element;
+pub use element::{Element, Evaluable};
 
 use core::fmt::Debug;
 use core::ops::{Add, Mul, Neg, Sub};
 use zkstd::common::{PrimeField, Vec};
 
 #[derive(Clone, Debug, Default)]
-pub(crate) struct SparseMatrix<F: PrimeField>(pub(crate) Vec<SparseRow<F>>);
+pub struct SparseMatrix<F: PrimeField>(pub(crate) Vec<SparseRow<F>>);
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct SparseRow<F: PrimeField>(pub(crate) Vec<Element<F>>);
-
-pub trait Evaluable<F: PrimeField, R> {
-    fn evaluate(&self, instance: &[Element<F>], witness: &[Element<F>]) -> R;
-}
 
 impl<F: PrimeField> SparseRow<F> {
     /// Creates a new expression with the given wire coefficients.
@@ -194,7 +190,6 @@ impl<F: PrimeField> Mul<&F> for SparseRow<F> {
     }
 }
 
-#[allow(clippy::op_ref)]
 impl<F: PrimeField> Mul<F> for &SparseRow<F> {
     type Output = SparseRow<F>;
 

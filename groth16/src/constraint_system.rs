@@ -1,12 +1,10 @@
 use crate::bit_iterator::BitIterator8;
 use crate::curves::CurveWitness;
 use crate::error::Error;
-use crate::matrix::{Element, SparseRow};
-use crate::r1cs::R1csStruct;
-use crate::wire::Wire;
 
 use core::ops::{Index, Neg};
 use jub_jub::compute_windowed_naf;
+use r1cs::{Element, R1csStruct, SparseRow, Wire};
 use zkstd::common::{
     vec, FftField, Group, IntGroup, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve,
     TwistedEdwardsExtended, Vec,
@@ -609,10 +607,10 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::circuit::Circuit;
     use crate::constraint_system::ConstraintSystem;
     use crate::error::Error;
-    use crate::matrix::SparseRow;
     use crate::zksnark::ZkSnark;
     use bls_12_381::Fr as BlsScalar;
     use ec_pairing::TatePairing;

@@ -576,6 +576,9 @@ dependencies = [
 [[package]]
 name = "r1cs"
 version = "0.1.0"
+dependencies = [
+ "zkstd",
+]
 
 [[package]]
 name = "rand"
@@ -1057,6 +1060,7 @@ dependencies = [
  "ec-pairing",
  "jub-jub",
  "poly-commit",
+ "r1cs",
  "zkstd",
 ]
 
