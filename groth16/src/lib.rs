@@ -1,4 +1,4 @@
-// #![no_std]
+#![no_std]
 #![doc = include_str!("../README.md")]
 
 mod bit_iterator;
