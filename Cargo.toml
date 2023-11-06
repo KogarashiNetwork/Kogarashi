@@ -6,6 +6,7 @@ members = [
     "jubjub",
     "pairing",
     "poly",
+    "r1cs",
     "zkstd",
 ]
 
