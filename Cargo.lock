@@ -79,6 +79,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "bn-254"
+version = "0.0.1"
+dependencies = [
+ "criterion",
+ "parity-scale-codec",
+ "proptest",
+ "rand_core",
+ "serde",
+ "zkstd",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

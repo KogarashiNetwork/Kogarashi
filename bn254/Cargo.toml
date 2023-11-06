@@ -1,0 +1,37 @@
+[package]
+authors = [
+    'ashWhiteHat<phantomofrotten@gmail.com>',
+    'KiriosK<KiriosK@yandex.ru>'
+]
+name = "bn-254"
+description = 'bn254 pairing-friendly curve implementation'
+version = "0.0.1"
+edition = "2021"
+license = "Apache-2.0"
+homepage = 'https://github.com/KogarashiNetwork/Kogarashi/'
+repository = 'https://github.com/KogarashiNetwork/Kogarashi/'
+readme = 'README.md'
+categories = ["cryptography"]
+keywords = ["zkp", "blockchain", "elliptic-curve"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "katex-header.html"]
+
+[dependencies]
+serde = { version = "1.0.102", default-features = false, features = ["derive"] }
+parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
+zkstd = { path = "../zkstd", default-features = false }
+
+[dev-dependencies]
+criterion = "0.4.0"
+proptest = "1"
+rand_core = { version="0.6.4", default-features = false, features = ["getrandom"] }
+
+[[bench]]
+name = "bls12_381_curve"
+harness = false
+
+[[bench]]
+name = "bls12_381_field"
+harness = false
