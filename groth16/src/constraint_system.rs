@@ -4,7 +4,7 @@ use crate::error::Error;
 
 use core::ops::{Index, Neg};
 use jub_jub::compute_windowed_naf;
-use r1cs::{R1csStruct, SparseRow, Wire};
+use r1cs::{DenseVectors, R1csStruct, SparseRow, Wire};
 use zkstd::common::{
     vec, FftField, Group, IntGroup, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve,
     TwistedEdwardsExtended, Vec,
@@ -13,8 +13,8 @@ use zkstd::common::{
 #[derive(Debug)]
 pub struct ConstraintSystem<C: TwistedEdwardsAffine> {
     pub(crate) constraints: R1csStruct<C::Range>,
-    pub(crate) instance: Vec<(Wire, C::Range)>,
-    pub(crate) witness: Vec<(Wire, C::Range)>,
+    pub(crate) instance: DenseVectors<C::Range>,
+    pub(crate) witness: DenseVectors<C::Range>,
 }
 
 impl<C: TwistedEdwardsAffine> Index<Wire> for ConstraintSystem<C> {
@@ -22,8 +22,8 @@ impl<C: TwistedEdwardsAffine> Index<Wire> for ConstraintSystem<C> {
 
     fn index(&self, w: Wire) -> &Self::Output {
         match w {
-            Wire::Instance(i) => &self.instance[i].1,
-            Wire::Witness(i) => &self.witness[i].1,
+            Wire::Instance(i) => &self.instance[i],
+            Wire::Witness(i) => &self.witness[i],
         }
     }
 }
@@ -32,8 +32,8 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
     pub(crate) fn initialize() -> Self {
         Self {
             constraints: R1csStruct::default(),
-            instance: [(Wire::Instance(0), C::Range::one())].to_vec(),
-            witness: vec![],
+            instance: DenseVectors([C::Range::one()].to_vec()),
+            witness: DenseVectors(vec![]),
         }
     }
 
@@ -43,33 +43,33 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
 
     fn alloc_instance(&mut self, instance: C::Range) -> Wire {
         let wire = self.public_wire();
-        self.instance.push((wire, instance));
+        self.instance.0.push(instance);
         wire
     }
 
     fn alloc_witness(&mut self, witness: C::Range) -> Wire {
         let wire = self.private_wire();
-        self.witness.push((wire, witness));
+        self.witness.0.push(witness);
         wire
     }
 
     pub(crate) fn instance_len(&self) -> usize {
-        self.instance.len()
+        self.instance.0.len()
     }
 
     pub(crate) fn witness_len(&self) -> usize {
-        self.witness.len()
+        self.witness.0.len()
     }
 
     /// Add a public wire to the gadget. It will start with no generator and no associated constraints.
     pub fn public_wire(&mut self) -> Wire {
-        let index = self.instance.len();
+        let index = self.instance.0.len();
         Wire::Instance(index)
     }
 
     /// Add a private wire to the gadget. It will start with no generator and no associated constraints.
     fn private_wire(&mut self) -> Wire {
-        let index = self.witness.len();
+        let index = self.witness.0.len();
         Wire::Witness(index)
     }
 

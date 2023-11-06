@@ -6,7 +6,7 @@ use crate::zksnark::Parameters;
 
 use core::marker::PhantomData;
 use poly_commit::{msm_curve_addition, Fft, PointsValue};
-use zkstd::common::{CurveGroup, Group, Pairing, RngCore, TwistedEdwardsAffine, Vec};
+use zkstd::common::{CurveGroup, Group, Pairing, RngCore, TwistedEdwardsAffine};
 
 #[derive(Debug)]
 pub struct Prover<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> {
@@ -52,18 +52,8 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
         // From here we do all evaluations with `msm_curve_addition` to not give access to original values.
         let q = msm_curve_addition(&self.params.h, &q);
 
-        cs.instance.sort();
-        cs.witness.sort();
-        let input_assignment = cs
-            .instance
-            .iter()
-            .map(|element| element.1)
-            .collect::<Vec<_>>();
-        let aux_assignment = cs
-            .witness
-            .iter()
-            .map(|element| element.1)
-            .collect::<Vec<_>>();
+        let input_assignment = cs.instance.0.clone();
+        let aux_assignment = cs.witness.0.clone();
 
         let l = msm_curve_addition(&self.params.l, &aux_assignment);
 

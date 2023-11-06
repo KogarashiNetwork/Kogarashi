@@ -1,4 +1,4 @@
-use super::matrix::{SparseMatrix, SparseRow};
+use super::matrix::{DenseVectors, SparseMatrix, SparseRow};
 use super::wire::Wire;
 
 use zkstd::common::{vec, PrimeField, Vec};
@@ -26,8 +26,8 @@ impl<F: PrimeField> R1csStruct<F> {
 
     pub fn evaluate(
         &self,
-        instance: &[(Wire, F)],
-        witness: &[(Wire, F)],
+        instance: &DenseVectors<F>,
+        witness: &DenseVectors<F>,
     ) -> (Vec<F>, Vec<F>, Vec<F>) {
         let (mut a_evals, mut b_evals, mut c_evals) = (Vec::new(), Vec::new(), Vec::new());
         self.a

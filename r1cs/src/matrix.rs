@@ -1,8 +1,9 @@
-use crate::wire::Wire;
+mod vector;
 
-use core::fmt::Debug;
-use core::ops::{Add, Mul, Neg, Sub};
-use zkstd::common::{PrimeField, Vec};
+use crate::wire::Wire;
+pub use vector::DenseVectors;
+
+use zkstd::common::{Add, Debug, Mul, Neg, PrimeField, Sub, Vec};
 
 #[derive(Clone, Debug, Default)]
 pub struct SparseMatrix<F: PrimeField>(pub(crate) Vec<SparseRow<F>>);
@@ -11,7 +12,7 @@ pub struct SparseMatrix<F: PrimeField>(pub(crate) Vec<SparseRow<F>>);
 pub struct SparseRow<F: PrimeField>(pub(crate) Vec<(Wire, F)>);
 
 pub trait Evaluable<F: PrimeField, R> {
-    fn evaluate(&self, instance: &[(Wire, F)], witness: &[(Wire, F)]) -> R;
+    fn evaluate(&self, instance: &DenseVectors<F>, witness: &DenseVectors<F>) -> R;
 }
 
 impl<F: PrimeField> SparseRow<F> {
@@ -47,13 +48,12 @@ impl<F: PrimeField> SparseRow<F> {
         }
     }
 
-    pub fn evaluate(&self, instance: &[(Wire, F)], witness: &[(Wire, F)]) -> F {
+    pub fn evaluate(&self, instance: &DenseVectors<F>, witness: &DenseVectors<F>) -> F {
         self.0.iter().fold(F::zero(), |sum, (wire, coefficient)| {
             let wire_value: F = match wire {
-                Wire::Instance(_) => get_value_from_wire(*wire, instance),
-                Wire::Witness(_) => get_value_from_wire(*wire, witness),
-            }
-            .expect("No value for the wire was found");
+                Wire::Instance(i) => instance[*i],
+                Wire::Witness(i) => witness[*i],
+            };
             sum + (wire_value * *coefficient)
         })
     }
