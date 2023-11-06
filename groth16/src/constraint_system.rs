@@ -32,8 +32,8 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
     pub(crate) fn initialize() -> Self {
         Self {
             constraints: R1csStruct::default(),
-            instance: DenseVectors([C::Range::one()].to_vec()),
-            witness: DenseVectors(vec![]),
+            instance: DenseVectors::new([C::Range::one()].to_vec()),
+            witness: DenseVectors::default(),
         }
     }
 
@@ -43,33 +43,33 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
 
     fn alloc_instance(&mut self, instance: C::Range) -> Wire {
         let wire = self.public_wire();
-        self.instance.0.push(instance);
+        self.instance.push(instance);
         wire
     }
 
     fn alloc_witness(&mut self, witness: C::Range) -> Wire {
         let wire = self.private_wire();
-        self.witness.0.push(witness);
+        self.witness.push(witness);
         wire
     }
 
     pub(crate) fn instance_len(&self) -> usize {
-        self.instance.0.len()
+        self.instance.len()
     }
 
     pub(crate) fn witness_len(&self) -> usize {
-        self.witness.0.len()
+        self.witness.len()
     }
 
     /// Add a public wire to the gadget. It will start with no generator and no associated constraints.
     pub fn public_wire(&mut self) -> Wire {
-        let index = self.instance.0.len();
+        let index = self.instance.len();
         Wire::Instance(index)
     }
 
     /// Add a private wire to the gadget. It will start with no generator and no associated constraints.
     fn private_wire(&mut self) -> Wire {
-        let index = self.witness.0.len();
+        let index = self.witness.len();
         Wire::Witness(index)
     }
 

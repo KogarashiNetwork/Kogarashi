@@ -107,7 +107,7 @@ impl<F: PrimeField> Add<&SparseRow<F>> for &SparseRow<F> {
     fn add(self, rhs: &SparseRow<F>) -> SparseRow<F> {
         let mut res = self.0.clone();
         for (wire, coeff_b) in rhs.0.clone() {
-            match get_value_from_wire::<F>(wire, &self.0) {
+            match get_value_from_wire(wire, &self.0) {
                 Some(coeff_a) => res.push((wire, coeff_a + coeff_b)),
                 None => res.push((wire, coeff_b)),
             }

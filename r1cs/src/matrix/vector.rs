@@ -2,9 +2,25 @@ use core::ops::{Index, IndexMut};
 use zkstd::common::{Add, Mul, PrimeField, Sub};
 
 #[derive(Clone, Debug, Default)]
-pub struct DenseVectors<F: PrimeField>(pub Vec<F>);
+pub struct DenseVectors<F: PrimeField>(Vec<F>);
 
 impl<F: PrimeField> DenseVectors<F> {
+    pub fn new(vectors: Vec<F>) -> Self {
+        Self(vectors)
+    }
+
+    pub fn get(&self) -> Vec<F> {
+        self.0.clone()
+    }
+
+    pub fn push(&mut self, vector: F) {
+        self.0.push(vector)
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
     pub fn iter(&self) -> DenseVectorsIterator<F> {
         DenseVectorsIterator {
             dense_vectors: self.clone(),
@@ -12,7 +28,7 @@ impl<F: PrimeField> DenseVectors<F> {
         }
     }
 
-    pub(crate) fn identity(m: usize) -> Self {
+    pub fn identity(m: usize) -> Self {
         Self(vec![F::one(); m])
     }
 }

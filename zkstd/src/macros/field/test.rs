@@ -3,7 +3,7 @@ macro_rules! field_test {
     ($test_name:ident, $field:ident, $iter_times:expr) => {
         paste! {
             #[test]
-            fn [< $test_name _comparator_test >]() {
+            fn [< $test_name _equivalence_test >]() {
                 for _ in 0..$iter_times {
                     let a = $field::random(OsRng);
                     let b = a.square();
@@ -15,6 +15,21 @@ macro_rules! field_test {
                     assert!(!(a < a));
                     assert!(a != b);
                 }
+            }
+        }
+
+        paste! {
+            #[test]
+            fn [< $test_name _ordering_test >]() {
+                let five = $field::one() + $field::one() + $field::one() + $field::one() + $field::one();
+                let ten = five.double();
+                let fifteen = five + ten;
+
+                assert!(five < ten);
+                assert!(five < fifteen);
+                assert!(ten < fifteen);
+                assert!(ten > five);
+                assert!(fifteen > five);
             }
         }
 
