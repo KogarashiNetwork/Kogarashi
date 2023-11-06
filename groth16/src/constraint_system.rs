@@ -4,7 +4,7 @@ use crate::error::Error;
 
 use core::ops::{Index, Neg};
 use jub_jub::compute_windowed_naf;
-use r1cs::{Entry, R1csStruct, SparseRow, Wire};
+use r1cs::{R1csStruct, SparseRow, Wire};
 use zkstd::common::{
     vec, FftField, Group, IntGroup, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve,
     TwistedEdwardsExtended, Vec,
@@ -13,8 +13,8 @@ use zkstd::common::{
 #[derive(Debug)]
 pub struct ConstraintSystem<C: TwistedEdwardsAffine> {
     pub(crate) constraints: R1csStruct<C::Range>,
-    pub(crate) instance: Vec<Entry<C::Range>>,
-    pub(crate) witness: Vec<Entry<C::Range>>,
+    pub(crate) instance: Vec<(Wire, C::Range)>,
+    pub(crate) witness: Vec<(Wire, C::Range)>,
 }
 
 impl<C: TwistedEdwardsAffine> Index<Wire> for ConstraintSystem<C> {
@@ -32,7 +32,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
     pub(crate) fn initialize() -> Self {
         Self {
             constraints: R1csStruct::default(),
-            instance: [Entry::one()].to_vec(),
+            instance: [(Wire::Instance(0), C::Range::one())].to_vec(),
             witness: vec![],
         }
     }
@@ -43,13 +43,13 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
 
     fn alloc_instance(&mut self, instance: C::Range) -> Wire {
         let wire = self.public_wire();
-        self.instance.push(Entry(wire, instance));
+        self.instance.push((wire, instance));
         wire
     }
 
     fn alloc_witness(&mut self, witness: C::Range) -> Wire {
         let wire = self.private_wire();
-        self.witness.push(Entry(wire, witness));
+        self.witness.push((wire, witness));
         wire
     }
 
