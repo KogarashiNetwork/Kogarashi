@@ -1,7 +1,8 @@
-mod element;
+mod entry;
+
 use crate::wire::Wire;
 
-pub use element::{Element, Evaluable};
+pub use entry::{Entry, Evaluable};
 
 use core::fmt::Debug;
 use core::ops::{Add, Mul, Neg, Sub};
@@ -11,11 +12,11 @@ use zkstd::common::{PrimeField, Vec};
 pub struct SparseMatrix<F: PrimeField>(pub(crate) Vec<SparseRow<F>>);
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct SparseRow<F: PrimeField>(pub(crate) Vec<Element<F>>);
+pub struct SparseRow<F: PrimeField>(pub(crate) Vec<Entry<F>>);
 
 impl<F: PrimeField> SparseRow<F> {
     /// Creates a new expression with the given wire coefficients.
-    pub fn new(coefficients: Vec<Element<F>>) -> Self {
+    pub fn new(coefficients: Vec<Entry<F>>) -> Self {
         Self(
             coefficients
                 .into_iter()
@@ -24,7 +25,7 @@ impl<F: PrimeField> SparseRow<F> {
         )
     }
 
-    pub fn coefficients(&self) -> &Vec<Element<F>> {
+    pub fn coefficients(&self) -> &Vec<Entry<F>> {
         &self.0
     }
 
@@ -45,11 +46,11 @@ impl<F: PrimeField> SparseRow<F> {
         }
     }
 
-    pub fn evaluate(&self, instance: &[Element<F>], witness: &[Element<F>]) -> F {
+    pub fn evaluate(&self, instance: &[Entry<F>], witness: &[Entry<F>]) -> F {
         self.0
             .iter()
-            .fold(F::zero(), |sum, Element(wire, coefficient)| {
-                let wire_value = match wire {
+            .fold(F::zero(), |sum, Entry(wire, coefficient)| {
+                let wire_value: F = match wire {
                     Wire::Instance(_) => get_value_from_wire(*wire, instance),
                     Wire::Witness(_) => get_value_from_wire(*wire, witness),
                 }
@@ -61,7 +62,7 @@ impl<F: PrimeField> SparseRow<F> {
 
 impl<F: PrimeField> From<Wire> for SparseRow<F> {
     fn from(wire: Wire) -> Self {
-        SparseRow::new([Element(wire, F::one())].to_vec())
+        SparseRow::new([Entry(wire, F::one())].to_vec())
     }
 }
 
@@ -73,7 +74,7 @@ impl<F: PrimeField> From<&Wire> for SparseRow<F> {
 
 impl<F: PrimeField> From<F> for SparseRow<F> {
     fn from(value: F) -> Self {
-        SparseRow::new([Element(Wire::ONE, value)].to_vec())
+        SparseRow::new([Entry(Wire::ONE, value)].to_vec())
     }
 }
 
@@ -106,10 +107,10 @@ impl<F: PrimeField> Add<&SparseRow<F>> for &SparseRow<F> {
 
     fn add(self, rhs: &SparseRow<F>) -> SparseRow<F> {
         let mut res = self.0.clone();
-        for Element(wire, coeff_b) in rhs.0.clone() {
-            match get_value_from_wire(wire, &self.0) {
-                Some(coeff_a) => res.push(Element(wire, coeff_a + coeff_b)),
-                None => res.push(Element(wire, coeff_b)),
+        for Entry(wire, coeff_b) in rhs.0.clone() {
+            match get_value_from_wire::<F>(wire, &self.0) {
+                Some(coeff_a) => res.push(Entry(wire, coeff_a + coeff_b)),
+                None => res.push(Entry(wire, coeff_b)),
             }
         }
         SparseRow::new(res)
@@ -164,7 +165,7 @@ impl<F: PrimeField> Neg for SparseRow<F> {
     }
 }
 
-fn get_value_from_wire<F: PrimeField>(index: Wire, vectors: &[Element<F>]) -> Option<F> {
+fn get_value_from_wire<F: PrimeField>(index: Wire, vectors: &[Entry<F>]) -> Option<F> {
     for vector in vectors {
         if index == vector.0 {
             return Some(vector.1);
@@ -205,7 +206,7 @@ impl<F: PrimeField> Mul<&F> for &SparseRow<F> {
         SparseRow::new(
             self.0
                 .iter()
-                .map(|Element(k, v)| Element(*k, *v * *rhs))
+                .map(|Entry(k, v)| Entry(*k, *v * *rhs))
                 .collect(),
         )
     }

@@ -4,7 +4,7 @@ use crate::error::Error;
 
 use core::ops::{Index, Neg};
 use jub_jub::compute_windowed_naf;
-use r1cs::{Element, R1csStruct, SparseRow, Wire};
+use r1cs::{Entry, R1csStruct, SparseRow, Wire};
 use zkstd::common::{
     vec, FftField, Group, IntGroup, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve,
     TwistedEdwardsExtended, Vec,
@@ -13,8 +13,8 @@ use zkstd::common::{
 #[derive(Debug)]
 pub struct ConstraintSystem<C: TwistedEdwardsAffine> {
     pub(crate) constraints: R1csStruct<C::Range>,
-    pub(crate) instance: Vec<Element<C::Range>>,
-    pub(crate) witness: Vec<Element<C::Range>>,
+    pub(crate) instance: Vec<Entry<C::Range>>,
+    pub(crate) witness: Vec<Entry<C::Range>>,
 }
 
 impl<C: TwistedEdwardsAffine> Index<Wire> for ConstraintSystem<C> {
@@ -32,7 +32,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
     pub(crate) fn initialize() -> Self {
         Self {
             constraints: R1csStruct::default(),
-            instance: [Element::one()].to_vec(),
+            instance: [Entry::one()].to_vec(),
             witness: vec![],
         }
     }
@@ -43,13 +43,13 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
 
     fn alloc_instance(&mut self, instance: C::Range) -> Wire {
         let wire = self.public_wire();
-        self.instance.push(Element(wire, instance));
+        self.instance.push(Entry(wire, instance));
         wire
     }
 
     fn alloc_witness(&mut self, witness: C::Range) -> Wire {
         let wire = self.private_wire();
-        self.witness.push(Element(wire, witness));
+        self.witness.push(Entry(wire, witness));
         wire
     }
 
@@ -306,7 +306,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
         //     .d(last_accumulated_bit);
         // self.append_gate(constraint);
 
-        // constrain the last element in the accumulator to be equal to the
+        // constrain the last Entry in the accumulator to be equal to the
         // input jubjub scalar
         self.assert_equal(
             &SparseRow::from(last_accumulated_bit),
@@ -595,7 +595,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
     /// satisfiable.
     pub fn inverse(&mut self, x: &SparseRow<C::Range>) -> SparseRow<C::Range> {
         let x_value = x.evaluate(&self.instance, &self.witness);
-        let inverse_value = x_value.invert().expect("Can't find an inverse element");
+        let inverse_value = x_value.invert().expect("Can't find an inverse Entry");
         let x_inv = self.alloc_witness(inverse_value);
 
         let x_inv_expression = SparseRow::from(x_inv);

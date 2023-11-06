@@ -1,4 +1,4 @@
-use super::matrix::{Element, SparseMatrix, SparseRow};
+use super::matrix::{Entry, SparseMatrix, SparseRow};
 use super::wire::Wire;
 
 use zkstd::common::{vec, PrimeField, Vec};
@@ -26,8 +26,8 @@ impl<F: PrimeField> R1csStruct<F> {
 
     pub fn evaluate(
         &self,
-        instance: &[Element<F>],
-        witness: &[Element<F>],
+        instance: &[Entry<F>],
+        witness: &[Entry<F>],
     ) -> (Vec<F>, Vec<F>, Vec<F>) {
         let (mut a_evals, mut b_evals, mut c_evals) = (Vec::new(), Vec::new(), Vec::new());
         self.a
@@ -73,24 +73,18 @@ impl<F: PrimeField> R1csStruct<F> {
             .zip(self.c.0.iter())
             .enumerate()
         {
-            a.coefficients()
-                .iter()
-                .for_each(|Element(w, coeff)| match w {
-                    Wire::Instance(k) => a_instance[*k].push((*coeff, i)),
-                    Wire::Witness(k) => a_witness[*k].push((*coeff, i)),
-                });
-            b.coefficients()
-                .iter()
-                .for_each(|Element(w, coeff)| match w {
-                    Wire::Instance(k) => b_instance[*k].push((*coeff, i)),
-                    Wire::Witness(k) => b_witness[*k].push((*coeff, i)),
-                });
-            c.coefficients()
-                .iter()
-                .for_each(|Element(w, coeff)| match w {
-                    Wire::Instance(k) => c_instance[*k].push((*coeff, i)),
-                    Wire::Witness(k) => c_witness[*k].push((*coeff, i)),
-                });
+            a.coefficients().iter().for_each(|Entry(w, coeff)| match w {
+                Wire::Instance(k) => a_instance[*k].push((*coeff, i)),
+                Wire::Witness(k) => a_witness[*k].push((*coeff, i)),
+            });
+            b.coefficients().iter().for_each(|Entry(w, coeff)| match w {
+                Wire::Instance(k) => b_instance[*k].push((*coeff, i)),
+                Wire::Witness(k) => b_witness[*k].push((*coeff, i)),
+            });
+            c.coefficients().iter().for_each(|Entry(w, coeff)| match w {
+                Wire::Instance(k) => c_instance[*k].push((*coeff, i)),
+                Wire::Witness(k) => c_witness[*k].push((*coeff, i)),
+            });
         }
 
         (

@@ -1,4 +1,4 @@
-use r1cs::{Element, Evaluable, SparseRow};
+use r1cs::{Entry, Evaluable, SparseRow};
 use zkstd::common::{IntGroup, Ring, TwistedEdwardsAffine};
 
 #[derive(Clone, Debug)]
@@ -8,7 +8,7 @@ pub struct CurveWitness<C: TwistedEdwardsAffine> {
 }
 
 impl<C: TwistedEdwardsAffine> Evaluable<C::Range, C> for CurveWitness<C> {
-    fn evaluate(&self, instance: &[Element<C::Range>], witness: &[Element<C::Range>]) -> C {
+    fn evaluate(&self, instance: &[Entry<C::Range>], witness: &[Entry<C::Range>]) -> C {
         C::from_raw_unchecked(
             self.x.evaluate(instance, witness),
             self.y.evaluate(instance, witness),
