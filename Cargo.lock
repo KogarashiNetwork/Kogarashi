@@ -220,17 +220,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ec-pairing"
-version = "0.0.14"
-dependencies = [
- "bls-12-381",
- "criterion",
- "jub-jub",
- "parity-scale-codec",
- "zkstd",
-]
-
-[[package]]
 name = "either"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -507,7 +496,6 @@ version = "0.0.13"
 dependencies = [
  "bls-12-381",
  "criterion",
- "ec-pairing",
  "parity-scale-codec",
  "rayon",
  "zkstd",
@@ -1057,7 +1045,6 @@ name = "zkgroth16"
 version = "0.0.1"
 dependencies = [
  "bls-12-381",
- "ec-pairing",
  "jub-jub",
  "poly-commit",
  "r1cs",

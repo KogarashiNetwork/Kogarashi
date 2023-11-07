@@ -22,7 +22,6 @@ rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "katex-header.html"]
 parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
 rayon = { version = "1.5.1", optional = true }
 zkstd = { path = "../zkstd", default-features = false }
-ec-pairing = { path = "../pairing", default-features = false }
 bls-12-381 = { path = "../bls12_381", default-features = false }
 
 [dev-dependencies]
@@ -32,3 +31,10 @@ criterion = "0.4.0"
 name = "msm"
 harness = false
 required-features = ["std"]
+
+[features]
+default = ["std"]
+std = [
+    "zkstd/std",
+    "rayon"
+]

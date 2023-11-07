@@ -1,25 +1,5 @@
-// Copyright (C) 2022-2023 Invers (JP) INC.
-// SPDX-License-Identifier: Apache-2.0
-
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// 	http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-#![no_std]
-#![doc = include_str!("../README.md")]
-
-use bls_12_381::params::{BLS_X, BLS_X_IS_NEGATIVE};
-use bls_12_381::{Fq12, Fr, G1Affine, G1Projective, G2Affine, G2PairingAffine, G2Projective, Gt};
-use jub_jub::EDWARDS_D;
-use zkstd::common::Vec;
+use crate::params::{BLS_X, BLS_X_IS_NEGATIVE};
+use crate::{Fq12, G1Affine, G2Affine, G2PairingAffine, G2Projective, Gt};
 use zkstd::common::*;
 
 /// Tate pairing struct holds necessary components for pairing.
@@ -28,26 +8,14 @@ use zkstd::common::*;
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Default, Encode, Decode, Copy)]
 pub struct TatePairing;
 
-impl Pairing for TatePairing {
-    type G1Affine = G1Affine;
-    type G2Affine = G2Affine;
-    type G1Projective = G1Projective;
-    type G2Projective = G2Projective;
-    type G2PairngRepr = G2PairingAffine;
-    type PairingRange = Fq12;
-    type Gt = Gt;
-    type ScalarField = Fr;
-    const PARAM_D: Fr = EDWARDS_D;
-    const X: u64 = BLS_X;
-    const X_IS_NEGATIVE: bool = BLS_X_IS_NEGATIVE;
-
-    fn pairing(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::Gt {
+impl TatePairing {
+    pub fn pairing(g1: G1Affine, g2: G2Affine) -> Gt {
         Self::miller_loop(g1, g2).final_exp()
     }
 
-    fn miller_loop(g1: Self::G1Affine, g2: Self::G2Affine) -> Self::PairingRange {
-        let mut acc = Self::PairingRange::one();
-        let mut g2_projective = Self::G2Projective::from(g2);
+    pub fn miller_loop(g1: G1Affine, g2: G2Affine) -> Fq12 {
+        let mut acc = Fq12::one();
+        let mut g2_projective = G2Projective::from(g2);
         let mut found_one = false;
 
         for i in (0..64).rev().map(|b| (((BLS_X >> 1) >> b) & 1) == 1) {
@@ -67,19 +35,19 @@ impl Pairing for TatePairing {
 
         acc = acc.untwist(g2_projective.double_eval(), g1);
 
-        if Self::X_IS_NEGATIVE {
+        if BLS_X_IS_NEGATIVE {
             acc.conjugate()
         } else {
             acc
         }
     }
 
-    fn multi_miller_loop(pairs: &[(Self::G1Affine, Self::G2PairngRepr)]) -> Self::PairingRange {
+    pub fn multi_miller_loop(pairs: &[(G1Affine, G2PairingAffine)]) -> Fq12 {
         let pairs = pairs
             .iter()
             .filter(|(a, b)| !a.is_identity() && !b.is_identity())
             .collect::<Vec<_>>();
-        let mut acc = Self::PairingRange::one();
+        let mut acc = Fq12::one();
         let mut counter = 0;
         let mut found_one = false;
 
@@ -108,7 +76,7 @@ impl Pairing for TatePairing {
             acc = acc.untwist(g2.coeffs[counter], *g1);
         }
 
-        if Self::X_IS_NEGATIVE {
+        if BLS_X_IS_NEGATIVE {
             acc.conjugate()
         } else {
             acc

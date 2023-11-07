@@ -5,7 +5,7 @@ use rand_core::RngCore;
 
 /// any element has its inverse and these is the identity in group
 /// existence of inverse is ensured for only additive arithmetic
-pub trait Group: Basic + Eq + PartialEq {
+pub trait Group: Basic + Eq + PartialEq + Send + Sync {
     // generator of group
     const ADDITIVE_GENERATOR: Self;
 

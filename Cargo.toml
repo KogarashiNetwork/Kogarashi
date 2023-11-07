@@ -4,7 +4,6 @@ members = [
     "elgamal",
     "groth16",
     "jubjub",
-    "pairing",
     "poly",
     "r1cs",
     "zkstd",
