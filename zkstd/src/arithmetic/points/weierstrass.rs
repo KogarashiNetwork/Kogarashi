@@ -143,12 +143,13 @@ pub fn add_projective_point<P: WeierstrassProjective>(lhs: P, rhs: P) -> P {
 pub fn double_projective_point<P: WeierstrassProjective>(lhs: P) -> P {
     // Algorithm 9, https://eprint.iacr.org/2015/1060.pdf
     let (x, y, z) = (lhs.get_x(), lhs.get_y(), lhs.get_z());
+    let b3 = <P as WeierstrassCurve>::PARAM_3B;
 
     let t0 = y.square();
     let z3 = t0.double().double().double();
     let t1 = y * z;
     let t2 = z.square();
-    let t2 = t2 + t2.double().double().double();
+    let t2 = t2 * b3;
     let x3 = t2 * z3;
     let y3 = t0 + t2;
     let z3 = t1 * z3;

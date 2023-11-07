@@ -13,12 +13,7 @@ pub const BETA: Fq = Fq([
     0xc26a2ff874fd029b,
 ]);
 
-const B: Fq = Fq([
-    0xaa270000000cfff3,
-    0x53cc0032fc34000a,
-    0x478fe97a6b0a807f,
-    0xb1d37ebee6ba24d7,
-]);
+const B: Fq = Fq::to_mont_form([3, 0, 0, 0]);
 
 const B3: Fq = B.add_const(B).add_const(B);
 

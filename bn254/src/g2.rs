@@ -9,17 +9,17 @@ use zkstd::common::*;
 use zkstd::macros::{curve::weierstrass::*, pairing::bls12_g2_pairing};
 
 const B: Fq2 = Fq2([
-    Fq([
-        0xaa270000000cfff3,
-        0x53cc0032fc34000a,
-        0x478fe97a6b0a807f,
-        0xb1d37ebee6ba24d7,
+    Fq::to_mont_form([
+        0x3267e6dc24a138e5,
+        0xb5b4c5e559dbefa3,
+        0x81be18991be06ac3,
+        0x2b149d40ceb8aaae,
     ]),
-    Fq([
-        0xaa270000000cfff3,
-        0x53cc0032fc34000a,
-        0x478fe97a6b0a807f,
-        0xb1d37ebee6ba24d7,
+    Fq::to_mont_form([
+        0xe4a2bd0685c315d2,
+        0xa74fa084e52d1852,
+        0xcd2cafadeed8fdf4,
+        0x009713b03af0fed4,
     ]),
 ]);
 
