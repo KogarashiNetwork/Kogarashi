@@ -1,10 +1,11 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
-use bls_12_381::{Fq, Fq12, Fq2, Fq6, Fr};
-use zkstd::common::{Group, OsRng, PrimeField};
+use bn_254::{Fq, Fq12, Fq2, Fq6, Fr};
+use rand_core::OsRng;
+use zkstd::common::{Group, PrimeField};
 
-fn bench_bls12_381_fr(c: &mut Criterion) {
-    let mut group = c.benchmark_group("bls12_381_fr");
+fn bench_bn_254_fr(c: &mut Criterion) {
+    let mut group = c.benchmark_group("bench_bn_254_fr");
 
     let x = Fr::random(OsRng);
     let y = Fr::random(OsRng);
@@ -55,16 +56,12 @@ fn run<PF: PrimeField>(c: &mut Criterion) {
     });
 }
 
-fn bls12_381_field_benchmark(c: &mut Criterion) {
+fn bn_254_field_benchmark(c: &mut Criterion) {
     run::<Fq>(c);
     run::<Fq2>(c);
     run::<Fq6>(c);
     run::<Fq12>(c);
 }
 
-criterion_group!(
-    bls12_381_field,
-    bench_bls12_381_fr,
-    bls12_381_field_benchmark
-);
-criterion_main!(bls12_381_field);
+criterion_group!(bn_254_field, bench_bn_254_fr, bn_254_field_benchmark);
+criterion_main!(bn_254_field);

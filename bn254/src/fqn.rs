@@ -34,6 +34,9 @@ bls12_range_field_pairing!(
 );
 
 impl Fq2 {
+    pub const fn new_unchecked(val: [Fq; 2]) -> Self {
+        Self(val)
+    }
     pub(crate) const fn add_const(self, rhs: Self) -> Self {
         Self([self.0[0].add_const(rhs.0[0]), self.0[1].add_const(rhs.0[1])])
     }

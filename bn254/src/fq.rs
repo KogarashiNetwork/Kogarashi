@@ -77,11 +77,14 @@ impl SigUtils<32> for Fq {
 }
 
 impl Fq {
-    pub(crate) const fn add_const(self, rhs: Self) -> Self {
+    pub const fn new_unchecked(val: [u64; 4]) -> Self {
+        Self(val)
+    }
+    pub const fn add_const(self, rhs: Self) -> Self {
         Self(add(self.0, rhs.0, MODULUS))
     }
 
-    pub(crate) const fn to_mont_form(val: [u64; 4]) -> Self {
+    pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
 

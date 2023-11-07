@@ -4,6 +4,7 @@ members = [
     "bn254",
     "elgamal",
     "groth16",
+    "grumpkin",
     "jubjub",
     "pairing",
     "poly",

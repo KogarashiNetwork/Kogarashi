@@ -288,6 +288,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "grumpkin"
+version = "0.0.1"
+dependencies = [
+ "bn-254",
+ "criterion",
+ "parity-scale-codec",
+ "proptest",
+ "rand_core",
+ "serde",
+ "zkstd",
+]
+
+[[package]]
 name = "half"
 version = "1.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
