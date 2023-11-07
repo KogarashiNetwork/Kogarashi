@@ -81,29 +81,17 @@ impl<F: PrimeField> R1cs<F> {
         Wire::Witness(self.w.len())
     }
 
-    pub fn evaluate(
-        &self,
-        instance: &DenseVectors<F>,
-        witness: &DenseVectors<F>,
-    ) -> (Vec<F>, Vec<F>, Vec<F>) {
-        let (mut a_evals, mut b_evals, mut c_evals) = (Vec::new(), Vec::new(), Vec::new());
-        self.a
-            .0
-            .iter()
-            .zip(self.b.0.iter())
-            .zip(self.c.0.iter())
-            .for_each(|((a, b), c)| {
-                a_evals.push(a.evaluate(instance, witness));
-                b_evals.push(b.evaluate(instance, witness));
-                c_evals.push(c.evaluate(instance, witness));
-            });
+    pub fn evaluate(&self, x: &DenseVectors<F>, w: &DenseVectors<F>) -> (Vec<F>, Vec<F>, Vec<F>) {
+        let a_evals = self.a.evaluate_with_z(x, w);
+        let b_evals = self.b.evaluate_with_z(x, w);
+        let c_evals = self.c.evaluate_with_z(x, w);
         (a_evals, b_evals, c_evals)
     }
 
     pub fn z_vectors(
         &self,
-        instance_size: usize,
-        witness_size: usize,
+        l: usize,
+        m_l_1: usize,
     ) -> (
         (
             Vec<Vec<(F, usize)>>,
@@ -116,38 +104,11 @@ impl<F: PrimeField> R1cs<F> {
             Vec<Vec<(F, usize)>>,
         ),
     ) {
-        let mut a_instance = vec![vec![]; instance_size];
-        let mut b_instance = vec![vec![]; instance_size];
-        let mut c_instance = vec![vec![]; instance_size];
-        let mut a_witness = vec![vec![]; witness_size];
-        let mut b_witness = vec![vec![]; witness_size];
-        let mut c_witness = vec![vec![]; witness_size];
-        for (i, ((a, b), c)) in self
-            .a
-            .0
-            .iter()
-            .zip(self.b.0.iter())
-            .zip(self.c.0.iter())
-            .enumerate()
-        {
-            a.coefficients().iter().for_each(|(w, coeff)| match w {
-                Wire::Instance(k) => a_instance[*k].push((*coeff, i)),
-                Wire::Witness(k) => a_witness[*k].push((*coeff, i)),
-            });
-            b.coefficients().iter().for_each(|(w, coeff)| match w {
-                Wire::Instance(k) => b_instance[*k].push((*coeff, i)),
-                Wire::Witness(k) => b_witness[*k].push((*coeff, i)),
-            });
-            c.coefficients().iter().for_each(|(w, coeff)| match w {
-                Wire::Instance(k) => c_instance[*k].push((*coeff, i)),
-                Wire::Witness(k) => c_witness[*k].push((*coeff, i)),
-            });
-        }
+        let (a_x, a_w) = self.a.x_and_w(l, m_l_1);
+        let (b_x, b_w) = self.b.x_and_w(l, m_l_1);
+        let (c_x, c_w) = self.c.x_and_w(l, m_l_1);
 
-        (
-            (a_instance, b_instance, c_instance),
-            (a_witness, b_witness, c_witness),
-        )
+        ((a_x, b_x, c_x), (a_w, b_w, c_w))
     }
 }
 
