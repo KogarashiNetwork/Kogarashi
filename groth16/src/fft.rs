@@ -1,5 +1,4 @@
-use crate::poly::Coefficients;
-use crate::PointsValue;
+use crate::poly::{Coefficients, PointsValue};
 #[cfg(feature = "std")]
 use rayon::join;
 use zkstd::common::{FftField, Vec};
@@ -89,26 +88,6 @@ impl<F: FftField> Fft<F> {
         }
     }
 
-    /// polynomial degree
-    pub fn size(&self) -> usize {
-        self.n
-    }
-
-    /// size inverse
-    pub fn size_inv(&self) -> F {
-        self.n_inv
-    }
-
-    /// nth unity of root
-    pub fn generator(&self) -> F {
-        self.twiddle_factors[1]
-    }
-
-    /// nth unity of root
-    pub fn generator_inv(&self) -> F {
-        self.inv_twiddle_factors[1]
-    }
-
     /// perform discrete fourier transform
     pub fn dft(&self, coeffs: Coefficients<F>) -> PointsValue<F> {
         let mut evals = coeffs.0;
@@ -183,6 +162,7 @@ impl<F: FftField> Fft<F> {
     }
 
     /// polynomial multiplication
+    #[cfg(test)]
     pub fn poly_mul(&self, rhs: Coefficients<F>, lhs: Coefficients<F>) -> Coefficients<F> {
         let rhs = self.dft(rhs);
         let lhs = self.dft(lhs);

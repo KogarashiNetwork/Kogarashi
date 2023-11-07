@@ -3,7 +3,6 @@ members = [
     "bls12_381",
     "groth16",
     "jubjub",
-    "poly",
     "r1cs",
     "zkstd",
 ]

@@ -19,10 +19,11 @@ zkstd = { path = "../zkstd", default-features = false }
 r1cs = { path = "../r1cs", default-features = false }
 jub-jub = { path = "../jubjub", default-features = false }
 bls-12-381 = { path = "../bls12_381", default-features = false }
-poly-commit = { path = "../poly", default-features = false }
+rayon = { version = "1.5.1", optional = true }
 
 [features]
 default = ["std"]
 std = [
-    "zkstd/std"
+    "zkstd/std",
+    "rayon"
 ]

@@ -3,8 +3,10 @@ use crate::error::Error;
 use crate::proof::Proof;
 use crate::zksnark::Parameters;
 
+use crate::fft::Fft;
+use crate::msm::msm_curve_addition;
+use crate::poly::PointsValue;
 use bls_12_381::Fr;
-use poly_commit::{msm_curve_addition, Fft, PointsValue};
 use r1cs::R1cs;
 use zkstd::common::{CurveGroup, Group, RngCore};
 

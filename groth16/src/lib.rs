@@ -3,6 +3,9 @@
 
 mod circuit;
 mod error;
+mod fft;
+mod msm;
+mod poly;
 mod proof;
 mod prover;
 mod verifier;

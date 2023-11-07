@@ -3,8 +3,9 @@ use crate::error::Error;
 use crate::prover::Prover;
 use crate::verifier::{Verifier, VerifyingKey};
 
+use crate::fft::Fft;
+use crate::poly::{Coefficients, PointsValue};
 use bls_12_381::{Fr, G1Affine, G2Affine};
-use poly_commit::{Coefficients, Fft, PointsValue};
 use r1cs::R1cs;
 use zkstd::common::{vec, Group, MulAssign, PrimeField, RngCore, Vec};
 
