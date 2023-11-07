@@ -748,17 +748,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "she-elgamal"
-version = "0.0.12"
-dependencies = [
- "jub-jub",
- "num-traits",
- "parity-scale-codec",
- "serde",
- "zkstd",
-]
-
-[[package]]
 name = "sp-std"
 version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
