@@ -1,19 +1,20 @@
 use crate::error::Error;
 use crate::verifier::PreparedVerifyingKey;
 
-use zkstd::common::{Pairing, PairingRange, WeierstrassProjective};
+use bls_12_381::{Fr, G1Affine, G1Projective, G2Affine, G2PairingAffine, TatePairing};
+use zkstd::common::WeierstrassProjective;
 
-pub struct Proof<P: Pairing> {
-    pub(crate) a: P::G1Affine,
-    pub(crate) b: P::G2Affine,
-    pub(crate) c: P::G1Affine,
+pub struct Proof {
+    pub(crate) a: G1Affine,
+    pub(crate) b: G2Affine,
+    pub(crate) c: G1Affine,
 }
 
-impl<P: Pairing> Proof<P> {
+impl Proof {
     pub(crate) fn verify(
         &self,
-        vk: &PreparedVerifyingKey<P>,
-        public_inputs: &[P::ScalarField],
+        vk: &PreparedVerifyingKey,
+        public_inputs: &[Fr],
     ) -> Result<(), Error> {
         if (public_inputs.len() + 1) != vk.ic.len() {
             return Err(Error::InconsistentPublicInputsLen {
@@ -21,7 +22,7 @@ impl<P: Pairing> Proof<P> {
                 provided: public_inputs.len(),
             });
         }
-        let mut acc = P::G1Projective::from(vk.ic[0]);
+        let mut acc = G1Projective::from(vk.ic[0]);
 
         for (&i, &b) in public_inputs.iter().zip(vk.ic.iter().skip(1)) {
             acc += b * i;
@@ -35,8 +36,8 @@ impl<P: Pairing> Proof<P> {
         // A * B + inputs * (-gamma) + C * (-delta) = alpha * beta
         // which allows us to do a single final exponentiation.
 
-        let pairing = P::multi_miller_loop(&[
-            (self.a, P::G2PairngRepr::from(self.b)),
+        let pairing = TatePairing::multi_miller_loop(&[
+            (self.a, G2PairingAffine::from(self.b)),
             (acc.to_affine(), vk.neg_gamma_g2.clone()),
             (self.c, vk.neg_delta_g2.clone()),
         ])

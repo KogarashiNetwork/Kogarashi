@@ -23,14 +23,9 @@ const TWELV_DEGREE_EXTENSION_LIMBS_LENGTH: usize = 2;
 extension_field_operation!(Fq12, Fq6, TWELV_DEGREE_EXTENSION_LIMBS_LENGTH);
 
 // pairing extension for degree 12 extension field
-impl PairingRange for Fq12 {
-    type G1Affine = G1Affine;
-    type G2Coeff = PairingCoeff;
-    type QuadraticField = Fq2;
-    type Gt = Gt;
-
+impl Fq12 {
     // twisting isomorphism from E to E'
-    fn untwist(self, coeffs: Self::G2Coeff, g1: Self::G1Affine) -> Self {
+    pub(crate) fn untwist(self, coeffs: PairingCoeff, g1: G1Affine) -> Self {
         let mut c0 = coeffs.0;
         let mut c1 = coeffs.1;
 
@@ -43,29 +38,11 @@ impl PairingRange for Fq12 {
         self.mul_by_014(coeffs.2, c1, c0)
     }
 
-    fn mul_by_014(
-        self,
-        c0: Self::QuadraticField,
-        c1: Self::QuadraticField,
-        c4: Self::QuadraticField,
-    ) -> Self {
-        let aa = self.0[0].mul_by_01(c0, c1);
-        let bb = self.0[1].mul_by_1(c4);
-        let o = c1 + c4;
-        let c1 = self.0[1] + self.0[0];
-        let c1 = c1.mul_by_01(c0, o);
-        let c1 = c1 - aa - bb;
-        let c0 = bb.mul_by_nonresidue();
-        let c0 = c0 + aa;
-
-        Self([c0, c1])
-    }
-
-    fn final_exp(self) -> Self::Gt {
+    pub fn final_exp(self) -> Gt {
         fn fp4_square(a: Fq2, b: Fq2) -> (Fq2, Fq2) {
             let t0 = a.square();
             let t1 = b.square();
-            let mut t2 = t1.mul_by_nonresidue();
+            let mut t2 = t1.mul_by_nonres();
             let c0 = t2 + t0;
             t2 = a + b;
             t2 = t2.square();
@@ -106,7 +83,7 @@ impl PairingRange for Fq12 {
             z5 = z5.double() + t1;
 
             // For B
-            t0 = t3.mul_by_nonresidue();
+            t0 = t3.mul_by_nonres();
             z2 = t0 + z2;
             z2 = z2.double() + t0;
 
@@ -440,16 +417,16 @@ impl Fq2 {
 
 impl Fq6 {
     fn get_invert(self) -> Option<Self> {
-        let c0 = (self.0[1] * self.0[2]).mul_by_nonresidue();
+        let c0 = (self.0[1] * self.0[2]).mul_by_nonres();
         let c0 = self.0[0].square() - c0;
 
-        let c1 = self.0[2].square().mul_by_nonresidue();
+        let c1 = self.0[2].square().mul_by_nonres();
         let c1 = c1 - (self.0[0] * self.0[1]);
 
         let c2 = self.0[1].square();
         let c2 = c2 - (self.0[0] * self.0[2]);
 
-        let tmp = ((self.0[1] * c2) + (self.0[2] * c1)).mul_by_nonresidue();
+        let tmp = ((self.0[1] * c2) + (self.0[2] * c1)).mul_by_nonres();
         let tmp = tmp + (self.0[0] * c0);
 
         tmp.invert().map(|t| Self([t * c0, t * c1, t * c2]))
@@ -467,7 +444,7 @@ impl Fq6 {
             t1 *= tmp;
             t1 -= b_b;
             t1 -= c_c;
-            t1 = t1.mul_by_nonresidue();
+            t1 = t1.mul_by_nonres();
             t1 += a_a;
         }
 
@@ -488,7 +465,7 @@ impl Fq6 {
             t2 *= tmp;
             t2 -= a_a;
             t2 -= b_b;
-            t2 += c_c.mul_by_nonresidue();
+            t2 += c_c.mul_by_nonres();
         }
 
         Self([t1, t2, t3])
@@ -506,15 +483,15 @@ impl Fq6 {
         let s3 = bc.double();
         let s4 = self.0[2].square();
 
-        let c0 = s3.mul_by_nonresidue() + s0;
-        let c1 = s4.mul_by_nonresidue() + s1;
+        let c0 = s3.mul_by_nonres() + s0;
+        let c1 = s4.mul_by_nonres() + s1;
         let c2 = s1 + s2 + s3 - s0 - s4;
 
         Self([c0, c1, c2])
     }
 
     fn mul_by_nonres(self) -> Self {
-        Self([self.0[2].mul_by_nonresidue(), self.0[0], self.0[1]])
+        Self([self.0[2].mul_by_nonres(), self.0[0], self.0[1]])
     }
 
     pub fn frobenius_map(&self) -> Self {
@@ -535,7 +512,7 @@ impl Fq6 {
 
     pub fn mul_by_1(&self, c1: Fq2) -> Self {
         Self([
-            (self.0[2] * c1).mul_by_nonresidue(),
+            (self.0[2] * c1).mul_by_nonres(),
             self.0[0] * c1,
             self.0[1] * c1,
         ])
@@ -544,7 +521,7 @@ impl Fq6 {
     pub fn mul_by_01(&self, c0: Fq2, c1: Fq2) -> Self {
         let a_a = self.0[0] * c0;
         let b_b = self.0[1] * c1;
-        let t1 = (self.0[2] * c1).mul_by_nonresidue() + a_a;
+        let t1 = (self.0[2] * c1).mul_by_nonres() + a_a;
         let t2 = (c0 + c1) * (self.0[0] + self.0[1]) - a_a - b_b;
         let t3 = self.0[2] * c0 + b_b;
 
@@ -554,7 +531,7 @@ impl Fq6 {
 
 impl Fq12 {
     fn get_invert(self) -> Option<Self> {
-        (self.0[0].square() - self.0[1].square().mul_by_nonresidue())
+        (self.0[0].square() - self.0[1].square().mul_by_nonres())
             .invert()
             .map(|t| Self([self.0[0] * t, self.0[1] * -t]))
     }
@@ -567,7 +544,7 @@ impl Fq12 {
         let c1 = c1 * o;
         let c1 = c1 - aa;
         let c1 = c1 - bb;
-        let c0 = bb.mul_by_nonresidue();
+        let c0 = bb.mul_by_nonres();
         let c0 = c0 + aa;
 
         Self([c0, c1])
@@ -576,10 +553,10 @@ impl Fq12 {
     fn square_ext_field(self) -> Self {
         let ab = self.0[0] * self.0[1];
         let c0c1 = self.0[0] + self.0[1];
-        let c0 = self.0[1].mul_by_nonresidue() + self.0[0];
+        let c0 = self.0[1].mul_by_nonres() + self.0[0];
         let tmp = c0 * c0c1 - ab;
 
-        Self([tmp - ab.mul_by_nonresidue(), ab.double()])
+        Self([tmp - ab.mul_by_nonres(), ab.double()])
     }
 
     fn mul_by_nonres(self) -> Self {
@@ -617,7 +594,7 @@ impl Fq12 {
         let c1 = self.0[1] + self.0[0];
         let c1 = c1.mul_by_01(c0, o);
         let c0 = bb;
-        let c0 = c0.mul_by_nonresidue();
+        let c0 = c0.mul_by_nonres();
 
         Self([c0 + aa, c1 - aa - bb])
     }
@@ -640,7 +617,7 @@ mod tests {
             let a = Fq2::random(OsRng);
             let expected = a * b;
 
-            assert_eq!(a.mul_by_nonresidue(), expected)
+            assert_eq!(a.mul_by_nonres(), expected)
         }
     }
 
@@ -651,7 +628,7 @@ mod tests {
             let a = Fq6::random(OsRng);
             let expected = a * b;
 
-            assert_eq!(a.mul_by_nonresidue(), expected)
+            assert_eq!(a.mul_by_nonres(), expected)
         }
     }
 

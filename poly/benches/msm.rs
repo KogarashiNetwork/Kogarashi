@@ -1,9 +1,8 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
-use rand::rngs::OsRng;
 
 use bls_12_381::{Fr, G1Affine};
 use poly_commit::msm_curve_addition;
-use zkstd::common::{CurveGroup, Group};
+use zkstd::common::{Group, OsRng};
 
 fn msm(c: &mut Criterion) {
     let mut group = c.benchmark_group("msm");

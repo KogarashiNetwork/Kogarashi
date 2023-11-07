@@ -20,7 +20,6 @@ r1cs = { path = "../r1cs", default-features = false }
 jub-jub = { path = "../jubjub", default-features = false }
 bls-12-381 = { path = "../bls12_381", default-features = false }
 poly-commit = { path = "../poly", default-features = false }
-ec-pairing = { path = "../pairing", default-features = false }
 
 [features]
 default = ["std"]

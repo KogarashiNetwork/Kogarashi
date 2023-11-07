@@ -274,7 +274,7 @@ fft_field_operation!(
 mod tests {
     use super::*;
     use paste::paste;
-    use rand_core::OsRng;
+    use zkstd::common::OsRng;
 
     field_test!(fp_field, Fp, 1000);
 

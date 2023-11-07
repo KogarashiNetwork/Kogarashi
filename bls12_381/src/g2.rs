@@ -1,5 +1,5 @@
 use crate::fq::Fq;
-use crate::fqn::{Fq12, Fq2};
+use crate::fqn::Fq2;
 use crate::fr::Fr;
 use crate::params::*;
 use core::borrow::Borrow;
@@ -356,13 +356,8 @@ weierstrass_curve_operation!(
 impl ParityCmp for PairingCoeff {}
 impl ParityCmp for G2PairingAffine {}
 
-impl G2Pairing for G2Projective {
-    type PairingRange = Fq12;
-    type PairingCoeff = PairingCoeff;
-    type PairingRepr = G2PairingAffine;
-    type G2Affine = G2Affine;
-
-    fn double_eval(&mut self) -> PairingCoeff {
+impl G2Projective {
+    pub(crate) fn double_eval(&mut self) -> PairingCoeff {
         // Adaptation of Algorithm 26, https://eprint.iacr.org/2010/354.pdf
         let tmp0 = self.x.square();
         let tmp1 = self.y.square();
@@ -386,7 +381,7 @@ impl G2Pairing for G2Projective {
         PairingCoeff(tmp0, tmp3, tmp6)
     }
 
-    fn add_eval(&mut self, rhs: G2Affine) -> PairingCoeff {
+    pub(crate) fn add_eval(&mut self, rhs: G2Affine) -> PairingCoeff {
         // Adaptation of Algorithm 27, https://eprint.iacr.org/2010/354.pdf
         let zsquared = self.z.square();
         let ysquared = rhs.y.square();
