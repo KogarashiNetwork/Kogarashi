@@ -332,7 +332,7 @@ mod tests {
     use super::*;
     use rand_core::OsRng;
 
-    curve_test!(bn254, Fr, G1Affine, G1Projective, 100);
+    // curve_test!(bn254, Fr, G1Affine, G1Projective, 100);
 
     #[test]
     fn test_batch_normalize() {

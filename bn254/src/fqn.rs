@@ -1,13 +1,9 @@
 use crate::fq::Fq;
-use crate::g1::G1Affine;
-use crate::g2::PairingCoeff;
-use crate::gt::Gt;
 use crate::params::{
-    BLS_X, FROBENIUS_COEFF_FQ12_C1, FROBENIUS_COEFF_FQ2_C1, FROBENIUS_COEFF_FQ6_C1,
-    FROBENIUS_COEFF_FQ6_C2,
+    FROBENIUS_COEFF_FQ12_C1, FROBENIUS_COEFF_FQ2_C1, FROBENIUS_COEFF_FQ6_C1, FROBENIUS_COEFF_FQ6_C2,
 };
 use zkstd::macros::extension_field::*;
-use zkstd::macros::pairing::{bls12_range_field_pairing, peculiar_extension_field_operation};
+use zkstd::macros::pairing::peculiar_extension_field_operation;
 
 // sextic twist of Fp12
 // degree 2 extension field
@@ -21,17 +17,6 @@ extension_field_operation!(Fq6, Fq2, SIX_DEGREE_EXTENSION_LIMBS_LENGTH);
 // degree 12 extension field
 const TWELV_DEGREE_EXTENSION_LIMBS_LENGTH: usize = 2;
 extension_field_operation!(Fq12, Fq6, TWELV_DEGREE_EXTENSION_LIMBS_LENGTH);
-
-// pairing extension for degree 12 extension field
-bls12_range_field_pairing!(
-    Fq12,
-    Fq2,
-    Gt,
-    G1Affine,
-    PairingCoeff,
-    BLS_X,
-    BLS_X_IS_NEGATIVE
-);
 
 impl Fq2 {
     pub const fn new_unchecked(val: [Fq; 2]) -> Self {

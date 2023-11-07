@@ -25,7 +25,6 @@ mod fqn;
 mod fr;
 mod g1;
 mod g2;
-mod gt;
 pub mod params;
 
 pub use fq::Fq;
@@ -33,4 +32,3 @@ pub use fqn::{Fq12, Fq2, Fq6};
 pub use fr::{Fr, MULTIPLICATIVE_GENERATOR, ROOT_OF_UNITY, TWO_ADACITY};
 pub use g1::{G1Affine, G1Projective};
 pub use g2::{G2Affine, G2PairingAffine, G2Projective, PairingCoeff};
-pub use gt::Gt;

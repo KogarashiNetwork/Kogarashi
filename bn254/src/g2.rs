@@ -1,12 +1,12 @@
 use crate::fq::Fq;
-use crate::fqn::{Fq12, Fq2};
+use crate::fqn::Fq2;
 use crate::fr::Fr;
 use crate::params::*;
 use core::borrow::Borrow;
 use core::iter::Sum;
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
-use zkstd::macros::{curve::weierstrass::*, pairing::bls12_g2_pairing};
+use zkstd::macros::curve::weierstrass::*;
 
 const B: Fq2 = Fq2([
     Fq::to_mont_form([
@@ -342,7 +342,6 @@ weierstrass_curve_operation!(
     G2_GENERATOR_X,
     G2_GENERATOR_Y
 );
-bls12_g2_pairing!(G2Projective, G2Affine, PairingCoeff, G2PairingAffine, Fq12);
 
 #[cfg(test)]
 mod tests {

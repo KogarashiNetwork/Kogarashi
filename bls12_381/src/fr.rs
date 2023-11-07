@@ -367,7 +367,7 @@ mod tests {
 
         for _ in 0..100 {
             let square_root = square.sqrt();
-            if bool::from(square_root.is_none()) {
+            if square_root.is_none() {
                 none_count += 1;
             } else {
                 assert_eq!(square_root.unwrap() * square_root.unwrap(), square);
