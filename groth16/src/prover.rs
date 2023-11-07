@@ -3,24 +3,25 @@ use crate::error::Error;
 use crate::proof::Proof;
 use crate::zksnark::Parameters;
 
-use core::marker::PhantomData;
-use poly_commit::{msm_curve_addition, Fft, PointsValue};
+use crate::fft::Fft;
+use crate::msm::msm_curve_addition;
+use crate::poly::PointsValue;
+use bls_12_381::Fr;
 use r1cs::R1cs;
-use zkstd::common::{CurveGroup, Group, Pairing, RngCore, TwistedEdwardsAffine};
+use zkstd::common::{CurveGroup, Group, RngCore};
 
 #[derive(Debug)]
-pub struct Prover<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> {
-    pub params: Parameters<P>,
-    pub(crate) _mark: PhantomData<A>,
+pub struct Prover {
+    pub params: Parameters,
 }
 
-impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
+impl Prover {
     /// Execute the gadget, and return whether all constraints were satisfied.
-    pub fn create_proof<C: Circuit<A>, R: RngCore>(
+    pub fn create_proof<C: Circuit, R: RngCore>(
         &mut self,
         rng: &mut R,
         circuit: C,
-    ) -> Result<Proof<P>, Error> {
+    ) -> Result<Proof, Error> {
         let mut cs = R1cs::default();
         circuit.synthesize(&mut cs)?;
 
@@ -28,7 +29,7 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
         let k = size.trailing_zeros();
         let vk = self.params.vk.clone();
 
-        let fft = Fft::<P::ScalarField>::new(k as usize);
+        let fft = Fft::<Fr>::new(k as usize);
         let (a, b, c) = cs.evaluate();
 
         // Do the calculation of H(X): A(X) * B(X) - C(X) == H(X) * T(X)
@@ -67,8 +68,8 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
             return Err(Error::ProverSubVersionCrsAttack);
         }
 
-        let r = P::ScalarField::random(&mut *rng);
-        let s = P::ScalarField::random(&mut *rng);
+        let r = Fr::random(&mut *rng);
+        let s = Fr::random(&mut *rng);
 
         // Setup shift parameters r * delta and s * delta in A, B and C computations.
         let mut g_a = vk.delta_g1 * r + vk.alpha_g1;
@@ -90,7 +91,7 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
         // Evaluations for QAP polynomials with alpha and beta shift.
         g_c += q + l;
 
-        Ok(Proof::<P> {
+        Ok(Proof {
             a: g_a.into(),
             b: g_b.into(),
             c: g_c.into(),

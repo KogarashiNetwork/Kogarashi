@@ -3,6 +3,9 @@
 
 mod circuit;
 mod error;
+mod fft;
+mod msm;
+mod poly;
 mod proof;
 mod prover;
 mod verifier;
@@ -19,8 +22,6 @@ mod tests {
     use crate::error::Error;
     use crate::zksnark::ZkSnark;
     use bls_12_381::Fr as BlsScalar;
-    use ec_pairing::TatePairing;
-    use jub_jub::JubjubAffine;
     use r1cs::*;
     use zkstd::common::OsRng;
 
@@ -44,7 +45,7 @@ mod tests {
             }
         }
 
-        impl Circuit<JubjubAffine> for DummyCircuit {
+        impl Circuit for DummyCircuit {
             fn synthesize(&self, composer: &mut R1cs<BlsScalar>) -> Result<(), Error> {
                 let x = SparseRow::from(composer.alloc_instance(self.x));
                 let o = composer.alloc_instance(self.o);
@@ -67,8 +68,7 @@ mod tests {
         let circuit = DummyCircuit::new(x, o);
 
         let (mut prover, verifier) =
-            ZkSnark::<TatePairing, JubjubAffine>::setup::<DummyCircuit>(OsRng)
-                .expect("Failed to compile circuit");
+            ZkSnark::setup::<DummyCircuit>(OsRng).expect("Failed to compile circuit");
         let proof = prover
             .create_proof(&mut OsRng, circuit)
             .expect("Failed to prove");

@@ -1,4 +1,3 @@
-use crate::error::Error;
 use bls_12_381::Fr;
 use serde::{Deserialize, Serialize};
 use zkstd::arithmetic::bits_256::*;
@@ -100,46 +99,6 @@ impl Fp {
             MODULUS,
             INV,
         )
-    }
-
-    pub fn from_hex(hex: &str) -> Result<Fp, Error> {
-        let max_len = 64;
-        let hex = hex.strip_prefix("0x").unwrap_or(hex);
-        let length = hex.len();
-        if length > max_len {
-            return Err(Error::HexStringTooLong);
-        }
-        let hex_bytes = hex.as_bytes();
-
-        let mut hex: [[u8; 16]; 4] = [[0; 16]; 4];
-        for i in 0..max_len {
-            hex[i / 16][i % 16] = if i >= length {
-                0
-            } else {
-                match hex_bytes[length - i - 1] {
-                    48..=57 => hex_bytes[length - i - 1] - 48,
-                    65..=70 => hex_bytes[length - i - 1] - 55,
-                    97..=102 => hex_bytes[length - i - 1] - 87,
-                    _ => return Err(Error::HexStringInvalid),
-                }
-            };
-        }
-        let mut limbs: [u64; 4] = [0; 4];
-        for i in 0..hex.len() {
-            limbs[i] = Fp::bytes_to_u64(&hex[i]).unwrap();
-        }
-        Ok(Fp(mul(limbs, R2, MODULUS, INV)))
-    }
-
-    fn bytes_to_u64(bytes: &[u8; 16]) -> Result<u64, Error> {
-        let mut res: u64 = 0;
-        for (i, byte) in bytes.iter().enumerate() {
-            res += match byte {
-                0..=15 => 16u64.pow(i as u32) * (*byte as u64),
-                _ => return Err(Error::BytesInvalid),
-            }
-        }
-        Ok(res)
     }
 
     pub fn reduce(&self) -> Self {
@@ -274,22 +233,7 @@ fft_field_operation!(
 mod tests {
     use super::*;
     use paste::paste;
-    use rand_core::OsRng;
+    use zkstd::common::OsRng;
 
     field_test!(fp_field, Fp, 1000);
-
-    #[test]
-    fn test_from_hex() {
-        let a = Fp::from_hex("0x64774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab")
-            .unwrap();
-        assert_eq!(
-            a,
-            Fp([
-                0x4ddc8f91e171cd75,
-                0x9b925835a7d203fb,
-                0x0cdb538ead47e463,
-                0x01a19f85f00d79b8,
-            ])
-        )
-    }
 }

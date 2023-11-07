@@ -204,7 +204,6 @@ twisted_edwards_curve_operation!(Fp, Fr, EDWARDS_D, JubjubAffine, JubjubExtended
 
 #[cfg(test)]
 mod tests {
-    #[allow(unused_imports)]
     use super::*;
     use zkstd::macros::curve::weierstrass::*;
 

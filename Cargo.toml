@@ -2,12 +2,9 @@
 members = [
     "bls12_381",
     "bn254",
-    "elgamal",
     "groth16",
     "grumpkin",
     "jubjub",
-    "pairing",
-    "poly",
     "r1cs",
     "zkstd",
 ]

@@ -18,12 +18,6 @@ macro_rules! extension_field_operation {
 
         impl ParityCmp for $extension_field {}
         impl Basic for $extension_field {}
-
-        impl ExtensionField for $extension_field {
-            fn mul_by_nonresidue(self) -> Self {
-                self.mul_by_nonres()
-            }
-        }
     };
 }
 

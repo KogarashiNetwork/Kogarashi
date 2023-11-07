@@ -232,17 +232,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ec-pairing"
-version = "0.0.14"
-dependencies = [
- "bls-12-381",
- "criterion",
- "jub-jub",
- "parity-scale-codec",
- "zkstd",
-]
-
-[[package]]
 name = "either"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -390,7 +379,6 @@ dependencies = [
  "criterion",
  "parity-scale-codec",
  "proptest",
- "rand_core",
  "serde",
  "zkstd",
 ]
@@ -524,18 +512,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "38f6d39893cca0701371e3c27294f09797214b86f1fb951b89ade8ec04e2abab"
 dependencies = [
  "plotters-backend",
-]
-
-[[package]]
-name = "poly-commit"
-version = "0.0.13"
-dependencies = [
- "bls-12-381",
- "criterion",
- "ec-pairing",
- "parity-scale-codec",
- "rayon",
- "zkstd",
 ]
 
 [[package]]
@@ -783,17 +759,6 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
-]
-
-[[package]]
-name = "she-elgamal"
-version = "0.0.12"
-dependencies = [
- "jub-jub",
- "num-traits",
- "parity-scale-codec",
- "serde",
- "zkstd",
 ]
 
 [[package]]
@@ -1082,10 +1047,9 @@ name = "zkgroth16"
 version = "0.0.1"
 dependencies = [
  "bls-12-381",
- "ec-pairing",
  "jub-jub",
- "poly-commit",
  "r1cs",
+ "rayon",
  "zkstd",
 ]
 

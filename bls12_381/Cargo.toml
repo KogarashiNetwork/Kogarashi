@@ -34,3 +34,13 @@ harness = false
 [[bench]]
 name = "bls12_381_field"
 harness = false
+
+[[bench]]
+name = "pairing"
+harness = false
+
+[features]
+default = ["std"]
+std = [
+    "zkstd/std"
+]

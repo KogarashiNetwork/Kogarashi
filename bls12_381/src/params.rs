@@ -28,7 +28,6 @@ pub(crate) const G1_GENERATOR_Y: Fq = Fq([
     0x0e1c8c3fad0059c0,
     0x0bbc3efc5008a26a,
 ]);
-pub(crate) const G1_PARAM_A: Fq = Fq([0, 0, 0, 0, 0, 0]);
 pub(crate) const G1_PARAM_B: Fq = Fq([
     0xaa270000000cfff3,
     0x53cc0032fc34000a,
@@ -75,7 +74,6 @@ pub(crate) const G2_GENERATOR_Y: Fq2 = Fq2([
         0x0b2bc2a163de1bf2,
     ]),
 ]);
-pub(crate) const G2_PARAM_A: Fq2 = Fq2([Fq([0, 0, 0, 0, 0, 0]), Fq([0, 0, 0, 0, 0, 0])]);
 pub(crate) const G2_PARAM_B: Fq2 = Fq2([
     Fq([
         0xaa270000000cfff3,

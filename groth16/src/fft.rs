@@ -1,9 +1,7 @@
-use crate::poly::Coefficients;
-use crate::util::batch_inversion;
-use crate::PointsValue;
+use crate::poly::{Coefficients, PointsValue};
 #[cfg(feature = "std")]
 use rayon::join;
-use zkstd::common::{vec, FftField, Vec};
+use zkstd::common::{FftField, Vec};
 
 /// fft construction using n th root of unity supports polynomial operation less than n degree
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -22,7 +20,6 @@ pub struct Fft<F: FftField> {
     n_inv: F,
     // bit reverse index
     bit_reverse: Vec<(usize, usize)>,
-    pub elements: Vec<F>,
 }
 
 // SBP-M1 review: use safe math operations
@@ -73,14 +70,6 @@ impl<F: FftField> Fft<F> {
             })
             .collect::<Vec<_>>();
 
-        let elements = (0..n)
-            .scan(F::one(), |w, _| {
-                let tw = *w;
-                *w *= g;
-                Some(tw)
-            })
-            .collect::<Vec<_>>();
-
         let bit_reverse = (0..n as u64)
             .filter_map(|i| {
                 let r = i.reverse_bits() >> offset;
@@ -96,28 +85,7 @@ impl<F: FftField> Fft<F> {
             inv_cosets,
             n_inv: F::from(n as u64).invert().unwrap(),
             bit_reverse,
-            elements,
         }
-    }
-
-    /// polynomial degree
-    pub fn size(&self) -> usize {
-        self.n
-    }
-
-    /// size inverse
-    pub fn size_inv(&self) -> F {
-        self.n_inv
-    }
-
-    /// nth unity of root
-    pub fn generator(&self) -> F {
-        self.twiddle_factors[1]
-    }
-
-    /// nth unity of root
-    pub fn generator_inv(&self) -> F {
-        self.inv_twiddle_factors[1]
     }
 
     /// perform discrete fourier transform
@@ -194,6 +162,7 @@ impl<F: FftField> Fft<F> {
     }
 
     /// polynomial multiplication
+    #[cfg(test)]
     pub fn poly_mul(&self, rhs: Coefficients<F>, lhs: Coefficients<F>) -> Coefficients<F> {
         let rhs = self.dft(rhs);
         let lhs = self.dft(lhs);
@@ -205,60 +174,6 @@ impl<F: FftField> Fft<F> {
                 .collect(),
         );
         self.idft(mul_poly)
-    }
-
-    /// Evaluate all the lagrange polynomials defined by this domain at the
-    /// point `tau`.
-    pub fn evaluate_all_lagrange_coefficients(&self, tau: F) -> Vec<F> {
-        // Evaluate all Lagrange polynomials
-        let size = self.n;
-        let t_size = tau.pow(size as u64);
-        let one = F::one();
-        if t_size == F::one() {
-            let mut u = vec![F::zero(); size];
-            let mut omega_i = one;
-            for x in u.iter_mut().take(size) {
-                if omega_i == tau {
-                    *x = one;
-                    break;
-                }
-                omega_i *= &self.generator();
-            }
-            u
-        } else {
-            let mut l = (t_size - one) * self.n_inv;
-            let mut r = one;
-            let mut u = vec![F::zero(); size];
-            let mut ls = vec![F::zero(); size];
-            for i in 0..size {
-                u[i] = tau - r;
-                ls[i] = l;
-                l *= &self.generator();
-                r *= &self.generator();
-            }
-
-            batch_inversion(u.as_mut_slice());
-
-            u.iter()
-                .zip(ls)
-                .map(|(tau_minus_r, l)| l * *tau_minus_r)
-                .collect()
-        }
-    }
-
-    /// Given that the domain size is `D`
-    /// This function computes the `D` evaluation points for
-    /// the vanishing polynomial of degree `n` over a coset
-    pub fn compute_vanishing_poly_over_coset(
-        &self,            // domain to evaluate over
-        poly_degree: u64, // degree of the vanishing polynomial
-    ) -> PointsValue<F> {
-        assert!((self.size() as u64) > poly_degree);
-        let coset_gen = F::MULTIPLICATIVE_GENERATOR.pow(poly_degree);
-        let v_h: Vec<_> = (0..self.size())
-            .map(|i| (coset_gen * self.generator().pow(poly_degree * i as u64)) - F::one())
-            .collect();
-        PointsValue::new(v_h)
     }
 }
 

@@ -1,6 +1,6 @@
+use bls_12_381::TatePairing;
 use bls_12_381::{Fq12, Fr, G1Affine, G2Affine, G2PairingAffine, Gt};
-use ec_pairing::TatePairing;
-use zkstd::common::{Group, OsRng, Pairing, PairingRange};
+use zkstd::common::{Group, OsRng};
 
 #[test]
 fn generator_pairing_test() {
