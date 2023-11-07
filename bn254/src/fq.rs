@@ -135,12 +135,10 @@ impl Fq {
         // First, because self is in Montgomery form we need to reduce it
         let tmp = self.montgomery_reduce();
 
-        let (_, borrow) = sbb(tmp[0], 0xdcff7fffffffd556, 0);
-        let (_, borrow) = sbb(tmp[1], 0x0f55ffff58a9ffff, borrow);
-        let (_, borrow) = sbb(tmp[2], 0xb39869507b587b12, borrow);
-        let (_, borrow) = sbb(tmp[3], 0xb23ba5c279c2895f, borrow);
-        let (_, borrow) = sbb(tmp[4], 0x258dd3db21a5d66b, borrow);
-        let (_, borrow) = sbb(tmp[5], 0x0d0088f51cbff34d, borrow);
+        let (_, borrow) = sbb(tmp[0], 0x9e10460b6c3e7ea4, 0);
+        let (_, borrow) = sbb(tmp[1], 0xcbc0b548b438e546, borrow);
+        let (_, borrow) = sbb(tmp[2], 0xdc2822db40c0ac2e, borrow);
+        let (_, borrow) = sbb(tmp[3], 0x183227397098d014, borrow);
 
         // If the element was smaller, the subtraction will underflow
         // producing a borrow value of 0xffff...ffff, otherwise it will

@@ -17,7 +17,7 @@ const MODULUS: [u64; 4] = [
 const GENERATOR: [u64; 4] = [7, 0, 0, 0];
 
 /// generator of the scalar field
-pub const MULTIPLICATIVE_GENERATOR: Fr = Fr([7, 0, 0, 0]);
+pub const MULTIPLICATIVE_GENERATOR: Fr = Fr::to_mont_form([7, 0, 0, 0]);
 
 /// `R = 2^256 mod r`
 /// `0xe0a77c19a07df2f666ea36f7879462e36fc76959f60cd29ac96341c4ffffffb`
@@ -49,14 +49,14 @@ const R3: [u64; 4] = [
 /// INV = -(r^{-1} mod 2^64) mod 2^64
 pub const INV: u64 = 0xc2e1f593efffffff;
 
-const S: usize = 32;
+const S: usize = 28;
 
 /// multiplicative group generator of n th root of unity
 /// GENERATOR^t where t * 2^s + 1 = r
 /// with t odd. In other words, this
 /// is a 2^s root of unity.
 /// `0x3ddb9f5166d18b798865ea93dd31f743215cf6dd39329c8d34f1ed960c37c9c`
-pub const ROOT_OF_UNITY: Fr = Fr([
+pub const ROOT_OF_UNITY: Fr = Fr::to_mont_form([
     0xd34f1ed960c37c9c,
     0x3215cf6dd39329c8,
     0x98865ea93dd31f74,
@@ -344,7 +344,7 @@ mod tests {
     use paste::paste;
     use rand_core::OsRng;
 
-    field_test!(bls12_381_scalar, Fr, 1000);
+    field_test!(bn254_scalar, Fr, 1000);
 
     #[test]
     fn test_root_of_unity() {
@@ -356,26 +356,17 @@ mod tests {
 
     #[test]
     fn test_sqrt() {
-        let mut square = Fr([
-            0xa1f0fac9f8000001,
-            0x9419f4243cdcb848,
-            0xdc2822db40c0ac2e,
-            0x183227397098d014,
-        ]);
-
-        let mut none_count = 0;
-
         for _ in 0..100 {
-            let square_root = square.sqrt();
-            if square_root.is_none() {
-                none_count += 1;
-            } else {
-                assert_eq!(square_root.unwrap() * square_root.unwrap(), square);
-            }
-            square -= Fr::one();
-        }
+            let a = Fr::random(OsRng);
+            let mut b = a;
+            b = b.square();
 
-        assert_eq!(49, none_count);
+            let b = b.sqrt().unwrap();
+            let mut negb = b;
+            negb = negb.neg();
+
+            assert!(a == b || a == negb);
+        }
     }
 
     #[test]

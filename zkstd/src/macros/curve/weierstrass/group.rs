@@ -21,7 +21,7 @@ macro_rules! affine_group_operation {
 
             const ADDITIVE_IDENTITY: Self = Self {
                 x: $range::zero(),
-                y: $range::one(),
+                y: $range::zero(),
                 is_infinity: true,
             };
 
@@ -56,6 +56,7 @@ macro_rules! affine_group_operation {
             }
 
             fn is_on_curve(self) -> bool {
+                println!("{:?}", self);
                 if self.is_infinity {
                     true
                 } else {
@@ -133,6 +134,7 @@ macro_rules! projective_group_operation {
             }
 
             fn is_on_curve(self) -> bool {
+                println!("{:?}", self);
                 if self.is_identity() {
                     true
                 } else {

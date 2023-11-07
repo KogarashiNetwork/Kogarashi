@@ -349,5 +349,5 @@ mod tests {
     use super::curve_test;
     use rand_core::OsRng;
 
-    curve_test!(bls12_381, Fr, G2Affine, G2Projective, 50);
+    curve_test!(bn254, Fr, G2Affine, G2Projective, 50);
 }

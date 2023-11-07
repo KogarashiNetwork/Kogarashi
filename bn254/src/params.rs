@@ -6,19 +6,19 @@ pub const BLS_X_IS_NEGATIVE: bool = true;
 
 // g1 curve parameters
 pub(crate) const G1_GENERATOR_X: Fq = Fq::one();
-pub(crate) const G1_GENERATOR_Y: Fq = Fq([2, 0, 0, 0]);
+pub(crate) const G1_GENERATOR_Y: Fq = Fq::to_mont_form([2, 0, 0, 0]);
 pub(crate) const G1_PARAM_A: Fq = Fq::zero();
-pub(crate) const G1_PARAM_B: Fq = Fq([3, 0, 0, 0]);
+pub(crate) const G1_PARAM_B: Fq = Fq::to_mont_form([3, 0, 0, 0]);
 
 // g2 curve parameters
 pub(crate) const G2_GENERATOR_X: Fq2 = Fq2([
-    Fq([
+    Fq::to_mont_form([
         0x46debd5cd992f6ed,
         0x674322d4f75edadd,
         0x426a00665e5c4479,
         0x1800deef121f1e76,
     ]),
-    Fq([
+    Fq::to_mont_form([
         0x97e485b7aef312c2,
         0xf1aa493335a9e712,
         0x7260bfb731fb5d25,
@@ -26,28 +26,28 @@ pub(crate) const G2_GENERATOR_X: Fq2 = Fq2([
     ]),
 ]);
 pub(crate) const G2_GENERATOR_Y: Fq2 = Fq2([
-    Fq([
+    Fq::to_mont_form([
         0x4ce6cc0166fa7daa,
         0xe3d1e7690c43d37b,
         0x4aab71808dcb408f,
         0x12c85ea5db8c6deb,
     ]),
-    Fq([
+    Fq::to_mont_form([
         0x55acdadcd122975b,
         0xbc4b313370b38ef3,
         0xec9e99ad690c3395,
         0x090689d0585ff075,
     ]),
 ]);
-pub(crate) const G2_PARAM_A: Fq2 = Fq2([Fq([0, 0, 0, 0]), Fq([0, 0, 0, 0])]);
+pub(crate) const G2_PARAM_A: Fq2 = Fq2([Fq::zero(), Fq::zero()]);
 pub(crate) const G2_PARAM_B: Fq2 = Fq2([
-    Fq([
+    Fq::to_mont_form([
         0x3267e6dc24a138e5,
         0xb5b4c5e559dbefa3,
         0x81be18991be06ac3,
         0x2b149d40ceb8aaae,
     ]),
-    Fq([
+    Fq::to_mont_form([
         0xe4a2bd0685c315d2,
         0xa74fa084e52d1852,
         0xcd2cafadeed8fdf4,
