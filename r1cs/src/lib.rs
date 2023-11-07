@@ -38,11 +38,29 @@ impl<F: PrimeField> R1cs<F> {
         self.w.len()
     }
 
-    pub fn append(&mut self, a: SparseRow<F>, b: SparseRow<F>, c: SparseRow<F>) {
+    pub fn x(&self) -> Vec<F> {
+        self.x.get()
+    }
+
+    pub fn w(&self) -> Vec<F> {
+        self.w.get()
+    }
+
+    fn append(&mut self, a: SparseRow<F>, b: SparseRow<F>, c: SparseRow<F>) {
         self.a.0.push(a);
         self.b.0.push(b);
         self.c.0.push(c);
         self.m += 1;
+    }
+
+    fn public_wire(&mut self) -> Wire {
+        let index = self.x.len();
+        Wire::Instance(index)
+    }
+
+    fn private_wire(&mut self) -> Wire {
+        let index = self.w.len();
+        Wire::Witness(index)
     }
 
     pub fn alloc_instance(&mut self, instance: F) -> Wire {
@@ -51,40 +69,64 @@ impl<F: PrimeField> R1cs<F> {
         wire
     }
 
-    pub fn alloc_witness(&mut self, witness: F) -> Wire {
+    fn alloc_witness(&mut self, witness: F) -> Wire {
         let wire = self.private_wire();
         self.w.push(witness);
         wire
     }
 
-    pub fn constrain_mul(&mut self, x: SparseRow<F>, y: SparseRow<F>, z: SparseRow<F>) {
-        self.append(x, y, z)
+    /// constrain x * y = z
+    pub fn constrain_mul(&mut self, x: &SparseRow<F>, y: &SparseRow<F>, z: &SparseRow<F>) {
+        self.append(x.clone(), y.clone(), z.clone());
     }
 
-    pub fn constrain_add(&mut self, x: SparseRow<F>, y: SparseRow<F>, z: SparseRow<F>) {
-        self.append(x + y, SparseRow::from(Wire::ONE), z)
+    /// constrain x + y = z
+    pub fn constrain_add(&mut self, x: &SparseRow<F>, y: &SparseRow<F>, z: &SparseRow<F>) {
+        self.append(x + y, SparseRow::from(Wire::ONE), z.clone());
     }
 
-    pub fn w(&self) -> DenseVectors<F> {
-        self.w.clone()
+    /// constrain x == y
+    pub fn constrain_equal(&mut self, x: &SparseRow<F>, y: &SparseRow<F>) {
+        self.constrain_mul(x, &SparseRow::one(), y);
     }
 
-    pub fn x(&self) -> DenseVectors<F> {
-        self.x.clone()
+    /// product of two SparseRow x and y
+    pub fn product(&mut self, x: &SparseRow<F>, y: &SparseRow<F>) -> SparseRow<F> {
+        if let Some(c) = x.as_constant() {
+            return y * c;
+        }
+        if let Some(c) = y.as_constant() {
+            return x * c;
+        }
+
+        let product_value = x.evaluate(&self.x, &self.w) * y.evaluate(&self.x, &self.w);
+        let product = self.alloc_witness(product_value);
+        let product_exp = SparseRow::from(product);
+        self.constrain_mul(x, y, &product_exp);
+
+        product_exp
     }
 
-    fn public_wire(&self) -> Wire {
-        Wire::Instance(self.x.len())
+    /// sum of two SparseRow x and y
+    pub fn sum(&mut self, x: &SparseRow<F>, y: &SparseRow<F>) -> SparseRow<F> {
+        if let Some(c) = x.as_constant() {
+            return y * c;
+        }
+        if let Some(c) = y.as_constant() {
+            return x * c;
+        }
+
+        let sum_value = x.evaluate(&self.x, &self.w) + y.evaluate(&self.x, &self.w);
+        let sum = self.alloc_witness(sum_value);
+        let sum_exp = SparseRow::from(sum);
+        self.constrain_add(x, y, &sum_exp);
+        sum_exp
     }
 
-    fn private_wire(&self) -> Wire {
-        Wire::Witness(self.w.len())
-    }
-
-    pub fn evaluate(&self, x: &DenseVectors<F>, w: &DenseVectors<F>) -> (Vec<F>, Vec<F>, Vec<F>) {
-        let a_evals = self.a.evaluate_with_z(x, w);
-        let b_evals = self.b.evaluate_with_z(x, w);
-        let c_evals = self.c.evaluate_with_z(x, w);
+    pub fn evaluate(&self) -> (Vec<F>, Vec<F>, Vec<F>) {
+        let a_evals = self.a.evaluate_with_z(&self.x, &self.w);
+        let b_evals = self.b.evaluate_with_z(&self.x, &self.w);
+        let c_evals = self.c.evaluate_with_z(&self.x, &self.w);
         (a_evals, b_evals, c_evals)
     }
 
@@ -119,8 +161,8 @@ impl<F: PrimeField> Default for R1cs<F> {
             a: SparseMatrix::default(),
             b: SparseMatrix::default(),
             c: SparseMatrix::default(),
-            w: DenseVectors::new(vec![F::one()]),
-            x: DenseVectors::default(),
+            x: DenseVectors::new(vec![F::one()]),
+            w: DenseVectors::default(),
         }
     }
 }
@@ -130,8 +172,8 @@ impl<F: PrimeField> Index<Wire> for R1cs<F> {
 
     fn index(&self, w: Wire) -> &Self::Output {
         match w {
-            Wire::Witness(i) => &self.w[i],
             Wire::Instance(i) => &self.x[i],
+            Wire::Witness(i) => &self.w[i],
         }
     }
 }
