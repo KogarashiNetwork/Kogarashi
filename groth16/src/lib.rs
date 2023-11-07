@@ -5,6 +5,7 @@ mod circuit;
 mod error;
 mod fft;
 mod msm;
+mod params;
 mod poly;
 mod proof;
 mod prover;

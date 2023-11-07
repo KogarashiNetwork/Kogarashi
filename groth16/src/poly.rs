@@ -1,5 +1,7 @@
-use core::iter::{self, Sum};
-use core::ops::{Add, Deref, DerefMut, Index, Mul, Sub};
+use core::{
+    iter::{self, Sum},
+    ops::{Add, Deref, DerefMut, Index, Mul, Sub},
+};
 use zkstd::common::{FftField, PrimeField, RngCore, Vec};
 
 /// polynomial coefficients form expression

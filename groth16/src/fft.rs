@@ -24,7 +24,7 @@ pub struct Fft<F: FftField> {
 
 // SBP-M1 review: use safe math operations
 impl<F: FftField> Fft<F> {
-    pub fn new(k: usize) -> Self {
+    pub(crate) fn new(k: usize) -> Self {
         assert!(k >= 1);
         let n = 1 << k;
         let half_n = n >> 1;
@@ -89,7 +89,7 @@ impl<F: FftField> Fft<F> {
     }
 
     /// perform discrete fourier transform
-    pub fn dft(&self, coeffs: Coefficients<F>) -> PointsValue<F> {
+    pub(crate) fn dft(&self, coeffs: Coefficients<F>) -> PointsValue<F> {
         let mut evals = coeffs.0;
         self.prepare_fft(&mut evals);
         classic_fft_arithmetic(&mut evals, self.n, 1, &self.twiddle_factors);
@@ -97,7 +97,7 @@ impl<F: FftField> Fft<F> {
     }
 
     /// perform classic inverse discrete fourier transform
-    pub fn idft(&self, points: PointsValue<F>) -> Coefficients<F> {
+    pub(crate) fn idft(&self, points: PointsValue<F>) -> Coefficients<F> {
         let mut coeffs = points.0;
         self.prepare_fft(&mut coeffs);
         classic_fft_arithmetic(&mut coeffs, self.n, 1, &self.inv_twiddle_factors);
@@ -106,7 +106,7 @@ impl<F: FftField> Fft<F> {
     }
 
     /// perform discrete fourier transform on coset
-    pub fn coset_dft(&self, mut coeffs: Coefficients<F>) -> PointsValue<F> {
+    pub(crate) fn coset_dft(&self, mut coeffs: Coefficients<F>) -> PointsValue<F> {
         coeffs
             .0
             .iter_mut()
@@ -116,7 +116,7 @@ impl<F: FftField> Fft<F> {
     }
 
     /// perform discrete fourier transform on coset
-    pub fn coset_idft(&self, points: PointsValue<F>) -> Coefficients<F> {
+    pub(crate) fn coset_idft(&self, points: PointsValue<F>) -> Coefficients<F> {
         let mut points = self.idft(points);
         points
             .0
@@ -128,7 +128,7 @@ impl<F: FftField> Fft<F> {
 
     /// This evaluates t(tau) for this domain, which is
     /// tau^m - 1 for these radix-2 domains.
-    pub fn z(&self, tau: &F) -> F {
+    pub(crate) fn z(&self, tau: &F) -> F {
         let mut tmp = tau.pow(self.n as u64);
         tmp.sub_assign(&F::one());
 
@@ -137,7 +137,7 @@ impl<F: FftField> Fft<F> {
 
     /// This evaluates t(tau) for this domain, which is
     /// tau^m - 1 for these radix-2 domains.
-    pub fn z_on_coset(&self) -> F {
+    pub(crate) fn z_on_coset(&self) -> F {
         let mut tmp = F::MULTIPLICATIVE_GENERATOR.pow(self.n as u64);
         tmp.sub_assign(&F::one());
 
@@ -147,7 +147,7 @@ impl<F: FftField> Fft<F> {
     /// The target polynomial is the zero polynomial in our
     /// evaluation domain, so we must perform division over
     /// a coset.
-    pub fn divide_by_z_on_coset(&self, points: PointsValue<F>) -> PointsValue<F> {
+    pub(crate) fn divide_by_z_on_coset(&self, points: PointsValue<F>) -> PointsValue<F> {
         let i = self.z_on_coset().invert().unwrap();
 
         PointsValue(points.0.into_iter().map(|v| v * i).collect())
@@ -159,21 +159,6 @@ impl<F: FftField> Fft<F> {
         self.bit_reverse
             .iter()
             .for_each(|(i, ri)| coeffs.swap(*ri, *i));
-    }
-
-    /// polynomial multiplication
-    #[cfg(test)]
-    pub fn poly_mul(&self, rhs: Coefficients<F>, lhs: Coefficients<F>) -> Coefficients<F> {
-        let rhs = self.dft(rhs);
-        let lhs = self.dft(lhs);
-        let mul_poly = PointsValue::new(
-            rhs.0
-                .iter()
-                .zip(lhs.0.iter())
-                .map(|(a, b)| *a * *b)
-                .collect(),
-        );
-        self.idft(mul_poly)
     }
 }
 
@@ -235,7 +220,7 @@ fn butterfly_arithmetic<F: FftField>(
 #[cfg(test)]
 mod tests {
     use super::Fft;
-    use crate::poly::Coefficients;
+    use crate::poly::{Coefficients, PointsValue};
 
     use bls_12_381::Fr;
     use zkstd::common::{vec, Group, OsRng, PrimeField, Vec};
@@ -289,7 +274,16 @@ mod tests {
         let poly_f = &evals_a * &evals_b;
         let poly_f = fft.idft(poly_f);
 
-        let poly_i = fft.poly_mul(poly_g, poly_h);
+        let rhs = fft.dft(poly_g);
+        let lhs = fft.dft(poly_h);
+        let mul_poly = PointsValue::new(
+            rhs.0
+                .iter()
+                .zip(lhs.0.iter())
+                .map(|(a, b)| *a * *b)
+                .collect(),
+        );
+        let poly_i = fft.idft(mul_poly);
 
         assert_eq!(poly_e, poly_f);
         assert_eq!(poly_e, poly_i)
