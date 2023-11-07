@@ -49,21 +49,7 @@ pub trait TwistedEdwardsCurve: ParityCmp + RuntimeCmp + ParallelCmp + Basic {
 pub trait TwistedEdwardsAffine:
     TwistedEdwardsCurve
     + From<Self::Extended>
-    + for<'a> Add<&'a Self, Output = Self::Extended>
-    + for<'b> Add<&'b Self, Output = Self::Extended>
-    + for<'a, 'b> Add<&'b Self, Output = Self::Extended>
-    + Sub<Self, Output = Self::Extended>
-    + for<'a> Sub<&'a Self, Output = Self::Extended>
-    + for<'b> Sub<&'b Self, Output = Self::Extended>
-    + for<'a, 'b> Sub<&'b Self, Output = Self::Extended>
-    + Add<Self::Extended, Output = Self::Extended>
-    + for<'a> Add<&'a Self::Extended, Output = Self::Extended>
-    + for<'b> Add<&'b Self::Extended, Output = Self::Extended>
-    + for<'a, 'b> Add<&'b Self::Extended, Output = Self::Extended>
-    + Sub<Self::Extended, Output = Self::Extended>
-    + for<'a> Sub<&'a Self::Extended, Output = Self::Extended>
-    + for<'b> Sub<&'b Self::Extended, Output = Self::Extended>
-    + for<'a, 'b> Sub<&'b Self::Extended, Output = Self::Extended>
+    + Neg<Output = Self>
     + Add<Self, Output = Self::Extended>
     + for<'a> Add<&'a Self, Output = Self::Extended>
     + for<'b> Add<&'b Self, Output = Self::Extended>
@@ -76,7 +62,6 @@ pub trait TwistedEdwardsAffine:
     + for<'a> Mul<&'a Self::Scalar, Output = Self::Extended>
     + for<'b> Mul<&'b Self::Scalar, Output = Self::Extended>
     + for<'a, 'b> Mul<&'b Self::Scalar, Output = Self::Extended>
-    + Neg<Output = Self>
 {
     type Extended: TwistedEdwardsExtended<Range = Self::Range>;
 
@@ -92,7 +77,6 @@ pub trait TwistedEdwardsAffine:
 
 pub trait TwistedEdwardsExtended:
     TwistedEdwardsCurve
-    + Copy
     + Add<Self, Output = Self>
     + for<'a> Add<&'a Self, Output = Self>
     + for<'b> Add<&'b Self, Output = Self>
@@ -105,27 +89,16 @@ pub trait TwistedEdwardsExtended:
     + for<'a> Sub<&'a Self, Output = Self>
     + for<'b> Sub<&'b Self, Output = Self>
     + for<'a, 'b> Sub<&'b Self, Output = Self>
-    + AddAssign
-    + AddAssign<Self>
-    + for<'a> AddAssign<&'a Self>
-    + Add<Self, Output = Self>
-    + for<'a> Add<&'a Self, Output = Self>
-    + for<'b> Add<&'b Self, Output = Self>
-    + for<'a, 'b> Add<&'b Self, Output = Self>
-    + SubAssign
-    + SubAssign<Self>
-    + for<'a> SubAssign<&'a Self>
-    + Sub<Self, Output = Self>
-    + for<'a> Sub<&'a Self, Output = Self>
-    + for<'b> Sub<&'b Self, Output = Self>
-    + for<'a, 'b> Sub<&'b Self, Output = Self>
     + Mul<Self::Scalar, Output = Self>
     + for<'a> Mul<&'a Self::Scalar, Output = Self>
     + for<'b> Mul<&'b Self::Scalar, Output = Self>
     + for<'a, 'b> Mul<&'b Self::Scalar, Output = Self>
+    + AddAssign<Self>
+    + for<'a> AddAssign<&'a Self>
+    + SubAssign<Self>
+    + for<'a> SubAssign<&'a Self>
     + MulAssign<Self::Scalar>
     + for<'a> MulAssign<&'a Self::Scalar>
-    + Neg<Output = Self>
 {
     type Affine: TwistedEdwardsAffine<Range = Self::Range>;
 
