@@ -1,5 +1,3 @@
-use crate::curves::CurveWitness;
-
 use core::ops::Index;
 use r1cs::{DenseVectors, R1cs, SparseRow, Wire};
 use zkstd::common::{Ring, TwistedEdwardsAffine};
@@ -67,33 +65,6 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
         Wire::Witness(index)
     }
 
-    /// Appends a point in affine form as [`WitnessPoint`]
-    pub fn append_point<A: Into<C>>(&mut self, affine: A) -> CurveWitness<C> {
-        let affine = affine.into();
-
-        let x = self.alloc_witness(affine.get_x());
-        let y = self.alloc_witness(affine.get_y());
-
-        self.append_edwards_expression(SparseRow::from(x), SparseRow::from(y))
-    }
-
-    pub fn append_edwards_expression(
-        &mut self,
-        x: SparseRow<C::Range>,
-        y: SparseRow<C::Range>,
-    ) -> CurveWitness<C> {
-        let x_squared = self.product(&x, &x);
-        let y_squared = self.product(&y, &y);
-        let x_squared_y_squared = self.product(&x_squared, &y_squared);
-
-        self.assert_equal(
-            &y_squared,
-            &(SparseRow::one() + x_squared_y_squared * C::PARAM_D + &x_squared),
-        );
-
-        CurveWitness::new_unsafe(x, y)
-    }
-
     /// Assert that x * y = z;
     pub fn assert_product(
         &mut self,
@@ -118,22 +89,6 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
     /// Assert that x == y.
     pub fn assert_equal(&mut self, x: &SparseRow<C::Range>, y: &SparseRow<C::Range>) {
         self.assert_product(x, &SparseRow::one(), y);
-    }
-
-    /// Asserts `a == b` by appending two gates
-    pub fn assert_equal_point(&mut self, a: &CurveWitness<C>, b: &CurveWitness<C>) {
-        self.assert_equal(&a.x, &b.x);
-        self.assert_equal(&a.y, &b.y);
-    }
-
-    /// Asserts `point == public`.
-    ///
-    /// Will add `public` affine coordinates `(x,y)` as public inputs
-    pub fn assert_equal_public_point<A: Into<C>>(&mut self, point: &CurveWitness<C>, public: A) {
-        let public = public.into();
-
-        self.assert_equal(&point.x, &SparseRow::from(public.get_x()));
-        self.assert_equal(&point.y, &SparseRow::from(public.get_y()));
     }
 
     /// The product of two `SparseRow`s `x` and `y`, i.e. `x * y`.
@@ -187,63 +142,7 @@ mod tests {
     use zkstd::common::OsRng;
 
     #[test]
-    fn circuit_to_r1cs() {
-        #[derive(Debug)]
-        pub struct DummyCircuit {
-            x: BlsScalar,
-            y: BlsScalar,
-        }
-
-        impl DummyCircuit {
-            pub fn new(x: BlsScalar, y: BlsScalar) -> Self {
-                Self { x, y }
-            }
-        }
-
-        impl Default for DummyCircuit {
-            fn default() -> Self {
-                Self::new(0.into(), 0.into())
-            }
-        }
-
-        impl Circuit<JubjubAffine> for DummyCircuit {
-            fn synthesize(
-                &self,
-                composer: &mut ConstraintSystem<JubjubAffine>,
-            ) -> Result<(), Error> {
-                let x = composer.alloc_witness(self.x);
-                let y = composer.alloc_witness(self.y);
-
-                composer.append_edwards_expression(SparseRow::from(x), SparseRow::from(y));
-
-                Ok(())
-            }
-        }
-
-        let x = BlsScalar::from_hex(
-            "0x187d2619ff114316d237e86684fb6e3c6b15e9b924fa4e322764d3177508297a",
-        )
-        .unwrap();
-        let y = BlsScalar::from_hex(
-            "0x6230c613f1b460e026221be21cf4eabd5a8ea552db565cb18d3cabc39761eb9b",
-        )
-        .unwrap();
-
-        let circuit = DummyCircuit::new(x, y);
-
-        let (mut prover, verifier) =
-            ZkSnark::<TatePairing, JubjubAffine>::setup::<DummyCircuit>(OsRng)
-                .expect("Failed to compile circuit");
-        let proof = prover
-            .create_proof(&mut OsRng, circuit)
-            .expect("Failed to prove");
-        verifier
-            .verify(&proof, &[])
-            .expect("Failed to verify the proof");
-    }
-
-    #[test]
-    fn r1cs_qap() {
+    fn arithmetic_test() {
         #[derive(Debug)]
         pub struct DummyCircuit {
             x: BlsScalar,
