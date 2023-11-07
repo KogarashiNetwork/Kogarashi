@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::proof::Proof;
 
-use zkstd::common::{Neg, Pairing, PairingRange, Vec};
+use zkstd::common::{Pairing, PairingRange, Vec};
 
 // Verify proofs of a given circuit
 pub struct Verifier<P: Pairing> {
@@ -45,8 +45,8 @@ pub struct VerifyingKey<P: Pairing> {
 
 impl<P: Pairing> VerifyingKey<P> {
     pub(crate) fn prepare(&self) -> PreparedVerifyingKey<P> {
-        let gamma = self.gamma_g2.neg();
-        let delta = self.delta_g2.neg();
+        let gamma = -self.gamma_g2;
+        let delta = -self.delta_g2;
 
         PreparedVerifyingKey {
             alpha_g1_beta_g2: P::multi_miller_loop(&[(

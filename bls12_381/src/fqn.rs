@@ -6,6 +6,7 @@ use crate::params::{
     BLS_X, FROBENIUS_COEFF_FQ12_C1, FROBENIUS_COEFF_FQ2_C1, FROBENIUS_COEFF_FQ6_C1,
     FROBENIUS_COEFF_FQ6_C2,
 };
+use zkstd::common::*;
 use zkstd::macros::extension_field::*;
 use zkstd::macros::pairing::{bls12_range_field_pairing, peculiar_extension_field_operation};
 

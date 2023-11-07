@@ -1,13 +1,13 @@
-use zkstd::common::{CurveAffine, Decode, Encode, Pairing, Vec};
+use zkstd::common::{Decode, Encode, Pairing, Vec, WeierstrassAffine};
 
 use crate::{msm_curve_addition, Coefficients, Commitment};
 
 #[derive(Clone, Debug, PartialEq, Decode, Encode, Default)]
-pub struct CommitmentKey<C: CurveAffine> {
+pub struct CommitmentKey<C: WeierstrassAffine> {
     pub bases: Vec<C>,
 }
 
-impl<C: CurveAffine> CommitmentKey<C> {
+impl<C: WeierstrassAffine> CommitmentKey<C> {
     pub fn trim(&self, truncated_degree: usize) -> Self {
         Self {
             bases: self.bases[..=truncated_degree].to_vec(),

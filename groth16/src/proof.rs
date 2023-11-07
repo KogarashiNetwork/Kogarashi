@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::verifier::PreparedVerifyingKey;
 
-use zkstd::common::{CurveExtended, Pairing, PairingRange};
+use zkstd::common::{Pairing, PairingRange, WeierstrassProjective};
 
 pub struct Proof<P: Pairing> {
     pub(crate) a: P::G1Affine,

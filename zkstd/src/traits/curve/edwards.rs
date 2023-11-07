@@ -1,20 +1,12 @@
-use crate::traits::{Basic, FftField, PrimeField, RuntimeCmp};
+use crate::traits::{Basic, FftField, Group, PrimeField, RuntimeCmp};
 use crate::{
     common::Vec,
     traits::{ParallelCmp, ParityCmp},
 };
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use rand_core::RngCore;
 
-pub trait TwistedEdwardsCurve: ParityCmp + RuntimeCmp + ParallelCmp + Basic {
+pub trait TwistedEdwardsCurve: Group + ParityCmp + RuntimeCmp + ParallelCmp + Basic {
     const PARAM_D: Self::Range;
-
-    // generator of group
-    const ADDITIVE_GENERATOR: Self;
-
-    // additive identity of group
-    // a * e = a for any a
-    const ADDITIVE_IDENTITY: Self;
 
     // range field of curve
     type Range: FftField;
@@ -22,19 +14,8 @@ pub trait TwistedEdwardsCurve: ParityCmp + RuntimeCmp + ParallelCmp + Basic {
     // scalar field of curve
     type Scalar: PrimeField + From<Self::Range>;
 
-    // return zero element
-    fn zero() -> Self;
-
     // check that point is on curve
     fn is_identity(&self) -> bool;
-
-    // get inverse of group element
-    fn invert(self) -> Option<Self>
-    where
-        Self: Sized;
-
-    // get randome element
-    fn random(rand: impl RngCore) -> Self;
 
     // check that point is on curve
     fn is_on_curve(self) -> bool;
@@ -50,6 +31,7 @@ pub trait TwistedEdwardsAffine:
     TwistedEdwardsCurve
     + From<Self::Extended>
     + Neg<Output = Self>
+    + for<'a> Neg<Output = Self>
     + Add<Self, Output = Self::Extended>
     + for<'a> Add<&'a Self, Output = Self::Extended>
     + for<'b> Add<&'b Self, Output = Self::Extended>
@@ -63,6 +45,7 @@ pub trait TwistedEdwardsAffine:
     + for<'b> Mul<&'b Self::Scalar, Output = Self::Extended>
     + for<'a, 'b> Mul<&'b Self::Scalar, Output = Self::Extended>
 {
+    // extended coordinate representation
     type Extended: TwistedEdwardsExtended<Range = Self::Range>;
 
     // doubling this point
@@ -77,6 +60,8 @@ pub trait TwistedEdwardsAffine:
 
 pub trait TwistedEdwardsExtended:
     TwistedEdwardsCurve
+    + Neg<Output = Self>
+    + for<'a> Neg<Output = Self>
     + Add<Self, Output = Self>
     + for<'a> Add<&'a Self, Output = Self>
     + for<'b> Add<&'b Self, Output = Self>
@@ -100,6 +85,7 @@ pub trait TwistedEdwardsExtended:
     + MulAssign<Self::Scalar>
     + for<'a> MulAssign<&'a Self::Scalar>
 {
+    // affine coordinate representation
     type Affine: TwistedEdwardsAffine<Range = Self::Range>;
 
     fn new(x: Self::Range, y: Self::Range, t: Self::Range, z: Self::Range) -> Self;

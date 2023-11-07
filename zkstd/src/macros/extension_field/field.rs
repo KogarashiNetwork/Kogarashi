@@ -1,9 +1,6 @@
 #[macro_export]
 macro_rules! ext_field_operation {
     ($extension_field:ident, $sub_field:ident, $limbs_length:ident) => {
-        use zkstd::common::*;
-        use zkstd::common::*;
-
         ext_field_ring_operation!($extension_field, $sub_field, $limbs_length);
 
         impl Field for $extension_field {}

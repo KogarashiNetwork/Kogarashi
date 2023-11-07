@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! affine_group_operation {
-    ($affine:ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident, $a:ident) => {
+    ($affine:ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident, $a:ident, $b:ident, $b3:ident) => {
         curve_arithmetic_extension!($affine, $scalar, $projective);
         impl PartialEq for $affine {
             fn eq(&self, other: &Self) -> bool {
@@ -41,18 +41,15 @@ macro_rules! affine_group_operation {
             }
         }
 
-        impl CurveGroup for $affine {
+        impl WeierstrassCurve for $affine {
+            const PARAM_B: $range = $b;
+            const PARAM_3B: $range = $b3;
+
             type Range = $range;
-            type Affine = $affine;
-            type Extended = $projective;
             type Scalar = $scalar;
 
             fn is_identity(&self) -> bool {
                 self.is_infinity
-            }
-
-            fn double(self) -> $projective {
-                double_projective_point(self.to_extended())
             }
 
             fn is_on_curve(self) -> bool {
@@ -76,7 +73,7 @@ macro_rules! affine_group_operation {
 
 #[macro_export]
 macro_rules! projective_group_operation {
-    ($affine: ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident, $a:ident) => {
+    ($affine: ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident, $a:ident, $b:ident, $b3:ident) => {
         curve_arithmetic_extension!($projective, $scalar, $projective);
 
         impl PartialEq for $projective {
@@ -118,18 +115,14 @@ macro_rules! projective_group_operation {
             }
         }
 
-        impl CurveGroup for $projective {
+        impl WeierstrassCurve for $projective {
+            const PARAM_B: $range = $b;
+            const PARAM_3B: $range = $b3;
             type Range = $range;
-            type Affine = $affine;
-            type Extended = $projective;
             type Scalar = $scalar;
 
             fn is_identity(&self) -> bool {
                 self.z == $range::zero()
-            }
-
-            fn double(self) -> Self {
-                double_projective_point(self)
             }
 
             fn is_on_curve(self) -> bool {
