@@ -6,62 +6,61 @@ use zkstd::macros::field::*;
 
 use crate::error::Error;
 
+/// r = 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001
 const MODULUS: [u64; 4] = [
-    0xffffffff00000001,
-    0x53bda402fffe5bfe,
-    0x3339d80809a1d805,
-    0x73eda753299d7d48,
+    0x43e1f593f0000001,
+    0x2833e84879b97091,
+    0xb85045b68181585d,
+    0x30644e72e131a029,
 ];
 
-const GENERATOR: [u64; 4] = [
-    0x0000000efffffff1,
-    0x17e363d300189c0f,
-    0xff9c57876f8457b0,
-    0x351332208fc5a8c4,
-];
+const GENERATOR: [u64; 4] = [7, 0, 0, 0];
 
 /// generator of the scalar field
-pub const MULTIPLICATIVE_GENERATOR: Fr = Fr([
-    0x0000000efffffff1,
-    0x17e363d300189c0f,
-    0xff9c57876f8457b0,
-    0x351332208fc5a8c4,
-]);
+pub const MULTIPLICATIVE_GENERATOR: Fr = Fr::to_mont_form([7, 0, 0, 0]);
 
-/// R = 2^256 mod r
+/// `R = 2^256 mod r`
+/// `0xe0a77c19a07df2f666ea36f7879462e36fc76959f60cd29ac96341c4ffffffb`
 const R: [u64; 4] = [
-    0x00000001fffffffe,
-    0x5884b7fa00034802,
-    0x998c4fefecbc4ff5,
-    0x1824b159acc5056f,
+    0xac96341c4ffffffb,
+    0x36fc76959f60cd29,
+    0x666ea36f7879462e,
+    0x0e0a77c19a07df2f,
 ];
 
-/// R^2 = 2^512 mod r
+/// `R^2 = 2^512 mod r`
+/// `0x216d0b17f4e44a58c49833d53bb808553fe3ab1e35c59e31bb8e645ae216da7`
 const R2: [u64; 4] = [
-    0xc999e990f3f29c6d,
-    0x2b6cedcb87925c23,
-    0x05d314967254398f,
-    0x0748d9d99f59ff11,
+    0x1bb8e645ae216da7,
+    0x53fe3ab1e35c59e3,
+    0x8c49833d53bb8085,
+    0x0216d0b17f4e44a5,
 ];
 
-/// R^3 = 2^768 mod r
+/// `R^3 = 2^768 mod r`
+/// `0xcf8594b7fcc657c893cc664a19fcfed2a489cbe1cfbb6b85e94d8e1b4bf0040`
 const R3: [u64; 4] = [
-    0xc62c1807439b73af,
-    0x1b3e0d188cf06990,
-    0x73d13c71c7b5f418,
-    0x6e2a5bb9c8db33e9,
+    0x5e94d8e1b4bf0040,
+    0x2a489cbe1cfbb6b8,
+    0x893cc664a19fcfed,
+    0x0cf8594b7fcc657c,
 ];
 
-pub const INV: u64 = 0xfffffffeffffffff;
+/// INV = -(r^{-1} mod 2^64) mod 2^64
+pub const INV: u64 = 0xc2e1f593efffffff;
 
-const S: usize = 32;
+const S: usize = 28;
 
 /// multiplicative group generator of n th root of unity
-pub const ROOT_OF_UNITY: Fr = Fr([
-    0xb9b58d8c5f0e466a,
-    0x5b1b4c801819d7ec,
-    0x0af53ae352a31e64,
-    0x5bf3adda19e9b27b,
+/// GENERATOR^t where t * 2^s + 1 = r
+/// with t odd. In other words, this
+/// is a 2^s root of unity.
+/// `0x3ddb9f5166d18b798865ea93dd31f743215cf6dd39329c8d34f1ed960c37c9c`
+pub const ROOT_OF_UNITY: Fr = Fr::to_mont_form([
+    0xd34f1ed960c37c9c,
+    0x3215cf6dd39329c8,
+    0x98865ea93dd31f74,
+    0x03ddb9f5166d18b7,
 ]);
 
 pub const TWO_ADACITY: u32 = 32;
@@ -197,10 +196,10 @@ impl Fr {
 
     pub fn sqrt(&self) -> Option<Self> {
         let w = self.pow_vartime(&[
-            0x7fff2dff7fffffff,
-            0x04d0ec02a9ded201,
-            0x94cebea4199cec04,
-            0x39f6d3a9,
+            0xcdcb848a1f0fac9f,
+            0x0c0ac2e9419f4243,
+            0x098d014dc2822db4,
+            0x0000000183227397,
         ]);
 
         let mut v = Self::S;
@@ -343,8 +342,9 @@ impl From<Fq2> for Fr {
 mod tests {
     use super::*;
     use paste::paste;
+    use rand_core::OsRng;
 
-    field_test!(bls12_381_scalar, Fr, 1000);
+    field_test!(bn254_scalar, Fr, 1000);
 
     #[test]
     fn test_root_of_unity() {
@@ -356,26 +356,17 @@ mod tests {
 
     #[test]
     fn test_sqrt() {
-        let mut square = Fr([
-            0x46cd85a5f273077e,
-            0x1d30c47dd68fc735,
-            0x77f656f60beca0eb,
-            0x494aa01bdf32468d,
-        ]);
-
-        let mut none_count = 0;
-
         for _ in 0..100 {
-            let square_root = square.sqrt();
-            if square_root.is_none() {
-                none_count += 1;
-            } else {
-                assert_eq!(square_root.unwrap() * square_root.unwrap(), square);
-            }
-            square -= Fr::one();
-        }
+            let a = Fr::random(OsRng);
+            let mut b = a;
+            b = b.square();
 
-        assert_eq!(49, none_count);
+            let b = b.sqrt().unwrap();
+            let mut negb = b;
+            negb = negb.neg();
+
+            assert!(a == b || a == negb);
+        }
     }
 
     #[test]
