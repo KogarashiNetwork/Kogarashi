@@ -56,17 +56,17 @@ macro_rules! group_operation {
             }
         }
 
-        impl<'b> AddAssign<&'b $field> for $field {
-            fn add_assign(&mut self, rhs: &'b $field) {
-                *self = $field(add(self.0, rhs.0, $p))
-            }
-        }
-
         impl<'b> Add<&'b $field> for $field {
             type Output = $field;
 
             fn add(self, rhs: &'b $field) -> Self {
                 $field(add(self.0, rhs.0, $p))
+            }
+        }
+
+        impl<'b> AddAssign<&'b $field> for $field {
+            fn add_assign(&mut self, rhs: &'b $field) {
+                *self = $field(add(self.0, rhs.0, $p))
             }
         }
 

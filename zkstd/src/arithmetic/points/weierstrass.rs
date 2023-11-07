@@ -1,16 +1,15 @@
 use crate::arithmetic::utils::Naf;
 use crate::common::{
-    CurveExtended, CurveGroup, Group, PrimeField, WeierstrassAffine, WeierstrassCurve,
-    WeierstrassProjective,
+    CurveGroup, Group, PrimeField, WeierstrassAffine, WeierstrassCurve, WeierstrassProjective,
 };
 
 /// weierstrass affine coordinate addition
 #[inline(always)]
-pub fn add_affine_point<A: WeierstrassAffine>(lhs: A, rhs: A) -> A::Projective {
+pub fn add_affine_point<A: WeierstrassAffine>(lhs: A, rhs: A) -> A::Extended {
     if lhs.is_identity() {
-        return rhs.to_projective();
+        return rhs.to_extended();
     } else if rhs.is_identity() {
-        return lhs.to_projective();
+        return lhs.to_extended();
     }
 
     let (x0, y0) = (lhs.get_x(), lhs.get_y());
@@ -20,7 +19,7 @@ pub fn add_affine_point<A: WeierstrassAffine>(lhs: A, rhs: A) -> A::Projective {
         if y0 == y1 {
             return double_affine_point(lhs);
         } else {
-            return A::Projective::ADDITIVE_IDENTITY;
+            return A::Extended::ADDITIVE_IDENTITY;
         }
     }
 
@@ -34,12 +33,12 @@ pub fn add_affine_point<A: WeierstrassAffine>(lhs: A, rhs: A) -> A::Projective {
     let y = s * (x0 * uu - w) - y0 * uuu;
     let z = uuu;
 
-    A::Projective::new(x, y, z)
+    A::Extended::new(x, y, z)
 }
 
 /// weierstrass affine coordinate doubling
 #[inline(always)]
-pub fn double_affine_point<A: WeierstrassAffine>(point: A) -> A::Projective {
+pub fn double_affine_point<A: WeierstrassAffine>(point: A) -> A::Extended {
     // Algorithm 9, https://eprint.iacr.org/2015/1060.pdf
     let b3 = <A as WeierstrassCurve>::PARAM_3B;
     let (x, y) = (point.get_x(), point.get_y());
@@ -58,16 +57,16 @@ pub fn double_affine_point<A: WeierstrassAffine>(point: A) -> A::Projective {
     let x3 = t0 * t1;
     let x3 = x3.double();
 
-    A::Projective::new(x3, y3, z3)
+    A::Extended::new(x3, y3, z3)
 }
 
 /// weierstrass mixed coordinate addition
 #[inline(always)]
-pub fn add_mixed_point<A: WeierstrassAffine>(lhs: A, rhs: A::Projective) -> A::Projective {
+pub fn add_mixed_point<A: WeierstrassAffine>(lhs: A, rhs: A::Extended) -> A::Extended {
     if lhs.is_identity() {
         return rhs;
     } else if rhs.is_identity() {
-        return lhs.to_projective();
+        return lhs.to_extended();
     }
 
     let (x1, y1, z1) = (rhs.get_x(), rhs.get_y(), rhs.get_z());
@@ -80,7 +79,7 @@ pub fn add_mixed_point<A: WeierstrassAffine>(lhs: A, rhs: A::Projective) -> A::P
         if s1 == y1 {
             return double_affine_point(lhs);
         } else {
-            return A::ADDITIVE_IDENTITY.to_projective();
+            return A::ADDITIVE_IDENTITY.to_extended();
         }
     }
 
@@ -96,7 +95,7 @@ pub fn add_mixed_point<A: WeierstrassAffine>(lhs: A, rhs: A::Projective) -> A::P
     let y = u * (r - a) - vvv * y1;
     let z = vvv * z1;
 
-    A::Projective::new(x, y, z)
+    A::Extended::new(x, y, z)
 }
 
 /// weierstrass projective coordinate addition

@@ -33,8 +33,6 @@ macro_rules! prime_field_operation {
             }
         }
 
-        impl RefOps for $field {}
-
         impl PrimeField for $field {
             const MODULUS: Self = $field($p);
 

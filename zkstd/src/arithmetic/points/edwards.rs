@@ -1,7 +1,5 @@
 use crate::arithmetic::utils::Naf;
-use crate::common::{
-    PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsCurve, TwistedEdwardsExtended,
-};
+use crate::common::{CurveGroup, PrimeField, Ring, TwistedEdwardsAffine, TwistedEdwardsExtended};
 
 /// twisted edwards coordinate addition
 /// 9M + 4A + 2B

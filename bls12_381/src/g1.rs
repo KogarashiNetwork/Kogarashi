@@ -337,8 +337,8 @@ weierstrass_curve_operation!(
 
 #[cfg(test)]
 mod tests {
-    #[allow(unused_imports)]
     use super::*;
+    use zkstd::common::OsRng;
 
     curve_test!(bls12_381, Fr, G1Affine, G1Projective, 100);
 

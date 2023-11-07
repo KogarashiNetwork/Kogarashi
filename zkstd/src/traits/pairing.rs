@@ -4,7 +4,6 @@ use parity_scale_codec::{Decode, Encode, EncodeLike};
 
 use super::{
     algebra::Field,
-    curve::CurveAffine,
     primitive::{Basic, ParityCmp},
     sign::SigUtils,
     FftField, IntGroup, WeierstrassAffine, WeierstrassProjective,
@@ -17,7 +16,7 @@ pub trait ExtensionField: Field + Basic + ParityCmp {
 
 /// pairing function range field
 pub trait PairingRange: ExtensionField {
-    type G1Affine: CurveAffine;
+    type G1Affine: WeierstrassAffine;
     type G2Coeff: ParityCmp;
     type QuadraticField: ExtensionField;
     type Gt: IntGroup + Debug;
@@ -39,7 +38,7 @@ pub trait G2Pairing: WeierstrassProjective {
     type PairingRange: PairingRange;
     type PairingCoeff: ParityCmp;
     type PairingRepr: ParityCmp;
-    type G2Affine: CurveAffine;
+    type G2Affine: WeierstrassAffine;
 
     fn double_eval(&mut self) -> Self::PairingCoeff;
 
@@ -51,11 +50,8 @@ pub trait Pairing:
     Send + Sync + Clone + Copy + Debug + Eq + PartialEq + Ord + Default + Encode + Decode
 {
     // g1 group affine point
-    type G1Affine: WeierstrassAffine<
-            Affine = Self::G1Affine,
-            Extended = Self::G1Projective,
-            Scalar = Self::ScalarField,
-        > + From<Self::G1Projective>
+    type G1Affine: WeierstrassAffine<Extended = Self::G1Projective, Scalar = Self::ScalarField>
+        + From<Self::G1Projective>
         + Add<Self::G1Projective, Output = Self::G1Projective>
         + SigUtils<48>
         + Sync
@@ -63,28 +59,19 @@ pub trait Pairing:
         + Encode
         + Decode;
     // g2 group affine point
-    type G2Affine: WeierstrassAffine<
-            Affine = Self::G2Affine,
-            Extended = Self::G2Projective,
-            Scalar = Self::ScalarField,
-        > + From<Self::G2Projective>
+    type G2Affine: WeierstrassAffine<Extended = Self::G2Projective, Scalar = Self::ScalarField>
+        + From<Self::G2Projective>
         + Encode
         + Decode;
     // g1 group projective point
-    type G1Projective: WeierstrassProjective<
-            Affine = Self::G1Affine,
-            Extended = Self::G1Projective,
-            Scalar = Self::ScalarField,
-        > + From<Self::G1Affine>
+    type G1Projective: WeierstrassProjective<Affine = Self::G1Affine, Scalar = Self::ScalarField>
+        + From<Self::G1Affine>
         + Sum
         + Send
         + Sync;
     // g2 group projective point
-    type G2Projective: WeierstrassProjective<
-            Affine = Self::G2Affine,
-            Extended = Self::G2Projective,
-            Scalar = Self::ScalarField,
-        > + From<Self::G2Affine>
+    type G2Projective: WeierstrassProjective<Affine = Self::G2Affine, Scalar = Self::ScalarField>
+        + From<Self::G2Affine>
         + G2Pairing
         + PartialEq
         + Eq;

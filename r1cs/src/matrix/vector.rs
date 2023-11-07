@@ -28,8 +28,12 @@ impl<F: PrimeField> DenseVectors<F> {
         }
     }
 
-    pub fn identity(m: usize) -> Self {
+    pub fn one(m: usize) -> Self {
         Self(vec![F::one(); m])
+    }
+
+    pub fn zero(m: usize) -> Self {
+        Self(vec![F::zero(); m])
     }
 }
 

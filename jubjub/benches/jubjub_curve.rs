@@ -1,9 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 use jub_jub::{Fp, JubjubAffine, JubjubExtended};
-use zkstd::common::{
-    Group, OsRng, TwistedEdwardsAffine, TwistedEdwardsCurve, TwistedEdwardsExtended,
-};
+use zkstd::common::{Group, OsRng, TwistedEdwardsAffine, TwistedEdwardsExtended};
 
 fn bench_jubjub_affine(c: &mut Criterion) {
     let mut group = c.benchmark_group("jubjub_affine");

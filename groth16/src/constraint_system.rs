@@ -1,14 +1,14 @@
 use crate::curves::CurveWitness;
 
 use core::ops::Index;
-use r1cs::{DenseVectors, R1csStruct, SparseRow, Wire};
+use r1cs::{DenseVectors, R1cs, SparseRow, Wire};
 use zkstd::common::{Ring, TwistedEdwardsAffine};
 
 #[derive(Debug)]
 pub struct ConstraintSystem<C: TwistedEdwardsAffine> {
-    pub(crate) constraints: R1csStruct<C::Range>,
-    pub(crate) instance: DenseVectors<C::Range>,
-    pub(crate) witness: DenseVectors<C::Range>,
+    pub(crate) constraints: R1cs<C::Range>,
+    pub(crate) x: DenseVectors<C::Range>,
+    pub(crate) w: DenseVectors<C::Range>,
 }
 
 impl<C: TwistedEdwardsAffine> Index<Wire> for ConstraintSystem<C> {
@@ -16,8 +16,8 @@ impl<C: TwistedEdwardsAffine> Index<Wire> for ConstraintSystem<C> {
 
     fn index(&self, w: Wire) -> &Self::Output {
         match w {
-            Wire::Instance(i) => &self.instance[i],
-            Wire::Witness(i) => &self.witness[i],
+            Wire::Instance(i) => &self.x[i],
+            Wire::Witness(i) => &self.w[i],
         }
     }
 }
@@ -25,9 +25,9 @@ impl<C: TwistedEdwardsAffine> Index<Wire> for ConstraintSystem<C> {
 impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
     pub(crate) fn initialize() -> Self {
         Self {
-            constraints: R1csStruct::default(),
-            instance: DenseVectors::new([C::Range::one()].to_vec()),
-            witness: DenseVectors::default(),
+            constraints: R1cs::default(),
+            x: DenseVectors::new([C::Range::one()].to_vec()),
+            w: DenseVectors::default(),
         }
     }
 
@@ -37,33 +37,33 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
 
     fn alloc_instance(&mut self, instance: C::Range) -> Wire {
         let wire = self.public_wire();
-        self.instance.push(instance);
+        self.x.push(instance);
         wire
     }
 
     fn alloc_witness(&mut self, witness: C::Range) -> Wire {
         let wire = self.private_wire();
-        self.witness.push(witness);
+        self.w.push(witness);
         wire
     }
 
     pub(crate) fn instance_len(&self) -> usize {
-        self.instance.len()
+        self.x.len()
     }
 
     pub(crate) fn witness_len(&self) -> usize {
-        self.witness.len()
+        self.w.len()
     }
 
     /// Add a public wire to the gadget. It will start with no generator and no associated constraints.
     pub fn public_wire(&mut self) -> Wire {
-        let index = self.instance.len();
+        let index = self.x.len();
         Wire::Instance(index)
     }
 
     /// Add a private wire to the gadget. It will start with no generator and no associated constraints.
     fn private_wire(&mut self) -> Wire {
-        let index = self.witness.len();
+        let index = self.w.len();
         Wire::Witness(index)
     }
 
@@ -149,8 +149,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
             return x * c;
         }
 
-        let product_value =
-            x.evaluate(&self.instance, &self.witness) * y.evaluate(&self.instance, &self.witness);
+        let product_value = x.evaluate(&self.x, &self.w) * y.evaluate(&self.x, &self.w);
         let product = self.alloc_witness(product_value);
         let product_exp = SparseRow::from(product);
         self.assert_product(x, y, &product_exp);
@@ -167,8 +166,7 @@ impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
             return x * c;
         }
 
-        let sum_value =
-            x.evaluate(&self.instance, &self.witness) + y.evaluate(&self.instance, &self.witness);
+        let sum_value = x.evaluate(&self.x, &self.w) + y.evaluate(&self.x, &self.w);
         let sum = self.alloc_witness(sum_value);
         let sum_exp = SparseRow::from(sum);
         self.assert_sum(x, y, &sum_exp);

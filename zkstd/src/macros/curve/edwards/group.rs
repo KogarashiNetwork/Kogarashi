@@ -8,27 +8,13 @@ macro_rules! twisted_edwards_affine_group_operation {
             }
         }
 
-        impl TwistedEdwardsCurve for $affine {
-            type Range = $range;
-
-            type Scalar = $scalar;
-
-            const PARAM_D: $range = $d;
-
+        impl Group for $affine {
             const ADDITIVE_GENERATOR: Self = Self { x: $x, y: $y };
 
             const ADDITIVE_IDENTITY: Self = Self {
                 x: $range::zero(),
                 y: $range::one(),
             };
-
-            fn is_identity(&self) -> bool {
-                self == &Self::ADDITIVE_IDENTITY
-            }
-
-            fn zero() -> Self {
-                Self::ADDITIVE_IDENTITY
-            }
 
             fn invert(self) -> Option<Self> {
                 match self.x.is_zero() {
@@ -42,6 +28,14 @@ macro_rules! twisted_edwards_affine_group_operation {
 
             fn random(rand: impl RngCore) -> $affine {
                 (Self::ADDITIVE_GENERATOR * $scalar::random(rand)).into()
+            }
+        }
+
+        impl CurveGroup for $affine {
+            type Range = $range;
+
+            fn is_identity(&self) -> bool {
+                self == &Self::ADDITIVE_IDENTITY
             }
 
             fn is_on_curve(self) -> bool {
@@ -62,6 +56,11 @@ macro_rules! twisted_edwards_affine_group_operation {
                 self.y
             }
         }
+
+        impl TwistedEdwardsCurve for $affine {
+            const PARAM_D: $range = $d;
+            type Scalar = $scalar;
+        }
     };
 }
 
@@ -76,12 +75,7 @@ macro_rules! twisted_edwards_extend_group_operation {
             }
         }
 
-        impl TwistedEdwardsCurve for $extended {
-            type Range = $range;
-            type Scalar = $scalar;
-
-            const PARAM_D: $range = $d;
-
+        impl Group for $extended {
             const ADDITIVE_GENERATOR: Self = Self {
                 x: $x,
                 y: $y,
@@ -95,14 +89,6 @@ macro_rules! twisted_edwards_extend_group_operation {
                 t: $range::zero(),
                 z: $range::one(),
             };
-
-            fn is_identity(&self) -> bool {
-                (self.x == $range::zero()) & (self.y == self.z)
-            }
-
-            fn zero() -> Self {
-                Self::ADDITIVE_IDENTITY
-            }
 
             fn invert(self) -> Option<Self> {
                 match self.z.is_zero() {
@@ -118,6 +104,14 @@ macro_rules! twisted_edwards_extend_group_operation {
 
             fn random(rand: impl RngCore) -> Self {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
+            }
+        }
+
+        impl CurveGroup for $extended {
+            type Range = $range;
+
+            fn is_identity(&self) -> bool {
+                (self.x == $range::zero()) & (self.y == self.z)
             }
 
             fn is_on_curve(self) -> bool {
@@ -136,6 +130,11 @@ macro_rules! twisted_edwards_extend_group_operation {
             fn get_y(&self) -> Self::Range {
                 self.y
             }
+        }
+
+        impl TwistedEdwardsCurve for $extended {
+            const PARAM_D: $range = $d;
+            type Scalar = $scalar;
         }
 
         impl AddAssign for $extended {

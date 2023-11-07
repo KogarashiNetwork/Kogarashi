@@ -8,11 +8,8 @@ pub use test::*;
 #[macro_export]
 macro_rules! weierstrass_curve_operation {
     ($scalar:ident, $range:ident, $a:ident, $b:ident, $b3:ident, $affine:ident, $projective:ident, $x:ident, $y:ident) => {
-        use zkstd::common::*;
-        use zkstd::common::*;
-
-        affine_group_operation!($affine, $projective, $range, $scalar, $x, $y, $a);
-        projective_group_operation!($affine, $projective, $range, $scalar, $x, $y, $a);
+        affine_group_operation!($affine, $projective, $range, $scalar, $x, $y, $a, $b, $b3);
+        projective_group_operation!($affine, $projective, $range, $scalar, $x, $y, $a, $b, $b3);
         mixed_curve_operations!($affine, $projective);
 
         impl ParityCmp for $affine {}
@@ -22,12 +19,9 @@ macro_rules! weierstrass_curve_operation {
         impl ParallelCmp for $affine {}
         impl ParallelCmp for $projective {}
 
-        impl WeierstrassCurve for $affine {
-            const PARAM_B: $range = $b;
-            const PARAM_3B: $range = $b3;
-        }
+        impl WeierstrassAffine for $affine {
+            type Extended = $projective;
 
-        impl CurveAffine for $affine {
             fn to_extended(self) -> $projective {
                 if self.is_identity() {
                     $projective::ADDITIVE_IDENTITY
@@ -43,30 +37,19 @@ macro_rules! weierstrass_curve_operation {
             fn to_raw_bytes(self) -> Vec<u8> {
                 self.to_bytes().to_vec()
             }
-        }
 
-        impl WeierstrassAffine for $affine {
-            type Projective = $projective;
-
-            fn to_projective(self) -> $projective {
-                if self.is_identity() {
-                    $projective::ADDITIVE_IDENTITY
-                } else {
-                    $projective {
-                        x: self.x,
-                        y: self.y,
-                        z: Self::Range::one(),
-                    }
-                }
+            fn double(self) -> $projective {
+                double_affine_point(self)
             }
         }
 
-        impl WeierstrassCurve for $projective {
-            const PARAM_B: $range = $b;
-            const PARAM_3B: $range = $b3;
-        }
+        impl WeierstrassProjective for $projective {
+            type Affine = $affine;
 
-        impl CurveExtended for $projective {
+            fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self {
+                Self { x, y, z }
+            }
+
             fn to_affine(self) -> Self::Affine {
                 match self.z.invert() {
                     Some(z_inv) => Self::Affine {
@@ -81,11 +64,9 @@ macro_rules! weierstrass_curve_operation {
             fn get_z(&self) -> Self::Range {
                 self.z
             }
-        }
 
-        impl WeierstrassProjective for $projective {
-            fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self {
-                Self { x, y, z }
+            fn double(self) -> $projective {
+                double_projective_point(self)
             }
         }
 

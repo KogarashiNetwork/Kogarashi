@@ -39,8 +39,6 @@ macro_rules! prime_extension_field_operation {
             }
         }
 
-        impl RefOps for $extension_field {}
-
         impl PrimeField for $extension_field {
             // wrong if this is problem
             const MODULUS: $extension_field = $extension_field::one();

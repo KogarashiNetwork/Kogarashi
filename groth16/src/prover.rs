@@ -16,14 +16,11 @@ pub struct Prover<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> {
 
 impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
     /// Execute the gadget, and return whether all constraints were satisfied.
-    pub fn create_proof<C, R: RngCore>(
+    pub fn create_proof<C: Circuit<A>, R: RngCore>(
         &mut self,
         rng: &mut R,
         circuit: C,
-    ) -> Result<Proof<P>, Error>
-    where
-        C: Circuit<A>,
-    {
+    ) -> Result<Proof<P>, Error> {
         let mut cs = ConstraintSystem::initialize();
         circuit.synthesize(&mut cs)?;
 
@@ -32,7 +29,7 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
         let vk = self.params.vk.clone();
 
         let fft = Fft::<P::ScalarField>::new(k as usize);
-        let (a, b, c) = cs.constraints.evaluate(&cs.instance, &cs.witness);
+        let (a, b, c) = cs.constraints.evaluate(&cs.x, &cs.w);
 
         // Do the calculation of H(X): A(X) * B(X) - C(X) == H(X) * T(X)
         let a = fft.idft(PointsValue(a));
@@ -52,8 +49,8 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
         // From here we do all evaluations with `msm_curve_addition` to not give access to original values.
         let q = msm_curve_addition(&self.params.h, &q);
 
-        let input_assignment = cs.instance.get();
-        let aux_assignment = cs.witness.get();
+        let input_assignment = cs.x.get();
+        let aux_assignment = cs.w.get();
 
         let l = msm_curve_addition(&self.params.l, &aux_assignment);
 
