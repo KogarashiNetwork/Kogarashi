@@ -44,6 +44,14 @@ macro_rules! affine_group_operation {
         impl CurveGroup for $affine {
             type Range = $range;
 
+            fn from_x_and_y(x: $range, y: $range) -> $affine {
+                $affine {
+                    x,
+                    y,
+                    is_infinity: false,
+                }
+            }
+
             fn is_identity(&self) -> bool {
                 self.is_infinity
             }
@@ -119,6 +127,14 @@ macro_rules! projective_group_operation {
 
         impl CurveGroup for $projective {
             type Range = $range;
+
+            fn from_x_and_y(x: $range, y: $range) -> $projective {
+                $projective {
+                    x,
+                    y,
+                    z: $range::one(),
+                }
+            }
 
             fn is_identity(&self) -> bool {
                 self.z == $range::zero()

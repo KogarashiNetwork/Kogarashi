@@ -47,6 +47,8 @@ pub trait CurveGroup: Group {
     // range field of curve
     type Range: PrimeField;
 
+    fn from_x_and_y(x: Self::Range, y: Self::Range) -> Self;
+
     // check that point is on curve
     fn is_identity(&self) -> bool;
 
