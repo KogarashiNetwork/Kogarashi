@@ -1,12 +1,12 @@
 use crate::curves::CurveWitness;
 
 use core::ops::Index;
-use r1cs::{DenseVectors, R1csStruct, SparseRow, Wire};
+use r1cs::{DenseVectors, R1cs, SparseRow, Wire};
 use zkstd::common::{Ring, TwistedEdwardsAffine};
 
 #[derive(Debug)]
 pub struct ConstraintSystem<C: TwistedEdwardsAffine> {
-    pub(crate) constraints: R1csStruct<C::Range>,
+    pub(crate) constraints: R1cs<C::Range>,
     pub(crate) instance: DenseVectors<C::Range>,
     pub(crate) witness: DenseVectors<C::Range>,
 }
@@ -25,7 +25,7 @@ impl<C: TwistedEdwardsAffine> Index<Wire> for ConstraintSystem<C> {
 impl<C: TwistedEdwardsAffine> ConstraintSystem<C> {
     pub(crate) fn initialize() -> Self {
         Self {
-            constraints: R1csStruct::default(),
+            constraints: R1cs::default(),
             instance: DenseVectors::new([C::Range::one()].to_vec()),
             witness: DenseVectors::default(),
         }

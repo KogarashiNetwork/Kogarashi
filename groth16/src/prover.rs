@@ -16,14 +16,11 @@ pub struct Prover<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> {
 
 impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
     /// Execute the gadget, and return whether all constraints were satisfied.
-    pub fn create_proof<C, R: RngCore>(
+    pub fn create_proof<C: Circuit<A>, R: RngCore>(
         &mut self,
         rng: &mut R,
         circuit: C,
-    ) -> Result<Proof<P>, Error>
-    where
-        C: Circuit<A>,
-    {
+    ) -> Result<Proof<P>, Error> {
         let mut cs = ConstraintSystem::initialize();
         circuit.synthesize(&mut cs)?;
 
