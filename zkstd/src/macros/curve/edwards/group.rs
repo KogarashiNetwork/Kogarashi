@@ -34,6 +34,10 @@ macro_rules! twisted_edwards_affine_group_operation {
         impl CurveGroup for $affine {
             type Range = $range;
 
+            fn from_x_and_y(x: $range, y: $range) -> $affine {
+                $affine { x, y }
+            }
+
             fn is_identity(&self) -> bool {
                 self == &Self::ADDITIVE_IDENTITY
             }
@@ -109,6 +113,15 @@ macro_rules! twisted_edwards_extend_group_operation {
 
         impl CurveGroup for $extended {
             type Range = $range;
+
+            fn from_x_and_y(x: $range, y: $range) -> $extended {
+                $extended {
+                    x,
+                    y,
+                    t: x * y,
+                    z: $range::one(),
+                }
+            }
 
             fn is_identity(&self) -> bool {
                 (self.x == $range::zero()) & (self.y == self.z)

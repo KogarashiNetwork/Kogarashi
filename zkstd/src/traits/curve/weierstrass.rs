@@ -1,6 +1,6 @@
 use crate::{
     common::{FftField, Vec},
-    traits::{CurveGroup, ParallelCmp, ParityCmp},
+    traits::CurveGroup,
 };
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
@@ -19,8 +19,6 @@ pub trait WeierstrassCurve: CurveGroup {
 /// affine representation check that a point is infinite by the struct field
 pub trait WeierstrassAffine:
     WeierstrassCurve
-    + ParityCmp
-    + ParallelCmp
     + From<Self::Extended>
     + Neg<Output = Self>
     + for<'a> Neg<Output = Self>
@@ -56,7 +54,6 @@ pub trait WeierstrassAffine:
 /// projective representation check that a point is infinite by z coordinate
 pub trait WeierstrassProjective:
     WeierstrassCurve
-    + ParallelCmp
     + Into<Self::Affine>
     + From<Self::Affine>
     + Neg<Output = Self>

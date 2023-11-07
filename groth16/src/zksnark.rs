@@ -1,11 +1,11 @@
 use crate::circuit::Circuit;
-use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
 use crate::prover::Prover;
 use crate::verifier::{Verifier, VerifyingKey};
 
 use core::marker::PhantomData;
 use poly_commit::{Coefficients, Fft, PointsValue};
+use r1cs::R1cs;
 use zkstd::common::{
     vec, Group, IntGroup, MulAssign, Pairing, PrimeField, Ring, RngCore, TwistedEdwardsAffine, Vec,
 };
@@ -19,7 +19,7 @@ pub struct ZkSnark<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> 
 impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> ZkSnark<P, A> {
     pub fn setup<C: Circuit<A>>(mut r: impl RngCore) -> Result<(Prover<P, A>, Verifier<P>), Error> {
         let circuit = C::default();
-        let mut cs = ConstraintSystem::initialize();
+        let mut cs = R1cs::default();
 
         circuit.synthesize(&mut cs)?;
 
@@ -62,16 +62,14 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> ZkSnark<P, A> 
         // Use inverse FFT to convert powers of tau to Lagrange coefficients
         let powers_of_tau = fft.idft(powers_of_tau);
 
-        let mut a = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
-        let mut b_g1 = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
-        let mut b_g2: Vec<P::G2Affine> =
-            vec![P::G2Affine::ADDITIVE_IDENTITY; cs.instance_len() + cs.witness_len()];
-        let mut ic = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.instance_len()];
-        let mut l = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.witness_len()];
+        let mut a = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.l() + cs.m_l_1()];
+        let mut b_g1 = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.l() + cs.m_l_1()];
+        let mut b_g2: Vec<P::G2Affine> = vec![P::G2Affine::ADDITIVE_IDENTITY; cs.l() + cs.m_l_1()];
+        let mut ic = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.l()];
+        let mut l = vec![P::G1Affine::ADDITIVE_IDENTITY; cs.m_l_1()];
 
-        let ((at_inputs, bt_inputs, ct_inputs), (at_aux, bt_aux, ct_aux)) = cs
-            .constraints
-            .z_vectors(cs.instance_len(), cs.witness_len());
+        let ((at_inputs, bt_inputs, ct_inputs), (at_aux, bt_aux, ct_aux)) =
+            cs.z_vectors(cs.l(), cs.m_l_1());
 
         // Evaluate for inputs.
         eval::<P>(
@@ -81,9 +79,9 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> ZkSnark<P, A> 
             &at_inputs,
             &bt_inputs,
             &ct_inputs,
-            &mut a[0..cs.instance_len()],
-            &mut b_g1[0..cs.instance_len()],
-            &mut b_g2[0..cs.instance_len()],
+            &mut a[0..cs.l()],
+            &mut b_g1[0..cs.l()],
+            &mut b_g2[0..cs.l()],
             &mut ic,
             &gamma_inverse,
             &alpha,
@@ -98,9 +96,9 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> ZkSnark<P, A> 
             &at_aux,
             &bt_aux,
             &ct_aux,
-            &mut a[cs.instance_len()..],
-            &mut b_g1[cs.instance_len()..],
-            &mut b_g2[cs.instance_len()..],
+            &mut a[cs.l()..],
+            &mut b_g1[cs.l()..],
+            &mut b_g2[cs.l()..],
             &mut l,
             &delta_inverse,
             &alpha,

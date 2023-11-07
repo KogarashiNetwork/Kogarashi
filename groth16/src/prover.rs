@@ -1,11 +1,11 @@
 use crate::circuit::Circuit;
-use crate::constraint_system::ConstraintSystem;
 use crate::error::Error;
 use crate::proof::Proof;
 use crate::zksnark::Parameters;
 
 use core::marker::PhantomData;
 use poly_commit::{msm_curve_addition, Fft, PointsValue};
+use r1cs::R1cs;
 use zkstd::common::{CurveGroup, Group, Pairing, RngCore, TwistedEdwardsAffine};
 
 #[derive(Debug)]
@@ -21,7 +21,7 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
         rng: &mut R,
         circuit: C,
     ) -> Result<Proof<P>, Error> {
-        let mut cs = ConstraintSystem::initialize();
+        let mut cs = R1cs::default();
         circuit.synthesize(&mut cs)?;
 
         let size = cs.m().next_power_of_two();
@@ -29,7 +29,7 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
         let vk = self.params.vk.clone();
 
         let fft = Fft::<P::ScalarField>::new(k as usize);
-        let (a, b, c) = cs.constraints.evaluate(&cs.x, &cs.w);
+        let (a, b, c) = cs.evaluate();
 
         // Do the calculation of H(X): A(X) * B(X) - C(X) == H(X) * T(X)
         let a = fft.idft(PointsValue(a));
@@ -49,19 +49,19 @@ impl<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> Prover<P, A> {
         // From here we do all evaluations with `msm_curve_addition` to not give access to original values.
         let q = msm_curve_addition(&self.params.h, &q);
 
-        let input_assignment = cs.x.get();
-        let aux_assignment = cs.w.get();
+        let input_assignment = cs.x();
+        let aux_assignment = cs.w();
 
         let l = msm_curve_addition(&self.params.l, &aux_assignment);
 
         let a_inputs = msm_curve_addition(&self.params.a, &input_assignment);
-        let a_aux = msm_curve_addition(&self.params.a[cs.instance_len()..], &aux_assignment);
+        let a_aux = msm_curve_addition(&self.params.a[cs.l()..], &aux_assignment);
 
         let b_g1_inputs = msm_curve_addition(&self.params.b_g1, &input_assignment);
-        let b_g1_aux = msm_curve_addition(&self.params.b_g1[cs.instance_len()..], &aux_assignment);
+        let b_g1_aux = msm_curve_addition(&self.params.b_g1[cs.l()..], &aux_assignment);
 
         let b_g2_inputs = msm_curve_addition(&self.params.b_g2, &input_assignment);
-        let b_g2_aux = msm_curve_addition(&self.params.b_g2[cs.instance_len()..], &aux_assignment);
+        let b_g2_aux = msm_curve_addition(&self.params.b_g2[cs.l()..], &aux_assignment);
 
         if vk.delta_g1.is_identity() || vk.delta_g2.is_identity() {
             return Err(Error::ProverSubVersionCrsAttack);

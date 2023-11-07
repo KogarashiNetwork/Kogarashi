@@ -1,11 +1,8 @@
-use crate::traits::{Basic, CurveGroup, PrimeField, RuntimeCmp};
-use crate::{
-    common::Vec,
-    traits::{ParallelCmp, ParityCmp},
-};
+use crate::common::Vec;
+use crate::traits::{CurveGroup, PrimeField};
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-pub trait TwistedEdwardsCurve: CurveGroup + ParityCmp + RuntimeCmp + ParallelCmp + Basic {
+pub trait TwistedEdwardsCurve: CurveGroup {
     // d param
     const PARAM_D: Self::Range;
     // scalar field of curve
