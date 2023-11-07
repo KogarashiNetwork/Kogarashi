@@ -41,12 +41,8 @@ macro_rules! affine_group_operation {
             }
         }
 
-        impl WeierstrassCurve for $affine {
-            const PARAM_B: $range = $b;
-            const PARAM_3B: $range = $b3;
-
+        impl CurveGroup for $affine {
             type Range = $range;
-            type Scalar = $scalar;
 
             fn is_identity(&self) -> bool {
                 self.is_infinity
@@ -67,6 +63,12 @@ macro_rules! affine_group_operation {
             fn get_y(&self) -> Self::Range {
                 self.y
             }
+        }
+
+        impl WeierstrassCurve for $affine {
+            const PARAM_B: $range = $b;
+            const PARAM_3B: $range = $b3;
+            type Scalar = $scalar;
         }
     };
 }
@@ -115,11 +117,8 @@ macro_rules! projective_group_operation {
             }
         }
 
-        impl WeierstrassCurve for $projective {
-            const PARAM_B: $range = $b;
-            const PARAM_3B: $range = $b3;
+        impl CurveGroup for $projective {
             type Range = $range;
-            type Scalar = $scalar;
 
             fn is_identity(&self) -> bool {
                 self.z == $range::zero()
@@ -141,6 +140,12 @@ macro_rules! projective_group_operation {
             fn get_y(&self) -> Self::Range {
                 self.y
             }
+        }
+
+        impl WeierstrassCurve for $projective {
+            const PARAM_B: $range = $b;
+            const PARAM_3B: $range = $b3;
+            type Scalar = $scalar;
         }
 
         impl AddAssign for $projective {

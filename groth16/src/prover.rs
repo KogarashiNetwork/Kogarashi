@@ -6,7 +6,7 @@ use crate::zksnark::Parameters;
 
 use core::marker::PhantomData;
 use poly_commit::{msm_curve_addition, Fft, PointsValue};
-use zkstd::common::{Group, Pairing, RngCore, TwistedEdwardsAffine, WeierstrassCurve};
+use zkstd::common::{CurveGroup, Group, Pairing, RngCore, TwistedEdwardsAffine};
 
 #[derive(Debug)]
 pub struct Prover<P: Pairing, A: TwistedEdwardsAffine<Range = P::ScalarField>> {

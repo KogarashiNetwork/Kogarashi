@@ -22,18 +22,6 @@ macro_rules! weierstrass_curve_operation {
         impl WeierstrassAffine for $affine {
             type Extended = $projective;
 
-            fn to_projective(self) -> $projective {
-                if self.is_identity() {
-                    $projective::ADDITIVE_IDENTITY
-                } else {
-                    $projective {
-                        x: self.x,
-                        y: self.y,
-                        z: Self::Range::one(),
-                    }
-                }
-            }
-
             fn to_extended(self) -> $projective {
                 if self.is_identity() {
                     $projective::ADDITIVE_IDENTITY

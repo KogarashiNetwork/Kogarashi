@@ -1,34 +1,18 @@
 use crate::{
-    common::{FftField, PrimeField, Vec},
-    traits::{Group, ParallelCmp, ParityCmp},
+    common::{FftField, Vec},
+    traits::{CurveGroup, ParallelCmp, ParityCmp},
 };
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 /// elliptic curve rational points group
 /// rational points group behaves as abelian group
-pub trait WeierstrassCurve: Group {
+pub trait WeierstrassCurve: CurveGroup {
     // b param
     const PARAM_B: Self::Range;
     // 3b param
     const PARAM_3B: Self::Range;
-
-    // range field of curve
-    type Range: PrimeField;
-
     // scalar field of curve
     type Scalar: FftField + From<Self::Range>;
-
-    // check that point is on curve
-    fn is_identity(&self) -> bool;
-
-    // check that point is on curve
-    fn is_on_curve(self) -> bool;
-
-    // get x coordinate
-    fn get_x(&self) -> Self::Range;
-
-    // get y coordinate
-    fn get_y(&self) -> Self::Range;
 }
 
 /// rational point affine representation
@@ -59,8 +43,6 @@ pub trait WeierstrassAffine:
 {
     // extented coordinate representation
     type Extended: WeierstrassProjective<Affine = Self, Range = Self::Range>;
-
-    fn to_projective(self) -> Self::Extended;
 
     fn to_extended(self) -> Self::Extended;
 

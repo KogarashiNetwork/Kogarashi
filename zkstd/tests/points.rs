@@ -7,7 +7,7 @@ mod twisted_edwards_points_tests {
     use rand_core::OsRng;
     use zkstd::{
         arithmetic::edwards::*,
-        common::{Group, TwistedEdwardsAffine, TwistedEdwardsCurve},
+        common::{CurveGroup, Group, TwistedEdwardsAffine},
     };
 
     #[test]

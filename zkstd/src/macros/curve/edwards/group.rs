@@ -31,12 +31,8 @@ macro_rules! twisted_edwards_affine_group_operation {
             }
         }
 
-        impl TwistedEdwardsCurve for $affine {
+        impl CurveGroup for $affine {
             type Range = $range;
-
-            type Scalar = $scalar;
-
-            const PARAM_D: $range = $d;
 
             fn is_identity(&self) -> bool {
                 self == &Self::ADDITIVE_IDENTITY
@@ -59,6 +55,11 @@ macro_rules! twisted_edwards_affine_group_operation {
             fn get_y(&self) -> Self::Range {
                 self.y
             }
+        }
+
+        impl TwistedEdwardsCurve for $affine {
+            const PARAM_D: $range = $d;
+            type Scalar = $scalar;
         }
     };
 }
@@ -106,11 +107,8 @@ macro_rules! twisted_edwards_extend_group_operation {
             }
         }
 
-        impl TwistedEdwardsCurve for $extended {
+        impl CurveGroup for $extended {
             type Range = $range;
-            type Scalar = $scalar;
-
-            const PARAM_D: $range = $d;
 
             fn is_identity(&self) -> bool {
                 (self.x == $range::zero()) & (self.y == self.z)
@@ -132,6 +130,11 @@ macro_rules! twisted_edwards_extend_group_operation {
             fn get_y(&self) -> Self::Range {
                 self.y
             }
+        }
+
+        impl TwistedEdwardsCurve for $extended {
+            const PARAM_D: $range = $d;
+            type Scalar = $scalar;
         }
 
         impl AddAssign for $extended {

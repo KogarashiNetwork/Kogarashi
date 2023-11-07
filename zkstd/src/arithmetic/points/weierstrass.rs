@@ -1,15 +1,15 @@
 use crate::arithmetic::utils::Naf;
 use crate::common::{
-    Group, PrimeField, WeierstrassAffine, WeierstrassCurve, WeierstrassProjective,
+    CurveGroup, Group, PrimeField, WeierstrassAffine, WeierstrassCurve, WeierstrassProjective,
 };
 
 /// weierstrass affine coordinate addition
 #[inline(always)]
 pub fn add_affine_point<A: WeierstrassAffine>(lhs: A, rhs: A) -> A::Extended {
     if lhs.is_identity() {
-        return rhs.to_projective();
+        return rhs.to_extended();
     } else if rhs.is_identity() {
-        return lhs.to_projective();
+        return lhs.to_extended();
     }
 
     let (x0, y0) = (lhs.get_x(), lhs.get_y());
@@ -79,7 +79,7 @@ pub fn add_mixed_point<A: WeierstrassAffine>(lhs: A, rhs: A::Extended) -> A::Ext
         if s1 == y1 {
             return double_affine_point(lhs);
         } else {
-            return A::ADDITIVE_IDENTITY.to_projective();
+            return A::ADDITIVE_IDENTITY.to_extended();
         }
     }
 

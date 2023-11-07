@@ -1,5 +1,5 @@
 // trait resresenting abstract algebra concept
-use crate::traits::primitive::Basic;
+use crate::traits::{field::PrimeField, primitive::Basic};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use rand_core::RngCore;
 
@@ -41,6 +41,23 @@ pub trait IntGroup:
 {
     // return zero element
     fn zero() -> Self;
+}
+
+pub trait CurveGroup: Group {
+    // range field of curve
+    type Range: PrimeField;
+
+    // check that point is on curve
+    fn is_identity(&self) -> bool;
+
+    // check that point is on curve
+    fn is_on_curve(self) -> bool;
+
+    // get x coordinate
+    fn get_x(&self) -> Self::Range;
+
+    // get y coordinate
+    fn get_y(&self) -> Self::Range;
 }
 
 /// ring trait which supports additive and multiplicative arithmetics

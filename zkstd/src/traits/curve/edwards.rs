@@ -1,30 +1,15 @@
-use crate::traits::{Basic, FftField, Group, PrimeField, RuntimeCmp};
+use crate::traits::{Basic, CurveGroup, PrimeField, RuntimeCmp};
 use crate::{
     common::Vec,
     traits::{ParallelCmp, ParityCmp},
 };
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-pub trait TwistedEdwardsCurve: Group + ParityCmp + RuntimeCmp + ParallelCmp + Basic {
+pub trait TwistedEdwardsCurve: CurveGroup + ParityCmp + RuntimeCmp + ParallelCmp + Basic {
+    // d param
     const PARAM_D: Self::Range;
-
-    // range field of curve
-    type Range: FftField;
-
     // scalar field of curve
     type Scalar: PrimeField + From<Self::Range>;
-
-    // check that point is on curve
-    fn is_identity(&self) -> bool;
-
-    // check that point is on curve
-    fn is_on_curve(self) -> bool;
-
-    // get x coordinate
-    fn get_x(&self) -> Self::Range;
-
-    // get y coordinate
-    fn get_y(&self) -> Self::Range;
 }
 
 pub trait TwistedEdwardsAffine:
@@ -48,14 +33,14 @@ pub trait TwistedEdwardsAffine:
     // extended coordinate representation
     type Extended: TwistedEdwardsExtended<Range = Self::Range>;
 
-    // doubling this point
-    fn double(self) -> Self::Extended;
-
     fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self;
 
     fn to_extended(self) -> Self::Extended;
 
     fn to_raw_bytes(self) -> Vec<u8>;
+
+    // doubling this point
+    fn double(self) -> Self::Extended;
 }
 
 pub trait TwistedEdwardsExtended:
