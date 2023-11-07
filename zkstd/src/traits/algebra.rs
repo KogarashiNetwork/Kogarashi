@@ -22,10 +22,24 @@ pub trait Group: Basic + Eq + PartialEq {
     fn random(rand: impl RngCore) -> Self;
 }
 
-/// group trait which supports additive and scalar arithmetic
-/// additive and scalar arithmetic hold associative and distributive property
+/// integer group trait which supports additive arithmetic
+/// additive arithmetic hold associative and distributive property
 pub trait IntGroup:
-    Group + Add<Output = Self> + AddAssign + Neg<Output = Self> + Sub<Output = Self> + SubAssign
+    Group
+    + Neg<Output = Self>
+    + for<'a> Neg
+    + Add<Output = Self>
+    + for<'a> Add<&'a Self, Output = Self>
+    + for<'b> Add<&'b Self, Output = Self>
+    + for<'a, 'b> Add<&'b Self, Output = Self>
+    + AddAssign
+    + for<'b> AddAssign<&'b Self>
+    + Sub<Output = Self>
+    + for<'a> Sub<&'a Self, Output = Self>
+    + for<'b> Sub<&'b Self, Output = Self>
+    + for<'a, 'b> Sub<&'b Self, Output = Self>
+    + SubAssign
+    + for<'b> SubAssign<&'b Self>
 {
     // return zero element
     fn zero() -> Self;
@@ -33,6 +47,7 @@ pub trait IntGroup:
 
 pub trait CurveGroup:
     Group
+    + Neg<Output = Self>
     + Add<Self, Output = Self::Extended>
     + for<'a> Add<&'a Self, Output = Self::Extended>
     + for<'b> Add<&'b Self, Output = Self::Extended>
@@ -41,7 +56,6 @@ pub trait CurveGroup:
     + for<'a> Sub<&'a Self, Output = Self::Extended>
     + for<'b> Sub<&'b Self, Output = Self::Extended>
     + for<'a, 'b> Sub<&'b Self, Output = Self::Extended>
-    + Neg<Output = Self>
     + Mul<Self::Scalar, Output = Self::Extended>
     + for<'a> Mul<&'a Self::Scalar, Output = Self::Extended>
     + for<'b> Mul<&'b Self::Scalar, Output = Self::Extended>
@@ -76,7 +90,18 @@ pub trait CurveGroup:
 /// ring trait which supports additive and multiplicative arithmetics
 /// both arithmetics hold associative and distributive property
 /// default element is multiplicative generator
-pub trait Ring: IntGroup + PartialOrd + Ord + Default + Mul<Output = Self> + MulAssign {
+pub trait Ring:
+    IntGroup
+    + PartialOrd
+    + Ord
+    + Default
+    + Mul<Output = Self>
+    + for<'a> Mul<&'a Self, Output = Self>
+    + for<'b> Mul<&'b Self, Output = Self>
+    + for<'a, 'b> Mul<&'b Self, Output = Self>
+    + MulAssign
+    + for<'b> MulAssign<&'b Self>
+{
     const MULTIPLICATIVE_IDENTITY: Self;
 
     // return one element

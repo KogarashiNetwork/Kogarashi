@@ -38,11 +38,55 @@ impl Add for Gt {
     type Output = Gt;
 
     fn add(self, rhs: Gt) -> Gt {
+        &self + &rhs
+    }
+}
+
+impl<'a, 'b> Add<&'b Gt> for &'a Gt {
+    type Output = Gt;
+
+    fn add(self, rhs: &'b Gt) -> Gt {
         Gt(self.0 * rhs.0)
     }
 }
 
+impl<'a> Add<Gt> for &'a Gt {
+    type Output = Gt;
+
+    fn add(self, rhs: Gt) -> Gt {
+        self + &rhs
+    }
+}
+
+impl<'b> Add<&'b Gt> for Gt {
+    type Output = Gt;
+
+    fn add(self, rhs: &'b Gt) -> Self {
+        &self + rhs
+    }
+}
+
+impl AddAssign for Gt {
+    fn add_assign(&mut self, rhs: Gt) {
+        *self = *self + rhs;
+    }
+}
+
+impl<'b> AddAssign<&'b Gt> for Gt {
+    fn add_assign(&mut self, rhs: &'b Gt) {
+        *self = *self + rhs
+    }
+}
+
 impl Neg for Gt {
+    type Output = Gt;
+
+    fn neg(self) -> Gt {
+        -&self
+    }
+}
+
+impl<'a> Neg for &'a Gt {
     type Output = Gt;
 
     fn neg(self) -> Gt {
@@ -54,7 +98,43 @@ impl Sub for Gt {
     type Output = Gt;
 
     fn sub(self, rhs: Gt) -> Gt {
+        &self - &rhs
+    }
+}
+
+impl<'a, 'b> Sub<&'b Gt> for &'a Gt {
+    type Output = Gt;
+
+    fn sub(self, rhs: &'b Gt) -> Gt {
         self + (-rhs)
+    }
+}
+
+impl<'a> Sub<Gt> for &'a Gt {
+    type Output = Gt;
+
+    fn sub(self, rhs: Gt) -> Gt {
+        self - &rhs
+    }
+}
+
+impl<'b> Sub<&'b Gt> for Gt {
+    type Output = Gt;
+
+    fn sub(self, rhs: &'b Gt) -> Self {
+        &self - rhs
+    }
+}
+
+impl SubAssign for Gt {
+    fn sub_assign(&mut self, rhs: Gt) {
+        *self = *self - rhs;
+    }
+}
+
+impl<'b> SubAssign<&'b Gt> for Gt {
+    fn sub_assign(&mut self, rhs: &'b Gt) {
+        *self = *self - rhs
     }
 }
 
@@ -69,18 +149,6 @@ impl Mul<Gt> for Gt {
 impl MulAssign for Gt {
     fn mul_assign(&mut self, rhs: Gt) {
         *self = *self * rhs;
-    }
-}
-
-impl AddAssign for Gt {
-    fn add_assign(&mut self, rhs: Gt) {
-        *self = *self + rhs;
-    }
-}
-
-impl SubAssign for Gt {
-    fn sub_assign(&mut self, rhs: Gt) {
-        *self = *self - rhs;
     }
 }
 
