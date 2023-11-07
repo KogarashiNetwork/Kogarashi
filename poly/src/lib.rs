@@ -20,10 +20,8 @@ mod commitment;
 mod fft;
 mod msm;
 mod poly;
-mod util;
 
 pub use commitment::Commitment;
 pub use fft::Fft;
 pub use msm::msm_curve_addition;
 pub use poly::{Coefficients, PointsValue};
-pub use util::{batch_inversion, powers_of};

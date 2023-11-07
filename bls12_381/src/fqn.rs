@@ -559,10 +559,6 @@ impl Fq12 {
         Self([tmp - ab.mul_by_nonres(), ab.double()])
     }
 
-    fn mul_by_nonres(self) -> Self {
-        unimplemented!()
-    }
-
     pub fn conjugate(self) -> Self {
         Self([self.0[0], -self.0[1]])
     }
