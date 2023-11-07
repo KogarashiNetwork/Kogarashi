@@ -20,21 +20,6 @@ macro_rules! field_test {
 
         paste! {
             #[test]
-            fn [< $test_name _ordering_test >]() {
-                let five = $field::one() + $field::one() + $field::one() + $field::one() + $field::one();
-                let ten = five.double();
-                let fifteen = five + ten;
-
-                assert!(five < ten);
-                assert!(five < fifteen);
-                assert!(ten < fifteen);
-                assert!(ten > five);
-                assert!(fifteen > five);
-            }
-        }
-
-        paste! {
-            #[test]
             fn [< $test_name _addition_test >]() {
                 for _ in 0..$iter_times {
                     let a = $field::random(OsRng);

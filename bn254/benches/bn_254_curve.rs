@@ -2,7 +2,7 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 use bn_254::{Fr, G1Affine, G1Projective, G2Affine, G2Projective};
 use rand_core::OsRng;
-use zkstd::common::{CurveGroup, Group};
+use zkstd::common::{Group, WeierstrassAffine, WeierstrassProjective};
 
 fn bench_g1_affine(c: &mut Criterion) {
     let mut group = c.benchmark_group("g1_affine");
