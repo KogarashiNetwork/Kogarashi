@@ -1,11 +1,17 @@
+#![no_std]
+#![doc = include_str!("../README.md")]
+
+mod gadget;
 mod matrix;
+#[cfg(test)]
+mod test;
 mod wire;
 
-pub use matrix::*;
+pub use matrix::{DenseVectors, SparseMatrix, SparseRow};
 pub use wire::Wire;
 
 use core::ops::Index;
-use zkstd::common::PrimeField;
+use zkstd::common::{vec, PrimeField, Vec};
 
 #[derive(Debug)]
 pub struct R1cs<F: PrimeField> {
@@ -44,6 +50,23 @@ impl<F: PrimeField> R1cs<F> {
 
     pub fn w(&self) -> Vec<F> {
         self.w.get()
+    }
+
+    ///  check (A · Z) ◦ (B · Z) = C · Z
+    pub fn is_sat(&self) -> bool {
+        let R1cs { m, a, b, c, x, w } = self;
+        // A · Z
+        let az = a.prod(m, x, w);
+        // B · Z
+        let bz = b.prod(m, x, w);
+        // C · Z
+        let cz = c.prod(m, x, w);
+        // (A · Z) ◦ (B · Z)
+        let azbz = az * bz;
+
+        azbz.iter()
+            .zip(cz.iter())
+            .all(|(left, right)| left == right)
     }
 
     fn append(&mut self, a: SparseRow<F>, b: SparseRow<F>, c: SparseRow<F>) {
@@ -88,39 +111,6 @@ impl<F: PrimeField> R1cs<F> {
     /// constrain x == y
     pub fn constrain_equal(&mut self, x: &SparseRow<F>, y: &SparseRow<F>) {
         self.constrain_mul(x, &SparseRow::one(), y);
-    }
-
-    /// product of two SparseRow x and y
-    pub fn product(&mut self, x: &SparseRow<F>, y: &SparseRow<F>) -> SparseRow<F> {
-        if let Some(c) = x.as_constant() {
-            return y * c;
-        }
-        if let Some(c) = y.as_constant() {
-            return x * c;
-        }
-
-        let product_value = x.evaluate(&self.x, &self.w) * y.evaluate(&self.x, &self.w);
-        let product = self.alloc_witness(product_value);
-        let product_exp = SparseRow::from(product);
-        self.constrain_mul(x, y, &product_exp);
-
-        product_exp
-    }
-
-    /// sum of two SparseRow x and y
-    pub fn sum(&mut self, x: &SparseRow<F>, y: &SparseRow<F>) -> SparseRow<F> {
-        if let Some(c) = x.as_constant() {
-            return y * c;
-        }
-        if let Some(c) = y.as_constant() {
-            return x * c;
-        }
-
-        let sum_value = x.evaluate(&self.x, &self.w) + y.evaluate(&self.x, &self.w);
-        let sum = self.alloc_witness(sum_value);
-        let sum_exp = SparseRow::from(sum);
-        self.constrain_add(x, y, &sum_exp);
-        sum_exp
     }
 
     pub fn evaluate(&self) -> (Vec<F>, Vec<F>, Vec<F>) {
@@ -174,6 +164,20 @@ impl<F: PrimeField> Index<Wire> for R1cs<F> {
         match w {
             Wire::Instance(i) => &self.x[i],
             Wire::Witness(i) => &self.w[i],
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::test::example_r1cs;
+    use jub_jub::Fr as Scalar;
+
+    #[test]
+    fn r1cs_test() {
+        for i in 1..10 {
+            let r1cs = example_r1cs::<Scalar>(i);
+            assert!(r1cs.is_sat())
         }
     }
 }

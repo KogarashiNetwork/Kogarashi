@@ -14,7 +14,6 @@ impl<F: PrimeField> SparseRow<F> {
             coefficients
                 .into_iter()
                 .filter(|element| element.1 != F::zero())
-                .map(|element| (element.0, element.1))
                 .collect(),
         )
     }
@@ -42,7 +41,7 @@ impl<F: PrimeField> SparseRow<F> {
 
     pub fn evaluate(&self, instance: &DenseVectors<F>, witness: &DenseVectors<F>) -> F {
         self.0.iter().fold(F::zero(), |sum, (wire, coefficient)| {
-            let wire_value: F = match wire {
+            let wire_value = match wire {
                 Wire::Instance(i) => instance[*i],
                 Wire::Witness(i) => witness[*i],
             };
@@ -53,34 +52,34 @@ impl<F: PrimeField> SparseRow<F> {
 
 impl<F: PrimeField> From<Wire> for SparseRow<F> {
     fn from(wire: Wire) -> Self {
-        SparseRow::new([(wire, F::one())].to_vec())
+        Self::new([(wire, F::one())].to_vec())
     }
 }
 
 impl<F: PrimeField> From<&Wire> for SparseRow<F> {
     fn from(wire: &Wire) -> Self {
-        SparseRow::from(*wire)
+        Self::from(*wire)
     }
 }
 
 impl<F: PrimeField> From<F> for SparseRow<F> {
     fn from(value: F) -> Self {
-        SparseRow::new([(Wire::ONE, value)].to_vec())
+        Self::new([(Wire::ONE, value)].to_vec())
     }
 }
 
 impl<F: PrimeField> Add<SparseRow<F>> for SparseRow<F> {
-    type Output = SparseRow<F>;
+    type Output = Self;
 
-    fn add(self, rhs: SparseRow<F>) -> SparseRow<F> {
+    fn add(self, rhs: Self) -> Self {
         &self + &rhs
     }
 }
 
 impl<F: PrimeField> Add<&SparseRow<F>> for SparseRow<F> {
-    type Output = SparseRow<F>;
+    type Output = Self;
 
-    fn add(self, rhs: &SparseRow<F>) -> SparseRow<F> {
+    fn add(self, rhs: &Self) -> Self {
         &self + rhs
     }
 }
@@ -88,7 +87,7 @@ impl<F: PrimeField> Add<&SparseRow<F>> for SparseRow<F> {
 impl<F: PrimeField> Add<SparseRow<F>> for &SparseRow<F> {
     type Output = SparseRow<F>;
 
-    fn add(self, rhs: SparseRow<F>) -> SparseRow<F> {
+    fn add(self, rhs: SparseRow<F>) -> Self::Output {
         self + &rhs
     }
 }
@@ -96,7 +95,7 @@ impl<F: PrimeField> Add<SparseRow<F>> for &SparseRow<F> {
 impl<F: PrimeField> Add<&SparseRow<F>> for &SparseRow<F> {
     type Output = SparseRow<F>;
 
-    fn add(self, rhs: &SparseRow<F>) -> SparseRow<F> {
+    fn add(self, rhs: &SparseRow<F>) -> Self::Output {
         let mut res = self.0.clone();
         for (wire, coeff_b) in rhs.0.clone() {
             match get_value_from_wire(wire, &self.0) {
@@ -143,7 +142,7 @@ impl<F: PrimeField> Sub<&SparseRow<F>> for &SparseRow<F> {
 impl<F: PrimeField> Neg for &SparseRow<F> {
     type Output = SparseRow<F>;
 
-    fn neg(self) -> SparseRow<F> {
+    fn neg(self) -> Self::Output {
         self * -F::one()
     }
 }
@@ -151,7 +150,7 @@ impl<F: PrimeField> Neg for &SparseRow<F> {
 impl<F: PrimeField> Neg for SparseRow<F> {
     type Output = SparseRow<F>;
 
-    fn neg(self) -> SparseRow<F> {
+    fn neg(self) -> Self::Output {
         -&self
     }
 }
@@ -159,7 +158,7 @@ impl<F: PrimeField> Neg for SparseRow<F> {
 impl<F: PrimeField> Mul<F> for SparseRow<F> {
     type Output = SparseRow<F>;
 
-    fn mul(self, rhs: F) -> SparseRow<F> {
+    fn mul(self, rhs: F) -> Self::Output {
         &self * &rhs
     }
 }
@@ -167,7 +166,7 @@ impl<F: PrimeField> Mul<F> for SparseRow<F> {
 impl<F: PrimeField> Mul<&F> for SparseRow<F> {
     type Output = SparseRow<F>;
 
-    fn mul(self, rhs: &F) -> SparseRow<F> {
+    fn mul(self, rhs: &F) -> Self::Output {
         &self * rhs
     }
 }
@@ -175,7 +174,7 @@ impl<F: PrimeField> Mul<&F> for SparseRow<F> {
 impl<F: PrimeField> Mul<F> for &SparseRow<F> {
     type Output = SparseRow<F>;
 
-    fn mul(self, rhs: F) -> SparseRow<F> {
+    fn mul(self, rhs: F) -> Self::Output {
         self * &rhs
     }
 }
@@ -183,7 +182,7 @@ impl<F: PrimeField> Mul<F> for &SparseRow<F> {
 impl<F: PrimeField> Mul<&F> for &SparseRow<F> {
     type Output = SparseRow<F>;
 
-    fn mul(self, rhs: &F) -> SparseRow<F> {
+    fn mul(self, rhs: &F) -> Self::Output {
         SparseRow::new(self.0.iter().map(|(k, v)| (*k, *v * *rhs)).collect())
     }
 }
