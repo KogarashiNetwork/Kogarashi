@@ -30,6 +30,26 @@ impl<F: PrimeField> SparseMatrix<F> {
     pub(crate) fn evaluate_with_z(&self, x: &DenseVectors<F>, w: &DenseVectors<F>) -> Vec<F> {
         self.0.iter().map(|row| row.evaluate(x, w)).collect()
     }
+
+    // matrix-vector multiplication
+    pub(crate) fn prod(
+        &self,
+        m: &usize,
+        x: &DenseVectors<F>,
+        w: &DenseVectors<F>,
+    ) -> DenseVectors<F> {
+        let mut vectors = DenseVectors::zero(*m);
+        for (index, elements) in self.0.iter().enumerate() {
+            vectors[index] = elements.iter().fold(F::zero(), |sum, (wire, coeff)| {
+                let value = match wire {
+                    Wire::Instance(i) => x[*i],
+                    Wire::Witness(i) => w[*i],
+                };
+                sum + *coeff * value
+            })
+        }
+        vectors
+    }
 }
 
 pub trait Evaluable<F: PrimeField, R> {

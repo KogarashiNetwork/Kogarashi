@@ -1,4 +1,6 @@
 mod matrix;
+#[cfg(test)]
+mod test;
 mod wire;
 
 pub use matrix::*;
@@ -44,6 +46,23 @@ impl<F: PrimeField> R1cs<F> {
 
     pub fn w(&self) -> Vec<F> {
         self.w.get()
+    }
+
+    ///  check (A · Z) ◦ (B · Z) = C · Z
+    pub fn is_sat(&self) -> bool {
+        let R1cs { m, a, b, c, x, w } = self.clone();
+        // A · Z
+        let az = a.prod(m, &x, &w);
+        // B · Z
+        let bz = b.prod(m, &x, &w);
+        // C · Z
+        let cz = c.prod(m, &x, &w);
+        // (A · Z) ◦ (B · Z)
+        let azbz = az * bz;
+
+        azbz.iter()
+            .zip(cz.iter())
+            .all(|(left, right)| left == right)
     }
 
     fn append(&mut self, a: SparseRow<F>, b: SparseRow<F>, c: SparseRow<F>) {
@@ -174,6 +193,21 @@ impl<F: PrimeField> Index<Wire> for R1cs<F> {
         match w {
             Wire::Instance(i) => &self.x[i],
             Wire::Witness(i) => &self.w[i],
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::R1cs;
+    use crate::test::example_r1cs;
+    use jub_jub::Fr as Scalar;
+
+    #[test]
+    fn r1cs_test() {
+        for i in 1..10 {
+            let r1cs = example_r1cs::<Scalar>(i);
+            assert!(r1cs.is_sat())
         }
     }
 }
