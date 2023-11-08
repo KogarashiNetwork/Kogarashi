@@ -2,7 +2,7 @@ use crate::matrix::{DenseVectors, SparseMatrix, SparseRow};
 use crate::wire::Wire;
 use crate::R1cs;
 
-use zkstd::common::PrimeField;
+use zkstd::common::{vec, PrimeField, Vec};
 
 fn array_to_witnessess<F: PrimeField>(witnesses: Vec<u64>) -> Vec<F> {
     witnesses
@@ -22,7 +22,7 @@ fn dense_to_sparse<F: PrimeField>(value: Vec<Vec<u64>>, l: usize) -> SparseMatri
                     if index <= l {
                         (Wire::Instance(index), F::from(*element))
                     } else {
-                        let index = index - l;
+                        let index = index - l - 1;
                         (Wire::Witness(index), F::from(*element))
                     }
                 })
@@ -31,7 +31,6 @@ fn dense_to_sparse<F: PrimeField>(value: Vec<Vec<u64>>, l: usize) -> SparseMatri
             SparseRow(coeffs)
         })
         .collect::<Vec<_>>();
-    println!("sparse_matrix {:?}\n", sparse_matrix);
     SparseMatrix(sparse_matrix)
 }
 
@@ -45,7 +44,6 @@ fn example_z_witness<F: PrimeField>(input: u64, l: usize) -> (DenseVectors<F>, D
         input * input * input + input,
     ]);
     let (public_inputs, witness) = z.split_at(l + 1);
-    println!("public_inputs {:?}\n witness{:?}", public_inputs, witness);
     (
         DenseVectors::new(public_inputs.to_vec()),
         DenseVectors::new(witness.to_vec()),

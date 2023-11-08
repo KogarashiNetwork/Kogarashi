@@ -1,3 +1,6 @@
+#![no_std]
+#![doc = include_str!("../README.md")]
+
 mod matrix;
 #[cfg(test)]
 mod test;
@@ -7,7 +10,7 @@ pub use matrix::*;
 pub use wire::Wire;
 
 use core::ops::Index;
-use zkstd::common::PrimeField;
+use zkstd::common::{vec, PrimeField, Vec};
 
 #[derive(Debug)]
 pub struct R1cs<F: PrimeField> {
@@ -199,7 +202,6 @@ impl<F: PrimeField> Index<Wire> for R1cs<F> {
 
 #[cfg(test)]
 mod tests {
-    use super::R1cs;
     use crate::test::example_r1cs;
     use jub_jub::Fr as Scalar;
 

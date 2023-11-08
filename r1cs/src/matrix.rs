@@ -5,7 +5,7 @@ use crate::wire::Wire;
 pub use row::SparseRow;
 pub use vector::DenseVectors;
 
-use zkstd::common::{Debug, PrimeField, Vec};
+use zkstd::common::{vec, Debug, PrimeField, Vec};
 
 #[derive(Clone, Debug, Default)]
 pub struct SparseMatrix<F: PrimeField>(pub(crate) Vec<SparseRow<F>>);
