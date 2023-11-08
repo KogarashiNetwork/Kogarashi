@@ -1,8 +1,8 @@
 //! Bls12 381 construction and frobennius map constant
 use crate::{Fq, Fq2};
 
-pub const BLS_X: u64 = 4965661367192848881;
-pub const BLS_X_IS_NEGATIVE: bool = true;
+pub const BN_X: u64 = 4965661367192848881;
+pub const BN_X_IS_NEGATIVE: bool = true;
 
 // g1 curve parameters
 pub(crate) const G1_GENERATOR_X: Fq = Fq::one();

@@ -1,4 +1,4 @@
-use crate::params::{BLS_X, BLS_X_IS_NEGATIVE, G1_GENERATOR_X, G1_GENERATOR_Y, G1_PARAM_B};
+use crate::params::{BN_X, BN_X_IS_NEGATIVE, G1_GENERATOR_X, G1_GENERATOR_Y, G1_PARAM_B};
 use crate::{Fq, Fr};
 use core::borrow::Borrow;
 use core::iter::Sum;
@@ -230,7 +230,7 @@ impl G1Projective {
     fn mul_by_x(&self) -> G1Projective {
         let mut xself = G1Projective::ADDITIVE_IDENTITY;
         // NOTE: in BLS12-381 we can just skip the first bit.
-        let mut x = BLS_X >> 1;
+        let mut x = BN_X >> 1;
         let mut tmp = *self;
         while x != 0 {
             tmp = tmp.double();
@@ -241,7 +241,7 @@ impl G1Projective {
             x >>= 1;
         }
         // finally, flip the sign
-        if BLS_X_IS_NEGATIVE {
+        if BN_X_IS_NEGATIVE {
             xself = -xself;
         }
         xself
