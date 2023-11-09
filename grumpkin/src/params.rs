@@ -1,8 +1,8 @@
 use bn_254::Fr;
 
 // g1 curve parameters
-pub(crate) const GENERATOR_X: Fr = Fr::one();
-pub(crate) const GENERATOR_Y: Fr = Fr::new_unchecked([
+pub const GENERATOR_X: Fr = Fr::one();
+pub const GENERATOR_Y: Fr = Fr::new_unchecked([
     0x11b2dff1448c41d8,
     0x23d3446f21c77dc3,
     0xaa7b8cf435dfafbb,

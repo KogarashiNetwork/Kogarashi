@@ -54,3 +54,21 @@ impl<C: CircuitDriver> PointAssignment<C> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{PointAssignment, R1cs};
+    use crate::test::GrumpkinDriver;
+    use grumpkin::params::{GENERATOR_X, GENERATOR_Y};
+
+    #[test]
+    fn curve_double_test() {
+        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
+        let x = GENERATOR_X;
+        let y = GENERATOR_Y;
+        let is_infinity = false;
+
+        let a = PointAssignment::instance(&mut cs, x, y, is_infinity);
+        let aa = a.double(&mut cs);
+    }
+}

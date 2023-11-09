@@ -1,6 +1,7 @@
 use crate::circuit::CircuitDriver;
+use crate::matrix::SparseRow;
 use crate::wire::Wire;
-use crate::{matrix::SparseRow, R1cs};
+use crate::R1cs;
 
 use zkstd::common::{vec, Add, Ring};
 
