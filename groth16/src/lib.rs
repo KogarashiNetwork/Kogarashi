@@ -23,7 +23,8 @@ mod tests {
     use crate::error::Error;
     use crate::zksnark::ZkSnark;
     use bls_12_381::Fr as BlsScalar;
-    use r1cs::*;
+    use r1cs::gadget::field::FieldAssignment;
+    use r1cs::{R1cs, SparseRow};
     use zkstd::common::OsRng;
 
     #[test]
@@ -48,17 +49,15 @@ mod tests {
 
         impl Circuit for DummyCircuit {
             fn synthesize(&self, composer: &mut R1cs<BlsScalar>) -> Result<(), Error> {
-                let x = SparseRow::from(composer.alloc_instance(self.x));
-                let o = composer.alloc_instance(self.o);
+                let x = FieldAssignment::instance(composer, self.x);
+                let o = FieldAssignment::instance(composer, self.o);
 
-                let sym1 = composer.product(&x, &x);
-                let y = composer.product(&sym1, &x);
-                let sym2 = composer.sum(&y, &x);
+                let sym1 = FieldAssignment::mul(composer, &x, &x);
+                let y = FieldAssignment::mul(composer, &sym1, &x);
+                let sym2 = FieldAssignment::add(composer, &y, &x);
+                let out = sym2 + SparseRow::from(BlsScalar::from(5));
 
-                composer.constrain_equal(
-                    &(sym2 + SparseRow::from(BlsScalar::from(5))),
-                    &SparseRow::from(o),
-                );
+                FieldAssignment::eq(composer, &out, &o);
 
                 Ok(())
             }
