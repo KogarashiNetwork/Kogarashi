@@ -1,38 +1,29 @@
-use crate::params::{BN_X, BN_X_IS_NEGATIVE, G1_GENERATOR_X, G1_GENERATOR_Y, G1_PARAM_B};
-use crate::{Fq, Fr};
+use crate::params::{GENERATOR_X, GENERATOR_Y, PARAM_B};
+use bn_254::{Fq, Fr};
 use core::borrow::Borrow;
 use core::iter::Sum;
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
 use zkstd::macros::curve::weierstrass::*;
 
-pub const BETA: Fq = Fq([
+pub const BETA: Fr = Fr::new_unchecked([
     0x30f1361b798a64e8,
     0xf3b8ddab7ece5a2a,
     0x16a8ca3ac61577f7,
     0xc26a2ff874fd029b,
 ]);
 
-const B3: Fq = G1_PARAM_B.add_const(G1_PARAM_B).add_const(G1_PARAM_B);
+const B3: Fr = PARAM_B.add_const(PARAM_B).add_const(PARAM_B);
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct G1Affine {
-    pub(crate) x: Fq,
-    pub(crate) y: Fq,
+pub struct Affine {
+    pub(crate) x: Fr,
+    pub(crate) y: Fr,
     is_infinity: bool,
 }
 
-fn endomorphism(p: &G1Affine) -> G1Affine {
-    // Endomorphism of the points on the curve.
-    // endomorphism_p(x,y) = (BETA * x, y)
-    // where BETA is a non-trivial cubic root of unity in Fq.
-    let mut res = *p;
-    res.x *= BETA;
-    res
-}
-
-impl G1Affine {
+impl Affine {
     pub const RAW_SIZE: usize = 97;
 
     pub fn from_slice_unchecked(bytes: &[u8]) -> Self {
@@ -48,8 +39,8 @@ impl G1Affine {
                 *n = u64::from_le_bytes(z);
             });
 
-        let x = Fq(x);
-        let y = Fq(y);
+        let x = Fr::new_unchecked(x);
+        let y = Fr::new_unchecked(y);
 
         let is_infinity = if bytes.len() >= Self::RAW_SIZE {
             bytes[Self::RAW_SIZE - 1] == 1
@@ -60,27 +51,32 @@ impl G1Affine {
         Self { x, y, is_infinity }
     }
 
-    pub fn is_torsion_free(&self) -> bool {
-        // Algorithm from Section 6 of https://eprint.iacr.org/2021/1130
-        // Updated proof of correctness in https://eprint.iacr.org/2022/352
-        //
-        // Check that endomorphism_p(P) == -[x^2] P
+    pub fn to_raw_bytes(&self) -> [u8; Self::RAW_SIZE] {
+        let mut bytes = [0u8; Self::RAW_SIZE];
+        let chunks = bytes.chunks_mut(8);
 
-        let minus_x_squared_times_p = G1Projective::from(*self).mul_by_x().mul_by_x().neg();
-        let endomorphism_p = endomorphism(self);
-        minus_x_squared_times_p == G1Projective::from(endomorphism_p)
+        self.x
+            .inner()
+            .iter()
+            .chain(self.y.inner().iter())
+            .zip(chunks)
+            .for_each(|(n, c)| c.copy_from_slice(&n.to_le_bytes()));
+
+        bytes[Self::RAW_SIZE - 1] = self.is_infinity.into();
+
+        bytes
     }
 }
 
-impl Add for G1Affine {
-    type Output = G1Projective;
+impl Add for Affine {
+    type Output = Projective;
 
-    fn add(self, rhs: G1Affine) -> Self::Output {
+    fn add(self, rhs: Affine) -> Self::Output {
         add_affine_point(self, rhs)
     }
 }
 
-impl Neg for G1Affine {
+impl Neg for Affine {
     type Output = Self;
 
     fn neg(self) -> Self {
@@ -92,81 +88,59 @@ impl Neg for G1Affine {
     }
 }
 
-impl Sub for G1Affine {
-    type Output = G1Projective;
+impl Sub for Affine {
+    type Output = Projective;
 
-    fn sub(self, rhs: G1Affine) -> Self::Output {
+    fn sub(self, rhs: Affine) -> Self::Output {
         add_affine_point(self, rhs.neg())
     }
 }
 
-impl Mul<Fr> for G1Affine {
-    type Output = G1Projective;
+impl Mul<Fq> for Affine {
+    type Output = Projective;
 
-    fn mul(self, rhs: Fr) -> Self::Output {
+    fn mul(self, rhs: Fq) -> Self::Output {
         scalar_point(self.to_extended(), &rhs)
     }
 }
 
-impl Mul<G1Affine> for Fr {
-    type Output = G1Projective;
+impl Mul<Affine> for Fq {
+    type Output = Projective;
 
-    fn mul(self, rhs: G1Affine) -> Self::Output {
+    fn mul(self, rhs: Affine) -> Self::Output {
         scalar_point(rhs.to_extended(), &self)
     }
 }
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
-pub struct G1Projective {
-    pub(crate) x: Fq,
-    pub(crate) y: Fq,
-    pub(crate) z: Fq,
+pub struct Projective {
+    pub(crate) x: Fr,
+    pub(crate) y: Fr,
+    pub(crate) z: Fr,
 }
 
-impl G1Projective {
-    /// Multiply `self` by `crate::BN_X`, using double and add.
-    fn mul_by_x(&self) -> G1Projective {
-        let mut xself = G1Projective::ADDITIVE_IDENTITY;
-        // NOTE: in BLS12-381 we can just skip the first bit.
-        // TODO: need to test conversion to bytes and back
-        let mut x = BN_X >> 1;
-        let mut tmp = *self;
-        while x != 0 {
-            tmp = tmp.double();
-
-            if x % 2 == 1 {
-                xself += tmp;
-            }
-            x >>= 1;
-        }
-        // finally, flip the sign
-        if BN_X_IS_NEGATIVE {
-            xself = -xself;
-        }
-        xself
-    }
-
+impl Projective {
     /// Converts a batch of `G1Projective` elements into `G1Affine` elements. This
     /// function will panic if `p.len() != q.len()`.
-    pub fn batch_normalize(p: &[Self], q: &mut [G1Affine]) {
+    pub fn batch_normalize(p: &[Self], q: &mut [Affine]) {
         assert_eq!(p.len(), q.len());
 
         p.iter()
             .zip(q.iter_mut())
-            .for_each(|(a, b)| *b = G1Affine::from(*a))
+            .for_each(|(a, b)| *b = Affine::from(*a))
     }
 }
 
-impl Add for G1Projective {
+impl Add for Projective {
     type Output = Self;
 
-    fn add(self, rhs: G1Projective) -> Self {
+    fn add(self, rhs: Projective) -> Self {
         add_projective_point(self, rhs)
     }
 }
 
-impl Neg for G1Projective {
+impl Neg for Projective {
     type Output = Self;
 
     fn neg(self) -> Self {
@@ -178,33 +152,33 @@ impl Neg for G1Projective {
     }
 }
 
-impl Sub for G1Projective {
+impl Sub for Projective {
     type Output = Self;
 
-    fn sub(self, rhs: G1Projective) -> Self {
+    fn sub(self, rhs: Projective) -> Self {
         add_projective_point(self, -rhs)
     }
 }
 
-impl Mul<Fr> for G1Projective {
-    type Output = G1Projective;
+impl Mul<Fq> for Projective {
+    type Output = Projective;
 
-    fn mul(self, rhs: Fr) -> Self::Output {
+    fn mul(self, rhs: Fq) -> Self::Output {
         scalar_point(self, &rhs)
     }
 }
 
-impl Mul<G1Projective> for Fr {
-    type Output = G1Projective;
+impl Mul<Projective> for Fq {
+    type Output = Projective;
 
-    fn mul(self, rhs: G1Projective) -> Self::Output {
+    fn mul(self, rhs: Projective) -> Self::Output {
         scalar_point(rhs, &self)
     }
 }
 
-impl<T> Sum<T> for G1Projective
+impl<T> Sum<T> for Projective
 where
-    T: Borrow<G1Projective>,
+    T: Borrow<Projective>,
 {
     fn sum<I>(iter: I) -> Self
     where
@@ -215,14 +189,14 @@ where
 }
 
 weierstrass_curve_operation!(
-    Fr,
     Fq,
-    G1_PARAM_B,
+    Fr,
+    PARAM_B,
     B3,
-    G1Affine,
-    G1Projective,
-    G1_GENERATOR_X,
-    G1_GENERATOR_Y
+    Affine,
+    Projective,
+    GENERATOR_X,
+    GENERATOR_Y
 );
 
 #[cfg(test)]
@@ -231,11 +205,11 @@ mod tests {
     use super::*;
     use rand_core::OsRng;
 
-    curve_test!(bn254, Fr, G1Affine, G1Projective, 100);
+    curve_test!(grumpkin, Fq, Affine, Projective, 100);
 
     #[test]
     fn test_batch_normalize() {
-        let a = G1Projective::ADDITIVE_GENERATOR.double();
+        let a = Projective::ADDITIVE_GENERATOR.double();
         let b = a.double();
         let c = b.double();
 
@@ -244,27 +218,23 @@ mod tests {
                 for c_identity in (0..1).map(|n| n == 1) {
                     let mut v = [a, b, c];
                     if a_identity {
-                        v[0] = G1Projective::ADDITIVE_IDENTITY
+                        v[0] = Projective::ADDITIVE_IDENTITY
                     }
                     if b_identity {
-                        v[1] = G1Projective::ADDITIVE_IDENTITY
+                        v[1] = Projective::ADDITIVE_IDENTITY
                     }
                     if c_identity {
-                        v[2] = G1Projective::ADDITIVE_IDENTITY
+                        v[2] = Projective::ADDITIVE_IDENTITY
                     }
 
                     let mut t = [
-                        G1Affine::ADDITIVE_IDENTITY,
-                        G1Affine::ADDITIVE_IDENTITY,
-                        G1Affine::ADDITIVE_IDENTITY,
+                        Affine::ADDITIVE_IDENTITY,
+                        Affine::ADDITIVE_IDENTITY,
+                        Affine::ADDITIVE_IDENTITY,
                     ];
-                    let expected = [
-                        G1Affine::from(v[0]),
-                        G1Affine::from(v[1]),
-                        G1Affine::from(v[2]),
-                    ];
+                    let expected = [Affine::from(v[0]), Affine::from(v[1]), Affine::from(v[2])];
 
-                    G1Projective::batch_normalize(&v[..], &mut t[..]);
+                    Projective::batch_normalize(&v[..], &mut t[..]);
 
                     assert_eq!(&t[..], &expected[..]);
                 }
@@ -274,12 +244,12 @@ mod tests {
 
     #[test]
     #[allow(clippy::op_ref)]
-    fn bn254_operations() {
-        let aff1 = G1Affine::random(OsRng);
-        let aff2 = G1Affine::random(OsRng);
-        let mut ext1 = G1Projective::random(OsRng);
-        let ext2 = G1Projective::random(OsRng);
-        let scalar = Fr::from(42);
+    fn grumpkin_operations() {
+        let aff1 = Affine::random(OsRng);
+        let aff2 = Affine::random(OsRng);
+        let mut ext1 = Projective::random(OsRng);
+        let ext2 = Projective::random(OsRng);
+        let scalar = Fq::from(42);
 
         let _ = aff1 + aff2;
         let _ = &aff1 + &aff2;

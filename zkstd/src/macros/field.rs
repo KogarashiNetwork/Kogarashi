@@ -50,6 +50,18 @@ macro_rules! prime_field_operation {
                 to_nafs(self.montgomery_reduce())
             }
 
+            fn to_raw_bytes(&self) -> [u8; 32] {
+                // TODO: remove trim
+                // In current implementation `to_raw_bytes` is
+                // never called on `Fq` from bls12_381 crate.
+                // Won't be necessary after migrating to the bn254.
+                // `Fq` from Bls has 48 bytes size, so we trim it to
+                // keep the signature same.
+                let mut res = [0; 32];
+                res[..32].copy_from_slice(&self.to_bytes()[..32]);
+                res
+            }
+
             fn double(self) -> Self {
                 Self(double(self.0, $p))
             }
@@ -158,10 +170,6 @@ macro_rules! fft_field_operation {
                     u64::from_le_bytes(hash[56..64].try_into().unwrap()),
                 ]);
                 d0 * Self($r2) + d1 * Self($r3)
-            }
-
-            fn to_raw_bytes(&self) -> [u8; 32] {
-                self.to_bytes()
             }
 
             fn reduce(&self) -> Self {

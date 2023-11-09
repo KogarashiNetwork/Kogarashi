@@ -1,6 +1,6 @@
 #[cfg(feature = "std")]
 use rayon::prelude::*;
-use zkstd::common::{vec, FftField, Group, Vec, WeierstrassAffine, WeierstrassProjective};
+use zkstd::common::{vec, Group, PrimeField, Vec, WeierstrassAffine, WeierstrassProjective};
 
 /// Performs a Variable Base Multiscalar Multiplication.
 pub fn msm_curve_addition<C: WeierstrassAffine>(bases: &[C], coeffs: &[C::Scalar]) -> C::Extended {

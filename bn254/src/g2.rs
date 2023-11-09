@@ -9,22 +9,7 @@ use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
 use zkstd::macros::curve::weierstrass::*;
 
-const B: Fq2 = Fq2([
-    Fq::to_mont_form([
-        0x3267e6dc24a138e5,
-        0xb5b4c5e559dbefa3,
-        0x81be18991be06ac3,
-        0x2b149d40ceb8aaae,
-    ]),
-    Fq::to_mont_form([
-        0xe4a2bd0685c315d2,
-        0xa74fa084e52d1852,
-        0xcd2cafadeed8fdf4,
-        0x009713b03af0fed4,
-    ]),
-]);
-
-const B3: Fq2 = B.add_const(B).add_const(B);
+const B3: Fq2 = G2_PARAM_B.add_const(G2_PARAM_B).add_const(G2_PARAM_B);
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]

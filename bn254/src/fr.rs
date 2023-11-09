@@ -103,12 +103,19 @@ impl SigUtils<32> for Fr {
 }
 
 impl Fr {
+    pub const fn new_unchecked(val: [u64; 4]) -> Self {
+        Self(val)
+    }
+    pub const fn add_const(self, rhs: Self) -> Self {
+        Self(add(self.0, rhs.0, MODULUS))
+    }
+
     pub const fn to_mont_form(val: [u64; 4]) -> Self {
         Self(to_mont_form(val, R2, MODULUS, INV))
     }
 
-    pub const fn inner(&self) -> [u64; 4] {
-        self.0
+    pub const fn inner(&self) -> &[u64; 4] {
+        &self.0
     }
 
     pub fn from_hex(hex: &str) -> Result<Fr, Error> {
@@ -327,8 +334,8 @@ use crate::fq::Fq;
 use crate::fqn::Fq2;
 
 impl From<Fq> for Fr {
-    fn from(_: Fq) -> Fr {
-        unimplemented!()
+    fn from(val: Fq) -> Fr {
+        Self(to_mont_form(val.0, R2, MODULUS, INV))
     }
 }
 
