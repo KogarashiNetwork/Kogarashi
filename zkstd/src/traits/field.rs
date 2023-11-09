@@ -22,6 +22,8 @@ pub trait PrimeField: Field + ParityCmp + From<u64> {
 
     fn to_nafs(self) -> Nafs;
 
+    fn to_raw_bytes(&self) -> [u8; 32];
+
     fn double(self) -> Self;
 
     fn square(self) -> Self;

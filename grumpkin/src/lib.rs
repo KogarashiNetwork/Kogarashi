@@ -21,8 +21,8 @@
 
 mod error;
 
-mod g1;
+mod curve;
 
 pub mod params;
 
-pub use g1::{G1Affine, G1Projective};
+pub use curve::{Affine, Projective};

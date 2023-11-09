@@ -1,4 +1,5 @@
-use crate::{common::FftField, traits::CurveGroup};
+use crate::common::PrimeField;
+use crate::traits::CurveGroup;
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 /// elliptic curve rational points group
@@ -9,7 +10,7 @@ pub trait WeierstrassCurve: CurveGroup {
     // 3b param
     const PARAM_3B: Self::Range;
     // scalar field of curve
-    type Scalar: FftField + From<Self::Range>;
+    type Scalar: PrimeField + From<Self::Range>;
 }
 
 /// rational point affine representation
