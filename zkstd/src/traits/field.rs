@@ -1,12 +1,13 @@
 // This trait resresents prime field
 
+use super::{algebra::Field, primitive::ParityCmp};
+use crate::arithmetic::utils::{Bits, Nafs};
+
 use core::{
     fmt::Debug,
     ops::{BitAnd, BitXor},
 };
-
-use super::{algebra::Field, primitive::ParityCmp};
-use crate::arithmetic::utils::{Bits, Nafs};
+use sp_std::vec::Vec;
 
 /// This is prime field trait
 pub trait PrimeField: Field + ParityCmp + From<u64> {
@@ -29,6 +30,8 @@ pub trait PrimeField: Field + ParityCmp + From<u64> {
     fn double_assign(&mut self);
 
     fn square_assign(&mut self);
+
+    fn to_raw_bytes(&self) -> Vec<u8>;
 }
 
 pub trait FieldRepr: Debug + BitAnd + BitXor + Sized {

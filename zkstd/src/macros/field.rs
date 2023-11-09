@@ -65,6 +65,10 @@ macro_rules! prime_field_operation {
             fn square_assign(&mut self) {
                 self.0 = square(self.0, $p, $inv)
             }
+
+            fn to_raw_bytes(&self) -> Vec<u8> {
+                self.to_bytes().to_vec()
+            }
         }
     };
 }
@@ -158,10 +162,6 @@ macro_rules! fft_field_operation {
                     u64::from_le_bytes(hash[56..64].try_into().unwrap()),
                 ]);
                 d0 * Self($r2) + d1 * Self($r3)
-            }
-
-            fn to_raw_bytes(&self) -> [u8; 32] {
-                self.to_bytes()
             }
 
             fn reduce(&self) -> Self {

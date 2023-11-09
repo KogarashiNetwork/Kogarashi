@@ -31,8 +31,6 @@ pub trait FftField: PrimeField + ParallelCmp + From<[u64; 4]> {
     fn reduce(&self) -> Self;
 
     fn from_hash(hash: &[u8; 64]) -> Self;
-
-    fn to_raw_bytes(&self) -> [u8; 32];
 }
 
 /// This is polynomial
