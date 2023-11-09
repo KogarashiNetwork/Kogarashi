@@ -42,7 +42,7 @@ macro_rules! affine_group_operation {
         }
 
         impl CurveGroup for $affine {
-            type Range = $range;
+            type Base = $range;
 
             fn from_x_and_y(x: $range, y: $range) -> $affine {
                 $affine {
@@ -64,11 +64,11 @@ macro_rules! affine_group_operation {
                 }
             }
 
-            fn get_x(&self) -> Self::Range {
+            fn get_x(&self) -> Self::Base {
                 self.x
             }
 
-            fn get_y(&self) -> Self::Range {
+            fn get_y(&self) -> Self::Base {
                 self.y
             }
         }
@@ -126,7 +126,7 @@ macro_rules! projective_group_operation {
         }
 
         impl CurveGroup for $projective {
-            type Range = $range;
+            type Base = $range;
 
             fn from_x_and_y(x: $range, y: $range) -> $projective {
                 $projective {
@@ -149,11 +149,11 @@ macro_rules! projective_group_operation {
                 }
             }
 
-            fn get_x(&self) -> Self::Range {
+            fn get_x(&self) -> Self::Base {
                 self.x
             }
 
-            fn get_y(&self) -> Self::Range {
+            fn get_y(&self) -> Self::Base {
                 self.y
             }
         }

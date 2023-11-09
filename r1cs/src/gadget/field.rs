@@ -1,30 +1,32 @@
+use crate::circuit::CircuitDriver;
+use crate::matrix::SparseRow;
 use crate::wire::Wire;
-use crate::{matrix::SparseRow, R1cs};
+use crate::R1cs;
 
-use zkstd::common::{vec, Add, PrimeField};
+use zkstd::common::{vec, Add, Ring};
 
-pub struct FieldAssignment<F: PrimeField>(SparseRow<F>);
+pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Base>);
 
-impl<F: PrimeField> FieldAssignment<F> {
-    pub fn instance(cs: &mut R1cs<F>, instance: F) -> Self {
+impl<C: CircuitDriver> FieldAssignment<C> {
+    pub fn instance(cs: &mut R1cs<C>, instance: C::Base) -> Self {
         let wire = cs.public_wire();
         cs.x.push(instance);
 
-        Self(SparseRow(vec![(wire, F::one())]))
+        Self(SparseRow(vec![(wire, C::Base::one())]))
     }
 
-    pub fn witness(cs: &mut R1cs<F>, witness: F) -> Self {
+    pub fn witness(cs: &mut R1cs<C>, witness: C::Base) -> Self {
         let wire = cs.private_wire();
         cs.w.push(witness);
 
-        Self(SparseRow(vec![(wire, F::one())]))
+        Self(SparseRow(vec![(wire, C::Base::one())]))
     }
 
-    pub fn constant(constant: &F) -> Self {
+    pub fn constant(constant: &C::Base) -> Self {
         Self(SparseRow(vec![(Wire::Instance(0), *constant)]))
     }
 
-    pub fn mul(cs: &mut R1cs<F>, x: &Self, y: &Self) -> Self {
+    pub fn mul(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
         if let Some(c) = x.0.as_constant() {
             return Self(y.0.clone() * c);
         }
@@ -39,12 +41,12 @@ impl<F: PrimeField> FieldAssignment<F> {
         z
     }
 
-    pub fn add(cs: &mut R1cs<F>, x: &Self, y: &Self) -> Self {
+    pub fn add(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
         if let Some(c) = x.0.as_constant() {
-            return Self(y.0.clone() * c);
+            return Self(y.0.clone() + SparseRow::from(c));
         }
         if let Some(c) = y.0.as_constant() {
-            return Self(x.0.clone() * c);
+            return Self(x.0.clone() + SparseRow::from(c));
         }
 
         let witness = x.0.evaluate(&cs.x, &cs.w) + y.0.evaluate(&cs.x, &cs.w);
@@ -54,13 +56,28 @@ impl<F: PrimeField> FieldAssignment<F> {
         z
     }
 
-    pub fn eq(cs: &mut R1cs<F>, x: &Self, y: &Self) {
+    pub fn sub(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
+        if let Some(c) = x.0.as_constant() {
+            return Self(y.0.clone() - SparseRow::from(c));
+        }
+        if let Some(c) = y.0.as_constant() {
+            return Self(x.0.clone() - SparseRow::from(c));
+        }
+
+        let witness = x.0.evaluate(&cs.x, &cs.w) - y.0.evaluate(&cs.x, &cs.w);
+        let z = Self::witness(cs, witness);
+        cs.sub_gate(&x.0, &y.0, &z.0);
+
+        z
+    }
+
+    pub fn eq(cs: &mut R1cs<C>, x: &Self, y: &Self) {
         cs.mul_gate(&x.0, &SparseRow::one(), &y.0)
     }
 }
 
-impl<F: PrimeField> Add for FieldAssignment<F> {
-    type Output = FieldAssignment<F>;
+impl<C: CircuitDriver> Add for FieldAssignment<C> {
+    type Output = FieldAssignment<C>;
 
     fn add(self, rhs: Self) -> Self::Output {
         Self(self.0 + rhs.0)
@@ -70,12 +87,13 @@ impl<F: PrimeField> Add for FieldAssignment<F> {
 #[cfg(test)]
 mod tests {
     use super::{FieldAssignment, R1cs};
-    use jub_jub::Fr as Scalar;
+    use crate::circuit::GrumpkinDriver;
+    use bn_254::Fr as Scalar;
     use zkstd::common::{Group, OsRng};
 
     #[test]
     fn field_add_test() {
-        let mut cs = R1cs::default();
+        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let mut ncs = cs.clone();
         let a = Scalar::random(OsRng);
         let b = Scalar::random(OsRng);
@@ -103,7 +121,7 @@ mod tests {
 
     #[test]
     fn field_mul_test() {
-        let mut cs = R1cs::default();
+        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let mut ncs = cs.clone();
         let a = Scalar::random(OsRng);
         let b = Scalar::random(OsRng);
@@ -131,7 +149,7 @@ mod tests {
 
     #[test]
     fn field_ops_test() {
-        let mut cs = R1cs::default();
+        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let mut ncs = cs.clone();
         let input = Scalar::from(3);
         let c = Scalar::from(5);

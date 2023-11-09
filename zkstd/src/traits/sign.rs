@@ -12,16 +12,16 @@ pub trait SigUtils<const L: usize>: Sized {
 }
 
 pub trait RedDSA: Copy + Debug + Default + Ord + PartialEq {
-    type Range: FftField + SigUtils<32> + EncodeLike + Decode;
+    type Base: FftField + SigUtils<32> + EncodeLike + Decode;
 
-    type Scalar: FftField + SigUtils<32> + Into<Self::Range>;
+    type Scalar: FftField + SigUtils<32> + Into<Self::Base>;
 
     // affine point
-    type Affine: TwistedEdwardsAffine<Extended = Self::Extended, Range = Self::Range, Scalar = Self::Scalar>
+    type Affine: TwistedEdwardsAffine<Extended = Self::Extended, Base = Self::Base, Scalar = Self::Scalar>
         + SigUtils<32>;
 
     // extend point
-    type Extended: TwistedEdwardsExtended<Affine = Self::Affine, Range = Self::Range, Scalar = Self::Scalar>
+    type Extended: TwistedEdwardsExtended<Affine = Self::Affine, Base = Self::Base, Scalar = Self::Scalar>
         + Ord
         + SigUtils<32>;
 }

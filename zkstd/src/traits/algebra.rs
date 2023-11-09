@@ -45,9 +45,9 @@ pub trait IntGroup:
 
 pub trait CurveGroup: Group {
     // range field of curve
-    type Range: PrimeField;
+    type Base: PrimeField;
 
-    fn from_x_and_y(x: Self::Range, y: Self::Range) -> Self;
+    fn from_x_and_y(x: Self::Base, y: Self::Base) -> Self;
 
     // check that point is on curve
     fn is_identity(&self) -> bool;
@@ -56,10 +56,10 @@ pub trait CurveGroup: Group {
     fn is_on_curve(self) -> bool;
 
     // get x coordinate
-    fn get_x(&self) -> Self::Range;
+    fn get_x(&self) -> Self::Base;
 
     // get y coordinate
-    fn get_y(&self) -> Self::Range;
+    fn get_y(&self) -> Self::Base;
 }
 
 /// ring trait which supports additive and multiplicative arithmetics

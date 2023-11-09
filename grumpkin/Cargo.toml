@@ -4,7 +4,7 @@ authors = [
     'KiriosK<KiriosK@yandex.ru>'
 ]
 name = "grumpkin"
-description = 'grumpkin pairing-friendly curve implementation'
+description = 'grumpkin curve implementation'
 version = "0.0.1"
 edition = "2021"
 license = "Apache-2.0"

@@ -1,10 +1,11 @@
+use crate::fq::Fq;
+use crate::fqn::Fq2;
+
 use core::borrow::Borrow;
 use core::iter::{Product, Sum};
 use zkstd::arithmetic::bits_256::*;
 use zkstd::common::*;
 use zkstd::macros::field::*;
-
-use crate::error::Error;
 
 /// r = 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001
 const MODULUS: [u64; 4] = [
@@ -116,46 +117,6 @@ impl Fr {
 
     pub const fn inner(&self) -> &[u64; 4] {
         &self.0
-    }
-
-    pub fn from_hex(hex: &str) -> Result<Fr, Error> {
-        let max_len = 64;
-        let hex = hex.strip_prefix("0x").unwrap_or(hex);
-        let length = hex.len();
-        if length > max_len {
-            return Err(Error::HexStringTooLong);
-        }
-        let hex_bytes = hex.as_bytes();
-
-        let mut hex: [[u8; 16]; 4] = [[0; 16]; 4];
-        for i in 0..max_len {
-            hex[i / 16][i % 16] = if i >= length {
-                0
-            } else {
-                match hex_bytes[length - i - 1] {
-                    48..=57 => hex_bytes[length - i - 1] - 48,
-                    65..=70 => hex_bytes[length - i - 1] - 55,
-                    97..=102 => hex_bytes[length - i - 1] - 87,
-                    _ => return Err(Error::HexStringInvalid),
-                }
-            };
-        }
-        let mut limbs: [u64; 4] = [0; 4];
-        for i in 0..hex.len() {
-            limbs[i] = Fr::bytes_to_u64(&hex[i]).unwrap();
-        }
-        Ok(Fr(mul(limbs, R2, MODULUS, INV)))
-    }
-
-    fn bytes_to_u64(bytes: &[u8; 16]) -> Result<u64, Error> {
-        let mut res: u64 = 0;
-        for (i, byte) in bytes.iter().enumerate() {
-            res += match byte {
-                0..=15 => 16u64.pow(i as u32) * (*byte as u64),
-                _ => return Err(Error::BytesInvalid),
-            }
-        }
-        Ok(res)
     }
 
     pub(crate) const fn montgomery_reduce(self) -> [u64; 4] {
@@ -329,9 +290,6 @@ fft_field_operation!(
     R3,
     S
 );
-
-use crate::fq::Fq;
-use crate::fqn::Fq2;
 
 impl From<Fq> for Fr {
     fn from(val: Fq) -> Fr {

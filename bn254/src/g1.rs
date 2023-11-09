@@ -128,8 +128,7 @@ impl G1Projective {
     /// Multiply `self` by `crate::BN_X`, using double and add.
     fn mul_by_x(&self) -> G1Projective {
         let mut xself = G1Projective::ADDITIVE_IDENTITY;
-        // NOTE: in BLS12-381 we can just skip the first bit.
-        // TODO: need to test conversion to bytes and back
+        // NOTE: in BN254 we can just skip the first bit.
         let mut x = BN_X >> 1;
         let mut tmp = *self;
         while x != 0 {
