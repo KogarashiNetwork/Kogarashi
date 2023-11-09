@@ -51,6 +51,10 @@ macro_rules! prime_extension_field_operation {
                 unimplemented!()
             }
 
+            fn to_raw_bytes(&self) -> Vec<u8> {
+                unimplemented!()
+            }
+
             fn double(self) -> Self {
                 let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
                 for i in 0..$limbs_length {
@@ -69,10 +73,6 @@ macro_rules! prime_extension_field_operation {
 
             fn square_assign(&mut self) {
                 *self = self.square()
-            }
-
-            fn to_raw_bytes(&self) -> Vec<u8> {
-                unimplemented!()
             }
         }
     };

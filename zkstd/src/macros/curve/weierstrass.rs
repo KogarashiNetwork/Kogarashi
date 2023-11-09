@@ -7,9 +7,9 @@ pub use test::*;
 /// Weierstrass standard curve operation macro
 #[macro_export]
 macro_rules! weierstrass_curve_operation {
-    ($scalar:ident, $range:ident, $a:ident, $b:ident, $b3:ident, $affine:ident, $projective:ident, $x:ident, $y:ident) => {
-        affine_group_operation!($affine, $projective, $range, $scalar, $x, $y, $a, $b, $b3);
-        projective_group_operation!($affine, $projective, $range, $scalar, $x, $y, $a, $b, $b3);
+    ($scalar:ident, $range:ident, $b:ident, $b3:ident, $affine:ident, $projective:ident, $x:ident, $y:ident) => {
+        affine_group_operation!($affine, $projective, $range, $scalar, $x, $y, $b, $b3);
+        projective_group_operation!($affine, $projective, $range, $scalar, $x, $y, $b, $b3);
         mixed_curve_operations!($affine, $projective);
 
         impl ParityCmp for $affine {}
@@ -32,10 +32,6 @@ macro_rules! weierstrass_curve_operation {
                         z: Self::Range::one(),
                     }
                 }
-            }
-
-            fn to_raw_bytes(self) -> Vec<u8> {
-                self.to_bytes().to_vec()
             }
 
             fn double(self) -> $projective {
