@@ -23,7 +23,7 @@ macro_rules! twisted_edwards_curve_operation {
 
         impl TwistedEdwardsAffine for $affine {
             type Extended = $extended;
-            fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self {
+            fn from_raw_unchecked(x: Self::Base, y: Self::Base) -> Self {
                 Self { x, y }
             }
 
@@ -32,7 +32,7 @@ macro_rules! twisted_edwards_curve_operation {
                     x: self.x,
                     y: self.y,
                     t: self.x * self.y,
-                    z: Self::Range::one(),
+                    z: Self::Base::one(),
                 }
             }
 
@@ -47,15 +47,15 @@ macro_rules! twisted_edwards_curve_operation {
 
         impl TwistedEdwardsExtended for $extended {
             type Affine = $affine;
-            fn new(x: Self::Range, y: Self::Range, t: Self::Range, z: Self::Range) -> Self {
+            fn new(x: Self::Base, y: Self::Base, t: Self::Base, z: Self::Base) -> Self {
                 Self { x, y, t, z }
             }
 
-            fn get_t(&self) -> Self::Range {
+            fn get_t(&self) -> Self::Base {
                 self.t
             }
 
-            fn get_z(&self) -> Self::Range {
+            fn get_z(&self) -> Self::Base {
                 self.z
             }
 

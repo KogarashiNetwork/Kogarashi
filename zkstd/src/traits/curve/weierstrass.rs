@@ -5,11 +5,11 @@ use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 /// rational points group behaves as abelian group
 pub trait BNCurve: CurveGroup {
     // b param
-    const PARAM_B: Self::Range;
+    const PARAM_B: Self::Base;
     // 3b param
-    const PARAM_3B: Self::Range;
+    const PARAM_3B: Self::Base;
     // scalar field of curve
-    type Scalar: PrimeField + From<Self::Range>;
+    type Scalar: PrimeField + From<Self::Base>;
 }
 
 /// rational point affine representation
@@ -37,7 +37,7 @@ pub trait BNAffine:
     + for<'a, 'b> Mul<&'b Self::Scalar, Output = Self::Extended>
 {
     // extented coordinate representation
-    type Extended: BNProjective<Affine = Self, Range = Self::Range>;
+    type Extended: BNProjective<Affine = Self, Base = Self::Base>;
 
     fn to_extended(self) -> Self::Extended;
 
@@ -79,12 +79,12 @@ pub trait BNProjective:
     + for<'a> MulAssign<&'a Self::Scalar>
 {
     // affine coordinate representation
-    type Affine: BNAffine<Range = Self::Range, Scalar = Self::Scalar, Extended = Self>;
+    type Affine: BNAffine<Base = Self::Base, Scalar = Self::Scalar, Extended = Self>;
 
-    fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self;
+    fn new(x: Self::Base, y: Self::Base, z: Self::Base) -> Self;
 
     // get z coordinate
-    fn get_z(&self) -> Self::Range;
+    fn get_z(&self) -> Self::Base;
 
     // convert projective to affine representation
     fn to_affine(self) -> Self::Affine;

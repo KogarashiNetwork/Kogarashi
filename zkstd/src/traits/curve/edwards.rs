@@ -4,9 +4,9 @@ use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 pub trait TwistedEdwardsCurve: CurveGroup {
     // d param
-    const PARAM_D: Self::Range;
+    const PARAM_D: Self::Base;
     // scalar field of curve
-    type Scalar: PrimeField + From<Self::Range>;
+    type Scalar: PrimeField + From<Self::Base>;
 }
 
 pub trait TwistedEdwardsAffine:
@@ -28,9 +28,9 @@ pub trait TwistedEdwardsAffine:
     + for<'a, 'b> Mul<&'b Self::Scalar, Output = Self::Extended>
 {
     // extended coordinate representation
-    type Extended: TwistedEdwardsExtended<Range = Self::Range>;
+    type Extended: TwistedEdwardsExtended<Base = Self::Base>;
 
-    fn from_raw_unchecked(x: Self::Range, y: Self::Range) -> Self;
+    fn from_raw_unchecked(x: Self::Base, y: Self::Base) -> Self;
 
     fn to_extended(self) -> Self::Extended;
 
@@ -68,15 +68,15 @@ pub trait TwistedEdwardsExtended:
     + for<'a> MulAssign<&'a Self::Scalar>
 {
     // affine coordinate representation
-    type Affine: TwistedEdwardsAffine<Range = Self::Range>;
+    type Affine: TwistedEdwardsAffine<Base = Self::Base>;
 
-    fn new(x: Self::Range, y: Self::Range, t: Self::Range, z: Self::Range) -> Self;
+    fn new(x: Self::Base, y: Self::Base, t: Self::Base, z: Self::Base) -> Self;
 
     // get t coordinate
-    fn get_t(&self) -> Self::Range;
+    fn get_t(&self) -> Self::Base;
 
     // get z coordinate
-    fn get_z(&self) -> Self::Range;
+    fn get_z(&self) -> Self::Base;
 
     // convert projective to affine representation
     fn to_affine(self) -> Self::Affine;

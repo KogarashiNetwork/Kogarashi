@@ -1,36 +1,38 @@
 #![doc = include_str!("../README.md")]
 
+mod circuit;
 pub mod gadget;
 mod matrix;
 #[cfg(test)]
 mod test;
 mod wire;
 
+pub use circuit::CircuitDriver;
 pub use matrix::{DenseVectors, SparseMatrix, SparseRow};
 pub use wire::Wire;
 
 use core::ops::Index;
-use zkstd::common::{vec, PrimeField, Vec};
+use zkstd::common::{vec, Ring, Vec};
 
 #[derive(Clone, Debug)]
-pub struct R1cs<F: PrimeField> {
+pub struct R1cs<C: CircuitDriver> {
     // 1. Structure S
     // a, b and c matrices and matrix size
     m: usize,
-    a: SparseMatrix<F>,
-    b: SparseMatrix<F>,
-    c: SparseMatrix<F>,
+    a: SparseMatrix<C::Base>,
+    b: SparseMatrix<C::Base>,
+    c: SparseMatrix<C::Base>,
 
     // 2. Instance
     // r1cs witness includes private inputs and intermediate value
-    w: DenseVectors<F>,
+    w: DenseVectors<C::Base>,
 
     // 3. Witness
     // r1cs instance includes public inputs and outputs
-    x: DenseVectors<F>,
+    x: DenseVectors<C::Base>,
 }
 
-impl<F: PrimeField> R1cs<F> {
+impl<C: CircuitDriver> R1cs<C> {
     pub fn m(&self) -> usize {
         self.m
     }
@@ -43,11 +45,11 @@ impl<F: PrimeField> R1cs<F> {
         self.w.len()
     }
 
-    pub fn x(&self) -> Vec<F> {
+    pub fn x(&self) -> Vec<C::Base> {
         self.x.get()
     }
 
-    pub fn w(&self) -> Vec<F> {
+    pub fn w(&self) -> Vec<C::Base> {
         self.w.get()
     }
 
@@ -68,7 +70,7 @@ impl<F: PrimeField> R1cs<F> {
             .all(|(left, right)| left == right)
     }
 
-    fn append(&mut self, a: SparseRow<F>, b: SparseRow<F>, c: SparseRow<F>) {
+    fn append(&mut self, a: SparseRow<C::Base>, b: SparseRow<C::Base>, c: SparseRow<C::Base>) {
         self.a.0.push(a);
         self.b.0.push(b);
         self.c.0.push(c);
@@ -86,21 +88,31 @@ impl<F: PrimeField> R1cs<F> {
     }
 
     /// constrain x * y = z
-    pub fn mul_gate(&mut self, x: &SparseRow<F>, y: &SparseRow<F>, z: &SparseRow<F>) {
+    pub fn mul_gate(
+        &mut self,
+        x: &SparseRow<C::Base>,
+        y: &SparseRow<C::Base>,
+        z: &SparseRow<C::Base>,
+    ) {
         self.append(x.clone(), y.clone(), z.clone());
     }
 
     /// constrain x + y = z
-    pub fn add_gate(&mut self, x: &SparseRow<F>, y: &SparseRow<F>, z: &SparseRow<F>) {
+    pub fn add_gate(
+        &mut self,
+        x: &SparseRow<C::Base>,
+        y: &SparseRow<C::Base>,
+        z: &SparseRow<C::Base>,
+    ) {
         self.append(x + y, SparseRow::from(Wire::ONE), z.clone());
     }
 
     /// constrain x == y
-    pub fn equal_gate(&mut self, x: &SparseRow<F>, y: &SparseRow<F>) {
+    pub fn equal_gate(&mut self, x: &SparseRow<C::Base>, y: &SparseRow<C::Base>) {
         self.mul_gate(x, &SparseRow::one(), y);
     }
 
-    pub fn evaluate(&self) -> (Vec<F>, Vec<F>, Vec<F>) {
+    pub fn evaluate(&self) -> (Vec<C::Base>, Vec<C::Base>, Vec<C::Base>) {
         let a_evals = self.a.evaluate_with_z(&self.x, &self.w);
         let b_evals = self.b.evaluate_with_z(&self.x, &self.w);
         let c_evals = self.c.evaluate_with_z(&self.x, &self.w);
@@ -113,14 +125,14 @@ impl<F: PrimeField> R1cs<F> {
         m_l_1: usize,
     ) -> (
         (
-            Vec<Vec<(F, usize)>>,
-            Vec<Vec<(F, usize)>>,
-            Vec<Vec<(F, usize)>>,
+            Vec<Vec<(C::Base, usize)>>,
+            Vec<Vec<(C::Base, usize)>>,
+            Vec<Vec<(C::Base, usize)>>,
         ),
         (
-            Vec<Vec<(F, usize)>>,
-            Vec<Vec<(F, usize)>>,
-            Vec<Vec<(F, usize)>>,
+            Vec<Vec<(C::Base, usize)>>,
+            Vec<Vec<(C::Base, usize)>>,
+            Vec<Vec<(C::Base, usize)>>,
         ),
     ) {
         let (a_x, a_w) = self.a.x_and_w(l, m_l_1);
@@ -131,21 +143,21 @@ impl<F: PrimeField> R1cs<F> {
     }
 }
 
-impl<F: PrimeField> Default for R1cs<F> {
+impl<C: CircuitDriver> Default for R1cs<C> {
     fn default() -> Self {
         Self {
             m: 0,
             a: SparseMatrix::default(),
             b: SparseMatrix::default(),
             c: SparseMatrix::default(),
-            x: DenseVectors::new(vec![F::one()]),
+            x: DenseVectors::new(vec![C::Base::one()]),
             w: DenseVectors::default(),
         }
     }
 }
 
-impl<F: PrimeField> Index<Wire> for R1cs<F> {
-    type Output = F;
+impl<C: CircuitDriver> Index<Wire> for R1cs<C> {
+    type Output = C::Base;
 
     fn index(&self, w: Wire) -> &Self::Output {
         match w {

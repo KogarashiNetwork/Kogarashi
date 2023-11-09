@@ -13,8 +13,8 @@ pub fn add_affine_point<P: TwistedEdwardsAffine>(lhs: P, rhs: P) -> P::Extended 
     let c = P::PARAM_D * a * b;
     let h = a + b;
     let e = (x0 + y0) * (x1 + y1) - h;
-    let f = P::Range::one() - c;
-    let g = P::Range::one() + c;
+    let f = P::Base::one() - c;
+    let g = P::Base::one() + c;
 
     let x = e * f;
     let y = g * h;
@@ -35,8 +35,8 @@ pub fn double_affine_point<P: TwistedEdwardsAffine>(lhs: P) -> P::Extended {
     let c = P::PARAM_D * a * b;
     let h = a + b;
     let e = (x + y).square() - h;
-    let f = P::Range::one() - c;
-    let g = P::Range::one() + c;
+    let f = P::Base::one() - c;
+    let g = P::Base::one() + c;
 
     let x = e * f;
     let y = g * h;

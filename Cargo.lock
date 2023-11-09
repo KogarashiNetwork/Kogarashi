@@ -284,6 +284,7 @@ dependencies = [
  "criterion",
  "parity-scale-codec",
  "proptest",
+ "r1cs",
  "rand_core",
  "serde",
  "zkstd",
@@ -578,6 +579,7 @@ dependencies = [
 name = "r1cs"
 version = "0.1.0"
 dependencies = [
+ "grumpkin",
  "jub-jub",
  "zkstd",
 ]

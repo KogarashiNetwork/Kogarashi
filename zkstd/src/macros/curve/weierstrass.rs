@@ -29,7 +29,7 @@ macro_rules! weierstrass_curve_operation {
                     $projective {
                         x: self.x,
                         y: self.y,
-                        z: Self::Range::one(),
+                        z: Self::Base::one(),
                     }
                 }
             }
@@ -42,7 +42,7 @@ macro_rules! weierstrass_curve_operation {
         impl BNProjective for $projective {
             type Affine = $affine;
 
-            fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self {
+            fn new(x: Self::Base, y: Self::Base, z: Self::Base) -> Self {
                 Self { x, y, z }
             }
 
@@ -57,7 +57,7 @@ macro_rules! weierstrass_curve_operation {
                 }
             }
 
-            fn get_z(&self) -> Self::Range {
+            fn get_z(&self) -> Self::Base {
                 self.z
             }
 
