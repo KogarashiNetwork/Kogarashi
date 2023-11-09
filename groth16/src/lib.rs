@@ -1,4 +1,3 @@
-#![no_std]
 #![doc = include_str!("../README.md")]
 
 mod circuit;
@@ -24,7 +23,7 @@ mod tests {
     use crate::zksnark::ZkSnark;
     use bls_12_381::Fr as BlsScalar;
     use r1cs::gadget::field::FieldAssignment;
-    use r1cs::{R1cs, SparseRow};
+    use r1cs::R1cs;
     use zkstd::common::OsRng;
 
     #[test]
@@ -51,13 +50,13 @@ mod tests {
             fn synthesize(&self, composer: &mut R1cs<BlsScalar>) -> Result<(), Error> {
                 let x = FieldAssignment::instance(composer, self.x);
                 let o = FieldAssignment::instance(composer, self.o);
+                let c = FieldAssignment::constant(BlsScalar::from(5));
 
                 let sym1 = FieldAssignment::mul(composer, &x, &x);
                 let y = FieldAssignment::mul(composer, &sym1, &x);
                 let sym2 = FieldAssignment::add(composer, &y, &x);
-                let out = sym2 + SparseRow::from(BlsScalar::from(5));
 
-                FieldAssignment::eq(composer, &out, &o);
+                FieldAssignment::eq(composer, &(sym2 + c), &o);
 
                 Ok(())
             }

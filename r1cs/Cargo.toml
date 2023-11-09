@@ -8,3 +8,9 @@ zkstd = { path = "../zkstd", default-features = false }
 
 [dev-dependencies]
 jub-jub = { path = "../jubjub", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+    "zkstd/std"
+]

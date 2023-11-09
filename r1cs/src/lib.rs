@@ -1,4 +1,3 @@
-#![no_std]
 #![doc = include_str!("../README.md")]
 
 pub mod gadget;
@@ -13,7 +12,7 @@ pub use wire::Wire;
 use core::ops::Index;
 use zkstd::common::{vec, PrimeField, Vec};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct R1cs<F: PrimeField> {
     // 1. Structure S
     // a, b and c matrices and matrix size
