@@ -6,13 +6,6 @@ use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
 use zkstd::macros::curve::weierstrass::*;
 
-pub const BETA: Fr = Fr::new_unchecked([
-    0x30f1361b798a64e8,
-    0xf3b8ddab7ece5a2a,
-    0x16a8ca3ac61577f7,
-    0xc26a2ff874fd029b,
-]);
-
 const B3: Fr = PARAM_B.add_const(PARAM_B).add_const(PARAM_B);
 
 /// The projective form of coordinate
