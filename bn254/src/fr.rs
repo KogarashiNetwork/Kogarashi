@@ -65,7 +65,7 @@ pub const ROOT_OF_UNITY: Fr = Fr::to_mont_form([
 
 pub const TWO_ADACITY: u32 = 32;
 
-/// Bls12 381 curve scalar field
+/// Bn254 curve scalar field
 #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fr(pub [u64; 4]);
 

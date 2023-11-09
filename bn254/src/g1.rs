@@ -1,4 +1,4 @@
-use crate::params::{BLS_X, BLS_X_IS_NEGATIVE, G1_GENERATOR_X, G1_GENERATOR_Y, G1_PARAM_B};
+use crate::params::{BN_X, BN_X_IS_NEGATIVE, G1_GENERATOR_X, G1_GENERATOR_Y, G1_PARAM_B};
 use crate::{Fq, Fr};
 use core::borrow::Borrow;
 use core::iter::Sum;
@@ -23,89 +23,6 @@ pub struct G1Affine {
     pub(crate) x: Fq,
     pub(crate) y: Fq,
     is_infinity: bool,
-}
-
-impl SigUtils<32> for G1Affine {
-    fn to_bytes(self) -> [u8; Self::LENGTH] {
-        // Strictly speaking, self.x is zero already when self.infinity is true, but
-        // to guard against implementation mistakes we do not assume this.
-        let mut res = (if self.is_infinity { Fq::zero() } else { self.x }).to_bytes();
-
-        // This point is in compressed form, so we set the most significant bit.
-        res[0] |= 1u8 << 7;
-
-        // Is this point at infinity? If so, set the second-most significant bit.
-        res[0] |= if self.is_infinity { 1u8 << 6 } else { 0u8 };
-
-        // Is the y-coordinate the lexicographically largest of the two associated with the
-        // x-coordinate? If so, set the third-most significant bit so long as this is not
-        // the point at infinity.
-        res[0] |= if !self.is_infinity & self.y.lexicographically_largest() {
-            1u8 << 5
-        } else {
-            0u8
-        };
-
-        res
-    }
-
-    fn from_bytes(buf: [u8; Self::LENGTH]) -> Option<Self> {
-        // We already know the point is on the curve because this is established
-        // by the y-coordinate recovery procedure in from_compressed_unchecked().
-
-        let compression_flag_set = (buf[0] >> 7) & 1 == 1;
-        let infinity_flag_set = (buf[0] >> 6) & 1 == 1;
-        let sort_flag_set = (buf[0] >> 5) & 1 == 1;
-
-        // Attempt to obtain the x-coordinate
-        let x = {
-            let mut tmp = [0; Self::LENGTH];
-            tmp.copy_from_slice(&buf[..Self::LENGTH]);
-
-            // Mask away the flag bits
-            tmp[0] &= 0b0001_1111;
-
-            Fq::from_bytes(tmp)
-        };
-
-        x.and_then(|x| {
-            // If the infinity flag is set, return the value assuming
-            // the x-coordinate is zero and the sort bit is not set.
-            //
-            // Otherwise, return a recovered point (assuming the correct
-            // y-coordinate can be found) so long as the infinity flag
-            // was not set.
-
-            if infinity_flag_set & // Infinity flag should be set
-                compression_flag_set & // Compression flag should be set
-                    (!sort_flag_set) & // Sort flag should not be set
-                    x.is_zero()
-            {
-                Some(G1Affine::ADDITIVE_IDENTITY)
-            } else {
-                ((x.square() * x) + B).sqrt().and_then(|y| {
-                    // Switch to the correct y-coordinate if necessary.
-                    let y = if y.lexicographically_largest() ^ sort_flag_set {
-                        -y
-                    } else {
-                        y
-                    };
-                    if (!infinity_flag_set) & // Infinity flag should not be set
-                            compression_flag_set
-                    {
-                        Some(G1Affine {
-                            x,
-                            y,
-                            is_infinity: infinity_flag_set,
-                        })
-                    } else {
-                        None
-                    }
-                })
-            }
-        })
-        .and_then(|p| if p.is_torsion_free() { Some(p) } else { None })
-    }
 }
 
 fn endomorphism(p: &G1Affine) -> G1Affine {
@@ -143,22 +60,6 @@ impl G1Affine {
         };
 
         Self { x, y, is_infinity }
-    }
-
-    pub fn to_raw_bytes(&self) -> [u8; Self::RAW_SIZE] {
-        let mut bytes = [0u8; Self::RAW_SIZE];
-        let chunks = bytes.chunks_mut(8);
-
-        self.x
-            .internal_repr()
-            .iter()
-            .chain(self.y.internal_repr().iter())
-            .zip(chunks)
-            .for_each(|(n, c)| c.copy_from_slice(&n.to_le_bytes()));
-
-        bytes[Self::RAW_SIZE - 1] = self.is_infinity.into();
-
-        bytes
     }
 
     pub fn is_torsion_free(&self) -> bool {
@@ -226,11 +127,12 @@ pub struct G1Projective {
 }
 
 impl G1Projective {
-    /// Multiply `self` by `crate::BLS_X`, using double and add.
+    /// Multiply `self` by `crate::BN_X`, using double and add.
     fn mul_by_x(&self) -> G1Projective {
         let mut xself = G1Projective::ADDITIVE_IDENTITY;
         // NOTE: in BLS12-381 we can just skip the first bit.
-        let mut x = BLS_X >> 1;
+        // TODO: need to test conversion to bytes and back
+        let mut x = BN_X >> 1;
         let mut tmp = *self;
         while x != 0 {
             tmp = tmp.double();
@@ -241,7 +143,7 @@ impl G1Projective {
             x >>= 1;
         }
         // finally, flip the sign
-        if BLS_X_IS_NEGATIVE {
+        if BN_X_IS_NEGATIVE {
             xself = -xself;
         }
         xself
@@ -317,7 +219,6 @@ where
 weierstrass_curve_operation!(
     Fr,
     Fq,
-    G1_PARAM_A,
     G1_PARAM_B,
     B3,
     G1Affine,
@@ -375,7 +276,7 @@ mod tests {
 
     #[test]
     #[allow(clippy::op_ref)]
-    fn bls_operations() {
+    fn bn254_operations() {
         let aff1 = G1Affine::random(OsRng);
         let aff2 = G1Affine::random(OsRng);
         let mut ext1 = G1Projective::random(OsRng);

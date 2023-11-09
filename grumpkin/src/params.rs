@@ -12,7 +12,6 @@ pub(crate) const G1_GENERATOR_Y: Fq = Fq::new_unchecked([
     0xaa7b8cf435dfafbb,
     0x14b34cf69dc25d68,
 ]);
-pub(crate) const G1_PARAM_A: Fq = Fq::zero();
 pub(crate) const G1_PARAM_B: Fq = Fq::new_unchecked([
     0xdd7056026000005a,
     0x223fa97acb319311,
