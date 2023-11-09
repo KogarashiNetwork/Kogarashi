@@ -23,7 +23,6 @@ serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
 zkstd = { path = "../zkstd", default-features = false }
 bn-254 = { path = "../bn254", default-features = false }
-r1cs = { path = "../r1cs", default-features = false }
 
 [dev-dependencies]
 criterion = "0.4.0"

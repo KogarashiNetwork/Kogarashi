@@ -3,8 +3,6 @@ use crate::matrix::{DenseVectors, SparseMatrix, SparseRow};
 use crate::wire::Wire;
 use crate::R1cs;
 
-use bn_254::{Fq, Fr};
-use grumpkin::params::PARAM_B3;
 use zkstd::common::{vec, PrimeField, Vec};
 
 fn array_to_witnessess<F: PrimeField>(witnesses: Vec<u64>) -> Vec<F> {
@@ -85,17 +83,4 @@ pub(crate) fn example_r1cs<C: CircuitDriver>(input: u64) -> R1cs<C> {
     );
     let (x, w) = example_z_witness(input, l);
     R1cs { m, a, b, c, x, w }
-}
-
-#[derive(Clone, Debug, Default)]
-pub struct GrumpkinDriver;
-
-impl CircuitDriver for GrumpkinDriver {
-    type Base = Fr;
-
-    type Scalar = Fq;
-
-    fn b3() -> Self::Base {
-        PARAM_B3
-    }
 }

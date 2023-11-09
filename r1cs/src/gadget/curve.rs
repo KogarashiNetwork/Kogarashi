@@ -58,7 +58,7 @@ impl<C: CircuitDriver> PointAssignment<C> {
 #[cfg(test)]
 mod tests {
     use super::{PointAssignment, R1cs};
-    use crate::test::GrumpkinDriver;
+    use crate::circuit::GrumpkinDriver;
     use grumpkin::params::{GENERATOR_X, GENERATOR_Y};
 
     #[test]

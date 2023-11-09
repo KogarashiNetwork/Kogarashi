@@ -87,7 +87,7 @@ impl<C: CircuitDriver> Add for FieldAssignment<C> {
 #[cfg(test)]
 mod tests {
     use super::{FieldAssignment, R1cs};
-    use crate::test::GrumpkinDriver;
+    use crate::circuit::GrumpkinDriver;
     use bn_254::Fr as Scalar;
     use zkstd::common::{Group, OsRng};
 

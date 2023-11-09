@@ -284,7 +284,6 @@ dependencies = [
  "criterion",
  "parity-scale-codec",
  "proptest",
- "r1cs",
  "rand_core",
  "serde",
  "zkstd",
