@@ -1,7 +1,4 @@
-use crate::{
-    common::{FftField, Vec},
-    traits::CurveGroup,
-};
+use crate::{common::FftField, traits::CurveGroup};
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 /// elliptic curve rational points group
@@ -43,8 +40,6 @@ pub trait WeierstrassAffine:
     type Extended: WeierstrassProjective<Affine = Self, Range = Self::Range>;
 
     fn to_extended(self) -> Self::Extended;
-
-    fn to_raw_bytes(self) -> Vec<u8>;
 
     // doubling this point
     fn double(self) -> Self::Extended;
