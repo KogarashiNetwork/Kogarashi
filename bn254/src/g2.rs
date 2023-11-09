@@ -202,9 +202,11 @@ impl SigUtils<96> for G2Affine {
 }
 
 impl G2Projective {
+    /// Multiply `self` by `crate::BN_X`, using double and add.
     fn mul_by_x(&self) -> G2Projective {
         let mut xself = G2Projective::ADDITIVE_IDENTITY;
         // NOTE: in BLS12-381 we can just skip the first bit.
+        // TODO: need to test conversion to bytes and back
         let mut x = BN_X >> 1;
         let mut acc = *self;
         while x != 0 {
@@ -448,7 +450,6 @@ where
 weierstrass_curve_operation!(
     Fr,
     Fq2,
-    G2_PARAM_A,
     G2_PARAM_B,
     B3,
     G2Affine,

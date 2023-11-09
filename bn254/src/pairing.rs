@@ -1,4 +1,3 @@
-use crate::params::{BN_X, BN_X_IS_NEGATIVE};
 use crate::{Fq, Fq12, Fq2, G1Affine, G2Affine, G2PairingAffine, Gt};
 use zkstd::common::*;
 
@@ -24,7 +23,7 @@ pub const XI_TO_Q_MINUS_1_OVER_2: Fq2 = Fq2([
     ]),
 ]);
 
-/// Tate pairing struct holds necessary components for pairing.
+/// Ate pairing struct holds necessary components for pairing.
 /// `pairing` function takes G1 and G2 group elements and output
 /// GT target group element.
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Default, Encode, Decode, Copy)]
@@ -52,7 +51,6 @@ impl AteParing {
             for &mut (p, ref mut coeffs) in &mut pairs {
                 acc = acc.untwist(*coeffs.next().unwrap(), *p);
             }
-            // println!("Acc_after = {acc:#?}");
             let x = SIX_U_PLUS_2_NAF[i - 1];
             match x {
                 1 => {

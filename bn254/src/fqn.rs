@@ -93,54 +93,54 @@ impl Fq12 {
 
         #[must_use]
         fn cycolotomic_exp(f: Fq12) -> Fq12 {
-            let mut tmp = Fq12::one();
-            let mut found_one = false;
-            for i in (0..64).rev().map(|b| ((BN_X >> b) & 1) == 1) {
-                if found_one {
-                    tmp = cyclotomic_square(tmp)
-                } else {
-                    found_one = i;
-                }
-
-                if i {
-                    tmp *= f;
+            let mut res = Fq12::one();
+            for is_one in (0..64).rev().map(|i| ((BN_X >> i) & 1) == 1) {
+                res = cyclotomic_square(res);
+                if is_one {
+                    res *= f;
                 }
             }
-
-            tmp.conjugate()
+            res
         }
 
-        let mut f = self;
-        let mut t0 = f.frobenius_maps(6);
+        let f = self;
+        let f1 = f.conjugate();
         Gt(f.invert()
-            .map(|mut t1| {
-                let mut t2 = t0 * t1;
-                t1 = t2;
-                t2 = t2.frobenius_maps(2);
-                t2 *= t1;
-                t1 = cyclotomic_square(t2).conjugate();
-                let mut t3 = cycolotomic_exp(t2);
-                let mut t4 = cyclotomic_square(t3);
-                let mut t5 = t1 * t3;
-                t1 = cycolotomic_exp(t5);
-                t0 = cycolotomic_exp(t1);
-                let mut t6 = cycolotomic_exp(t0);
-                t6 *= t4;
-                t4 = cycolotomic_exp(t6);
-                t5 = t5.conjugate();
-                t4 *= t5 * t2;
-                t5 = t2.conjugate();
-                t1 *= t2;
-                t1 = t1.frobenius_maps(3);
-                t6 *= t5;
-                t6 = t6.frobenius_map();
-                t3 *= t0;
-                t3 = t3.frobenius_maps(2);
-                t3 *= t1;
-                t3 *= t6;
-                f = t3 * t4;
+            .map(|mut f2| {
+                f2 *= f1;
+                let r = f2.frobenius_maps(2) * f2;
 
-                f
+                let fp = r.frobenius_maps(1);
+                let fp2 = r.frobenius_maps(2);
+                let fp3 = fp2.frobenius_maps(1);
+
+                let fu = cycolotomic_exp(r);
+                let fu2 = cycolotomic_exp(fu);
+                let fu3 = cycolotomic_exp(fu2);
+
+                let y3 = fu.frobenius_maps(1).conjugate();
+
+                let fu2p = fu2.frobenius_maps(1);
+                let fu3p = fu3.frobenius_maps(1);
+
+                let y2 = fu2.frobenius_maps(2);
+
+                let y0 = fp * fp2 * fp3;
+                let y1 = r.conjugate();
+                let y5 = fu2.conjugate();
+
+                let y4 = (fu * fu2p).conjugate();
+
+                let mut y6 = cyclotomic_square((fu3 * fu3p).conjugate()) * y4 * y5;
+
+                let mut t1 = y3 * y5 * y6;
+                y6 *= y2;
+                t1 = cyclotomic_square(cyclotomic_square(t1) * y6);
+
+                let mut t0 = t1 * y1;
+                t1 *= y0;
+                t0 = cyclotomic_square(t0) * t1;
+                t0
             })
             .unwrap())
     }
@@ -152,88 +152,88 @@ impl Fq12 {
             Fq6([
                 Fq2([
                     Fq([
-                        0x1972e433a01f85c5,
-                        0x97d32b76fd772538,
-                        0xc8ce546fc96bcdf9,
-                        0xcef63e7366d40614,
+                        0xc556f62b2a98671d,
+                        0x23a59ac167bcf363,
+                        0x5ef208445f5f6f37,
+                        0x12adf27ccb29382a,
                     ]),
                     Fq([
-                        0xd26331b02e9d6995,
-                        0x9d68a482f7797e7d,
-                        0x9c9b29248d39ea92,
-                        0xf4801ca2e13107aa,
-                    ]),
-                ]),
-                Fq2([
-                    Fq([
-                        0x59e261db0916b641,
-                        0x2716b6f4b23e960d,
-                        0xc8e55b10a0bd9c45,
-                        0x0bdb0bd99c4deda8,
-                    ]),
-                    Fq([
-                        0x5fc85188b0e15f35,
-                        0x34a06e3a8f096365,
-                        0xdb3126a6e02ad62c,
-                        0xfc6f5aa97d9a990b,
+                        0x2e02a64acbd60549,
+                        0xd618018ea58e4add,
+                        0x14d585f1a45ba647,
+                        0x1832226987c434fc,
                     ]),
                 ]),
                 Fq2([
                     Fq([
-                        0x93588f2971828778,
-                        0x43f65b8611ab7585,
-                        0x3183aaf5ec279fdf,
-                        0xfa73d7e18ac99df6,
+                        0x2306e4312363b991,
+                        0x465f6072d4023bf4,
+                        0xa2ff062a4a77e736,
+                        0x76ea6f18435864a,
                     ]),
                     Fq([
-                        0x672a0a11ca2aef12,
-                        0x0d11b9b52aa3f16b,
-                        0xa44412d0699d056e,
-                        0xc01d0177221a5ba5,
+                        0x172d1f257a4d598e,
+                        0xddf5bc7b7ffb5ac0,
+                        0xae0b22c0bbb0f602,
+                        0x1B158F3C2FAE9B18,
+                    ]),
+                ]),
+                Fq2([
+                    Fq([
+                        0x5cf9cc917da86724,
+                        0xc799dc487a0b2753,
+                        0xdf2027bf1de17a7,
+                        0x197cda6cc3e20636,
+                    ]),
+                    Fq([
+                        0xf16c96d081754cdb,
+                        0xce0394312bceeb55,
+                        0x644e4dcf1f01ff0a,
+                        0xcbea85ee0b236cc,
                     ]),
                 ]),
             ]),
             Fq6([
                 Fq2([
                     Fq([
-                        0xd30a88a1b062c679,
-                        0x5ac56a5d35fc8304,
-                        0xd0c834a6a81f290d,
-                        0xcd5430c2da3707c7,
+                        0x1bb0ce0def1b82a1,
+                        0x4c4c9fe1cadefa95,
+                        0x746d9990cb12b27e,
+                        0x13495c08e5d415c5,
                     ]),
                     Fq([
-                        0x9f2e0676791b5156,
-                        0xe2d1c8234918fe13,
-                        0x4c9e459f3c561bf4,
-                        0xa3e85e53b9d3e3c1,
-                    ]),
-                ]),
-                Fq2([
-                    Fq([
-                        0x7c95658c24993ab1,
-                        0x73eb38721ca886b9,
-                        0x5256d749477434bc,
-                        0x8ba41902ea504a8b,
-                    ]),
-                    Fq([
-                        0xbb83e71bb920cf26,
-                        0x2a5277ac92a73945,
-                        0xfc0ee59f94f046a0,
-                        0x7158cdf3786058f7,
+                        0x9458abcb56d24998,
+                        0xb17540bd2a9e5adb,
+                        0x9a9983c82e401a9f,
+                        0x1614817a84c16291,
                     ]),
                 ]),
                 Fq2([
                     Fq([
-                        0x8078dba56134e657,
-                        0x1cd7ec9a43998a6e,
-                        0xb1aa599a1a993766,
-                        0xc9a0f62f0842ee44,
+                        0x8975b68a2bab1f9c,
+                        0x2fdd826b796e0f35,
+                        0x6a90a35fa03dfaa5,
+                        0x1ffef4581607fc37,
                     ]),
                     Fq([
-                        0xe80ff2a06a52ffb1,
-                        0x7694ca48721a906c,
-                        0x7583183e03b08514,
-                        0xf567afdd40cee4e2,
+                        0x7002907c28ebfe11,
+                        0x7b0591d3d080da67,
+                        0xde7e5aa2181f138e,
+                        0x210e437dfc43d951,
+                    ]),
+                ]),
+                Fq2([
+                    Fq([
+                        0x988ae2485b36cf53,
+                        0x5091cc0581334e54,
+                        0xda7903229312ca0f,
+                        0x2a2341538eaee95c,
+                    ]),
+                    Fq([
+                        0xd34bab373157aa84,
+                        0x3511ed44fd0d8598,
+                        0x67e42a0bc2ced972,
+                        0x2b8f1d5dfd20c55b,
                     ]),
                 ]),
             ]),
@@ -368,12 +368,18 @@ impl Fq2 {
         Self([re, im])
     }
 
+    /// Multiply this element by quadratic nonresidue 9 + u.
     fn mul_by_nonres(self) -> Self {
+        // (xi+y)(i+9) = (9x+y)i+(9y-x)
         let t0 = self.0[0];
         let t1 = self.0[1];
+        // 8*x*i + 8*y
         let mut res = self.double().double().double();
+
+        // 9*y - x
         res.0[0] += t0 - t1;
-        res.0[1] += t1 + t0;
+        // (9*x + y)i
+        res.0[1] += t0 + t1;
         res
     }
 
@@ -561,18 +567,6 @@ impl Fq12 {
         Self([c0, c1])
     }
 
-    fn mul_by_014(self, c0: Fq2, c1: Fq2, c4: Fq2) -> Self {
-        let aa = self.0[0].mul_by_01(c0, c1);
-        let bb = self.0[1].mul_by_1(c4);
-        let o = c1 + c4;
-        let c1 = self.0[1] + self.0[0];
-        let c1 = c1.mul_by_01(c0, o);
-        let c0 = bb;
-        let c0 = c0.mul_by_nonres();
-
-        Self([c0 + aa, c1 - aa - bb])
-    }
-
     pub fn mul_by_034(self, c0: Fq2, c3: Fq2, c4: Fq2) -> Self {
         let t0 = Fq6([
             self.0[0].0[0] * c0,
@@ -605,7 +599,7 @@ mod tests {
 
     #[test]
     fn fq2_mul_nonresidue_test() {
-        let b = Fq2([Fq::one(); 2]);
+        let b = Fq2([Fq::from(9), Fq::one()]);
         for _ in 0..1000 {
             let a = Fq2::random(OsRng);
             let expected = a * b;
@@ -649,18 +643,18 @@ mod tests {
     }
 
     #[test]
-    fn fq12_mul_by_014_test() {
+    fn test_fq12_mul_by_034() {
         for _ in 0..1000 {
             let c0 = Fq2::random(OsRng);
-            let c1 = Fq2::random(OsRng);
-            let c5 = Fq2::random(OsRng);
+            let c3 = Fq2::random(OsRng);
+            let c4 = Fq2::random(OsRng);
             let a = Fq12::random(OsRng);
             let b = Fq12([
-                Fq6([c0, c1, Fq2::zero()]),
-                Fq6([Fq2::zero(), c5, Fq2::zero()]),
+                Fq6([c0, Fq2::zero(), Fq2::zero()]),
+                Fq6([c3, c4, Fq2::zero()]),
             ]);
 
-            assert_eq!(a.mul_by_014(c0, c1, c5), a * b);
+            assert_eq!(a.mul_by_034(c0, c3, c4), a * b);
         }
     }
 

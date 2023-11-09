@@ -17,7 +17,7 @@
 #![doc = include_str!("../README.md")]
 #![allow(clippy::suspicious_arithmetic_impl)]
 #![allow(clippy::suspicious_op_assign_impl)]
-#![allow(dead_code)]
+#![allow(clippy::op_ref)]
 
 mod error;
 mod fq;

@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! affine_group_operation {
-    ($affine:ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident, $a:ident, $b:ident, $b3:ident) => {
+    ($affine:ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident, $b:ident, $b3:ident) => {
         curve_arithmetic_extension!($affine, $scalar, $projective);
         impl PartialEq for $affine {
             fn eq(&self, other: &Self) -> bool {
@@ -83,7 +83,7 @@ macro_rules! affine_group_operation {
 
 #[macro_export]
 macro_rules! projective_group_operation {
-    ($affine: ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident, $a:ident, $b:ident, $b3:ident) => {
+    ($affine: ident, $projective:ident, $range:ident, $scalar:ident, $x:ident, $y:ident, $b:ident, $b3:ident) => {
         curve_arithmetic_extension!($projective, $scalar, $projective);
 
         impl PartialEq for $projective {

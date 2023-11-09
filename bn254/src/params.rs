@@ -1,4 +1,4 @@
-//! Bls12 381 construction and frobennius map constant
+//! Bn254 construction and frobennius map constant
 use crate::{Fq, Fq2};
 
 pub const BN_X: u64 = 4965661367192848881;
@@ -7,7 +7,6 @@ pub const BN_X_IS_NEGATIVE: bool = true;
 // g1 curve parameters
 pub(crate) const G1_GENERATOR_X: Fq = Fq::one();
 pub(crate) const G1_GENERATOR_Y: Fq = Fq::to_mont_form([2, 0, 0, 0]);
-pub(crate) const G1_PARAM_A: Fq = Fq::zero();
 pub(crate) const G1_PARAM_B: Fq = Fq::to_mont_form([3, 0, 0, 0]);
 
 // g2 curve parameters
@@ -39,7 +38,7 @@ pub(crate) const G2_GENERATOR_Y: Fq2 = Fq2([
         0x090689d0585ff075,
     ]),
 ]);
-pub(crate) const G2_PARAM_A: Fq2 = Fq2([Fq::zero(), Fq::zero()]);
+
 pub(crate) const G2_PARAM_B: Fq2 = Fq2([
     Fq::to_mont_form([
         0x3267e6dc24a138e5,

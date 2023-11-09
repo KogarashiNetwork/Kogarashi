@@ -344,7 +344,6 @@ where
 weierstrass_curve_operation!(
     Fr,
     Fq2,
-    G2_PARAM_A,
     G2_PARAM_B,
     B3,
     G2Affine,
