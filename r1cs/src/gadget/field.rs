@@ -42,15 +42,30 @@ impl<C: CircuitDriver> FieldAssignment<C> {
 
     pub fn add(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
         if let Some(c) = x.0.as_constant() {
-            return Self(y.0.clone() * c);
+            return Self(y.0.clone() + SparseRow::from(c));
         }
         if let Some(c) = y.0.as_constant() {
-            return Self(x.0.clone() * c);
+            return Self(x.0.clone() + SparseRow::from(c));
         }
 
         let witness = x.0.evaluate(&cs.x, &cs.w) + y.0.evaluate(&cs.x, &cs.w);
         let z = Self::witness(cs, witness);
         cs.add_gate(&x.0, &y.0, &z.0);
+
+        z
+    }
+
+    pub fn sub(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
+        if let Some(c) = x.0.as_constant() {
+            return Self(y.0.clone() - SparseRow::from(c));
+        }
+        if let Some(c) = y.0.as_constant() {
+            return Self(x.0.clone() - SparseRow::from(c));
+        }
+
+        let witness = x.0.evaluate(&cs.x, &cs.w) - y.0.evaluate(&cs.x, &cs.w);
+        let z = Self::witness(cs, witness);
+        cs.sub_gate(&x.0, &y.0, &z.0);
 
         z
     }
@@ -71,12 +86,13 @@ impl<C: CircuitDriver> Add for FieldAssignment<C> {
 #[cfg(test)]
 mod tests {
     use super::{FieldAssignment, R1cs};
-    use jub_jub::Fr as Scalar;
+    use crate::test::GrumpkinDriver;
+    use bn_254::Fr as Scalar;
     use zkstd::common::{Group, OsRng};
 
     #[test]
     fn field_add_test() {
-        let mut cs = R1cs::default();
+        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let mut ncs = cs.clone();
         let a = Scalar::random(OsRng);
         let b = Scalar::random(OsRng);
@@ -104,7 +120,7 @@ mod tests {
 
     #[test]
     fn field_mul_test() {
-        let mut cs = R1cs::default();
+        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let mut ncs = cs.clone();
         let a = Scalar::random(OsRng);
         let b = Scalar::random(OsRng);
@@ -132,7 +148,7 @@ mod tests {
 
     #[test]
     fn field_ops_test() {
-        let mut cs = R1cs::default();
+        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let mut ncs = cs.clone();
         let input = Scalar::from(3);
         let c = Scalar::from(5);

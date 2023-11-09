@@ -1,12 +1,12 @@
 use zkstd::common::PrimeField;
 
-pub trait CircuitDriver {
+pub trait CircuitDriver: Clone {
     // curve base field
     type Base: PrimeField;
 
     // curve scalar field
     type Scalar: PrimeField;
 
-    // bn curve b param
-    fn b() -> Self::Base;
+    // bn curve 3b param
+    fn b3() -> Self::Base;
 }

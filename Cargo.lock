@@ -579,8 +579,8 @@ dependencies = [
 name = "r1cs"
 version = "0.1.0"
 dependencies = [
+ "bn-254",
  "grumpkin",
- "jub-jub",
  "zkstd",
 ]
 

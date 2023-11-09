@@ -107,6 +107,16 @@ impl<C: CircuitDriver> R1cs<C> {
         self.append(x + y, SparseRow::from(Wire::ONE), z.clone());
     }
 
+    /// constrain x - y = z
+    pub fn sub_gate(
+        &mut self,
+        x: &SparseRow<C::Base>,
+        y: &SparseRow<C::Base>,
+        z: &SparseRow<C::Base>,
+    ) {
+        self.append(x - y, SparseRow::from(Wire::ONE), z.clone());
+    }
+
     /// constrain x == y
     pub fn equal_gate(&mut self, x: &SparseRow<C::Base>, y: &SparseRow<C::Base>) {
         self.mul_gate(x, &SparseRow::one(), y);
@@ -169,13 +179,13 @@ impl<C: CircuitDriver> Index<Wire> for R1cs<C> {
 
 #[cfg(test)]
 mod tests {
-    use crate::test::example_r1cs;
-    use jub_jub::Fr as Scalar;
+    use crate::test::GrumpkinDriver;
+    use crate::{test::example_r1cs, R1cs};
 
     #[test]
     fn r1cs_test() {
         for i in 1..10 {
-            let r1cs = example_r1cs::<Scalar>(i);
+            let r1cs: R1cs<GrumpkinDriver> = example_r1cs(i);
             assert!(r1cs.is_sat())
         }
     }

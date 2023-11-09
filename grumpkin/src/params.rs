@@ -14,3 +14,4 @@ pub(crate) const PARAM_B: Fr = Fr::new_unchecked([
     0xcc388229877910c0,
     0x034394632b724eaa,
 ]);
+pub const PARAM_B3: Fr = PARAM_B.add_const(PARAM_B).add_const(PARAM_B);

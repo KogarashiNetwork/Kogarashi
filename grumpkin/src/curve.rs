@@ -1,12 +1,10 @@
-use crate::params::{GENERATOR_X, GENERATOR_Y, PARAM_B};
+use crate::params::{GENERATOR_X, GENERATOR_Y, PARAM_B, PARAM_B3};
 use bn_254::{Fq, Fr};
 use core::borrow::Borrow;
 use core::iter::Sum;
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::common::*;
 use zkstd::macros::curve::weierstrass::*;
-
-const B3: Fr = PARAM_B.add_const(PARAM_B).add_const(PARAM_B);
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
@@ -185,7 +183,7 @@ weierstrass_curve_operation!(
     Fq,
     Fr,
     PARAM_B,
-    B3,
+    PARAM_B3,
     Affine,
     Projective,
     GENERATOR_X,

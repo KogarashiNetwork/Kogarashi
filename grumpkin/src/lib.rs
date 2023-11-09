@@ -19,5 +19,4 @@
 mod curve;
 
 pub use curve::{Affine, Projective};
-pub mod driver;
 pub mod params;

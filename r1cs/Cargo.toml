@@ -7,7 +7,7 @@ edition = "2021"
 zkstd = { path = "../zkstd", default-features = false }
 
 [dev-dependencies]
-jub-jub = { path = "../jubjub", default-features = false }
+bn-254 = { path = "../bn254", default-features = false }
 grumpkin = { path = "../grumpkin", default-features = false }
 
 [features]
