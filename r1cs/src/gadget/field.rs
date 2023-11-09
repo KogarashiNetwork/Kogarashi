@@ -20,8 +20,8 @@ impl<F: PrimeField> FieldAssignment<F> {
         Self(SparseRow(vec![(wire, F::one())]))
     }
 
-    pub fn constant(constant: F) -> Self {
-        Self(SparseRow(vec![(Wire::Instance(0), constant)]))
+    pub fn constant(constant: &F) -> Self {
+        Self(SparseRow(vec![(Wire::Instance(0), *constant)]))
     }
 
     pub fn mul(cs: &mut R1cs<F>, x: &Self, y: &Self) -> Self {
@@ -75,12 +75,11 @@ mod tests {
 
     #[test]
     fn field_add_test() {
+        let mut cs = R1cs::default();
+        let mut ncs = cs.clone();
         let a = Scalar::random(OsRng);
         let b = Scalar::random(OsRng);
         let mut c = a + b;
-
-        let mut cs = R1cs::default();
-        let mut ncs = cs.clone();
 
         // a + b == c
         let x = FieldAssignment::instance(&mut cs, a);
@@ -88,6 +87,8 @@ mod tests {
         let z = FieldAssignment::instance(&mut cs, c);
         let sum = FieldAssignment::add(&mut cs, &x, &y);
         FieldAssignment::eq(&mut cs, &z, &sum);
+
+        assert!(cs.is_sat());
 
         // a + b != c
         c += Scalar::one();
@@ -98,5 +99,66 @@ mod tests {
         FieldAssignment::eq(&mut ncs, &z, &sum);
 
         assert!(!ncs.is_sat())
+    }
+
+    #[test]
+    fn field_mul_test() {
+        let mut cs = R1cs::default();
+        let mut ncs = cs.clone();
+        let a = Scalar::random(OsRng);
+        let b = Scalar::random(OsRng);
+        let mut c = a * b;
+
+        // a * b == c
+        let x = FieldAssignment::instance(&mut cs, a);
+        let y = FieldAssignment::witness(&mut cs, b);
+        let z = FieldAssignment::instance(&mut cs, c);
+        let product = FieldAssignment::mul(&mut cs, &x, &y);
+        FieldAssignment::eq(&mut cs, &z, &product);
+
+        assert!(cs.is_sat());
+
+        // a * b != c
+        c += Scalar::one();
+        let x = FieldAssignment::instance(&mut ncs, a);
+        let y = FieldAssignment::witness(&mut ncs, b);
+        let z = FieldAssignment::instance(&mut ncs, c);
+        let product = FieldAssignment::mul(&mut ncs, &x, &y);
+        FieldAssignment::eq(&mut ncs, &z, &product);
+
+        assert!(!ncs.is_sat())
+    }
+
+    #[test]
+    fn field_ops_test() {
+        let mut cs = R1cs::default();
+        let mut ncs = cs.clone();
+        let input = Scalar::from(3);
+        let c = Scalar::from(5);
+        let out = Scalar::from(35);
+
+        // x^3 + x + 5 == 35
+        let x = FieldAssignment::witness(&mut cs, input);
+        let c = FieldAssignment::constant(&c);
+        let z = FieldAssignment::instance(&mut cs, out);
+        let sym_1 = FieldAssignment::mul(&mut cs, &x, &x);
+        let y = FieldAssignment::mul(&mut cs, &sym_1, &x);
+        let sym_2 = FieldAssignment::add(&mut cs, &y, &x);
+        FieldAssignment::eq(&mut cs, &z, &(sym_2 + c));
+
+        assert!(cs.is_sat());
+
+        // x^3 + x + 5 != 36
+        let c = Scalar::from(5);
+        let out = Scalar::from(36);
+        let x = FieldAssignment::witness(&mut ncs, input);
+        let c = FieldAssignment::constant(&c);
+        let z = FieldAssignment::instance(&mut ncs, out);
+        let sym_1 = FieldAssignment::mul(&mut ncs, &x, &x);
+        let y = FieldAssignment::mul(&mut ncs, &sym_1, &x);
+        let sym_2 = FieldAssignment::add(&mut ncs, &y, &x);
+        FieldAssignment::eq(&mut ncs, &z, &(sym_2 + c));
+
+        assert!(!ncs.is_sat());
     }
 }

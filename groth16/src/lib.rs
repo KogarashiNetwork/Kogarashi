@@ -50,7 +50,7 @@ mod tests {
             fn synthesize(&self, composer: &mut R1cs<BlsScalar>) -> Result<(), Error> {
                 let x = FieldAssignment::instance(composer, self.x);
                 let o = FieldAssignment::instance(composer, self.o);
-                let c = FieldAssignment::constant(BlsScalar::from(5));
+                let c = FieldAssignment::constant(&BlsScalar::from(5));
 
                 let sym1 = FieldAssignment::mul(composer, &x, &x);
                 let y = FieldAssignment::mul(composer, &sym1, &x);
