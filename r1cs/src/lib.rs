@@ -1,7 +1,6 @@
-#![no_std]
 #![doc = include_str!("../README.md")]
 
-mod gadget;
+pub mod gadget;
 mod matrix;
 #[cfg(test)]
 mod test;
@@ -13,7 +12,7 @@ pub use wire::Wire;
 use core::ops::Index;
 use zkstd::common::{vec, PrimeField, Vec};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct R1cs<F: PrimeField> {
     // 1. Structure S
     // a, b and c matrices and matrix size
@@ -86,31 +85,19 @@ impl<F: PrimeField> R1cs<F> {
         Wire::Witness(index)
     }
 
-    pub fn alloc_instance(&mut self, instance: F) -> Wire {
-        let wire = self.public_wire();
-        self.x.push(instance);
-        wire
-    }
-
-    fn alloc_witness(&mut self, witness: F) -> Wire {
-        let wire = self.private_wire();
-        self.w.push(witness);
-        wire
-    }
-
     /// constrain x * y = z
-    pub fn constrain_mul(&mut self, x: &SparseRow<F>, y: &SparseRow<F>, z: &SparseRow<F>) {
+    pub fn mul_gate(&mut self, x: &SparseRow<F>, y: &SparseRow<F>, z: &SparseRow<F>) {
         self.append(x.clone(), y.clone(), z.clone());
     }
 
     /// constrain x + y = z
-    pub fn constrain_add(&mut self, x: &SparseRow<F>, y: &SparseRow<F>, z: &SparseRow<F>) {
+    pub fn add_gate(&mut self, x: &SparseRow<F>, y: &SparseRow<F>, z: &SparseRow<F>) {
         self.append(x + y, SparseRow::from(Wire::ONE), z.clone());
     }
 
     /// constrain x == y
-    pub fn constrain_equal(&mut self, x: &SparseRow<F>, y: &SparseRow<F>) {
-        self.constrain_mul(x, &SparseRow::one(), y);
+    pub fn equal_gate(&mut self, x: &SparseRow<F>, y: &SparseRow<F>) {
+        self.mul_gate(x, &SparseRow::one(), y);
     }
 
     pub fn evaluate(&self) -> (Vec<F>, Vec<F>, Vec<F>) {

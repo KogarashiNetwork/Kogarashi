@@ -51,7 +51,7 @@ macro_rules! prime_extension_field_operation {
                 unimplemented!()
             }
 
-            fn to_raw_bytes(&self) -> [u8; 32] {
+            fn to_raw_bytes(&self) -> Vec<u8> {
                 unimplemented!()
             }
 

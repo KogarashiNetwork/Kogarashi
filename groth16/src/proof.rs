@@ -2,7 +2,7 @@ use crate::error::Error;
 use crate::verifier::PreparedVerifyingKey;
 
 use bls_12_381::{Fr, G1Affine, G1Projective, G2Affine, G2PairingAffine, TatePairing};
-use zkstd::common::WeierstrassProjective;
+use zkstd::common::BNProjective;
 
 pub struct Proof {
     pub(crate) a: G1Affine,

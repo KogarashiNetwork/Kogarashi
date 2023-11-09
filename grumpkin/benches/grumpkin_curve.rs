@@ -3,7 +3,7 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use bn_254::Fq;
 use grumpkin::{Affine, Projective};
 use rand_core::OsRng;
-use zkstd::common::{Group, WeierstrassAffine, WeierstrassProjective};
+use zkstd::common::{BNAffine, BNProjective, Group};
 
 fn bench_g1_affine(c: &mut Criterion) {
     let mut group = c.benchmark_group("g1_affine");

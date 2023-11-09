@@ -1,11 +1,9 @@
 use crate::arithmetic::utils::Naf;
-use crate::common::{
-    CurveGroup, Group, PrimeField, WeierstrassAffine, WeierstrassCurve, WeierstrassProjective,
-};
+use crate::common::{BNAffine, BNCurve, BNProjective, CurveGroup, Group, PrimeField};
 
 /// weierstrass affine coordinate addition
 #[inline(always)]
-pub fn add_affine_point<A: WeierstrassAffine>(lhs: A, rhs: A) -> A::Extended {
+pub fn add_affine_point<A: BNAffine>(lhs: A, rhs: A) -> A::Extended {
     if lhs.is_identity() {
         return rhs.to_extended();
     } else if rhs.is_identity() {
@@ -38,9 +36,9 @@ pub fn add_affine_point<A: WeierstrassAffine>(lhs: A, rhs: A) -> A::Extended {
 
 /// weierstrass affine coordinate doubling
 #[inline(always)]
-pub fn double_affine_point<A: WeierstrassAffine>(point: A) -> A::Extended {
+pub fn double_affine_point<A: BNAffine>(point: A) -> A::Extended {
     // Algorithm 9, https://eprint.iacr.org/2015/1060.pdf
-    let b3 = <A as WeierstrassCurve>::PARAM_3B;
+    let b3 = <A as BNCurve>::PARAM_3B;
     let (x, y) = (point.get_x(), point.get_y());
 
     let t0 = y.square();
@@ -62,7 +60,7 @@ pub fn double_affine_point<A: WeierstrassAffine>(point: A) -> A::Extended {
 
 /// weierstrass mixed coordinate addition
 #[inline(always)]
-pub fn add_mixed_point<A: WeierstrassAffine>(lhs: A, rhs: A::Extended) -> A::Extended {
+pub fn add_mixed_point<A: BNAffine>(lhs: A, rhs: A::Extended) -> A::Extended {
     if lhs.is_identity() {
         return rhs;
     } else if rhs.is_identity() {
@@ -100,7 +98,7 @@ pub fn add_mixed_point<A: WeierstrassAffine>(lhs: A, rhs: A::Extended) -> A::Ext
 
 /// weierstrass projective coordinate addition
 #[inline(always)]
-pub fn add_projective_point<P: WeierstrassProjective>(lhs: P, rhs: P) -> P {
+pub fn add_projective_point<P: BNProjective>(lhs: P, rhs: P) -> P {
     if lhs.is_identity() {
         return rhs;
     } else if rhs.is_identity() {
@@ -139,10 +137,10 @@ pub fn add_projective_point<P: WeierstrassProjective>(lhs: P, rhs: P) -> P {
 
 /// weierstrass projective coordinate doubling
 #[inline(always)]
-pub fn double_projective_point<P: WeierstrassProjective>(lhs: P) -> P {
+pub fn double_projective_point<P: BNProjective>(lhs: P) -> P {
     // Algorithm 9, https://eprint.iacr.org/2015/1060.pdf
     let (x, y, z) = (lhs.get_x(), lhs.get_y(), lhs.get_z());
-    let b3 = <P as WeierstrassCurve>::PARAM_3B;
+    let b3 = <P as BNCurve>::PARAM_3B;
 
     let t0 = y.square();
     let z3 = t0.double().double().double();
@@ -166,7 +164,7 @@ pub fn double_projective_point<P: WeierstrassProjective>(lhs: P) -> P {
 
 /// coordinate scalar
 #[inline(always)]
-pub fn scalar_point<P: WeierstrassProjective>(point: P, scalar: &P::Scalar) -> P {
+pub fn scalar_point<P: BNProjective>(point: P, scalar: &P::Scalar) -> P {
     let mut res = P::ADDITIVE_IDENTITY;
     for &naf in scalar.to_nafs().iter() {
         res = double_projective_point(res);

@@ -1,9 +1,9 @@
 #[cfg(feature = "std")]
 use rayon::prelude::*;
-use zkstd::common::{vec, Group, PrimeField, Vec, WeierstrassAffine, WeierstrassProjective};
+use zkstd::common::{vec, BNAffine, BNProjective, Group, PrimeField, Vec};
 
 /// Performs a Variable Base Multiscalar Multiplication.
-pub fn msm_curve_addition<C: WeierstrassAffine>(bases: &[C], coeffs: &[C::Scalar]) -> C::Extended {
+pub fn msm_curve_addition<C: BNAffine>(bases: &[C], coeffs: &[C::Scalar]) -> C::Extended {
     let c = if bases.len() < 4 {
         1
     } else if bases.len() < 32 {
@@ -23,7 +23,7 @@ pub fn msm_curve_addition<C: WeierstrassAffine>(bases: &[C], coeffs: &[C::Scalar
         .rev()
         .map(|(i, bucket)| {
             for (coeff, base) in coeffs.iter().zip(bases.iter()) {
-                let seg = get_at(i, c, coeff.to_raw_bytes());
+                let seg = get_at(i, c, coeff.to_raw_bytes().try_into().unwrap());
                 if seg != 0 {
                     bucket[seg - 1].add_assign(base);
                 }
@@ -48,13 +48,13 @@ pub fn msm_curve_addition<C: WeierstrassAffine>(bases: &[C], coeffs: &[C::Scalar
 }
 
 #[derive(Clone, Copy)]
-enum Bucket<C: WeierstrassAffine> {
+enum Bucket<C: BNAffine> {
     None,
     Affine(C),
     Projective(C::Extended),
 }
 
-impl<C: WeierstrassAffine> Bucket<C> {
+impl<C: BNAffine> Bucket<C> {
     fn add_assign(&mut self, other: &C) {
         *self = match *self {
             Bucket::None => Bucket::Affine(*other),
@@ -95,9 +95,9 @@ mod tests {
     use super::msm_curve_addition;
 
     use bls_12_381::{Fr, G1Affine, G1Projective};
-    use zkstd::common::{Group, OsRng, Vec, WeierstrassAffine, WeierstrassProjective};
+    use zkstd::common::{BNAffine, BNProjective, Group, OsRng, Vec};
 
-    fn customized_scalar_point<P: WeierstrassProjective>(point: P, scalar: &Fr) -> P {
+    fn customized_scalar_point<P: BNProjective>(point: P, scalar: &Fr) -> P {
         let mut res = P::ADDITIVE_IDENTITY;
         let one = point;
         let two = one + point;

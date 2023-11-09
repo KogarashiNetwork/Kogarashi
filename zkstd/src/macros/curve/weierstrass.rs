@@ -19,7 +19,7 @@ macro_rules! weierstrass_curve_operation {
         impl ParallelCmp for $affine {}
         impl ParallelCmp for $projective {}
 
-        impl WeierstrassAffine for $affine {
+        impl BNAffine for $affine {
             type Extended = $projective;
 
             fn to_extended(self) -> $projective {
@@ -39,7 +39,7 @@ macro_rules! weierstrass_curve_operation {
             }
         }
 
-        impl WeierstrassProjective for $projective {
+        impl BNProjective for $projective {
             type Affine = $affine;
 
             fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self {

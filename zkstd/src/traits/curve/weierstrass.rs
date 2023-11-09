@@ -1,10 +1,9 @@
-use crate::common::PrimeField;
-use crate::traits::CurveGroup;
+use crate::traits::{CurveGroup, PrimeField};
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 /// elliptic curve rational points group
 /// rational points group behaves as abelian group
-pub trait WeierstrassCurve: CurveGroup {
+pub trait BNCurve: CurveGroup {
     // b param
     const PARAM_B: Self::Range;
     // 3b param
@@ -15,8 +14,8 @@ pub trait WeierstrassCurve: CurveGroup {
 
 /// rational point affine representation
 /// affine representation check that a point is infinite by the struct field
-pub trait WeierstrassAffine:
-    WeierstrassCurve
+pub trait BNAffine:
+    BNCurve
     + From<Self::Extended>
     + Neg<Output = Self>
     + for<'a> Neg<Output = Self>
@@ -38,7 +37,7 @@ pub trait WeierstrassAffine:
     + for<'a, 'b> Mul<&'b Self::Scalar, Output = Self::Extended>
 {
     // extented coordinate representation
-    type Extended: WeierstrassProjective<Affine = Self, Range = Self::Range>;
+    type Extended: BNProjective<Affine = Self, Range = Self::Range>;
 
     fn to_extended(self) -> Self::Extended;
 
@@ -48,8 +47,8 @@ pub trait WeierstrassAffine:
 
 /// rational point projective representation
 /// projective representation check that a point is infinite by z coordinate
-pub trait WeierstrassProjective:
-    WeierstrassCurve
+pub trait BNProjective:
+    BNCurve
     + Into<Self::Affine>
     + From<Self::Affine>
     + Neg<Output = Self>
@@ -80,7 +79,7 @@ pub trait WeierstrassProjective:
     + for<'a> MulAssign<&'a Self::Scalar>
 {
     // affine coordinate representation
-    type Affine: WeierstrassAffine<Range = Self::Range, Scalar = Self::Scalar, Extended = Self>;
+    type Affine: BNAffine<Range = Self::Range, Scalar = Self::Scalar, Extended = Self>;
 
     fn new(x: Self::Range, y: Self::Range, z: Self::Range) -> Self;
 
