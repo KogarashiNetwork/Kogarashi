@@ -23,7 +23,7 @@ pub struct R1cs<C: CircuitDriver> {
     c: SparseMatrix<C::Scalar>,
 
     // 2. Instance
-    // r1cs instance includes public inputs and outputs
+    // r1cs instance includes one constant and public inputs and outputs
     x: DenseVectors<C::Scalar>,
 
     // 3. Witness

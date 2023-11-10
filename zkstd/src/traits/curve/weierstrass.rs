@@ -39,6 +39,8 @@ pub trait BNAffine:
     // extented coordinate representation
     type Extended: BNProjective<Affine = Self, Base = Self::Base>;
 
+    fn new_unchecked(x: Self::Base, y: Self::Base) -> Self;
+
     fn to_extended(self) -> Self::Extended;
 
     // doubling this point
@@ -81,7 +83,7 @@ pub trait BNProjective:
     // affine coordinate representation
     type Affine: BNAffine<Base = Self::Base, Scalar = Self::Scalar, Extended = Self>;
 
-    fn new(x: Self::Base, y: Self::Base, z: Self::Base) -> Self;
+    fn new_unchecked(x: Self::Base, y: Self::Base, z: Self::Base) -> Self;
 
     // get z coordinate
     fn get_z(&self) -> Self::Base;

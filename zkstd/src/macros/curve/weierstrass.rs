@@ -22,6 +22,14 @@ macro_rules! weierstrass_curve_operation {
         impl BNAffine for $affine {
             type Extended = $projective;
 
+            fn new_unchecked(x: Self::Base, y: Self::Base) -> Self {
+                Self {
+                    x,
+                    y,
+                    is_infinity: false,
+                }
+            }
+
             fn to_extended(self) -> $projective {
                 if self.is_identity() {
                     $projective::ADDITIVE_IDENTITY
@@ -42,7 +50,7 @@ macro_rules! weierstrass_curve_operation {
         impl BNProjective for $projective {
             type Affine = $affine;
 
-            fn new(x: Self::Base, y: Self::Base, z: Self::Base) -> Self {
+            fn new_unchecked(x: Self::Base, y: Self::Base, z: Self::Base) -> Self {
                 Self { x, y, z }
             }
 
