@@ -11,3 +11,5 @@ categories = ["cryptography"]
 keywords = ["zkp", "blockchain", "elliptic-curve"]
 
 [dependencies]
+r1cs = { path = "../r1cs", default-features = false }
+zkstd = { path = "../zkstd", default-features = false }

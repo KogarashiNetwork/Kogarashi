@@ -1034,6 +1034,10 @@ dependencies = [
 [[package]]
 name = "zknova"
 version = "0.0.1"
+dependencies = [
+ "r1cs",
+ "zkstd",
+]
 
 [[package]]
 name = "zkstd"

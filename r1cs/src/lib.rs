@@ -3,8 +3,7 @@
 mod circuit;
 pub mod gadget;
 mod matrix;
-#[cfg(test)]
-mod test;
+pub mod test;
 mod wire;
 
 pub use circuit::{CircuitDriver, GrumpkinDriver};
@@ -24,12 +23,12 @@ pub struct R1cs<C: CircuitDriver> {
     c: SparseMatrix<C::Base>,
 
     // 2. Instance
-    // r1cs witness includes private inputs and intermediate value
-    w: DenseVectors<C::Base>,
-
-    // 3. Witness
     // r1cs instance includes public inputs and outputs
     x: DenseVectors<C::Base>,
+
+    // 3. Witness
+    // r1cs witness includes private inputs and intermediate value
+    w: DenseVectors<C::Base>,
 }
 
 impl<C: CircuitDriver> R1cs<C> {
@@ -51,6 +50,16 @@ impl<C: CircuitDriver> R1cs<C> {
 
     pub fn w(&self) -> Vec<C::Base> {
         self.w.get()
+    }
+
+    pub fn matrices(
+        &self,
+    ) -> (
+        SparseMatrix<C::Base>,
+        SparseMatrix<C::Base>,
+        SparseMatrix<C::Base>,
+    ) {
+        (self.a.clone(), self.b.clone(), self.c.clone())
     }
 
     ///  check (A · Z) ◦ (B · Z) = C · Z

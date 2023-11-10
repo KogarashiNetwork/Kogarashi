@@ -51,7 +51,7 @@ fn example_z_witness<F: PrimeField>(input: u64, l: usize) -> (DenseVectors<F>, D
     )
 }
 
-pub(crate) fn example_r1cs<C: CircuitDriver>(input: u64) -> R1cs<C> {
+pub fn example_r1cs<C: CircuitDriver>(input: u64) -> R1cs<C> {
     let m = 4;
     let l = 1;
     let a = dense_to_sparse(
