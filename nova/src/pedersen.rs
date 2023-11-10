@@ -1,4 +1,4 @@
-use r1cs::{CircuitDriver, DenseVectors};
+use r1cs::DenseVectors;
 use zkstd::common::{BNAffine, Group, RngCore};
 
 pub struct PedersenCommitment<C: BNAffine> {
@@ -7,7 +7,7 @@ pub struct PedersenCommitment<C: BNAffine> {
 }
 
 impl<C: BNAffine> PedersenCommitment<C> {
-    pub(crate) fn new(n: u64, mut r: impl RngCore) -> Self {
+    pub fn new(n: u64, mut r: impl RngCore) -> Self {
         let h = C::random(&mut r).into();
         let g = (0..=1 << n).map(|_| C::random(&mut r).into()).collect();
         Self { h, g }

@@ -3,29 +3,38 @@ use crate::{pedersen::PedersenCommitment, relaxed_r1cs::RelaxedR1cs};
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::Ring;
 
-pub(crate) struct Prover<C: CircuitDriver> {
+pub struct Prover<C: CircuitDriver> {
     // public parameters
-    pub(crate) pp: PedersenCommitment<C::Affine>,
+    pp: PedersenCommitment<C::Affine>,
 
     // r1cs structure
-    pub(crate) f: R1cs<C>,
+    f: R1cs<C>,
 }
 
 impl<C: CircuitDriver> Prover<C> {
-    pub(crate) fn prove(&self, r1cs: R1cs<C>, relaxed_r1cs: RelaxedR1cs<C>) -> RelaxedR1cs<C> {
+    pub fn prove(&self, r1cs: R1cs<C>, relaxed_r1cs: RelaxedR1cs<C>) -> RelaxedR1cs<C> {
         // compute cross term t
-        let t = self.compute_cross_term(r1cs, relaxed_r1cs);
+        let t = self.compute_cross_term(&r1cs, &relaxed_r1cs);
 
         // TODO: replace with transcript
         let lc_random = C::Scalar::one();
         let commit_t = self.pp.commit(&t, &lc_random);
+
+        // fold instance
+        let instance = relaxed_r1cs.fold_instance(&r1cs, lc_random, commit_t);
+
+        // fold witness
+        let witness = relaxed_r1cs.fold_witness(r1cs, lc_random, t);
+
+        // return folded relaxed r1cs
+        relaxed_r1cs.update(instance, witness)
     }
 
     // T = AZ1 ◦ BZ2 + AZ2 ◦ BZ1 − u1 · CZ2 − u2 · CZ1
     fn compute_cross_term(
         &self,
-        r1cs: R1cs<C>,
-        relaxed_r1cs: RelaxedR1cs<C>,
+        r1cs: &R1cs<C>,
+        relaxed_r1cs: &RelaxedR1cs<C>,
     ) -> DenseVectors<C::Scalar> {
         let u1 = C::Scalar::one();
         let u2 = relaxed_r1cs.u();

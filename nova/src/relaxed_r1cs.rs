@@ -1,7 +1,12 @@
-use r1cs::{CircuitDriver, DenseVectors, R1cs, SparseMatrix};
-use zkstd::common::{IntGroup, Ring};
+mod instance;
+mod witness;
 
-pub(crate) struct RelaxedR1cs<C: CircuitDriver> {
+use instance::RelaxedR1csInstance;
+use r1cs::{CircuitDriver, DenseVectors, R1cs, SparseMatrix};
+use witness::RelaxedR1csWitness;
+
+#[derive(Clone, Debug)]
+pub struct RelaxedR1cs<C: CircuitDriver> {
     // 1. Structure S
     // a, b and c matrices and matrix size
     m: usize,
@@ -10,61 +15,105 @@ pub(crate) struct RelaxedR1cs<C: CircuitDriver> {
     c: SparseMatrix<C::Scalar>,
 
     // 2. Instance
-    // r1cs instance includes public inputs and outputs, and error vector, scalar
-    e: DenseVectors<C::Scalar>,
-    u: C::Scalar,
-    x: DenseVectors<C::Scalar>,
+    // r1cs instance includes public inputs, outputs and scalar
+    instance: RelaxedR1csInstance<C>,
 
     // 3. Witness
-    // r1cs witness includes private inputs and intermediate value
-    w: DenseVectors<C::Scalar>,
+    // r1cs witness includes private inputs, intermediate value and error vector
+    witness: RelaxedR1csWitness<C>,
 }
 
 impl<C: CircuitDriver> RelaxedR1cs<C> {
-    pub(crate) fn new(r1cs: R1cs<C>) -> Self {
+    pub fn new(r1cs: R1cs<C>) -> Self {
         let m = r1cs.m();
         let (a, b, c) = r1cs.matrices();
-        let e = DenseVectors::new(vec![C::Scalar::zero(); m]);
-        let u = C::Scalar::one();
         let x = DenseVectors::new(r1cs.x());
         let w = DenseVectors::new(r1cs.w());
+
+        let instance = RelaxedR1csInstance::default(x);
+        let witness = RelaxedR1csWitness::default(w);
 
         Self {
             m,
             a,
             b,
             c,
-            e,
-            u,
-            x,
-            w,
+            instance,
+            witness,
         }
     }
 
     pub(crate) fn u(&self) -> C::Scalar {
-        self.u.clone()
+        self.instance.u.clone()
     }
 
     pub(crate) fn x(&self) -> DenseVectors<C::Scalar> {
-        self.x.clone()
+        self.instance.x.clone()
     }
 
     pub(crate) fn w(&self) -> DenseVectors<C::Scalar> {
-        self.w.clone()
+        self.witness.w.clone()
+    }
+
+    pub(crate) fn fold_instance(
+        &self,
+        r1cs: &R1cs<C>,
+        r: C::Scalar,
+        t: C::Affine,
+    ) -> RelaxedR1csInstance<C> {
+        self.instance.fold(r1cs, r, t)
+    }
+
+    pub(crate) fn fold_witness(
+        &self,
+        r1cs: R1cs<C>,
+        r: C::Scalar,
+        t: DenseVectors<C::Scalar>,
+    ) -> RelaxedR1csWitness<C> {
+        self.witness.fold(r1cs, r, t)
+    }
+
+    pub(crate) fn update(
+        self,
+        instance: RelaxedR1csInstance<C>,
+        witness: RelaxedR1csWitness<C>,
+    ) -> Self {
+        let RelaxedR1cs {
+            m,
+            a,
+            b,
+            c,
+            instance: _,
+            witness: _,
+        } = self;
+        Self {
+            m,
+            a,
+            b,
+            c,
+            instance,
+            witness,
+        }
     }
 
     ///  check (A · Z) ◦ (B · Z) = u · (C · Z) + E
-    pub(crate) fn is_sat(&self) -> bool {
+    pub fn is_sat(&self) -> bool {
         let Self {
             m,
             a,
             b,
             c,
-            e,
+            instance,
+            witness,
+        } = self;
+        let RelaxedR1csInstance {
+            commit_w: _,
+            commit_e: _,
             u,
             x,
-            w,
-        } = self;
+        } = instance;
+        let RelaxedR1csWitness { w, e } = witness;
+
         // A · Z
         let az = a.prod(m, x, w);
         // B · Z
