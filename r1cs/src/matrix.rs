@@ -52,7 +52,3 @@ impl<F: PrimeField> SparseMatrix<F> {
         vectors
     }
 }
-
-pub trait Evaluable<F: PrimeField, R> {
-    fn evaluate(&self, instance: &DenseVectors<F>, witness: &DenseVectors<F>) -> R;
-}

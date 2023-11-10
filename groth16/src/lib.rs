@@ -50,13 +50,14 @@ mod tests {
             fn synthesize(&self, composer: &mut R1cs<GrumpkinDriver>) -> Result<(), Error> {
                 let x = FieldAssignment::instance(composer, self.x);
                 let o = FieldAssignment::instance(composer, self.o);
-                let c = FieldAssignment::constant(&BnScalar::from(5));
+                let c = FieldAssignment::constant(BnScalar::from(5));
 
                 let sym1 = FieldAssignment::mul(composer, &x, &x);
                 let y = FieldAssignment::mul(composer, &sym1, &x);
+                // TODO: check why using the `Add` trait crashes this test
                 let sym2 = FieldAssignment::add(composer, &y, &x);
 
-                FieldAssignment::eq(composer, &(sym2 + c), &o);
+                FieldAssignment::eq(composer, &(&sym2 + &c), &o);
 
                 Ok(())
             }
