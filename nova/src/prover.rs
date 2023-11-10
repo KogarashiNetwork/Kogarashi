@@ -1,7 +1,7 @@
 use crate::{pedersen::PedersenCommitment, relaxed_r1cs::RelaxedR1cs};
 
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
-use zkstd::common::Ring;
+use zkstd::common::{Ring, RngCore};
 
 pub struct Prover<C: CircuitDriver> {
     // public parameters
@@ -12,6 +12,14 @@ pub struct Prover<C: CircuitDriver> {
 }
 
 impl<C: CircuitDriver> Prover<C> {
+    pub fn new(f: R1cs<C>, rng: impl RngCore) -> Self {
+        let m = f.m();
+        let n = m.next_power_of_two() as u64;
+        let pp = PedersenCommitment::new(n, rng);
+
+        Self { pp, f }
+    }
+
     pub fn prove(&self, r1cs: R1cs<C>, relaxed_r1cs: RelaxedR1cs<C>) -> RelaxedR1cs<C> {
         // compute cross term t
         let t = self.compute_cross_term(&r1cs, &relaxed_r1cs);
@@ -61,5 +69,31 @@ impl<C: CircuitDriver> Prover<C> {
 
         // vector addition and subtraction
         az2bz1 + az1bz2 - c1cz2 - c2cz1
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Prover, RelaxedR1cs};
+
+    use r1cs::{test::example_r1cs, GrumpkinDriver};
+    use zkstd::common::OsRng;
+
+    fn example_prover() -> Prover<GrumpkinDriver> {
+        let r1cs = example_r1cs(0);
+        Prover::new(r1cs, OsRng)
+    }
+
+    #[test]
+    fn folding_scheme_test() {
+        let prover = example_prover();
+        let r1cs = example_r1cs(1);
+        let mut relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
+        for i in 1..10 {
+            let r1cs = example_r1cs(i);
+            relaxed_r1cs = prover.prove(r1cs, relaxed_r1cs);
+        }
+
+        assert!(relaxed_r1cs.is_sat())
     }
 }
