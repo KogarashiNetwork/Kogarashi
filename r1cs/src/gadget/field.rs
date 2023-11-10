@@ -1,9 +1,9 @@
 use crate::circuit::CircuitDriver;
 use crate::matrix::SparseRow;
-use crate::wire::Wire;
 use crate::R1cs;
+use std::ops::Sub;
 
-use zkstd::common::{vec, Add, Ring};
+use zkstd::common::Add;
 
 pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Base>);
 
@@ -12,18 +12,18 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         let wire = cs.public_wire();
         cs.x.push(instance);
 
-        Self(SparseRow(vec![(wire, C::Base::one())]))
+        Self(SparseRow::from(wire))
     }
 
     pub fn witness(cs: &mut R1cs<C>, witness: C::Base) -> Self {
         let wire = cs.private_wire();
         cs.w.push(witness);
 
-        Self(SparseRow(vec![(wire, C::Base::one())]))
+        Self(SparseRow::from(wire))
     }
 
-    pub fn constant(constant: &C::Base) -> Self {
-        Self(SparseRow(vec![(Wire::Instance(0), *constant)]))
+    pub fn constant(constant: C::Base) -> Self {
+        Self(SparseRow::from(constant))
     }
 
     pub fn mul(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
@@ -56,31 +56,24 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         z
     }
 
-    pub fn sub(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
-        if let Some(c) = x.0.as_constant() {
-            return Self(y.0.clone() - SparseRow::from(c));
-        }
-        if let Some(c) = y.0.as_constant() {
-            return Self(x.0.clone() - SparseRow::from(c));
-        }
-
-        let witness = x.0.evaluate(&cs.x, &cs.w) - y.0.evaluate(&cs.x, &cs.w);
-        let z = Self::witness(cs, witness);
-        cs.sub_gate(&x.0, &y.0, &z.0);
-
-        z
-    }
-
     pub fn eq(cs: &mut R1cs<C>, x: &Self, y: &Self) {
         cs.mul_gate(&x.0, &SparseRow::one(), &y.0)
     }
 }
 
-impl<C: CircuitDriver> Add for FieldAssignment<C> {
+impl<C: CircuitDriver> Add<&FieldAssignment<C>> for &FieldAssignment<C> {
     type Output = FieldAssignment<C>;
 
-    fn add(self, rhs: Self) -> Self::Output {
-        Self(self.0 + rhs.0)
+    fn add(self, rhs: &FieldAssignment<C>) -> Self::Output {
+        FieldAssignment(&self.0 + &rhs.0)
+    }
+}
+
+impl<C: CircuitDriver> Sub<&FieldAssignment<C>> for &FieldAssignment<C> {
+    type Output = FieldAssignment<C>;
+
+    fn sub(self, rhs: &FieldAssignment<C>) -> Self::Output {
+        FieldAssignment(&self.0 - &rhs.0)
     }
 }
 
@@ -103,7 +96,7 @@ mod tests {
         let x = FieldAssignment::instance(&mut cs, a);
         let y = FieldAssignment::witness(&mut cs, b);
         let z = FieldAssignment::instance(&mut cs, c);
-        let sum = FieldAssignment::add(&mut cs, &x, &y);
+        let sum = &x + &y;
         FieldAssignment::eq(&mut cs, &z, &sum);
 
         assert!(cs.is_sat());
@@ -113,7 +106,7 @@ mod tests {
         let x = FieldAssignment::instance(&mut ncs, a);
         let y = FieldAssignment::witness(&mut ncs, b);
         let z = FieldAssignment::instance(&mut ncs, c);
-        let sum = FieldAssignment::add(&mut ncs, &x, &y);
+        let sum = &x + &y;
         FieldAssignment::eq(&mut ncs, &z, &sum);
 
         assert!(!ncs.is_sat())
@@ -157,12 +150,12 @@ mod tests {
 
         // x^3 + x + 5 == 35
         let x = FieldAssignment::witness(&mut cs, input);
-        let c = FieldAssignment::constant(&c);
+        let c = FieldAssignment::constant(c);
         let z = FieldAssignment::instance(&mut cs, out);
         let sym_1 = FieldAssignment::mul(&mut cs, &x, &x);
         let y = FieldAssignment::mul(&mut cs, &sym_1, &x);
-        let sym_2 = FieldAssignment::add(&mut cs, &y, &x);
-        FieldAssignment::eq(&mut cs, &z, &(sym_2 + c));
+        let sym_2 = &y + &x;
+        FieldAssignment::eq(&mut cs, &z, &(&sym_2 + &c));
 
         assert!(cs.is_sat());
 
@@ -170,12 +163,12 @@ mod tests {
         let c = Scalar::from(5);
         let out = Scalar::from(36);
         let x = FieldAssignment::witness(&mut ncs, input);
-        let c = FieldAssignment::constant(&c);
+        let c = FieldAssignment::constant(c);
         let z = FieldAssignment::instance(&mut ncs, out);
         let sym_1 = FieldAssignment::mul(&mut ncs, &x, &x);
         let y = FieldAssignment::mul(&mut ncs, &sym_1, &x);
-        let sym_2 = FieldAssignment::add(&mut ncs, &y, &x);
-        FieldAssignment::eq(&mut ncs, &z, &(sym_2 + c));
+        let sym_2 = &y + &x;
+        FieldAssignment::eq(&mut ncs, &z, &(&sym_2 + &c));
 
         assert!(!ncs.is_sat());
     }

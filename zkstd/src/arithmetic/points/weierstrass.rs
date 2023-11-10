@@ -31,7 +31,7 @@ pub fn add_affine_point<A: BNAffine>(lhs: A, rhs: A) -> A::Extended {
     let y = s * (x0 * uu - w) - y0 * uuu;
     let z = uuu;
 
-    A::Extended::new(x, y, z)
+    A::Extended::new_unchecked(x, y, z)
 }
 
 /// weierstrass affine coordinate doubling
@@ -55,7 +55,7 @@ pub fn double_affine_point<A: BNAffine>(point: A) -> A::Extended {
     let x3 = t0 * t1;
     let x3 = x3.double();
 
-    A::Extended::new(x3, y3, z3)
+    A::Extended::new_unchecked(x3, y3, z3)
 }
 
 /// weierstrass mixed coordinate addition
@@ -93,7 +93,7 @@ pub fn add_mixed_point<A: BNAffine>(lhs: A, rhs: A::Extended) -> A::Extended {
     let y = u * (r - a) - vvv * y1;
     let z = vvv * z1;
 
-    A::Extended::new(x, y, z)
+    A::Extended::new_unchecked(x, y, z)
 }
 
 /// weierstrass projective coordinate addition
@@ -132,7 +132,7 @@ pub fn add_projective_point<P: BNProjective>(lhs: P, rhs: P) -> P {
     let y = s * (u1 * uu - w) - s1 * uuu;
     let z = uuu * v;
 
-    P::new(x, y, z)
+    P::new_unchecked(x, y, z)
 }
 
 /// weierstrass projective coordinate doubling
@@ -159,7 +159,7 @@ pub fn double_projective_point<P: BNProjective>(lhs: P) -> P {
     let x3 = t0 * t1;
     let x3 = x3.double();
 
-    P::new(x3, y3, z3)
+    P::new_unchecked(x3, y3, z3)
 }
 
 /// coordinate scalar

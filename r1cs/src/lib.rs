@@ -28,7 +28,7 @@ pub struct R1cs<C: CircuitDriver> {
     w: DenseVectors<C::Base>,
 
     // 3. Witness
-    // r1cs instance includes public inputs and outputs
+    // r1cs instance includes ONE constant, public inputs and outputs
     x: DenseVectors<C::Base>,
 }
 
