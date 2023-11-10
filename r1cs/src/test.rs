@@ -1,4 +1,4 @@
-use crate::circuit::CircuitDriver;
+use crate::driver::CircuitDriver;
 use crate::matrix::{DenseVectors, SparseMatrix, SparseRow};
 use crate::wire::Wire;
 use crate::R1cs;

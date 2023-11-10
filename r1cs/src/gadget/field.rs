@@ -1,28 +1,28 @@
-use crate::circuit::CircuitDriver;
+use crate::driver::CircuitDriver;
 use crate::matrix::SparseRow;
 use crate::wire::Wire;
 use crate::R1cs;
 
 use zkstd::common::{vec, Add, Ring};
 
-pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Base>);
+pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Scalar>);
 
 impl<C: CircuitDriver> FieldAssignment<C> {
-    pub fn instance(cs: &mut R1cs<C>, instance: C::Base) -> Self {
+    pub fn instance(cs: &mut R1cs<C>, instance: C::Scalar) -> Self {
         let wire = cs.public_wire();
         cs.x.push(instance);
 
-        Self(SparseRow(vec![(wire, C::Base::one())]))
+        Self(SparseRow(vec![(wire, C::Scalar::one())]))
     }
 
-    pub fn witness(cs: &mut R1cs<C>, witness: C::Base) -> Self {
+    pub fn witness(cs: &mut R1cs<C>, witness: C::Scalar) -> Self {
         let wire = cs.private_wire();
         cs.w.push(witness);
 
-        Self(SparseRow(vec![(wire, C::Base::one())]))
+        Self(SparseRow(vec![(wire, C::Scalar::one())]))
     }
 
-    pub fn constant(constant: &C::Base) -> Self {
+    pub fn constant(constant: &C::Scalar) -> Self {
         Self(SparseRow(vec![(Wire::Instance(0), *constant)]))
     }
 
@@ -87,7 +87,7 @@ impl<C: CircuitDriver> Add for FieldAssignment<C> {
 #[cfg(test)]
 mod tests {
     use super::{FieldAssignment, R1cs};
-    use crate::circuit::GrumpkinDriver;
+    use crate::driver::GrumpkinDriver;
     use bn_254::Fr as Scalar;
     use zkstd::common::{Group, OsRng};
 

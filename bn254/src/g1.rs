@@ -1,4 +1,4 @@
-use crate::params::{BN_X, BN_X_IS_NEGATIVE, G1_GENERATOR_X, G1_GENERATOR_Y, G1_PARAM_B};
+use crate::params::{BN_X, BN_X_IS_NEGATIVE, G1_GENERATOR_X, G1_GENERATOR_Y, G1_PARAM_B, PARAM_B3};
 use crate::{Fq, Fr};
 use core::borrow::Borrow;
 use core::iter::Sum;
@@ -12,8 +12,6 @@ pub const BETA: Fq = Fq([
     0x16a8ca3ac61577f7,
     0xc26a2ff874fd029b,
 ]);
-
-const B3: Fq = G1_PARAM_B.add_const(G1_PARAM_B).add_const(G1_PARAM_B);
 
 /// The projective form of coordinate
 #[derive(Debug, Clone, Copy, Decode, Encode)]
@@ -217,7 +215,7 @@ weierstrass_curve_operation!(
     Fr,
     Fq,
     G1_PARAM_B,
-    B3,
+    PARAM_B3,
     G1Affine,
     G1Projective,
     G1_GENERATOR_X,

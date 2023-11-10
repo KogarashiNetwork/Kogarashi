@@ -1,4 +1,4 @@
-use r1cs::DenseVectors;
+use r1cs::{CircuitDriver, DenseVectors};
 use zkstd::common::{BNAffine, Group, RngCore};
 
 pub struct PedersenCommitment<C: BNAffine> {

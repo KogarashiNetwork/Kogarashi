@@ -5,27 +5,27 @@ pub(crate) struct RelaxedR1cs<C: CircuitDriver> {
     // 1. Structure S
     // a, b and c matrices and matrix size
     m: usize,
-    a: SparseMatrix<C::Base>,
-    b: SparseMatrix<C::Base>,
-    c: SparseMatrix<C::Base>,
+    a: SparseMatrix<C::Scalar>,
+    b: SparseMatrix<C::Scalar>,
+    c: SparseMatrix<C::Scalar>,
 
     // 2. Instance
     // r1cs instance includes public inputs and outputs, and error vector, scalar
-    e: DenseVectors<C::Base>,
-    u: C::Base,
-    x: DenseVectors<C::Base>,
+    e: DenseVectors<C::Scalar>,
+    u: C::Scalar,
+    x: DenseVectors<C::Scalar>,
 
     // 3. Witness
     // r1cs witness includes private inputs and intermediate value
-    w: DenseVectors<C::Base>,
+    w: DenseVectors<C::Scalar>,
 }
 
 impl<C: CircuitDriver> RelaxedR1cs<C> {
     pub(crate) fn new(r1cs: R1cs<C>) -> Self {
         let m = r1cs.m();
         let (a, b, c) = r1cs.matrices();
-        let e = DenseVectors::new(vec![C::Base::zero(); m]);
-        let u = C::Base::one();
+        let e = DenseVectors::new(vec![C::Scalar::zero(); m]);
+        let u = C::Scalar::one();
         let x = DenseVectors::new(r1cs.x());
         let w = DenseVectors::new(r1cs.w());
 
@@ -39,6 +39,18 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
             x,
             w,
         }
+    }
+
+    pub(crate) fn u(&self) -> C::Scalar {
+        self.u.clone()
+    }
+
+    pub(crate) fn x(&self) -> DenseVectors<C::Scalar> {
+        self.x.clone()
+    }
+
+    pub(crate) fn w(&self) -> DenseVectors<C::Scalar> {
+        self.w.clone()
     }
 
     ///  check (A · Z) ◦ (B · Z) = u · (C · Z) + E
