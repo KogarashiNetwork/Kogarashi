@@ -7,7 +7,7 @@ mod matrix;
 mod test;
 mod wire;
 
-pub use circuit::CircuitDriver;
+pub use circuit::{CircuitDriver, GrumpkinDriver};
 pub use matrix::{DenseVectors, SparseMatrix, SparseRow};
 pub use wire::Wire;
 
@@ -122,6 +122,7 @@ impl<C: CircuitDriver> R1cs<C> {
         self.mul_gate(x, &SparseRow::one(), y);
     }
 
+    #[allow(clippy::type_complexity)]
     pub fn evaluate(&self) -> (Vec<C::Base>, Vec<C::Base>, Vec<C::Base>) {
         let a_evals = self.a.evaluate_with_z(&self.x, &self.w);
         let b_evals = self.b.evaluate_with_z(&self.x, &self.w);
@@ -129,6 +130,7 @@ impl<C: CircuitDriver> R1cs<C> {
         (a_evals, b_evals, c_evals)
     }
 
+    #[allow(clippy::type_complexity)]
     pub fn z_vectors(
         &self,
         l: usize,

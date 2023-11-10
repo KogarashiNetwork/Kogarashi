@@ -172,7 +172,7 @@ pub mod jubjub_curve {
         }
 
         // dummy
-        pub(crate) const fn to_bytes(&self) -> [u8; 32] {
+        pub(crate) const fn to_bytes(self) -> [u8; 32] {
             [0; 32]
         }
 

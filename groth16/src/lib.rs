@@ -21,21 +21,21 @@ mod tests {
     use crate::circuit::Circuit;
     use crate::error::Error;
     use crate::zksnark::ZkSnark;
-    use bls_12_381::Fr as BlsScalar;
+    use bn_254::Fr as BnScalar;
     use r1cs::gadget::field::FieldAssignment;
-    use r1cs::R1cs;
+    use r1cs::{GrumpkinDriver, R1cs};
     use zkstd::common::OsRng;
 
     #[test]
     fn arithmetic_test() {
         #[derive(Debug)]
         pub struct DummyCircuit {
-            x: BlsScalar,
-            o: BlsScalar,
+            x: BnScalar,
+            o: BnScalar,
         }
 
         impl DummyCircuit {
-            pub fn new(x: BlsScalar, o: BlsScalar) -> Self {
+            pub fn new(x: BnScalar, o: BnScalar) -> Self {
                 Self { x, o }
             }
         }
@@ -47,10 +47,10 @@ mod tests {
         }
 
         impl Circuit for DummyCircuit {
-            fn synthesize(&self, composer: &mut R1cs<BlsScalar>) -> Result<(), Error> {
+            fn synthesize(&self, composer: &mut R1cs<GrumpkinDriver>) -> Result<(), Error> {
                 let x = FieldAssignment::instance(composer, self.x);
                 let o = FieldAssignment::instance(composer, self.o);
-                let c = FieldAssignment::constant(&BlsScalar::from(5));
+                let c = FieldAssignment::constant(&BnScalar::from(5));
 
                 let sym1 = FieldAssignment::mul(composer, &x, &x);
                 let y = FieldAssignment::mul(composer, &sym1, &x);
@@ -62,8 +62,8 @@ mod tests {
             }
         }
 
-        let x = BlsScalar::from(3);
-        let o = BlsScalar::from(35);
+        let x = BnScalar::from(3);
+        let o = BnScalar::from(35);
         let circuit = DummyCircuit::new(x, o);
 
         let (mut prover, verifier) =

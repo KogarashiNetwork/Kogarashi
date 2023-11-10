@@ -11,6 +11,7 @@ use zkstd::common::{vec, Debug, PrimeField, Vec};
 pub struct SparseMatrix<F: PrimeField>(pub(crate) Vec<SparseRow<F>>);
 
 impl<F: PrimeField> SparseMatrix<F> {
+    #[allow(clippy::type_complexity)]
     pub(crate) fn x_and_w(
         &self,
         l: usize,

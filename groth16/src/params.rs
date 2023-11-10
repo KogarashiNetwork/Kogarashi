@@ -1,6 +1,6 @@
 use crate::verifier::VerifyingKey;
 
-use bls_12_381::{G1Affine, G2Affine};
+use bn_254::{G1Affine, G2Affine};
 use zkstd::common::Vec;
 
 #[derive(Clone, Debug)]

@@ -222,7 +222,7 @@ mod tests {
     use super::Fft;
     use crate::poly::{Coefficients, PointsValue};
 
-    use bls_12_381::Fr;
+    use bn_254::Fr;
     use zkstd::common::{vec, Group, OsRng, PrimeField, Vec};
 
     fn arb_poly(k: u32) -> Vec<Fr> {

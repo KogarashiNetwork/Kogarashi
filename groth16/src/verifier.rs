@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::proof::Proof;
 
-use bls_12_381::{Fr, G1Affine, G2Affine, G2PairingAffine, Gt, TatePairing};
+use bn_254::{AteParing, Fr, G1Affine, G2Affine, G2PairingAffine, Gt};
 use zkstd::common::Vec;
 
 // Verify proofs of a given circuit
@@ -50,7 +50,7 @@ impl VerifyingKey {
         let delta = -self.delta_g2;
 
         PreparedVerifyingKey {
-            alpha_g1_beta_g2: TatePairing::multi_miller_loop(&[(
+            alpha_g1_beta_g2: AteParing::multi_miller_loop(&[(
                 self.alpha_g1,
                 G2PairingAffine::from(self.beta_g2),
             )])

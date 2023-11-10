@@ -6,7 +6,7 @@ use crate::params::Parameters;
 use crate::poly::PointsValue;
 use crate::proof::Proof;
 
-use bls_12_381::Fr;
+use bn_254::Fr;
 use r1cs::R1cs;
 use zkstd::common::{CurveGroup, Group, RngCore};
 

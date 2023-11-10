@@ -68,17 +68,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "327762f6e5a765692301e5bb513e0d9fef63be86bbc14528052b1cd3e6f03e07"
 
 [[package]]
-name = "bls-12-381"
-version = "0.0.23"
-dependencies = [
- "criterion",
- "parity-scale-codec",
- "proptest",
- "serde",
- "zkstd",
-]
-
-[[package]]
 name = "bn-254"
 version = "0.0.1"
 dependencies = [
@@ -369,18 +358,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "54c0c35952f67de54bb584e9fd912b3023117cbafc0a77d8f3dee1fb5f572fe8"
 dependencies = [
  "wasm-bindgen",
-]
-
-[[package]]
-name = "jub-jub"
-version = "0.0.20"
-dependencies = [
- "bls-12-381",
- "criterion",
- "parity-scale-codec",
- "proptest",
- "serde",
- "zkstd",
 ]
 
 [[package]]
@@ -1048,8 +1025,7 @@ dependencies = [
 name = "zkgroth16"
 version = "0.0.1"
 dependencies = [
- "bls-12-381",
- "jub-jub",
+ "bn-254",
  "r1cs",
  "rayon",
  "zkstd",
@@ -1059,8 +1035,8 @@ dependencies = [
 name = "zkstd"
 version = "0.0.22"
 dependencies = [
- "bls-12-381",
- "jub-jub",
+ "bn-254",
+ "grumpkin",
  "parity-scale-codec",
  "paste",
  "rand_core",

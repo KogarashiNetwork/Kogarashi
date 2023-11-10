@@ -94,7 +94,7 @@ fn get_at(segment: usize, c: usize, bytes: [u8; 32]) -> usize {
 mod tests {
     use super::msm_curve_addition;
 
-    use bls_12_381::{Fr, G1Affine, G1Projective};
+    use bn_254::{Fr, G1Affine, G1Projective};
     use zkstd::common::{BNAffine, BNProjective, Group, OsRng, Vec};
 
     fn customized_scalar_point<P: BNProjective>(point: P, scalar: &Fr) -> P {
@@ -118,9 +118,7 @@ mod tests {
     #[test]
     fn multi_scalar_multiplication_test() {
         let n = 1 << 5;
-        let points = (0..n)
-            .map(|_| G1Affine::from(G1Affine::random(OsRng)))
-            .collect::<Vec<_>>();
+        let points = (0..n).map(|_| G1Affine::random(OsRng)).collect::<Vec<_>>();
         let scalars = (0..n).map(|_| Fr::random(OsRng)).collect::<Vec<_>>();
         let msm = msm_curve_addition(&points[..], &scalars[..]);
         let naive = points
