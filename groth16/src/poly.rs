@@ -234,7 +234,7 @@ impl<'a, 'b, F: FftField> Mul<&'a F> for &'b Coefficients<F> {
 mod tests {
     use super::{Coefficients, PointsValue};
 
-    use bls_12_381::Fr;
+    use bn_254::Fr;
     use core::iter;
     use zkstd::common::{vec, Group, OsRng, PrimeField, Vec};
 

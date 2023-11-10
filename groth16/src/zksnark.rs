@@ -6,7 +6,7 @@ use crate::poly::{Coefficients, PointsValue};
 use crate::prover::Prover;
 use crate::verifier::{Verifier, VerifyingKey};
 
-use bls_12_381::{Fr, G1Affine, G2Affine};
+use bn_254::{Fr, G1Affine, G2Affine};
 use r1cs::R1cs;
 use zkstd::common::{vec, Group, MulAssign, PrimeField, RngCore, Vec};
 
@@ -127,6 +127,7 @@ impl ZkSnark {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn eval(
     g1: G1Affine,
     g2: G2Affine,

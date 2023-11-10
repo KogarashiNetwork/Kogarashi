@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::verifier::PreparedVerifyingKey;
 
-use bls_12_381::{Fr, G1Affine, G1Projective, G2Affine, G2PairingAffine, TatePairing};
+use bn_254::{AteParing, Fr, G1Affine, G1Projective, G2Affine, G2PairingAffine};
 use zkstd::common::BNProjective;
 
 pub struct Proof {
@@ -36,7 +36,7 @@ impl Proof {
         // A * B + inputs * (-gamma) + C * (-delta) = alpha * beta
         // which allows us to do a single final exponentiation.
 
-        let pairing = TatePairing::multi_miller_loop(&[
+        let pairing = AteParing::multi_miller_loop(&[
             (self.a, G2PairingAffine::from(self.b)),
             (acc.to_affine(), vk.neg_gamma_g2.clone()),
             (self.c, vk.neg_delta_g2.clone()),

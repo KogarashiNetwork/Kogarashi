@@ -15,6 +15,7 @@
 
 #![no_std]
 #![doc = include_str!("../README.md")]
+#![allow(clippy::suspicious_arithmetic_impl)]
 
 mod curve;
 

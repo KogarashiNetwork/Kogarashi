@@ -69,6 +69,6 @@ mod tests {
         let is_infinity = false;
 
         let a = PointAssignment::instance(&mut cs, x, y, is_infinity);
-        let aa = a.double(&mut cs);
+        a.double(&mut cs);
     }
 }
