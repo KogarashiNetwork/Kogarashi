@@ -1,29 +1,30 @@
-use crate::circuit::CircuitDriver;
+use crate::driver::CircuitDriver;
 use crate::matrix::SparseRow;
+use crate::wire::Wire;
 use crate::R1cs;
 use std::ops::Sub;
 
 use zkstd::common::Add;
 
-pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Base>);
+pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Scalar>);
 
 impl<C: CircuitDriver> FieldAssignment<C> {
-    pub fn instance(cs: &mut R1cs<C>, instance: C::Base) -> Self {
+    pub fn instance(cs: &mut R1cs<C>, instance: C::Scalar) -> Self {
         let wire = cs.public_wire();
         cs.x.push(instance);
 
         Self(SparseRow::from(wire))
     }
 
-    pub fn witness(cs: &mut R1cs<C>, witness: C::Base) -> Self {
+    pub fn witness(cs: &mut R1cs<C>, witness: C::Scalar) -> Self {
         let wire = cs.private_wire();
         cs.w.push(witness);
 
         Self(SparseRow::from(wire))
     }
 
-    pub fn constant(constant: C::Base) -> Self {
-        Self(SparseRow::from(constant))
+    pub fn constant(constant: &C::Scalar) -> Self {
+        Self(SparseRow(vec![(Wire::ONE, *constant)]))
     }
 
     pub fn mul(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
@@ -80,7 +81,7 @@ impl<C: CircuitDriver> Sub<&FieldAssignment<C>> for &FieldAssignment<C> {
 #[cfg(test)]
 mod tests {
     use super::{FieldAssignment, R1cs};
-    use crate::circuit::GrumpkinDriver;
+    use crate::driver::GrumpkinDriver;
     use bn_254::Fr as Scalar;
     use zkstd::common::{Group, OsRng};
 
@@ -150,7 +151,7 @@ mod tests {
 
         // x^3 + x + 5 == 35
         let x = FieldAssignment::witness(&mut cs, input);
-        let c = FieldAssignment::constant(c);
+        let c = FieldAssignment::constant(&c);
         let z = FieldAssignment::instance(&mut cs, out);
         let sym_1 = FieldAssignment::mul(&mut cs, &x, &x);
         let y = FieldAssignment::mul(&mut cs, &sym_1, &x);
@@ -163,7 +164,7 @@ mod tests {
         let c = Scalar::from(5);
         let out = Scalar::from(36);
         let x = FieldAssignment::witness(&mut ncs, input);
-        let c = FieldAssignment::constant(c);
+        let c = FieldAssignment::constant(&c);
         let z = FieldAssignment::instance(&mut ncs, out);
         let sym_1 = FieldAssignment::mul(&mut ncs, &x, &x);
         let y = FieldAssignment::mul(&mut ncs, &sym_1, &x);

@@ -3,6 +3,7 @@ members = [
     "bn254",
     "groth16",
     "grumpkin",
+    "nova",
     "r1cs",
     "zkstd",
 ]

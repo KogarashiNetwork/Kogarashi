@@ -33,12 +33,7 @@ impl<F: PrimeField> SparseMatrix<F> {
     }
 
     // matrix-vector multiplication
-    pub(crate) fn prod(
-        &self,
-        m: &usize,
-        x: &DenseVectors<F>,
-        w: &DenseVectors<F>,
-    ) -> DenseVectors<F> {
+    pub fn prod(&self, m: &usize, x: &DenseVectors<F>, w: &DenseVectors<F>) -> DenseVectors<F> {
         let mut vectors = DenseVectors::zero(*m);
         for (index, elements) in self.0.iter().enumerate() {
             vectors[index] = elements.iter().fold(F::zero(), |sum, (wire, coeff)| {

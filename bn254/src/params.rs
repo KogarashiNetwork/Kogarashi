@@ -9,6 +9,8 @@ pub(crate) const G1_GENERATOR_X: Fq = Fq::one();
 pub(crate) const G1_GENERATOR_Y: Fq = Fq::to_mont_form([2, 0, 0, 0]);
 pub(crate) const G1_PARAM_B: Fq = Fq::to_mont_form([3, 0, 0, 0]);
 
+pub const PARAM_B3: Fq = G1_PARAM_B.add_const(G1_PARAM_B).add_const(G1_PARAM_B);
+
 // g2 curve parameters
 pub(crate) const G2_GENERATOR_X: Fq2 = Fq2([
     Fq::to_mont_form([
