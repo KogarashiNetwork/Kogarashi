@@ -13,7 +13,14 @@ keywords = ["zkp", "blockchain", "elliptic-curve"]
 [dependencies]
 r1cs = { path = "../r1cs", default-features = false }
 zkstd = { path = "../zkstd", default-features = false }
-merlin = { version = "3.0", default-features = false }
+neptune = { version = "13.0.0", default-features = false }
+generic-array = { version = "0.14.7", default-features = false }
+bn-254 = { path = "../bn254", default-features = false }
+serde = { version = "1.0.102", default-features = false, features = ["derive"] }
+ff = { version = "0.13.0", features = ["derive"] }
+
+[dev-dependencies]
+rand_core = { version="0.6.4", default-features = false, features = ["getrandom"] }
 
 [features]
 default = ["std"]

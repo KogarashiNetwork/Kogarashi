@@ -3,6 +3,8 @@ use crate::fqn::Fq2;
 
 use core::borrow::Borrow;
 use core::iter::{Product, Sum};
+use ff::derive::subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
+use ff::PrimeField as FfPrimeField;
 use zkstd::arithmetic::bits_256::*;
 use zkstd::common::*;
 use zkstd::macros::field::*;
@@ -19,6 +21,13 @@ const GENERATOR: [u64; 4] = [7, 0, 0, 0];
 
 /// generator of the scalar field
 pub const MULTIPLICATIVE_GENERATOR: Fr = Fr::to_mont_form([7, 0, 0, 0]);
+
+const TWO_INV: Fr = Fr::to_mont_form([
+    0xa1f0fac9f8000001,
+    0x9419f4243cdcb848,
+    0xdc2822db40c0ac2e,
+    0x183227397098d014,
+]);
 
 /// `R = 2^256 mod r`
 /// `0xe0a77c19a07df2f666ea36f7879462e36fc76959f60cd29ac96341c4ffffffb`
@@ -62,6 +71,20 @@ pub const ROOT_OF_UNITY: Fr = Fr::to_mont_form([
     0x3215cf6dd39329c8,
     0x98865ea93dd31f74,
     0x03ddb9f5166d18b7,
+]);
+
+const ROOT_OF_UNITY_INV: Fr = Fr::to_mont_form([
+    0x0ed3e50a414e6dba,
+    0xb22625f59115aba7,
+    0x1bbe587180f34361,
+    0x048127174daabc26,
+]);
+
+const DELTA: Fr = Fr::to_mont_form([
+    0x870e56bbe533e9a2,
+    0x5b5f898e5e963f25,
+    0x64ec26aad4c86e71,
+    0x09226b6e22c6f0ca,
 ]);
 
 pub const TWO_ADACITY: u32 = 32;
@@ -170,12 +193,12 @@ impl Fr {
             0x0000000183227397,
         ]);
 
-        let mut v = Self::S;
+        let mut v = <Self as FftField>::S;
         let mut x = w * self;
         let mut b = x * w;
-        let mut z = Self::ROOT_OF_UNITY;
+        let mut z = <Self as FftField>::ROOT_OF_UNITY;
 
-        for max_v in (1..=Self::S).rev() {
+        for max_v in (1..=<Self as FftField>::S).rev() {
             let mut k = 1;
             let mut b2k = b.square();
             let mut j_less_than_v = true;
@@ -205,6 +228,117 @@ impl Fr {
         } else {
             None
         }
+    }
+}
+
+impl ConditionallySelectable for Fr {
+    fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
+        Fr([
+            u64::conditional_select(&a.0[0], &b.0[0], choice),
+            u64::conditional_select(&a.0[1], &b.0[1], choice),
+            u64::conditional_select(&a.0[2], &b.0[2], choice),
+            u64::conditional_select(&a.0[3], &b.0[3], choice),
+        ])
+    }
+}
+
+impl ConstantTimeEq for Fr {
+    fn ct_eq(&self, other: &Self) -> Choice {
+        self.0[0].ct_eq(&other.0[0])
+            & self.0[1].ct_eq(&other.0[1])
+            & self.0[2].ct_eq(&other.0[2])
+            & self.0[3].ct_eq(&other.0[3])
+    }
+}
+
+impl ff::Field for Fr {
+    const ZERO: Self = Self::zero();
+    const ONE: Self = Self::one();
+
+    fn random(rng: impl RngCore) -> Self {
+        <Self as Group>::random(rng)
+    }
+
+    fn square(&self) -> Self {
+        <Self as zkstd::common::PrimeField>::square(*self)
+    }
+
+    fn double(&self) -> Self {
+        <Self as zkstd::common::PrimeField>::double(*self)
+    }
+
+    fn invert(&self) -> CtOption<Self> {
+        let tmp = <Self as zkstd::common::Group>::invert(*self).unwrap_or_default();
+        CtOption::new(tmp, !tmp.ct_eq(&Self::zero()))
+    }
+
+    fn sqrt_ratio(num: &Self, div: &Self) -> (Choice, Self) {
+        ff::helpers::sqrt_ratio_generic(num, div)
+    }
+}
+
+impl FfPrimeField for Fr {
+    type Repr = [u8; 32];
+
+    fn from_repr(repr: Self::Repr) -> CtOption<Self> {
+        let mut tmp = Fr([0, 0, 0, 0]);
+
+        tmp.0[0] = u64::from_le_bytes(repr[0..8].try_into().unwrap());
+        tmp.0[1] = u64::from_le_bytes(repr[8..16].try_into().unwrap());
+        tmp.0[2] = u64::from_le_bytes(repr[16..24].try_into().unwrap());
+        tmp.0[3] = u64::from_le_bytes(repr[24..32].try_into().unwrap());
+
+        tmp = Fr(to_mont_form(tmp.0, R2, MODULUS, INV));
+
+        CtOption::new(tmp, Choice::from(1))
+    }
+
+    fn to_repr(&self) -> Self::Repr {
+        let tmp = self.montgomery_reduce();
+
+        let mut res = [0; 32];
+        res[0..8].copy_from_slice(&tmp[0].to_le_bytes());
+        res[8..16].copy_from_slice(&tmp[1].to_le_bytes());
+        res[16..24].copy_from_slice(&tmp[2].to_le_bytes());
+        res[24..32].copy_from_slice(&tmp[3].to_le_bytes());
+
+        res
+    }
+
+    fn is_odd(&self) -> Choice {
+        Choice::from((self.to_repr()[0] & 1) as u8)
+    }
+
+    const MODULUS: &'static str =
+        "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001";
+    const NUM_BITS: u32 = 254;
+    const CAPACITY: u32 = 253;
+    const TWO_INV: Self = TWO_INV;
+    const MULTIPLICATIVE_GENERATOR: Self = MULTIPLICATIVE_GENERATOR;
+    const S: u32 = S as u32;
+    const ROOT_OF_UNITY: Self = ROOT_OF_UNITY;
+    const ROOT_OF_UNITY_INV: Self = ROOT_OF_UNITY_INV;
+    const DELTA: Self = DELTA;
+}
+
+impl ff::PrimeFieldBits for Fr {
+    type ReprBits = [u64; 4];
+
+    fn to_le_bits(&self) -> ff::FieldBits<Self::ReprBits> {
+        let bytes = self.to_repr();
+
+        let limbs = [
+            u64::from_le_bytes(bytes[0..8].try_into().unwrap()),
+            u64::from_le_bytes(bytes[8..16].try_into().unwrap()),
+            u64::from_le_bytes(bytes[16..24].try_into().unwrap()),
+            u64::from_le_bytes(bytes[24..32].try_into().unwrap()),
+        ];
+
+        ff::FieldBits::new(limbs)
+    }
+
+    fn char_le_bits() -> ::ff::FieldBits<Self::ReprBits> {
+        ff::FieldBits::new(MODULUS)
     }
 }
 
@@ -313,8 +447,8 @@ mod tests {
 
     #[test]
     fn test_root_of_unity() {
-        let s = Fr::S;
-        let mut root_of_unity = Fr::ROOT_OF_UNITY;
+        let s = <Fr as FftField>::S;
+        let mut root_of_unity = <Fr as FftField>::ROOT_OF_UNITY;
         (0..s).for_each(|_| root_of_unity.square_assign());
         assert_eq!(root_of_unity, Fr::one())
     }

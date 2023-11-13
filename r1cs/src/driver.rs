@@ -10,7 +10,7 @@ pub trait CircuitDriver: Clone {
     type Base: PrimeField;
 
     // curve scalar field
-    type Scalar: PrimeField + From<Self::Base>;
+    type Scalar: PrimeField + From<Self::Base> + ff::PrimeField;
 
     // bn curve 3b param
     fn b3() -> Self::Scalar;
