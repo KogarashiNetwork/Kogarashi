@@ -1,7 +1,7 @@
 mod instance;
 mod witness;
 
-use instance::RelaxedR1csInstance;
+pub use instance::RelaxedR1csInstance;
 use r1cs::{CircuitDriver, DenseVectors, R1cs, SparseMatrix};
 use witness::RelaxedR1csWitness;
 
@@ -59,14 +59,14 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
         &self,
         r1cs: &R1cs<C>,
         r: C::Scalar,
-        t: C::Affine,
+        commit_t: C::Affine,
     ) -> RelaxedR1csInstance<C> {
-        self.instance.fold(r1cs, r, t)
+        self.instance.fold(r1cs, r, commit_t)
     }
 
     pub(crate) fn fold_witness(
         &self,
-        r1cs: R1cs<C>,
+        r1cs: &R1cs<C>,
         r: C::Scalar,
         t: DenseVectors<C::Scalar>,
     ) -> RelaxedR1csWitness<C> {
@@ -74,7 +74,7 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
     }
 
     pub(crate) fn update(
-        self,
+        &self,
         instance: RelaxedR1csInstance<C>,
         witness: RelaxedR1csWitness<C>,
     ) -> Self {
@@ -85,7 +85,7 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
             c,
             instance: _,
             witness: _,
-        } = self;
+        } = self.clone();
         Self {
             m,
             a,
@@ -130,6 +130,11 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
         azbz.iter()
             .zip(ucze.iter())
             .all(|(left, right)| left == right)
+    }
+
+    #[cfg(test)]
+    pub(crate) fn instance(&self) -> RelaxedR1csInstance<C> {
+        self.instance.clone()
     }
 }
 

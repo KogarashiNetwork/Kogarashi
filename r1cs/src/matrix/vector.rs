@@ -1,7 +1,7 @@
 use core::ops::{Index, IndexMut};
 use zkstd::common::{vec, Add, Mul, PrimeField, Sub, Vec};
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct DenseVectors<F: PrimeField>(Vec<F>);
 
 impl<F: PrimeField> DenseVectors<F> {

@@ -20,7 +20,11 @@ impl<C: CircuitDriver> Prover<C> {
         Self { pp, f }
     }
 
-    pub fn prove(&self, r1cs: R1cs<C>, relaxed_r1cs: RelaxedR1cs<C>) -> RelaxedR1cs<C> {
+    pub fn prove(
+        &self,
+        r1cs: &R1cs<C>,
+        relaxed_r1cs: &RelaxedR1cs<C>,
+    ) -> (C::Affine, RelaxedR1cs<C>) {
         // compute cross term t
         let t = self.compute_cross_term(&r1cs, &relaxed_r1cs);
 
@@ -35,7 +39,8 @@ impl<C: CircuitDriver> Prover<C> {
         let witness = relaxed_r1cs.fold_witness(r1cs, lc_random, t);
 
         // return folded relaxed r1cs
-        relaxed_r1cs.update(instance, witness)
+        let folded_r1cs = relaxed_r1cs.update(instance, witness);
+        (commit_t, folded_r1cs)
     }
 
     // T = AZ1 ◦ BZ2 + AZ2 ◦ BZ1 − u1 · CZ2 − u2 · CZ1
@@ -73,25 +78,26 @@ impl<C: CircuitDriver> Prover<C> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::{Prover, RelaxedR1cs};
 
     use r1cs::{test::example_r1cs, GrumpkinDriver};
     use zkstd::common::OsRng;
 
-    fn example_prover() -> Prover<GrumpkinDriver> {
+    pub(crate) fn example_prover() -> Prover<GrumpkinDriver> {
         let r1cs = example_r1cs(0);
         Prover::new(r1cs, OsRng)
     }
 
     #[test]
-    fn folding_scheme_test() {
+    fn folding_scheme_prover_test() {
         let prover = example_prover();
         let r1cs = example_r1cs(1);
         let mut relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
         for i in 1..10 {
             let r1cs = example_r1cs(i);
-            relaxed_r1cs = prover.prove(r1cs, relaxed_r1cs);
+            let (_, folded_relaxed_r1cs) = prover.prove(&r1cs, &relaxed_r1cs);
+            relaxed_r1cs = folded_relaxed_r1cs;
         }
 
         assert!(relaxed_r1cs.is_sat())

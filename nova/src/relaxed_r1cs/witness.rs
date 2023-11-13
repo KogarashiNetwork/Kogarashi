@@ -17,7 +17,7 @@ impl<C: CircuitDriver> RelaxedR1csWitness<C> {
         }
     }
 
-    pub(crate) fn fold(&self, r1cs: R1cs<C>, r: C::Scalar, t: DenseVectors<C::Scalar>) -> Self {
+    pub(crate) fn fold(&self, r1cs: &R1cs<C>, r: C::Scalar, t: DenseVectors<C::Scalar>) -> Self {
         let r2 = r.square();
         let e2 = self.e.clone();
         let w1 = DenseVectors::new(r1cs.w());

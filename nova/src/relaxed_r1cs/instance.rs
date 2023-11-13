@@ -1,8 +1,8 @@
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Group, PrimeField, Ring};
 
-#[derive(Clone, Debug)]
-pub(crate) struct RelaxedR1csInstance<C: CircuitDriver> {
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RelaxedR1csInstance<C: CircuitDriver> {
     /// commitment for witness vectors
     pub(crate) commit_w: C::Affine,
     /// commitment for error vectors
