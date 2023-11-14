@@ -29,14 +29,14 @@ impl<C: CircuitDriver> Prover<C> {
         relaxed_r1cs: &RelaxedR1cs<C>,
     ) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>, C::Affine) {
         // compute cross term t
-        let t = self.compute_cross_term(&r1cs, &relaxed_r1cs);
+        let t = self.compute_cross_term(r1cs, relaxed_r1cs);
 
         // TODO: replace with transcript
         let lc_random = C::Scalar::one();
         let commit_t = self.pp.commit(&t, &lc_random);
 
         // fold instance
-        let instance = relaxed_r1cs.fold_instance(&r1cs, lc_random, commit_t);
+        let instance = relaxed_r1cs.fold_instance(r1cs, lc_random, commit_t);
 
         // fold witness
         let witness = relaxed_r1cs.fold_witness(r1cs, lc_random, t);

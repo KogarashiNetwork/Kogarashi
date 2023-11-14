@@ -25,7 +25,7 @@ impl<C: CircuitDriver> RecursiveProof<C> {
             zi,
             r1cs,
             pair,
-        } = self.clone();
+        } = self;
         let ((l_ui, l_wi), (s_ui, s_wi)) = pair;
 
         if *i == 0 {
@@ -37,8 +37,8 @@ impl<C: CircuitDriver> RecursiveProof<C> {
 
             // check if instance-witness pair satisfy
             let relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
-            let l_relaxed_r1cs = relaxed_r1cs.update(&l_ui, &l_wi);
-            let s_relaxed_r1cs = relaxed_r1cs.update(&s_ui, &s_wi);
+            let l_relaxed_r1cs = relaxed_r1cs.update(l_ui, l_wi);
+            let s_relaxed_r1cs = relaxed_r1cs.update(s_ui, s_wi);
             let is_instance_witness_sat = l_relaxed_r1cs.is_sat() && s_relaxed_r1cs.is_sat();
 
             is_folded_instance_default && is_instance_witness_sat

@@ -44,7 +44,7 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
     }
 
     pub(crate) fn u(&self) -> C::Scalar {
-        self.instance.u.clone()
+        self.instance.u
     }
 
     pub(crate) fn x(&self) -> DenseVectors<C::Scalar> {

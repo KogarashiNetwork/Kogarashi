@@ -17,7 +17,7 @@ impl<C: CircuitDriver> Verifier<C> {
         // TODO: replace with transcript
         let lc_random = C::Scalar::one();
 
-        relaxed_r1cs.fold_instance(&r1cs, lc_random, commit_t)
+        relaxed_r1cs.fold_instance(r1cs, lc_random, commit_t)
     }
 }
 
