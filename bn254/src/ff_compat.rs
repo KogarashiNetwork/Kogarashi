@@ -272,7 +272,7 @@ mod fq {
         }
 
         const MODULUS: &'static str =
-            "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001";
+            "0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47";
         const NUM_BITS: u32 = 254;
         const CAPACITY: u32 = 253;
         const TWO_INV: Self = TWO_INV;
