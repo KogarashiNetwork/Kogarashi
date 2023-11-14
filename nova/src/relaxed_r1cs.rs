@@ -1,9 +1,9 @@
 mod instance;
 mod witness;
 
-pub use instance::RelaxedR1csInstance;
+pub(crate) use instance::RelaxedR1csInstance;
 use r1cs::{CircuitDriver, DenseVectors, R1cs, SparseMatrix};
-use witness::RelaxedR1csWitness;
+pub(crate) use witness::RelaxedR1csWitness;
 
 #[derive(Clone, Debug)]
 pub struct RelaxedR1cs<C: CircuitDriver> {
@@ -75,8 +75,8 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
 
     pub(crate) fn update(
         &self,
-        instance: RelaxedR1csInstance<C>,
-        witness: RelaxedR1csWitness<C>,
+        instance: &RelaxedR1csInstance<C>,
+        witness: &RelaxedR1csWitness<C>,
     ) -> Self {
         let RelaxedR1cs {
             m,
@@ -91,8 +91,8 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
             a,
             b,
             c,
-            instance,
-            witness,
+            instance: instance.clone(),
+            witness: witness.clone(),
         }
     }
 
@@ -130,11 +130,6 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
         azbz.iter()
             .zip(ucze.iter())
             .all(|(left, right)| left == right)
-    }
-
-    #[cfg(test)]
-    pub(crate) fn instance(&self) -> RelaxedR1csInstance<C> {
-        self.instance.clone()
     }
 }
 

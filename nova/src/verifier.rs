@@ -35,10 +35,10 @@ mod tests {
         let mut relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
         for i in 1..10 {
             let r1cs = example_r1cs(i);
-            let (commit_t, folded_relaxed_r1cs) = prover.prove(&r1cs, &relaxed_r1cs);
+            let (instance, witness, commit_t) = prover.prove(&r1cs, &relaxed_r1cs);
             let verified_instance = Verifier::verify(commit_t, &r1cs, &relaxed_r1cs);
-            assert_eq!(folded_relaxed_r1cs.instance(), verified_instance);
-            relaxed_r1cs = folded_relaxed_r1cs;
+            assert_eq!(instance, verified_instance);
+            relaxed_r1cs = relaxed_r1cs.update(&instance, &witness);
         }
 
         assert!(relaxed_r1cs.is_sat())

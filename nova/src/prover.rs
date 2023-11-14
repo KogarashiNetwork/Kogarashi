@@ -1,4 +1,7 @@
-use crate::{pedersen::PedersenCommitment, relaxed_r1cs::RelaxedR1cs};
+use crate::{
+    pedersen::PedersenCommitment,
+    relaxed_r1cs::{RelaxedR1cs, RelaxedR1csInstance, RelaxedR1csWitness},
+};
 
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Ring, RngCore};
@@ -24,7 +27,7 @@ impl<C: CircuitDriver> Prover<C> {
         &self,
         r1cs: &R1cs<C>,
         relaxed_r1cs: &RelaxedR1cs<C>,
-    ) -> (C::Affine, RelaxedR1cs<C>) {
+    ) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>, C::Affine) {
         // compute cross term t
         let t = self.compute_cross_term(&r1cs, &relaxed_r1cs);
 
@@ -38,9 +41,8 @@ impl<C: CircuitDriver> Prover<C> {
         // fold witness
         let witness = relaxed_r1cs.fold_witness(r1cs, lc_random, t);
 
-        // return folded relaxed r1cs
-        let folded_r1cs = relaxed_r1cs.update(instance, witness);
-        (commit_t, folded_r1cs)
+        // return folded relaxed r1cs instance, witness and commit T
+        (instance, witness, commit_t)
     }
 
     // T = AZ1 ◦ BZ2 + AZ2 ◦ BZ1 − u1 · CZ2 − u2 · CZ1
@@ -96,8 +98,8 @@ pub(crate) mod tests {
         let mut relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
         for i in 1..10 {
             let r1cs = example_r1cs(i);
-            let (_, folded_relaxed_r1cs) = prover.prove(&r1cs, &relaxed_r1cs);
-            relaxed_r1cs = folded_relaxed_r1cs;
+            let (instance, witness, _) = prover.prove(&r1cs, &relaxed_r1cs);
+            relaxed_r1cs = relaxed_r1cs.update(&instance, &witness);
         }
 
         assert!(relaxed_r1cs.is_sat())
