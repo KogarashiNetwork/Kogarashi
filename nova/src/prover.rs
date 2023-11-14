@@ -1,4 +1,7 @@
-use crate::{pedersen::PedersenCommitment, relaxed_r1cs::RelaxedR1cs};
+use crate::{
+    pedersen::PedersenCommitment,
+    relaxed_r1cs::{RelaxedR1cs, RelaxedR1csInstance, RelaxedR1csWitness},
+};
 
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Ring, RngCore};
@@ -20,22 +23,26 @@ impl<C: CircuitDriver> Prover<C> {
         Self { pp, f }
     }
 
-    pub fn prove(&self, r1cs: R1cs<C>, relaxed_r1cs: RelaxedR1cs<C>) -> RelaxedR1cs<C> {
+    pub fn prove(
+        &self,
+        r1cs: &R1cs<C>,
+        relaxed_r1cs: &RelaxedR1cs<C>,
+    ) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>, C::Affine) {
         // compute cross term t
-        let t = self.compute_cross_term(&r1cs, &relaxed_r1cs);
+        let t = self.compute_cross_term(r1cs, relaxed_r1cs);
 
         // TODO: replace with transcript
         let lc_random = C::Scalar::one();
         let commit_t = self.pp.commit(&t, &lc_random);
 
         // fold instance
-        let instance = relaxed_r1cs.fold_instance(&r1cs, lc_random, commit_t);
+        let instance = relaxed_r1cs.fold_instance(r1cs, lc_random, commit_t);
 
         // fold witness
         let witness = relaxed_r1cs.fold_witness(r1cs, lc_random, t);
 
-        // return folded relaxed r1cs
-        relaxed_r1cs.update(instance, witness)
+        // return folded relaxed r1cs instance, witness and commit T
+        (instance, witness, commit_t)
     }
 
     // T = AZ1 ◦ BZ2 + AZ2 ◦ BZ1 − u1 · CZ2 − u2 · CZ1
@@ -73,25 +80,26 @@ impl<C: CircuitDriver> Prover<C> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::{Prover, RelaxedR1cs};
 
     use r1cs::{test::example_r1cs, GrumpkinDriver};
     use zkstd::common::OsRng;
 
-    fn example_prover() -> Prover<GrumpkinDriver> {
+    pub(crate) fn example_prover() -> Prover<GrumpkinDriver> {
         let r1cs = example_r1cs(0);
         Prover::new(r1cs, OsRng)
     }
 
     #[test]
-    fn folding_scheme_test() {
+    fn folding_scheme_prover_test() {
         let prover = example_prover();
         let r1cs = example_r1cs(1);
         let mut relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
         for i in 1..10 {
             let r1cs = example_r1cs(i);
-            relaxed_r1cs = prover.prove(r1cs, relaxed_r1cs);
+            let (instance, witness, _) = prover.prove(&r1cs, &relaxed_r1cs);
+            relaxed_r1cs = relaxed_r1cs.update(&instance, &witness);
         }
 
         assert!(relaxed_r1cs.is_sat())

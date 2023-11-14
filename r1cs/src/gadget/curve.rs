@@ -31,9 +31,9 @@ impl<C: CircuitDriver> PointAssignment<C> {
         cs: &mut R1cs<C>,
         point: impl BNProjective<Scalar = C::Base, Base = C::Scalar>,
     ) {
-        let point_x = FieldAssignment::constant(&point.get_x().into());
-        let point_y = FieldAssignment::constant(&point.get_y().into());
-        let point_z = FieldAssignment::constant(&point.get_z().into());
+        let point_x = FieldAssignment::constant(&point.get_x());
+        let point_y = FieldAssignment::constant(&point.get_y());
+        let point_z = FieldAssignment::constant(&point.get_z());
 
         let xz1 = FieldAssignment::mul(cs, &self.x, &point_z);
         let xz2 = FieldAssignment::mul(cs, &point_x, &self.z);

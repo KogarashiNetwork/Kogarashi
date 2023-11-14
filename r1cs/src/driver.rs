@@ -16,7 +16,7 @@ pub trait CircuitDriver: Clone {
     fn b3() -> Self::Scalar;
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct GrumpkinDriver;
 
 impl CircuitDriver for GrumpkinDriver {
