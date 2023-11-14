@@ -3,6 +3,7 @@
 mod pedersen;
 mod prover;
 mod relaxed_r1cs;
+#[allow(dead_code)]
 mod transcript;
 
 pub use pedersen::PedersenCommitment;

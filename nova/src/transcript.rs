@@ -1,15 +1,12 @@
 use generic_array::typenum::U24;
 use neptune::{
-    circuit2::Elt,
     poseidon::PoseidonConstants,
     sponge::{
         api::{IOPattern, SpongeAPI, SpongeOp},
-        circuit::SpongeCircuit,
         vanilla::{Mode::Simplex, Sponge, SpongeTrait},
     },
     Strength,
 };
-use r1cs::{CircuitDriver, R1cs};
 use std::marker::PhantomData;
 use zkstd::common::{Deserialize, PrimeField, Serialize};
 
@@ -48,7 +45,7 @@ where
     Base: PrimeField + Serialize + for<'de> Deserialize<'de> + ff::PrimeField + ff::PrimeFieldBits,
     Scalar: PrimeField + ff::PrimeField,
 {
-    fn new(constants: PoseidonConstantsCircuit<Base>, num_absorbs: usize) -> Self {
+    pub fn new(constants: PoseidonConstantsCircuit<Base>, num_absorbs: usize) -> Self {
         Self {
             state: Vec::new(),
             constants,
@@ -59,13 +56,13 @@ where
     }
 
     /// Absorb a new number into the state of the oracle
-    fn absorb(&mut self, e: Base) {
+    pub fn absorb(&mut self, e: Base) {
         assert!(!self.squeezed, "Cannot absorb after squeezing");
         self.state.push(e);
     }
 
     /// Compute a challenge by hashing the current state
-    fn squeeze(&mut self, num_bits: usize) -> Scalar {
+    pub fn squeeze(&mut self, num_bits: usize) -> Scalar {
         // check if we have squeezed already
         assert!(!self.squeezed, "Cannot squeeze again after squeezing");
         self.squeezed = true;
@@ -100,23 +97,20 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use r1cs::GrumpkinDriver;
+    use r1cs::{CircuitDriver, GrumpkinDriver};
     use rand_core::OsRng;
     use zkstd::common::Group;
 
     fn test_poseidon_ro_with<C: CircuitDriver>() {
-        // Check that the number computed inside the circuit is equal to the number computed outside the circuit
-        let mut csprng: OsRng = OsRng;
         let constants = PoseidonConstantsCircuit::<C::Scalar>::default();
         let num_absorbs = 32;
-        let mut ro: PoseidonRO<C::Scalar, C::Base> =
-            PoseidonRO::new(constants.clone(), num_absorbs);
+        let mut ro: PoseidonRO<C::Scalar, C::Base> = PoseidonRO::new(constants, num_absorbs);
 
-        for i in 0..num_absorbs {
-            let num = C::Scalar::random(&mut csprng);
+        for _ in 0..num_absorbs {
+            let num = C::Scalar::random(OsRng);
             ro.absorb(num);
         }
-        let num = ro.squeeze(NUM_CHALLENGE_BITS);
+        let _ = ro.squeeze(NUM_CHALLENGE_BITS);
     }
 
     #[test]

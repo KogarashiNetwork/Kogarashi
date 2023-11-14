@@ -88,7 +88,7 @@ mod tests {
     fn folding_scheme_test() {
         let prover = example_prover();
         let r1cs = example_r1cs(1);
-        let mut relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
+        let mut relaxed_r1cs = RelaxedR1cs::new(r1cs);
         for i in 1..10 {
             let r1cs = example_r1cs(i);
             relaxed_r1cs = prover.prove(r1cs, relaxed_r1cs);

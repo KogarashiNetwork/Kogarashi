@@ -8,8 +8,8 @@ pub struct PedersenCommitment<C: BNAffine> {
 
 impl<C: BNAffine> PedersenCommitment<C> {
     pub fn new(n: u64, mut r: impl RngCore) -> Self {
-        let h = C::random(&mut r).into();
-        let g = (0..=1 << n).map(|_| C::random(&mut r).into()).collect();
+        let h = C::random(&mut r);
+        let g = (0..=1 << n).map(|_| C::random(&mut r)).collect();
         Self { h, g }
     }
 
