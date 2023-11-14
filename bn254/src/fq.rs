@@ -44,7 +44,7 @@ pub(crate) const R3: [u64; 4] = [
 pub(crate) const INV: u64 = 0x87d20782e4866389;
 
 /// bn254 curve base field
-#[derive(Clone, Copy, Decode, Encode)]
+#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
 pub struct Fq(pub(crate) [u64; 4]);
 
 impl SigUtils<32> for Fq {

@@ -1,3 +1,4 @@
+use crate::transcript::{absorb_commitment_in_ro, PoseidonRO};
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Group, PrimeField, Ring};
 
@@ -43,6 +44,15 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
             commit_e,
             u,
             x,
+        }
+    }
+
+    pub(crate) fn absorb_in_ro(&self, ro: &mut PoseidonRO<C::Base, C::Scalar>) {
+        absorb_commitment_in_ro::<C>(self.commit_w, ro);
+        absorb_commitment_in_ro::<C>(self.commit_e, ro);
+        ro.absorb(C::Base::from(self.u));
+        for x in &self.x.get() {
+            ro.absorb(C::Base::from(*x));
         }
     }
 }

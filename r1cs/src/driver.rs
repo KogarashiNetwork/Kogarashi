@@ -7,7 +7,12 @@ pub trait CircuitDriver: Clone {
     type Affine: BNAffine<Scalar = Self::Scalar, Base = Self::Base>;
 
     // curve base field
-    type Base: PrimeField + ff::PrimeField;
+    type Base: PrimeField
+        + From<Self::Scalar>
+        + ff::PrimeField
+        + ff::PrimeFieldBits
+        + Serialize
+        + for<'de> Deserialize<'de>;
 
     // curve scalar field
     type Scalar: PrimeField
@@ -16,7 +21,6 @@ pub trait CircuitDriver: Clone {
         + ff::PrimeFieldBits
         + Serialize
         + for<'de> Deserialize<'de>;
-
     // bn curve 3b param
     fn b3() -> Self::Scalar;
 }

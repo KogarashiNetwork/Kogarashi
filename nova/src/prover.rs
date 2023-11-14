@@ -3,6 +3,10 @@ use crate::{
     relaxed_r1cs::{RelaxedR1cs, RelaxedR1csInstance, RelaxedR1csWitness},
 };
 
+use crate::transcript::{
+    absorb_commitment_in_ro, PoseidonConstantsCircuit, PoseidonRO, NUM_CHALLENGE_BITS,
+    NUM_FE_FOR_RO,
+};
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Ring, RngCore};
 
@@ -26,8 +30,11 @@ impl<C: CircuitDriver> Prover<C> {
     pub fn prove(
         &self,
         r1cs: &R1cs<C>,
+        ro_consts: &PoseidonConstantsCircuit<C::Base>,
         relaxed_r1cs: &RelaxedR1cs<C>,
     ) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>, C::Affine) {
+        let mut ro = PoseidonRO::<C::Base, C::Scalar>::new(ro_consts.clone(), NUM_FE_FOR_RO);
+
         // compute cross term t
         let t = self.compute_cross_term(r1cs, relaxed_r1cs);
 
@@ -35,8 +42,14 @@ impl<C: CircuitDriver> Prover<C> {
         let lc_random = C::Scalar::one();
         let commit_t = self.pp.commit(&t, &lc_random);
 
+        absorb_commitment_in_ro::<C>(commit_t, &mut ro);
+
+        let _r = ro.squeeze(NUM_CHALLENGE_BITS);
+
         // fold instance
         let instance = relaxed_r1cs.fold_instance(r1cs, lc_random, commit_t);
+
+        instance.absorb_in_ro(&mut ro);
 
         // fold witness
         let witness = relaxed_r1cs.fold_witness(r1cs, lc_random, t);
@@ -83,6 +96,7 @@ impl<C: CircuitDriver> Prover<C> {
 pub(crate) mod tests {
     use super::{Prover, RelaxedR1cs};
 
+    use crate::transcript::PoseidonConstantsCircuit;
     use r1cs::{test::example_r1cs, GrumpkinDriver};
     use zkstd::common::OsRng;
 
@@ -98,7 +112,8 @@ pub(crate) mod tests {
         let mut relaxed_r1cs = RelaxedR1cs::new(r1cs);
         for i in 1..10 {
             let r1cs = example_r1cs(i);
-            let (instance, witness, _) = prover.prove(&r1cs, &relaxed_r1cs);
+            let ro_constants = PoseidonConstantsCircuit::default();
+            let (instance, witness, _) = prover.prove(&r1cs, &ro_constants, &relaxed_r1cs);
             relaxed_r1cs = relaxed_r1cs.update(&instance, &witness);
         }
 

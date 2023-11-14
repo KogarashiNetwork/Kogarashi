@@ -26,16 +26,18 @@ mod tests {
     use super::{RelaxedR1cs, Verifier};
     use crate::prover::tests::example_prover;
 
+    use crate::transcript::PoseidonConstantsCircuit;
     use r1cs::test::example_r1cs;
 
     #[test]
     fn folding_scheme_verifier_test() {
         let prover = example_prover();
         let r1cs = example_r1cs(1);
-        let mut relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
+        let mut relaxed_r1cs = RelaxedR1cs::new(r1cs);
         for i in 1..10 {
             let r1cs = example_r1cs(i);
-            let (instance, witness, commit_t) = prover.prove(&r1cs, &relaxed_r1cs);
+            let ro_constants = PoseidonConstantsCircuit::default();
+            let (instance, witness, commit_t) = prover.prove(&r1cs, &ro_constants, &relaxed_r1cs);
             let verified_instance = Verifier::verify(commit_t, &r1cs, &relaxed_r1cs);
             assert_eq!(instance, verified_instance);
             relaxed_r1cs = relaxed_r1cs.update(&instance, &witness);

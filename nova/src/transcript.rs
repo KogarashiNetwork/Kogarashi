@@ -7,10 +7,12 @@ use neptune::{
     },
     Strength,
 };
+use r1cs::CircuitDriver;
 use std::marker::PhantomData;
-use zkstd::common::{Deserialize, PrimeField, Serialize};
+use zkstd::common::{CurveGroup, Deserialize, IntGroup, PrimeField, Ring, Serialize};
 
 pub(crate) const NUM_CHALLENGE_BITS: usize = 128;
+pub(crate) const NUM_FE_FOR_RO: usize = 24;
 
 /// All Poseidon Constants that are used in Nova
 #[derive(Clone, PartialEq, Serialize, Deserialize)]
@@ -92,6 +94,20 @@ where
         }
         res
     }
+}
+
+pub fn absorb_commitment_in_ro<C: CircuitDriver>(
+    comm: C::Affine,
+    ro: &mut PoseidonRO<C::Base, C::Scalar>,
+) {
+    let (x, y, is_infinity) = (comm.get_x(), comm.get_y(), comm.is_identity());
+    ro.absorb(x);
+    ro.absorb(y);
+    ro.absorb(if is_infinity {
+        C::Base::one()
+    } else {
+        C::Base::zero()
+    });
 }
 
 #[cfg(test)]
