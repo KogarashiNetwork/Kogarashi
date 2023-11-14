@@ -52,6 +52,7 @@ impl<C: CircuitDriver> R1cs<C> {
         self.w.get()
     }
 
+    #[allow(clippy::type_complexity)]
     pub fn matrices(
         &self,
     ) -> (

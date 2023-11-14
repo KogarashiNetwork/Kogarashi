@@ -8,7 +8,7 @@ use zkstd::common::*;
 use zkstd::macros::field::*;
 
 /// r = 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001
-const MODULUS: [u64; 4] = [
+pub(crate) const MODULUS: [u64; 4] = [
     0x43e1f593f0000001,
     0x2833e84879b97091,
     0xb85045b68181585d,
@@ -22,7 +22,7 @@ pub const MULTIPLICATIVE_GENERATOR: Fr = Fr::to_mont_form([7, 0, 0, 0]);
 
 /// `R = 2^256 mod r`
 /// `0xe0a77c19a07df2f666ea36f7879462e36fc76959f60cd29ac96341c4ffffffb`
-const R: [u64; 4] = [
+pub(crate) const R: [u64; 4] = [
     0xac96341c4ffffffb,
     0x36fc76959f60cd29,
     0x666ea36f7879462e,
@@ -31,7 +31,7 @@ const R: [u64; 4] = [
 
 /// `R^2 = 2^512 mod r`
 /// `0x216d0b17f4e44a58c49833d53bb808553fe3ab1e35c59e31bb8e645ae216da7`
-const R2: [u64; 4] = [
+pub(crate) const R2: [u64; 4] = [
     0x1bb8e645ae216da7,
     0x53fe3ab1e35c59e3,
     0x8c49833d53bb8085,
@@ -40,7 +40,7 @@ const R2: [u64; 4] = [
 
 /// `R^3 = 2^768 mod r`
 /// `0xcf8594b7fcc657c893cc664a19fcfed2a489cbe1cfbb6b85e94d8e1b4bf0040`
-const R3: [u64; 4] = [
+pub(crate) const R3: [u64; 4] = [
     0x5e94d8e1b4bf0040,
     0x2a489cbe1cfbb6b8,
     0x893cc664a19fcfed,
@@ -50,7 +50,7 @@ const R3: [u64; 4] = [
 /// INV = -(r^{-1} mod 2^64) mod 2^64
 pub const INV: u64 = 0xc2e1f593efffffff;
 
-const S: usize = 28;
+pub(crate) const S: usize = 28;
 
 /// multiplicative group generator of n th root of unity
 /// GENERATOR^t where t * 2^s + 1 = r
@@ -170,12 +170,12 @@ impl Fr {
             0x0000000183227397,
         ]);
 
-        let mut v = Self::S;
+        let mut v = <Self as FftField>::S;
         let mut x = w * self;
         let mut b = x * w;
-        let mut z = Self::ROOT_OF_UNITY;
+        let mut z = <Self as FftField>::ROOT_OF_UNITY;
 
-        for max_v in (1..=Self::S).rev() {
+        for max_v in (1..=<Self as FftField>::S).rev() {
             let mut k = 1;
             let mut b2k = b.square();
             let mut j_less_than_v = true;
@@ -262,7 +262,7 @@ where
     where
         I: Iterator<Item = T>,
     {
-        iter.fold(Fr::one(), |acc, item| acc * *item.borrow())
+        iter.fold(Self::one(), |acc, item| acc * *item.borrow())
     }
 }
 
@@ -313,8 +313,8 @@ mod tests {
 
     #[test]
     fn test_root_of_unity() {
-        let s = Fr::S;
-        let mut root_of_unity = Fr::ROOT_OF_UNITY;
+        let s = <Fr as FftField>::S;
+        let mut root_of_unity = <Fr as FftField>::ROOT_OF_UNITY;
         (0..s).for_each(|_| root_of_unity.square_assign());
         assert_eq!(root_of_unity, Fr::one())
     }

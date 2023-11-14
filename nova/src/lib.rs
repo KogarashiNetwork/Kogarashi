@@ -6,6 +6,7 @@ mod pedersen;
 mod proof;
 mod prover;
 mod relaxed_r1cs;
+#[allow(dead_code)]
 mod transcript;
 mod verifier;
 

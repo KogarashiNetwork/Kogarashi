@@ -1,21 +1,23 @@
 use crate::Fr;
+use core::borrow::Borrow;
+use core::iter::{Product, Sum};
 use zkstd::arithmetic::bits_256::*;
 use zkstd::common::*;
 use zkstd::macros::field::*;
 
 /// Constant representing the modulus
 /// q = 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47
-const MODULUS: [u64; 4] = [
+pub(crate) const MODULUS: [u64; 4] = [
     0x3c208c16d87cfd47,
     0x97816a916871ca8d,
     0xb85045b68181585d,
     0x30644e72e131a029,
 ];
 
-const GENERATOR: [u64; 4] = [3, 0, 0, 0];
+pub(crate) const GENERATOR: [u64; 4] = [3, 0, 0, 0];
 
 /// R = 2^256 mod q
-const R: [u64; 4] = [
+pub(crate) const R: [u64; 4] = [
     0xd35d438dc58f0d9d,
     0x0a78eb28f5c70b3d,
     0x666ea36f7879462c,
@@ -23,7 +25,7 @@ const R: [u64; 4] = [
 ];
 
 /// R^2 = 2^512 mod q
-const R2: [u64; 4] = [
+pub(crate) const R2: [u64; 4] = [
     0xf32cfc5b538afa89,
     0xb5e71911d44501fb,
     0x47ab1eff0a417ff6,
@@ -31,7 +33,7 @@ const R2: [u64; 4] = [
 ];
 
 /// R^3 = 2^768 mod q
-const R3: [u64; 4] = [
+pub(crate) const R3: [u64; 4] = [
     0xb1cd6dafda1530df,
     0x62f210e6a7283db6,
     0xef7f0b0c0ada0afb,
@@ -39,7 +41,7 @@ const R3: [u64; 4] = [
 ];
 
 /// INV = -(q^{-1} mod 2^64) mod 2^64
-const INV: u64 = 0x87d20782e4866389;
+pub(crate) const INV: u64 = 0x87d20782e4866389;
 
 /// bn254 curve base field
 #[derive(Clone, Copy, Decode, Encode)]
@@ -151,6 +153,30 @@ impl Fq {
         // than its negation) and then negate it.
 
         (borrow & 1) == 0
+    }
+}
+
+impl<T> Product<T> for Fq
+where
+    T: Borrow<Fq>,
+{
+    fn product<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        iter.fold(Self::one(), |acc, item| acc * *item.borrow())
+    }
+}
+
+impl<T> Sum<T> for Fq
+where
+    T: Borrow<Fq>,
+{
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        iter.fold(Self::zero(), |acc, item| acc + *item.borrow())
     }
 }
 
