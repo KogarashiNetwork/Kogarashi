@@ -14,6 +14,7 @@ keywords = ["zkp", "blockchain", "elliptic-curve"]
 r1cs = { path = "../r1cs", default-features = false }
 zkstd = { path = "../zkstd", default-features = false }
 neptune = { version = "13.0.0", default-features = false }
+merlin = { version = "3.0", default-features = false }
 generic-array = { version = "0.14.7", default-features = false }
 bn-254 = { path = "../bn254", default-features = false }
 serde = { version = "1.0.102", default-features = false, features = ["derive"] }

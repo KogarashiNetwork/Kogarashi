@@ -2,11 +2,9 @@ use crate::{
     pedersen::PedersenCommitment,
     relaxed_r1cs::{RelaxedR1cs, RelaxedR1csInstance, RelaxedR1csWitness},
 };
+use merlin::Transcript as Merlin;
 
-use crate::transcript::{
-    absorb_commitment_in_ro, PoseidonConstantsCircuit, PoseidonRO, NUM_CHALLENGE_BITS,
-    NUM_FE_FOR_RO,
-};
+use crate::transcript::Transcript;
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Ring, RngCore};
 
@@ -30,29 +28,23 @@ impl<C: CircuitDriver> Prover<C> {
     pub fn prove(
         &self,
         r1cs: &R1cs<C>,
-        ro_consts: &PoseidonConstantsCircuit<C::Base>,
         relaxed_r1cs: &RelaxedR1cs<C>,
     ) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>, C::Affine) {
-        let mut ro = PoseidonRO::<C::Base, C::Scalar>::new(ro_consts.clone(), NUM_FE_FOR_RO);
-
+        let mut transcript = Merlin::new(b"nova");
         // compute cross term t
         let t = self.compute_cross_term(r1cs, relaxed_r1cs);
 
-        // TODO: replace with transcript
-        let lc_random = C::Scalar::one();
-        let commit_t = self.pp.commit(&t, &lc_random);
+        let commit_t = self.pp.commit(&t);
 
-        absorb_commitment_in_ro::<C>(commit_t, &mut ro);
+        <Merlin as Transcript<C>>::absorb_point(&mut transcript, b"commit_t", commit_t);
 
-        let _r = ro.squeeze(NUM_CHALLENGE_BITS);
+        let r = <Merlin as Transcript<C>>::challenge_scalar(&mut transcript, b"randomness");
 
         // fold instance
-        let instance = relaxed_r1cs.fold_instance(r1cs, lc_random, commit_t);
-
-        instance.absorb_in_ro(&mut ro);
+        let instance = relaxed_r1cs.fold_instance(r1cs, r, commit_t);
 
         // fold witness
-        let witness = relaxed_r1cs.fold_witness(r1cs, lc_random, t);
+        let witness = relaxed_r1cs.fold_witness(r1cs, r, t);
 
         // return folded relaxed r1cs instance, witness and commit T
         (instance, witness, commit_t)
@@ -96,7 +88,6 @@ impl<C: CircuitDriver> Prover<C> {
 pub(crate) mod tests {
     use super::{Prover, RelaxedR1cs};
 
-    use crate::transcript::PoseidonConstantsCircuit;
     use r1cs::{test::example_r1cs, GrumpkinDriver};
     use zkstd::common::OsRng;
 
@@ -112,8 +103,7 @@ pub(crate) mod tests {
         let mut relaxed_r1cs = RelaxedR1cs::new(r1cs);
         for i in 1..10 {
             let r1cs = example_r1cs(i);
-            let ro_constants = PoseidonConstantsCircuit::default();
-            let (instance, witness, _) = prover.prove(&r1cs, &ro_constants, &relaxed_r1cs);
+            let (instance, witness, _) = prover.prove(&r1cs, &relaxed_r1cs);
             relaxed_r1cs = relaxed_r1cs.update(&instance, &witness);
         }
 

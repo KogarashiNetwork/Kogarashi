@@ -1,4 +1,5 @@
 use generic_array::typenum::U24;
+use merlin::Transcript as Merlin;
 use neptune::{
     poseidon::PoseidonConstants,
     sponge::{
@@ -10,6 +11,41 @@ use neptune::{
 use r1cs::CircuitDriver;
 use std::marker::PhantomData;
 use zkstd::common::{CurveGroup, Deserialize, IntGroup, PrimeField, Ring, Serialize};
+
+pub trait Transcript<C: CircuitDriver> {
+    fn absorb(&mut self, label: &'static [u8], value: C::Base);
+
+    fn absorb_point(&mut self, label: &'static [u8], point: C::Affine);
+
+    fn challenge_scalar(&mut self, label: &'static [u8]) -> C::Scalar;
+}
+
+impl<C: CircuitDriver> Transcript<C> for Merlin {
+    fn absorb(&mut self, label: &'static [u8], value: C::Base) {
+        self.append_message(label, &value.to_raw_bytes())
+    }
+
+    fn absorb_point(&mut self, label: &'static [u8], point: C::Affine) {
+        <Self as Transcript<C>>::absorb(self, label, point.get_x());
+        <Self as Transcript<C>>::absorb(self, label, point.get_y());
+        <Self as Transcript<C>>::absorb(
+            self,
+            label,
+            if point.is_identity() {
+                C::Base::one()
+            } else {
+                C::Base::zero()
+            },
+        );
+    }
+
+    fn challenge_scalar(&mut self, label: &'static [u8]) -> C::Scalar {
+        // Reduce a double-width scalar to ensure a uniform distribution
+        let mut buf = [0; 64];
+        self.challenge_bytes(label, &mut buf);
+        C::Scalar::from_bytes_wide(&buf)
+    }
+}
 
 pub(crate) const NUM_CHALLENGE_BITS: usize = 128;
 pub(crate) const NUM_FE_FOR_RO: usize = 24;
