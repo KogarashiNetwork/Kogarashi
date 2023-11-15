@@ -18,6 +18,7 @@ impl<C: CircuitDriver> Verifier<C> {
         let mut transcript = Merlin::new(b"nova");
 
         <Merlin as Transcript<C>>::absorb_point(&mut transcript, b"commit_t", commit_t);
+        relaxed_r1cs.absorb_by_transcript(&mut transcript);
 
         let r = <Merlin as Transcript<C>>::challenge_scalar(&mut transcript, b"randomness");
 

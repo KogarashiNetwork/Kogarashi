@@ -1,6 +1,7 @@
 mod instance;
 mod witness;
 
+use crate::transcript::Transcript;
 pub(crate) use instance::RelaxedR1csInstance;
 use r1cs::{CircuitDriver, DenseVectors, R1cs, SparseMatrix};
 pub(crate) use witness::RelaxedR1csWitness;
@@ -130,6 +131,10 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
         azbz.iter()
             .zip(ucze.iter())
             .all(|(left, right)| left == right)
+    }
+
+    pub fn absorb_by_transcript<T: Transcript<C>>(&self, transcript: &mut T) {
+        self.instance.absorb_by_transcript(transcript);
     }
 }
 

@@ -132,20 +132,6 @@ where
     }
 }
 
-pub fn absorb_commitment_in_ro<C: CircuitDriver>(
-    comm: C::Affine,
-    ro: &mut PoseidonRO<C::Base, C::Scalar>,
-) {
-    let (x, y, is_infinity) = (comm.get_x(), comm.get_y(), comm.is_identity());
-    ro.absorb(x);
-    ro.absorb(y);
-    ro.absorb(if is_infinity {
-        C::Base::one()
-    } else {
-        C::Base::zero()
-    });
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
