@@ -31,6 +31,8 @@ pub trait PrimeField: Field + ParityCmp + From<u64> {
 
     fn square_assign(&mut self);
 
+    fn pow_of_2(by: u64) -> Self;
+
     fn from_bytes_wide(bytes: &[u8; 64]) -> Self;
 
     fn to_raw_bytes(&self) -> Vec<u8>;

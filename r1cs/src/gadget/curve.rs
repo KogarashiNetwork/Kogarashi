@@ -123,13 +123,11 @@ impl<C: CircuitDriver> PointAssignment<C> {
         let i = C::Affine::ADDITIVE_IDENTITY;
         let mut res =
             PointAssignment::instance(cs, i.get_x().into(), i.get_y().into(), i.is_identity());
-        for &naf in FieldAssignment::to_nafs(cs, scalar).iter() {
+        for bit in FieldAssignment::to_bits(cs, scalar).get() {
             res = res.double(cs);
-            if naf == Naf::Plus {
-                res.add(self, cs);
-            } else if naf == Naf::Minus {
-                res.add(&-self, cs);
-            }
+            // if /*select_identity*/ {
+            //     res.add(self, cs);
+            // }
         }
         res
     }

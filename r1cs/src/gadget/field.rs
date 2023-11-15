@@ -4,12 +4,16 @@ use crate::wire::Wire;
 use crate::R1cs;
 use std::ops::{Neg, Sub};
 
+use crate::gadget::binary::BinaryAssignment;
 use zkstd::common::{Add, Nafs, PrimeField};
 
 #[derive(Clone)]
 pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Scalar>);
 
 impl<C: CircuitDriver> FieldAssignment<C> {
+    pub fn inner(&self) -> &SparseRow<C::Scalar> {
+        &self.0
+    }
     pub fn instance(cs: &mut R1cs<C>, instance: C::Scalar) -> Self {
         let wire = cs.public_wire();
         cs.x.push(instance);
@@ -58,8 +62,8 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         z
     }
 
-    pub fn to_nafs(cs: &mut R1cs<C>, x: &Self) -> Nafs {
-        x.0.evaluate(&cs.x, &cs.w).to_nafs()
+    pub fn to_bits(cs: &mut R1cs<C>, x: &Self) -> BinaryAssignment<C> {
+        BinaryAssignment::instance(cs, x)
     }
 
     pub fn eq(cs: &mut R1cs<C>, x: &Self, y: &Self) {

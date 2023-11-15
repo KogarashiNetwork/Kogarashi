@@ -66,6 +66,20 @@ macro_rules! prime_field_operation {
                 self.0 = square(self.0, $p, $inv)
             }
 
+            fn pow_of_2(by: u64) -> Self {
+                let two = Self::from(2u64);
+                let mut res = Self::one();
+                for i in (0..64).rev() {
+                    res = res.square();
+                    let mut tmp = res;
+                    tmp *= two;
+                    if (by >> i) & 0x1 == 1 {
+                        res = tmp
+                    }
+                }
+                res
+            }
+
             fn from_bytes_wide(bytes: &[u8; 64]) -> Self {
                 Self(from_u512(
                     [
@@ -107,20 +121,6 @@ macro_rules! fft_field_operation {
 
             fn pow(self, val: u64) -> Self {
                 Self(pow(self.0, [val, 0, 0, 0], $r, $p, $i))
-            }
-
-            fn pow_of_2(by: u64) -> Self {
-                let two = Self::from(2u64);
-                let mut res = Self::one();
-                for i in (0..64).rev() {
-                    res = res.square();
-                    let mut tmp = res;
-                    tmp *= two;
-                    if (by >> i) & 0x1 == 1 {
-                        res = tmp
-                    }
-                }
-                res
             }
 
             fn divn(&mut self, mut n: u32) {
