@@ -55,6 +55,10 @@ macro_rules! prime_extension_field_operation {
                 unimplemented!()
             }
 
+            fn from_bytes_wide(bytes: &[u8; 64]) -> Self {
+                unimplemented!()
+            }
+
             fn double(self) -> Self {
                 let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
                 for i in 0..$limbs_length {

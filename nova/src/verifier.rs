@@ -1,8 +1,9 @@
 use crate::relaxed_r1cs::{RelaxedR1cs, RelaxedR1csInstance};
 
+use crate::transcript::Transcript;
 use core::marker::PhantomData;
+use merlin::Transcript as Merlin;
 use r1cs::{CircuitDriver, R1cs};
-use zkstd::common::Ring;
 
 pub struct Verifier<C: CircuitDriver> {
     mark: PhantomData<C>,
@@ -14,10 +15,14 @@ impl<C: CircuitDriver> Verifier<C> {
         r1cs: &R1cs<C>,
         relaxed_r1cs: &RelaxedR1cs<C>,
     ) -> RelaxedR1csInstance<C> {
-        // TODO: replace with transcript
-        let lc_random = C::Scalar::one();
+        let mut transcript = Merlin::new(b"nova");
 
-        relaxed_r1cs.fold_instance(r1cs, lc_random, commit_t)
+        <Merlin as Transcript<C>>::absorb_point(&mut transcript, b"commit_t", commit_t);
+        relaxed_r1cs.absorb_by_transcript(&mut transcript);
+
+        let r = <Merlin as Transcript<C>>::challenge_scalar(&mut transcript, b"randomness");
+
+        relaxed_r1cs.fold_instance(r1cs, r, commit_t)
     }
 }
 
@@ -32,7 +37,7 @@ mod tests {
     fn folding_scheme_verifier_test() {
         let prover = example_prover();
         let r1cs = example_r1cs(1);
-        let mut relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
+        let mut relaxed_r1cs = RelaxedR1cs::new(r1cs);
         for i in 1..10 {
             let r1cs = example_r1cs(i);
             let (instance, witness, commit_t) = prover.prove(&r1cs, &relaxed_r1cs);

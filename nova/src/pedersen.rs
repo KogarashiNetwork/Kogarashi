@@ -2,22 +2,19 @@ use r1cs::DenseVectors;
 use zkstd::common::{BNAffine, Group, RngCore};
 
 pub struct PedersenCommitment<C: BNAffine> {
-    h: C,
     g: Vec<C>,
 }
 
 impl<C: BNAffine> PedersenCommitment<C> {
     pub fn new(n: u64, mut r: impl RngCore) -> Self {
-        let h = C::random(&mut r);
         let g = (0..=1 << n).map(|_| C::random(&mut r)).collect();
-        Self { h, g }
+        Self { g }
     }
 
-    pub(crate) fn commit(&self, m: &DenseVectors<C::Scalar>, r: &C::Scalar) -> C {
-        (self.h * r
-            + m.iter()
-                .zip(self.g.iter())
-                .fold(C::Extended::ADDITIVE_IDENTITY, |sum, (v, e)| sum + *e * v))
+    pub(crate) fn commit(&self, m: &DenseVectors<C::Scalar>) -> C {
+        (m.iter()
+            .zip(self.g.iter())
+            .fold(C::Extended::ADDITIVE_IDENTITY, |sum, (v, e)| sum + *e * v))
         .into()
     }
 }

@@ -6,6 +6,7 @@ use crate::{
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Group, Ring};
 
+#[allow(clippy::type_complexity)]
 pub struct RecursiveProof<C: CircuitDriver> {
     i: usize,
     z0: DenseVectors<C::Scalar>,
