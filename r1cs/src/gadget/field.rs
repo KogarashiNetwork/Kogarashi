@@ -2,10 +2,11 @@ use crate::driver::CircuitDriver;
 use crate::matrix::SparseRow;
 use crate::wire::Wire;
 use crate::R1cs;
-use std::ops::Sub;
+use std::ops::{Neg, Sub};
 
-use zkstd::common::Add;
+use zkstd::common::{Add, Nafs, PrimeField};
 
+#[derive(Clone)]
 pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Scalar>);
 
 impl<C: CircuitDriver> FieldAssignment<C> {
@@ -57,6 +58,10 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         z
     }
 
+    pub fn to_nafs(cs: &mut R1cs<C>, x: &Self) -> Nafs {
+        x.0.evaluate(&cs.x, &cs.w).to_nafs()
+    }
+
     pub fn eq(cs: &mut R1cs<C>, x: &Self, y: &Self) {
         cs.mul_gate(&x.0, &SparseRow::one(), &y.0)
     }
@@ -75,6 +80,14 @@ impl<C: CircuitDriver> Sub<&FieldAssignment<C>> for &FieldAssignment<C> {
 
     fn sub(self, rhs: &FieldAssignment<C>) -> Self::Output {
         FieldAssignment(&self.0 - &rhs.0)
+    }
+}
+
+impl<C: CircuitDriver> Neg for &FieldAssignment<C> {
+    type Output = FieldAssignment<C>;
+
+    fn neg(self) -> Self::Output {
+        FieldAssignment(-&self.0)
     }
 }
 

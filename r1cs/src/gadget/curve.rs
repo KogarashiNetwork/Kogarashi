@@ -1,8 +1,9 @@
 use super::field::FieldAssignment;
 use crate::driver::CircuitDriver;
 use crate::R1cs;
+use std::ops::Neg;
 
-use zkstd::common::{BNProjective, IntGroup, Ring};
+use zkstd::common::{BNProjective, CurveGroup, Group, IntGroup, Naf, Ring};
 
 pub struct PointAssignment<C: CircuitDriver> {
     x: FieldAssignment<C>,
@@ -116,12 +117,42 @@ impl<C: CircuitDriver> PointAssignment<C> {
             z: z3,
         }
     }
+
+    /// coordinate scalar
+    pub fn scalar_point(&self, cs: &mut R1cs<C>, scalar: &FieldAssignment<C>) -> Self {
+        let i = C::Affine::ADDITIVE_IDENTITY;
+        let mut res =
+            PointAssignment::instance(cs, i.get_x().into(), i.get_y().into(), i.is_identity());
+        for &naf in FieldAssignment::to_nafs(cs, scalar).iter() {
+            res = res.double(cs);
+            if naf == Naf::Plus {
+                res.add(self, cs);
+            } else if naf == Naf::Minus {
+                res.add(&-self, cs);
+            }
+        }
+        res
+    }
+}
+
+impl<C: CircuitDriver> Neg for &PointAssignment<C> {
+    type Output = PointAssignment<C>;
+
+    fn neg(self) -> Self::Output {
+        PointAssignment {
+            x: self.x.clone(),
+            y: -&self.y,
+            z: self.z.clone(),
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::{PointAssignment, R1cs};
     use crate::driver::GrumpkinDriver;
+    use crate::gadget::field::FieldAssignment;
+    use bn_254::{Fq, Fr};
     use grumpkin::Affine;
     use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, OsRng};
 
@@ -163,6 +194,27 @@ mod tests {
 
             a_assignment
                 .add(&b_assignment, &mut cs)
+                .assert_equal_public_point(&mut cs, expected);
+
+            assert!(cs.is_sat());
+        }
+    }
+
+    #[test]
+    fn curve_scalar_mul_test() {
+        for _ in 0..100 {
+            let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
+            let x = Fr::random(OsRng);
+            let p = Affine::random(OsRng);
+
+            let x_assignment = FieldAssignment::instance(&mut cs, x);
+            let p_assignment =
+                PointAssignment::instance(&mut cs, p.get_x(), p.get_y(), p.is_identity());
+
+            let expected = p * Fq::from(x);
+
+            p_assignment
+                .scalar_point(&mut cs, &x_assignment)
                 .assert_equal_public_point(&mut cs, expected);
 
             assert!(cs.is_sat());
