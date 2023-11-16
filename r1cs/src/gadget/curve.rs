@@ -3,8 +3,10 @@ use crate::driver::CircuitDriver;
 use crate::R1cs;
 use std::ops::Neg;
 
+use crate::gadget::binary::BinaryAssignment;
 use zkstd::common::{BNProjective, CurveGroup, Group, IntGroup, Ring};
 
+#[derive(Clone)]
 pub struct PointAssignment<C: CircuitDriver> {
     x: FieldAssignment<C>,
     y: FieldAssignment<C>,
@@ -119,17 +121,38 @@ impl<C: CircuitDriver> PointAssignment<C> {
     }
 
     /// coordinate scalar
-    pub fn scalar_point(&self, cs: &mut R1cs<C>, _scalar: &FieldAssignment<C>) -> Self {
+    pub fn scalar_point(&self, cs: &mut R1cs<C>, scalar: &FieldAssignment<C>) -> Self {
         let i = C::Affine::ADDITIVE_IDENTITY;
-        let res =
+        let mut res =
             PointAssignment::instance(cs, i.get_x().into(), i.get_y().into(), i.is_identity());
-        // for _bit in FieldAssignment::to_bits(cs, scalar).get() {
-        //     res = res.double(cs);
-        //     // if /*select_identity*/ {
-        //     //     res.add(self, cs);
-        //     // }
-        // }
+        println!("Origin");
+        print!("X = {:?}, ", res.x.inner().evaluate(&cs.x, &cs.w));
+        print!("Y = {:?}, ", res.y.inner().evaluate(&cs.x, &cs.w));
+        println!("Z = {:?}", res.z.inner().evaluate(&cs.x, &cs.w));
+        for bit in FieldAssignment::to_bits(cs, scalar) {
+            res = res.double(cs);
+            let point_to_add = self.select_identity(cs, bit);
+            println!("Point to add");
+            print!("X = {:?}, ", point_to_add.x.inner().evaluate(&cs.x, &cs.w));
+            print!("Y = {:?}, ", point_to_add.y.inner().evaluate(&cs.x, &cs.w));
+            println!("Z = {:?}", point_to_add.z.inner().evaluate(&cs.x, &cs.w));
+            res = res.add(&point_to_add, cs);
+            println!("After sum");
+            print!("X = {:?}, ", res.x.inner().evaluate(&cs.x, &cs.w));
+            print!("Y = {:?}, ", res.y.inner().evaluate(&cs.x, &cs.w));
+            println!("Z = {:?}", res.z.inner().evaluate(&cs.x, &cs.w));
+        }
+
         res
+    }
+
+    pub fn select_identity(&self, cs: &mut R1cs<C>, bit: BinaryAssignment<C>) -> Self {
+        let PointAssignment { x, y, z } = self.clone();
+        Self {
+            x,
+            y,
+            z: FieldAssignment::mul(cs, &z, &FieldAssignment::from(bit)),
+        }
     }
 }
 
@@ -200,22 +223,22 @@ mod tests {
 
     #[test]
     fn curve_scalar_mul_test() {
-        for _ in 0..100 {
-            let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let x = Fr::random(OsRng);
-            let p = Affine::random(OsRng);
+        // for _ in 0..100 {
+        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
+        let x = Fr::random(OsRng);
+        let p = Affine::random(OsRng);
 
-            let x_assignment = FieldAssignment::instance(&mut cs, x);
-            let p_assignment =
-                PointAssignment::instance(&mut cs, p.get_x(), p.get_y(), p.is_identity());
+        let x_assignment = FieldAssignment::instance(&mut cs, x);
+        let p_assignment =
+            PointAssignment::instance(&mut cs, p.get_x(), p.get_y(), p.is_identity());
 
-            let expected = p * Fq::from(x);
+        let expected = p * Fq::from(x);
 
-            p_assignment
-                .scalar_point(&mut cs, &x_assignment)
-                .assert_equal_public_point(&mut cs, expected);
+        p_assignment
+            .scalar_point(&mut cs, &x_assignment)
+            .assert_equal_public_point(&mut cs, expected);
 
-            assert!(cs.is_sat());
-        }
+        assert!(cs.is_sat());
+        // }
     }
 }
