@@ -1,14 +1,24 @@
 use crate::driver::CircuitDriver;
-use crate::R1cs;
+use crate::{R1cs, Wire};
+use std::marker::PhantomData;
 
 use crate::gadget::field::FieldAssignment;
 use zkstd::common::{IntGroup, PrimeField};
 
 #[derive(Clone)]
-pub struct BinaryAssignment<C: CircuitDriver>(Vec<FieldAssignment<C>>);
+pub struct BinaryAssignment<C: CircuitDriver>(Wire, PhantomData<C>);
 
 impl<C: CircuitDriver> BinaryAssignment<C> {
-    pub fn instance(cs: &mut R1cs<C>, val: &FieldAssignment<C>) -> Self {
+    pub fn witness(cs: &mut R1cs<C>, bit: u8) -> Self {
+        if bit != 0 && bit != 1 {
+            panic!("Bit value should be passed, got {bit}");
+        }
+        let wire = cs.private_wire();
+        cs.w.push(C::Scalar::from(bit as u64));
+
+        Self(wire, PhantomData::default())
+    }
+    pub fn decomposition(cs: &mut R1cs<C>, val: &FieldAssignment<C>) -> Vec<Self> {
         let mut decomposition = vec![];
 
         let acc = val
@@ -21,22 +31,22 @@ impl<C: CircuitDriver> BinaryAssignment<C> {
             .fold(
                 FieldAssignment::constant(&C::Scalar::zero()),
                 |acc, (i, w)| {
-                    let bit = FieldAssignment::witness(cs, C::Scalar::from(*w as u64));
+                    let bit = BinaryAssignment::witness(cs, *w);
                     decomposition.push(bit.clone());
                     let res = &acc
                         + &FieldAssignment::mul(
                             cs,
-                            &bit,
+                            &FieldAssignment::from(bit),
                             &FieldAssignment::constant(&C::Scalar::pow_of_2(i as u64)),
                         );
                     res
                 },
             );
         FieldAssignment::eq(cs, val, &acc);
-        Self(decomposition)
+        decomposition
     }
 
-    pub fn get(&self) -> &[FieldAssignment<C>] {
+    pub fn inner(&self) -> &Wire {
         &self.0
     }
 }
@@ -54,7 +64,7 @@ mod tests {
         let input = Fr::random(OsRng);
 
         let x = FieldAssignment::instance(&mut cs, input);
-        let _bits: BinaryAssignment<GrumpkinDriver> = FieldAssignment::to_bits(&mut cs, &x);
+        let _bits: Vec<BinaryAssignment<GrumpkinDriver>> = FieldAssignment::to_bits(&mut cs, &x);
 
         assert!(cs.is_sat());
     }

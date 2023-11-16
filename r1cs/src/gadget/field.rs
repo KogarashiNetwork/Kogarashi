@@ -62,12 +62,18 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         z
     }
 
-    pub fn to_bits(cs: &mut R1cs<C>, x: &Self) -> BinaryAssignment<C> {
-        BinaryAssignment::instance(cs, x)
+    pub fn to_bits(cs: &mut R1cs<C>, x: &Self) -> Vec<BinaryAssignment<C>> {
+        BinaryAssignment::decomposition(cs, x)
     }
 
     pub fn eq(cs: &mut R1cs<C>, x: &Self, y: &Self) {
         cs.mul_gate(&x.0, &SparseRow::one(), &y.0)
+    }
+}
+
+impl<C: CircuitDriver> From<BinaryAssignment<C>> for FieldAssignment<C> {
+    fn from(value: BinaryAssignment<C>) -> Self {
+        Self(SparseRow::from(value.inner()))
     }
 }
 

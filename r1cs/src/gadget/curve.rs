@@ -121,14 +121,14 @@ impl<C: CircuitDriver> PointAssignment<C> {
     /// coordinate scalar
     pub fn scalar_point(&self, cs: &mut R1cs<C>, scalar: &FieldAssignment<C>) -> Self {
         let i = C::Affine::ADDITIVE_IDENTITY;
-        let mut res =
+        let res =
             PointAssignment::instance(cs, i.get_x().into(), i.get_y().into(), i.is_identity());
-        for _bit in FieldAssignment::to_bits(cs, scalar).get() {
-            res = res.double(cs);
-            // if /*select_identity*/ {
-            //     res.add(self, cs);
-            // }
-        }
+        // for _bit in FieldAssignment::to_bits(cs, scalar).get() {
+        //     res = res.double(cs);
+        //     // if /*select_identity*/ {
+        //     //     res.add(self, cs);
+        //     // }
+        // }
         res
     }
 }
