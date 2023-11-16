@@ -5,7 +5,7 @@ use crate::R1cs;
 use std::ops::{Neg, Sub};
 
 use crate::gadget::binary::BinaryAssignment;
-use zkstd::common::{Add, Nafs, PrimeField};
+use zkstd::common::Add;
 
 #[derive(Clone)]
 pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Scalar>);
