@@ -2,7 +2,6 @@ use crate::driver::CircuitDriver;
 use crate::matrix::SparseRow;
 use crate::wire::Wire;
 use crate::R1cs;
-use ff::PrimeField as FFPrimeField;
 use std::ops::{Neg, Sub};
 
 use crate::gadget::binary::BinaryAssignment;
@@ -64,7 +63,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
     }
 
     fn range_check(cs: &mut R1cs<C>, value: &Self, num_of_bits: u16) {
-        assert!(0 < num_of_bits && num_of_bits <= C::Scalar::NUM_BITS as u16);
+        assert!(0 < num_of_bits && num_of_bits <= C::NUM_BITS);
         fn inner_product<C: CircuitDriver>(
             cs: &mut R1cs<C>,
             a: &[u8],
@@ -95,7 +94,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
     }
 
     pub fn to_bits(cs: &mut R1cs<C>, x: &Self) -> Vec<BinaryAssignment<C>> {
-        FieldAssignment::range_check(cs, x, C::Scalar::NUM_BITS as u16);
+        FieldAssignment::range_check(cs, x, C::NUM_BITS);
         let decomposition: Vec<BinaryAssignment<C>> = x
             .inner()
             .evaluate(&cs.x, &cs.w)

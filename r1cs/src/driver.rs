@@ -3,6 +3,7 @@ use grumpkin::params::PARAM_B3;
 use zkstd::common::{BNAffine, Deserialize, PrimeField, Serialize};
 
 pub trait CircuitDriver: Clone {
+    const NUM_BITS: u16;
     // curve affine
     type Affine: BNAffine<Scalar = Self::Scalar, Base = Self::Base>;
 
@@ -29,6 +30,7 @@ pub trait CircuitDriver: Clone {
 pub struct GrumpkinDriver;
 
 impl CircuitDriver for GrumpkinDriver {
+    const NUM_BITS: u16 = 254;
     type Affine = G1Affine;
 
     type Base = Fq;
