@@ -2,10 +2,11 @@ use crate::driver::CircuitDriver;
 use crate::matrix::SparseRow;
 use crate::wire::Wire;
 use crate::R1cs;
+use ff::PrimeField as FFPrimeField;
 use std::ops::{Neg, Sub};
 
 use crate::gadget::binary::BinaryAssignment;
-use zkstd::common::Add;
+use zkstd::common::{Add, PrimeField};
 
 #[derive(Clone)]
 pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Scalar>);
@@ -62,8 +63,49 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         z
     }
 
+    fn range_check(cs: &mut R1cs<C>, value: &Self, num_of_bits: u16) {
+        assert!(0 < num_of_bits && num_of_bits <= C::Scalar::NUM_BITS as u16);
+        fn inner_product<C: CircuitDriver>(
+            cs: &mut R1cs<C>,
+            a: &[u8],
+            b: &[C::Scalar],
+        ) -> FieldAssignment<C> {
+            if a.len() == 1 && b.len() == 1 {
+                let bit = BinaryAssignment::witness(cs, a[0]);
+                FieldAssignment::mul(
+                    cs,
+                    &FieldAssignment::from(bit),
+                    &FieldAssignment::constant(&b[0]),
+                )
+            } else {
+                &inner_product(cs, &a[0..a.len() / 2], &b[0..b.len() / 2])
+                    + &inner_product(cs, &a[a.len() / 2..], &b[b.len() / 2..])
+            }
+        }
+
+        let powers_of_2 = (0..num_of_bits)
+            .map(|i| C::Scalar::pow_of_2(i as u64))
+            .collect::<Vec<_>>();
+        let mut bits = value.inner().evaluate(&cs.x, &cs.w).to_bits();
+        bits.reverse();
+        bits.resize(num_of_bits as usize, 0);
+
+        let inner_product = inner_product(cs, &bits, &powers_of_2);
+        FieldAssignment::eq(cs, value, &inner_product);
+    }
+
     pub fn to_bits(cs: &mut R1cs<C>, x: &Self) -> Vec<BinaryAssignment<C>> {
-        BinaryAssignment::decomposition(cs, x)
+        FieldAssignment::range_check(cs, x, C::Scalar::NUM_BITS as u16);
+        let decomposition: Vec<BinaryAssignment<C>> = x
+            .inner()
+            .evaluate(&cs.x, &cs.w)
+            .to_bits()
+            .iter()
+            .rev()
+            .map(|b| BinaryAssignment::witness(cs, *b))
+            .collect();
+
+        decomposition
     }
 
     pub fn eq(cs: &mut R1cs<C>, x: &Self, y: &Self) {
@@ -105,8 +147,38 @@ impl<C: CircuitDriver> Neg for &FieldAssignment<C> {
 mod tests {
     use super::{FieldAssignment, R1cs};
     use crate::driver::GrumpkinDriver;
-    use bn_254::Fr as Scalar;
-    use zkstd::common::{Group, OsRng};
+    use crate::gadget::binary::BinaryAssignment;
+    use bn_254::{Fr as Scalar, Fr};
+    use ff::PrimeField as FFPrimeField;
+    use zkstd::common::{Group, OsRng, PrimeField};
+
+    #[test]
+    fn to_bits() {
+        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
+        let input = Fr::random(OsRng);
+
+        let x = FieldAssignment::instance(&mut cs, input);
+        let _bits: Vec<BinaryAssignment<GrumpkinDriver>> = FieldAssignment::to_bits(&mut cs, &x);
+
+        assert!(cs.is_sat());
+    }
+
+    #[test]
+    fn field_range() {
+        for i in 1..Fr::NUM_BITS {
+            let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
+            let mut ncs = cs.clone();
+            let x = Fr::pow_of_2(i as u64);
+
+            let x_ass = FieldAssignment::instance(&mut cs, x - Fr::one());
+            FieldAssignment::range_check(&mut cs, &x_ass, i as u16);
+            assert!(cs.is_sat());
+
+            let x_ass = FieldAssignment::instance(&mut ncs, x);
+            FieldAssignment::range_check(&mut ncs, &x_ass, i as u16);
+            assert!(!ncs.is_sat());
+        }
+    }
 
     #[test]
     fn field_add_test() {
