@@ -11,6 +11,19 @@ A Next-Generation Composable Hybrid Smart Contract and (De)Centralized Merged Ap
 
 We provide the composable layer 2 technologies by **Recursive Snarks** on top of **zk-friendly** blockchain.
 
+- [x] Bn254 / Grumpkin
+- [x] R1cs
+- [x] Groth16
+- [x] Nova nifs
+- [ ] Nova IVC
+- [ ] Spartan
+- [ ] Hyper Nova
+- [ ] Lookup
+- [ ] Homomorphic Encryption Circuit
+- [ ] Deco Protocol Circuit
+- [ ] Remote Attestation Circuit
+- [ ] Composable Hybrid Smart Contract
+
 ## Test
 
 ```shell
