@@ -66,6 +66,25 @@ macro_rules! prime_field_operation {
                 self.0 = square(self.0, $p, $inv)
             }
 
+            fn from_bytes_wide(bytes: &[u8; 64]) -> Self {
+                Self(from_u512(
+                    [
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[0..8]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[8..16]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[16..24]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[24..32]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[32..40]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[40..48]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[48..56]).unwrap()),
+                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[56..64]).unwrap()),
+                    ],
+                    $r2,
+                    $r3,
+                    $p,
+                    $inv,
+                ))
+            }
+
             fn to_raw_bytes(&self) -> Vec<u8> {
                 self.to_bytes().to_vec()
             }
@@ -127,25 +146,6 @@ macro_rules! fft_field_operation {
                         t = t2;
                     }
                 }
-            }
-
-            fn from_bytes_wide(bytes: &[u8; 64]) -> Self {
-                Self(from_u512(
-                    [
-                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[0..8]).unwrap()),
-                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[8..16]).unwrap()),
-                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[16..24]).unwrap()),
-                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[24..32]).unwrap()),
-                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[32..40]).unwrap()),
-                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[40..48]).unwrap()),
-                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[48..56]).unwrap()),
-                        u64::from_le_bytes(<[u8; 8]>::try_from(&bytes[56..64]).unwrap()),
-                    ],
-                    $r2,
-                    $r3,
-                    $p,
-                    $i,
-                ))
             }
 
             fn from_hash(hash: &[u8; 64]) -> Self {

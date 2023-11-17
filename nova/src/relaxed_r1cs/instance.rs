@@ -1,3 +1,4 @@
+use crate::transcript::Transcript;
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Group, PrimeField, Ring};
 
@@ -43,6 +44,15 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
             commit_e,
             u,
             x,
+        }
+    }
+
+    pub(crate) fn absorb_by_transcript<T: Transcript<C>>(&self, transcript: &mut T) {
+        transcript.absorb_point(b"commit_w", self.commit_w);
+        transcript.absorb_point(b"commit_e", self.commit_e);
+        transcript.absorb(b"u", C::Base::from(self.u));
+        for x in &self.x.get() {
+            transcript.absorb(b"x", C::Base::from(*x));
         }
     }
 }
