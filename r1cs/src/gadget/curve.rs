@@ -1,7 +1,6 @@
 use super::field::FieldAssignment;
 use crate::driver::CircuitDriver;
 use crate::R1cs;
-use std::ops::Neg;
 
 use crate::gadget::binary::BinaryAssignment;
 use zkstd::common::{BNProjective, CurveGroup, Group, IntGroup, Ring};
@@ -147,18 +146,6 @@ impl<C: CircuitDriver> PointAssignment<C> {
     }
 }
 
-impl<C: CircuitDriver> Neg for &PointAssignment<C> {
-    type Output = PointAssignment<C>;
-
-    fn neg(self) -> Self::Output {
-        PointAssignment {
-            x: self.x.clone(),
-            y: -&self.y,
-            z: self.z.clone(),
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::{PointAssignment, R1cs};
@@ -166,7 +153,6 @@ mod tests {
     use crate::gadget::field::FieldAssignment;
     use bn_254::{Fq, Fr};
     use grumpkin::{Affine, Projective};
-    use std::ptr::eq;
     use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, OsRng, PrimeField};
 
     #[test]
