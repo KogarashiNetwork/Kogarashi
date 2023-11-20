@@ -122,6 +122,7 @@ impl<C: CircuitDriver> PointAssignment<C> {
 
     /// coordinate scalar
     pub fn scalar_point(&self, cs: &mut R1cs<C>, scalar: &FieldAssignment<C>) -> Self {
+        println!("Scalar = {:?}", scalar.inner().evaluate(&cs.x, &cs.w));
         let i = C::Affine::ADDITIVE_IDENTITY;
         let mut res =
             PointAssignment::instance(cs, i.get_x().into(), i.get_y().into(), i.is_identity());
@@ -174,8 +175,8 @@ mod tests {
     use crate::driver::GrumpkinDriver;
     use crate::gadget::field::FieldAssignment;
     use bn_254::{Fq, Fr};
-    use grumpkin::Affine;
-    use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, OsRng};
+    use grumpkin::{Affine, Projective};
+    use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, OsRng, PrimeField};
 
     #[test]
     fn curve_double_test() {
@@ -201,6 +202,35 @@ mod tests {
 
     #[test]
     fn curve_add_test() {
+        // Identity addition test
+        {
+            let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
+            let a = Affine::random(OsRng);
+            let b = Affine::ADDITIVE_IDENTITY;
+
+            let a_assignment =
+                PointAssignment::instance(&mut cs, a.get_x(), a.get_y(), a.is_identity());
+            let b_assignment =
+                PointAssignment::instance(&mut cs, b.get_x(), b.get_y(), b.is_identity());
+
+            let expected = a.to_extended() + b.to_extended();
+
+            let sum_circuit = a_assignment.add(&b_assignment, &mut cs);
+
+            assert_eq!(
+                expected,
+                Projective::new_unchecked(
+                    sum_circuit.x.inner().evaluate(&cs.x, &cs.w),
+                    sum_circuit.y.inner().evaluate(&cs.x, &cs.w),
+                    sum_circuit.z.inner().evaluate(&cs.x, &cs.w)
+                )
+            );
+
+            sum_circuit.assert_equal_public_point(&mut cs, expected);
+
+            assert!(cs.is_sat());
+        }
+
         for _ in 0..100 {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
             let a = Affine::random(OsRng);
@@ -213,9 +243,18 @@ mod tests {
 
             let expected = a.to_extended() + b.to_extended();
 
-            a_assignment
-                .add(&b_assignment, &mut cs)
-                .assert_equal_public_point(&mut cs, expected);
+            let sum_circuit = a_assignment.add(&b_assignment, &mut cs);
+
+            assert_eq!(
+                expected,
+                Projective::new_unchecked(
+                    sum_circuit.x.inner().evaluate(&cs.x, &cs.w),
+                    sum_circuit.y.inner().evaluate(&cs.x, &cs.w),
+                    sum_circuit.z.inner().evaluate(&cs.x, &cs.w)
+                )
+            );
+
+            sum_circuit.assert_equal_public_point(&mut cs, expected);
 
             assert!(cs.is_sat());
         }
@@ -234,9 +273,18 @@ mod tests {
 
         let expected = p * Fq::from(x);
 
-        p_assignment
-            .scalar_point(&mut cs, &x_assignment)
-            .assert_equal_public_point(&mut cs, expected);
+        assert_eq!(x.to_bits(), Fq::from(x).to_bits());
+
+        let mul_circuit = p_assignment.scalar_point(&mut cs, &x_assignment);
+        assert_eq!(
+            expected,
+            Projective::new_unchecked(
+                mul_circuit.x.inner().evaluate(&cs.x, &cs.w),
+                mul_circuit.y.inner().evaluate(&cs.x, &cs.w),
+                mul_circuit.z.inner().evaluate(&cs.x, &cs.w)
+            )
+        );
+        mul_circuit.assert_equal_public_point(&mut cs, expected);
 
         assert!(cs.is_sat());
         // }

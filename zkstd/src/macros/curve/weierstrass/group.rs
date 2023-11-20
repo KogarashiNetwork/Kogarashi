@@ -21,7 +21,7 @@ macro_rules! affine_group_operation {
 
             const ADDITIVE_IDENTITY: Self = Self {
                 x: $range::zero(),
-                y: $range::zero(),
+                y: $range::one(),
                 is_infinity: true,
             };
 
