@@ -8,11 +8,11 @@ use zkstd::common::{Group, Ring};
 
 #[allow(clippy::type_complexity)]
 pub struct RecursiveProof<C: CircuitDriver> {
-    i: usize,
-    z0: DenseVectors<C::Scalar>,
-    zi: DenseVectors<C::Scalar>,
-    r1cs: R1cs<C>,
-    pair: (
+    pub(crate) i: usize,
+    pub(crate) z0: DenseVectors<C::Scalar>,
+    pub(crate) zi: DenseVectors<C::Scalar>,
+    pub(crate) r1cs: R1cs<C>,
+    pub(crate) pair: (
         (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>),
         (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>),
     ),
