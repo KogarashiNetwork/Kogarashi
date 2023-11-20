@@ -2,6 +2,7 @@
 #![allow(dead_code)]
 
 mod function;
+mod hash;
 mod ivc;
 mod pedersen;
 mod proof;
