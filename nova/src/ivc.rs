@@ -11,7 +11,9 @@ pub struct Ivc<C: CircuitDriver> {
     zi: DenseVectors<C::Scalar>,
     prover: Prover<C>,
     r1cs: R1cs<C>,
+    // r1cs instance to be folded
     instance: RelaxedR1cs<C>,
+    // running r1cs instance
     running_instance: RelaxedR1cs<C>,
 }
 
