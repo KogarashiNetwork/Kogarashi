@@ -5,7 +5,7 @@ use crate::R1cs;
 use std::ops::{Neg, Sub};
 
 use crate::gadget::binary::BinaryAssignment;
-use zkstd::common::{Add, PrimeField};
+use zkstd::common::{Add, IntGroup, PrimeField, Ring};
 
 #[derive(Clone)]
 pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Scalar>);
@@ -62,8 +62,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         z
     }
 
-    fn range_check(cs: &mut R1cs<C>, value: &Self, num_of_bits: u16) {
-        assert!(0 < num_of_bits && num_of_bits <= C::NUM_BITS);
+    fn range_check(cs: &mut R1cs<C>, value: &Self, limit: C::Scalar) {
         fn inner_product<C: CircuitDriver>(
             cs: &mut R1cs<C>,
             a: &[u8],
@@ -82,29 +81,40 @@ impl<C: CircuitDriver> FieldAssignment<C> {
             }
         }
 
-        let powers_of_2 = (0..num_of_bits)
+        let powers_of_2 = (0..C::NUM_BITS)
             .map(|i| C::Scalar::pow_of_2(i as u64))
             .collect::<Vec<_>>();
         let mut bits = value.inner().evaluate(&cs.x, &cs.w).to_bits();
         bits.reverse();
-        bits.resize(num_of_bits as usize, 0);
+        bits.resize(C::NUM_BITS as usize, 0);
 
         let inner_product = inner_product(cs, &bits, &powers_of_2);
+
         FieldAssignment::eq(cs, value, &inner_product);
     }
 
     /// To bit representation in Big-endian
     pub fn to_bits(cs: &mut R1cs<C>, x: &Self) -> Vec<BinaryAssignment<C>> {
-        FieldAssignment::range_check(cs, x, C::NUM_BITS);
-        let decomposition: Vec<BinaryAssignment<C>> = x
-            .inner()
+        FieldAssignment::range_check(cs, x, C::Scalar::MODULUS);
+        x.inner()
             .evaluate(&cs.x, &cs.w)
             .to_bits()
             .iter()
-            .map(|b| BinaryAssignment::witness(cs, *b))
-            .collect();
-
-        decomposition
+            .map(|b| {
+                let bit = BinaryAssignment::witness(cs, *b);
+                let bool_constr = FieldAssignment::mul(
+                    cs,
+                    &(&FieldAssignment::from(&bit) - &FieldAssignment::constant(&C::Scalar::one())),
+                    &FieldAssignment::from(&bit),
+                );
+                FieldAssignment::eq(
+                    cs,
+                    &bool_constr,
+                    &FieldAssignment::constant(&C::Scalar::zero()),
+                );
+                bit
+            })
+            .collect()
     }
 
     pub fn eq(cs: &mut R1cs<C>, x: &Self, y: &Self) {
@@ -170,11 +180,11 @@ mod tests {
             let x = Fr::pow_of_2(i as u64);
 
             let x_ass = FieldAssignment::instance(&mut cs, x - Fr::one());
-            FieldAssignment::range_check(&mut cs, &x_ass, i as u16);
+            FieldAssignment::range_check(&mut cs, &x_ass, x);
             assert!(cs.is_sat());
 
-            let x_ass = FieldAssignment::instance(&mut ncs, x);
-            FieldAssignment::range_check(&mut ncs, &x_ass, i as u16);
+            let x_ass = FieldAssignment::instance(&mut ncs, x + Fr::one());
+            FieldAssignment::range_check(&mut ncs, &x_ass, x);
             assert!(!ncs.is_sat());
         }
     }
