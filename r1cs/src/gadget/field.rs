@@ -73,7 +73,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
                 let bit = BinaryAssignment::witness(cs, a[0]);
                 FieldAssignment::mul(
                     cs,
-                    &FieldAssignment::from(bit),
+                    &FieldAssignment::from(&bit),
                     &FieldAssignment::constant(&b[0]),
                 )
             } else {
@@ -93,6 +93,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         FieldAssignment::eq(cs, value, &inner_product);
     }
 
+    /// To bit representation in Big-endian
     pub fn to_bits(cs: &mut R1cs<C>, x: &Self) -> Vec<BinaryAssignment<C>> {
         FieldAssignment::range_check(cs, x, C::NUM_BITS);
         let decomposition: Vec<BinaryAssignment<C>> = x
@@ -100,7 +101,6 @@ impl<C: CircuitDriver> FieldAssignment<C> {
             .evaluate(&cs.x, &cs.w)
             .to_bits()
             .iter()
-            .rev()
             .map(|b| BinaryAssignment::witness(cs, *b))
             .collect();
 
@@ -112,8 +112,8 @@ impl<C: CircuitDriver> FieldAssignment<C> {
     }
 }
 
-impl<C: CircuitDriver> From<BinaryAssignment<C>> for FieldAssignment<C> {
-    fn from(value: BinaryAssignment<C>) -> Self {
+impl<C: CircuitDriver> From<&BinaryAssignment<C>> for FieldAssignment<C> {
+    fn from(value: &BinaryAssignment<C>) -> Self {
         Self(SparseRow::from(value.inner()))
     }
 }

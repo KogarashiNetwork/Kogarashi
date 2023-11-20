@@ -292,9 +292,8 @@ fft_field_operation!(
 );
 
 impl From<Fq> for Fr {
-    // TODO: fix
     fn from(val: Fq) -> Fr {
-        Self(to_mont_form(val.0, R2, MODULUS, INV))
+        Self(to_mont_form(val.montgomery_reduce(), R2, MODULUS, INV))
     }
 }
 
@@ -343,5 +342,12 @@ mod tests {
             let s_prime = Fr::from_bytes(bytes).unwrap();
             assert_eq!(s, s_prime);
         }
+    }
+
+    #[test]
+    fn to_fq_and_back() {
+        let x = Fr::random(OsRng);
+        let y = Fq::from(x);
+        assert_eq!(x, Fr::from(y));
     }
 }

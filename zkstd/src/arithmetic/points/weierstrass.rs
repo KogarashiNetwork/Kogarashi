@@ -165,34 +165,14 @@ pub fn double_projective_point<P: BNProjective>(lhs: P) -> P {
 /// coordinate scalar
 #[inline(always)]
 pub fn scalar_point<P: BNProjective>(point: P, scalar: &P::Scalar) -> P {
-    // let mut res = P::ADDITIVE_IDENTITY;
-    // for &naf in scalar.to_nafs().iter() {
-    //     res = double_projective_point(res);
-    //     if naf == Naf::Plus {
-    //         res += point;
-    //     } else if naf == Naf::Minus {
-    //         res -= point;
-    //     }
-    // }
-    // res
-
     let mut res = P::ADDITIVE_IDENTITY;
-    // println!("Origin");
-    // println!("{res:#?}");
-    // println!("{:?}", scalar.to_bits());
-    for &bit in scalar.to_bits().iter().rev() {
+    for &naf in scalar.to_nafs().iter() {
         res = double_projective_point(res);
-        let point_to_add = if bit == 1 {
-            point
-        } else {
-            P::ADDITIVE_IDENTITY
-        };
-        // println!("Point to add");
-        // println!("{point_to_add:#?}");
-        res += point_to_add;
-        // println!("After sum");
-        // println!("{res:#?}");
+        if naf == Naf::Plus {
+            res += point;
+        } else if naf == Naf::Minus {
+            res -= point;
+        }
     }
-
     res
 }

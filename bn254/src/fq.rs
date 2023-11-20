@@ -184,7 +184,7 @@ prime_field_operation!(Fq, MODULUS, GENERATOR, INV, R, R2, R3);
 
 impl From<Fr> for Fq {
     fn from(val: Fr) -> Fq {
-        Self(val.0)
+        Self(to_mont_form(val.montgomery_reduce(), R2, MODULUS, INV))
     }
 }
 
@@ -201,5 +201,12 @@ mod tests {
             let s_prime = Fq::from_bytes(bytes).unwrap();
             assert_eq!(s, s_prime);
         }
+    }
+
+    #[test]
+    fn to_fr_and_back() {
+        let x = Fq::random(OsRng);
+        let y = Fr::from(x);
+        assert_eq!(x, Fq::from(y));
     }
 }

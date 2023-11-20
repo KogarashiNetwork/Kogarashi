@@ -19,6 +19,7 @@ pub trait PrimeField: Field + ParityCmp + From<u64> {
 
     fn is_zero(self) -> bool;
 
+    /// To bit representation in Big-endian
     fn to_bits(self) -> Bits;
 
     fn to_nafs(self) -> Nafs;
