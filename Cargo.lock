@@ -1460,6 +1460,7 @@ dependencies = [
 name = "zknova"
 version = "0.0.1"
 dependencies = [
+ "blake2b_simd",
  "bn-254",
  "ff",
  "generic-array",

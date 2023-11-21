@@ -18,7 +18,7 @@ pub(crate) const MODULUS: [u64; 4] = [
 const GENERATOR: [u64; 4] = [7, 0, 0, 0];
 
 /// generator of the scalar field
-pub const MULTIPLICATIVE_GENERATOR: Fr = Fr::to_mont_form([7, 0, 0, 0]);
+pub const MULTIPLICATIVE_GENERATOR: Fr = Fr::to_mont_form(GENERATOR);
 
 /// `R = 2^256 mod r`
 /// `0xe0a77c19a07df2f666ea36f7879462e36fc76959f60cd29ac96341c4ffffffb`
