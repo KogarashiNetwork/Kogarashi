@@ -1,3 +1,4 @@
+use core::marker::PhantomData;
 use generic_array::typenum::U24;
 use merlin::Transcript as Merlin;
 use neptune::{
@@ -9,7 +10,6 @@ use neptune::{
     Strength,
 };
 use r1cs::CircuitDriver;
-use std::marker::PhantomData;
 use zkstd::common::{CurveGroup, Deserialize, IntGroup, PrimeField, Ring, Serialize};
 
 pub trait Transcript<C: CircuitDriver> {
