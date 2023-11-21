@@ -62,36 +62,75 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         z
     }
 
-    // fn range_check(cs: &mut R1cs<C>, value: &Self, limit: C::Scalar) {
-    //     let num_of_bits = limit.to_bits().iter().skip_while(|&b| *b == 0).count();
-    //     let repr = FieldAssignment::constant(&(limit - C::Scalar::pow_of_2(num_of_bits as u64)));
-    //
-    //     let powers_of_2 = (0..num_of_bits - 1)
-    //         .map(|i| C::Scalar::pow_of_2(i as u64))
-    //         .collect::<Vec<_>>();
-    //     let bits = value.inner().evaluate(&cs.x, &cs.w).to_bits();
-    //
-    //     let value_from_bit =
-    //         bits.iter()
-    //             .rev()
-    //             .zip(powers_of_2.iter())
-    //             .fold(repr, |acc, (&b, coeff)| {
-    //                 let bit = BinaryAssignment::witness(cs, b);
-    //                 &acc + &FieldAssignment::mul(
-    //                     cs,
-    //                     &FieldAssignment::from(&bit),
-    //                     &FieldAssignment::constant(coeff),
-    //                 )
-    //             });
-    //
-    //     FieldAssignment::eq(cs, value, &value_from_bit);
-    // }
+    fn range_check(cs: &mut R1cs<C>, a: &Self, c: C::Scalar) {
+        let a_bits = a.inner().evaluate(&cs.x, &cs.w).to_bits();
+        let c_bits = c
+            .to_bits()
+            .into_iter()
+            .skip_while(|&b| b == 0)
+            .collect::<Vec<_>>();
+
+        // Check that there are no zeroes before the first one in the C
+        assert!(a_bits
+            .iter()
+            .take(a_bits.len() - c_bits.len())
+            .all(|&b| b == 0));
+
+        let a_bits = a_bits
+            .iter()
+            .map(|&b| BinaryAssignment::witness(cs, b))
+            .skip(a_bits.len() - c_bits.len())
+            .collect::<Vec<_>>();
+
+        let mut p = vec![FieldAssignment::from(&a_bits[0])];
+        let t = c_bits
+            .iter()
+            .rposition(|&b| b != 1)
+            .unwrap_or(c_bits.len() - 1);
+
+        for (a, &c) in a_bits.iter().zip(c_bits.iter().skip(1).take(t + 1)) {
+            if c == 1 {
+                p.push(FieldAssignment::mul(
+                    cs,
+                    &p.last().unwrap(),
+                    &FieldAssignment::from(a),
+                ));
+            } else {
+                p.push(p.last().unwrap().clone());
+            }
+        }
+
+        for (i, (a, &c)) in a_bits.iter().zip(c_bits.iter()).enumerate() {
+            let bit_field = FieldAssignment::from(a);
+            if c == 1 {
+                let bool_constr = FieldAssignment::mul(
+                    cs,
+                    &(&bit_field - &FieldAssignment::constant(&C::Scalar::one())),
+                    &bit_field,
+                );
+                FieldAssignment::eq(
+                    cs,
+                    &bool_constr,
+                    &FieldAssignment::constant(&C::Scalar::zero()),
+                );
+            } else if c == 0 {
+                let bool_constr = FieldAssignment::mul(
+                    cs,
+                    &(&(&FieldAssignment::constant(&C::Scalar::one()) - &bit_field) - &p[i - 1]),
+                    &bit_field,
+                );
+                FieldAssignment::eq(
+                    cs,
+                    &bool_constr,
+                    &FieldAssignment::constant(&C::Scalar::zero()),
+                );
+            }
+        }
+    }
 
     /// To bit representation in Big-endian
     pub fn to_bits(cs: &mut R1cs<C>, x: &Self) -> Vec<BinaryAssignment<C>> {
         let bound = C::Scalar::MODULUS - C::Scalar::one();
-        println!("Bound = \n{:?}", bound.to_bits());
-        println!("X = \n{:?}", x.inner().evaluate(&cs.x, &cs.w).to_bits());
         let mut repr_from_bits = FieldAssignment::constant(&C::Scalar::zero());
 
         let powers_of_2 = (0..C::NUM_BITS)
@@ -111,7 +150,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
                 let bit_field = FieldAssignment::from(&bit);
                 let bool_constr = FieldAssignment::mul(
                     cs,
-                    &(&bit_field - &FieldAssignment::constant(&C::Scalar::one())),
+                    &(&FieldAssignment::constant(&C::Scalar::one()) - &bit_field),
                     &bit_field,
                 );
                 FieldAssignment::eq(
@@ -196,8 +235,8 @@ mod tests {
     use super::{FieldAssignment, R1cs};
     use crate::driver::GrumpkinDriver;
     use crate::gadget::binary::BinaryAssignment;
+    use crate::CircuitDriver;
     use bn_254::{Fr as Scalar, Fr};
-    use ff::PrimeField as FFPrimeField;
     use zkstd::common::{Group, OsRng, PrimeField};
 
     #[test]
@@ -205,22 +244,20 @@ mod tests {
         let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let input = Fr::random(OsRng);
 
-        println!("Input = {:?}", input);
-
         let x = FieldAssignment::instance(&mut cs, input);
         let _bits: Vec<BinaryAssignment<GrumpkinDriver>> = FieldAssignment::to_bits(&mut cs, &x);
 
         assert!(cs.is_sat());
     }
 
-    /*  #[test]
+    #[test]
     fn field_range() {
-        for i in 1..Fr::NUM_BITS {
+        for i in 1..GrumpkinDriver::NUM_BITS {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
             let mut ncs = cs.clone();
             let x = Fr::pow_of_2(i as u64);
 
-            let x_ass = FieldAssignment::instance(&mut cs, x - Fr::one());
+            let x_ass = FieldAssignment::instance(&mut cs, x);
             FieldAssignment::range_check(&mut cs, &x_ass, x);
             assert!(cs.is_sat());
 
@@ -228,7 +265,7 @@ mod tests {
             FieldAssignment::range_check(&mut ncs, &x_ass, x);
             assert!(!ncs.is_sat());
         }
-    }*/
+    }
 
     #[test]
     fn field_add_test() {
