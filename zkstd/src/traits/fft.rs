@@ -18,8 +18,6 @@ pub trait FftField: PrimeField + ParallelCmp + From<[u64; 4]> {
 
     fn pow(self, val: u64) -> Self;
 
-    fn pow_of_2(by: u64) -> Self;
-
     fn divn(&mut self, n: u32);
 
     fn mod_2_pow_k(&self, k: u8) -> u8;
