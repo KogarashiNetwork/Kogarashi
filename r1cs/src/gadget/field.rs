@@ -62,7 +62,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         z
     }
 
-    fn range_check(cs: &mut R1cs<C>, a_bits: &[BinaryAssignment<C>], c: C::Scalar) {
+    pub fn range_check(cs: &mut R1cs<C>, a_bits: &[BinaryAssignment<C>], c: C::Scalar) {
         let c_bits = c
             .to_bits()
             .into_iter()
