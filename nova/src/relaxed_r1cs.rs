@@ -1,7 +1,7 @@
 mod instance;
 mod witness;
 
-use crate::transcript::Transcript;
+use crate::hash::MimcRO;
 pub(crate) use instance::RelaxedR1csInstance;
 use r1cs::{CircuitDriver, DenseVectors, R1cs, SparseMatrix};
 pub(crate) use witness::RelaxedR1csWitness;
@@ -133,7 +133,10 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
             .all(|(left, right)| left == right)
     }
 
-    pub fn absorb_by_transcript<T: Transcript<C>>(&self, transcript: &mut T) {
+    pub(crate) fn absorb_by_transcript<const ROUNDS: usize>(
+        &self,
+        transcript: &mut MimcRO<ROUNDS, C::Base>,
+    ) {
         self.instance.absorb_by_transcript(transcript);
     }
 }
