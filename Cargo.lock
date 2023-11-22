@@ -1464,6 +1464,7 @@ dependencies = [
  "bn-254",
  "ff",
  "generic-array",
+ "grumpkin",
  "merlin",
  "neptune",
  "r1cs",

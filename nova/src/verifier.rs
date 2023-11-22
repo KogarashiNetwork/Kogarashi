@@ -14,7 +14,7 @@ impl<C: CircuitDriver> Verifier<C> {
         r1cs: &R1cs<C>,
         relaxed_r1cs: &RelaxedR1cs<C>,
     ) -> RelaxedR1csInstance<C> {
-        let mut transcript = MimcRO::<10, C::Base>::default();
+        let mut transcript = MimcRO::<322, C::Base>::default();
 
         transcript.append_point(commit_t);
         relaxed_r1cs.absorb_by_transcript(&mut transcript);

@@ -23,6 +23,7 @@ blake2b_simd = { version = "1", default-features = false }
 
 [dev-dependencies]
 rand_core = { version="0.6.4", default-features = false, features = ["getrandom"] }
+grumpkin = { path = "../grumpkin", default-features = false }
 
 [features]
 default = ["std"]

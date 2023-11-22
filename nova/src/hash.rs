@@ -1,3 +1,4 @@
+mod circuit;
 mod helper;
 
 use helper::BlakeHelper;
@@ -61,9 +62,9 @@ impl<const ROUND: usize, F: PrimeField> MimcRO<ROUND, F> {
         self.append(point.get_x());
         self.append(point.get_y());
         self.append(if point.is_identity() {
-            A::Base::one()
-        } else {
             A::Base::zero()
+        } else {
+            A::Base::one()
         });
     }
 

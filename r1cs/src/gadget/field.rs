@@ -32,6 +32,10 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         Self(SparseRow(vec![(Wire::ONE, *constant)]))
     }
 
+    pub fn square(cs: &mut R1cs<C>, x: &Self) -> Self {
+        Self::mul(cs, x, x)
+    }
+
     pub fn mul(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
         if let Some(c) = x.0.as_constant() {
             return Self(y.0.clone() * c);
@@ -143,6 +147,14 @@ impl<C: CircuitDriver> FieldAssignment<C> {
 
     pub fn eq(cs: &mut R1cs<C>, x: &Self, y: &Self) {
         cs.mul_gate(&x.0, &SparseRow::one(), &y.0)
+    }
+
+    pub fn eq_constant(cs: &mut R1cs<C>, x: &Self, c: &C::Scalar) {
+        cs.mul_gate(
+            &x.0,
+            &SparseRow::one(),
+            &FieldAssignment::<C>::constant(c).0,
+        )
     }
 }
 

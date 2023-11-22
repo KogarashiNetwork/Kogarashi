@@ -29,7 +29,7 @@ impl<C: CircuitDriver> Prover<C> {
         r1cs: &R1cs<C>,
         relaxed_r1cs: &RelaxedR1cs<C>,
     ) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>, C::Affine) {
-        let mut transcript = MimcRO::<10, C::Base>::default();
+        let mut transcript = MimcRO::<322, C::Base>::default();
         // compute cross term t
         let t = self.compute_cross_term(r1cs, relaxed_r1cs);
 
