@@ -196,8 +196,7 @@ impl<C: CircuitDriver> Index<Wire> for R1cs<C> {
 
 #[cfg(test)]
 mod tests {
-    use crate::driver::GrumpkinDriver;
-    use crate::{test::example_r1cs, R1cs};
+    use crate::{driver::GrumpkinDriver, test::example_r1cs, R1cs};
 
     #[test]
     fn r1cs_test() {

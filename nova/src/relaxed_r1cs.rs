@@ -17,11 +17,11 @@ pub struct RelaxedR1cs<C: CircuitDriver> {
 
     // 2. Instance
     // r1cs instance includes public inputs, outputs and scalar
-    instance: RelaxedR1csInstance<C>,
+    pub(crate) instance: RelaxedR1csInstance<C>,
 
     // 3. Witness
     // r1cs witness includes private inputs, intermediate value and error vector
-    witness: RelaxedR1csWitness<C>,
+    pub(crate) witness: RelaxedR1csWitness<C>,
 }
 
 impl<C: CircuitDriver> RelaxedR1cs<C> {

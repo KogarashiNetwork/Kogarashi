@@ -1,6 +1,8 @@
 #![doc = include_str!("../README.md")]
 #![allow(dead_code)]
 
+mod function;
+mod hash;
 mod ivc;
 mod pedersen;
 mod proof;
@@ -9,6 +11,9 @@ mod relaxed_r1cs;
 #[allow(dead_code)]
 mod transcript;
 mod verifier;
+
+#[cfg(test)]
+mod test;
 
 pub use ivc::Ivc;
 pub use pedersen::PedersenCommitment;
