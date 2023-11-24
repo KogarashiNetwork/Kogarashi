@@ -1,6 +1,8 @@
 use zkstd::arithmetic::bits_256::*;
+use zkstd::arithmetic::weierstrass::*;
 use zkstd::circuit::CircuitDriver;
 use zkstd::common::*;
+use zkstd::macros::curve::weierstrass::*;
 use zkstd::macros::field::*;
 
 pub(crate) const FR_MODULUS: [u64; 4] = [
@@ -35,14 +37,44 @@ pub(crate) const FR_R3: [u64; 4] = [
 
 pub const FR_INV: u64 = 0xc2e1f593efffffff;
 
-pub const FR_ROOT_OF_UNITY: [u64; 4] = [
-    0xd34f1ed960c37c9c,
-    0x3215cf6dd39329c8,
-    0x98865ea93dd31f74,
-    0x03ddb9f5166d18b7,
+pub(crate) const FQ_MODULUS: [u64; 4] = [
+    0x3c208c16d87cfd47,
+    0x97816a916871ca8d,
+    0xb85045b68181585d,
+    0x30644e72e131a029,
 ];
 
+pub(crate) const FQ_GENERATOR: [u64; 4] = [3, 0, 0, 0];
+
+/// R = 2^256 mod q
+pub(crate) const FQ_R: [u64; 4] = [
+    0xd35d438dc58f0d9d,
+    0x0a78eb28f5c70b3d,
+    0x666ea36f7879462c,
+    0x0e0a77c19a07df2f,
+];
+
+/// R^2 = 2^512 mod q
+pub(crate) const FQ_R2: [u64; 4] = [
+    0xf32cfc5b538afa89,
+    0xb5e71911d44501fb,
+    0x47ab1eff0a417ff6,
+    0x06d89f71cab8351f,
+];
+
+/// R^3 = 2^768 mod q
+pub(crate) const FQ_R3: [u64; 4] = [
+    0xb1cd6dafda1530df,
+    0x62f210e6a7283db6,
+    0xef7f0b0c0ada0afb,
+    0x20fd6e902d592544,
+];
+
+/// INV = -(q^{-1} mod 2^64) mod 2^64
+pub(crate) const FQ_INV: u64 = 0x87d20782e4866389;
+
 curve_macro!(Fr, FR_GENERATOR, FR_MODULUS, FR_R, FR_R2, FR_R3, FR_INV);
+curve_macro!(Fq, FQ_GENERATOR, FQ_MODULUS, FQ_R, FQ_R2, FQ_R3, FQ_INV);
 
 pub(crate) const FR_PARAM_B: Fr = Fr::new_unchecked([
     0xdd7056026000005a,
@@ -50,8 +82,12 @@ pub(crate) const FR_PARAM_B: Fr = Fr::new_unchecked([
     0xcc388229877910c0,
     0x034394632b724eaa,
 ]);
-
 pub const FR_PARAM_B3: Fr = FR_PARAM_B.add_const(FR_PARAM_B).add_const(FR_PARAM_B);
+
+pub(crate) const G1_GENERATOR_X: Fq = Fq::one();
+pub(crate) const G1_GENERATOR_Y: Fq = Fq::to_mont_form([2, 0, 0, 0]);
+pub(crate) const G1_PARAM_B: Fq = Fq::to_mont_form([3, 0, 0, 0]);
+pub const FQ_PARAM_B3: Fq = G1_PARAM_B.add_const(G1_PARAM_B).add_const(G1_PARAM_B);
 
 #[macro_export]
 macro_rules! curve_macro {
@@ -121,18 +157,155 @@ macro_rules! curve_macro {
     };
 }
 
-// #[derive(Clone, Debug, Default, PartialEq, Eq)]
-// pub struct GrumpkinDriver;
+impl From<Fq> for Fr {
+    fn from(val: Fq) -> Fr {
+        Self(to_mont_form(
+            val.montgomery_reduce(),
+            FR_R2,
+            FR_MODULUS,
+            FR_INV,
+        ))
+    }
+}
 
-// impl CircuitDriver for GrumpkinDriver {
-//     const NUM_BITS: u16 = 254;
-//     type Affine = G1Affine;
+impl From<Fr> for Fq {
+    fn from(val: Fr) -> Fq {
+        Self(to_mont_form(
+            val.montgomery_reduce(),
+            FQ_R2,
+            FQ_MODULUS,
+            FQ_INV,
+        ))
+    }
+}
 
-//     type Base = Fq;
+/// The projective form of coordinate
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct G1Affine {
+    pub(crate) x: Fq,
+    pub(crate) y: Fq,
+    is_infinity: bool,
+}
 
-//     type Scalar = Fr;
+impl Add for G1Affine {
+    type Output = G1Projective;
 
-//     fn b3() -> Self::Scalar {
-//         PARAM_B3
-//     }
-// }
+    fn add(self, rhs: G1Affine) -> Self::Output {
+        add_affine_point(self, rhs)
+    }
+}
+
+impl Neg for G1Affine {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            is_infinity: self.is_infinity,
+        }
+    }
+}
+
+impl Sub for G1Affine {
+    type Output = G1Projective;
+
+    fn sub(self, rhs: G1Affine) -> Self::Output {
+        add_affine_point(self, rhs.neg())
+    }
+}
+
+impl Mul<Fr> for G1Affine {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self.to_extended(), &rhs)
+    }
+}
+
+impl Mul<G1Affine> for Fr {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: G1Affine) -> Self::Output {
+        scalar_point(rhs.to_extended(), &self)
+    }
+}
+
+/// The projective form of coordinate
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct G1Projective {
+    pub(crate) x: Fq,
+    pub(crate) y: Fq,
+    pub(crate) z: Fq,
+}
+
+impl Add for G1Projective {
+    type Output = Self;
+
+    fn add(self, rhs: G1Projective) -> Self {
+        add_projective_point(self, rhs)
+    }
+}
+
+impl Neg for G1Projective {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            z: self.z,
+        }
+    }
+}
+
+impl Sub for G1Projective {
+    type Output = Self;
+
+    fn sub(self, rhs: G1Projective) -> Self {
+        add_projective_point(self, -rhs)
+    }
+}
+
+impl Mul<Fr> for G1Projective {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: Fr) -> Self::Output {
+        scalar_point(self, &rhs)
+    }
+}
+
+impl Mul<G1Projective> for Fr {
+    type Output = G1Projective;
+
+    fn mul(self, rhs: G1Projective) -> Self::Output {
+        scalar_point(rhs, &self)
+    }
+}
+
+weierstrass_curve_operation!(
+    Fr,
+    Fq,
+    G1_PARAM_B,
+    FQ_PARAM_B3,
+    G1Affine,
+    G1Projective,
+    G1_GENERATOR_X,
+    G1_GENERATOR_Y
+);
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct GrumpkinDriver;
+
+impl CircuitDriver for GrumpkinDriver {
+    const NUM_BITS: u16 = 254;
+    type Affine = G1Affine;
+
+    type Base = Fq;
+
+    type Scalar = Fr;
+
+    fn b3() -> Self::Scalar {
+        FR_PARAM_B3
+    }
+}
