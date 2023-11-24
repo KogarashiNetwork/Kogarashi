@@ -73,24 +73,8 @@ pub(crate) const FQ_R3: [u64; 4] = [
 /// INV = -(q^{-1} mod 2^64) mod 2^64
 pub(crate) const FQ_INV: u64 = 0x87d20782e4866389;
 
-curve_macro!(Fr, FR_GENERATOR, FR_MODULUS, FR_R, FR_R2, FR_R3, FR_INV);
-curve_macro!(Fq, FQ_GENERATOR, FQ_MODULUS, FQ_R, FQ_R2, FQ_R3, FQ_INV);
-
-pub(crate) const FR_PARAM_B: Fr = Fr::new_unchecked([
-    0xdd7056026000005a,
-    0x223fa97acb319311,
-    0xcc388229877910c0,
-    0x034394632b724eaa,
-]);
-pub const FR_PARAM_B3: Fr = FR_PARAM_B.add_const(FR_PARAM_B).add_const(FR_PARAM_B);
-
-pub(crate) const G1_GENERATOR_X: Fq = Fq::one();
-pub(crate) const G1_GENERATOR_Y: Fq = Fq::to_mont_form([2, 0, 0, 0]);
-pub(crate) const G1_PARAM_B: Fq = Fq::to_mont_form([3, 0, 0, 0]);
-pub const FQ_PARAM_B3: Fq = G1_PARAM_B.add_const(G1_PARAM_B).add_const(G1_PARAM_B);
-
 #[macro_export]
-macro_rules! curve_macro {
+macro_rules! cycle_pair_field {
     ($field:ident, $generator:ident, $modulus:ident, $r:ident, $r2:ident, $r3:ident, $inv:ident) => {
         #[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
         pub struct $field(pub [u64; 4]);
@@ -156,6 +140,22 @@ macro_rules! curve_macro {
         prime_field_operation!($field, $modulus, $generator, $inv, $r, $r2, $r3);
     };
 }
+
+cycle_pair_field!(Fr, FR_GENERATOR, FR_MODULUS, FR_R, FR_R2, FR_R3, FR_INV);
+cycle_pair_field!(Fq, FQ_GENERATOR, FQ_MODULUS, FQ_R, FQ_R2, FQ_R3, FQ_INV);
+
+pub(crate) const FR_PARAM_B: Fr = Fr::new_unchecked([
+    0xdd7056026000005a,
+    0x223fa97acb319311,
+    0xcc388229877910c0,
+    0x034394632b724eaa,
+]);
+pub const FR_PARAM_B3: Fr = FR_PARAM_B.add_const(FR_PARAM_B).add_const(FR_PARAM_B);
+
+pub(crate) const G1_GENERATOR_X: Fq = Fq::one();
+pub(crate) const G1_GENERATOR_Y: Fq = Fq::to_mont_form([2, 0, 0, 0]);
+pub(crate) const G1_PARAM_B: Fq = Fq::to_mont_form([3, 0, 0, 0]);
+pub const FQ_PARAM_B3: Fq = G1_PARAM_B.add_const(G1_PARAM_B).add_const(G1_PARAM_B);
 
 impl From<Fq> for Fr {
     fn from(val: Fq) -> Fr {
@@ -292,6 +292,133 @@ weierstrass_curve_operation!(
     G1Projective,
     G1_GENERATOR_X,
     G1_GENERATOR_Y
+);
+
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct Affine {
+    pub(crate) x: Fr,
+    pub(crate) y: Fr,
+    is_infinity: bool,
+}
+impl Add for Affine {
+    type Output = Projective;
+
+    fn add(self, rhs: Affine) -> Self::Output {
+        add_affine_point(self, rhs)
+    }
+}
+
+impl Neg for Affine {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            is_infinity: self.is_infinity,
+        }
+    }
+}
+
+impl Sub for Affine {
+    type Output = Projective;
+
+    fn sub(self, rhs: Affine) -> Self::Output {
+        add_affine_point(self, rhs.neg())
+    }
+}
+
+impl Mul<Fq> for Affine {
+    type Output = Projective;
+
+    fn mul(self, rhs: Fq) -> Self::Output {
+        scalar_point(self.to_extended(), &rhs)
+    }
+}
+
+impl Mul<Affine> for Fq {
+    type Output = Projective;
+
+    fn mul(self, rhs: Affine) -> Self::Output {
+        scalar_point(rhs.to_extended(), &self)
+    }
+}
+
+#[derive(Debug, Clone, Copy, Decode, Encode)]
+pub struct Projective {
+    pub(crate) x: Fr,
+    pub(crate) y: Fr,
+    pub(crate) z: Fr,
+}
+
+impl Add for Projective {
+    type Output = Self;
+
+    fn add(self, rhs: Projective) -> Self {
+        add_projective_point(self, rhs)
+    }
+}
+
+impl Neg for Projective {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self {
+            x: self.x,
+            y: -self.y,
+            z: self.z,
+        }
+    }
+}
+
+impl Sub for Projective {
+    type Output = Self;
+
+    fn sub(self, rhs: Projective) -> Self {
+        add_projective_point(self, -rhs)
+    }
+}
+
+impl Mul<Fq> for Projective {
+    type Output = Projective;
+
+    fn mul(self, rhs: Fq) -> Self::Output {
+        scalar_point(self, &rhs)
+    }
+}
+
+impl Mul<Projective> for Fq {
+    type Output = Projective;
+
+    fn mul(self, rhs: Projective) -> Self::Output {
+        scalar_point(rhs, &self)
+    }
+}
+
+pub const GENERATOR_X: Fr = Fr::one();
+pub const GENERATOR_Y: Fr = Fr::new_unchecked([
+    0x11b2dff1448c41d8,
+    0x23d3446f21c77dc3,
+    0xaa7b8cf435dfafbb,
+    0x14b34cf69dc25d68,
+]);
+pub(crate) const PARAM_B: Fr = Fr::new_unchecked([
+    0xdd7056026000005a,
+    0x223fa97acb319311,
+    0xcc388229877910c0,
+    0x034394632b724eaa,
+]);
+pub const PARAM_B3: Fr = PARAM_B.add_const(PARAM_B).add_const(PARAM_B);
+
+weierstrass_curve_operation!(
+    Fq,
+    Fr,
+    PARAM_B,
+    PARAM_B3,
+    Affine,
+    Projective,
+    GENERATOR_X,
+    GENERATOR_Y
 );
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
