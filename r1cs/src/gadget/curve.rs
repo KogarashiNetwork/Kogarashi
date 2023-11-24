@@ -144,6 +144,18 @@ impl<C: CircuitDriver> PointAssignment<C> {
             z: FieldAssignment::mul(cs, &z, &bit),
         }
     }
+
+    pub fn get_x(&self) -> FieldAssignment<C> {
+        self.x.clone()
+    }
+
+    pub fn get_y(&self) -> FieldAssignment<C> {
+        self.y.clone()
+    }
+
+    pub fn get_z(&self) -> FieldAssignment<C> {
+        self.z.clone()
+    }
 }
 
 #[cfg(test)]

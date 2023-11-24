@@ -1,4 +1,4 @@
-use crate::transcript::Transcript;
+use crate::hash::MimcRO;
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Group, PrimeField, Ring};
 
@@ -47,12 +47,15 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
         }
     }
 
-    pub(crate) fn absorb_by_transcript<T: Transcript<C>>(&self, transcript: &mut T) {
-        transcript.absorb_point(b"commit_w", self.commit_w);
-        transcript.absorb_point(b"commit_e", self.commit_e);
-        transcript.absorb(b"u", C::Base::from(self.u));
+    pub(crate) fn absorb_by_transcript<const ROUNDS: usize>(
+        &self,
+        transcript: &mut MimcRO<ROUNDS, C::Base>,
+    ) {
+        transcript.append_point(self.commit_w);
+        transcript.append_point(self.commit_e);
+        transcript.append(self.u.into());
         for x in &self.x.get() {
-            transcript.absorb(b"x", C::Base::from(*x));
+            transcript.append(C::Base::from(*x));
         }
     }
 }

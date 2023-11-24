@@ -2,9 +2,8 @@ use crate::{
     pedersen::PedersenCommitment,
     relaxed_r1cs::{RelaxedR1cs, RelaxedR1csInstance, RelaxedR1csWitness},
 };
-use merlin::Transcript as Merlin;
 
-use crate::transcript::Transcript;
+use crate::hash::{MimcRO, MIMC_ROUNDS};
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Ring, RngCore};
 
@@ -30,16 +29,16 @@ impl<C: CircuitDriver> Prover<C> {
         r1cs: &R1cs<C>,
         relaxed_r1cs: &RelaxedR1cs<C>,
     ) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>, C::Affine) {
-        let mut transcript = Merlin::new(b"nova");
+        let mut transcript = MimcRO::<MIMC_ROUNDS, C::Base>::default();
         // compute cross term t
         let t = self.compute_cross_term(r1cs, relaxed_r1cs);
 
         let commit_t = self.pp.commit(&t);
 
-        <Merlin as Transcript<C>>::absorb_point(&mut transcript, b"commit_t", commit_t);
+        transcript.append_point(commit_t);
         relaxed_r1cs.absorb_by_transcript(&mut transcript);
 
-        let r = <Merlin as Transcript<C>>::challenge_scalar(&mut transcript, b"randomness");
+        let r = transcript.squeeze().into();
 
         // fold instance
         let instance = relaxed_r1cs.fold_instance(r1cs, r, commit_t);

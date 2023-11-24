@@ -1,8 +1,7 @@
 use crate::relaxed_r1cs::{RelaxedR1cs, RelaxedR1csInstance};
 
-use crate::transcript::Transcript;
+use crate::hash::{MimcRO, MIMC_ROUNDS};
 use core::marker::PhantomData;
-use merlin::Transcript as Merlin;
 use r1cs::{CircuitDriver, R1cs};
 
 pub struct Verifier<C: CircuitDriver> {
@@ -15,12 +14,12 @@ impl<C: CircuitDriver> Verifier<C> {
         r1cs: &R1cs<C>,
         relaxed_r1cs: &RelaxedR1cs<C>,
     ) -> RelaxedR1csInstance<C> {
-        let mut transcript = Merlin::new(b"nova");
+        let mut transcript = MimcRO::<MIMC_ROUNDS, C::Base>::default();
 
-        <Merlin as Transcript<C>>::absorb_point(&mut transcript, b"commit_t", commit_t);
+        transcript.append_point(commit_t);
         relaxed_r1cs.absorb_by_transcript(&mut transcript);
 
-        let r = <Merlin as Transcript<C>>::challenge_scalar(&mut transcript, b"randomness");
+        let r = transcript.squeeze().into();
 
         relaxed_r1cs.fold_instance(r1cs, r, commit_t)
     }

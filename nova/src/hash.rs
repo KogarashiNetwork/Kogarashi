@@ -1,7 +1,12 @@
+mod circuit;
 mod helper;
 
 use helper::BlakeHelper;
-use zkstd::common::PrimeField;
+use zkstd::common::{BNAffine, PrimeField};
+
+/// Amount of rounds calculated for the 254 bit field.
+/// Doubled due to the usage of Feistel mode with zero key.
+pub(crate) const MIMC_ROUNDS: usize = 322;
 
 pub(crate) struct Mimc<const ROUND: usize, F: PrimeField> {
     constants: [F; ROUND],
@@ -55,6 +60,16 @@ impl<const ROUND: usize, F: PrimeField> Default for MimcRO<ROUND, F> {
 impl<const ROUND: usize, F: PrimeField> MimcRO<ROUND, F> {
     pub(crate) fn append(&mut self, absorb: F) {
         self.state.push(absorb)
+    }
+
+    pub(crate) fn append_point<A: BNAffine<Base = F>>(&mut self, point: A) {
+        self.append(point.get_x());
+        self.append(point.get_y());
+        self.append(if point.is_identity() {
+            A::Base::zero()
+        } else {
+            A::Base::one()
+        });
     }
 
     pub(crate) fn squeeze(&self) -> F {
