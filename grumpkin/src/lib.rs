@@ -18,6 +18,7 @@
 #![allow(clippy::suspicious_arithmetic_impl)]
 
 mod curve;
+pub mod driver;
+pub mod params;
 
 pub use curve::{Affine, Projective};
-pub mod params;

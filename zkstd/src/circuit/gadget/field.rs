@@ -1,11 +1,8 @@
-use crate::driver::CircuitDriver;
+use super::binary::BinaryAssignment;
+use crate::circuit::CircuitDriver;
+use crate::common::{vec, Add, IntGroup, Neg, PrimeField, Ring, Sub, Vec};
 use crate::matrix::SparseRow;
-use crate::wire::Wire;
-use crate::R1cs;
-use std::ops::{Neg, Sub};
-
-use crate::gadget::binary::BinaryAssignment;
-use zkstd::common::{Add, IntGroup, PrimeField, Ring};
+use crate::r1cs::{R1cs, Wire};
 
 #[derive(Clone)]
 pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Scalar>);
@@ -185,132 +182,5 @@ impl<C: CircuitDriver> Neg for &FieldAssignment<C> {
 
     fn neg(self) -> Self::Output {
         FieldAssignment(-&self.0)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{FieldAssignment, R1cs};
-    use crate::driver::GrumpkinDriver;
-    use bn_254::{Fr as Scalar, Fr};
-    use zkstd::common::{Group, OsRng};
-
-    #[test]
-    fn to_bits() {
-        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-        let input = Fr::random(OsRng);
-
-        let x = FieldAssignment::instance(&mut cs, input);
-        let _ = FieldAssignment::to_bits(&mut cs, &x);
-
-        assert!(cs.is_sat());
-    }
-
-    #[test]
-    fn field_range() {
-        for _ in 0..100 {
-            let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let mut ncs = cs.clone();
-            let bound = Fr::from(10);
-
-            let x_ass = FieldAssignment::instance(&mut cs, bound);
-            let x_bits = FieldAssignment::to_bits(&mut cs, &x_ass);
-            FieldAssignment::range_check(&mut cs, &x_bits, bound);
-            assert!(cs.is_sat());
-
-            let x_ass = FieldAssignment::instance(&mut ncs, bound + Fr::one());
-            let x_bits = FieldAssignment::to_bits(&mut ncs, &x_ass);
-            FieldAssignment::range_check(&mut ncs, &x_bits, bound);
-            assert!(!ncs.is_sat());
-        }
-    }
-
-    #[test]
-    fn field_add_test() {
-        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-        let mut ncs = cs.clone();
-        let a = Scalar::random(OsRng);
-        let b = Scalar::random(OsRng);
-        let mut c = a + b;
-
-        // a + b == c
-        let x = FieldAssignment::instance(&mut cs, a);
-        let y = FieldAssignment::witness(&mut cs, b);
-        let z = FieldAssignment::instance(&mut cs, c);
-        let sum = &x + &y;
-        FieldAssignment::eq(&mut cs, &z, &sum);
-
-        assert!(cs.is_sat());
-
-        // a + b != c
-        c += Scalar::one();
-        let x = FieldAssignment::instance(&mut ncs, a);
-        let y = FieldAssignment::witness(&mut ncs, b);
-        let z = FieldAssignment::instance(&mut ncs, c);
-        let sum = &x + &y;
-        FieldAssignment::eq(&mut ncs, &z, &sum);
-
-        assert!(!ncs.is_sat())
-    }
-
-    #[test]
-    fn field_mul_test() {
-        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-        let mut ncs = cs.clone();
-        let a = Scalar::random(OsRng);
-        let b = Scalar::random(OsRng);
-        let mut c = a * b;
-
-        // a * b == c
-        let x = FieldAssignment::instance(&mut cs, a);
-        let y = FieldAssignment::witness(&mut cs, b);
-        let z = FieldAssignment::instance(&mut cs, c);
-        let product = FieldAssignment::mul(&mut cs, &x, &y);
-        FieldAssignment::eq(&mut cs, &z, &product);
-
-        assert!(cs.is_sat());
-
-        // a * b != c
-        c += Scalar::one();
-        let x = FieldAssignment::instance(&mut ncs, a);
-        let y = FieldAssignment::witness(&mut ncs, b);
-        let z = FieldAssignment::instance(&mut ncs, c);
-        let product = FieldAssignment::mul(&mut ncs, &x, &y);
-        FieldAssignment::eq(&mut ncs, &z, &product);
-
-        assert!(!ncs.is_sat())
-    }
-
-    #[test]
-    fn field_ops_test() {
-        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-        let mut ncs = cs.clone();
-        let input = Scalar::from(3);
-        let c = Scalar::from(5);
-        let out = Scalar::from(35);
-
-        // x^3 + x + 5 == 35
-        let x = FieldAssignment::witness(&mut cs, input);
-        let c = FieldAssignment::constant(&c);
-        let z = FieldAssignment::instance(&mut cs, out);
-        let sym_1 = FieldAssignment::mul(&mut cs, &x, &x);
-        let y = FieldAssignment::mul(&mut cs, &sym_1, &x);
-        let sym_2 = &y + &x;
-        FieldAssignment::eq(&mut cs, &z, &(&sym_2 + &c));
-
-        assert!(cs.is_sat());
-
-        // x^3 + x + 5 != 36
-        let c = Scalar::from(5);
-        let out = Scalar::from(36);
-        let x = FieldAssignment::witness(&mut ncs, input);
-        let c = FieldAssignment::constant(&c);
-        let z = FieldAssignment::instance(&mut ncs, out);
-        let sym_1 = FieldAssignment::mul(&mut ncs, &x, &x);
-        let y = FieldAssignment::mul(&mut ncs, &sym_1, &x);
-        let sym_2 = &y + &x;
-        FieldAssignment::eq(&mut ncs, &z, &(&sym_2 + &c));
-
-        assert!(!ncs.is_sat());
     }
 }

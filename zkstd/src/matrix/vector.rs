@@ -1,5 +1,5 @@
+use crate::common::{vec, Add, Mul, PrimeField, Sub, Vec};
 use core::ops::{Index, IndexMut};
-use zkstd::common::{vec, Add, Mul, PrimeField, Sub, Vec};
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct DenseVectors<F: PrimeField>(Vec<F>);

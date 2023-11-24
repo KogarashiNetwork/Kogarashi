@@ -7,8 +7,8 @@ use crate::prover::Prover;
 use crate::verifier::{Verifier, VerifyingKey};
 
 use bn_254::{Fr, G1Affine, G2Affine};
-use r1cs::R1cs;
 use zkstd::common::{vec, Group, MulAssign, PrimeField, RngCore, Vec};
+use zkstd::r1cs::R1cs;
 
 /// Generate the arguments to prove and verify a circuit
 pub struct ZkSnark {}

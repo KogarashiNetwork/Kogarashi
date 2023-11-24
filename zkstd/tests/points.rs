@@ -1,9 +1,9 @@
-mod construction;
+mod jubjub;
 
 #[cfg(test)]
 mod twisted_edwards_points_tests {
     use super::*;
-    use construction::jubjub_curve::{BlsScalar, JubjubAffine, JubjubExtended};
+    use jubjub::jubjub_curve::{BlsScalar, JubjubAffine, JubjubExtended};
     use rand_core::OsRng;
     use zkstd::{
         arithmetic::edwards::*,

@@ -1,11 +1,11 @@
 mod row;
 mod vector;
 
-use crate::wire::Wire;
+use crate::r1cs::Wire;
 pub use row::SparseRow;
 pub use vector::DenseVectors;
 
-use zkstd::common::{vec, Debug, PrimeField, Vec};
+use crate::common::{vec, Debug, PrimeField, Vec};
 
 #[derive(Clone, Debug, Default)]
 pub struct SparseMatrix<F: PrimeField>(pub(crate) Vec<SparseRow<F>>);
