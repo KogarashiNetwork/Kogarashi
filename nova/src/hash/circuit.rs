@@ -72,7 +72,7 @@ impl<const ROUND: usize, C: CircuitDriver> MimcROCircuit<ROUND, C> {
 #[cfg(test)]
 mod tests {
     use crate::hash::circuit::MimcROCircuit;
-    use crate::hash::MimcRO;
+    use crate::hash::{MimcRO, MIMC_ROUNDS};
     use bn_254::Fr;
     use grumpkin::Affine;
     use r1cs::gadget::curve::PointAssignment;
@@ -83,8 +83,8 @@ mod tests {
 
     #[test]
     fn mimc_circuit() {
-        let mut mimc = MimcRO::<322, Fr>::default();
-        let mut mimc_circuit = MimcROCircuit::<322, GrumpkinDriver>::default();
+        let mut mimc = MimcRO::<MIMC_ROUNDS, Fr>::default();
+        let mut mimc_circuit = MimcROCircuit::<MIMC_ROUNDS, GrumpkinDriver>::default();
         let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let point = Affine::random(OsRng);
         let scalar = Fr::random(OsRng);

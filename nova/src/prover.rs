@@ -3,7 +3,7 @@ use crate::{
     relaxed_r1cs::{RelaxedR1cs, RelaxedR1csInstance, RelaxedR1csWitness},
 };
 
-use crate::hash::MimcRO;
+use crate::hash::{MimcRO, MIMC_ROUNDS};
 use r1cs::{CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Ring, RngCore};
 
@@ -29,7 +29,7 @@ impl<C: CircuitDriver> Prover<C> {
         r1cs: &R1cs<C>,
         relaxed_r1cs: &RelaxedR1cs<C>,
     ) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>, C::Affine) {
-        let mut transcript = MimcRO::<322, C::Base>::default();
+        let mut transcript = MimcRO::<MIMC_ROUNDS, C::Base>::default();
         // compute cross term t
         let t = self.compute_cross_term(r1cs, relaxed_r1cs);
 

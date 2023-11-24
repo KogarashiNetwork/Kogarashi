@@ -1,6 +1,6 @@
 use crate::relaxed_r1cs::{RelaxedR1cs, RelaxedR1csInstance};
 
-use crate::hash::MimcRO;
+use crate::hash::{MimcRO, MIMC_ROUNDS};
 use core::marker::PhantomData;
 use r1cs::{CircuitDriver, R1cs};
 
@@ -14,7 +14,7 @@ impl<C: CircuitDriver> Verifier<C> {
         r1cs: &R1cs<C>,
         relaxed_r1cs: &RelaxedR1cs<C>,
     ) -> RelaxedR1csInstance<C> {
-        let mut transcript = MimcRO::<322, C::Base>::default();
+        let mut transcript = MimcRO::<MIMC_ROUNDS, C::Base>::default();
 
         transcript.append_point(commit_t);
         relaxed_r1cs.absorb_by_transcript(&mut transcript);
