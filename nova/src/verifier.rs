@@ -2,7 +2,7 @@ use crate::relaxed_r1cs::{RelaxedR1cs, RelaxedR1csInstance};
 
 use crate::hash::{MimcRO, MIMC_ROUNDS};
 use core::marker::PhantomData;
-use r1cs::prelude::{CircuitDriver, R1cs};
+use zkstd::circuit::prelude::{CircuitDriver, R1cs};
 
 pub struct Verifier<C: CircuitDriver> {
     mark: PhantomData<C>,
@@ -30,7 +30,7 @@ mod tests {
     use super::{RelaxedR1cs, Verifier};
     use crate::prover::tests::example_prover;
 
-    use r1cs::test::example_r1cs;
+    use zkstd::r1cs::test::example_r1cs;
 
     #[test]
     fn folding_scheme_verifier_test() {

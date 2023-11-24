@@ -3,8 +3,9 @@ use crate::{
     RelaxedR1cs,
 };
 
-use r1cs::{prelude::CircuitDriver, DenseVectors, R1cs};
+use zkstd::circuit::prelude::{CircuitDriver, R1cs};
 use zkstd::common::{Group, Ring};
+use zkstd::matrix::DenseVectors;
 
 #[allow(clippy::type_complexity)]
 pub struct RecursiveProof<C: CircuitDriver> {

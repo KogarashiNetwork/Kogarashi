@@ -1,6 +1,6 @@
 use crate::gadget::MimcAssignment;
 
-use r1cs::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
+use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
 use zkstd::common::IntGroup;
 
 pub(crate) struct MimcROCircuit<const ROUND: usize, C: CircuitDriver> {
@@ -44,9 +44,9 @@ mod tests {
     use crate::hash::{MimcRO, MIMC_ROUNDS};
 
     use bn_254::Fr;
-    use grumpkin::Affine;
-    use r1cs::prelude::{FieldAssignment, GrumpkinDriver, PointAssignment, R1cs};
+    use grumpkin::{driver::GrumpkinDriver, Affine};
     use rand_core::OsRng;
+    use zkstd::circuit::prelude::{FieldAssignment, PointAssignment, R1cs};
     use zkstd::common::{CurveGroup, Group};
 
     #[test]

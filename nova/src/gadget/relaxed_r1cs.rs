@@ -1,6 +1,6 @@
-use r1cs::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
-
 use crate::relaxed_r1cs::RelaxedR1csInstance;
+
+use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
 
 pub(crate) struct RelaxedR1csAssignment<C: CircuitDriver> {
     pub(crate) commit_w: PointAssignment<C>,

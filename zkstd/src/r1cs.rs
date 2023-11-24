@@ -1,3 +1,4 @@
+pub mod test;
 mod wire;
 
 use crate::circuit::CircuitDriver;

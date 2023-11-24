@@ -23,7 +23,8 @@ mod tests {
     use crate::zksnark::ZkSnark;
 
     use bn_254::Fr as BnScalar;
-    use r1cs::prelude::{FieldAssignment, GrumpkinDriver, R1cs};
+    use grumpkin::driver::GrumpkinDriver;
+    use zkstd::circuit::prelude::{FieldAssignment, R1cs};
     use zkstd::common::OsRng;
 
     #[test]

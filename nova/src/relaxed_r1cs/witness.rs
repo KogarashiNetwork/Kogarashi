@@ -1,5 +1,6 @@
-use r1cs::{prelude::CircuitDriver, DenseVectors, R1cs};
+use zkstd::circuit::prelude::{CircuitDriver, R1cs};
 use zkstd::common::{IntGroup, PrimeField};
+use zkstd::matrix::DenseVectors;
 
 #[derive(Clone, Debug)]
 pub struct RelaxedR1csWitness<C: CircuitDriver> {
