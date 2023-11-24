@@ -4,11 +4,11 @@ use r1cs::gadget::field::FieldAssignment;
 use r1cs::{CircuitDriver, R1cs};
 use zkstd::common::IntGroup;
 
-pub(crate) struct ZKMimc<const ROUND: usize, C: CircuitDriver> {
+pub(crate) struct MimcAssignment<const ROUND: usize, C: CircuitDriver> {
     constants: [C::Scalar; ROUND],
 }
 
-impl<const ROUND: usize, C: CircuitDriver> Default for ZKMimc<ROUND, C> {
+impl<const ROUND: usize, C: CircuitDriver> Default for MimcAssignment<ROUND, C> {
     fn default() -> Self {
         Self {
             constants: Mimc::<ROUND, C::Scalar>::default().constants,
@@ -16,7 +16,7 @@ impl<const ROUND: usize, C: CircuitDriver> Default for ZKMimc<ROUND, C> {
     }
 }
 
-impl<const ROUND: usize, C: CircuitDriver> ZKMimc<ROUND, C> {
+impl<const ROUND: usize, C: CircuitDriver> MimcAssignment<ROUND, C> {
     pub(crate) fn hash(
         &self,
         cs: &mut R1cs<C>,
@@ -35,7 +35,7 @@ impl<const ROUND: usize, C: CircuitDriver> ZKMimc<ROUND, C> {
 }
 
 pub(crate) struct MimcROCircuit<const ROUND: usize, C: CircuitDriver> {
-    hasher: ZKMimc<ROUND, C>,
+    hasher: MimcAssignment<ROUND, C>,
     state: Vec<FieldAssignment<C>>,
     key: FieldAssignment<C>,
 }
@@ -43,7 +43,7 @@ pub(crate) struct MimcROCircuit<const ROUND: usize, C: CircuitDriver> {
 impl<const ROUND: usize, C: CircuitDriver> Default for MimcROCircuit<ROUND, C> {
     fn default() -> Self {
         Self {
-            hasher: ZKMimc::default(),
+            hasher: MimcAssignment::default(),
             state: Vec::default(),
             key: FieldAssignment::constant(&C::Scalar::zero()),
         }
