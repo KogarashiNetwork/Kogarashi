@@ -116,4 +116,24 @@ mod tests {
             &commit_t
         ));
     }
+
+    #[test]
+    fn nifs_fold_loop() {
+        let prover = example_prover();
+        let r1cs = example_r1cs(1);
+
+        let mut running_r1cs = RelaxedR1cs::new(r1cs);
+        assert!(running_r1cs.is_sat());
+
+        for i in 1..10 {
+            let incoming_r1cs = example_r1cs(i);
+
+            let (folded_instance, folded_witness, commit_t) =
+                prover.prove(&incoming_r1cs, &running_r1cs);
+            let verified_instance = Verifier::verify(commit_t, &incoming_r1cs, &running_r1cs);
+            assert_eq!(folded_instance, verified_instance);
+            running_r1cs = running_r1cs.update(&folded_instance, &folded_witness);
+            assert!(running_r1cs.is_sat());
+        }
+    }
 }
