@@ -1,7 +1,7 @@
 # ZkStd
 [![CI](https://github.com/KogarashiNetwork/zkstd/actions/workflows/ci.yml/badge.svg)](https://github.com/KogarashiNetwork/zkstd/actions/workflows/ci.yml) [![crates.io badge](https://img.shields.io/crates/v/zkstd.svg)](https://crates.io/crates/zkstd) [![Documentation](https://docs.rs/zkstd/badge.svg)](https://docs.rs/zkstd) [![GitHub license](https://img.shields.io/badge/license-GPL3%2FApache2-blue)](#LICENSE) [![codecov](https://codecov.io/gh/KogarashiNetwork/zkstd/branch/master/graph/badge.svg?token=801ESOH5ZV)](https://codecov.io/gh/KogarashiNetwork/zkstd) [![dependency status](https://deps.rs/crate/zkstd/latest/status.svg)](https://deps.rs/crate/zkstd/latest)
 
-This crate provides basic cryptographic implementation as in `Field`, `Curve` and `Pairing`, `Fft`, `Kzg`, and also supports fully `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec).
+This crate provides basic cryptographic implementation as in `Field`, `Curve`, `Pairing` and `Fft`, `Kzg`, `R1cs` and also supports fully `no_std` and [`parity-scale-codec`](https://github.com/paritytech/parity-scale-codec).
 
 ## Design
 
