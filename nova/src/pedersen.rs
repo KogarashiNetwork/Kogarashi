@@ -1,5 +1,5 @@
-use r1cs::DenseVectors;
 use zkstd::common::{BNAffine, Group, RngCore};
+use zkstd::matrix::DenseVectors;
 
 pub struct PedersenCommitment<C: BNAffine> {
     g: Vec<C>,

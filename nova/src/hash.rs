@@ -1,4 +1,3 @@
-mod circuit;
 mod helper;
 
 use helper::BlakeHelper;
@@ -9,7 +8,7 @@ use zkstd::common::{BNAffine, PrimeField};
 pub(crate) const MIMC_ROUNDS: usize = 322;
 
 pub(crate) struct Mimc<const ROUND: usize, F: PrimeField> {
-    constants: [F; ROUND],
+    pub(crate) constants: [F; ROUND],
 }
 
 impl<const ROUND: usize, F: PrimeField> Default for Mimc<ROUND, F> {

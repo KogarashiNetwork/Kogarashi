@@ -2,8 +2,9 @@ use crate::function::Function;
 use crate::proof::RecursiveProof;
 use crate::{Prover, RelaxedR1cs};
 
-use r1cs::{CircuitDriver, DenseVectors, R1cs};
+use zkstd::circuit::prelude::{CircuitDriver, R1cs};
 use zkstd::common::RngCore;
+use zkstd::matrix::DenseVectors;
 
 pub struct Ivc<C: CircuitDriver> {
     i: usize,
@@ -71,8 +72,12 @@ impl<C: CircuitDriver> Ivc<C> {
 mod tests {
     use super::Ivc;
     use crate::test::ExampleFunction;
-    use r1cs::{test::example_r1cs, DenseVectors, GrumpkinDriver, R1cs};
+
+    use grumpkin::driver::GrumpkinDriver;
     use rand_core::OsRng;
+    use zkstd::circuit::prelude::R1cs;
+    use zkstd::matrix::DenseVectors;
+    use zkstd::r1cs::test::example_r1cs;
 
     #[test]
     fn ivc_test() {

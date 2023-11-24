@@ -1,6 +1,7 @@
 use crate::hash::MimcRO;
-use r1cs::{CircuitDriver, DenseVectors, R1cs};
+use zkstd::circuit::prelude::{CircuitDriver, R1cs};
 use zkstd::common::{Group, PrimeField, Ring};
+use zkstd::matrix::DenseVectors;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RelaxedR1csInstance<C: CircuitDriver> {

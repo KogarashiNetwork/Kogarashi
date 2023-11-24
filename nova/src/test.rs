@@ -1,8 +1,8 @@
-use core::marker::PhantomData;
-
 use crate::function::Function;
 
-use r1cs::{CircuitDriver, DenseVectors};
+use core::marker::PhantomData;
+use zkstd::circuit::prelude::CircuitDriver;
+use zkstd::matrix::DenseVectors;
 
 pub(crate) struct ExampleFunction<C: CircuitDriver> {
     mark: PhantomData<C>,

@@ -1,9 +1,9 @@
 #![allow(clippy::op_ref)]
 use super::vector::DenseVectors;
-use crate::wire::Wire;
+use crate::common::{Add, Debug, Mul, Neg, PrimeField, Sub, Vec};
+use crate::r1cs::Wire;
 
 use core::slice::Iter;
-use zkstd::common::{Add, Debug, Mul, Neg, PrimeField, Sub, Vec};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct SparseRow<F: PrimeField>(pub(crate) Vec<(Wire, F)>);

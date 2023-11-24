@@ -1,6 +1,6 @@
-use crate::driver::CircuitDriver;
-use crate::{R1cs, Wire};
-use std::marker::PhantomData;
+use crate::circuit::CircuitDriver;
+use crate::r1cs::{R1cs, Wire};
+use core::marker::PhantomData;
 
 #[derive(Clone)]
 pub struct BinaryAssignment<C: CircuitDriver>(Wire, PhantomData<C>);

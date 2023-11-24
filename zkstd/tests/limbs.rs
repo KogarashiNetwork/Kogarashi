@@ -1,11 +1,11 @@
-mod construction;
+mod jubjub;
 
 macro_rules! limbs_test {
     ($test_name:ident, $test_bits:ident, $test_mod:ident, $limbs_type:ident, $one:expr, $two:expr) => {
         #[cfg(test)]
         mod $test_name {
             use super::*;
-            use construction::$test_mod::*;
+            use jubjub::$test_mod::*;
             use paste::paste;
             use rand_core::OsRng;
             use zkstd::arithmetic::$test_bits::*;
@@ -117,7 +117,7 @@ macro_rules! limbs_test {
     };
 }
 
-use construction::{Bits256Limbs, Bits384Limbs};
+use jubjub::{Bits256Limbs, Bits384Limbs};
 
 limbs_test!(
     jubjub_limbs_tests,

@@ -1,17 +1,12 @@
-#![doc = include_str!("../README.md")]
-
-mod driver;
-pub mod gadget;
-mod matrix;
 pub mod test;
 mod wire;
 
-pub use driver::{CircuitDriver, GrumpkinDriver};
-pub use matrix::{DenseVectors, SparseMatrix, SparseRow};
-pub use wire::Wire;
+use crate::circuit::CircuitDriver;
+use crate::common::{vec, Ring, Vec};
+use crate::matrix::{DenseVectors, SparseMatrix, SparseRow};
 
-use core::ops::Index;
-use zkstd::common::{vec, Ring, Vec};
+use sp_std::ops::Index;
+pub(crate) use wire::Wire;
 
 #[derive(Clone, Debug)]
 pub struct R1cs<C: CircuitDriver> {
@@ -24,11 +19,11 @@ pub struct R1cs<C: CircuitDriver> {
 
     // 2. Instance
     // r1cs instance includes one constant and public inputs and outputs
-    x: DenseVectors<C::Scalar>,
+    pub(crate) x: DenseVectors<C::Scalar>,
 
     // 3. Witness
     // r1cs witness includes private inputs and intermediate value
-    w: DenseVectors<C::Scalar>,
+    pub(crate) w: DenseVectors<C::Scalar>,
 }
 
 impl<C: CircuitDriver> R1cs<C> {
@@ -92,12 +87,12 @@ impl<C: CircuitDriver> R1cs<C> {
         self.m += 1;
     }
 
-    fn public_wire(&mut self) -> Wire {
+    pub(crate) fn public_wire(&mut self) -> Wire {
         let index = self.x.len();
         Wire::Instance(index)
     }
 
-    fn private_wire(&mut self) -> Wire {
+    pub(crate) fn private_wire(&mut self) -> Wire {
         let index = self.w.len();
         Wire::Witness(index)
     }
@@ -190,19 +185,6 @@ impl<C: CircuitDriver> Index<Wire> for R1cs<C> {
         match w {
             Wire::Instance(i) => &self.x[i],
             Wire::Witness(i) => &self.w[i],
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::{driver::GrumpkinDriver, test::example_r1cs, R1cs};
-
-    #[test]
-    fn r1cs_test() {
-        for i in 1..10 {
-            let r1cs: R1cs<GrumpkinDriver> = example_r1cs(i);
-            assert!(r1cs.is_sat())
         }
     }
 }

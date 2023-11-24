@@ -1,9 +1,9 @@
+use super::binary::BinaryAssignment;
 use super::field::FieldAssignment;
-use crate::driver::CircuitDriver;
-use crate::R1cs;
 
-use crate::gadget::binary::BinaryAssignment;
-use zkstd::common::{BNProjective, CurveGroup, Group, IntGroup, Ring};
+use crate::circuit::CircuitDriver;
+use crate::common::{BNProjective, CurveGroup, Group, IntGroup, Ring};
+use crate::r1cs::R1cs;
 
 #[derive(Clone)]
 pub struct PointAssignment<C: CircuitDriver> {
@@ -17,6 +17,21 @@ impl<C: CircuitDriver> PointAssignment<C> {
         let x = FieldAssignment::instance(cs, x);
         let y = FieldAssignment::instance(cs, y);
         let z = FieldAssignment::instance(
+            cs,
+            if is_infinity {
+                C::Scalar::zero()
+            } else {
+                C::Scalar::one()
+            },
+        );
+
+        Self { x, y, z }
+    }
+
+    pub fn witness(cs: &mut R1cs<C>, x: C::Scalar, y: C::Scalar, is_infinity: bool) -> Self {
+        let x = FieldAssignment::witness(cs, x);
+        let y = FieldAssignment::witness(cs, y);
+        let z = FieldAssignment::witness(
             cs,
             if is_infinity {
                 C::Scalar::zero()
@@ -155,126 +170,5 @@ impl<C: CircuitDriver> PointAssignment<C> {
 
     pub fn get_z(&self) -> FieldAssignment<C> {
         self.z.clone()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{PointAssignment, R1cs};
-    use crate::driver::GrumpkinDriver;
-    use crate::gadget::field::FieldAssignment;
-    use bn_254::{Fq, Fr};
-    use grumpkin::{Affine, Projective};
-    use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, OsRng, PrimeField};
-
-    #[test]
-    fn curve_double_test() {
-        for _ in 0..100 {
-            let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let point = Affine::random(OsRng);
-
-            let circuit_double = PointAssignment::instance(
-                &mut cs,
-                point.get_x(),
-                point.get_y(),
-                point.is_identity(),
-            )
-            .double(&mut cs);
-
-            let expected = point.to_extended().double();
-
-            circuit_double.assert_equal_public_point(&mut cs, expected);
-
-            assert!(cs.is_sat());
-        }
-    }
-
-    #[test]
-    fn curve_add_test() {
-        // Identity addition test
-        {
-            let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let a = Affine::random(OsRng);
-            let b = Affine::ADDITIVE_IDENTITY;
-
-            let a_assignment =
-                PointAssignment::instance(&mut cs, a.get_x(), a.get_y(), a.is_identity());
-            let b_assignment =
-                PointAssignment::instance(&mut cs, b.get_x(), b.get_y(), b.is_identity());
-
-            let expected = a.to_extended() + b.to_extended();
-
-            let sum_circuit = a_assignment.add(&b_assignment, &mut cs);
-
-            assert_eq!(
-                expected,
-                Projective::new_unchecked(
-                    sum_circuit.x.inner().evaluate(&cs.x, &cs.w),
-                    sum_circuit.y.inner().evaluate(&cs.x, &cs.w),
-                    sum_circuit.z.inner().evaluate(&cs.x, &cs.w)
-                )
-            );
-
-            sum_circuit.assert_equal_public_point(&mut cs, expected);
-
-            assert!(cs.is_sat());
-        }
-
-        for _ in 0..100 {
-            let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let a = Affine::random(OsRng);
-            let b = Affine::random(OsRng);
-
-            let a_assignment =
-                PointAssignment::instance(&mut cs, a.get_x(), a.get_y(), a.is_identity());
-            let b_assignment =
-                PointAssignment::instance(&mut cs, b.get_x(), b.get_y(), b.is_identity());
-
-            let expected = a.to_extended() + b.to_extended();
-
-            let sum_circuit = a_assignment.add(&b_assignment, &mut cs);
-
-            assert_eq!(
-                expected,
-                Projective::new_unchecked(
-                    sum_circuit.x.inner().evaluate(&cs.x, &cs.w),
-                    sum_circuit.y.inner().evaluate(&cs.x, &cs.w),
-                    sum_circuit.z.inner().evaluate(&cs.x, &cs.w)
-                )
-            );
-
-            sum_circuit.assert_equal_public_point(&mut cs, expected);
-
-            assert!(cs.is_sat());
-        }
-    }
-
-    #[test]
-    fn curve_scalar_mul_test() {
-        for _ in 0..100 {
-            let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let x = Fr::random(OsRng);
-            let p = Affine::random(OsRng);
-
-            let x_assignment = FieldAssignment::instance(&mut cs, x); // Fr
-            let p_assignment =
-                PointAssignment::instance(&mut cs, p.get_x(), p.get_y(), p.is_identity());
-            let expected = p * Fq::from(x);
-
-            assert_eq!(x.to_bits(), Fq::from(x).to_bits());
-
-            let mul_circuit = p_assignment.scalar_point(&mut cs, &x_assignment);
-            assert_eq!(
-                expected,
-                Projective::new_unchecked(
-                    mul_circuit.x.inner().evaluate(&cs.x, &cs.w),
-                    mul_circuit.y.inner().evaluate(&cs.x, &cs.w),
-                    mul_circuit.z.inner().evaluate(&cs.x, &cs.w)
-                )
-            );
-            mul_circuit.assert_equal_public_point(&mut cs, expected);
-
-            assert!(cs.is_sat());
-        }
     }
 }

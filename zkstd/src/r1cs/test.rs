@@ -1,9 +1,8 @@
-use crate::driver::CircuitDriver;
+use super::{R1cs, Wire};
+use crate::circuit::CircuitDriver;
 use crate::matrix::{DenseVectors, SparseMatrix, SparseRow};
-use crate::wire::Wire;
-use crate::R1cs;
 
-use zkstd::common::{vec, PrimeField, Vec};
+use crate::common::{vec, PrimeField, Vec};
 
 fn array_to_witnessess<F: PrimeField>(witnesses: Vec<u64>) -> Vec<F> {
     witnesses
