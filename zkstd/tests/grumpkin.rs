@@ -1,3 +1,6 @@
+#![allow(clippy::suspicious_arithmetic_impl)]
+#![allow(clippy::suspicious_op_assign_impl)]
+
 use zkstd::arithmetic::bits_256::*;
 use zkstd::arithmetic::weierstrass::*;
 use zkstd::circuit::CircuitDriver;

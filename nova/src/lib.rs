@@ -1,4 +1,5 @@
 #![doc = include_str!("../README.md")]
+#![allow(unused_variables, dead_code)]
 
 mod circuit;
 mod function;
