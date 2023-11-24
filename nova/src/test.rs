@@ -22,8 +22,9 @@ mod tests {
     use crate::relaxed_r1cs::{RelaxedR1csInstance, RelaxedR1csWitness};
     use crate::{RelaxedR1cs, Verifier};
     use bn_254::{Fq, Fr};
-    use r1cs::test::example_r1cs;
-    use r1cs::{CircuitDriver, DenseVectors};
+    use zkstd::circuit::CircuitDriver;
+    use zkstd::matrix::DenseVectors;
+    use zkstd::r1cs::test::example_r1cs;
 
     /// Verify committed folded instance relations.
     /// Does not open the commitments, but just checks that
@@ -75,7 +76,7 @@ mod tests {
         ]
         .concat();
 
-        let z1 = [vec![Fr::one()], r1cs_1.x().clone(), r1cs_1.w().clone()].concat();
+        let z1 = [vec![Fr::one()], r1cs_1.x(), r1cs_1.w()].concat();
         let z2 = [
             vec![relaxed_r1cs.instance.u],
             relaxed_r1cs.x().get(),
