@@ -21,9 +21,9 @@ mod tests {
     use crate::circuit::Circuit;
     use crate::error::Error;
     use crate::zksnark::ZkSnark;
+
     use bn_254::Fr as BnScalar;
-    use r1cs::gadget::FieldAssignment;
-    use r1cs::{GrumpkinDriver, R1cs};
+    use r1cs::prelude::{FieldAssignment, GrumpkinDriver, R1cs};
     use zkstd::common::OsRng;
 
     #[test]

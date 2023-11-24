@@ -1,5 +1,5 @@
 use crate::hash::MimcRO;
-use r1cs::{CircuitDriver, DenseVectors, R1cs};
+use r1cs::{prelude::CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Group, PrimeField, Ring};
 
 #[derive(Clone, Debug, PartialEq, Eq)]

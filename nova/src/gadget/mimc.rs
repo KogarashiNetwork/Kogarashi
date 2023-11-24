@@ -1,6 +1,5 @@
 use crate::hash::Mimc;
-use r1cs::gadget::FieldAssignment;
-use r1cs::{CircuitDriver, R1cs};
+use r1cs::prelude::{CircuitDriver, FieldAssignment, R1cs};
 
 pub(crate) struct MimcAssignment<const ROUND: usize, C: CircuitDriver> {
     constants: [C::Scalar; ROUND],

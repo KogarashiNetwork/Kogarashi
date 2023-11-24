@@ -1,12 +1,13 @@
 #![doc = include_str!("../README.md")]
 
 mod driver;
-pub mod gadget;
+mod gadget;
 mod matrix;
+pub mod prelude;
 pub mod test;
 mod wire;
 
-pub use driver::{CircuitDriver, GrumpkinDriver};
+use driver::CircuitDriver;
 pub use matrix::{DenseVectors, SparseMatrix, SparseRow};
 pub use wire::Wire;
 
@@ -196,7 +197,8 @@ impl<C: CircuitDriver> Index<Wire> for R1cs<C> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{driver::GrumpkinDriver, test::example_r1cs, R1cs};
+    use super::R1cs;
+    use crate::test::{example_r1cs, GrumpkinDriver};
 
     #[test]
     fn r1cs_test() {

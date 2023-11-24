@@ -191,7 +191,7 @@ impl<C: CircuitDriver> Neg for &FieldAssignment<C> {
 #[cfg(test)]
 mod tests {
     use super::{FieldAssignment, R1cs};
-    use crate::driver::GrumpkinDriver;
+    use crate::test::GrumpkinDriver;
     use bn_254::{Fr as Scalar, Fr};
     use zkstd::common::{Group, OsRng};
 

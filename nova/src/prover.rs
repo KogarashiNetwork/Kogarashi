@@ -4,7 +4,7 @@ use crate::{
 };
 
 use crate::hash::{MimcRO, MIMC_ROUNDS};
-use r1cs::{CircuitDriver, DenseVectors, R1cs};
+use r1cs::{prelude::CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{Ring, RngCore};
 
 pub struct Prover<C: CircuitDriver> {
@@ -88,7 +88,7 @@ impl<C: CircuitDriver> Prover<C> {
 pub(crate) mod tests {
     use super::{Prover, RelaxedR1cs};
 
-    use r1cs::{test::example_r1cs, GrumpkinDriver};
+    use r1cs::{prelude::GrumpkinDriver, test::example_r1cs};
     use zkstd::common::OsRng;
 
     pub(crate) fn example_prover() -> Prover<GrumpkinDriver> {

@@ -3,7 +3,7 @@ mod witness;
 
 use crate::hash::MimcRO;
 pub(crate) use instance::RelaxedR1csInstance;
-use r1cs::{CircuitDriver, DenseVectors, R1cs, SparseMatrix};
+use r1cs::{prelude::CircuitDriver, DenseVectors, R1cs, SparseMatrix};
 pub(crate) use witness::RelaxedR1csWitness;
 
 #[derive(Clone, Debug)]
@@ -144,7 +144,11 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
 #[cfg(test)]
 mod tests {
     use super::RelaxedR1cs;
-    use r1cs::{test::example_r1cs, GrumpkinDriver, R1cs};
+
+    use r1cs::{
+        prelude::{GrumpkinDriver, R1cs},
+        test::example_r1cs,
+    };
 
     #[test]
     fn relaxed_r1cs_test() {

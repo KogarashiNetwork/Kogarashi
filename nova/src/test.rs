@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use crate::function::Function;
 
-use r1cs::{CircuitDriver, DenseVectors};
+use r1cs::{prelude::CircuitDriver, DenseVectors};
 
 pub(crate) struct ExampleFunction<C: CircuitDriver> {
     mark: PhantomData<C>,

@@ -28,6 +28,21 @@ impl<C: CircuitDriver> PointAssignment<C> {
         Self { x, y, z }
     }
 
+    pub fn witness(cs: &mut R1cs<C>, x: C::Scalar, y: C::Scalar, is_infinity: bool) -> Self {
+        let x = FieldAssignment::witness(cs, x);
+        let y = FieldAssignment::witness(cs, y);
+        let z = FieldAssignment::witness(
+            cs,
+            if is_infinity {
+                C::Scalar::zero()
+            } else {
+                C::Scalar::one()
+            },
+        );
+
+        Self { x, y, z }
+    }
+
     pub fn assert_equal_public_point(
         &self,
         cs: &mut R1cs<C>,
@@ -161,8 +176,8 @@ impl<C: CircuitDriver> PointAssignment<C> {
 #[cfg(test)]
 mod tests {
     use super::{PointAssignment, R1cs};
-    use crate::driver::GrumpkinDriver;
     use crate::gadget::field::FieldAssignment;
+    use crate::test::GrumpkinDriver;
     use bn_254::{Fq, Fr};
     use grumpkin::{Affine, Projective};
     use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, OsRng, PrimeField};
@@ -181,7 +196,7 @@ mod tests {
             )
             .double(&mut cs);
 
-            let expected = point.to_extended().double();
+            let expected = point.double();
 
             circuit_double.assert_equal_public_point(&mut cs, expected);
 

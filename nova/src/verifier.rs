@@ -2,7 +2,7 @@ use crate::relaxed_r1cs::{RelaxedR1cs, RelaxedR1csInstance};
 
 use crate::hash::{MimcRO, MIMC_ROUNDS};
 use core::marker::PhantomData;
-use r1cs::{CircuitDriver, R1cs};
+use r1cs::prelude::{CircuitDriver, R1cs};
 
 pub struct Verifier<C: CircuitDriver> {
     mark: PhantomData<C>,

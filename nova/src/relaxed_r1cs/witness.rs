@@ -1,4 +1,4 @@
-use r1cs::{CircuitDriver, DenseVectors, R1cs};
+use r1cs::{prelude::CircuitDriver, DenseVectors, R1cs};
 use zkstd::common::{IntGroup, PrimeField};
 
 #[derive(Clone, Debug)]

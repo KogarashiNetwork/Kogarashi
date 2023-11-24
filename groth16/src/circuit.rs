@@ -1,6 +1,6 @@
 use crate::error::Error;
 
-use r1cs::{GrumpkinDriver, R1cs};
+use r1cs::prelude::{GrumpkinDriver, R1cs};
 use zkstd::common::Debug;
 
 /// circuit trait
