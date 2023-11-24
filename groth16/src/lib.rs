@@ -22,7 +22,7 @@ mod tests {
     use crate::error::Error;
     use crate::zksnark::ZkSnark;
     use bn_254::Fr as BnScalar;
-    use r1cs::gadget::field::FieldAssignment;
+    use r1cs::gadget::FieldAssignment;
     use r1cs::{GrumpkinDriver, R1cs};
     use zkstd::common::OsRng;
 

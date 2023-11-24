@@ -1,14 +1,14 @@
 #![doc = include_str!("../README.md")]
-#![allow(dead_code)]
 
+mod circuit;
 mod function;
+mod gadget;
 mod hash;
 mod ivc;
 mod pedersen;
 mod proof;
 mod prover;
 mod relaxed_r1cs;
-
 mod verifier;
 
 #[cfg(test)]

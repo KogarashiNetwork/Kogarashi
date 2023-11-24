@@ -1,38 +1,8 @@
-use crate::hash::Mimc;
-use r1cs::gadget::curve::PointAssignment;
-use r1cs::gadget::field::FieldAssignment;
+use crate::gadget::MimcAssignment;
+
+use r1cs::gadget::{FieldAssignment, PointAssignment};
 use r1cs::{CircuitDriver, R1cs};
 use zkstd::common::IntGroup;
-
-pub(crate) struct MimcAssignment<const ROUND: usize, C: CircuitDriver> {
-    constants: [C::Scalar; ROUND],
-}
-
-impl<const ROUND: usize, C: CircuitDriver> Default for MimcAssignment<ROUND, C> {
-    fn default() -> Self {
-        Self {
-            constants: Mimc::<ROUND, C::Scalar>::default().constants,
-        }
-    }
-}
-
-impl<const ROUND: usize, C: CircuitDriver> MimcAssignment<ROUND, C> {
-    pub(crate) fn hash(
-        &self,
-        cs: &mut R1cs<C>,
-        mut xl: FieldAssignment<C>,
-        mut xr: FieldAssignment<C>,
-    ) -> FieldAssignment<C> {
-        for c in self.constants.iter().map(|c| FieldAssignment::constant(c)) {
-            let cxl = &xl + &c;
-            let mut ccxl = FieldAssignment::square(cs, &cxl);
-            ccxl = &FieldAssignment::mul(cs, &ccxl, &cxl) + &xr;
-            xr = xl;
-            xl = ccxl;
-        }
-        xl
-    }
-}
 
 pub(crate) struct MimcROCircuit<const ROUND: usize, C: CircuitDriver> {
     hasher: MimcAssignment<ROUND, C>,
@@ -71,12 +41,11 @@ impl<const ROUND: usize, C: CircuitDriver> MimcROCircuit<ROUND, C> {
 
 #[cfg(test)]
 mod tests {
-    use crate::hash::circuit::MimcROCircuit;
+    use super::MimcROCircuit;
     use crate::hash::{MimcRO, MIMC_ROUNDS};
     use bn_254::Fr;
     use grumpkin::Affine;
-    use r1cs::gadget::curve::PointAssignment;
-    use r1cs::gadget::field::FieldAssignment;
+    use r1cs::gadget::{FieldAssignment, PointAssignment};
     use r1cs::{GrumpkinDriver, R1cs};
     use rand_core::OsRng;
     use zkstd::common::{CurveGroup, Group};

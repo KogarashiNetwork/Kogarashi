@@ -1,3 +1,6 @@
 mod binary;
-pub mod curve;
-pub mod field;
+mod curve;
+mod field;
+
+pub use curve::*;
+pub use field::*;
