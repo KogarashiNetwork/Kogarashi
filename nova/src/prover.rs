@@ -88,9 +88,14 @@ impl<C: CircuitDriver> Prover<C> {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::{Prover, RelaxedR1cs};
+    use bn_254::{Fq, Fr};
 
+    use crate::hash::{MimcRO, MIMC_ROUNDS};
+    use crate::relaxed_r1cs::{RelaxedR1csInstance, RelaxedR1csWitness};
+    use crate::Verifier;
     use grumpkin::driver::GrumpkinDriver;
     use zkstd::common::OsRng;
+    use zkstd::matrix::DenseVectors;
     use zkstd::r1cs::test::example_r1cs;
 
     pub(crate) fn example_prover() -> Prover<GrumpkinDriver> {
@@ -99,16 +104,71 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn folding_scheme_prover_test() {
+    fn nifs_folding_test() {
         let prover = example_prover();
-        let r1cs = example_r1cs(1);
-        let mut relaxed_r1cs = RelaxedR1cs::new(r1cs);
-        for i in 1..10 {
-            let r1cs = example_r1cs(i);
-            let (instance, witness, _) = prover.prove(&r1cs, &relaxed_r1cs);
-            relaxed_r1cs = relaxed_r1cs.update(&instance, &witness);
-        }
+        let mut transcript = MimcRO::<MIMC_ROUNDS, Fq>::default();
+        let r1cs_1 = example_r1cs(4);
+        let r1cs_2 = example_r1cs(3);
 
-        assert!(relaxed_r1cs.is_sat())
+        let mut relaxed_r1cs = RelaxedR1cs::new(r1cs_2);
+
+        let (folded_instance, witness, commit_t) = prover.prove(&r1cs_1, &relaxed_r1cs);
+        let verified_instance = Verifier::verify(commit_t, &r1cs_1, &relaxed_r1cs);
+        assert_eq!(folded_instance, verified_instance);
+
+        transcript.append_point(commit_t);
+        relaxed_r1cs.absorb_by_transcript(&mut transcript);
+        let t = prover.compute_cross_term(&r1cs_1, &relaxed_r1cs);
+        let r = Fr::from(transcript.squeeze());
+
+        // naive check that the folded witness satisfies the relaxed r1cs
+        let z3: Vec<Fr> = [
+            vec![verified_instance.u],
+            verified_instance.x.get(),
+            witness.w.get(),
+        ]
+        .concat();
+
+        let z1 = [vec![Fr::one()], r1cs_1.x(), r1cs_1.w()].concat();
+        let z2 = [
+            vec![relaxed_r1cs.instance.u],
+            relaxed_r1cs.x().get(),
+            relaxed_r1cs.w().get(),
+        ]
+        .concat();
+
+        let z3_aux: Vec<Fr> = z2
+            .iter()
+            .map(|x| x * r)
+            .zip(z1)
+            .map(|(x, y)| x + y)
+            .collect();
+
+        assert_eq!(z3, z3_aux);
+
+        // check that relations hold for the 2 inputted instances and the folded one
+        let instance1 = RelaxedR1csInstance::default(DenseVectors::new(r1cs_1.x()));
+        let instance2 = relaxed_r1cs.instance.clone();
+        assert!(relaxed_r1cs.is_sat());
+        relaxed_r1cs = relaxed_r1cs.update(
+            &instance1,
+            &RelaxedR1csWitness::default(DenseVectors::new(r1cs_1.w())),
+        );
+        assert!(relaxed_r1cs.is_sat());
+        relaxed_r1cs = relaxed_r1cs.update(&folded_instance, &witness);
+        assert!(relaxed_r1cs.is_sat());
+
+        // next equalities should hold since we started from two cmE of zero-vector E's
+        assert_eq!(verified_instance.commit_e, (commit_t * r).into());
+        assert_eq!(witness.e, t * r);
+
+        let r2 = r * r;
+        assert!(
+            folded_instance.commit_e
+                == (instance1.commit_e + commit_t * r + instance2.commit_e * r2).into()
+                && folded_instance.u == instance1.u + r * instance2.u
+                && folded_instance.commit_w == (instance1.commit_w + instance2.commit_w * r).into()
+                && folded_instance.x == &instance1.x + &(&instance2.x * r)
+        );
     }
 }
