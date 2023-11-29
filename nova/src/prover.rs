@@ -10,7 +10,7 @@ use zkstd::matrix::DenseVectors;
 
 pub struct Prover<C: CircuitDriver> {
     // public parameters
-    pp: PedersenCommitment<C::Affine>,
+    pub(crate) pp: PedersenCommitment<C::Affine>,
 
     // r1cs structure
     f: R1cs<C>,
@@ -52,7 +52,7 @@ impl<C: CircuitDriver> Prover<C> {
     }
 
     // T = AZ1 ◦ BZ2 + AZ2 ◦ BZ1 − u1 · CZ2 − u2 · CZ1
-    fn compute_cross_term(
+    pub(crate) fn compute_cross_term(
         &self,
         r1cs: &R1cs<C>,
         relaxed_r1cs: &RelaxedR1cs<C>,
