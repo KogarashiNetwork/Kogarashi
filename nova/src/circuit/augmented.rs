@@ -1,6 +1,9 @@
 use crate::function::FunctionCircuit;
+use crate::gadget::RelaxedR1csInstanceAssignment;
 use crate::relaxed_r1cs::RelaxedR1csInstance;
+use zkstd::circuit::prelude::{FieldAssignment, PointAssignment};
 use zkstd::circuit::CircuitDriver;
+use zkstd::common::{CurveGroup, IntGroup};
 use zkstd::matrix::DenseVectors;
 use zkstd::r1cs::R1cs;
 
@@ -18,5 +21,39 @@ pub struct AugmentedFCircuit<C: CircuitDriver, FC: FunctionCircuit<C>> {
 }
 
 impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
-    fn generate(&self, cs: &mut R1cs<C>) {}
+    pub(crate) fn generate(&self, cs: &mut R1cs<C>) {
+        // allocate inputs
+        let i = FieldAssignment::witness(cs, C::Scalar::from(self.i));
+        let z_0 = self
+            .z_0
+            .iter()
+            .map(|x| FieldAssignment::witness(cs, x))
+            .collect::<Vec<_>>();
+        let z_i = self
+            .z_i
+            .iter()
+            .map(|x| FieldAssignment::witness(cs, x))
+            .collect::<Vec<_>>();
+
+        let u_def = RelaxedR1csInstanceAssignment::witness(cs, &RelaxedR1csInstance::default());
+        let u_i = RelaxedR1csInstanceAssignment::witness(cs, &self.u_i);
+        let U_i = RelaxedR1csInstanceAssignment::witness(cs, &self.U_i);
+        let U_i1 = RelaxedR1csInstanceAssignment::witness(cs, &self.U_i1);
+        let commit_t = PointAssignment::witness(
+            cs,
+            self.commit_t.get_x(),
+            self.commit_t.get_y(),
+            self.commit_t.is_identity(),
+        );
+        let x = FieldAssignment::witness(cs, self.x);
+
+        let z_next = FC::invoke_cs(cs, z_i.clone());
+        let zero = FieldAssignment::constant(&C::Scalar::zero());
+
+        // realise `equal` with `BinaryAssignment` return type
+        let base_case = FieldAssignment::eq(cs, &i, &zero);
+        let not_base_case = FieldAssignment::neq(cs, &i, &zero);
+
+        let u_i_x = U_i.hash(cs, i.clone(), z_0.clone(), z_i.clone());
+    }
 }

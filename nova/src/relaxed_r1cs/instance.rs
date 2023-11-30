@@ -1,7 +1,7 @@
-use crate::hash::MimcRO;
+use crate::hash::{MimcRO, MIMC_ROUNDS};
 use crate::RelaxedR1cs;
 use zkstd::circuit::prelude::CircuitDriver;
-use zkstd::common::{Group, PrimeField, Ring};
+use zkstd::common::{CurveGroup, Group, PrimeField, Ring};
 use zkstd::matrix::DenseVectors;
 
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
@@ -59,5 +59,28 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
         for x in &self.x.get() {
             transcript.append(C::Base::from(*x));
         }
+    }
+
+    pub fn hash(&self, i: usize, z_0: &DenseVectors<C>, z_i: &DenseVectors<C>) -> C::Scalar {
+        MimcRO::<MIMC_ROUNDS, C>::default().hash_vec(
+            vec![
+                vec![i.into()],
+                z_0.get(),
+                z_i.get(),
+                vec![self.u.clone()],
+                self.x.clone(),
+                vec![
+                    self.commit_e.get_x(),
+                    self.commit_e.get_y(),
+                    self.commit_e.get_z(),
+                ],
+                vec![
+                    self.commit_w.get_x(),
+                    self.commit_w.get_y(),
+                    self.commit_w.get_z(),
+                ],
+            ]
+            .concat(),
+        )
     }
 }

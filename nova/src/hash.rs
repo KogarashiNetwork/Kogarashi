@@ -71,6 +71,13 @@ impl<const ROUND: usize, F: PrimeField> MimcRO<ROUND, F> {
         });
     }
 
+    pub(crate) fn hash_vec(&mut self, values: Vec<F>) -> F {
+        for x in values {
+            self.state.push(x);
+        }
+        self.squeeze()
+    }
+
     pub(crate) fn squeeze(&self) -> F {
         self.state.iter().fold(self.key, |acc, scalar| {
             let h = self.hasher.hash(*scalar, acc);

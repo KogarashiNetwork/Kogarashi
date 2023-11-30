@@ -47,7 +47,7 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         }
     }
 
-    fn hash(
+    pub(crate) fn hash(
         &self,
         cs: &mut R1cs<C>,
         i: FieldAssignment<C>,

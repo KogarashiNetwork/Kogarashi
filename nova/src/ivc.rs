@@ -2,12 +2,13 @@ use crate::function::FunctionCircuit;
 use crate::proof::RecursiveProof;
 use crate::{Prover, RelaxedR1cs, Verifier};
 
+use crate::circuit::AugmentedFCircuit;
 use crate::relaxed_r1cs::{RelaxedR1csInstance, RelaxedR1csWitness};
 use zkstd::circuit::prelude::{CircuitDriver, R1cs};
 use zkstd::common::{Group, IntGroup, Ring, RngCore};
 use zkstd::matrix::DenseVectors;
 
-pub struct Ivc<C: CircuitDriver> {
+pub struct Ivc<C: CircuitDriver, FC: FunctionCircuit<C>> {
     i: usize,
     z0: DenseVectors<C::Scalar>,
     zi: DenseVectors<C::Scalar>,
@@ -19,15 +20,20 @@ pub struct Ivc<C: CircuitDriver> {
     // running r1cs instance
     // U
     running_instance: RelaxedR1cs<C>,
+    f: FC,
 }
 
-impl<C: CircuitDriver> Ivc<C> {
-    pub fn new(r1cs: R1cs<C>, rng: impl RngCore, z0: DenseVectors<C::Scalar>) -> Self {
+impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
+    pub fn new(r1cs: R1cs<C>, rng: impl RngCore, z0: DenseVectors<C::Scalar>, f: FC) -> Self {
         let i = 0;
         let zi = z0.clone();
         let prover = Prover::new(r1cs.clone(), rng);
         let instance = RelaxedR1cs::new(r1cs.clone());
         let running_instance = instance.clone();
+
+        let mut cs = r1cs.clone();
+        let augmented_circuit = AugmentedFCircuit::<C, FC>::default();
+        augmented_circuit.generate(&mut cs);
 
         Self {
             i,
@@ -37,6 +43,7 @@ impl<C: CircuitDriver> Ivc<C> {
             r1cs,
             instance,
             running_instance,
+            f,
         }
     }
 
@@ -77,6 +84,53 @@ impl<C: CircuitDriver> Ivc<C> {
         hash(self.i, &self.z0, &self.zi, &instance)
     }
 
+    pub fn prove_step(&mut self) {
+        let z_next = self.f.invoke();
+        let (u_next, u_next_x) = if self.i == 0 {
+            let u_next_x = self.running_instance.instance.hash(1, &self.z0, &z_next);
+            let (u_next, w_next, commit_t) = (
+                RelaxedR1csInstance::default(),
+                RelaxedR1csWitness::default(),
+                C::Affine::ADDITIVE_IDENTITY,
+            );
+
+            (u_next, u_next_x)
+        } else {
+            let (u_next, w_next, commit_t) =
+                self.prover.prove(&self.instance, &self.running_instance);
+
+            let new_instance = RelaxedR1cs::new(self.r1cs.clone());
+            new_instance.update(&u_next, &w_next);
+            assert!(new_instance.is_sat());
+
+            let u_next_x = u_next.hash(self.i + 1, &self.z0, &z_next);
+
+            (u_next, u_next_x)
+        };
+
+        let augmented_circuit = AugmentedFCircuit {
+            i: self.i,
+            z_0: self.z0.clone(),
+            z_i: self.zi.clone(),
+            u_i: self.instance.instance.clone(),
+            U_i: self.running_instance.instance.clone(),
+            U_i1: u_next,
+            commit_t,
+            f: self.f.clone(),
+            x: u_next_x,
+        };
+
+        let mut cs = R1cs::<C>::default();
+        augmented_circuit.generate(&mut cs);
+
+        let (x_next, w_next) = (cs.x(), cs.w());
+        assert_eq!(x_next.len(), 1);
+        assert_eq!(x_next[0], u_next_x);
+
+        self.i += 1;
+        self.zi = z_next;
+    }
+
     // pub fn recurse<F: Function<C>>(&mut self) {
     //     if self.i == 0 {}
     //     self.i += 1;
@@ -92,6 +146,7 @@ impl<C: CircuitDriver> Ivc<C> {
             r1cs,
             instance,
             running_instance,
+            f,
         } = self;
 
         let ((U_i, W_i), (u_i, w_i)) = p.pair;
