@@ -11,6 +11,8 @@ mod prover;
 mod verifier;
 mod zksnark;
 
+pub use circuit::Circuit;
+pub use error::Error;
 pub use proof::Proof;
 pub use prover::Prover;
 pub use verifier::Verifier;

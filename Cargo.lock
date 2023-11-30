@@ -1167,6 +1167,7 @@ dependencies = [
  "grumpkin",
  "rand_core",
  "serde",
+ "zkgroth16",
  "zkstd",
 ]
 

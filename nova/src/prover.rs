@@ -27,25 +27,25 @@ impl<C: CircuitDriver> Prover<C> {
 
     pub fn prove(
         &self,
-        r1cs: &R1cs<C>,
-        relaxed_r1cs: &RelaxedR1cs<C>,
+        r1cs_1: &RelaxedR1cs<C>,
+        r1cs_2: &RelaxedR1cs<C>,
     ) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>, C::Affine) {
         let mut transcript = MimcRO::<MIMC_ROUNDS, C::Base>::default();
         // compute cross term t
-        let t = self.compute_cross_term(r1cs, relaxed_r1cs);
+        let t = self.compute_cross_term(r1cs_1, r1cs_2);
 
         let commit_t = self.pp.commit(&t);
 
         transcript.append_point(commit_t);
-        relaxed_r1cs.absorb_by_transcript(&mut transcript);
+        r1cs_2.absorb_by_transcript(&mut transcript);
 
         let r = transcript.squeeze().into();
 
         // fold instance
-        let instance = relaxed_r1cs.fold_instance(r1cs, r, commit_t);
+        let instance = r1cs_2.fold_instance(r1cs_1, r, commit_t);
 
         // fold witness
-        let witness = relaxed_r1cs.fold_witness(r1cs, r, t);
+        let witness = r1cs_2.fold_witness(r1cs_1, r, t);
 
         // return folded relaxed r1cs instance, witness and commit T
         (instance, witness, commit_t)
@@ -54,15 +54,15 @@ impl<C: CircuitDriver> Prover<C> {
     // T = AZ1 ◦ BZ2 + AZ2 ◦ BZ1 − u1 · CZ2 − u2 · CZ1
     pub(crate) fn compute_cross_term(
         &self,
-        r1cs: &R1cs<C>,
-        relaxed_r1cs: &RelaxedR1cs<C>,
+        r1cs_1: &RelaxedR1cs<C>,
+        r1cs_2: &RelaxedR1cs<C>,
     ) -> DenseVectors<C::Scalar> {
         let u1 = C::Scalar::one();
-        let u2 = relaxed_r1cs.u();
+        let u2 = r1cs_2.u();
         let m = self.f.m();
         let (a, b, c) = self.f.matrices();
-        let (w0, w1) = (DenseVectors::new(r1cs.w()), relaxed_r1cs.w());
-        let (x0, x1) = (DenseVectors::new(r1cs.x()), relaxed_r1cs.x());
+        let (w0, w1) = (r1cs_1.w(), r1cs_2.w());
+        let (x0, x1) = (r1cs_1.x(), r1cs_2.x());
 
         // matrices and z vector matrix multiplication
         let az2 = a.prod(&m, &x1, &w1);
@@ -102,13 +102,13 @@ pub(crate) mod tests {
     fn folding_scheme_prover_test() {
         let prover = example_prover();
         let r1cs = example_r1cs(1);
-        let mut relaxed_r1cs = RelaxedR1cs::new(r1cs);
+        let mut running_r1cs = RelaxedR1cs::new(r1cs);
         for i in 1..10 {
-            let r1cs = example_r1cs(i);
-            let (instance, witness, _) = prover.prove(&r1cs, &relaxed_r1cs);
-            relaxed_r1cs = relaxed_r1cs.update(&instance, &witness);
+            let r1cs_to_fold = RelaxedR1cs::new(example_r1cs(i));
+            let (instance, witness, _) = prover.prove(&r1cs_to_fold, &running_r1cs);
+            running_r1cs = running_r1cs.update(&instance, &witness);
         }
 
-        assert!(relaxed_r1cs.is_sat())
+        assert!(running_r1cs.is_sat())
     }
 }

@@ -2,7 +2,7 @@ use crate::Fq12;
 use zkstd::common::*;
 
 /// pairing target group of 12 degree extension of field
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct Gt(pub Fq12);
 
 impl Basic for Gt {}

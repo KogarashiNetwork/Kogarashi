@@ -1,4 +1,4 @@
-use crate::function::Function;
+use crate::function::FunctionCircuit;
 use crate::proof::RecursiveProof;
 use crate::{Prover, RelaxedR1cs, Verifier};
 
@@ -14,8 +14,10 @@ pub struct Ivc<C: CircuitDriver> {
     prover: Prover<C>,
     r1cs: R1cs<C>,
     // r1cs instance to be folded
+    // u
     instance: RelaxedR1cs<C>,
     // running r1cs instance
+    // U
     running_instance: RelaxedR1cs<C>,
 }
 
@@ -39,7 +41,7 @@ impl<C: CircuitDriver> Ivc<C> {
     }
 
     // augmented function
-    pub fn recurse<F: Function<C>>(&mut self) -> C::Scalar {
+    pub fn recurse<F: FunctionCircuit<C>>(&mut self) -> C::Scalar {
         let instance = if self.i != 0 {
             // check that ui.x = hash(vk, i, z0, zi, Ui), where ui.x is the public IO of ui
             assert_eq!(
@@ -66,7 +68,7 @@ impl<C: CircuitDriver> Ivc<C> {
             Verifier::verify(commit_t, &self.instance, &self.running_instance)
         } else {
             // Default instance (dummy)
-            &self.running_instance.instance
+            self.running_instance.instance.clone()
         };
 
         self.i += 1;
@@ -86,7 +88,7 @@ impl<C: CircuitDriver> Ivc<C> {
             i,
             z0,
             zi,
-            prover: _,
+            prover,
             r1cs,
             instance,
             running_instance,
@@ -94,7 +96,7 @@ impl<C: CircuitDriver> Ivc<C> {
 
         let ((U_i, W_i), (u_i, w_i)) = p.pair;
 
-        let (U_i_1, W_i_1, commit_T) = if self.i == 0 {
+        let (U_i_1, W_i_1, commit_T) = if i == 0 {
             (
                 running_instance.instance.clone(),
                 running_instance.witness.clone(),
@@ -104,10 +106,10 @@ impl<C: CircuitDriver> Ivc<C> {
             let relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
             let U_relaxed_r1cs = relaxed_r1cs.update(&U_i, &W_i);
             let u_relaxed_r1cs = relaxed_r1cs.update(&u_i, &w_i);
-            self.prover.prove(&u_relaxed_r1cs, &U_relaxed_r1cs)
+            prover.prove(&u_relaxed_r1cs, &U_relaxed_r1cs)
         };
 
-        let (u_i_1, w_i_1) = trace(&U_i, &u_i, self.i, &self.z0, &self.zi, commit_T);
+        let (u_i_1, w_i_1) = trace(&U_i, &u_i, i, &z0, &zi, commit_T);
 
         // Generate p_i+1
 
@@ -132,6 +134,7 @@ pub fn hash<C: CircuitDriver>(
     zi: &DenseVectors<C::Scalar>,
     u: &RelaxedR1csInstance<C>,
 ) -> C::Scalar {
+    // MIMC
     C::Scalar::zero()
 }
 
