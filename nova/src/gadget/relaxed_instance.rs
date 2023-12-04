@@ -47,6 +47,18 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         }
     }
 
+    pub(crate) fn absorb_by_transcript<const ROUNDS: usize>(
+        &self,
+        transcript: &mut MimcROCircuit<ROUNDS, C>,
+    ) {
+        transcript.append_point(self.commit_w.clone());
+        transcript.append_point(self.commit_e.clone());
+        transcript.append(self.u.clone());
+        for x in &self.x {
+            transcript.append(x.clone());
+        }
+    }
+
     pub(crate) fn hash(
         &self,
         cs: &mut R1cs<C>,

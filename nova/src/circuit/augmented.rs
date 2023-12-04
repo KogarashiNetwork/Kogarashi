@@ -1,10 +1,13 @@
+use crate::circuit::nifs::NifsCircuit;
+use crate::circuit::MimcROCircuit;
 use crate::function::FunctionCircuit;
 use crate::gadget::RelaxedR1csInstanceAssignment;
+use crate::hash::MIMC_ROUNDS;
 use crate::relaxed_r1cs::RelaxedR1csInstance;
 use std::marker::PhantomData;
-use zkstd::circuit::prelude::{FieldAssignment, PointAssignment};
+use zkstd::circuit::prelude::{BinaryAssignment, FieldAssignment, PointAssignment};
 use zkstd::circuit::CircuitDriver;
-use zkstd::common::{CurveGroup, IntGroup};
+use zkstd::common::{CurveGroup, IntGroup, Ring};
 use zkstd::matrix::DenseVectors;
 use zkstd::r1cs::R1cs;
 
@@ -50,11 +53,64 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
 
         let z_next = FC::invoke_cs(cs, z_i.clone());
         let zero = FieldAssignment::constant(&C::Scalar::zero());
+        let bin_true = BinaryAssignment::witness(cs, 1);
 
-        // realise `equal` with `BinaryAssignment` return type
         let base_case = FieldAssignment::is_eq(cs, &i, &zero);
         let not_base_case = FieldAssignment::is_neq(cs, &i, &zero);
 
         let u_i_x = U_i.hash(cs, i.clone(), z_0.clone(), z_i.clone());
+
+        let check = FieldAssignment::is_eq(cs, &u_i.x[0], &u_i_x);
+        BinaryAssignment::conditional_enforce_equal(cs, &check, &bin_true, &not_base_case);
+
+        // commit_e = default value
+        let check = FieldAssignment::is_eq(cs, &u_i.commit_e.get_x(), &u_def.commit_e.get_x());
+        BinaryAssignment::conditional_enforce_equal(cs, &check, &bin_true, &not_base_case);
+        let check = FieldAssignment::is_eq(cs, &u_i.commit_e.get_y(), &u_def.commit_e.get_y());
+        BinaryAssignment::conditional_enforce_equal(cs, &check, &bin_true, &not_base_case);
+        let check = FieldAssignment::is_eq(cs, &u_i.commit_e.get_z(), &u_def.commit_e.get_z());
+        BinaryAssignment::conditional_enforce_equal(cs, &check, &bin_true, &not_base_case);
+
+        // u == 1
+        let check =
+            FieldAssignment::is_eq(cs, &u_i.u, &FieldAssignment::constant(&C::Scalar::one()));
+        BinaryAssignment::conditional_enforce_equal(cs, &check, &bin_true, &not_base_case);
+
+        let r = Self::get_challenge(cs, &U_i, commit_t.clone());
+
+        // NIFS
+
+        let nifs_check = NifsCircuit::verify(cs, r, u_i, U_i, U_i1);
+        BinaryAssignment::conditional_enforce_equal(cs, &nifs_check, &bin_true, &not_base_case);
+
+        let u_next_x_basecase = U_i.hash(
+            cs,
+            FieldAssignment::constant(&C::Scalar::one()),
+            z_0.clone(),
+            z_next.clone(),
+        );
+
+        let u_next_x = U_i1.hash(
+            cs,
+            &i + &FieldAssignment::constant(&C::Scalar::one()),
+            z_0.clone(),
+            z_next.clone(),
+        );
+
+        let check = FieldAssignment::is_eq(cs, &u_next_x_basecase, &x);
+        BinaryAssignment::conditional_enforce_equal(cs, &check, &bin_true, &base_case);
+        let check = FieldAssignment::is_eq(cs, &u_next_x, &x);
+        BinaryAssignment::conditional_enforce_equal(cs, &check, &bin_true, &not_base_case);
+    }
+
+    pub(crate) fn get_challenge(
+        cs: &mut R1cs<C>,
+        U_i: &RelaxedR1csInstanceAssignment<C>,
+        commit_t: PointAssignment<C>,
+    ) -> FieldAssignment<C> {
+        let mut transcript = MimcROCircuit::<MIMC_ROUNDS, C>::default();
+        transcript.append_point(commit_t);
+        U_i.absorb_by_transcript(&mut transcript);
+        transcript.squeeze(cs)
     }
 }
