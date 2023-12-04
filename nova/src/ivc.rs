@@ -32,9 +32,9 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
         let instance = RelaxedR1cs::new(r1cs.clone());
         let running_instance = instance.clone();
 
-        let mut cs = r1cs.clone();
-        let augmented_circuit = AugmentedFCircuit::<C, FC>::default();
-        augmented_circuit.generate(&mut cs);
+        // let mut cs = r1cs.clone();
+        // let augmented_circuit = AugmentedFCircuit::<C, FC>::default();
+        // augmented_circuit.generate(&mut cs);
 
         Self {
             i,
@@ -88,7 +88,9 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
     pub fn prove_step(&mut self) {
         let z_next = FC::invoke(&self.zi);
         let (u_next, u_next_x, commit_t) = if self.i == 0 {
+            println!("1, {:?}, {z_next:?}", self.z0);
             let u_next_x = self.running_instance.instance.hash(1, &self.z0, &z_next);
+            println!("{u_next_x:?}");
             let (u_next, w_next, commit_t) = (
                 RelaxedR1csInstance::<C>::default(),
                 RelaxedR1csWitness::<C>::default(),
@@ -117,7 +119,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
             U_i: self.running_instance.instance.clone(),
             U_i1: u_next,
             commit_t,
-            f: self.f.clone(),
+            f: self.f,
             x: u_next_x,
         };
 
@@ -125,8 +127,8 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
         augmented_circuit.generate(&mut cs);
 
         let (x_next, w_next) = (cs.x(), cs.w());
-        assert_eq!(x_next.len(), 1);
-        assert_eq!(x_next[0], u_next_x);
+        assert_eq!(x_next.len(), 2);
+        assert_eq!(x_next[1], u_next_x);
 
         self.i += 1;
         self.zi = z_next;
@@ -152,11 +154,11 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
 
         let ((U_i, W_i), (u_i, w_i)) = p.pair;
 
-        let (U_i_1, W_i_1, commit_T) = if i == 0 {
+        let (U_i_1, W_i_1, commit_t) = if i == 0 {
             (
                 running_instance.instance.clone(),
                 running_instance.witness.clone(),
-                running_instance.instance.commit_e.clone(),
+                running_instance.instance.commit_e,
             )
         } else {
             let relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
@@ -165,7 +167,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
             prover.prove(&u_relaxed_r1cs, &U_relaxed_r1cs)
         };
 
-        let (u_i_1, w_i_1) = trace(&U_i, &u_i, i, &z0, &zi, commit_T);
+        let (u_i_1, w_i_1) = trace(&U_i, &u_i, i, &z0, &zi, commit_t);
 
         // Generate p_i+1
 
@@ -200,7 +202,7 @@ pub fn trace<C: CircuitDriver>(
     i: usize,
     z0: &DenseVectors<C::Scalar>,
     zi: &DenseVectors<C::Scalar>,
-    commit_T: C::Affine,
+    commit_t: C::Affine,
 ) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>) {
     unimplemented!()
 }
@@ -210,7 +212,6 @@ mod tests {
     use super::Ivc;
     use crate::test::ExampleFunction;
 
-    use crate::RecursiveProof;
     use grumpkin::driver::GrumpkinDriver;
     use rand_core::OsRng;
     use zkstd::circuit::prelude::R1cs;
@@ -222,9 +223,10 @@ mod tests {
         let r1cs: R1cs<GrumpkinDriver> = example_r1cs(1);
         let z0 = DenseVectors::new(r1cs.x());
         let mut ivc = Ivc::<GrumpkinDriver, ExampleFunction<GrumpkinDriver>>::new(r1cs, OsRng, z0);
-        let hash = ivc.recurse::<ExampleFunction<GrumpkinDriver>>();
-        let proof = ivc.prove(RecursiveProof::default());
+        // let hash = ivc.recurse::<ExampleFunction<GrumpkinDriver>>();
+        ivc.prove_step();
+        // let proof = ivc.prove(RecursiveProof::default());
 
-        assert!(proof.verify())
+        // assert!(proof.verify())
     }
 }

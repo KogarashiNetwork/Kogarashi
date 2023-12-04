@@ -52,7 +52,7 @@ mod tests {
     fn nifs_circuit() {
         let prover = example_prover();
         let r1cs = example_r1cs(1);
-        let mut running_r1cs = RelaxedR1cs::new(r1cs);
+        let running_r1cs = RelaxedR1cs::new(r1cs);
 
         let r1cs_to_fold = RelaxedR1cs::new(example_r1cs(2));
         let (instance, witness, commit_t) = prover.prove(&r1cs_to_fold, &running_r1cs);

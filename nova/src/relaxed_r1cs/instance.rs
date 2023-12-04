@@ -74,7 +74,7 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
                 vec![C::Scalar::from(i as u64)],
                 z_0.get(),
                 z_i.get(),
-                vec![self.u.clone()],
+                vec![self.u],
                 self.x.get(),
                 vec![
                     commit_e.get_x().into(),

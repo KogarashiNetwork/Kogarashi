@@ -5,6 +5,7 @@ use crate::hash::MIMC_ROUNDS;
 use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
 use zkstd::common::CurveGroup;
 
+#[derive(Clone)]
 pub(crate) struct RelaxedR1csInstanceAssignment<C: CircuitDriver> {
     pub(crate) commit_w: PointAssignment<C>,
     pub(crate) commit_e: PointAssignment<C>,

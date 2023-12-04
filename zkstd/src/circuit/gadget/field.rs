@@ -154,7 +154,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
     pub fn is_neq(cs: &mut R1cs<C>, x: &Self, y: &Self) -> BinaryAssignment<C> {
         let x_val = x.inner().evaluate(&cs.x, &cs.w);
         let y_val = y.inner().evaluate(&cs.x, &cs.w);
-        let is_not_equal = BinaryAssignment::witness(cs, if x_val != y_val { 1 } else { 0 });
+        let is_not_equal = BinaryAssignment::witness(cs, u8::from(x_val != y_val));
         let multiplier = if x_val != y_val {
             FieldAssignment::witness(cs, (x_val - y_val).invert().unwrap())
         } else {
