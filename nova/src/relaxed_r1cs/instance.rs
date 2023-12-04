@@ -1,7 +1,7 @@
 use crate::hash::{MimcRO, MIMC_ROUNDS};
 use crate::RelaxedR1cs;
 use zkstd::circuit::prelude::CircuitDriver;
-use zkstd::common::{CurveGroup, Group, PrimeField, Ring};
+use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, PrimeField, Ring};
 use zkstd::matrix::DenseVectors;
 
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
@@ -61,23 +61,30 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
         }
     }
 
-    pub fn hash(&self, i: usize, z_0: &DenseVectors<C>, z_i: &DenseVectors<C>) -> C::Scalar {
-        MimcRO::<MIMC_ROUNDS, C>::default().hash_vec(
+    pub fn hash(
+        &self,
+        i: usize,
+        z_0: &DenseVectors<C::Scalar>,
+        z_i: &DenseVectors<C::Scalar>,
+    ) -> C::Scalar {
+        let commit_e = self.commit_e.to_extended();
+        let commit_w = self.commit_w.to_extended();
+        MimcRO::<MIMC_ROUNDS, C::Scalar>::default().hash_vec(
             vec![
-                vec![i.into()],
+                vec![C::Scalar::from(i as u64)],
                 z_0.get(),
                 z_i.get(),
                 vec![self.u.clone()],
-                self.x.clone(),
+                self.x.get(),
                 vec![
-                    self.commit_e.get_x(),
-                    self.commit_e.get_y(),
-                    self.commit_e.get_z(),
+                    commit_e.get_x().into(),
+                    commit_e.get_y().into(),
+                    commit_e.get_z().into(),
                 ],
                 vec![
-                    self.commit_w.get_x(),
-                    self.commit_w.get_y(),
-                    self.commit_w.get_z(),
+                    commit_w.get_x().into(),
+                    commit_w.get_y().into(),
+                    commit_w.get_z().into(),
                 ],
             ]
             .concat(),

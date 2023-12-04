@@ -40,7 +40,7 @@ mod grumpkin_gadget_tests {
         let y = FieldAssignment::witness(&mut cs, b);
         let z = FieldAssignment::instance(&mut cs, c);
         let sum = &x + &y;
-        FieldAssignment::eq(&mut cs, &z, &sum);
+        FieldAssignment::enforce_eq(&mut cs, &z, &sum);
 
         assert!(cs.is_sat());
 
@@ -50,7 +50,7 @@ mod grumpkin_gadget_tests {
         let y = FieldAssignment::witness(&mut ncs, b);
         let z = FieldAssignment::instance(&mut ncs, c);
         let sum = &x + &y;
-        FieldAssignment::eq(&mut ncs, &z, &sum);
+        FieldAssignment::enforce_eq(&mut ncs, &z, &sum);
 
         assert!(!ncs.is_sat())
     }
@@ -68,7 +68,7 @@ mod grumpkin_gadget_tests {
         let y = FieldAssignment::witness(&mut cs, b);
         let z = FieldAssignment::instance(&mut cs, c);
         let product = FieldAssignment::mul(&mut cs, &x, &y);
-        FieldAssignment::eq(&mut cs, &z, &product);
+        FieldAssignment::enforce_eq(&mut cs, &z, &product);
 
         assert!(cs.is_sat());
 
@@ -78,7 +78,7 @@ mod grumpkin_gadget_tests {
         let y = FieldAssignment::witness(&mut ncs, b);
         let z = FieldAssignment::instance(&mut ncs, c);
         let product = FieldAssignment::mul(&mut ncs, &x, &y);
-        FieldAssignment::eq(&mut ncs, &z, &product);
+        FieldAssignment::enforce_eq(&mut ncs, &z, &product);
 
         assert!(!ncs.is_sat())
     }
@@ -98,7 +98,7 @@ mod grumpkin_gadget_tests {
         let sym_1 = FieldAssignment::mul(&mut cs, &x, &x);
         let y = FieldAssignment::mul(&mut cs, &sym_1, &x);
         let sym_2 = &y + &x;
-        FieldAssignment::eq(&mut cs, &z, &(&sym_2 + &c));
+        FieldAssignment::enforce_eq(&mut cs, &z, &(&sym_2 + &c));
 
         assert!(cs.is_sat());
 
@@ -111,7 +111,7 @@ mod grumpkin_gadget_tests {
         let sym_1 = FieldAssignment::mul(&mut ncs, &x, &x);
         let y = FieldAssignment::mul(&mut ncs, &sym_1, &x);
         let sym_2 = &y + &x;
-        FieldAssignment::eq(&mut ncs, &z, &(&sym_2 + &c));
+        FieldAssignment::enforce_eq(&mut ncs, &z, &(&sym_2 + &c));
 
         assert!(!ncs.is_sat());
     }

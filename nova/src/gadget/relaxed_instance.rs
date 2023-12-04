@@ -98,9 +98,9 @@ mod tests {
         };
 
         let instance_assignment = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance);
-        FieldAssignment::eq_constant(&mut cs, &instance_assignment.u, &instance.u);
+        FieldAssignment::enforce_eq_constant(&mut cs, &instance_assignment.u, &instance.u);
         // Think how to restrict
-        FieldAssignment::eq_constant(&mut cs, &instance_assignment.x[0], &instance.x[0]);
+        FieldAssignment::enforce_eq_constant(&mut cs, &instance_assignment.x[0], &instance.x[0]);
 
         // Research about curve cycles
 

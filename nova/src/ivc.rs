@@ -1,6 +1,7 @@
 use crate::function::FunctionCircuit;
 use crate::proof::RecursiveProof;
 use crate::{Prover, RelaxedR1cs, Verifier};
+use std::marker::PhantomData;
 
 use crate::circuit::AugmentedFCircuit;
 use crate::relaxed_r1cs::{RelaxedR1csInstance, RelaxedR1csWitness};
@@ -20,11 +21,11 @@ pub struct Ivc<C: CircuitDriver, FC: FunctionCircuit<C>> {
     // running r1cs instance
     // U
     running_instance: RelaxedR1cs<C>,
-    f: FC,
+    f: PhantomData<FC>,
 }
 
 impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
-    pub fn new(r1cs: R1cs<C>, rng: impl RngCore, z0: DenseVectors<C::Scalar>, f: FC) -> Self {
+    pub fn new(r1cs: R1cs<C>, rng: impl RngCore, z0: DenseVectors<C::Scalar>) -> Self {
         let i = 0;
         let zi = z0.clone();
         let prover = Prover::new(r1cs.clone(), rng);
@@ -43,7 +44,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
             r1cs,
             instance,
             running_instance,
-            f,
+            f: PhantomData::default(),
         }
     }
 
@@ -85,16 +86,16 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
     }
 
     pub fn prove_step(&mut self) {
-        let z_next = self.f.invoke();
-        let (u_next, u_next_x) = if self.i == 0 {
+        let z_next = FC::invoke(&self.zi);
+        let (u_next, u_next_x, commit_t) = if self.i == 0 {
             let u_next_x = self.running_instance.instance.hash(1, &self.z0, &z_next);
             let (u_next, w_next, commit_t) = (
-                RelaxedR1csInstance::default(),
-                RelaxedR1csWitness::default(),
+                RelaxedR1csInstance::<C>::default(),
+                RelaxedR1csWitness::<C>::default(),
                 C::Affine::ADDITIVE_IDENTITY,
             );
 
-            (u_next, u_next_x)
+            (u_next, u_next_x, commit_t)
         } else {
             let (u_next, w_next, commit_t) =
                 self.prover.prove(&self.instance, &self.running_instance);
@@ -105,7 +106,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
 
             let u_next_x = u_next.hash(self.i + 1, &self.z0, &z_next);
 
-            (u_next, u_next_x)
+            (u_next, u_next_x, commit_t)
         };
 
         let augmented_circuit = AugmentedFCircuit {
@@ -220,7 +221,7 @@ mod tests {
     fn ivc_test() {
         let r1cs: R1cs<GrumpkinDriver> = example_r1cs(1);
         let z0 = DenseVectors::new(r1cs.x());
-        let mut ivc = Ivc::new(r1cs, OsRng, z0);
+        let mut ivc = Ivc::<GrumpkinDriver, ExampleFunction<GrumpkinDriver>>::new(r1cs, OsRng, z0);
         let hash = ivc.recurse::<ExampleFunction<GrumpkinDriver>>();
         let proof = ivc.prove(RecursiveProof::default());
 

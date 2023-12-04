@@ -77,7 +77,7 @@ mod tests {
 
         let expected = mimc.squeeze();
         let circuit_result = mimc_circuit.squeeze(&mut cs);
-        FieldAssignment::eq_constant(&mut cs, &circuit_result, &expected);
+        FieldAssignment::enforce_eq_constant(&mut cs, &circuit_result, &expected);
         assert!(cs.is_sat());
     }
 }

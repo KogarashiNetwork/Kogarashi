@@ -1,6 +1,6 @@
 use super::binary::BinaryAssignment;
 use crate::circuit::CircuitDriver;
-use crate::common::{vec, Add, IntGroup, Neg, PrimeField, Ring, Sub, Vec};
+use crate::common::{vec, Add, Group, IntGroup, Neg, PrimeField, Ring, Sub, Vec};
 use crate::matrix::SparseRow;
 use crate::r1cs::{R1cs, Wire};
 
@@ -107,7 +107,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
                     &(&bit_field - &FieldAssignment::constant(&C::Scalar::one())),
                     &bit_field,
                 );
-                FieldAssignment::eq(
+                FieldAssignment::enforce_eq(
                     cs,
                     &bool_constr,
                     &FieldAssignment::constant(&C::Scalar::zero()),
@@ -118,7 +118,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
                     &(&(&FieldAssignment::constant(&C::Scalar::one()) - &bit_field) - &p[i - 1]),
                     &bit_field,
                 );
-                FieldAssignment::eq(
+                FieldAssignment::enforce_eq(
                     cs,
                     &bool_constr,
                     &FieldAssignment::constant(&C::Scalar::zero()),
@@ -142,11 +142,37 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         bit_repr
     }
 
-    pub fn eq(cs: &mut R1cs<C>, x: &Self, y: &Self) {
+    pub fn enforce_eq(cs: &mut R1cs<C>, x: &Self, y: &Self) {
         cs.mul_gate(&x.0, &SparseRow::one(), &y.0)
     }
 
-    pub fn eq_constant(cs: &mut R1cs<C>, x: &Self, c: &C::Scalar) {
+    pub fn is_eq(cs: &mut R1cs<C>, x: &Self, y: &Self) -> BinaryAssignment<C> {
+        let is_neq = Self::is_neq(cs, x, y);
+        BinaryAssignment::not(cs, &is_neq)
+    }
+
+    pub fn is_neq(cs: &mut R1cs<C>, x: &Self, y: &Self) -> BinaryAssignment<C> {
+        let x_val = x.inner().evaluate(&cs.x, &cs.w);
+        let y_val = y.inner().evaluate(&cs.x, &cs.w);
+        let is_not_equal = BinaryAssignment::witness(cs, if x_val != y_val { 1 } else { 0 });
+        let multiplier = if x_val != y_val {
+            FieldAssignment::witness(cs, (x_val - y_val).invert().unwrap())
+        } else {
+            FieldAssignment::constant(&C::Scalar::one())
+        };
+
+        let diff = x - y;
+        let mul = FieldAssignment::mul(cs, &diff, &multiplier);
+        FieldAssignment::enforce_eq(cs, &mul, &FieldAssignment::from(&is_not_equal));
+
+        let not_is_not_equal = BinaryAssignment::not(cs, &is_not_equal);
+        let mul = FieldAssignment::mul(cs, &diff, &FieldAssignment::from(&not_is_not_equal));
+        FieldAssignment::enforce_eq(cs, &mul, &FieldAssignment::constant(&C::Scalar::zero()));
+
+        is_not_equal
+    }
+
+    pub fn enforce_eq_constant(cs: &mut R1cs<C>, x: &Self, c: &C::Scalar) {
         cs.mul_gate(
             &x.0,
             &SparseRow::one(),
