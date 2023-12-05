@@ -33,7 +33,7 @@ mod tests {
     use zkstd::r1cs::test::example_r1cs;
 
     #[test]
-    fn folding_scheme_verifier_test() {
+    fn recursive_nifs_test() {
         let prover = example_prover();
         let r1cs = example_r1cs(1);
         let mut running_r1cs = RelaxedR1cs::new(r1cs);
@@ -43,8 +43,7 @@ mod tests {
             let verified_instance = Verifier::verify(commit_t, &r1cs_to_fold, &running_r1cs);
             assert_eq!(instance, verified_instance);
             running_r1cs = running_r1cs.update(&instance, &witness);
+            assert!(running_r1cs.is_sat())
         }
-
-        assert!(running_r1cs.is_sat())
     }
 }

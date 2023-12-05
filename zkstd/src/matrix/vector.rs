@@ -82,6 +82,14 @@ impl<F: PrimeField> Mul<F> for DenseVectors<F> {
     }
 }
 
+impl<F: PrimeField> Mul<F> for &DenseVectors<F> {
+    type Output = DenseVectors<F>;
+
+    fn mul(self, rhs: F) -> DenseVectors<F> {
+        DenseVectors(self.iter().map(|element| element * rhs).collect())
+    }
+}
+
 /// Hadamard product
 impl<F: PrimeField> Mul for DenseVectors<F> {
     type Output = Self;
@@ -100,6 +108,16 @@ impl<F: PrimeField> Add for DenseVectors<F> {
         assert_eq!(self.0.len(), rhs.0.len());
 
         Self(self.iter().zip(rhs.iter()).map(|(a, b)| a + b).collect())
+    }
+}
+
+impl<F: PrimeField> Add for &DenseVectors<F> {
+    type Output = DenseVectors<F>;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        assert_eq!(self.0.len(), rhs.0.len());
+
+        DenseVectors(self.iter().zip(rhs.iter()).map(|(a, b)| a + b).collect())
     }
 }
 
