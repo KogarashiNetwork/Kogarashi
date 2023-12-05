@@ -13,17 +13,17 @@ pub struct R1cs<C: CircuitDriver> {
     // 1. Structure S
     // a, b and c matrices and matrix size
     m: usize,
-    a: SparseMatrix<C::Scalar>,
-    b: SparseMatrix<C::Scalar>,
-    c: SparseMatrix<C::Scalar>,
+    a: SparseMatrix<C::Base>,
+    b: SparseMatrix<C::Base>,
+    c: SparseMatrix<C::Base>,
 
     // 2. Instance
     // r1cs instance includes one constant and public inputs and outputs
-    pub(crate) x: DenseVectors<C::Scalar>,
+    pub(crate) x: DenseVectors<C::Base>,
 
     // 3. Witness
     // r1cs witness includes private inputs and intermediate value
-    pub(crate) w: DenseVectors<C::Scalar>,
+    pub(crate) w: DenseVectors<C::Base>,
 }
 
 impl<C: CircuitDriver> R1cs<C> {
@@ -39,11 +39,11 @@ impl<C: CircuitDriver> R1cs<C> {
         self.w.len()
     }
 
-    pub fn x(&self) -> Vec<C::Scalar> {
+    pub fn x(&self) -> Vec<C::Base> {
         self.x.get()
     }
 
-    pub fn w(&self) -> Vec<C::Scalar> {
+    pub fn w(&self) -> Vec<C::Base> {
         self.w.get()
     }
 
@@ -51,9 +51,9 @@ impl<C: CircuitDriver> R1cs<C> {
     pub fn matrices(
         &self,
     ) -> (
-        SparseMatrix<C::Scalar>,
-        SparseMatrix<C::Scalar>,
-        SparseMatrix<C::Scalar>,
+        SparseMatrix<C::Base>,
+        SparseMatrix<C::Base>,
+        SparseMatrix<C::Base>,
     ) {
         (self.a.clone(), self.b.clone(), self.c.clone())
     }
@@ -75,12 +75,7 @@ impl<C: CircuitDriver> R1cs<C> {
             .all(|(left, right)| left == right)
     }
 
-    fn append(
-        &mut self,
-        a: SparseRow<C::Scalar>,
-        b: SparseRow<C::Scalar>,
-        c: SparseRow<C::Scalar>,
-    ) {
+    fn append(&mut self, a: SparseRow<C::Base>, b: SparseRow<C::Base>, c: SparseRow<C::Base>) {
         self.a.0.push(a);
         self.b.0.push(b);
         self.c.0.push(c);
@@ -100,9 +95,9 @@ impl<C: CircuitDriver> R1cs<C> {
     /// constrain x * y = z
     pub fn mul_gate(
         &mut self,
-        x: &SparseRow<C::Scalar>,
-        y: &SparseRow<C::Scalar>,
-        z: &SparseRow<C::Scalar>,
+        x: &SparseRow<C::Base>,
+        y: &SparseRow<C::Base>,
+        z: &SparseRow<C::Base>,
     ) {
         self.append(x.clone(), y.clone(), z.clone());
     }
@@ -110,9 +105,9 @@ impl<C: CircuitDriver> R1cs<C> {
     /// constrain x + y = z
     pub fn add_gate(
         &mut self,
-        x: &SparseRow<C::Scalar>,
-        y: &SparseRow<C::Scalar>,
-        z: &SparseRow<C::Scalar>,
+        x: &SparseRow<C::Base>,
+        y: &SparseRow<C::Base>,
+        z: &SparseRow<C::Base>,
     ) {
         self.append(x + y, SparseRow::from(Wire::ONE), z.clone());
     }
@@ -120,20 +115,20 @@ impl<C: CircuitDriver> R1cs<C> {
     /// constrain x - y = z
     pub fn sub_gate(
         &mut self,
-        x: &SparseRow<C::Scalar>,
-        y: &SparseRow<C::Scalar>,
-        z: &SparseRow<C::Scalar>,
+        x: &SparseRow<C::Base>,
+        y: &SparseRow<C::Base>,
+        z: &SparseRow<C::Base>,
     ) {
         self.append(x - y, SparseRow::from(Wire::ONE), z.clone());
     }
 
     /// constrain x == y
-    pub fn equal_gate(&mut self, x: &SparseRow<C::Scalar>, y: &SparseRow<C::Scalar>) {
+    pub fn equal_gate(&mut self, x: &SparseRow<C::Base>, y: &SparseRow<C::Base>) {
         self.mul_gate(x, &SparseRow::one(), y);
     }
 
     #[allow(clippy::type_complexity)]
-    pub fn evaluate(&self) -> (Vec<C::Scalar>, Vec<C::Scalar>, Vec<C::Scalar>) {
+    pub fn evaluate(&self) -> (Vec<C::Base>, Vec<C::Base>, Vec<C::Base>) {
         let a_evals = self.a.evaluate_with_z(&self.x, &self.w);
         let b_evals = self.b.evaluate_with_z(&self.x, &self.w);
         let c_evals = self.c.evaluate_with_z(&self.x, &self.w);
@@ -147,14 +142,14 @@ impl<C: CircuitDriver> R1cs<C> {
         m_l_1: usize,
     ) -> (
         (
-            Vec<Vec<(C::Scalar, usize)>>,
-            Vec<Vec<(C::Scalar, usize)>>,
-            Vec<Vec<(C::Scalar, usize)>>,
+            Vec<Vec<(C::Base, usize)>>,
+            Vec<Vec<(C::Base, usize)>>,
+            Vec<Vec<(C::Base, usize)>>,
         ),
         (
-            Vec<Vec<(C::Scalar, usize)>>,
-            Vec<Vec<(C::Scalar, usize)>>,
-            Vec<Vec<(C::Scalar, usize)>>,
+            Vec<Vec<(C::Base, usize)>>,
+            Vec<Vec<(C::Base, usize)>>,
+            Vec<Vec<(C::Base, usize)>>,
         ),
     ) {
         let (a_x, a_w) = self.a.x_and_w(l, m_l_1);
@@ -172,14 +167,14 @@ impl<C: CircuitDriver> Default for R1cs<C> {
             a: SparseMatrix::default(),
             b: SparseMatrix::default(),
             c: SparseMatrix::default(),
-            x: DenseVectors::new(vec![C::Scalar::one()]),
+            x: DenseVectors::new(vec![C::Base::one()]),
             w: DenseVectors::default(),
         }
     }
 }
 
 impl<C: CircuitDriver> Index<Wire> for R1cs<C> {
-    type Output = C::Scalar;
+    type Output = C::Base;
 
     fn index(&self, w: Wire) -> &Self::Output {
         match w {

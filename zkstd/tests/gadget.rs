@@ -2,25 +2,25 @@ mod grumpkin;
 
 #[cfg(test)]
 mod grumpkin_gadget_tests {
-    use crate::grumpkin::{Affine, Fq as Base, Fr as Scalar, GrumpkinDriver};
+    use crate::grumpkin::{Affine, Fq as Scalar, Fr as Base, GrumpkinDriver};
 
     use rand_core::OsRng;
     use zkstd::circuit::prelude::{FieldAssignment, PointAssignment, R1cs};
-    use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, PrimeField};
+    use zkstd::common::{BNAffine, BNProjective, Group, PrimeField};
 
     #[test]
     fn range_proof_test() {
         for _ in 0..100 {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
             let mut ncs = cs.clone();
-            let bound = Scalar::from(10);
+            let bound = Base::from(10);
 
             let x_ass = FieldAssignment::instance(&mut cs, bound);
             let x_bits = FieldAssignment::to_bits(&mut cs, &x_ass);
             FieldAssignment::range_check(&mut cs, &x_bits, bound);
             assert!(cs.is_sat());
 
-            let x_ass = FieldAssignment::instance(&mut ncs, bound + Scalar::one());
+            let x_ass = FieldAssignment::instance(&mut ncs, bound + Base::one());
             let x_bits = FieldAssignment::to_bits(&mut ncs, &x_ass);
             FieldAssignment::range_check(&mut ncs, &x_bits, bound);
             assert!(!ncs.is_sat());
@@ -31,8 +31,8 @@ mod grumpkin_gadget_tests {
     fn field_add_test() {
         let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let mut ncs = cs.clone();
-        let a = Scalar::random(OsRng);
-        let b = Scalar::random(OsRng);
+        let a = Base::random(OsRng);
+        let b = Base::random(OsRng);
         let mut c = a + b;
 
         // a + b == c
@@ -45,7 +45,7 @@ mod grumpkin_gadget_tests {
         assert!(cs.is_sat());
 
         // a + b != c
-        c += Scalar::one();
+        c += Base::one();
         let x = FieldAssignment::instance(&mut ncs, a);
         let y = FieldAssignment::witness(&mut ncs, b);
         let z = FieldAssignment::instance(&mut ncs, c);
@@ -59,8 +59,8 @@ mod grumpkin_gadget_tests {
     fn field_mul_test() {
         let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let mut ncs = cs.clone();
-        let a = Scalar::random(OsRng);
-        let b = Scalar::random(OsRng);
+        let a = Base::random(OsRng);
+        let b = Base::random(OsRng);
         let mut c = a * b;
 
         // a * b == c
@@ -73,7 +73,7 @@ mod grumpkin_gadget_tests {
         assert!(cs.is_sat());
 
         // a * b != c
-        c += Scalar::one();
+        c += Base::one();
         let x = FieldAssignment::instance(&mut ncs, a);
         let y = FieldAssignment::witness(&mut ncs, b);
         let z = FieldAssignment::instance(&mut ncs, c);
@@ -87,9 +87,9 @@ mod grumpkin_gadget_tests {
     fn field_ops_test() {
         let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let mut ncs = cs.clone();
-        let input = Scalar::from(3);
-        let c = Scalar::from(5);
-        let out = Scalar::from(35);
+        let input = Base::from(3);
+        let c = Base::from(5);
+        let out = Base::from(35);
 
         // x^3 + x + 5 == 35
         let x = FieldAssignment::witness(&mut cs, input);
@@ -103,8 +103,8 @@ mod grumpkin_gadget_tests {
         assert!(cs.is_sat());
 
         // x^3 + x + 5 != 36
-        let c = Scalar::from(5);
-        let out = Scalar::from(36);
+        let c = Base::from(5);
+        let out = Base::from(36);
         let x = FieldAssignment::witness(&mut ncs, input);
         let c = FieldAssignment::constant(&c);
         let z = FieldAssignment::instance(&mut ncs, out);
@@ -122,13 +122,7 @@ mod grumpkin_gadget_tests {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
             let point = Affine::random(OsRng);
 
-            let circuit_double = PointAssignment::instance(
-                &mut cs,
-                point.get_x(),
-                point.get_y(),
-                point.is_identity(),
-            )
-            .double(&mut cs);
+            let circuit_double = PointAssignment::instance(&mut cs, point).double(&mut cs);
 
             let expected = point.to_extended().double();
 
@@ -146,10 +140,8 @@ mod grumpkin_gadget_tests {
             let a = Affine::random(OsRng);
             let b = Affine::ADDITIVE_IDENTITY;
 
-            let a_assignment =
-                PointAssignment::instance(&mut cs, a.get_x(), a.get_y(), a.is_identity());
-            let b_assignment =
-                PointAssignment::instance(&mut cs, b.get_x(), b.get_y(), b.is_identity());
+            let a_assignment = PointAssignment::instance(&mut cs, a);
+            let b_assignment = PointAssignment::instance(&mut cs, b);
 
             let expected = a + b;
 
@@ -165,10 +157,8 @@ mod grumpkin_gadget_tests {
             let a = Affine::random(OsRng);
             let b = Affine::random(OsRng);
 
-            let a_assignment =
-                PointAssignment::instance(&mut cs, a.get_x(), a.get_y(), a.is_identity());
-            let b_assignment =
-                PointAssignment::instance(&mut cs, b.get_x(), b.get_y(), b.is_identity());
+            let a_assignment = PointAssignment::instance(&mut cs, a);
+            let b_assignment = PointAssignment::instance(&mut cs, b);
 
             let expected = a.to_extended() + b.to_extended();
 
@@ -184,13 +174,12 @@ mod grumpkin_gadget_tests {
     fn curve_scalar_mul_test() {
         for _ in 0..100 {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let x = Scalar::random(OsRng);
+            let x = Base::random(OsRng);
             let p = Affine::random(OsRng);
 
             let x_assignment = FieldAssignment::instance(&mut cs, x); // Fr
-            let p_assignment =
-                PointAssignment::instance(&mut cs, p.get_x(), p.get_y(), p.is_identity());
-            let expected = p * Base::from(x);
+            let p_assignment = PointAssignment::instance(&mut cs, p);
+            let expected = p * Scalar::from(x);
 
             assert_eq!(x.to_bits(), Base::from(x).to_bits());
 

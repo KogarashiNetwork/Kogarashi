@@ -5,27 +5,28 @@ use crate::matrix::SparseRow;
 use crate::r1cs::{R1cs, Wire};
 
 #[derive(Clone)]
-pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Scalar>);
+pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Base>);
 
 impl<C: CircuitDriver> FieldAssignment<C> {
-    pub fn inner(&self) -> &SparseRow<C::Scalar> {
+    pub fn inner(&self) -> &SparseRow<C::Base> {
         &self.0
     }
-    pub fn instance(cs: &mut R1cs<C>, instance: C::Scalar) -> Self {
+
+    pub fn instance(cs: &mut R1cs<C>, instance: C::Base) -> Self {
         let wire = cs.public_wire();
         cs.x.push(instance);
 
         Self(SparseRow::from(wire))
     }
 
-    pub fn witness(cs: &mut R1cs<C>, witness: C::Scalar) -> Self {
+    pub fn witness(cs: &mut R1cs<C>, witness: C::Base) -> Self {
         let wire = cs.private_wire();
         cs.w.push(witness);
 
         Self(SparseRow::from(wire))
     }
 
-    pub fn constant(constant: &C::Scalar) -> Self {
+    pub fn constant(constant: &C::Base) -> Self {
         Self(SparseRow(vec![(Wire::ONE, *constant)]))
     }
 
@@ -63,7 +64,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         z
     }
 
-    pub fn range_check(cs: &mut R1cs<C>, a_bits: &[BinaryAssignment<C>], c: C::Scalar) {
+    pub fn range_check(cs: &mut R1cs<C>, a_bits: &[BinaryAssignment<C>], c: C::Base) {
         let c_bits = c
             .to_bits()
             .into_iter()
@@ -74,7 +75,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         assert!(a_bits
             .iter()
             .take(a_bits.len() - c_bits.len())
-            .all(|b| cs[*b.inner()] == C::Scalar::zero()));
+            .all(|b| cs[*b.inner()] == C::Base::zero()));
 
         let a_bits = a_bits
             .iter()
@@ -104,24 +105,24 @@ impl<C: CircuitDriver> FieldAssignment<C> {
             if c == 1 {
                 let bool_constr = FieldAssignment::mul(
                     cs,
-                    &(&bit_field - &FieldAssignment::constant(&C::Scalar::one())),
+                    &(&bit_field - &FieldAssignment::constant(&C::Base::one())),
                     &bit_field,
                 );
                 FieldAssignment::eq(
                     cs,
                     &bool_constr,
-                    &FieldAssignment::constant(&C::Scalar::zero()),
+                    &FieldAssignment::constant(&C::Base::zero()),
                 );
             } else if c == 0 {
                 let bool_constr = FieldAssignment::mul(
                     cs,
-                    &(&(&FieldAssignment::constant(&C::Scalar::one()) - &bit_field) - &p[i - 1]),
+                    &(&(&FieldAssignment::constant(&C::Base::one()) - &bit_field) - &p[i - 1]),
                     &bit_field,
                 );
                 FieldAssignment::eq(
                     cs,
                     &bool_constr,
-                    &FieldAssignment::constant(&C::Scalar::zero()),
+                    &FieldAssignment::constant(&C::Base::zero()),
                 );
             }
         }
@@ -129,7 +130,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
 
     /// To bit representation in Big-endian
     pub fn to_bits(cs: &mut R1cs<C>, x: &Self) -> Vec<BinaryAssignment<C>> {
-        let bound = C::Scalar::MODULUS - C::Scalar::one();
+        let bound = C::Base::MODULUS - C::Base::one();
 
         let bit_repr: Vec<BinaryAssignment<C>> = x
             .inner()
@@ -146,7 +147,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         cs.mul_gate(&x.0, &SparseRow::one(), &y.0)
     }
 
-    pub fn eq_constant(cs: &mut R1cs<C>, x: &Self, c: &C::Scalar) {
+    pub fn eq_constant(cs: &mut R1cs<C>, x: &Self, c: &C::Base) {
         cs.mul_gate(
             &x.0,
             &SparseRow::one(),

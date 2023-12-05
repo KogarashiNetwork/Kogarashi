@@ -147,6 +147,99 @@ macro_rules! cycle_pair_field {
 cycle_pair_field!(Fr, FR_GENERATOR, FR_MODULUS, FR_R, FR_R2, FR_R3, FR_INV);
 cycle_pair_field!(Fq, FQ_GENERATOR, FQ_MODULUS, FQ_R, FQ_R2, FQ_R3, FQ_INV);
 
+impl FftField for Fr {
+    const S: usize = 28;
+
+    const ROOT_OF_UNITY: Self = Fr::to_mont_form([
+        0xd34f1ed960c37c9c,
+        0x3215cf6dd39329c8,
+        0x98865ea93dd31f74,
+        0x03ddb9f5166d18b7,
+    ]);
+
+    const MULTIPLICATIVE_GENERATOR: Self = Fr::to_mont_form(FR_GENERATOR);
+
+    fn pow(self, val: u64) -> Self {
+        Self(pow(self.0, [val, 0, 0, 0], FR_R, FR_MODULUS, FR_INV))
+    }
+
+    fn divn(&mut self, mut n: u32) {
+        if n >= 256 {
+            *self = Self::from(0u64);
+            return;
+        }
+
+        while n >= 64 {
+            let mut t = 0;
+            for i in self.0.iter_mut().rev() {
+                core::mem::swap(&mut t, i);
+            }
+            n -= 64;
+        }
+
+        if n > 0 {
+            let mut t = 0;
+            for i in self.0.iter_mut().rev() {
+                let t2 = *i << (64 - n);
+                *i >>= n;
+                *i |= t;
+                t = t2;
+            }
+        }
+    }
+
+    fn from_hash(hash: &[u8; 64]) -> Self {
+        let d0 = Self([
+            u64::from_le_bytes(hash[0..8].try_into().unwrap()),
+            u64::from_le_bytes(hash[8..16].try_into().unwrap()),
+            u64::from_le_bytes(hash[16..24].try_into().unwrap()),
+            u64::from_le_bytes(hash[24..32].try_into().unwrap()),
+        ]);
+        let d1 = Self([
+            u64::from_le_bytes(hash[32..40].try_into().unwrap()),
+            u64::from_le_bytes(hash[40..48].try_into().unwrap()),
+            u64::from_le_bytes(hash[48..56].try_into().unwrap()),
+            u64::from_le_bytes(hash[56..64].try_into().unwrap()),
+        ]);
+        d0 * Self(FR_R2) + d1 * Self(FR_R3)
+    }
+
+    fn reduce(&self) -> Self {
+        Self(mont(
+            [self.0[0], self.0[1], self.0[2], self.0[3], 0, 0, 0, 0],
+            FR_MODULUS,
+            FR_INV,
+        ))
+    }
+
+    fn is_even(&self) -> bool {
+        self.0[0] % 2 == 0
+    }
+
+    fn mod_2_pow_k(&self, k: u8) -> u8 {
+        (self.0[0] & ((1 << k) - 1)) as u8
+    }
+
+    fn mods_2_pow_k(&self, w: u8) -> i8 {
+        assert!(w < 32u8);
+        let modulus = self.mod_2_pow_k(w) as i8;
+        let two_pow_w_minus_one = 1i8 << (w - 1);
+
+        match modulus >= two_pow_w_minus_one {
+            false => modulus,
+            true => modulus - ((1u8 << w) as i8),
+        }
+    }
+}
+
+impl From<[u64; 4]> for Fr {
+    fn from(val: [u64; 4]) -> Fr {
+        Fr(val)
+    }
+}
+
+impl ParallelCmp for Fr {}
+
 pub(crate) const FR_PARAM_B: Fr = Fr::new_unchecked([
     0xdd7056026000005a,
     0x223fa97acb319311,
@@ -429,13 +522,13 @@ pub struct GrumpkinDriver;
 
 impl CircuitDriver for GrumpkinDriver {
     const NUM_BITS: u16 = 254;
-    type Affine = G1Affine;
+    type Affine = Affine;
 
-    type Base = Fq;
+    type Base = Fr;
 
-    type Scalar = Fr;
+    type Scalar = Fq;
 
-    fn b3() -> Self::Scalar {
+    fn b3() -> Self::Base {
         FR_PARAM_B3
     }
 }

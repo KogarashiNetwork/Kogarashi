@@ -4,6 +4,7 @@ use super::field::FieldAssignment;
 use crate::circuit::CircuitDriver;
 use crate::common::{BNProjective, CurveGroup, Group, IntGroup, Ring};
 use crate::r1cs::R1cs;
+use crate::traits::BNAffine;
 
 #[derive(Clone)]
 pub struct PointAssignment<C: CircuitDriver> {
@@ -13,30 +14,30 @@ pub struct PointAssignment<C: CircuitDriver> {
 }
 
 impl<C: CircuitDriver> PointAssignment<C> {
-    pub fn instance(cs: &mut R1cs<C>, x: C::Scalar, y: C::Scalar, is_infinity: bool) -> Self {
-        let x = FieldAssignment::instance(cs, x);
-        let y = FieldAssignment::instance(cs, y);
+    pub fn instance(cs: &mut R1cs<C>, point: C::Affine) -> Self {
+        let x = FieldAssignment::instance(cs, point.get_x().into());
+        let y = FieldAssignment::instance(cs, point.get_y().into());
         let z = FieldAssignment::instance(
             cs,
-            if is_infinity {
-                C::Scalar::zero()
+            if point.is_identity() {
+                C::Base::zero()
             } else {
-                C::Scalar::one()
+                C::Base::one()
             },
         );
 
         Self { x, y, z }
     }
 
-    pub fn witness(cs: &mut R1cs<C>, x: C::Scalar, y: C::Scalar, is_infinity: bool) -> Self {
+    pub fn witness(cs: &mut R1cs<C>, x: C::Base, y: C::Base, is_infinity: bool) -> Self {
         let x = FieldAssignment::witness(cs, x);
         let y = FieldAssignment::witness(cs, y);
         let z = FieldAssignment::witness(
             cs,
             if is_infinity {
-                C::Scalar::zero()
+                C::Base::zero()
             } else {
-                C::Scalar::one()
+                C::Base::one()
             },
         );
 
@@ -46,11 +47,11 @@ impl<C: CircuitDriver> PointAssignment<C> {
     pub fn assert_equal_public_point(
         &self,
         cs: &mut R1cs<C>,
-        point: impl BNProjective<Scalar = C::Base, Base = C::Scalar>,
+        point: <C::Affine as BNAffine>::Extended,
     ) {
-        let point_x = FieldAssignment::constant(&point.get_x());
-        let point_y = FieldAssignment::constant(&point.get_y());
-        let point_z = FieldAssignment::constant(&point.get_z());
+        let point_x = FieldAssignment::constant(&C::Base::from(point.get_x()));
+        let point_y = FieldAssignment::constant(&C::Base::from(point.get_y()));
+        let point_z = FieldAssignment::constant(&C::Base::from(point.get_z()));
 
         let xz1 = FieldAssignment::mul(cs, &self.x, &point_z);
         let xz2 = FieldAssignment::mul(cs, &point_x, &self.z);
@@ -64,7 +65,7 @@ impl<C: CircuitDriver> PointAssignment<C> {
     }
 
     pub fn add(&self, rhs: &Self, cs: &mut R1cs<C>) -> Self {
-        let b3 = FieldAssignment::<C>::constant(&C::b3());
+        let b3 = FieldAssignment::<C>::constant(&C::Base::from(C::b3()));
         let t0 = FieldAssignment::mul(cs, &self.x, &rhs.x);
         let t1 = FieldAssignment::mul(cs, &self.y, &rhs.y);
         let t2 = FieldAssignment::mul(cs, &self.z, &rhs.z);
@@ -107,7 +108,7 @@ impl<C: CircuitDriver> PointAssignment<C> {
     }
 
     pub fn double(&self, cs: &mut R1cs<C>) -> Self {
-        let b3 = FieldAssignment::<C>::constant(&C::b3());
+        let b3 = FieldAssignment::<C>::constant(&C::Base::from(C::b3()));
         let t0 = FieldAssignment::mul(cs, &self.y, &self.y);
         let z3 = &t0 + &t0;
         let z3 = &z3 + &z3;
@@ -137,8 +138,7 @@ impl<C: CircuitDriver> PointAssignment<C> {
     /// coordinate scalar
     pub fn scalar_point(&self, cs: &mut R1cs<C>, scalar: &FieldAssignment<C>) -> Self {
         let i = C::Affine::ADDITIVE_IDENTITY;
-        let mut res =
-            PointAssignment::instance(cs, i.get_x().into(), i.get_y().into(), i.is_identity());
+        let mut res = PointAssignment::instance(cs, i);
         for bit in FieldAssignment::to_bits(cs, scalar).iter() {
             res = res.double(cs);
             let point_to_add = self.select_identity(cs, bit);
@@ -153,8 +153,7 @@ impl<C: CircuitDriver> PointAssignment<C> {
         let bit = FieldAssignment::from(bit);
         Self {
             x: FieldAssignment::mul(cs, &x, &bit),
-            y: &(&FieldAssignment::mul(cs, &y, &bit)
-                + &FieldAssignment::constant(&C::Scalar::one()))
+            y: &(&FieldAssignment::mul(cs, &y, &bit) + &FieldAssignment::constant(&C::Base::one()))
                 - &bit,
             z: FieldAssignment::mul(cs, &z, &bit),
         }
