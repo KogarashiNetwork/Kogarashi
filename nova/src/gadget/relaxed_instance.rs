@@ -101,6 +101,40 @@ mod tests {
     use zkstd::matrix::DenseVectors;
 
     #[test]
+    fn instance_assignment_hash() {
+        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
+        let instance = RelaxedR1csInstance {
+            commit_e: G1Affine::random(OsRng),
+            u: Fr::random(OsRng),
+            commit_w: G1Affine::random(OsRng),
+            x: DenseVectors::new(vec![Fr::random(OsRng); 1]),
+        };
+
+        let i = 3;
+        let z_0 = DenseVectors::new(vec![Fr::from(3)]);
+        let z_i = z_0.clone();
+
+        let hash = instance.hash(i, &z_0, &z_i);
+
+        let i_assignment = FieldAssignment::witness(&mut cs, Fr::from(i as u64));
+        let z_0_assignment = z_0
+            .iter()
+            .map(|x| FieldAssignment::witness(&mut cs, x))
+            .collect::<Vec<_>>();
+        let z_i_assignment = z_i
+            .iter()
+            .map(|x| FieldAssignment::witness(&mut cs, x))
+            .collect::<Vec<_>>();
+        let instance_assignment = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance);
+
+        let hash_circuit =
+            instance_assignment.hash(&mut cs, i_assignment, z_0_assignment, z_i_assignment);
+
+        FieldAssignment::enforce_eq_constant(&mut cs, &hash_circuit, &hash);
+        assert!(cs.is_sat());
+    }
+
+    #[test]
     fn relaxed_instance_assignment() {
         let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let instance = RelaxedR1csInstance {
@@ -112,7 +146,7 @@ mod tests {
 
         let instance_assignment = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance);
         FieldAssignment::enforce_eq_constant(&mut cs, &instance_assignment.u, &instance.u);
-        // Think how to restrict
+        // TODO: Think how to restrict size to 1
         FieldAssignment::enforce_eq_constant(&mut cs, &instance_assignment.x[0], &instance.x[0]);
 
         // Research about curve cycles

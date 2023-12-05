@@ -33,13 +33,13 @@ impl<F: PrimeField> SparseMatrix<F> {
     }
 
     // matrix-vector multiplication
-    pub fn prod(&self, m: &usize, x: &DenseVectors<F>, w: &DenseVectors<F>) -> DenseVectors<F> {
+    pub fn prod(&self, m: &usize, l: usize, z: &DenseVectors<F>) -> DenseVectors<F> {
         let mut vectors = DenseVectors::zero(*m);
         for (index, elements) in self.0.iter().enumerate() {
             vectors[index] = elements.iter().fold(F::zero(), |sum, (wire, coeff)| {
                 let value = match wire {
-                    Wire::Instance(i) => x[*i],
-                    Wire::Witness(i) => w[*i],
+                    Wire::Instance(i) => z[*i],
+                    Wire::Witness(i) => z[*i + l],
                 };
                 sum + *coeff * value
             })

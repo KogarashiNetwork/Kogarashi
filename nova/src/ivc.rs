@@ -1,12 +1,12 @@
 use crate::function::FunctionCircuit;
 use crate::proof::RecursiveProof;
-use crate::{Prover, RelaxedR1cs, Verifier};
+use crate::{Prover, RelaxedR1cs};
 use std::marker::PhantomData;
 
 use crate::circuit::AugmentedFCircuit;
 use crate::relaxed_r1cs::{RelaxedR1csInstance, RelaxedR1csWitness};
 use zkstd::circuit::prelude::{CircuitDriver, R1cs};
-use zkstd::common::{Group, IntGroup, Ring, RngCore};
+use zkstd::common::{Group, RngCore};
 use zkstd::matrix::DenseVectors;
 
 pub struct Ivc<C: CircuitDriver, FC: FunctionCircuit<C>> {
@@ -25,75 +25,37 @@ pub struct Ivc<C: CircuitDriver, FC: FunctionCircuit<C>> {
 }
 
 impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
-    pub fn new(r1cs: R1cs<C>, rng: impl RngCore, z0: DenseVectors<C::Scalar>) -> Self {
-        let i = 0;
-        let zi = z0.clone();
-        let prover = Prover::new(r1cs.clone(), rng);
-        let instance = RelaxedR1cs::new(r1cs.clone());
-        let running_instance = instance.clone();
+    pub fn new(rng: impl RngCore, z0: DenseVectors<C::Scalar>) -> Self {
+        let mut r1cs = R1cs::default();
 
-        // let mut cs = r1cs.clone();
-        // let augmented_circuit = AugmentedFCircuit::<C, FC>::default();
-        // augmented_circuit.generate(&mut cs);
+        let augmented_circuit = AugmentedFCircuit::<C, FC>::default();
+        augmented_circuit.generate(&mut r1cs);
+
+        let prover = Prover::new(r1cs.clone(), rng);
+        let mut relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
+        let u_dummy = RelaxedR1csInstance::<C>::dummy(r1cs.l() - 1);
+        let w_dummy = RelaxedR1csWitness::<C>::dummy(r1cs.m_l_1(), r1cs.m());
+        relaxed_r1cs = relaxed_r1cs.update(&u_dummy, &w_dummy);
 
         Self {
-            i,
-            z0,
-            zi,
+            i: 0,
+            z0: z0.clone(),
+            zi: z0,
             prover,
             r1cs,
-            instance,
-            running_instance,
+            instance: relaxed_r1cs.clone(),
+            running_instance: relaxed_r1cs,
             f: PhantomData::default(),
         }
-    }
-
-    // augmented function
-    pub fn recurse<F: FunctionCircuit<C>>(&mut self) -> C::Scalar {
-        let instance = if self.i != 0 {
-            // check that ui.x = hash(vk, i, z0, zi, Ui), where ui.x is the public IO of ui
-            assert_eq!(
-                self.running_instance.instance.x,
-                DenseVectors::new(vec![hash(
-                    self.i,
-                    &self.z0,
-                    &self.zi,
-                    &self.running_instance.instance
-                )])
-            );
-
-            // check that (ui.E, ui.u) = (u⊥.E, 1)
-            assert!(
-                self.running_instance.instance.commit_e == C::Affine::ADDITIVE_IDENTITY
-                    && self.running_instance.instance.u == C::Scalar::one()
-            );
-
-            // compute Ui+1 ← NIFS.V(vk, U, u, T)
-            let t = self
-                .prover
-                .compute_cross_term(&self.instance, &self.running_instance);
-            let commit_t = self.prover.pp.commit(&t);
-            Verifier::verify(commit_t, &self.instance, &self.running_instance)
-        } else {
-            // Default instance (dummy)
-            self.running_instance.instance.clone()
-        };
-
-        self.i += 1;
-        // zi is z0 for the i == 0
-        self.zi = F::invoke(&self.zi);
-        hash(self.i, &self.z0, &self.zi, &instance)
     }
 
     pub fn prove_step(&mut self) {
         let z_next = FC::invoke(&self.zi);
         let (u_next, u_next_x, commit_t) = if self.i == 0 {
-            println!("1, {:?}, {z_next:?}", self.z0);
             let u_next_x = self.running_instance.instance.hash(1, &self.z0, &z_next);
-            println!("{u_next_x:?}");
             let (u_next, w_next, commit_t) = (
-                RelaxedR1csInstance::<C>::default(),
-                RelaxedR1csWitness::<C>::default(),
+                RelaxedR1csInstance::<C>::dummy(1),
+                RelaxedR1csWitness::<C>::dummy(1, self.r1cs.m()),
                 C::Affine::ADDITIVE_IDENTITY,
             );
 
@@ -134,12 +96,6 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
         self.zi = z_next;
     }
 
-    // pub fn recurse<F: Function<C>>(&mut self) {
-    //     if self.i == 0 {}
-    //     self.i += 1;
-    //     self.zi = F::invoke(&self.zi);
-    // }
-
     pub fn prove(self, p: RecursiveProof<C>) -> RecursiveProof<C> {
         let Self {
             i,
@@ -167,10 +123,6 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
             prover.prove(&u_relaxed_r1cs, &U_relaxed_r1cs)
         };
 
-        let (u_i_1, w_i_1) = trace(&U_i, &u_i, i, &z0, &zi, commit_t);
-
-        // Generate p_i+1
-
         let pair = (
             (instance.instance, instance.witness),
             (running_instance.instance, running_instance.witness),
@@ -186,32 +138,12 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
     }
 }
 
-pub fn hash<C: CircuitDriver>(
-    i: usize,
-    z0: &DenseVectors<C::Scalar>,
-    zi: &DenseVectors<C::Scalar>,
-    u: &RelaxedR1csInstance<C>,
-) -> C::Scalar {
-    // MIMC
-    C::Scalar::zero()
-}
-
-pub fn trace<C: CircuitDriver>(
-    to_fold: &RelaxedR1csInstance<C>,
-    running: &RelaxedR1csInstance<C>,
-    i: usize,
-    z0: &DenseVectors<C::Scalar>,
-    zi: &DenseVectors<C::Scalar>,
-    commit_t: C::Affine,
-) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>) {
-    unimplemented!()
-}
-
 #[cfg(test)]
 mod tests {
     use super::Ivc;
     use crate::test::ExampleFunction;
 
+    use bn_254::Fr;
     use grumpkin::driver::GrumpkinDriver;
     use rand_core::OsRng;
     use zkstd::circuit::prelude::R1cs;
@@ -221,11 +153,9 @@ mod tests {
     #[test]
     fn ivc_test() {
         let r1cs: R1cs<GrumpkinDriver> = example_r1cs(1);
-        let z0 = DenseVectors::new(r1cs.x());
-        let mut ivc = Ivc::<GrumpkinDriver, ExampleFunction<GrumpkinDriver>>::new(r1cs, OsRng, z0);
-        // let hash = ivc.recurse::<ExampleFunction<GrumpkinDriver>>();
+        let z0 = DenseVectors::new(vec![Fr::from(3)]);
+        let mut ivc = Ivc::<GrumpkinDriver, ExampleFunction<GrumpkinDriver>>::new(OsRng, z0);
         ivc.prove_step();
-        // let proof = ivc.prove(RecursiveProof::default());
 
         // assert!(proof.verify())
     }

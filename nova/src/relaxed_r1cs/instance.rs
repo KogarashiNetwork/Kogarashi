@@ -1,10 +1,10 @@
 use crate::hash::{MimcRO, MIMC_ROUNDS};
 use crate::RelaxedR1cs;
 use zkstd::circuit::prelude::CircuitDriver;
-use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, PrimeField, Ring};
+use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, IntGroup, PrimeField, Ring};
 use zkstd::matrix::DenseVectors;
 
-#[derive(Clone, Debug, PartialEq, Eq, Default)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RelaxedR1csInstance<C: CircuitDriver> {
     /// commitment for witness vectors
     pub(crate) commit_w: C::Affine,
@@ -22,7 +22,16 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
             commit_w: C::Affine::ADDITIVE_IDENTITY,
             commit_e: C::Affine::ADDITIVE_IDENTITY,
             u: C::Scalar::one(),
-            x,
+            x: DenseVectors::new(x.get()[1..].to_vec()),
+        }
+    }
+
+    pub(crate) fn dummy(x_len: usize) -> Self {
+        Self {
+            commit_w: C::Affine::ADDITIVE_IDENTITY,
+            commit_e: C::Affine::ADDITIVE_IDENTITY,
+            u: C::Scalar::zero(),
+            x: DenseVectors::zero(x_len),
         }
     }
 

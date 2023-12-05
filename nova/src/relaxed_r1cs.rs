@@ -108,6 +108,7 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
             instance,
             witness,
         } = self;
+
         let RelaxedR1csInstance {
             commit_w: _,
             commit_e: _,
@@ -116,12 +117,14 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
         } = instance;
         let RelaxedR1csWitness { w, e } = witness;
 
+        let l = x.len() + 1;
+        let z = DenseVectors::new(vec![vec![*u], x.get(), w.get()].concat());
         // A · Z
-        let az = a.prod(m, x, w);
+        let az = a.prod(m, l, &z);
         // B · Z
-        let bz = b.prod(m, x, w);
+        let bz = b.prod(m, l, &z);
         // C · Z
-        let cz = c.prod(m, x, w);
+        let cz = c.prod(m, l, &z);
         // (A · Z) ◦ (B · Z)
         let azbz = az * bz;
 

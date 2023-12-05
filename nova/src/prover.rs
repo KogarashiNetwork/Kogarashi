@@ -64,13 +64,18 @@ impl<C: CircuitDriver> Prover<C> {
         let (w0, w1) = (r1cs_1.w(), r1cs_2.w());
         let (x0, x1) = (r1cs_1.x(), r1cs_2.x());
 
+        let z1 = DenseVectors::new(vec![vec![u1], x0.get(), w0.get()].concat());
+        let l1 = x0.len() + 1;
+        let z2 = DenseVectors::new(vec![vec![u2], x1.get(), w1.get()].concat());
+        let l2 = x1.len() + 1;
+
         // matrices and z vector matrix multiplication
-        let az2 = a.prod(&m, &x1, &w1);
-        let bz1 = b.prod(&m, &x0, &w0);
-        let az1 = a.prod(&m, &x0, &w0);
-        let bz2 = b.prod(&m, &x1, &w1);
-        let cz2 = c.prod(&m, &x1, &w1);
-        let cz1 = c.prod(&m, &x0, &w0);
+        let az2 = a.prod(&m, l2, &z2);
+        let bz1 = b.prod(&m, l1, &z1);
+        let az1 = a.prod(&m, l1, &z1);
+        let bz2 = b.prod(&m, l2, &z2);
+        let cz2 = c.prod(&m, l2, &z2);
+        let cz1 = c.prod(&m, l1, &z1);
 
         // matrices Hadamard product
         let az2bz1 = az2 * bz1;

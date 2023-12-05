@@ -3,7 +3,7 @@ use zkstd::circuit::prelude::CircuitDriver;
 use zkstd::common::{IntGroup, PrimeField};
 use zkstd::matrix::DenseVectors;
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct RelaxedR1csWitness<C: CircuitDriver> {
     /// witness
     pub(crate) w: DenseVectors<C::Scalar>,
@@ -16,6 +16,13 @@ impl<C: CircuitDriver> RelaxedR1csWitness<C> {
         Self {
             e: DenseVectors::new(vec![C::Scalar::zero(); w.get().len()]),
             w,
+        }
+    }
+
+    pub(crate) fn dummy(w_len: usize, m: usize) -> Self {
+        Self {
+            e: DenseVectors::zero(m),
+            w: DenseVectors::zero(w_len),
         }
     }
 

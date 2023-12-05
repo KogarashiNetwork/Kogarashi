@@ -3,13 +3,11 @@ use crate::{
     RelaxedR1cs,
 };
 
-use crate::ivc::hash;
 use zkstd::circuit::prelude::{CircuitDriver, R1cs};
 use zkstd::common::{Group, Ring};
 use zkstd::matrix::DenseVectors;
 
 #[allow(clippy::type_complexity)]
-#[derive(Default)]
 pub struct RecursiveProof<C: CircuitDriver> {
     pub(crate) i: usize,
     pub(crate) z0: DenseVectors<C::Scalar>,
@@ -39,11 +37,7 @@ impl<C: CircuitDriver> RecursiveProof<C> {
             z0 == zi
         } else {
             // check if folded instance has default error vectors and scalar
-            // check that the public input is equal to hash
-            s_ui.x.len() == 1
-                && s_ui.x == DenseVectors::new(vec![hash(*i, z0, zi, l_ui)])
-                && s_ui.commit_e == C::Affine::ADDITIVE_IDENTITY
-                && s_ui.u == C::Scalar::one()
+            s_ui.commit_e == C::Affine::ADDITIVE_IDENTITY && s_ui.u == C::Scalar::one()
         };
 
         // check if instance-witness pair satisfy
