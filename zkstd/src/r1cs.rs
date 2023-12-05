@@ -19,11 +19,11 @@ pub struct R1cs<C: CircuitDriver> {
 
     // 2. Instance
     // r1cs instance includes one constant and public inputs and outputs
-    pub x: DenseVectors<C::Scalar>,
+    pub(crate) x: DenseVectors<C::Scalar>,
 
     // 3. Witness
     // r1cs witness includes private inputs and intermediate value
-    pub w: DenseVectors<C::Scalar>,
+    pub(crate) w: DenseVectors<C::Scalar>,
 }
 
 impl<C: CircuitDriver> R1cs<C> {

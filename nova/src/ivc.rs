@@ -16,11 +16,13 @@ pub struct Ivc<C: CircuitDriver, FC: FunctionCircuit<C>> {
     prover: Prover<C>,
     r1cs: R1cs<C>,
     // r1cs instance to be folded
-    // u
-    instance: RelaxedR1cs<C>,
+    // u_i
+    // represents the correct execution of invocation i of F′
+    u_single: RelaxedR1cs<C>,
     // running r1cs instance
-    // U
-    running_instance: RelaxedR1cs<C>,
+    // U_i
+    // represents the correct execution of invocations 1, . . . , i - 1 of F′
+    u_range: RelaxedR1cs<C>,
     f: PhantomData<FC>,
 }
 
@@ -43,26 +45,25 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
             zi: z0,
             prover,
             r1cs,
-            instance: relaxed_r1cs.clone(),
-            running_instance: relaxed_r1cs,
+            u_single: relaxed_r1cs.clone(),
+            u_range: relaxed_r1cs,
             f: PhantomData::default(),
         }
     }
 
-    pub fn prove_step(&mut self) {
+    pub fn prove_step(&mut self) -> RecursiveProof<C> {
         let z_next = FC::invoke(&self.zi);
-        let (u_next, u_next_x, commit_t) = if self.i == 0 {
-            let u_next_x = self.running_instance.instance.hash(1, &self.z0, &z_next);
+        let (u_range_next, w_range_next, u_single_next_x, commit_t) = if self.i == 0 {
+            let u_next_x = self.u_range.instance.hash(1, &self.z0, &z_next);
             let (u_next, w_next, commit_t) = (
                 RelaxedR1csInstance::<C>::dummy(1),
                 RelaxedR1csWitness::<C>::dummy(1, self.r1cs.m()),
                 C::Affine::ADDITIVE_IDENTITY,
             );
 
-            (u_next, u_next_x, commit_t)
+            (u_next, w_next, u_next_x, commit_t)
         } else {
-            let (u_next, w_next, commit_t) =
-                self.prover.prove(&self.instance, &self.running_instance);
+            let (u_next, w_next, commit_t) = self.prover.prove(&self.u_single, &self.u_range);
 
             let new_instance = RelaxedR1cs::new(self.r1cs.clone());
             new_instance.update(&u_next, &w_next);
@@ -70,71 +71,51 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
 
             let u_next_x = u_next.hash(self.i + 1, &self.z0, &z_next);
 
-            (u_next, u_next_x, commit_t)
+            (u_next, w_next, u_next_x, commit_t)
         };
 
         let augmented_circuit = AugmentedFCircuit {
             i: self.i,
             z_0: self.z0.clone(),
             z_i: self.zi.clone(),
-            u_i: self.instance.instance.clone(),
-            U_i: self.running_instance.instance.clone(),
-            U_i1: u_next,
+            u_i: self.u_single.instance.clone(),
+            U_i: self.u_range.instance.clone(),
+            U_i1: u_range_next.clone(),
             commit_t,
             f: self.f,
-            x: u_next_x,
+            x: u_single_next_x,
         };
 
         let mut cs = R1cs::<C>::default();
         augmented_circuit.generate(&mut cs);
 
-        let (x_next, w_next) = (cs.x(), cs.w());
-        assert_eq!(x_next.len(), 2);
-        assert_eq!(x_next[1], u_next_x);
+        let single_next = RelaxedR1cs::new(cs);
+
+        let (u_single_next, w_single_next) = (single_next.x(), single_next.w());
+        assert_eq!(u_single_next.len(), 1);
+        assert_eq!(u_single_next[0], u_single_next_x);
+
+        self.u_range = self.u_range.update(&u_range_next, &w_range_next);
+        self.u_single = single_next;
+
+        // ((Ui+1, Wi+1), (ui+1, wi+1)
+        let pair = (
+            (self.u_range.instance.clone(), self.u_single.witness.clone()),
+            (self.u_range.instance.clone(), self.u_single.witness.clone()),
+        );
+
+        let proof = RecursiveProof {
+            i: self.i,
+            z0: self.z0.clone(),
+            zi: self.zi.clone(),
+            r1cs: self.r1cs.clone(),
+            pair,
+        };
 
         self.i += 1;
         self.zi = z_next;
-    }
 
-    pub fn prove(self, p: RecursiveProof<C>) -> RecursiveProof<C> {
-        let Self {
-            i,
-            z0,
-            zi,
-            prover,
-            r1cs,
-            instance,
-            running_instance,
-            f,
-        } = self;
-
-        let ((U_i, W_i), (u_i, w_i)) = p.pair;
-
-        let (U_i_1, W_i_1, commit_t) = if i == 0 {
-            (
-                running_instance.instance.clone(),
-                running_instance.witness.clone(),
-                running_instance.instance.commit_e,
-            )
-        } else {
-            let relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
-            let U_relaxed_r1cs = relaxed_r1cs.update(&U_i, &W_i);
-            let u_relaxed_r1cs = relaxed_r1cs.update(&u_i, &w_i);
-            prover.prove(&u_relaxed_r1cs, &U_relaxed_r1cs)
-        };
-
-        let pair = (
-            (instance.instance, instance.witness),
-            (running_instance.instance, running_instance.witness),
-        );
-
-        RecursiveProof {
-            i,
-            z0,
-            zi,
-            r1cs,
-            pair,
-        }
+        proof
     }
 }
 
@@ -155,7 +136,7 @@ mod tests {
         let r1cs: R1cs<GrumpkinDriver> = example_r1cs(1);
         let z0 = DenseVectors::new(vec![Fr::from(3)]);
         let mut ivc = Ivc::<GrumpkinDriver, ExampleFunction<GrumpkinDriver>>::new(OsRng, z0);
-        ivc.prove_step();
+        let proof = ivc.prove_step();
 
         // assert!(proof.verify())
     }

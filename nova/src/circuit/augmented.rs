@@ -70,8 +70,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
             self.commit_t.get_y().into(),
             self.commit_t.is_identity(),
         );
-        println!("X = {:?}", self.x);
-        println!("Hash = {:?}", self.U_i.hash(1, &self.z_0, &self.z_i));
+
         let x = FieldAssignment::instance(cs, self.x);
 
         let z_next = FC::invoke_cs(cs, z_i.clone());
@@ -109,13 +108,6 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
             z_0.clone(),
             z_next.clone(),
         );
-
-        println!(
-            "U_next = {:?}",
-            u_next_x_basecase.inner().evaluate(&cs.x, &cs.w)
-        );
-
-        println!("x = {:?}", x.inner().evaluate(&cs.x, &cs.w));
 
         let u_next_x = U_i_next.hash(
             cs,
