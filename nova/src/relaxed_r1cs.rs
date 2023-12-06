@@ -33,7 +33,7 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
         let w = DenseVectors::new(r1cs.w());
 
         let instance = RelaxedR1csInstance::new(x);
-        let witness = RelaxedR1csWitness::new(w);
+        let witness = RelaxedR1csWitness::new(w, m);
 
         Self {
             m,

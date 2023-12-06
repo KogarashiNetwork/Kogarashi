@@ -12,9 +12,9 @@ pub struct RelaxedR1csWitness<C: CircuitDriver> {
 }
 
 impl<C: CircuitDriver> RelaxedR1csWitness<C> {
-    pub(crate) fn new(w: DenseVectors<C::Scalar>) -> Self {
+    pub(crate) fn new(w: DenseVectors<C::Scalar>, m: usize) -> Self {
         Self {
-            e: DenseVectors::new(vec![C::Scalar::zero(); w.get().len()]),
+            e: DenseVectors::new(vec![C::Scalar::zero(); m]),
             w,
         }
     }
@@ -38,6 +38,7 @@ impl<C: CircuitDriver> RelaxedR1csWitness<C> {
         let w2 = self.w.clone();
 
         let e = t * r + e2 * r2;
+        println!("Fold: w1 = {} + w2 = {}", w1.len(), w2.len());
         let w = w1 + w2 * r;
 
         Self { e, w }
