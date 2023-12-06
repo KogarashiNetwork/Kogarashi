@@ -11,6 +11,8 @@ mod prover;
 mod verifier;
 mod zksnark;
 
+pub use circuit::Circuit;
+pub use error::Error;
 pub use proof::Proof;
 pub use prover::Prover;
 pub use verifier::Verifier;
@@ -58,7 +60,7 @@ mod tests {
                 // TODO: check why using the `Add` trait crashes this test
                 let sym2 = FieldAssignment::add(composer, &y, &x);
 
-                FieldAssignment::eq(composer, &(&sym2 + &c), &o);
+                FieldAssignment::enforce_eq(composer, &(&sym2 + &c), &o);
 
                 Ok(())
             }

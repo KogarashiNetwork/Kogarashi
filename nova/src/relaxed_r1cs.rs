@@ -32,8 +32,8 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
         let x = DenseVectors::new(r1cs.x());
         let w = DenseVectors::new(r1cs.w());
 
-        let instance = RelaxedR1csInstance::default(x);
-        let witness = RelaxedR1csWitness::default(w);
+        let instance = RelaxedR1csInstance::new(x);
+        let witness = RelaxedR1csWitness::new(w);
 
         Self {
             m,
@@ -59,7 +59,7 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
 
     pub(crate) fn fold_instance(
         &self,
-        r1cs: &R1cs<C>,
+        r1cs: &RelaxedR1cs<C>,
         r: C::Scalar,
         commit_t: C::Affine,
     ) -> RelaxedR1csInstance<C> {
@@ -68,7 +68,7 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
 
     pub(crate) fn fold_witness(
         &self,
-        r1cs: &R1cs<C>,
+        r1cs: &RelaxedR1cs<C>,
         r: C::Scalar,
         t: DenseVectors<C::Scalar>,
     ) -> RelaxedR1csWitness<C> {
@@ -108,6 +108,7 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
             instance,
             witness,
         } = self;
+
         let RelaxedR1csInstance {
             commit_w: _,
             commit_e: _,
@@ -116,12 +117,14 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
         } = instance;
         let RelaxedR1csWitness { w, e } = witness;
 
+        let l = x.len() + 1;
+        let z = DenseVectors::new(vec![vec![*u], x.get(), w.get()].concat());
         // A · Z
-        let az = a.prod(m, x, w);
+        let az = a.prod(m, l, &z);
         // B · Z
-        let bz = b.prod(m, x, w);
+        let bz = b.prod(m, l, &z);
         // C · Z
-        let cz = c.prod(m, x, w);
+        let cz = c.prod(m, l, &z);
         // (A · Z) ◦ (B · Z)
         let azbz = az * bz;
 

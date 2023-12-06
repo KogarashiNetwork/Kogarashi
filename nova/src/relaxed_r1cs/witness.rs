@@ -1,4 +1,5 @@
-use zkstd::circuit::prelude::{CircuitDriver, R1cs};
+use crate::RelaxedR1cs;
+use zkstd::circuit::prelude::CircuitDriver;
 use zkstd::common::{IntGroup, PrimeField};
 use zkstd::matrix::DenseVectors;
 
@@ -11,17 +12,29 @@ pub struct RelaxedR1csWitness<C: CircuitDriver> {
 }
 
 impl<C: CircuitDriver> RelaxedR1csWitness<C> {
-    pub(crate) fn default(w: DenseVectors<C::Scalar>) -> Self {
+    pub(crate) fn new(w: DenseVectors<C::Scalar>) -> Self {
         Self {
             e: DenseVectors::new(vec![C::Scalar::zero(); w.get().len()]),
             w,
         }
     }
 
-    pub(crate) fn fold(&self, r1cs: &R1cs<C>, r: C::Scalar, t: DenseVectors<C::Scalar>) -> Self {
+    pub(crate) fn dummy(w_len: usize, m: usize) -> Self {
+        Self {
+            e: DenseVectors::zero(m),
+            w: DenseVectors::zero(w_len),
+        }
+    }
+
+    pub(crate) fn fold(
+        &self,
+        r1cs: &RelaxedR1cs<C>,
+        r: C::Scalar,
+        t: DenseVectors<C::Scalar>,
+    ) -> Self {
         let r2 = r.square();
         let e2 = self.e.clone();
-        let w1 = DenseVectors::new(r1cs.w());
+        let w1 = r1cs.w();
         let w2 = self.w.clone();
 
         let e = t * r + e2 * r2;

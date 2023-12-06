@@ -55,12 +55,12 @@ impl<C: CircuitDriver> PointAssignment<C> {
         let xz1 = FieldAssignment::mul(cs, &self.x, &point_z);
         let xz2 = FieldAssignment::mul(cs, &point_x, &self.z);
 
-        FieldAssignment::eq(cs, &xz1, &xz2);
+        FieldAssignment::enforce_eq(cs, &xz1, &xz2);
 
         let yz1 = FieldAssignment::mul(cs, &self.y, &point_z);
         let yz2 = FieldAssignment::mul(cs, &point_y, &self.z);
 
-        FieldAssignment::eq(cs, &yz1, &yz2);
+        FieldAssignment::enforce_eq(cs, &yz1, &yz2);
     }
 
     pub fn add(&self, rhs: &Self, cs: &mut R1cs<C>) -> Self {

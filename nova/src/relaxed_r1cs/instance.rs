@@ -1,6 +1,7 @@
-use crate::hash::MimcRO;
-use zkstd::circuit::prelude::{CircuitDriver, R1cs};
-use zkstd::common::{Group, PrimeField, Ring};
+use crate::hash::{MimcRO, MIMC_ROUNDS};
+use crate::RelaxedR1cs;
+use zkstd::circuit::prelude::CircuitDriver;
+use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, IntGroup, PrimeField, Ring};
 use zkstd::matrix::DenseVectors;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -16,22 +17,31 @@ pub struct RelaxedR1csInstance<C: CircuitDriver> {
 }
 
 impl<C: CircuitDriver> RelaxedR1csInstance<C> {
-    pub(crate) fn default(x: DenseVectors<C::Scalar>) -> Self {
+    pub(crate) fn new(x: DenseVectors<C::Scalar>) -> Self {
         Self {
             commit_w: C::Affine::ADDITIVE_IDENTITY,
             commit_e: C::Affine::ADDITIVE_IDENTITY,
             u: C::Scalar::one(),
-            x,
+            x: DenseVectors::new(x.get()[1..].to_vec()),
         }
     }
 
-    pub(crate) fn fold(&self, r1cs: &R1cs<C>, r: C::Scalar, commit_t: C::Affine) -> Self {
+    pub(crate) fn dummy(x_len: usize) -> Self {
+        Self {
+            commit_w: C::Affine::ADDITIVE_IDENTITY,
+            commit_e: C::Affine::ADDITIVE_IDENTITY,
+            u: C::Scalar::zero(),
+            x: DenseVectors::zero(x_len),
+        }
+    }
+
+    pub(crate) fn fold(&self, r1cs: &RelaxedR1cs<C>, r: C::Scalar, commit_t: C::Affine) -> Self {
         let r2 = r.square();
         let (e1, u1, w1, x1) = (
             C::Affine::ADDITIVE_IDENTITY,
             C::Scalar::one(),
             C::Affine::ADDITIVE_IDENTITY,
-            DenseVectors::new(r1cs.x()),
+            r1cs.x(),
         );
         let (e2, u2, w2, x2) = (self.commit_e, self.u, self.commit_w, self.x.clone());
 
@@ -58,5 +68,35 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
         for x in &self.x.get() {
             transcript.append(C::Base::from(*x));
         }
+    }
+
+    pub fn hash(
+        &self,
+        i: usize,
+        z_0: &DenseVectors<C::Scalar>,
+        z_i: &DenseVectors<C::Scalar>,
+    ) -> C::Scalar {
+        let commit_e = self.commit_e.to_extended();
+        let commit_w = self.commit_w.to_extended();
+        MimcRO::<MIMC_ROUNDS, C::Scalar>::default().hash_vec(
+            vec![
+                vec![C::Scalar::from(i as u64)],
+                z_0.get(),
+                z_i.get(),
+                vec![self.u],
+                self.x.get(),
+                vec![
+                    commit_e.get_x().into(),
+                    commit_e.get_y().into(),
+                    commit_e.get_z().into(),
+                ],
+                vec![
+                    commit_w.get_x().into(),
+                    commit_w.get_y().into(),
+                    commit_w.get_z().into(),
+                ],
+            ]
+            .concat(),
+        )
     }
 }

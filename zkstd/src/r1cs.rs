@@ -61,12 +61,13 @@ impl<C: CircuitDriver> R1cs<C> {
     ///  check (A · Z) ◦ (B · Z) = C · Z
     pub fn is_sat(&self) -> bool {
         let R1cs { m, a, b, c, x, w } = self;
+        let z = DenseVectors::new(vec![x.get(), w.get()].concat());
         // A · Z
-        let az = a.prod(m, x, w);
+        let az = a.prod(m, self.l(), &z);
         // B · Z
-        let bz = b.prod(m, x, w);
+        let bz = b.prod(m, self.l(), &z);
         // C · Z
-        let cz = c.prod(m, x, w);
+        let cz = c.prod(m, self.l(), &z);
         // (A · Z) ◦ (B · Z)
         let azbz = az * bz;
 

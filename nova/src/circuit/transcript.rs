@@ -23,6 +23,16 @@ impl<const ROUND: usize, C: CircuitDriver> MimcROCircuit<ROUND, C> {
     pub(crate) fn append(&mut self, absorb: FieldAssignment<C>) {
         self.state.push(absorb)
     }
+    pub(crate) fn hash_vec(
+        &mut self,
+        cs: &mut R1cs<C>,
+        values: Vec<FieldAssignment<C>>,
+    ) -> FieldAssignment<C> {
+        for x in values {
+            self.state.push(x);
+        }
+        self.squeeze(cs)
+    }
 
     pub(crate) fn append_point(&mut self, point: PointAssignment<C>) {
         self.append(point.get_x());
@@ -67,7 +77,7 @@ mod tests {
 
         let expected = mimc.squeeze();
         let circuit_result = mimc_circuit.squeeze(&mut cs);
-        FieldAssignment::eq_constant(&mut cs, &circuit_result, &expected);
+        FieldAssignment::enforce_eq_constant(&mut cs, &circuit_result, &expected);
         assert!(cs.is_sat());
     }
 }
