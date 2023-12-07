@@ -38,7 +38,6 @@ impl<C: CircuitDriver> RelaxedR1csWitness<C> {
         let w2 = self.w.clone();
 
         let e = t * r + e2 * r2;
-        println!("Fold: w1 = {} + w2 = {}", w1.len(), w2.len());
         let w = w1 + w2 * r;
 
         Self { e, w }

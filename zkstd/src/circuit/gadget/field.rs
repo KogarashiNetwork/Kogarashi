@@ -146,6 +146,16 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         cs.mul_gate(&x.0, &SparseRow::one(), &y.0)
     }
 
+    pub fn conditional_enforce_equal(
+        cs: &mut R1cs<C>,
+        x: &Self,
+        y: &Self,
+        should_enforce: &BinaryAssignment<C>,
+    ) {
+        let mul = FieldAssignment::mul(cs, &(x - y), &FieldAssignment::from(should_enforce));
+        FieldAssignment::enforce_eq_constant(cs, &mul, &C::Scalar::zero());
+    }
+
     pub fn is_eq(cs: &mut R1cs<C>, x: &Self, y: &Self) -> BinaryAssignment<C> {
         let is_neq = Self::is_neq(cs, x, y);
         BinaryAssignment::not(cs, &is_neq)
@@ -158,7 +168,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         let multiplier = if x_val != y_val {
             FieldAssignment::witness(cs, (x_val - y_val).invert().unwrap())
         } else {
-            FieldAssignment::constant(&C::Scalar::one())
+            FieldAssignment::witness(cs, C::Scalar::one())
         };
 
         let diff = x - y;

@@ -71,13 +71,6 @@ impl<C: CircuitDriver> Prover<C> {
         let z2 = DenseVectors::new(vec![vec![u2], x1.get(), w1.get()].concat());
         let l2 = x1.len() + 1;
 
-        // println!("W1 = {}", w0.len());
-        // println!("W2 = {}", w1.len());
-        // println!("X1 = {}", x0.len());
-        // println!("X2 = {}", x1.len());
-        // println!("L1 = {l1}");
-        // println!("L2 = {l2}");
-
         // matrices and z vector matrix multiplication
         let az2 = a.prod(&m, l2, &z2);
         let bz1 = b.prod(&m, l1, &z1);

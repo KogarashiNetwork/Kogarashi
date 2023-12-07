@@ -52,12 +52,6 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
     }
 
     pub fn prove_step(&mut self) -> RecursiveProof<C> {
-        // println!("R1CS.w = {}", self.r1cs.m_l_1());
-        // println!("R1CS.u = {}", self.r1cs.l());
-        // println!("R1CS.e = {}", self.u_single.witness.e.len());
-
-        println!("u_i.w = {}", self.u_single.w().len());
-        println!("U_i.w = {}", self.u_range.w().len());
         let z_next = FC::invoke(&self.zi);
         let (u_range_next, w_range_next, u_single_next_x, commit_t) = if self.i == 0 {
             let u_single_next_x = self.u_range.instance.hash(1, &self.z0, &z_next);
@@ -96,14 +90,10 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
         let mut cs = R1cs::<C>::default();
         augmented_circuit.generate(&mut cs);
 
-        // println!("New R1CS.w = {}", cs.m_l_1());
-        // println!("New R1CS.u = {}", cs.l());
         let (u_single_next, w_single_next) = (
             RelaxedR1csInstance::new(DenseVectors::new(cs.x())),
             RelaxedR1csWitness::new(DenseVectors::new(cs.w()), self.r1cs.m()),
         );
-
-        // println!("New R1CS.e = {}", w_single_next.e.len());
 
         assert_eq!(u_single_next.x.len(), 1);
         assert_eq!(u_single_next.x[0], u_single_next_x);
@@ -112,9 +102,6 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
         self.u_range = self.u_range.update(&u_range_next, &w_range_next);
         self.i += 1;
         self.zi = z_next;
-
-        println!("u_i+1.w = {}", self.u_single.w().len());
-        println!("U_i+1.w = {}", self.u_range.w().len());
 
         // ((Ui+1, Wi+1), (ui+1, wi+1))
         let pair = (
@@ -125,15 +112,13 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
             ),
         );
 
-        let proof = RecursiveProof {
+        RecursiveProof {
             i: self.i,
             z0: self.z0.clone(),
             zi: self.zi.clone(),
             r1cs: self.r1cs.clone(),
             pair,
-        };
-
-        proof
+        }
     }
 }
 
@@ -168,12 +153,9 @@ mod tests {
 
         assert!(proof_0.verify());
 
-        let proof = ivc.prove_step();
-
-        assert!(proof.verify());
-
-        let proof = ivc.prove_step();
-
-        assert!(proof.verify());
+        for i in 0..2 {
+            let proof = ivc.prove_step();
+            assert!(proof.verify());
+        }
     }
 }

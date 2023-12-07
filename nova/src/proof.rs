@@ -34,30 +34,21 @@ impl<C: CircuitDriver> RecursiveProof<C> {
 
         if *i == 0 {
             // check if z vector is the same
-            println!("i = 0 case");
             z0 == zi
         } else {
             // check that ui.x = hash(vk, i, z0, zi, Ui)
             let expected_x = l_ui.hash(*i, z0, zi);
             let check_hash = expected_x == s_ui.x[0];
 
-            dbg!(check_hash);
-
             // check if folded instance has default error vectors and scalar
             let check_defaults =
                 s_ui.commit_e == C::Affine::ADDITIVE_IDENTITY && s_ui.u == C::Scalar::one();
-
-            dbg!(check_defaults);
 
             // check if instance-witness pair satisfy
             let relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
             let l_relaxed_r1cs = relaxed_r1cs.update(l_ui, l_wi);
             let s_relaxed_r1cs = relaxed_r1cs.update(s_ui, s_wi);
-            dbg!(l_relaxed_r1cs.is_sat());
-            dbg!(s_relaxed_r1cs.is_sat());
             let is_instance_witness_sat = l_relaxed_r1cs.is_sat() && s_relaxed_r1cs.is_sat();
-
-            dbg!(is_instance_witness_sat);
 
             check_hash && check_defaults && is_instance_witness_sat
         }
