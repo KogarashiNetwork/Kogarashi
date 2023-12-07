@@ -74,6 +74,7 @@ mod tests {
     use crate::test::ExampleFunction;
 
     use grumpkin::driver::GrumpkinDriver;
+    use bn_254::Fq;
     use rand_core::OsRng;
     use zkstd::circuit::prelude::R1cs;
     use zkstd::matrix::DenseVectors;
@@ -82,7 +83,7 @@ mod tests {
     #[test]
     fn ivc_test() {
         let r1cs: R1cs<GrumpkinDriver> = example_r1cs(1);
-        let z0 = DenseVectors::new(r1cs.x());
+        let z0 = DenseVectors::new(r1cs.x().iter().map(|x| Fq::from(*x)).collect());
         let mut ivc = Ivc::new(r1cs, OsRng, z0);
         ivc.recurse::<ExampleFunction<GrumpkinDriver>>();
         let proof = ivc.prove();

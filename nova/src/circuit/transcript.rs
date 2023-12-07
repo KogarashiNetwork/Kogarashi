@@ -14,7 +14,7 @@ impl<const ROUND: usize, C: CircuitDriver> Default for MimcROCircuit<ROUND, C> {
         Self {
             hasher: MimcAssignment::default(),
             state: Vec::default(),
-            key: FieldAssignment::constant(&C::Scalar::zero()),
+            key: FieldAssignment::constant(&C::Base::zero()),
         }
     }
 }
@@ -47,7 +47,7 @@ mod tests {
     use grumpkin::{driver::GrumpkinDriver, Affine};
     use rand_core::OsRng;
     use zkstd::circuit::prelude::{FieldAssignment, PointAssignment, R1cs};
-    use zkstd::common::{CurveGroup, Group};
+    use zkstd::common::Group;
 
     #[test]
     fn mimc_circuit() {
@@ -57,9 +57,8 @@ mod tests {
         let point = Affine::random(OsRng);
         let scalar = Fr::random(OsRng);
 
-        let point_assignment =
-            PointAssignment::instance(&mut cs, point.get_x(), point.get_y(), point.is_identity());
-        let scalar_assignment = FieldAssignment::instance(&mut cs, scalar);
+        let point_assignment = PointAssignment::instance(&mut cs, point);
+        let scalar_assignment = FieldAssignment::instance(&mut cs, scalar.into());
         mimc.append(scalar);
         mimc.append_point(point);
         mimc_circuit.append(scalar_assignment);

@@ -3,13 +3,13 @@ use crate::hash::Mimc;
 use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, R1cs};
 
 pub(crate) struct MimcAssignment<const ROUND: usize, C: CircuitDriver> {
-    constants: [C::Scalar; ROUND],
+    constants: [C::Base; ROUND],
 }
 
 impl<const ROUND: usize, C: CircuitDriver> Default for MimcAssignment<ROUND, C> {
     fn default() -> Self {
         Self {
-            constants: Mimc::<ROUND, C::Scalar>::default().constants,
+            constants: Mimc::<ROUND, C::Base>::default().constants,
         }
     }
 }

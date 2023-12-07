@@ -2,6 +2,7 @@
 #![allow(unused_variables, dead_code)]
 
 mod circuit;
+mod driver;
 mod function;
 mod gadget;
 mod hash;

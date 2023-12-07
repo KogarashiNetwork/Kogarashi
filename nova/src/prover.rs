@@ -8,15 +8,15 @@ use zkstd::circuit::prelude::{CircuitDriver, R1cs};
 use zkstd::common::{Ring, RngCore};
 use zkstd::matrix::DenseVectors;
 
-pub struct Prover<C: CircuitDriver> {
+pub struct Prover<C1: CircuitDriver, C2: CircuitDriver> {
     // public parameters
     pp: PedersenCommitment<C::Affine>,
 
     // r1cs structure
-    f: R1cs<C>,
+    f: R1cs<C2>,
 }
 
-impl<C: CircuitDriver> Prover<C> {
+impl<C1: CircuitDriver, C2: CircuitDriver> Prover<C1, C2> {
     pub fn new(f: R1cs<C>, rng: impl RngCore) -> Self {
         let m = f.m();
         let n = m.next_power_of_two() as u64;
@@ -61,8 +61,8 @@ impl<C: CircuitDriver> Prover<C> {
         let u2 = relaxed_r1cs.u();
         let m = self.f.m();
         let (a, b, c) = self.f.matrices();
-        let (w0, w1) = (DenseVectors::new(r1cs.w()), relaxed_r1cs.w());
-        let (x0, x1) = (DenseVectors::new(r1cs.x()), relaxed_r1cs.x());
+        let (w0, w1) = (DenseVectors::new(r1cs.w().iter().map(|c| C::Scalar::from(*c)).collect()), relaxed_r1cs.w());
+        let (x0, x1) = (DenseVectors::new(r1cs.x().iter().map(|c| C::Scalar::from(*c)).collect()), relaxed_r1cs.x());
 
         // matrices and z vector matrix multiplication
         let az2 = a.prod(&m, &x1, &w1);

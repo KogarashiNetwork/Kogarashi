@@ -31,7 +31,7 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
             C::Affine::ADDITIVE_IDENTITY,
             C::Scalar::one(),
             C::Affine::ADDITIVE_IDENTITY,
-            DenseVectors::new(r1cs.x()),
+            DenseVectors::new(r1cs.x().iter().map(|x| C::Scalar::from(*x)).collect()),
         );
         let (e2, u2, w2, x2) = (self.commit_e, self.u, self.commit_w, self.x.clone());
 
