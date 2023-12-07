@@ -4,7 +4,7 @@ use crate::common::{IntGroup, Ring};
 use crate::r1cs::{R1cs, Wire};
 use core::marker::PhantomData;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct BinaryAssignment<C: CircuitDriver>(Wire, PhantomData<C>);
 
 impl<C: CircuitDriver> BinaryAssignment<C> {
@@ -16,14 +16,12 @@ impl<C: CircuitDriver> BinaryAssignment<C> {
     }
 
     pub fn conditional_enforce_equal(cs: &mut R1cs<C>, x: &Self, y: &Self, should_enforce: &Self) {
-        if cs[should_enforce.0] != C::Scalar::zero() {
-            let mul = FieldAssignment::mul(
-                cs,
-                &(&FieldAssignment::from(x) - &FieldAssignment::from(y)),
-                &FieldAssignment::from(should_enforce),
-            );
-            FieldAssignment::enforce_eq(cs, &mul, &FieldAssignment::constant(&C::Scalar::zero()))
-        }
+        FieldAssignment::conditional_enforce_equal(
+            cs,
+            &FieldAssignment::from(x),
+            &FieldAssignment::from(y),
+            should_enforce,
+        );
     }
 
     pub fn witness(cs: &mut R1cs<C>, bit: u8) -> Self {

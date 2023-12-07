@@ -12,9 +12,9 @@ pub struct RelaxedR1csWitness<C: CircuitDriver> {
 }
 
 impl<C: CircuitDriver> RelaxedR1csWitness<C> {
-    pub(crate) fn new(w: DenseVectors<C::Scalar>) -> Self {
+    pub(crate) fn new(w: DenseVectors<C::Scalar>, m: usize) -> Self {
         Self {
-            e: DenseVectors::new(vec![C::Scalar::zero(); w.get().len()]),
+            e: DenseVectors::new(vec![C::Scalar::zero(); m]),
             w,
         }
     }

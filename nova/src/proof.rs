@@ -32,20 +32,25 @@ impl<C: CircuitDriver> RecursiveProof<C> {
         } = self;
         let ((l_ui, l_wi), (s_ui, s_wi)) = pair;
 
-        let is_valid_folding = if *i == 0 {
+        if *i == 0 {
             // check if z vector is the same
             z0 == zi
         } else {
+            // check that ui.x = hash(vk, i, z0, zi, Ui)
+            let expected_x = l_ui.hash(*i, z0, zi);
+            let check_hash = expected_x == s_ui.x[0];
+
             // check if folded instance has default error vectors and scalar
-            s_ui.commit_e == C::Affine::ADDITIVE_IDENTITY && s_ui.u == C::Scalar::one()
-        };
+            let check_defaults =
+                s_ui.commit_e == C::Affine::ADDITIVE_IDENTITY && s_ui.u == C::Scalar::one();
 
-        // check if instance-witness pair satisfy
-        let relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
-        let l_relaxed_r1cs = relaxed_r1cs.update(l_ui, l_wi);
-        let s_relaxed_r1cs = relaxed_r1cs.update(s_ui, s_wi);
-        let is_instance_witness_sat = l_relaxed_r1cs.is_sat() && s_relaxed_r1cs.is_sat();
+            // check if instance-witness pair satisfy
+            let relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
+            let l_relaxed_r1cs = relaxed_r1cs.update(l_ui, l_wi);
+            let s_relaxed_r1cs = relaxed_r1cs.update(s_ui, s_wi);
+            let is_instance_witness_sat = l_relaxed_r1cs.is_sat() && s_relaxed_r1cs.is_sat();
 
-        is_valid_folding && is_instance_witness_sat
+            check_hash && check_defaults && is_instance_witness_sat
+        }
     }
 }

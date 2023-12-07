@@ -19,11 +19,9 @@ pub struct Prover<C: CircuitDriver> {
 impl<C: CircuitDriver> Prover<C> {
     pub fn new(f: R1cs<C>, rng: impl RngCore) -> Self {
         let m = f.m();
-        println!("M = {m}");
         let n = m.next_power_of_two() as u64;
         let k = n.trailing_zeros();
 
-        println!("K = {k}");
         let pp = PedersenCommitment::new(k.into(), rng);
 
         Self { pp, f }
