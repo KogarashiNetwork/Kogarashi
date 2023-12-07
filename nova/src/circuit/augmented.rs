@@ -81,44 +81,27 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
 
         // (1) check that ui.x = hash(vk, i, z0, zi, Ui), where ui.x is the public IO of ui
         let u_i_x = u_range.hash(cs, i.clone(), z_0.clone(), z_i);
-        // let u_i_x = FieldAssignment::constant(&C::Scalar::zero());
-
-        // let check = FieldAssignment::is_eq(cs, &u_i.x[0], &u_i_x);
-
         FieldAssignment::conditional_enforce_equal(cs, &u_i.x[0], &u_i_x, &not_base_case);
 
         // (2) check that (ui.E, ui.u) = (u⊥.E, 1),
-        // let check = FieldAssignment::is_eq(cs, &u_i.commit_e.get_x(), &u_dummy.commit_e.get_x());
-        // BinaryAssignment::conditional_enforce_equal(cs, &check, &bin_true, &not_base_case);
-
         FieldAssignment::conditional_enforce_equal(
             cs,
             &u_i.commit_e.get_x(),
             &u_dummy.commit_e.get_x(),
             &not_base_case,
         );
-
-        // let check = FieldAssignment::is_eq(cs, &u_i.commit_e.get_y(), &u_dummy.commit_e.get_y());
-        // BinaryAssignment::conditional_enforce_equal(cs, &check, &bin_true, &not_base_case);
-
         FieldAssignment::conditional_enforce_equal(
             cs,
             &u_i.commit_e.get_y(),
             &u_dummy.commit_e.get_y(),
             &not_base_case,
         );
-        // let check = FieldAssignment::is_eq(cs, &u_i.commit_e.get_z(), &u_dummy.commit_e.get_z());
-        // BinaryAssignment::conditional_enforce_equal(cs, &check, &bin_true, &not_base_case);
-
         FieldAssignment::conditional_enforce_equal(
             cs,
             &u_i.commit_e.get_z(),
             &u_dummy.commit_e.get_z(),
             &not_base_case,
         );
-        // let check =
-        //     FieldAssignment::is_eq(cs, &u_i.u, &FieldAssignment::constant(&C::Scalar::one()));
-        // BinaryAssignment::conditional_enforce_equal(cs, &check, &bin_true, &not_base_case);
         FieldAssignment::conditional_enforce_equal(
             cs,
             &u_i.u,
@@ -126,9 +109,8 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
             &not_base_case,
         );
 
-        // (3) compute Ui+1 ← NIFS.V(vk, U, u, T )
+        // (3) Verify Ui+1 ← NIFS.V(vk, U, u, T )
         let r = Self::get_challenge(cs, &u_range, commit_t);
-
         let nifs_check = NifsCircuit::verify(cs, r, u_i, u_range.clone(), u_range_next.clone());
         BinaryAssignment::conditional_enforce_equal(cs, &nifs_check, &bin_true, &not_base_case);
 
@@ -139,7 +121,6 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
             z_0.clone(),
             z_next.clone(),
         );
-        // let u_next_x_basecase = FieldAssignment::constant(&C::Scalar::zero());
 
         // 4. (non-base case). u_{i+1}.x = H(i+1, z_0, z_i+1, U_{i+1})
         let u_next_x = u_range_next.hash(
@@ -149,15 +130,9 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
             z_next,
         );
 
-        // let u_next_x = FieldAssignment::constant(&C::Scalar::zero());
-
         // constrain u_{i+1}.x for base case
-        // let check = FieldAssignment::is_eq(cs, &u_next_x_basecase, &x);
-
         FieldAssignment::conditional_enforce_equal(cs, &u_next_x_basecase, &x, &base_case);
-
         // constrain u_{i+1}.x for non base case
-        // let check = FieldAssignment::is_eq(cs, &u_next_x, &x);
         FieldAssignment::conditional_enforce_equal(cs, &u_next_x, &x, &not_base_case);
     }
 
