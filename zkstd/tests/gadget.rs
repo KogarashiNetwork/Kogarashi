@@ -2,11 +2,11 @@ mod grumpkin;
 
 #[cfg(test)]
 mod grumpkin_gadget_tests {
-    use crate::grumpkin::{Affine, Fq as Base, Fr as Scalar, GrumpkinDriver};
+    use crate::grumpkin::{Affine, Fq as Scalar, Fr as Base, GrumpkinDriver};
 
     use rand_core::OsRng;
     use zkstd::circuit::prelude::{FieldAssignment, PointAssignment, R1cs};
-    use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, PrimeField};
+    use zkstd::common::{BNAffine, BNProjective, Group, PrimeField};
 
     #[test]
     fn range_proof_test() {
@@ -122,13 +122,7 @@ mod grumpkin_gadget_tests {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
             let point = Affine::random(OsRng);
 
-            let circuit_double = PointAssignment::instance(
-                &mut cs,
-                point.get_x(),
-                point.get_y(),
-                point.is_identity(),
-            )
-            .double(&mut cs);
+            let circuit_double = PointAssignment::instance(&mut cs, point).double(&mut cs);
 
             let expected = point.to_extended().double();
 
@@ -146,10 +140,8 @@ mod grumpkin_gadget_tests {
             let a = Affine::random(OsRng);
             let b = Affine::ADDITIVE_IDENTITY;
 
-            let a_assignment =
-                PointAssignment::instance(&mut cs, a.get_x(), a.get_y(), a.is_identity());
-            let b_assignment =
-                PointAssignment::instance(&mut cs, b.get_x(), b.get_y(), b.is_identity());
+            let a_assignment = PointAssignment::instance(&mut cs, a);
+            let b_assignment = PointAssignment::instance(&mut cs, b);
 
             let expected = a + b;
 
@@ -165,10 +157,8 @@ mod grumpkin_gadget_tests {
             let a = Affine::random(OsRng);
             let b = Affine::random(OsRng);
 
-            let a_assignment =
-                PointAssignment::instance(&mut cs, a.get_x(), a.get_y(), a.is_identity());
-            let b_assignment =
-                PointAssignment::instance(&mut cs, b.get_x(), b.get_y(), b.is_identity());
+            let a_assignment = PointAssignment::instance(&mut cs, a);
+            let b_assignment = PointAssignment::instance(&mut cs, b);
 
             let expected = a.to_extended() + b.to_extended();
 
@@ -188,9 +178,8 @@ mod grumpkin_gadget_tests {
             let p = Affine::random(OsRng);
 
             let x_assignment = FieldAssignment::instance(&mut cs, x); // Fr
-            let p_assignment =
-                PointAssignment::instance(&mut cs, p.get_x(), p.get_y(), p.is_identity());
-            let expected = p * Base::from(x);
+            let p_assignment = PointAssignment::instance(&mut cs, p);
+            let expected = p * x;
 
             assert_eq!(x.to_bits(), Base::from(x).to_bits());
 

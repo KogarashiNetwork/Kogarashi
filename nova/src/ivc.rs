@@ -128,7 +128,7 @@ mod tests {
     use crate::test::ExampleFunction;
 
     use crate::RecursiveProof;
-    use bn_254::Fr;
+    use bn_254::Fq;
     use grumpkin::driver::GrumpkinDriver;
     use rand_core::OsRng;
     use zkstd::circuit::prelude::R1cs;
@@ -138,7 +138,7 @@ mod tests {
     #[test]
     fn ivc_test() {
         let r1cs: R1cs<GrumpkinDriver> = example_r1cs(1);
-        let z0 = DenseVectors::new(vec![Fr::from(3)]);
+        let z0 = DenseVectors::new(vec![Fq::from(3)]);
         let mut ivc = Ivc::<GrumpkinDriver, ExampleFunction<GrumpkinDriver>>::new(OsRng, z0);
         let proof_0 = RecursiveProof {
             i: 0,

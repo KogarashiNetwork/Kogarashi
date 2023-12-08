@@ -32,7 +32,7 @@ impl<C: CircuitDriver> Prover<C> {
         r1cs_1: &RelaxedR1cs<C>,
         r1cs_2: &RelaxedR1cs<C>,
     ) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>, C::Affine) {
-        let mut transcript = MimcRO::<MIMC_ROUNDS, C::Base>::default();
+        let mut transcript = MimcRO::<MIMC_ROUNDS, C>::default();
         // compute cross term t
         let t = self.compute_cross_term(r1cs_1, r1cs_2);
 
@@ -41,7 +41,7 @@ impl<C: CircuitDriver> Prover<C> {
         transcript.append_point(commit_t);
         r1cs_2.absorb_by_transcript(&mut transcript);
 
-        let r = transcript.squeeze().into();
+        let r = transcript.squeeze();
 
         // fold instance
         let instance = r1cs_2.fold_instance(r1cs_1, r, commit_t);
@@ -95,7 +95,7 @@ impl<C: CircuitDriver> Prover<C> {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::{Prover, RelaxedR1cs};
-    use bn_254::{Fq, Fr};
+    use bn_254::Fq;
 
     use crate::hash::{MimcRO, MIMC_ROUNDS};
     use crate::Verifier;
@@ -112,7 +112,7 @@ pub(crate) mod tests {
     fn nifs_folding_test() {
         let prover = example_prover();
 
-        let mut transcript = MimcRO::<MIMC_ROUNDS, Fq>::default();
+        let mut transcript = MimcRO::<MIMC_ROUNDS, GrumpkinDriver>::default();
         let r1cs_1 = example_r1cs(4);
         let r1cs_2 = example_r1cs(3);
 
@@ -126,10 +126,10 @@ pub(crate) mod tests {
         transcript.append_point(commit_t);
         relaxed_r1cs_2.absorb_by_transcript(&mut transcript);
         let t = prover.compute_cross_term(&relaxed_r1cs_1, &relaxed_r1cs_2);
-        let r = Fr::from(transcript.squeeze());
+        let r = transcript.squeeze();
 
         // naive check that the folded witness satisfies the relaxed r1cs
-        let z3: Vec<Fr> = [
+        let z3: Vec<Fq> = [
             vec![verified_instance.u],
             verified_instance.x.get(),
             witness.w.get(),
@@ -137,7 +137,7 @@ pub(crate) mod tests {
         .concat();
 
         let z1 = [
-            vec![Fr::one()],
+            vec![Fq::one()],
             relaxed_r1cs_1.x().get(),
             relaxed_r1cs_1.w().get(),
         ]
@@ -149,7 +149,7 @@ pub(crate) mod tests {
         ]
         .concat();
 
-        let z3_aux: Vec<Fr> = z2
+        let z3_aux: Vec<Fq> = z2
             .iter()
             .map(|x| x * r)
             .zip(z1)

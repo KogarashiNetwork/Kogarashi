@@ -429,13 +429,13 @@ pub struct GrumpkinDriver;
 
 impl CircuitDriver for GrumpkinDriver {
     const NUM_BITS: u16 = 254;
-    type Affine = G1Affine;
+    type Affine = Affine;
 
-    type Base = Fq;
+    type Base = Fr;
 
-    type Scalar = Fr;
+    type Scalar = Fq;
 
-    fn b3() -> Self::Scalar {
+    fn b3() -> Self::Base {
         FR_PARAM_B3
     }
 }

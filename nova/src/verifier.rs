@@ -14,12 +14,12 @@ impl<C: CircuitDriver> Verifier<C> {
         r1cs_1: &RelaxedR1cs<C>,
         r1cs_2: &RelaxedR1cs<C>,
     ) -> RelaxedR1csInstance<C> {
-        let mut transcript = MimcRO::<MIMC_ROUNDS, C::Base>::default();
+        let mut transcript = MimcRO::<MIMC_ROUNDS, C>::default();
 
         transcript.append_point(commit_t);
         r1cs_2.absorb_by_transcript(&mut transcript);
 
-        let r = transcript.squeeze().into();
+        let r = transcript.squeeze();
 
         r1cs_2.fold_instance(r1cs_1, r, commit_t)
     }

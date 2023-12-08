@@ -94,8 +94,9 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use bn_254::{Fr, G1Affine};
+    use bn_254::Fq;
     use grumpkin::driver::GrumpkinDriver;
+    use grumpkin::Affine;
     use rand_core::OsRng;
     use zkstd::common::Group;
     use zkstd::matrix::DenseVectors;
@@ -104,19 +105,19 @@ mod tests {
     fn instance_assignment_hash() {
         let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let instance = RelaxedR1csInstance {
-            commit_e: G1Affine::random(OsRng),
-            u: Fr::random(OsRng),
-            commit_w: G1Affine::random(OsRng),
-            x: DenseVectors::new(vec![Fr::random(OsRng); 1]),
+            commit_e: Affine::random(OsRng),
+            u: Fq::random(OsRng),
+            commit_w: Affine::random(OsRng),
+            x: DenseVectors::new(vec![Fq::random(OsRng); 1]),
         };
 
         let i = 3;
-        let z_0 = DenseVectors::new(vec![Fr::from(3)]);
+        let z_0 = DenseVectors::new(vec![Fq::from(3)]);
         let z_i = z_0.clone();
 
         let hash = instance.hash(i, &z_0, &z_i);
 
-        let i_assignment = FieldAssignment::witness(&mut cs, Fr::from(i as u64));
+        let i_assignment = FieldAssignment::witness(&mut cs, Fq::from(i as u64));
         let z_0_assignment = z_0
             .iter()
             .map(|x| FieldAssignment::witness(&mut cs, x))
@@ -138,10 +139,10 @@ mod tests {
     fn relaxed_instance_assignment() {
         let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let instance = RelaxedR1csInstance {
-            commit_e: G1Affine::random(OsRng),
-            u: Fr::random(OsRng),
-            commit_w: G1Affine::random(OsRng),
-            x: DenseVectors::new(vec![Fr::random(OsRng); 1]),
+            commit_e: Affine::random(OsRng),
+            u: Fq::random(OsRng),
+            commit_w: Affine::random(OsRng),
+            x: DenseVectors::new(vec![Fq::random(OsRng); 1]),
         };
 
         let instance_assignment = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance);

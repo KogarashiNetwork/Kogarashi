@@ -19,6 +19,7 @@
 #![allow(clippy::suspicious_op_assign_impl)]
 #![allow(clippy::op_ref)]
 
+pub mod driver;
 mod ff_compat;
 mod fq;
 mod fqn;

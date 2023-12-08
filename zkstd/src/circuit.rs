@@ -15,5 +15,5 @@ pub trait CircuitDriver: Clone + Debug + Default {
     // curve scalar field
     type Scalar: PrimeField + From<Self::Base> + Serialize + for<'de> Deserialize<'de>;
     // bn curve 3b param
-    fn b3() -> Self::Scalar;
+    fn b3() -> Self::Base;
 }

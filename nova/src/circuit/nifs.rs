@@ -44,7 +44,7 @@ mod tests {
     use crate::hash::{MimcRO, MIMC_ROUNDS};
     use crate::prover::tests::example_prover;
     use crate::RelaxedR1cs;
-    use bn_254::{Fq, Fr};
+    use bn_254::Fq;
     use grumpkin::driver::GrumpkinDriver;
     use zkstd::r1cs::test::example_r1cs;
 
@@ -57,11 +57,11 @@ mod tests {
         let r1cs_to_fold = RelaxedR1cs::new(example_r1cs(2));
         let (instance, witness, commit_t) = prover.prove(&r1cs_to_fold, &running_r1cs);
 
-        let mut transcript = MimcRO::<MIMC_ROUNDS, Fq>::default();
+        let mut transcript = MimcRO::<MIMC_ROUNDS, GrumpkinDriver>::default();
         transcript.append_point(commit_t);
         running_r1cs.absorb_by_transcript(&mut transcript);
         let t = prover.compute_cross_term(&r1cs_to_fold, &running_r1cs);
-        let r = Fr::from(transcript.squeeze());
+        let r = transcript.squeeze();
 
         let mut cs = R1cs::<GrumpkinDriver>::default();
         let r = FieldAssignment::witness(&mut cs, r);
@@ -73,7 +73,7 @@ mod tests {
         FieldAssignment::enforce_eq_constant(
             &mut cs,
             &FieldAssignment::from(&nifs_check),
-            &Fr::one(),
+            &Fq::one(),
         );
         assert!(cs.is_sat());
     }

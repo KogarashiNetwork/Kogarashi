@@ -1,18 +1,18 @@
 use crate::params::PARAM_B3;
-use crate::Affine;
-use bn_254::{Fq, Fr};
+use crate::G1Affine;
+use crate::{Fq, Fr};
 use zkstd::circuit::CircuitDriver;
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct GrumpkinDriver;
+pub struct Bn254Driver;
 
-impl CircuitDriver for GrumpkinDriver {
+impl CircuitDriver for Bn254Driver {
     const NUM_BITS: u16 = 254;
-    type Affine = Affine;
+    type Affine = G1Affine;
 
-    type Base = Fr;
+    type Base = Fq;
 
-    type Scalar = Fq;
+    type Scalar = Fr;
 
     fn b3() -> Self::Base {
         PARAM_B3

@@ -53,22 +53,21 @@ mod tests {
     use super::MimcROCircuit;
     use crate::hash::{MimcRO, MIMC_ROUNDS};
 
-    use bn_254::Fr;
+    use bn_254::Fq;
     use grumpkin::{driver::GrumpkinDriver, Affine};
     use rand_core::OsRng;
     use zkstd::circuit::prelude::{FieldAssignment, PointAssignment, R1cs};
-    use zkstd::common::{CurveGroup, Group};
+    use zkstd::common::Group;
 
     #[test]
     fn mimc_circuit() {
-        let mut mimc = MimcRO::<MIMC_ROUNDS, Fr>::default();
+        let mut mimc = MimcRO::<MIMC_ROUNDS, GrumpkinDriver>::default();
         let mut mimc_circuit = MimcROCircuit::<MIMC_ROUNDS, GrumpkinDriver>::default();
         let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let point = Affine::random(OsRng);
-        let scalar = Fr::random(OsRng);
+        let scalar = Fq::random(OsRng);
 
-        let point_assignment =
-            PointAssignment::instance(&mut cs, point.get_x(), point.get_y(), point.is_identity());
+        let point_assignment = PointAssignment::instance(&mut cs, point);
         let scalar_assignment = FieldAssignment::instance(&mut cs, scalar);
         mimc.append(scalar);
         mimc.append_point(point);
