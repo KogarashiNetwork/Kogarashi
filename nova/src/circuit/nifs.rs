@@ -41,11 +41,11 @@ impl<C: CircuitDriver> NifsCircuit<C> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::driver::{Bn254Driver, GrumpkinDriver};
     use crate::hash::{MimcRO, MIMC_ROUNDS};
     use crate::prover::tests::example_prover;
     use crate::RelaxedR1cs;
     use bn_254::Fq;
-    use grumpkin::driver::GrumpkinDriver;
     use zkstd::r1cs::test::example_r1cs;
 
     #[test]
@@ -64,7 +64,7 @@ mod tests {
         let r = transcript.squeeze();
 
         let mut cs = R1cs::<GrumpkinDriver>::default();
-        let r = FieldAssignment::witness(&mut cs, r);
+        let r = FieldAssignment::witness(&mut cs, r.into());
         let instance1 = RelaxedR1csInstanceAssignment::witness(&mut cs, &r1cs_to_fold.instance);
         let instance2 = RelaxedR1csInstanceAssignment::witness(&mut cs, &running_r1cs.instance);
         let instance3 = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance);

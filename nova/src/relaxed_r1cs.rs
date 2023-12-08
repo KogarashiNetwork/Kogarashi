@@ -149,7 +149,7 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
 mod tests {
     use super::RelaxedR1cs;
 
-    use grumpkin::driver::GrumpkinDriver;
+    use crate::driver::GrumpkinDriver;
     use zkstd::circuit::prelude::R1cs;
     use zkstd::r1cs::test::example_r1cs;
 

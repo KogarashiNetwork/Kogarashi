@@ -13,9 +13,9 @@ pub struct PointAssignment<C: CircuitDriver> {
 }
 
 impl<C: CircuitDriver> PointAssignment<C> {
-    pub fn instance(cs: &mut R1cs<C>, point: C::Affine) -> Self {
-        let x = FieldAssignment::instance(cs, point.get_x().into());
-        let y = FieldAssignment::instance(cs, point.get_y().into());
+    pub fn instance(cs: &mut R1cs<C>, point: impl BNAffine<Base = C::Scalar>) -> Self {
+        let x = FieldAssignment::instance(cs, point.get_x());
+        let y = FieldAssignment::instance(cs, point.get_y());
         let z = FieldAssignment::instance(
             cs,
             if point.is_identity() {
@@ -24,6 +24,14 @@ impl<C: CircuitDriver> PointAssignment<C> {
                 C::Scalar::one()
             },
         );
+
+        Self { x, y, z }
+    }
+
+    pub fn identity() -> Self {
+        let x = FieldAssignment::constant(&C::Scalar::zero());
+        let y = FieldAssignment::constant(&C::Scalar::one());
+        let z = FieldAssignment::constant(&C::Scalar::one());
 
         Self { x, y, z }
     }
@@ -46,11 +54,11 @@ impl<C: CircuitDriver> PointAssignment<C> {
     pub fn assert_equal_public_point(
         &self,
         cs: &mut R1cs<C>,
-        point: <C::Affine as BNAffine>::Extended,
+        point: impl BNProjective<Base = C::Scalar>,
     ) {
-        let point_x = FieldAssignment::constant(&point.get_x().into());
-        let point_y = FieldAssignment::constant(&point.get_y().into());
-        let point_z = FieldAssignment::constant(&point.get_z().into());
+        let point_x = FieldAssignment::constant(&point.get_x());
+        let point_y = FieldAssignment::constant(&point.get_y());
+        let point_z = FieldAssignment::constant(&point.get_z());
 
         let xz1 = FieldAssignment::mul(cs, &self.x, &point_z);
         let xz2 = FieldAssignment::mul(cs, &point_x, &self.z);
@@ -64,7 +72,7 @@ impl<C: CircuitDriver> PointAssignment<C> {
     }
 
     pub fn add(&self, rhs: &Self, cs: &mut R1cs<C>) -> Self {
-        let b3 = FieldAssignment::<C>::constant(&C::b3().into());
+        let b3 = FieldAssignment::<C>::constant(&C::b3());
         let t0 = FieldAssignment::mul(cs, &self.x, &rhs.x);
         let t1 = FieldAssignment::mul(cs, &self.y, &rhs.y);
         let t2 = FieldAssignment::mul(cs, &self.z, &rhs.z);
@@ -136,8 +144,7 @@ impl<C: CircuitDriver> PointAssignment<C> {
 
     /// coordinate scalar
     pub fn scalar_point(&self, cs: &mut R1cs<C>, scalar: &FieldAssignment<C>) -> Self {
-        let i = C::Affine::ADDITIVE_IDENTITY;
-        let mut res = PointAssignment::instance(cs, i);
+        let mut res = PointAssignment::identity();
         for bit in FieldAssignment::to_bits(cs, scalar).iter() {
             res = res.double(cs);
             let point_to_add = self.select_identity(cs, bit);

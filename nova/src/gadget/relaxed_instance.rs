@@ -94,8 +94,8 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::driver::GrumpkinDriver;
     use bn_254::Fq;
-    use grumpkin::driver::GrumpkinDriver;
     use grumpkin::Affine;
     use rand_core::OsRng;
     use zkstd::common::Group;

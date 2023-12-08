@@ -96,14 +96,15 @@ impl<C: CircuitDriver> Prover<C> {
 pub(crate) mod tests {
     use super::{Prover, RelaxedR1cs};
     use bn_254::Fq;
+    use zkstd::circuit::CircuitDriver;
 
+    use crate::driver::GrumpkinDriver;
     use crate::hash::{MimcRO, MIMC_ROUNDS};
     use crate::Verifier;
-    use grumpkin::driver::GrumpkinDriver;
     use zkstd::common::OsRng;
     use zkstd::r1cs::test::example_r1cs;
 
-    pub(crate) fn example_prover() -> Prover<GrumpkinDriver> {
+    pub(crate) fn example_prover<C: CircuitDriver>() -> Prover<C> {
         let r1cs = example_r1cs(0);
         Prover::new(r1cs, OsRng)
     }

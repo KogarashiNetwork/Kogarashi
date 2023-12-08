@@ -127,9 +127,9 @@ mod tests {
     use super::Ivc;
     use crate::test::ExampleFunction;
 
+    use crate::driver::GrumpkinDriver;
     use crate::RecursiveProof;
     use bn_254::Fq;
-    use grumpkin::driver::GrumpkinDriver;
     use rand_core::OsRng;
     use zkstd::circuit::prelude::R1cs;
     use zkstd::matrix::DenseVectors;

@@ -12,6 +12,7 @@ mod prover;
 mod relaxed_r1cs;
 mod verifier;
 
+mod driver;
 #[cfg(test)]
 mod test;
 

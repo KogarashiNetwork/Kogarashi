@@ -151,10 +151,10 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::driver::GrumpkinDriver;
     use crate::relaxed_r1cs::RelaxedR1csWitness;
     use crate::test::ExampleFunction;
     use crate::RelaxedR1cs;
-    use grumpkin::driver::GrumpkinDriver;
 
     #[test]
     fn augmented_circuit_dummies() {
