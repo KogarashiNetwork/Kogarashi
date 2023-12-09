@@ -16,7 +16,10 @@ impl<C: CircuitDriver> FunctionCircuit<C> for ExampleFunction<C> {
         DenseVectors::new(vec![next_z])
     }
 
-    fn invoke_cs(cs: &mut R1cs<C>, z_i: Vec<FieldAssignment<C>>) -> Vec<FieldAssignment<C>> {
+    fn invoke_cs(
+        cs: &mut R1cs<C>,
+        z_i: Vec<FieldAssignment<C::Scalar>>,
+    ) -> Vec<FieldAssignment<C::Scalar>> {
         let five = FieldAssignment::constant(&C::Scalar::from(5));
         let z_i_square = FieldAssignment::mul(cs, &z_i[0], &z_i[0]);
         let z_i_cube = FieldAssignment::mul(cs, &z_i_square, &z_i[0]);

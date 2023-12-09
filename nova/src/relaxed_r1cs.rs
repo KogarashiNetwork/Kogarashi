@@ -139,7 +139,7 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
 
     pub(crate) fn absorb_by_transcript<const ROUNDS: usize>(
         &self,
-        transcript: &mut MimcRO<ROUNDS, C>,
+        transcript: &mut MimcRO<ROUNDS, C::Base>,
     ) {
         self.instance.absorb_by_transcript(transcript);
     }

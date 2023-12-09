@@ -7,10 +7,10 @@ use zkstd::common::CurveGroup;
 
 #[derive(Clone)]
 pub(crate) struct RelaxedR1csInstanceAssignment<C: CircuitDriver> {
-    pub(crate) commit_w: PointAssignment<C>,
-    pub(crate) commit_e: PointAssignment<C>,
-    pub(crate) u: FieldAssignment<C>,
-    pub(crate) x: Vec<FieldAssignment<C>>,
+    pub(crate) commit_w: PointAssignment<C::Scalar>,
+    pub(crate) commit_e: PointAssignment<C::Scalar>,
+    pub(crate) u: FieldAssignment<C::Scalar>,
+    pub(crate) x: Vec<FieldAssignment<C::Scalar>>,
 }
 
 impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
@@ -50,7 +50,7 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
 
     pub(crate) fn absorb_by_transcript<const ROUNDS: usize>(
         &self,
-        transcript: &mut MimcROCircuit<ROUNDS, C>,
+        transcript: &mut MimcROCircuit<ROUNDS, C::Base>,
     ) {
         transcript.append_point(self.commit_w.clone());
         transcript.append_point(self.commit_e.clone());
@@ -63,10 +63,10 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
     pub(crate) fn hash(
         &self,
         cs: &mut R1cs<C>,
-        i: FieldAssignment<C>,
-        z_0: Vec<FieldAssignment<C>>,
-        z_i: Vec<FieldAssignment<C>>,
-    ) -> FieldAssignment<C> {
+        i: FieldAssignment<C::Scalar>,
+        z_0: Vec<FieldAssignment<C::Scalar>>,
+        z_i: Vec<FieldAssignment<C::Scalar>>,
+    ) -> FieldAssignment<C::Scalar> {
         MimcROCircuit::<MIMC_ROUNDS, C>::default().hash_vec(
             cs,
             vec![

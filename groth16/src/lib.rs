@@ -20,10 +20,9 @@ pub use zksnark::ZkSnark;
 
 #[cfg(test)]
 mod tests {
-    use crate::circuit::Circuit;
+    use crate::circuit::{Bn254Driver, Circuit};
     use crate::error::Error;
     use crate::zksnark::ZkSnark;
-    use bn_254::driver::Bn254Driver;
 
     use bn_254::Fr as BnScalar;
     use zkstd::circuit::prelude::{FieldAssignment, R1cs};

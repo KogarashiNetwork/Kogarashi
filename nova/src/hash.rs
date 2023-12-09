@@ -41,45 +41,45 @@ impl<const ROUND: usize, F: PrimeField> Mimc<ROUND, F> {
     }
 }
 
-pub(crate) struct MimcRO<const ROUND: usize, C: CircuitDriver> {
-    hasher: Mimc<ROUND, C::Base>,
-    state: Vec<C::Base>,
-    key: C::Base,
+pub(crate) struct MimcRO<const ROUND: usize, F: PrimeField> {
+    hasher: Mimc<ROUND, F>,
+    state: Vec<F>,
+    key: F,
 }
 
-impl<const ROUND: usize, C: CircuitDriver> Default for MimcRO<ROUND, C> {
+impl<const ROUND: usize, F: PrimeField> Default for MimcRO<ROUND, F> {
     fn default() -> Self {
         Self {
             hasher: Mimc::default(),
             state: Vec::default(),
-            key: C::Base::zero(),
+            key: F::zero(),
         }
     }
 }
 
-impl<const ROUND: usize, C: CircuitDriver> MimcRO<ROUND, C> {
-    pub(crate) fn append(&mut self, absorb: C::Base) {
+impl<const ROUND: usize, F: PrimeField> MimcRO<ROUND, F> {
+    pub(crate) fn append(&mut self, absorb: F) {
         self.state.push(absorb)
     }
 
-    pub(crate) fn append_point(&mut self, point: C::Affine) {
+    pub(crate) fn append_point(&mut self, point: impl BNAffine<Base = F>) {
         self.append(point.get_x());
         self.append(point.get_y());
         self.append(if point.is_identity() {
-            C::Base::zero()
+            F::zero()
         } else {
-            C::Base::one()
+            F::one()
         });
     }
 
-    pub(crate) fn hash_vec(&mut self, values: Vec<C::Base>) -> C::Base {
+    pub(crate) fn hash_vec(&mut self, values: Vec<F>) -> F {
         for x in values {
             self.state.push(x);
         }
         self.squeeze()
     }
 
-    pub(crate) fn squeeze(&self) -> C::Base {
+    pub(crate) fn squeeze(&self) -> F {
         self.state.iter().fold(self.key, |acc, scalar| {
             let h = self.hasher.hash(*scalar, acc);
             acc + scalar + h

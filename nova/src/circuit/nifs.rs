@@ -10,11 +10,11 @@ pub(crate) struct NifsCircuit<C: CircuitDriver> {
 impl<C: CircuitDriver> NifsCircuit<C> {
     pub(crate) fn verify(
         cs: &mut R1cs<C>,
-        r: FieldAssignment<C>,
+        r: FieldAssignment<C::Scalar>,
         instance1: RelaxedR1csInstanceAssignment<C>,
         instance2: RelaxedR1csInstanceAssignment<C>,
         instance3: RelaxedR1csInstanceAssignment<C>,
-    ) -> BinaryAssignment<C> {
+    ) -> BinaryAssignment {
         let r_u = FieldAssignment::mul(cs, &r, &instance2.u);
         let first_check = FieldAssignment::is_eq(cs, &instance3.u, &(&instance1.u + &r_u));
 
@@ -26,7 +26,7 @@ impl<C: CircuitDriver> NifsCircuit<C> {
                 let r_x2 = FieldAssignment::mul(cs, &r, &x2);
                 x1 + &r_x2
             })
-            .collect::<Vec<FieldAssignment<C>>>();
+            .collect::<Vec<FieldAssignment<C::Scalar>>>();
         let second_check =
             x.iter()
                 .zip(instance3.x)
@@ -41,11 +41,11 @@ impl<C: CircuitDriver> NifsCircuit<C> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::driver::{Bn254Driver, GrumpkinDriver};
+    use crate::driver::GrumpkinDriver;
     use crate::hash::{MimcRO, MIMC_ROUNDS};
     use crate::prover::tests::example_prover;
     use crate::RelaxedR1cs;
-    use bn_254::Fq;
+    use bn_254::{Fq, Fr};
     use zkstd::r1cs::test::example_r1cs;
 
     #[test]
@@ -57,7 +57,7 @@ mod tests {
         let r1cs_to_fold = RelaxedR1cs::new(example_r1cs(2));
         let (instance, witness, commit_t) = prover.prove(&r1cs_to_fold, &running_r1cs);
 
-        let mut transcript = MimcRO::<MIMC_ROUNDS, GrumpkinDriver>::default();
+        let mut transcript = MimcRO::<MIMC_ROUNDS, Fr>::default();
         transcript.append_point(commit_t);
         running_r1cs.absorb_by_transcript(&mut transcript);
         let t = prover.compute_cross_term(&r1cs_to_fold, &running_r1cs);

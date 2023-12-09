@@ -139,9 +139,9 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
     pub(crate) fn get_challenge(
         cs: &mut R1cs<C>,
         u_range: &RelaxedR1csInstanceAssignment<C>,
-        commit_t: PointAssignment<C>,
-    ) -> FieldAssignment<C> {
-        let mut transcript = MimcROCircuit::<MIMC_ROUNDS, C>::default();
+        commit_t: PointAssignment<C::Scalar>,
+    ) -> FieldAssignment<C::Scalar> {
+        let mut transcript = MimcROCircuit::<MIMC_ROUNDS, C::Base>::default();
         transcript.append_point(commit_t);
         u_range.absorb_by_transcript(&mut transcript);
         transcript.squeeze(cs)
