@@ -60,7 +60,7 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
 
     pub(crate) fn absorb_by_transcript<const ROUNDS: usize>(
         &self,
-        transcript: &mut MimcRO<ROUNDS, C::Base>,
+        transcript: &mut MimcRO<ROUNDS, C>,
     ) {
         transcript.append_point(self.commit_w);
         transcript.append_point(self.commit_e);
@@ -75,10 +75,10 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
         i: usize,
         z_0: &DenseVectors<C::Base>,
         z_i: &DenseVectors<C::Base>,
-    ) -> C::Scalar {
+    ) -> C::Base {
         let commit_e = self.commit_e.to_extended();
         let commit_w = self.commit_w.to_extended();
-        MimcRO::<MIMC_ROUNDS, C::Base>::default().hash_vec(
+        MimcRO::<MIMC_ROUNDS, C>::default().hash_vec(
             vec![
                 vec![C::Base::from(i as u64)],
                 z_0.get(),

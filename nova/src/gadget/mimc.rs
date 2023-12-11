@@ -16,7 +16,7 @@ impl<const ROUND: usize, F: PrimeField> Default for MimcAssignment<ROUND, F> {
 }
 
 impl<const ROUND: usize, F: PrimeField> MimcAssignment<ROUND, F> {
-    pub(crate) fn hash<C: CircuitDriver<Base = F>>(
+    pub(crate) fn hash<C: CircuitDriver<Scalar = F>>(
         &self,
         cs: &mut R1cs<C>,
         mut xl: FieldAssignment<F>,

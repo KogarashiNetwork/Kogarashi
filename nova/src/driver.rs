@@ -1,6 +1,7 @@
 use bn_254::{params::PARAM_B3 as BN254_PARAM_B3, Fq, Fr, G1Affine};
 use grumpkin::{params::PARAM_B3 as GRUMPKIN_PARAM_B3, Affine};
 use zkstd::circuit::CircuitDriver;
+use zkstd::common::{IntGroup, PrimeField, Ring};
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct GrumpkinDriver;
@@ -32,6 +33,20 @@ impl CircuitDriver for Bn254Driver {
     fn b3() -> Self::Scalar {
         GRUMPKIN_PARAM_B3
     }
+}
+
+/// interpret scalar as base
+pub fn scalar_as_base<C: CircuitDriver>(input: C::Scalar) -> C::Base {
+    let input_bits = input.to_bits();
+    let mut mult = C::Base::one();
+    let mut val = C::Base::zero();
+    for bit in input_bits.iter().rev() {
+        if *bit == 1 {
+            val += mult;
+        }
+        mult = mult + mult;
+    }
+    val
 }
 
 #[cfg(test)]

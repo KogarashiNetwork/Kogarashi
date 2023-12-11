@@ -12,19 +12,19 @@ use zkstd::matrix::DenseVectors;
 use zkstd::r1cs::R1cs;
 
 #[derive(Debug, Clone)]
-pub struct AugmentedFCircuit<C: CircuitDriver, FC: FunctionCircuit<C>> {
+pub struct AugmentedFCircuit<C: CircuitDriver, FC: FunctionCircuit<C::Base>> {
     pub i: usize,
-    pub z_0: DenseVectors<C::Scalar>,
-    pub z_i: DenseVectors<C::Scalar>,
+    pub z_0: DenseVectors<C::Base>,
+    pub z_i: DenseVectors<C::Base>,
     pub u_single: RelaxedR1csInstance<C>,
     pub u_range: RelaxedR1csInstance<C>,
     pub u_range_next: RelaxedR1csInstance<C>,
     pub commit_t: C::Affine,
     pub f: PhantomData<FC>,
-    pub x: C::Scalar,
+    pub x: C::Base,
 }
 
-impl<C: CircuitDriver, FC: FunctionCircuit<C>> Default for AugmentedFCircuit<C, FC> {
+impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> Default for AugmentedFCircuit<C, FC> {
     fn default() -> Self {
         Self {
             i: 0,
@@ -44,10 +44,10 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> Default for AugmentedFCircuit<C, 
     }
 }
 
-impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
-    pub(crate) fn generate(&self, cs: &mut R1cs<C>) {
+impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
+    pub(crate) fn generate<CS: CircuitDriver<Scalar = C::Base>>(&self, cs: &mut R1cs<CS>) {
         // allocate inputs
-        let i = FieldAssignment::witness(cs, C::Scalar::from(self.i as u64));
+        let i = FieldAssignment::witness(cs, C::Base::from(self.i as u64));
         let z_0 = self
             .z_0
             .iter()
@@ -59,7 +59,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
             .map(|x| FieldAssignment::witness(cs, x))
             .collect::<Vec<_>>();
 
-        let u_dummy_native = RelaxedR1csInstance::dummy(1);
+        let u_dummy_native = RelaxedR1csInstance::<C>::dummy(1);
         let u_dummy = RelaxedR1csInstanceAssignment::witness(cs, &u_dummy_native);
         let u_i = RelaxedR1csInstanceAssignment::witness(cs, &self.u_single);
         let u_range = RelaxedR1csInstanceAssignment::witness(cs, &self.u_range);
@@ -73,7 +73,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
         let x = FieldAssignment::instance(cs, self.x);
 
         let z_next = FC::invoke_cs(cs, z_i.clone());
-        let zero = FieldAssignment::constant(&C::Scalar::zero());
+        let zero = FieldAssignment::constant(&C::Base::zero());
         let bin_true = BinaryAssignment::witness(cs, 1);
 
         let base_case = FieldAssignment::is_eq(cs, &i, &zero);
@@ -105,7 +105,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
         FieldAssignment::conditional_enforce_equal(
             cs,
             &u_i.u,
-            &FieldAssignment::constant(&C::Scalar::one()),
+            &FieldAssignment::constant(&C::Base::one()),
             &not_base_case,
         );
 
@@ -117,7 +117,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
         // 4. (base case) u_{i+1}.X == H(1, z_0, F(z_0)=F(z_i)=z_i1, U_i) (with U_i being dummy)
         let u_next_x_basecase = u_range.hash(
             cs,
-            FieldAssignment::constant(&C::Scalar::one()),
+            FieldAssignment::constant(&C::Base::one()),
             z_0.clone(),
             z_next.clone(),
         );
@@ -125,7 +125,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
         // 4. (non-base case). u_{i+1}.x = H(i+1, z_0, z_i+1, U_{i+1})
         let u_next_x = u_range_next.hash(
             cs,
-            &i + &FieldAssignment::constant(&C::Scalar::one()),
+            &i + &FieldAssignment::constant(&C::Base::one()),
             z_0,
             z_next,
         );
@@ -136,12 +136,12 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
         FieldAssignment::conditional_enforce_equal(cs, &u_next_x, &x, &not_base_case);
     }
 
-    pub(crate) fn get_challenge(
-        cs: &mut R1cs<C>,
+    pub(crate) fn get_challenge<CS: CircuitDriver<Scalar = C::Base>>(
+        cs: &mut R1cs<CS>,
         u_range: &RelaxedR1csInstanceAssignment<C>,
-        commit_t: PointAssignment<C::Scalar>,
-    ) -> FieldAssignment<C::Scalar> {
-        let mut transcript = MimcROCircuit::<MIMC_ROUNDS, C::Base>::default();
+        commit_t: PointAssignment<C::Base>,
+    ) -> FieldAssignment<C::Base> {
+        let mut transcript = MimcROCircuit::<MIMC_ROUNDS, C>::default();
         transcript.append_point(commit_t);
         u_range.absorb_by_transcript(&mut transcript);
         transcript.squeeze(cs)
@@ -151,16 +151,16 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::driver::GrumpkinDriver;
+    use crate::driver::{Bn254Driver, GrumpkinDriver};
     use crate::relaxed_r1cs::RelaxedR1csWitness;
     use crate::test::ExampleFunction;
     use crate::RelaxedR1cs;
+    use bn_254::Fr;
 
     #[test]
     fn augmented_circuit_dummies() {
-        let mut cs = R1cs::<GrumpkinDriver>::default();
-        let augmented_circuit =
-            AugmentedFCircuit::<GrumpkinDriver, ExampleFunction<GrumpkinDriver>>::default();
+        let mut cs = R1cs::<Bn254Driver>::default();
+        let augmented_circuit = AugmentedFCircuit::<GrumpkinDriver, ExampleFunction<Fr>>::default();
         augmented_circuit.generate(&mut cs);
 
         assert!(cs.is_sat());

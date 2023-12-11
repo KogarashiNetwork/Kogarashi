@@ -1,21 +1,22 @@
 use crate::relaxed_r1cs::RelaxedR1csInstance;
 
 use crate::circuit::MimcROCircuit;
+use crate::driver::scalar_as_base;
 use crate::hash::MIMC_ROUNDS;
 use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
 use zkstd::common::CurveGroup;
 
 #[derive(Clone)]
 pub(crate) struct RelaxedR1csInstanceAssignment<C: CircuitDriver> {
-    pub(crate) commit_w: PointAssignment<C::Scalar>,
-    pub(crate) commit_e: PointAssignment<C::Scalar>,
-    pub(crate) u: FieldAssignment<C::Scalar>,
-    pub(crate) x: Vec<FieldAssignment<C::Scalar>>,
+    pub(crate) commit_w: PointAssignment<C::Base>,
+    pub(crate) commit_e: PointAssignment<C::Base>,
+    pub(crate) u: FieldAssignment<C::Base>,
+    pub(crate) x: Vec<FieldAssignment<C::Base>>,
 }
 
 impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
-    pub(crate) fn witness(
-        cs: &mut R1cs<C>,
+    pub(crate) fn witness<CS: CircuitDriver<Scalar = C::Base>>(
+        cs: &mut R1cs<CS>,
         relaxed_r1cs_instance: &RelaxedR1csInstance<C>,
     ) -> Self {
         let RelaxedR1csInstance {
@@ -27,8 +28,8 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
 
         let commit_w = PointAssignment::witness(
             cs,
-            commit_w.get_x().into(),
-            commit_w.get_y().into(),
+            commit_w.get_x(),
+            commit_w.get_y(),
             commit_w.is_identity(),
         );
         let commit_e = PointAssignment::witness(
@@ -37,8 +38,11 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
             commit_e.get_y().into(),
             commit_e.is_identity(),
         );
-        let u = FieldAssignment::witness(cs, *u);
-        let x = x.iter().map(|x| FieldAssignment::witness(cs, x)).collect();
+        let u = FieldAssignment::witness(cs, scalar_as_base::<C>(*u));
+        let x = x
+            .iter()
+            .map(|x| FieldAssignment::witness(cs, scalar_as_base::<C>(x)))
+            .collect();
 
         Self {
             commit_w,
@@ -50,7 +54,7 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
 
     pub(crate) fn absorb_by_transcript<const ROUNDS: usize>(
         &self,
-        transcript: &mut MimcROCircuit<ROUNDS, C::Base>,
+        transcript: &mut MimcROCircuit<ROUNDS, C>,
     ) {
         transcript.append_point(self.commit_w.clone());
         transcript.append_point(self.commit_e.clone());
@@ -60,13 +64,13 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         }
     }
 
-    pub(crate) fn hash(
+    pub(crate) fn hash<CS: CircuitDriver<Scalar = C::Base>>(
         &self,
-        cs: &mut R1cs<C>,
-        i: FieldAssignment<C::Scalar>,
-        z_0: Vec<FieldAssignment<C::Scalar>>,
-        z_i: Vec<FieldAssignment<C::Scalar>>,
-    ) -> FieldAssignment<C::Scalar> {
+        cs: &mut R1cs<CS>,
+        i: FieldAssignment<C::Base>,
+        z_0: Vec<FieldAssignment<C::Base>>,
+        z_i: Vec<FieldAssignment<C::Base>>,
+    ) -> FieldAssignment<C::Base> {
         MimcROCircuit::<MIMC_ROUNDS, C>::default().hash_vec(
             cs,
             vec![

@@ -9,7 +9,7 @@ use zkstd::circuit::prelude::{CircuitDriver, R1cs};
 use zkstd::common::{Group, RngCore};
 use zkstd::matrix::DenseVectors;
 
-pub struct Ivc<C: CircuitDriver, FC: FunctionCircuit<C>> {
+pub struct Ivc<C: CircuitDriver, FC: FunctionCircuit<C::Base>> {
     i: usize,
     z0: DenseVectors<C::Scalar>,
     zi: DenseVectors<C::Scalar>,
@@ -26,7 +26,7 @@ pub struct Ivc<C: CircuitDriver, FC: FunctionCircuit<C>> {
     f: PhantomData<FC>,
 }
 
-impl<C: CircuitDriver, FC: FunctionCircuit<C>> Ivc<C, FC> {
+impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> Ivc<C, FC> {
     pub fn new(rng: impl RngCore, z0: DenseVectors<C::Scalar>) -> Self {
         let mut r1cs = R1cs::default();
 

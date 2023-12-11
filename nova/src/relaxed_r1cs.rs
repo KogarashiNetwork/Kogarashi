@@ -12,9 +12,9 @@ pub struct RelaxedR1cs<C: CircuitDriver> {
     // 1. Structure S
     // a, b and c matrices and matrix size
     m: usize,
-    a: SparseMatrix<C::Scalar>,
-    b: SparseMatrix<C::Scalar>,
-    c: SparseMatrix<C::Scalar>,
+    a: SparseMatrix<C::Base>,
+    b: SparseMatrix<C::Base>,
+    c: SparseMatrix<C::Base>,
 
     // 2. Instance
     // r1cs instance includes public inputs, outputs and scalar
@@ -139,7 +139,7 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
 
     pub(crate) fn absorb_by_transcript<const ROUNDS: usize>(
         &self,
-        transcript: &mut MimcRO<ROUNDS, C::Base>,
+        transcript: &mut MimcRO<ROUNDS, C>,
     ) {
         self.instance.absorb_by_transcript(transcript);
     }
