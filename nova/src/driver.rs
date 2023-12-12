@@ -70,7 +70,7 @@ mod grumpkin_gadget_tests {
     use bn_254::G1Affine;
     use rand_core::OsRng;
     use zkstd::circuit::prelude::{FieldAssignment, PointAssignment, R1cs};
-    use zkstd::common::{BNAffine, BNProjective, Group, PrimeField};
+    use zkstd::common::{BNAffine, BNProjective, Group};
 
     #[test]
     fn range_proof_test() {
@@ -240,14 +240,12 @@ mod grumpkin_gadget_tests {
         for _ in 0..100 {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
             // Base == GrumpkingScalar
-            let x = Base::random(OsRng);
+            let x = Scalar::random(OsRng);
             let p = G1Affine::random(OsRng);
 
-            let x_assignment = FieldAssignment::instance(&mut cs, x.into()); // Fr
+            let x_assignment = FieldAssignment::instance(&mut cs, x); // Fr
             let p_assignment = PointAssignment::instance(&mut cs, p);
-            let expected = p * x;
-
-            assert_eq!(x.to_bits(), Base::from(x).to_bits());
+            let expected = p * Base::from(x);
 
             let mul_circuit = p_assignment.scalar_point(&mut cs, &x_assignment);
 

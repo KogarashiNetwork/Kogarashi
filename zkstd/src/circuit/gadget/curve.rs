@@ -116,7 +116,7 @@ impl<F: PrimeField> PointAssignment<F> {
     }
 
     pub fn double<C: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<C>) -> Self {
-        let b3 = FieldAssignment::constant(&C::b3().into());
+        let b3 = FieldAssignment::constant(&C::b3());
         let t0 = FieldAssignment::mul(cs, &self.y, &self.y);
         let z3 = &t0 + &t0;
         let z3 = &z3 + &z3;

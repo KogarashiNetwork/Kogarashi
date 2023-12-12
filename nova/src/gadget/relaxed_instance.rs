@@ -34,8 +34,8 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         );
         let commit_e = PointAssignment::witness(
             cs,
-            commit_e.get_x().into(),
-            commit_e.get_y().into(),
+            commit_e.get_x(),
+            commit_e.get_y(),
             commit_e.is_identity(),
         );
         let u = FieldAssignment::witness(cs, scalar_as_base::<C>(*u));

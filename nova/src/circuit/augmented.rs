@@ -15,13 +15,13 @@ use zkstd::r1cs::R1cs;
 pub struct AugmentedFCircuit<C: CircuitDriver, FC: FunctionCircuit<C::Base>> {
     pub i: usize,
     pub z_0: DenseVectors<C::Base>,
-    pub z_i: DenseVectors<C::Base>,
-    pub u_single: RelaxedR1csInstance<C>,
-    pub u_range: RelaxedR1csInstance<C>,
-    pub u_range_next: RelaxedR1csInstance<C>,
-    pub commit_t: C::Affine,
+    pub z_i: Option<DenseVectors<C::Base>>,
+    pub u_single: Option<RelaxedR1csInstance<C>>,
+    pub u_range: Option<RelaxedR1csInstance<C>>,
+    pub u_range_next: Option<RelaxedR1csInstance<C>>, // Remove
+    pub commit_t: Option<C::Affine>,
     pub f: PhantomData<FC>,
-    pub x: C::Base,
+    pub x: C::Base, // Remove
 }
 
 impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> Default for AugmentedFCircuit<C, FC> {
@@ -29,24 +29,13 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> Default for AugmentedFCircu
         Self {
             i: 0,
             z_0: DenseVectors::zero(1),
-            z_i: DenseVectors::zero(1),
-            u_single: RelaxedR1csInstance::dummy(1),
-            u_range: RelaxedR1csInstance::dummy(1),
-            u_range_next: RelaxedR1csInstance::dummy(1),
-            commit_t: C::Affine::ADDITIVE_IDENTITY,
+            z_i: Some(DenseVectors::zero(1)),
+            u_single: Some(RelaxedR1csInstance::dummy(1)),
+            u_range: Some(RelaxedR1csInstance::dummy(1)),
+            u_range_next: Some(RelaxedR1csInstance::dummy(1)),
+            commit_t: Some(C::Affine::ADDITIVE_IDENTITY),
             f: Default::default(),
-            x: C::Base::zero(), // x: RelaxedR1csInstance::<C>::dummy(1)
-                                //     .hash(
-                                //         1,
-                                //         &DenseVectors::zero(1),
-                                //         &DenseVectors::new(
-                                //             FC::invoke(&DenseVectors::zero(1))
-                                //                 .iter()
-                                //                 .map(|x| base_as_scalar(x))
-                                //                 .collect(),
-                                //         ),
-                                //     )
-                                //     .into(),
+            x: C::Base::zero(),
         }
     }
 }
@@ -62,20 +51,39 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
             .collect::<Vec<_>>();
         let z_i = self
             .z_i
+            .clone()
+            .unwrap_or_else(|| self.z_0.clone())
             .iter()
             .map(|x| FieldAssignment::witness(cs, x))
             .collect::<Vec<_>>();
 
         let u_dummy_native = RelaxedR1csInstance::<C>::dummy(1);
         let u_dummy = RelaxedR1csInstanceAssignment::witness(cs, &u_dummy_native);
-        let u_i = RelaxedR1csInstanceAssignment::witness(cs, &self.u_single);
-        let u_range = RelaxedR1csInstanceAssignment::witness(cs, &self.u_range);
-        let u_range_next = RelaxedR1csInstanceAssignment::witness(cs, &self.u_range_next);
+        let u_i = RelaxedR1csInstanceAssignment::witness(
+            cs,
+            &self
+                .u_single
+                .clone()
+                .unwrap_or_else(|| u_dummy_native.clone()),
+        );
+        let u_range = RelaxedR1csInstanceAssignment::witness(
+            cs,
+            &self
+                .u_range
+                .clone()
+                .unwrap_or_else(|| u_dummy_native.clone()),
+        );
+        let u_range_next = RelaxedR1csInstanceAssignment::witness(
+            cs,
+            &self.u_range_next.clone().unwrap_or(u_dummy_native),
+        );
+
+        let commit_t = self.commit_t.unwrap_or(C::Affine::ADDITIVE_IDENTITY);
         let commit_t = PointAssignment::witness(
             cs,
-            self.commit_t.get_x().into(),
-            self.commit_t.get_y().into(),
-            self.commit_t.is_identity(),
+            commit_t.get_x(),
+            commit_t.get_y(),
+            commit_t.is_identity(),
         );
         let x = FieldAssignment::instance(cs, self.x);
 
@@ -176,7 +184,7 @@ mod tests {
         let u_dummy = RelaxedR1csInstance::dummy(cs.l() - 1);
         let w_dummy = RelaxedR1csWitness::dummy(cs.m_l_1(), cs.m());
 
-        let mut running_r1cs = R1csShape::from(cs);
+        let running_r1cs = R1csShape::from(cs);
         assert!(running_r1cs.is_sat(&u_dummy, &w_dummy));
     }
 }

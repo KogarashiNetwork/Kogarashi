@@ -56,7 +56,7 @@ where
             // check if instance-witness pair satisfy
 
             let is_instance_witness_sat =
-                self.r1cs.is_sat(&l_ui, &l_wi) && self.r1cs.is_sat(&s_ui, &s_wi);
+                self.r1cs.is_sat(l_ui, l_wi) && self.r1cs.is_sat(s_ui, s_wi);
 
             check_hash && check_defaults && is_instance_witness_sat
         }
