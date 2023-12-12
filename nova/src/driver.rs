@@ -49,6 +49,20 @@ pub fn scalar_as_base<C: CircuitDriver>(input: C::Scalar) -> C::Base {
     val
 }
 
+/// interpret base as scalar
+pub fn base_as_scalar<C: CircuitDriver>(input: C::Base) -> C::Scalar {
+    let input_bits = input.to_bits();
+    let mut mult = C::Scalar::one();
+    let mut val = C::Scalar::zero();
+    for bit in input_bits.iter().rev() {
+        if *bit == 1 {
+            val += mult;
+        }
+        mult = mult + mult;
+    }
+    val
+}
+
 #[cfg(test)]
 mod grumpkin_gadget_tests {
     use super::{Fq as Scalar, Fr as Base, GrumpkinDriver};

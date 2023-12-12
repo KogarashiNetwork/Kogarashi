@@ -44,29 +44,43 @@ mod tests {
     use crate::driver::{Bn254Driver, GrumpkinDriver};
     use crate::hash::{MimcRO, MIMC_ROUNDS};
     use crate::prover::tests::example_prover;
-    use crate::RelaxedR1cs;
-    use bn_254::{Fq, Fr};
+    use crate::relaxed_r1cs::{RelaxedR1csInstance, RelaxedR1csWitness};
+    use bn_254::Fq;
+    use zkstd::matrix::DenseVectors;
     use zkstd::r1cs::test::example_r1cs;
 
     #[test]
     fn nifs_circuit() {
         let prover = example_prover();
         let r1cs = example_r1cs::<Bn254Driver>(1);
-        let running_r1cs = RelaxedR1cs::new(r1cs);
+        let running_instance = RelaxedR1csInstance::new(DenseVectors::new(r1cs.x()));
+        let running_witness = RelaxedR1csWitness::new(DenseVectors::new(r1cs.w()), r1cs.m());
 
-        let r1cs_to_fold = RelaxedR1cs::new(example_r1cs(2));
-        let (instance, witness, commit_t) = prover.prove(&r1cs_to_fold, &running_r1cs);
+        let r1cs_2 = example_r1cs::<Bn254Driver>(2);
+        let instance_to_fold = RelaxedR1csInstance::new(DenseVectors::new(r1cs.x()));
+        let witness_to_fold = RelaxedR1csWitness::new(DenseVectors::new(r1cs.w()), r1cs.m());
+        let (instance, witness, commit_t) = prover.prove(
+            &instance_to_fold,
+            &witness_to_fold,
+            &running_instance,
+            &running_witness,
+        );
 
         let mut transcript = MimcRO::<MIMC_ROUNDS, Bn254Driver>::default();
         transcript.append_point(commit_t);
-        running_r1cs.absorb_by_transcript(&mut transcript);
-        let t = prover.compute_cross_term(&r1cs_to_fold, &running_r1cs);
+        running_instance.absorb_by_transcript(&mut transcript);
+        let t = prover.compute_cross_term(
+            &instance_to_fold,
+            &witness_to_fold,
+            &running_instance,
+            &running_witness,
+        );
         let r = transcript.squeeze();
 
         let mut cs = R1cs::<GrumpkinDriver>::default();
         let r = FieldAssignment::witness(&mut cs, r.into());
-        let instance1 = RelaxedR1csInstanceAssignment::witness(&mut cs, &r1cs_to_fold.instance);
-        let instance2 = RelaxedR1csInstanceAssignment::witness(&mut cs, &running_r1cs.instance);
+        let instance1 = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance_to_fold);
+        let instance2 = RelaxedR1csInstanceAssignment::witness(&mut cs, &running_instance);
         let instance3 = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance);
 
         let nifs_check = NifsCircuit::verify(&mut cs, r, instance1, instance2, instance3);

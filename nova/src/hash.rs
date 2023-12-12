@@ -1,5 +1,6 @@
 mod helper;
 
+use crate::driver::base_as_scalar;
 use helper::BlakeHelper;
 use zkstd::circuit::CircuitDriver;
 use zkstd::common::{BNAffine, IntGroup, PrimeField, Ring};
@@ -72,17 +73,17 @@ impl<const ROUND: usize, C: CircuitDriver> MimcRO<ROUND, C> {
         });
     }
 
-    pub(crate) fn hash_vec(&mut self, values: Vec<C::Base>) -> C::Base {
+    pub(crate) fn hash_vec(&mut self, values: Vec<C::Base>) -> C::Scalar {
         for x in values {
             self.state.push(x);
         }
         self.squeeze()
     }
 
-    pub(crate) fn squeeze(&self) -> C::Base {
-        self.state.iter().fold(self.key, |acc, scalar| {
+    pub(crate) fn squeeze(&self) -> C::Scalar {
+        base_as_scalar::<C>(self.state.iter().fold(self.key, |acc, scalar| {
             let h = self.hasher.hash(*scalar, acc);
             acc + scalar + h
-        })
+        }))
     }
 }

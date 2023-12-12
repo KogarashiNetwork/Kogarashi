@@ -1,113 +1,68 @@
 mod instance;
 mod witness;
 
-use crate::hash::MimcRO;
 pub(crate) use instance::RelaxedR1csInstance;
 pub(crate) use witness::RelaxedR1csWitness;
 use zkstd::circuit::prelude::{CircuitDriver, R1cs};
 use zkstd::matrix::{DenseVectors, SparseMatrix};
 
 #[derive(Clone, Debug)]
-pub struct RelaxedR1cs<C: CircuitDriver> {
+pub struct R1csShape<C: CircuitDriver> {
     // 1. Structure S
     // a, b and c matrices and matrix size
     m: usize,
-    a: SparseMatrix<C::Base>,
-    b: SparseMatrix<C::Base>,
-    c: SparseMatrix<C::Base>,
-
-    // 2. Instance
-    // r1cs instance includes public inputs, outputs and scalar
-    pub(crate) instance: RelaxedR1csInstance<C>,
-
-    // 3. Witness
-    // r1cs witness includes private inputs, intermediate value and error vector
-    pub(crate) witness: RelaxedR1csWitness<C>,
+    instance_length: usize,
+    witness_length: usize,
+    a: SparseMatrix<C::Scalar>,
+    b: SparseMatrix<C::Scalar>,
+    c: SparseMatrix<C::Scalar>,
 }
 
-impl<C: CircuitDriver> RelaxedR1cs<C> {
-    pub fn new(r1cs: R1cs<C>) -> Self {
-        let m = r1cs.m();
-        let (a, b, c) = r1cs.matrices();
-        let x = DenseVectors::new(r1cs.x());
-        let w = DenseVectors::new(r1cs.w());
-
-        let instance = RelaxedR1csInstance::new(x);
-        let witness = RelaxedR1csWitness::new(w, m);
-
+impl<C: CircuitDriver> From<R1cs<C>> for R1csShape<C> {
+    fn from(value: R1cs<C>) -> Self {
+        let (a, b, c) = value.matrices();
         Self {
-            m,
+            m: value.m(),
+            instance_length: value.l(),
+            witness_length: value.m_l_1(),
             a,
             b,
             c,
-            instance,
-            witness,
         }
     }
+}
 
-    pub(crate) fn u(&self) -> C::Scalar {
-        self.instance.u
-    }
-
-    pub(crate) fn x(&self) -> DenseVectors<C::Scalar> {
-        self.instance.x.clone()
-    }
-
-    pub(crate) fn w(&self) -> DenseVectors<C::Scalar> {
-        self.witness.w.clone()
-    }
-
-    pub(crate) fn fold_instance(
+impl<C: CircuitDriver> R1csShape<C> {
+    #[allow(clippy::type_complexity)]
+    pub fn matrices(
         &self,
-        r1cs: &RelaxedR1cs<C>,
-        r: C::Scalar,
-        commit_t: C::Affine,
-    ) -> RelaxedR1csInstance<C> {
-        self.instance.fold(r1cs, r, commit_t)
+    ) -> (
+        SparseMatrix<C::Scalar>,
+        SparseMatrix<C::Scalar>,
+        SparseMatrix<C::Scalar>,
+    ) {
+        (self.a.clone(), self.b.clone(), self.c.clone())
     }
 
-    pub(crate) fn fold_witness(
-        &self,
-        r1cs: &RelaxedR1cs<C>,
-        r: C::Scalar,
-        t: DenseVectors<C::Scalar>,
-    ) -> RelaxedR1csWitness<C> {
-        self.witness.fold(r1cs, r, t)
+    pub fn m(&self) -> usize {
+        self.m
     }
 
-    pub(crate) fn update(
-        &self,
-        instance: &RelaxedR1csInstance<C>,
-        witness: &RelaxedR1csWitness<C>,
-    ) -> Self {
-        let RelaxedR1cs {
-            m,
-            a,
-            b,
-            c,
-            instance: _,
-            witness: _,
-        } = self.clone();
-        Self {
-            m,
-            a,
-            b,
-            c,
-            instance: instance.clone(),
-            witness: witness.clone(),
-        }
+    pub fn l(&self) -> usize {
+        self.instance_length
+    }
+
+    pub fn m_l_1(&self) -> usize {
+        self.witness_length
     }
 
     ///  check (A · Z) ◦ (B · Z) = u · (C · Z) + E
-    pub fn is_sat(&self) -> bool {
-        let Self {
-            m,
-            a,
-            b,
-            c,
-            instance,
-            witness,
-        } = self;
+    pub fn is_sat(
+        &self,
+        instance: &RelaxedR1csInstance<C>,
+        witness: &RelaxedR1csWitness<C>,
+    ) -> bool {
+        let Self { m, a, b, c, .. } = self;
 
         let RelaxedR1csInstance {
             commit_w: _,
@@ -136,29 +91,25 @@ impl<C: CircuitDriver> RelaxedR1cs<C> {
             .zip(ucze.iter())
             .all(|(left, right)| left == right)
     }
-
-    pub(crate) fn absorb_by_transcript<const ROUNDS: usize>(
-        &self,
-        transcript: &mut MimcRO<ROUNDS, C>,
-    ) {
-        self.instance.absorb_by_transcript(transcript);
-    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::RelaxedR1cs;
+    use super::{R1csShape, RelaxedR1csInstance, RelaxedR1csWitness};
 
     use crate::driver::GrumpkinDriver;
     use zkstd::circuit::prelude::R1cs;
+    use zkstd::matrix::DenseVectors;
     use zkstd::r1cs::test::example_r1cs;
 
     #[test]
     fn relaxed_r1cs_test() {
         for i in 1..10 {
             let r1cs: R1cs<GrumpkinDriver> = example_r1cs(i);
-            let relaxed_r1cs = RelaxedR1cs::new(r1cs);
-            assert!(relaxed_r1cs.is_sat())
+            let instance = RelaxedR1csInstance::new(DenseVectors::new(r1cs.x()));
+            let witness = RelaxedR1csWitness::new(DenseVectors::new(r1cs.w()), r1cs.m());
+            let relaxed_r1cs = R1csShape::from(r1cs);
+            assert!(relaxed_r1cs.is_sat(&instance, &witness))
         }
     }
 }

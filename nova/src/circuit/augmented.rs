@@ -35,11 +35,18 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> Default for AugmentedFCircu
             u_range_next: RelaxedR1csInstance::dummy(1),
             commit_t: C::Affine::ADDITIVE_IDENTITY,
             f: Default::default(),
-            x: RelaxedR1csInstance::<C>::dummy(1).hash(
-                1,
-                &DenseVectors::zero(1),
-                &FC::invoke(&DenseVectors::zero(1)),
-            ),
+            x: C::Base::zero(), // x: RelaxedR1csInstance::<C>::dummy(1)
+                                //     .hash(
+                                //         1,
+                                //         &DenseVectors::zero(1),
+                                //         &DenseVectors::new(
+                                //             FC::invoke(&DenseVectors::zero(1))
+                                //                 .iter()
+                                //                 .map(|x| base_as_scalar(x))
+                                //                 .collect(),
+                                //         ),
+                                //     )
+                                //     .into(),
         }
     }
 }
@@ -152,9 +159,8 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
 mod tests {
     use super::*;
     use crate::driver::{Bn254Driver, GrumpkinDriver};
-    use crate::relaxed_r1cs::RelaxedR1csWitness;
+    use crate::relaxed_r1cs::{R1csShape, RelaxedR1csWitness};
     use crate::test::ExampleFunction;
-    use crate::RelaxedR1cs;
     use bn_254::Fr;
 
     #[test]
@@ -170,8 +176,7 @@ mod tests {
         let u_dummy = RelaxedR1csInstance::dummy(cs.l() - 1);
         let w_dummy = RelaxedR1csWitness::dummy(cs.m_l_1(), cs.m());
 
-        let mut running_r1cs = RelaxedR1cs::new(cs.clone());
-        running_r1cs = running_r1cs.update(&u_dummy, &w_dummy);
-        assert!(running_r1cs.is_sat());
+        let mut running_r1cs = R1csShape::from(cs);
+        assert!(running_r1cs.is_sat(&u_dummy, &w_dummy));
     }
 }

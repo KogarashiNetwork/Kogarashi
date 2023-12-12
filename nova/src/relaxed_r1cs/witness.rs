@@ -1,4 +1,3 @@
-use crate::RelaxedR1cs;
 use zkstd::circuit::prelude::CircuitDriver;
 use zkstd::common::{IntGroup, PrimeField};
 use zkstd::matrix::DenseVectors;
@@ -19,6 +18,10 @@ impl<C: CircuitDriver> RelaxedR1csWitness<C> {
         }
     }
 
+    pub(crate) fn w(&self) -> DenseVectors<C::Scalar> {
+        self.w.clone()
+    }
+
     pub(crate) fn dummy(w_len: usize, m: usize) -> Self {
         Self {
             e: DenseVectors::zero(m),
@@ -28,14 +31,14 @@ impl<C: CircuitDriver> RelaxedR1csWitness<C> {
 
     pub(crate) fn fold(
         &self,
-        r1cs: &RelaxedR1cs<C>,
+        witness: &RelaxedR1csWitness<C>,
         r: C::Scalar,
         t: DenseVectors<C::Scalar>,
     ) -> Self {
         let r2 = r.square();
         let e2 = self.e.clone();
-        let w1 = r1cs.w();
-        let w2 = self.w.clone();
+        let w1 = witness.w();
+        let w2 = self.w();
 
         let e = t * r + e2 * r2;
         let w = w1 + w2 * r;
