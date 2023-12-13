@@ -86,18 +86,18 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
     pub fn hash<E: CircuitDriver<Base = C::Scalar, Scalar = C::Base>>(
         &self,
         i: usize,
-        z_0: &DenseVectors<C::Scalar>,
-        z_i: &DenseVectors<C::Scalar>,
-    ) -> C::Base {
+        z_0: &DenseVectors<E::Scalar>,
+        z_i: &DenseVectors<E::Scalar>,
+    ) -> C::Scalar {
         let commit_e = self.commit_e.to_extended();
         let commit_w = self.commit_w.to_extended();
-        MimcRO::<MIMC_ROUNDS, E>::default().hash_vec(
+        MimcRO::<MIMC_ROUNDS, C>::default().hash_vec(
             vec![
-                vec![C::Scalar::from(i as u64)],
+                vec![E::Scalar::from(i as u64)],
                 z_0.get(),
                 z_i.get(),
-                vec![self.u],
-                self.x.get(),
+                vec![scalar_as_base::<C>(self.u)],
+                self.x.iter().map(|x| scalar_as_base::<C>(x)).collect(),
                 vec![
                     commit_e.get_x().into(),
                     commit_e.get_y().into(),

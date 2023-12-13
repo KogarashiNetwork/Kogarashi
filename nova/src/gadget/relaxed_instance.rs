@@ -3,7 +3,9 @@ use crate::relaxed_r1cs::RelaxedR1csInstance;
 use crate::circuit::MimcROCircuit;
 use crate::driver::scalar_as_base;
 use crate::hash::MIMC_ROUNDS;
-use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
+use zkstd::circuit::prelude::{
+    BinaryAssignment, CircuitDriver, FieldAssignment, PointAssignment, R1cs,
+};
 use zkstd::common::CurveGroup;
 
 #[derive(Clone)]
@@ -11,7 +13,8 @@ pub(crate) struct RelaxedR1csInstanceAssignment<C: CircuitDriver> {
     pub(crate) commit_w: PointAssignment<C::Base>,
     pub(crate) commit_e: PointAssignment<C::Base>,
     pub(crate) u: FieldAssignment<C::Base>,
-    pub(crate) x: Vec<FieldAssignment<C::Base>>,
+    pub(crate) x0: FieldAssignment<C::Base>,
+    pub(crate) x1: FieldAssignment<C::Base>,
 }
 
 impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
@@ -39,16 +42,35 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
             commit_e.is_identity(),
         );
         let u = FieldAssignment::witness(cs, scalar_as_base::<C>(*u));
-        let x = x
-            .iter()
-            .map(|x| FieldAssignment::witness(cs, scalar_as_base::<C>(x)))
-            .collect();
+        let x0 = FieldAssignment::witness(cs, scalar_as_base::<C>(x[0]));
+        let x1 = FieldAssignment::witness(cs, scalar_as_base::<C>(x[1]));
 
         Self {
             commit_w,
             commit_e,
             u,
-            x,
+            x0,
+            x1,
+        }
+    }
+
+    pub fn conditional_select<CS: CircuitDriver<Scalar = C::Base>>(
+        cs: &mut R1cs<CS>,
+        a: &Self,
+        b: &Self,
+        condition: &BinaryAssignment,
+    ) -> Self {
+        let commit_w = PointAssignment::conditional_select(cs, &a.commit_w, &b.commit_w, condition);
+        let commit_e = PointAssignment::conditional_select(cs, &a.commit_e, &b.commit_e, condition);
+        let u = FieldAssignment::conditional_select(cs, &a.u, &b.u, condition);
+        let x0 = FieldAssignment::conditional_select(cs, &a.x0, &b.x0, condition);
+        let x1 = FieldAssignment::conditional_select(cs, &a.x1, &b.x1, condition);
+        Self {
+            commit_w,
+            commit_e,
+            u,
+            x0,
+            x1,
         }
     }
 
@@ -59,9 +81,8 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         transcript.append_point(self.commit_w.clone());
         transcript.append_point(self.commit_e.clone());
         transcript.append(self.u.clone());
-        for x in &self.x {
-            transcript.append(x.clone());
-        }
+        transcript.append(self.x0.clone());
+        transcript.append(self.x1.clone());
     }
 
     pub(crate) fn hash<CS: CircuitDriver<Scalar = C::Base>>(
@@ -78,7 +99,8 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
                 z_0,
                 z_i,
                 vec![self.u.clone()],
-                self.x.clone(),
+                vec![self.x0.clone()],
+                vec![self.x1.clone()],
                 vec![
                     self.commit_e.get_x(),
                     self.commit_e.get_y(),
@@ -158,7 +180,7 @@ mod tests {
         // TODO: Think how to restrict size to 1
         FieldAssignment::enforce_eq_constant(
             &mut cs,
-            &instance_assignment.x[0],
+            &instance_assignment.x0,
             &scalar_as_base::<GrumpkinDriver>(instance.x[0]),
         );
 

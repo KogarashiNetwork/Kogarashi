@@ -1,5 +1,5 @@
 use crate::function::FunctionCircuit;
-use crate::Prover;
+use crate::{Prover, RecursiveProof};
 use rand_core::OsRng;
 use std::marker::PhantomData;
 
@@ -45,15 +45,15 @@ where
     FC1: FunctionCircuit<E1::Scalar>,
     FC2: FunctionCircuit<E2::Scalar>,
 {
-    pub fn new(
+    pub fn init(
         rng: OsRng,
         pp: &PublicParams<E1, E2, FC1, FC2>,
         z0_primary: DenseVectors<E1::Scalar>,
         z0_secondary: DenseVectors<E2::Scalar>,
-    ) -> Self {
+    ) -> (Self, RecursiveProof<E1, E2, FC1, FC2>) {
         let mut cs_primary = R1cs::<E1>::default();
         let circuit_primary = AugmentedFCircuit::<E2, FC1>::default();
-        circuit_primary.generate(&mut cs_primary); // get zi_primary
+        let zi_primary = circuit_primary.generate(&mut cs_primary); // get zi_primary
 
         // get u_single_next/w_single_next primary
 
@@ -61,7 +61,7 @@ where
 
         let mut cs_secondary = R1cs::<E2>::default();
         let circuit_secondary = AugmentedFCircuit::<E1, FC2>::default();
-        circuit_secondary.generate(&mut cs_secondary); // get zi_secondary
+        let zi_secondary = circuit_secondary.generate(&mut cs_secondary);
 
         // get u_single_next/w_single_next secondary
 
@@ -70,12 +70,22 @@ where
         let u_dummy = RelaxedR1csInstance::<E1>::dummy(cs_primary.l() - 1);
         let w_dummy = RelaxedR1csWitness::<E1>::dummy(cs_primary.m_l_1(), cs_primary.m());
 
-        Self {
+        let ivc = Self {
             i: 0,
             z0_primary,
             z0_secondary,
-            zi_primary: Default::default(),
-            zi_secondary: Default::default(),
+            zi_primary: DenseVectors::new(
+                zi_primary
+                    .into_iter()
+                    .map(|x| x.value(&mut cs_primary))
+                    .collect(),
+            ),
+            zi_secondary: DenseVectors::new(
+                zi_secondary
+                    .into_iter()
+                    .map(|x| x.value(&mut cs_secondary))
+                    .collect(),
+            ),
             prover_primary,
             prover_secondary,
             u_single_secondary: RelaxedR1csInstance::dummy(1),
@@ -85,11 +95,30 @@ where
             u_range_secondary: RelaxedR1csInstance::dummy(1),
             w_range_secondary: RelaxedR1csWitness::dummy(1, 1),
             f: PhantomData::default(),
-        }
+        };
+        let proof = RecursiveProof {
+            i: 0,
+            z0_primary: ivc.z0_primary.clone(),
+            z0_secondary: ivc.z0_secondary.clone(),
+            zi_primary: ivc.z0_primary.clone(),
+            zi_secondary: ivc.z0_secondary.clone(),
+            instances: (
+                (
+                    ivc.u_single_secondary.clone(),
+                    ivc.w_single_secondary.clone(),
+                ),
+                (ivc.u_range_primary.clone(), ivc.w_range_primary.clone()),
+                (ivc.u_range_secondary.clone(), ivc.w_range_secondary.clone()),
+            ),
+            marker: Default::default(),
+        };
+        (ivc, proof)
     }
 
-    pub fn prove_step(&mut self, pp: &PublicParams<E1, E2, FC1, FC2>) {
-        //-> RecursiveProof<E1, E2> {
+    pub fn prove_step(
+        &mut self,
+        pp: &PublicParams<E1, E2, FC1, FC2>,
+    ) -> RecursiveProof<E1, E2, FC1, FC2> {
         if self.i == 0 {
             self.i = 1;
             // return
@@ -105,6 +134,7 @@ where
 
         let mut cs = R1cs::<E1>::default();
         let circuit_primary = AugmentedFCircuit::<E2, FC1> {
+            is_primary: true,
             i: self.i,
             z_0: self.z0_primary.clone(),
             z_i: Some(self.zi_primary.clone()),
@@ -129,7 +159,8 @@ where
             );
 
         let mut cs = R1cs::<E2>::default();
-        let circuit_primary = AugmentedFCircuit::<E1, FC2> {
+        let circuit_secondary = AugmentedFCircuit::<E1, FC2> {
+            is_primary: false,
             i: self.i,
             z_0: self.z0_secondary.clone(),
             z_i: Some(self.zi_secondary.clone()),
@@ -141,7 +172,7 @@ where
             x: E1::Base::zero(),
         };
 
-        circuit_primary.generate(&mut cs); // zi_secondary
+        circuit_secondary.generate(&mut cs); // zi_secondary
 
         // get u_single_next/w_single_next secondary
 
@@ -156,20 +187,25 @@ where
         // self.zi_primary = zi_primary;
         // self.zi_secondary = zi_secondary;
 
-        // // ((Ui+1, Wi+1), (ui+1, wi+1))
-        // let pair = (
-        //     (self.u_range.clone(), self.w_range.clone()),
-        //     (self.u_single.clone(), self.w_single.clone()),
-        // );
-        //
-        // RecursiveProof {
-        //     i: self.i,
-        //     z0: self.z0.clone(),
-        //     zi: self.zi.clone(),
-        //     r1cs: self.r1cs.clone(),
-        //     pair,
-        //     marker: Default::default(),
-        // }
+        RecursiveProof {
+            i: 0,
+            z0_primary: self.z0_primary.clone(),
+            z0_secondary: self.z0_secondary.clone(),
+            zi_primary: self.z0_primary.clone(),
+            zi_secondary: self.z0_secondary.clone(),
+            instances: (
+                (
+                    self.u_single_secondary.clone(),
+                    self.w_single_secondary.clone(),
+                ),
+                (self.u_range_primary.clone(), self.w_range_primary.clone()),
+                (
+                    self.u_range_secondary.clone(),
+                    self.w_range_secondary.clone(),
+                ),
+            ),
+            marker: Default::default(),
+        }
     }
 }
 
@@ -180,8 +216,8 @@ where
     FC1: FunctionCircuit<E1::Scalar>,
     FC2: FunctionCircuit<E2::Scalar>,
 {
-    r1cs_shape_primary: R1csShape<E1>,
-    r1cs_shape_secondary: R1csShape<E2>,
+    pub r1cs_shape_primary: R1csShape<E1>,
+    pub r1cs_shape_secondary: R1csShape<E2>,
     marker: PhantomData<(FC1, FC2)>,
 }
 
@@ -239,30 +275,18 @@ mod tests {
 
         let z0_primary = DenseVectors::new(vec![Fr::from(3)]);
         let z0_secondary = DenseVectors::new(vec![Fq::from(3)]);
-        let mut ivc =
-            Ivc::<Bn254Driver, GrumpkinDriver, ExampleFunction<Fr>, ExampleFunction<Fq>>::new(
-                OsRng,
-                &pp,
-                z0_primary,
-                z0_secondary,
-            );
-        // let proof_0 = RecursiveProof {
-        //     i: 0,
-        //     z0: ivc.z0.clone(),
-        //     zi: ivc.zi.clone(),
-        //     r1cs: ivc.r1cs.clone(),
-        //     pair: (
-        //         (ivc.u_range.clone(), ivc.w_range.clone()),
-        //         (ivc.u_single.clone(), ivc.w_single.clone()),
-        //     ),
-        //     marker: Default::default(),
-        // };
-        //
-        // assert!(proof_0.verify());
+        let (mut ivc, proof_0) = Ivc::<
+            Bn254Driver,
+            GrumpkinDriver,
+            ExampleFunction<Fr>,
+            ExampleFunction<Fq>,
+        >::init(OsRng, &pp, z0_primary, z0_secondary);
+
+        assert!(proof_0.verify(&pp));
 
         for i in 0..2 {
-            ivc.prove_step(&pp);
-            // assert!(proof.verify());
+            let proof = ivc.prove_step(&pp);
+            assert!(proof.verify(&pp));
         }
     }
 }

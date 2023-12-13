@@ -25,6 +25,18 @@ impl<F: PrimeField> FieldAssignment<F> {
         Self(SparseRow::from(wire))
     }
 
+    pub fn inputize<C: CircuitDriver<Scalar = F>>(cs: &mut R1cs<C>, witness: Self) -> Self {
+        let wire = cs.public_wire();
+        let value = witness.inner().evaluate(&cs.x, &cs.w);
+        cs.x.push(value);
+
+        Self(SparseRow::from(wire))
+    }
+
+    pub fn value<C: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<C>) -> F {
+        self.inner().evaluate(&cs.x, &cs.w)
+    }
+
     pub fn constant(constant: &F) -> Self {
         Self(SparseRow(vec![(Wire::ONE, *constant)]))
     }
@@ -161,6 +173,24 @@ impl<F: PrimeField> FieldAssignment<F> {
     ) {
         let mul = FieldAssignment::mul(cs, &(x - y), &FieldAssignment::from(should_enforce));
         FieldAssignment::enforce_eq_constant(cs, &mul, &F::zero());
+    }
+
+    pub fn conditional_select<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
+        x: &Self,
+        y: &Self,
+        condition: &BinaryAssignment,
+    ) -> FieldAssignment<F> {
+        let c = if cs[*condition.inner()] == F::one() {
+            x
+        } else {
+            y
+        };
+
+        let left = FieldAssignment::mul(cs, &(x - y), &FieldAssignment::from(condition));
+
+        FieldAssignment::enforce_eq(cs, &left, &(c - y));
+        c.clone()
     }
 
     pub fn is_eq<C: CircuitDriver<Scalar = F>>(

@@ -1,7 +1,8 @@
 use core::marker::PhantomData;
 
 use crate::gadget::RelaxedR1csInstanceAssignment;
-use zkstd::circuit::prelude::{BinaryAssignment, CircuitDriver, FieldAssignment, R1cs};
+use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
+use zkstd::common::IntGroup;
 
 pub(crate) struct NifsCircuit<C: CircuitDriver> {
     p: PhantomData<C>,
@@ -11,30 +12,44 @@ impl<C: CircuitDriver> NifsCircuit<C> {
     pub(crate) fn verify<CS: CircuitDriver<Scalar = C::Base>>(
         cs: &mut R1cs<CS>,
         r: FieldAssignment<C::Base>,
-        instance1: RelaxedR1csInstanceAssignment<C>,
-        instance2: RelaxedR1csInstanceAssignment<C>,
-        instance3: RelaxedR1csInstanceAssignment<C>,
-    ) -> BinaryAssignment {
-        let r_u = FieldAssignment::mul(cs, &r, &instance2.u);
-        let first_check = FieldAssignment::is_eq(cs, &instance3.u, &(&instance1.u + &r_u));
+        u_single: RelaxedR1csInstanceAssignment<C>,
+        u_range: RelaxedR1csInstanceAssignment<C>,
+        commit_t: PointAssignment<C::Base>,
+    ) -> RelaxedR1csInstanceAssignment<C> {
+        let r2 = FieldAssignment::mul(cs, &r, &r);
+        // W_fold = u.W + r * U.W
+        let r_w = u_range.commit_w.scalar_point(cs, &r);
+        let w_fold = u_range.commit_w.add(&r_w, cs);
 
-        let x = instance1
-            .x
-            .iter()
-            .zip(instance2.x)
-            .map(|(x1, x2)| {
-                let r_x2 = FieldAssignment::mul(cs, &r, &x2);
-                x1 + &r_x2
-            })
-            .collect::<Vec<FieldAssignment<C::Base>>>();
-        let second_check =
-            x.iter()
-                .zip(instance3.x)
-                .fold(BinaryAssignment::witness(cs, 1), |acc, (a, b)| {
-                    let check = FieldAssignment::is_eq(cs, a, &b);
-                    BinaryAssignment::and(cs, &acc, &check)
-                });
-        BinaryAssignment::and(cs, &first_check, &second_check)
+        // E_fold = u.E + r * T + U.E * r^2
+        let r_t = commit_t.scalar_point(cs, &r);
+        let r2_e = u_range.commit_e.scalar_point(cs, &r2);
+        let e_fold = u_range.commit_e.add(&r_t, cs);
+        let e_fold = e_fold.add(&r2_e, cs);
+
+        // u_fold = u.u + r * U.u
+        let r_u = FieldAssignment::mul(cs, &r, &u_range.u);
+        let u_fold = &u_single.u + &r_u;
+        FieldAssignment::enforce_eq_constant(
+            cs,
+            &(&(&u_fold - &u_single.u) - &r),
+            &C::Base::zero(),
+        );
+
+        // Fold x0 + r * U.x0
+        let r_x0 = FieldAssignment::mul(cs, &r, &u_range.x0);
+        let x0_fold = &u_single.x0 + &r_x0;
+
+        // Fold x1 + r * U.x1
+        let r_x1 = FieldAssignment::mul(cs, &r, &u_range.x1);
+        let x1_fold = &u_single.x1 + &r_x1;
+        RelaxedR1csInstanceAssignment {
+            commit_w: w_fold,
+            commit_e: e_fold,
+            u: u_fold,
+            x0: x0_fold,
+            x1: x1_fold,
+        }
     }
 }
 
@@ -45,7 +60,7 @@ mod tests {
     use crate::hash::{MimcRO, MIMC_ROUNDS};
     use crate::prover::tests::example_prover;
     use crate::relaxed_r1cs::{RelaxedR1csInstance, RelaxedR1csWitness};
-    use bn_254::Fq;
+    use zkstd::common::CurveGroup;
     use zkstd::matrix::DenseVectors;
     use zkstd::r1cs::test::example_r1cs;
 
@@ -81,14 +96,14 @@ mod tests {
         let r = FieldAssignment::witness(&mut cs, r.into());
         let instance1 = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance_to_fold);
         let instance2 = RelaxedR1csInstanceAssignment::witness(&mut cs, &running_instance);
-        let instance3 = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance);
-
-        let nifs_check = NifsCircuit::verify(&mut cs, r, instance1, instance2, instance3);
-        FieldAssignment::enforce_eq_constant(
+        let commit_t = PointAssignment::witness(
             &mut cs,
-            &FieldAssignment::from(&nifs_check),
-            &Fq::one(),
+            commit_t.get_x(),
+            commit_t.get_y(),
+            commit_t.is_identity(),
         );
+
+        let instance3 = NifsCircuit::verify(&mut cs, r, instance1, instance2, commit_t);
         assert!(cs.is_sat());
     }
 }

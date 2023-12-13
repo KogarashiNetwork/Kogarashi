@@ -159,6 +159,19 @@ impl<F: PrimeField> PointAssignment<F> {
         res
     }
 
+    pub fn conditional_select<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
+        a: &Self,
+        b: &Self,
+        condition: &BinaryAssignment,
+    ) -> PointAssignment<F> {
+        let x = FieldAssignment::conditional_select(cs, &a.x, &b.x, condition);
+        let y = FieldAssignment::conditional_select(cs, &a.y, &b.y, condition);
+        let z = FieldAssignment::conditional_select(cs, &a.z, &b.z, condition);
+
+        Self { x, y, z }
+    }
+
     pub fn select_identity<C: CircuitDriver<Scalar = F>>(
         &self,
         cs: &mut R1cs<C>,
