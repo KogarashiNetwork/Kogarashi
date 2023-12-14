@@ -121,45 +121,49 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
 mod tests {
     use super::*;
     use crate::driver::{Bn254Driver, GrumpkinDriver};
-    use bn_254::Fq;
+    use bn_254::{Fq, Fr};
     use grumpkin::Affine;
     use rand_core::OsRng;
-    use zkstd::common::Group;
+    use zkstd::common::{BNAffine, Group};
     use zkstd::matrix::DenseVectors;
 
-    // #[test]
-    // fn instance_assignment_hash() {
-    //     let mut cs: R1cs<Bn254Driver> = R1cs::default();
-    //     let instance = RelaxedR1csInstance::<GrumpkinDriver> {
-    //         commit_e: Affine::random(OsRng),
-    //         u: Fq::random(OsRng),
-    //         commit_w: Affine::random(OsRng),
-    //         x: DenseVectors::new(vec![Fq::random(OsRng); 1]),
-    //     };
-    //
-    //     let i = 3;
-    //     let z_0 = DenseVectors::new(vec![Fr::from(3)]);
-    //     let z_i = z_0.clone();
-    //
-    //     let hash = instance.hash::<Bn254Driver>(i, &z_0, &z_i);
-    //
-    //     let i_assignment = FieldAssignment::witness(&mut cs, Fr::from(i as u64));
-    //     let z_0_assignment = z_0
-    //         .iter()
-    //         .map(|x| FieldAssignment::witness(&mut cs, x))
-    //         .collect::<Vec<_>>();
-    //     let z_i_assignment = z_i
-    //         .iter()
-    //         .map(|x| FieldAssignment::witness(&mut cs, x))
-    //         .collect::<Vec<_>>();
-    //     let instance_assignment = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance);
-    //
-    //     let hash_circuit =
-    //         instance_assignment.hash(&mut cs, i_assignment, z_0_assignment, z_i_assignment);
-    //
-    //     FieldAssignment::enforce_eq_constant(&mut cs, &hash_circuit, &hash);
-    //     assert!(cs.is_sat());
-    // }
+    #[test]
+    fn instance_assignment_hash() {
+        let mut cs: R1cs<Bn254Driver> = R1cs::default();
+        let instance = RelaxedR1csInstance::<GrumpkinDriver> {
+            commit_e: Affine::random(OsRng),
+            u: Fq::random(OsRng),
+            commit_w: Affine::random(OsRng),
+            x: DenseVectors::new(vec![Fq::random(OsRng); 2]),
+        };
+
+        let i = 3;
+        let z_0 = DenseVectors::new(vec![Fr::from(3)]);
+        let z_i = z_0.clone();
+
+        let hash = instance.hash::<Bn254Driver>(i, &z_0, &z_i);
+
+        let i_assignment = FieldAssignment::witness(&mut cs, Fr::from(i as u64));
+        let z_0_assignment = z_0
+            .iter()
+            .map(|x| FieldAssignment::witness(&mut cs, x))
+            .collect::<Vec<_>>();
+        let z_i_assignment = z_i
+            .iter()
+            .map(|x| FieldAssignment::witness(&mut cs, x))
+            .collect::<Vec<_>>();
+        let instance_assignment = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance);
+
+        let hash_circuit =
+            instance_assignment.hash(&mut cs, i_assignment, z_0_assignment, z_i_assignment); // E2::Base
+
+        FieldAssignment::enforce_eq_constant(
+            &mut cs,
+            &hash_circuit,
+            &scalar_as_base::<GrumpkinDriver>(hash),
+        );
+        assert!(cs.is_sat());
+    }
 
     #[test]
     fn relaxed_instance_assignment() {
@@ -168,7 +172,7 @@ mod tests {
             commit_e: Affine::random(OsRng),
             u: Fq::random(OsRng),
             commit_w: Affine::random(OsRng),
-            x: DenseVectors::new(vec![Fq::random(OsRng); 1]),
+            x: DenseVectors::new(vec![Fq::random(OsRng); 2]),
         };
 
         let instance_assignment = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance);
@@ -177,21 +181,23 @@ mod tests {
             &instance_assignment.u,
             &scalar_as_base::<GrumpkinDriver>(instance.u),
         );
-        // TODO: Think how to restrict size to 1
         FieldAssignment::enforce_eq_constant(
             &mut cs,
             &instance_assignment.x0,
             &scalar_as_base::<GrumpkinDriver>(instance.x[0]),
         );
+        FieldAssignment::enforce_eq_constant(
+            &mut cs,
+            &instance_assignment.x1,
+            &scalar_as_base::<GrumpkinDriver>(instance.x[1]),
+        );
 
-        // Research about curve cycles
-
-        // instance_assignment
-        //     .commit_e
-        //     .assert_equal_public_point(&mut cs, &instance.commit_e);
-        // instance_assignment
-        //     .commit_w
-        //     .assert_equal_public_point(&mut cs, &instance.commit_w);
+        instance_assignment
+            .commit_e
+            .assert_equal_public_point(&mut cs, instance.commit_e.to_extended());
+        instance_assignment
+            .commit_w
+            .assert_equal_public_point(&mut cs, instance.commit_w.to_extended());
 
         assert!(cs.is_sat());
     }

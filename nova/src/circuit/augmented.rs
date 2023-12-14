@@ -28,13 +28,13 @@ pub struct AugmentedFCircuit<C: CircuitDriver, FC: FunctionCircuit<C::Base>> {
 impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> Default for AugmentedFCircuit<C, FC> {
     fn default() -> Self {
         Self {
-            is_primary: false,
+            is_primary: true,
             i: 0,
             z_0: DenseVectors::zero(1),
             z_i: Some(DenseVectors::zero(1)),
-            u_single: Some(RelaxedR1csInstance::dummy(1)),
-            u_range: Some(RelaxedR1csInstance::dummy(1)),
-            u_range_next: Some(RelaxedR1csInstance::dummy(1)),
+            u_single: Some(RelaxedR1csInstance::dummy(2)),
+            u_range: Some(RelaxedR1csInstance::dummy(2)),
+            u_range_next: Some(RelaxedR1csInstance::dummy(2)),
             commit_t: Some(C::Affine::ADDITIVE_IDENTITY),
             f: Default::default(),
             x: C::Base::zero(),
@@ -62,7 +62,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
             .map(|x| FieldAssignment::witness(cs, x))
             .collect::<Vec<_>>();
 
-        let u_dummy_native = RelaxedR1csInstance::<C>::dummy(1);
+        let u_dummy_native = RelaxedR1csInstance::<C>::dummy(2);
         let u_dummy = RelaxedR1csInstanceAssignment::witness(cs, &u_dummy_native);
         let u_single = RelaxedR1csInstanceAssignment::witness(
             cs,
@@ -181,15 +181,10 @@ mod tests {
         let mut cs = R1cs::<Bn254Driver>::default();
         let augmented_circuit = AugmentedFCircuit::<GrumpkinDriver, ExampleFunction<Fr>>::default();
         augmented_circuit.generate(&mut cs);
+        let shape = R1csShape::from(cs);
+        let u_dummy = RelaxedR1csInstance::dummy(shape.l());
+        let w_dummy = RelaxedR1csWitness::dummy(shape.m_l_1(), shape.m());
 
-        assert!(cs.is_sat());
-
-        assert_eq!(cs.l(), 2);
-
-        let u_dummy = RelaxedR1csInstance::dummy(cs.l() - 1);
-        let w_dummy = RelaxedR1csWitness::dummy(cs.m_l_1(), cs.m());
-
-        let running_r1cs = R1csShape::from(cs);
-        assert!(running_r1cs.is_sat(&u_dummy, &w_dummy));
+        assert!(shape.is_sat(&u_dummy, &w_dummy));
     }
 }

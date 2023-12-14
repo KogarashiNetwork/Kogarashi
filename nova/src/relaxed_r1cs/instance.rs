@@ -22,7 +22,7 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
             commit_w: C::Affine::ADDITIVE_IDENTITY,
             commit_e: C::Affine::ADDITIVE_IDENTITY,
             u: C::Scalar::one(),
-            x: DenseVectors::new(x.get()[1..].to_vec()),
+            x,
         }
     }
 

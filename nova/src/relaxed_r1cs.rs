@@ -18,12 +18,24 @@ pub struct R1csShape<C: CircuitDriver> {
     c: SparseMatrix<C::Scalar>,
 }
 
+pub(crate) fn r1cs_instance_and_witness<C: CircuitDriver>(
+    cs: &R1cs<C>,
+    shape: &R1csShape<C>,
+) -> (Vec<C::Scalar>, Vec<C::Scalar>) {
+    assert_eq!(cs.m_l_1(), shape.m_l_1());
+    let w = cs.w();
+    let x = cs.x()[1..].to_vec();
+    assert_eq!(x.len(), shape.l());
+
+    (x, w)
+}
+
 impl<C: CircuitDriver> From<R1cs<C>> for R1csShape<C> {
     fn from(value: R1cs<C>) -> Self {
         let (a, b, c) = value.matrices();
         Self {
             m: value.m(),
-            instance_length: value.l(),
+            instance_length: value.l() - 1,
             witness_length: value.m_l_1(),
             a,
             b,
@@ -95,7 +107,7 @@ impl<C: CircuitDriver> R1csShape<C> {
 
 #[cfg(test)]
 mod tests {
-    use super::{R1csShape, RelaxedR1csInstance, RelaxedR1csWitness};
+    use super::{r1cs_instance_and_witness, R1csShape, RelaxedR1csInstance, RelaxedR1csWitness};
 
     use crate::driver::GrumpkinDriver;
     use zkstd::circuit::prelude::R1cs;
@@ -106,10 +118,11 @@ mod tests {
     fn relaxed_r1cs_test() {
         for i in 1..10 {
             let r1cs: R1cs<GrumpkinDriver> = example_r1cs(i);
-            let instance = RelaxedR1csInstance::new(DenseVectors::new(r1cs.x()));
-            let witness = RelaxedR1csWitness::new(DenseVectors::new(r1cs.w()), r1cs.m());
-            let relaxed_r1cs = R1csShape::from(r1cs);
-            assert!(relaxed_r1cs.is_sat(&instance, &witness))
+            let shape = R1csShape::from(r1cs.clone());
+            let (x, w) = r1cs_instance_and_witness(&r1cs, &shape);
+            let instance = RelaxedR1csInstance::new(DenseVectors::new(x));
+            let witness = RelaxedR1csWitness::new(DenseVectors::new(w), shape.m());
+            assert!(shape.is_sat(&instance, &witness))
         }
     }
 }

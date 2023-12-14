@@ -105,7 +105,9 @@ pub(crate) mod tests {
 
     use crate::driver::GrumpkinDriver;
     use crate::hash::{MimcRO, MIMC_ROUNDS};
-    use crate::relaxed_r1cs::{R1csShape, RelaxedR1csInstance, RelaxedR1csWitness};
+    use crate::relaxed_r1cs::{
+        r1cs_instance_and_witness, R1csShape, RelaxedR1csInstance, RelaxedR1csWitness,
+    };
     use crate::Verifier;
     use zkstd::common::OsRng;
     use zkstd::matrix::DenseVectors;
@@ -122,12 +124,15 @@ pub(crate) mod tests {
 
         let mut transcript = MimcRO::<MIMC_ROUNDS, GrumpkinDriver>::default();
         let r1cs_1 = example_r1cs::<GrumpkinDriver>(4);
+        let shape = R1csShape::from(r1cs_1.clone());
         let r1cs_2 = example_r1cs::<GrumpkinDriver>(3);
 
-        let instance1 = RelaxedR1csInstance::new(DenseVectors::new(r1cs_1.x()));
-        let witness1 = RelaxedR1csWitness::new(DenseVectors::new(r1cs_1.w()), r1cs_1.m());
-        let instance2 = RelaxedR1csInstance::new(DenseVectors::new(r1cs_2.x()));
-        let witness2 = RelaxedR1csWitness::new(DenseVectors::new(r1cs_2.w()), r1cs_2.m());
+        let (x1, w1) = r1cs_instance_and_witness(&r1cs_1, &shape);
+        let instance1 = RelaxedR1csInstance::new(DenseVectors::new(x1));
+        let witness1 = RelaxedR1csWitness::new(DenseVectors::new(w1), shape.m());
+        let (x2, w2) = r1cs_instance_and_witness(&r1cs_2, &shape);
+        let instance2 = RelaxedR1csInstance::new(DenseVectors::new(x2));
+        let witness2 = RelaxedR1csWitness::new(DenseVectors::new(w2), shape.m());
 
         let (folded_instance, folded_witness, commit_t) =
             prover.prove(&instance1, &witness1, &instance2, &witness2);
@@ -160,10 +165,9 @@ pub(crate) mod tests {
         assert_eq!(z3, z3_aux);
 
         // check that relations hold for the 2 inputted instances and the folded one
-        let r1cs = R1csShape::from(r1cs_1);
-        assert!(r1cs.is_sat(&instance1, &witness1));
-        assert!(r1cs.is_sat(&instance2, &witness2));
-        assert!(r1cs.is_sat(&folded_instance, &folded_witness));
+        assert!(shape.is_sat(&instance1, &witness1));
+        assert!(shape.is_sat(&instance2, &witness2));
+        assert!(shape.is_sat(&folded_instance, &folded_witness));
 
         // next equalities should hold since we started from two cmE of zero-vector E's
         assert_eq!(verified_instance.commit_e, (commit_t * r).into());
