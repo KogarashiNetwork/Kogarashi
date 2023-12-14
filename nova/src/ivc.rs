@@ -8,6 +8,7 @@ use crate::relaxed_r1cs::{
     r1cs_instance_and_witness, R1csShape, RelaxedR1csInstance, RelaxedR1csWitness,
 };
 use zkstd::circuit::prelude::{CircuitDriver, R1cs};
+use zkstd::common::IntGroup;
 use zkstd::matrix::DenseVectors;
 
 pub struct Ivc<E1, E2, FC1, FC2>
@@ -73,7 +74,7 @@ where
             RelaxedR1csWitness::new(DenseVectors::new(w), pp.r1cs_shape_primary.m()),
         );
 
-        let prover_primary = Prover::new(R1csShape::from(cs_primary.clone()), rng);
+        let prover_primary = Prover::new(pp.r1cs_shape_primary.clone(), rng);
 
         let mut cs_secondary = R1cs::<E2>::default();
         let circuit_secondary = AugmentedFCircuit::<E1, FC2> {
@@ -95,7 +96,7 @@ where
             RelaxedR1csWitness::new(DenseVectors::new(w), pp.r1cs_shape_secondary.m()),
         );
 
-        let prover_secondary = Prover::new(R1csShape::from(cs_secondary.clone()), rng);
+        let prover_secondary = Prover::new(pp.r1cs_shape_secondary.clone(), rng);
 
         let u_dummy = RelaxedR1csInstance::<E2>::dummy(pp.r1cs_shape_secondary.l());
         let w_dummy = RelaxedR1csWitness::<E2>::dummy(
@@ -166,7 +167,7 @@ where
                 &self.w_single_secondary,
             );
 
-        let mut cs = R1cs::<E1>::default();
+        let mut cs_primary = R1cs::<E1>::default();
         let circuit_primary = AugmentedFCircuit::<E2, FC1> {
             is_primary: true,
             i: self.i,
@@ -178,44 +179,62 @@ where
             f: Default::default(),
         };
 
-        circuit_primary.generate(&mut cs); // zi_primary
+        let zi_primary = circuit_primary.generate(&mut cs_primary);
 
-        // get u_single_next/w_single_next primary
+        let (x, w) = r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary);
+        let (u_single_next_primary, w_single_next_primary) = (
+            RelaxedR1csInstance::new(DenseVectors::new(x)),
+            RelaxedR1csWitness::new(DenseVectors::new(w), pp.r1cs_shape_primary.m()),
+        );
 
         let (u_range_next_primary, w_range_next_primary, commit_t_primary) =
             self.prover_primary.prove(
                 &self.u_range_primary,
                 &self.w_range_primary,
-                &self.u_range_primary, // u_single_next_primary
-                &self.w_range_primary, // w_single_next_primary
+                &u_single_next_primary, // u_single_next_primary
+                &w_single_next_primary, // w_single_next_primary
             );
 
-        let mut cs = R1cs::<E2>::default();
+        let mut cs_secondary = R1cs::<E2>::default();
         let circuit_secondary = AugmentedFCircuit::<E1, FC2> {
             is_primary: false,
             i: self.i,
             z_0: self.z0_secondary.clone(),
             z_i: Some(self.zi_secondary.clone()),
-            u_single: Some(self.u_range_primary.clone()), // u_single_next_primary
+            u_single: Some(u_single_next_primary),
             u_range: Some(self.u_range_primary.clone()),
             commit_t: Some(commit_t_primary),
             f: Default::default(),
         };
 
-        circuit_secondary.generate(&mut cs); // zi_secondary
+        let zi_secondary = circuit_secondary.generate(&mut cs_secondary);
 
-        // get u_single_next/w_single_next secondary
+        let (x, w) = r1cs_instance_and_witness(&cs_secondary, &pp.r1cs_shape_secondary);
+        let (u_single_next_secondary, w_single_next_secondary) = (
+            RelaxedR1csInstance::new(DenseVectors::new(x)),
+            RelaxedR1csWitness::new(DenseVectors::new(w), pp.r1cs_shape_secondary.m()),
+        );
 
         // update values
+        self.i += 1;
         self.u_range_primary = u_range_next_primary;
         self.w_range_primary = w_range_next_primary;
         self.u_range_secondary = u_range_next_secondary;
         self.w_range_secondary = w_range_next_secondary;
-        // self.u_single_secondary = u_single_next_secondary;
-        // self.w_single_secondary = w_single_next_secondary;
-        self.i += 1;
-        // self.zi_primary = zi_primary;
-        // self.zi_secondary = zi_secondary;
+        self.u_single_secondary = u_single_next_secondary;
+        self.w_single_secondary = w_single_next_secondary;
+        self.zi_primary = DenseVectors::new(
+            zi_primary
+                .into_iter()
+                .map(|x| x.value(&mut cs_primary))
+                .collect(),
+        );
+        self.zi_secondary = DenseVectors::new(
+            zi_secondary
+                .into_iter()
+                .map(|x| x.value(&mut cs_secondary))
+                .collect(),
+        );
 
         RecursiveProof {
             i: self.i,
@@ -260,13 +279,31 @@ where
 {
     pub fn setup() -> Self {
         // Initialize shape for the primary
-        let circuit_primary = AugmentedFCircuit::<E2, FC1>::default();
+        let circuit_primary = AugmentedFCircuit::<E2, FC1> {
+            is_primary: true,
+            i: 0,
+            z_0: DenseVectors::new(vec![E2::Base::zero(); 1]),
+            z_i: None,
+            u_single: None,
+            u_range: None,
+            commit_t: None,
+            f: Default::default(),
+        };
         let mut cs = R1cs::<E1>::default();
         circuit_primary.generate(&mut cs);
         let r1cs_shape_primary = R1csShape::from(cs);
 
         // Initialize shape for the secondary
-        let circuit_secondary = AugmentedFCircuit::<E1, FC2>::default();
+        let circuit_secondary = AugmentedFCircuit::<E1, FC2> {
+            is_primary: false,
+            i: 0,
+            z_0: DenseVectors::new(vec![E1::Base::zero(); 1]),
+            z_i: None,
+            u_single: None,
+            u_range: None,
+            commit_t: None,
+            f: Default::default(),
+        };
         let mut cs = R1cs::<E2>::default();
         circuit_secondary.generate(&mut cs);
         let r1cs_shape_secondary = R1csShape::from(cs);
@@ -313,7 +350,7 @@ mod tests {
                 z0_secondary,
             );
 
-        for i in 0..1 {
+        for i in 0..2 {
             let proof = ivc.prove_step(&pp);
             assert!(proof.verify(&pp));
         }

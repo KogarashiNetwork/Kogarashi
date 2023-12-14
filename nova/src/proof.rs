@@ -59,12 +59,17 @@ where
             )
         };
 
+        dbg!(hash_primary);
+        dbg!(hash_secondary);
+
         if hash_primary != u_single_secondary.x[0]
             || hash_secondary != scalar_as_base::<E2>(u_single_secondary.x[1])
         {
             println!("Hash doesn't match");
             return false;
         }
+
+        println!("r_U_primary = {:#?}", u_range_primary);
 
         dbg!(pp
             .r1cs_shape_primary

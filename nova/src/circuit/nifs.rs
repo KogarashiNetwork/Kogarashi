@@ -32,7 +32,7 @@ impl<C: CircuitDriver> NifsCircuit<C> {
         let u_fold = &u_single.u + &r_u;
         FieldAssignment::enforce_eq_constant(
             cs,
-            &(&(&u_fold - &u_single.u) - &r),
+            &(&(&u_fold - &u_single.u) - &r_u),
             &C::Base::zero(),
         );
 
