@@ -19,10 +19,8 @@ pub struct AugmentedFCircuit<C: CircuitDriver, FC: FunctionCircuit<C::Base>> {
     pub z_i: Option<DenseVectors<C::Base>>,
     pub u_single: Option<RelaxedR1csInstance<C>>,
     pub u_range: Option<RelaxedR1csInstance<C>>,
-    pub u_range_next: Option<RelaxedR1csInstance<C>>, // Remove
     pub commit_t: Option<C::Affine>,
     pub f: PhantomData<FC>,
-    pub x: C::Base, // Remove
 }
 
 impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> Default for AugmentedFCircuit<C, FC> {
@@ -34,10 +32,8 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> Default for AugmentedFCircu
             z_i: Some(DenseVectors::zero(1)),
             u_single: Some(RelaxedR1csInstance::dummy(2)),
             u_range: Some(RelaxedR1csInstance::dummy(2)),
-            u_range_next: Some(RelaxedR1csInstance::dummy(2)),
             commit_t: Some(C::Affine::ADDITIVE_IDENTITY),
             f: Default::default(),
-            x: C::Base::zero(),
         }
     }
 }
@@ -94,7 +90,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
         let not_base_case = FieldAssignment::is_neq(cs, &i, &zero);
 
         // base case
-        let u_single_next_base = if self.is_primary {
+        let u_range_next_base = if self.is_primary {
             u_dummy
         } else {
             u_single.clone()
@@ -132,27 +128,40 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
 
         // (3) Generate Ui+1 ← NIFS.V(vk, U, u, T)
         let r = Self::get_challenge(cs, &u_range, commit_t.clone());
-        let u_single_next_non_base =
+        let u_range_next_non_base =
             NifsCircuit::verify(cs, r, u_single.clone(), u_range.clone(), commit_t);
 
-        let u_single_next = RelaxedR1csInstanceAssignment::conditional_select(
+        let u_range_next = RelaxedR1csInstanceAssignment::conditional_select(
             cs,
-            &u_single_next_base,
-            &u_single_next_non_base,
+            &u_range_next_base,
+            &u_range_next_non_base,
             &base_case,
         );
 
         let z_next = FC::invoke_cs(cs, z_i);
 
-        let u_next_x = u_single_next.hash(
+        // println!(
+        //     "Hash(\n{:?}\n{:?}\n{:?}\n)",
+        //     (&i + &FieldAssignment::constant(&C::Base::one())).value(cs),
+        //     z_0.iter().map(|x| x.value(cs)).collect::<Vec<_>>(),
+        //     z_next.iter().map(|x| x.value(cs)).collect::<Vec<_>>()
+        // );
+        // println!(
+        //     "U = (\n{:?}\n{:?}\n{:?}\n)",
+        //     u_range_next.u.value(cs),
+        //     u_range_next.x0.value(cs),
+        //     u_range_next.x1.value(cs)
+        // );
+        let u_next_x = u_range_next.hash(
             cs,
             &i + &FieldAssignment::constant(&C::Base::one()),
             z_0,
             z_next.clone(),
         );
 
-        let x1 = FieldAssignment::inputize(cs, u_single.x1);
-        let u_next_x = FieldAssignment::inputize(cs, u_next_x);
+        let x0 = FieldAssignment::inputize(cs, u_single.x1);
+        let x1 = FieldAssignment::inputize(cs, u_next_x);
+
         z_next
     }
 

@@ -44,24 +44,37 @@ where
             (u_range_primary, w_range_primary),
             (u_range_secondary, w_range_secondary),
         ) = self.instances.clone();
+
         if u_single_secondary.x.len() != 2
             || u_range_primary.x.len() != 2
             || u_range_secondary.x.len() != 2
         {
+            println!("Length doesn't match");
             return false;
         }
         let (hash_primary, hash_secondary) = {
             (
                 u_range_secondary.hash::<E1>(self.i, &self.z0_primary, &self.zi_primary),
-                u_range_primary.hash::<E2>(self.i, &self.zi_secondary, &self.zi_secondary),
+                u_range_primary.hash::<E2>(self.i, &self.z0_secondary, &self.zi_secondary),
             )
         };
 
         if hash_primary != u_single_secondary.x[0]
             || hash_secondary != scalar_as_base::<E2>(u_single_secondary.x[1])
         {
+            println!("Hash doesn't match");
             return false;
         }
+
+        dbg!(pp
+            .r1cs_shape_primary
+            .is_sat(&u_range_primary, &w_range_primary));
+        dbg!(pp
+            .r1cs_shape_secondary
+            .is_sat(&u_range_secondary, &w_range_secondary));
+        dbg!(pp
+            .r1cs_shape_secondary
+            .is_sat(&u_single_secondary, &w_single_secondary));
 
         pp.r1cs_shape_primary
             .is_sat(&u_range_primary, &w_range_primary)

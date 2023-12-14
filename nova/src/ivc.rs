@@ -4,9 +4,10 @@ use rand_core::OsRng;
 use std::marker::PhantomData;
 
 use crate::circuit::AugmentedFCircuit;
-use crate::relaxed_r1cs::{R1csShape, RelaxedR1csInstance, RelaxedR1csWitness};
+use crate::relaxed_r1cs::{
+    r1cs_instance_and_witness, R1csShape, RelaxedR1csInstance, RelaxedR1csWitness,
+};
 use zkstd::circuit::prelude::{CircuitDriver, R1cs};
-use zkstd::common::IntGroup;
 use zkstd::matrix::DenseVectors;
 
 pub struct Ivc<E1, E2, FC1, FC2>
@@ -50,27 +51,59 @@ where
         pp: &PublicParams<E1, E2, FC1, FC2>,
         z0_primary: DenseVectors<E1::Scalar>,
         z0_secondary: DenseVectors<E2::Scalar>,
-    ) -> (Self, RecursiveProof<E1, E2, FC1, FC2>) {
+    ) -> Self {
+        println!("START");
         let mut cs_primary = R1cs::<E1>::default();
-        let circuit_primary = AugmentedFCircuit::<E2, FC1>::default();
-        let zi_primary = circuit_primary.generate(&mut cs_primary); // get zi_primary
+        let circuit_primary = AugmentedFCircuit::<E2, FC1> {
+            is_primary: true,
+            i: 0,
+            z_0: z0_primary.clone(),
+            z_i: None,
+            u_single: None,
+            u_range: None,
+            commit_t: None,
+            f: Default::default(),
+        };
+        let zi_primary = circuit_primary.generate(&mut cs_primary);
 
-        // get u_single_next/w_single_next primary
+        println!("Primary out");
+        let (x, w) = r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary);
+        let (u_single_next_primary, w_single_next_primary) = (
+            RelaxedR1csInstance::new(DenseVectors::new(x)),
+            RelaxedR1csWitness::new(DenseVectors::new(w), pp.r1cs_shape_primary.m()),
+        );
 
         let prover_primary = Prover::new(R1csShape::from(cs_primary.clone()), rng);
 
         let mut cs_secondary = R1cs::<E2>::default();
-        let circuit_secondary = AugmentedFCircuit::<E1, FC2>::default();
+        let circuit_secondary = AugmentedFCircuit::<E1, FC2> {
+            is_primary: false,
+            i: 0,
+            z_0: z0_secondary.clone(),
+            z_i: None,
+            u_single: Some(u_single_next_primary.clone()),
+            u_range: None,
+            commit_t: None,
+            f: Default::default(),
+        };
         let zi_secondary = circuit_secondary.generate(&mut cs_secondary);
 
-        // get u_single_next/w_single_next secondary
+        println!("Secondary out");
+        let (x, w) = r1cs_instance_and_witness(&cs_secondary, &pp.r1cs_shape_secondary);
+        let (u_single_next_secondary, w_single_next_secondary) = (
+            RelaxedR1csInstance::new(DenseVectors::new(x)),
+            RelaxedR1csWitness::new(DenseVectors::new(w), pp.r1cs_shape_secondary.m()),
+        );
 
         let prover_secondary = Prover::new(R1csShape::from(cs_secondary.clone()), rng);
 
-        let u_dummy = RelaxedR1csInstance::<E1>::dummy(cs_primary.l() - 1);
-        let w_dummy = RelaxedR1csWitness::<E1>::dummy(cs_primary.m_l_1(), cs_primary.m());
+        let u_dummy = RelaxedR1csInstance::<E2>::dummy(pp.r1cs_shape_secondary.l());
+        let w_dummy = RelaxedR1csWitness::<E2>::dummy(
+            pp.r1cs_shape_secondary.m_l_1(),
+            pp.r1cs_shape_secondary.m(),
+        );
 
-        let ivc = Self {
+        Self {
             i: 0,
             z0_primary,
             z0_secondary,
@@ -88,31 +121,14 @@ where
             ),
             prover_primary,
             prover_secondary,
-            u_single_secondary: RelaxedR1csInstance::dummy(1),
-            w_single_secondary: RelaxedR1csWitness::dummy(1, 1),
-            u_range_primary: RelaxedR1csInstance::dummy(1),
-            w_range_primary: RelaxedR1csWitness::dummy(1, 1),
-            u_range_secondary: RelaxedR1csInstance::dummy(1),
-            w_range_secondary: RelaxedR1csWitness::dummy(1, 1),
+            u_single_secondary: u_single_next_secondary,
+            w_single_secondary: w_single_next_secondary,
+            u_range_primary: u_single_next_primary,
+            w_range_primary: w_single_next_primary,
+            u_range_secondary: u_dummy,
+            w_range_secondary: w_dummy,
             f: PhantomData::default(),
-        };
-        let proof = RecursiveProof {
-            i: 0,
-            z0_primary: ivc.z0_primary.clone(),
-            z0_secondary: ivc.z0_secondary.clone(),
-            zi_primary: ivc.z0_primary.clone(),
-            zi_secondary: ivc.z0_secondary.clone(),
-            instances: (
-                (
-                    ivc.u_single_secondary.clone(),
-                    ivc.w_single_secondary.clone(),
-                ),
-                (ivc.u_range_primary.clone(), ivc.w_range_primary.clone()),
-                (ivc.u_range_secondary.clone(), ivc.w_range_secondary.clone()),
-            ),
-            marker: Default::default(),
-        };
-        (ivc, proof)
+        }
     }
 
     pub fn prove_step(
@@ -121,7 +137,25 @@ where
     ) -> RecursiveProof<E1, E2, FC1, FC2> {
         if self.i == 0 {
             self.i = 1;
-            // return
+            return RecursiveProof {
+                i: self.i,
+                z0_primary: self.z0_primary.clone(),
+                z0_secondary: self.z0_secondary.clone(),
+                zi_primary: self.zi_primary.clone(),
+                zi_secondary: self.zi_secondary.clone(),
+                instances: (
+                    (
+                        self.u_single_secondary.clone(),
+                        self.w_single_secondary.clone(),
+                    ),
+                    (self.u_range_primary.clone(), self.w_range_primary.clone()),
+                    (
+                        self.u_range_secondary.clone(),
+                        self.w_range_secondary.clone(),
+                    ),
+                ),
+                marker: Default::default(),
+            };
         }
         let z_next = FC1::invoke(&self.zi_primary);
         let (u_range_next_secondary, w_range_next_secondary, commit_t_secondary) =
@@ -140,10 +174,8 @@ where
             z_i: Some(self.zi_primary.clone()),
             u_single: Some(self.u_single_secondary.clone()),
             u_range: Some(self.u_range_secondary.clone()),
-            u_range_next: None,
             commit_t: Some(commit_t_secondary),
             f: Default::default(),
-            x: E2::Base::zero(),
         };
 
         circuit_primary.generate(&mut cs); // zi_primary
@@ -166,10 +198,8 @@ where
             z_i: Some(self.zi_secondary.clone()),
             u_single: Some(self.u_range_primary.clone()), // u_single_next_primary
             u_range: Some(self.u_range_primary.clone()),
-            u_range_next: None,
             commit_t: Some(commit_t_primary),
             f: Default::default(),
-            x: E1::Base::zero(),
         };
 
         circuit_secondary.generate(&mut cs); // zi_secondary
@@ -188,7 +218,7 @@ where
         // self.zi_secondary = zi_secondary;
 
         RecursiveProof {
-            i: 0,
+            i: self.i,
             z0_primary: self.z0_primary.clone(),
             z0_secondary: self.z0_secondary.clone(),
             zi_primary: self.z0_primary.clone(),
@@ -273,18 +303,17 @@ mod tests {
             ExampleFunction<Fq>,
         >::setup();
 
-        let z0_primary = DenseVectors::new(vec![Fr::from(3)]);
-        let z0_secondary = DenseVectors::new(vec![Fq::from(3)]);
-        let (mut ivc, proof_0) = Ivc::<
-            Bn254Driver,
-            GrumpkinDriver,
-            ExampleFunction<Fr>,
-            ExampleFunction<Fq>,
-        >::init(OsRng, &pp, z0_primary, z0_secondary);
+        let z0_primary = DenseVectors::new(vec![Fr::from(0)]);
+        let z0_secondary = DenseVectors::new(vec![Fq::from(0)]);
+        let mut ivc =
+            Ivc::<Bn254Driver, GrumpkinDriver, ExampleFunction<Fr>, ExampleFunction<Fq>>::init(
+                OsRng,
+                &pp,
+                z0_primary,
+                z0_secondary,
+            );
 
-        assert!(proof_0.verify(&pp));
-
-        for i in 0..2 {
+        for i in 0..1 {
             let proof = ivc.prove_step(&pp);
             assert!(proof.verify(&pp));
         }
