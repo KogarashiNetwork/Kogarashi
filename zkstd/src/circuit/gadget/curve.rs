@@ -34,7 +34,7 @@ impl<F: PrimeField> PointAssignment<F> {
     pub fn identity() -> Self {
         let x = FieldAssignment::constant(&F::zero());
         let y = FieldAssignment::constant(&F::one());
-        let z = FieldAssignment::constant(&F::one());
+        let z = FieldAssignment::constant(&F::zero());
 
         Self { x, y, z }
     }

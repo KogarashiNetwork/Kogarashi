@@ -40,32 +40,36 @@ where
 {
     pub fn verify(&self, pp: &PublicParams<E1, E2, FC1, FC2>) -> bool {
         let (
-            (l_u_secondary, l_w_secondary),
-            (r_U_primary, r_W_primary),
-            (r_U_secondary, r_W_secondary),
+            (u_single_secondary, w_single_secondary),
+            (u_range_primary, w_range_primary),
+            (u_range_secondary, w_range_secondary),
         ) = self.instances.clone();
-        if l_u_secondary.x.len() != 2 || r_U_primary.x.len() != 2 || r_U_secondary.x.len() != 2 {
+        if u_single_secondary.x.len() != 2
+            || u_range_primary.x.len() != 2
+            || u_range_secondary.x.len() != 2
+        {
             return false;
         }
         let (hash_primary, hash_secondary) = {
             (
-                r_U_secondary.hash::<E1>(self.i, &self.z0_primary, &self.zi_primary),
-                r_U_primary.hash::<E2>(self.i, &self.zi_secondary, &self.zi_secondary),
+                u_range_secondary.hash::<E1>(self.i, &self.z0_primary, &self.zi_primary),
+                u_range_primary.hash::<E2>(self.i, &self.zi_secondary, &self.zi_secondary),
             )
         };
 
-        if hash_primary != l_u_secondary.x[0]
-            || hash_secondary != scalar_as_base::<E2>(l_u_secondary.x[1])
+        if hash_primary != u_single_secondary.x[0]
+            || hash_secondary != scalar_as_base::<E2>(u_single_secondary.x[1])
         {
             return false;
         }
 
-        pp.r1cs_shape_primary.is_sat(&r_U_primary, &r_W_primary)
+        pp.r1cs_shape_primary
+            .is_sat(&u_range_primary, &w_range_primary)
             && pp
                 .r1cs_shape_secondary
-                .is_sat(&r_U_secondary, &r_W_secondary)
+                .is_sat(&u_range_secondary, &w_range_secondary)
             && pp
                 .r1cs_shape_secondary
-                .is_sat(&l_u_secondary, &l_w_secondary)
+                .is_sat(&u_single_secondary, &w_single_secondary)
     }
 }

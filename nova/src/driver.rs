@@ -239,11 +239,10 @@ mod grumpkin_gadget_tests {
     fn curve_scalar_mul_test() {
         for _ in 0..100 {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            // Base == GrumpkingScalar
             let x = Scalar::random(OsRng);
             let p = G1Affine::random(OsRng);
 
-            let x_assignment = FieldAssignment::instance(&mut cs, x); // Fr
+            let x_assignment = FieldAssignment::instance(&mut cs, x);
             let p_assignment = PointAssignment::instance(&mut cs, p);
             let expected = p * Base::from(x);
 

@@ -33,7 +33,7 @@ impl<F: PrimeField> FieldAssignment<F> {
         Self(SparseRow::from(wire))
     }
 
-    pub fn value<C: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<C>) -> F {
+    pub fn value<C: CircuitDriver<Scalar = F>>(&self, cs: &R1cs<C>) -> F {
         self.inner().evaluate(&cs.x, &cs.w)
     }
 
