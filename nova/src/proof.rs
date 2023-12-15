@@ -53,6 +53,14 @@ where
             return false;
         }
         let (hash_primary, hash_secondary) = {
+            dbg!(self.i);
+            dbg!(&self.z0_primary);
+            dbg!(&self.zi_primary);
+            dbg!(&u_range_secondary);
+            dbg!(self.i);
+            dbg!(&self.z0_secondary);
+            dbg!(&self.zi_secondary);
+            dbg!(&u_range_primary);
             (
                 u_range_secondary.hash::<E1>(self.i, &self.z0_primary, &self.zi_primary),
                 u_range_primary.hash::<E2>(self.i, &self.z0_secondary, &self.zi_secondary),
@@ -68,8 +76,6 @@ where
             println!("Hash doesn't match");
             return false;
         }
-
-        println!("r_U_primary = {:#?}", u_range_primary);
 
         dbg!(pp
             .r1cs_shape_primary

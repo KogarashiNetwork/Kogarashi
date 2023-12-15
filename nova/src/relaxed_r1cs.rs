@@ -1,6 +1,9 @@
 mod instance;
 mod witness;
 
+use crate::relaxed_r1cs::instance::R1csInstance;
+use crate::relaxed_r1cs::witness::R1csWitness;
+use crate::PedersenCommitment;
 pub(crate) use instance::RelaxedR1csInstance;
 pub(crate) use witness::RelaxedR1csWitness;
 use zkstd::circuit::prelude::{CircuitDriver, R1cs};
@@ -21,14 +24,19 @@ pub struct R1csShape<C: CircuitDriver> {
 pub(crate) fn r1cs_instance_and_witness<C: CircuitDriver>(
     cs: &R1cs<C>,
     shape: &R1csShape<C>,
-) -> (Vec<C::Scalar>, Vec<C::Scalar>) {
+    ck: &PedersenCommitment<C::Affine>,
+) -> (R1csInstance<C>, R1csWitness<C>) {
     println!("Cs.x = {:?}", cs.x());
     assert_eq!(cs.m_l_1(), shape.m_l_1());
     let w = cs.w();
     let x = cs.x()[1..].to_vec();
     assert_eq!(x.len(), shape.l());
 
-    (x, w)
+    let witness = R1csWitness::new(shape, w);
+    let commit_w = witness.commit(ck);
+    let instance = R1csInstance::new(shape, commit_w, x);
+
+    (instance, witness)
 }
 
 impl<C: CircuitDriver> From<R1cs<C>> for R1csShape<C> {
@@ -110,7 +118,11 @@ impl<C: CircuitDriver> R1csShape<C> {
 mod tests {
     use super::{r1cs_instance_and_witness, R1csShape, RelaxedR1csInstance, RelaxedR1csWitness};
 
+    use grumpkin::Affine;
+    use rand_core::OsRng;
+
     use crate::driver::GrumpkinDriver;
+    use crate::PedersenCommitment;
     use zkstd::circuit::prelude::R1cs;
     use zkstd::matrix::DenseVectors;
     use zkstd::r1cs::test::example_r1cs;
@@ -120,9 +132,11 @@ mod tests {
         for i in 1..10 {
             let r1cs: R1cs<GrumpkinDriver> = example_r1cs(i);
             let shape = R1csShape::from(r1cs.clone());
-            let (x, w) = r1cs_instance_and_witness(&r1cs, &shape);
-            let instance = RelaxedR1csInstance::new(DenseVectors::new(x));
-            let witness = RelaxedR1csWitness::new(DenseVectors::new(w), shape.m());
+            let k = (shape.m().next_power_of_two() as u64).trailing_zeros();
+            let ck = PedersenCommitment::<Affine>::new(k.into(), OsRng);
+            let (x, w) = r1cs_instance_and_witness(&r1cs, &shape, &ck);
+            let instance = RelaxedR1csInstance::new(x.x);
+            let witness = RelaxedR1csWitness::new(w.w, shape.m());
             assert!(shape.is_sat(&instance, &witness))
         }
     }

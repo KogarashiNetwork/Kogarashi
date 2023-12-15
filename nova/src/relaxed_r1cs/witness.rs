@@ -1,6 +1,27 @@
+use crate::{PedersenCommitment, R1csShape};
 use zkstd::circuit::prelude::CircuitDriver;
 use zkstd::common::{IntGroup, PrimeField};
 use zkstd::matrix::DenseVectors;
+
+/// A type that holds a witness for a given R1CS instance
+#[derive(Clone, Debug)]
+pub struct R1csWitness<C: CircuitDriver> {
+    pub w: DenseVectors<C::Scalar>,
+}
+
+impl<C: CircuitDriver> R1csWitness<C> {
+    pub fn new(shape: &R1csShape<C>, w: Vec<C::Scalar>) -> Self {
+        assert_eq!(shape.m_l_1(), w.len());
+        Self {
+            w: DenseVectors::new(w),
+        }
+    }
+
+    /// Commits to the witness using the supplied generators
+    pub fn commit(&self, ck: &PedersenCommitment<C::Affine>) -> C::Affine {
+        ck.commit(&self.w)
+    }
+}
 
 #[derive(Clone, Debug)]
 pub struct RelaxedR1csWitness<C: CircuitDriver> {
@@ -15,6 +36,13 @@ impl<C: CircuitDriver> RelaxedR1csWitness<C> {
         Self {
             e: DenseVectors::new(vec![C::Scalar::zero(); m]),
             w,
+        }
+    }
+
+    pub fn from_r1cs_witness(shape: &R1csShape<C>, witness: &R1csWitness<C>) -> Self {
+        Self {
+            w: witness.w.clone(),
+            e: DenseVectors::new(vec![C::Scalar::zero(); shape.m()]),
         }
     }
 

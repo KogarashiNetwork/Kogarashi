@@ -42,15 +42,15 @@ mod tests {
         let prover = example_prover();
         let r1cs = example_r1cs::<GrumpkinDriver>(1);
         let shape = R1csShape::from(r1cs.clone());
-        let (x, w) = r1cs_instance_and_witness(&r1cs, &shape);
-        let running_instance = RelaxedR1csInstance::new(DenseVectors::new(x));
-        let running_witness = RelaxedR1csWitness::new(DenseVectors::new(w), shape.m());
+        let (x, w) = r1cs_instance_and_witness(&r1cs, &shape, &prover.ck);
+        let running_instance = RelaxedR1csInstance::new(x.x);
+        let running_witness = RelaxedR1csWitness::new(w.w, shape.m());
 
         for i in 1..10 {
             let r1cs_i = example_r1cs::<GrumpkinDriver>(i);
-            let (x, w) = r1cs_instance_and_witness(&r1cs_i, &shape);
-            let instance_to_fold = RelaxedR1csInstance::new(DenseVectors::new(x));
-            let witness_to_fold = RelaxedR1csWitness::new(DenseVectors::new(w), shape.m());
+            let (x, w) = r1cs_instance_and_witness(&r1cs_i, &shape, &prover.ck);
+            let instance_to_fold = RelaxedR1csInstance::new(x.x);
+            let witness_to_fold = RelaxedR1csWitness::new(w.w, shape.m());
 
             let (instance, witness, commit_t) = prover.prove(
                 &instance_to_fold,

@@ -1,6 +1,7 @@
 use zkstd::common::{BNAffine, Group, RngCore};
 use zkstd::matrix::DenseVectors;
 
+#[derive(Clone)]
 pub struct PedersenCommitment<C: BNAffine> {
     g: Vec<C>,
 }

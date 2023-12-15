@@ -11,21 +11,15 @@ use zkstd::matrix::DenseVectors;
 
 pub struct Prover<C: CircuitDriver> {
     // public parameters
-    pub(crate) pp: PedersenCommitment<C::Affine>,
+    pub(crate) ck: PedersenCommitment<C::Affine>,
 
     // r1cs structure
     f: R1csShape<C>,
 }
 
 impl<C: CircuitDriver> Prover<C> {
-    pub fn new(f: R1csShape<C>, rng: impl RngCore) -> Self {
-        let m = f.m();
-        let n = m.next_power_of_two() as u64;
-        let k = n.trailing_zeros();
-
-        let pp = PedersenCommitment::new(k.into(), rng);
-
-        Self { pp, f }
+    pub fn new(shape: R1csShape<C>, ck: PedersenCommitment<C::Affine>) -> Self {
+        Self { ck, f: shape }
     }
 
     pub fn prove(
@@ -39,12 +33,14 @@ impl<C: CircuitDriver> Prover<C> {
         // compute cross term t
         let t = self.compute_cross_term(instance1, witness1, instance2, witness2);
 
-        let commit_t = self.pp.commit(&t);
+        let commit_t = self.ck.commit(&t);
 
         transcript.append_point(commit_t);
         instance2.absorb_by_transcript(&mut transcript);
 
         let r = transcript.squeeze();
+
+        dbg!(r);
 
         // fold instance
         let instance = instance2.fold(instance1, r, commit_t);
@@ -100,7 +96,7 @@ impl<C: CircuitDriver> Prover<C> {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::Prover;
-    use bn_254::Fq;
+    use bn_254::{Fq, G1Affine};
     use zkstd::circuit::CircuitDriver;
 
     use crate::driver::GrumpkinDriver;
@@ -108,14 +104,17 @@ pub(crate) mod tests {
     use crate::relaxed_r1cs::{
         r1cs_instance_and_witness, R1csShape, RelaxedR1csInstance, RelaxedR1csWitness,
     };
-    use crate::Verifier;
+    use crate::{PedersenCommitment, Verifier};
     use zkstd::common::OsRng;
     use zkstd::matrix::DenseVectors;
     use zkstd::r1cs::test::example_r1cs;
 
     pub(crate) fn example_prover<C: CircuitDriver>() -> Prover<C> {
         let r1cs = example_r1cs(0);
-        Prover::new(R1csShape::from(r1cs), OsRng)
+        let shape = R1csShape::from(r1cs);
+        let k = (shape.m().next_power_of_two() as u64).trailing_zeros();
+        let ck = PedersenCommitment::<C::Affine>::new(k.into(), OsRng);
+        Prover::new(shape, ck)
     }
 
     #[test]
@@ -127,12 +126,12 @@ pub(crate) mod tests {
         let shape = R1csShape::from(r1cs_1.clone());
         let r1cs_2 = example_r1cs::<GrumpkinDriver>(3);
 
-        let (x1, w1) = r1cs_instance_and_witness(&r1cs_1, &shape);
-        let instance1 = RelaxedR1csInstance::new(DenseVectors::new(x1));
-        let witness1 = RelaxedR1csWitness::new(DenseVectors::new(w1), shape.m());
-        let (x2, w2) = r1cs_instance_and_witness(&r1cs_2, &shape);
-        let instance2 = RelaxedR1csInstance::new(DenseVectors::new(x2));
-        let witness2 = RelaxedR1csWitness::new(DenseVectors::new(w2), shape.m());
+        let (x1, w1) = r1cs_instance_and_witness(&r1cs_1, &shape, &prover.ck);
+        let instance1 = RelaxedR1csInstance::new(x1.x);
+        let witness1 = RelaxedR1csWitness::new(w1.w, shape.m());
+        let (x2, w2) = r1cs_instance_and_witness(&r1cs_2, &shape, &prover.ck);
+        let instance2 = RelaxedR1csInstance::new(x2.x);
+        let witness2 = RelaxedR1csWitness::new(w2.w, shape.m());
 
         let (folded_instance, folded_witness, commit_t) =
             prover.prove(&instance1, &witness1, &instance2, &witness2);

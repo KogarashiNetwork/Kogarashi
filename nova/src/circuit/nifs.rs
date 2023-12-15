@@ -16,8 +16,9 @@ impl<C: CircuitDriver> NifsCircuit<C> {
         u_range: RelaxedR1csInstanceAssignment<C>,
         commit_t: PointAssignment<C::Base>,
     ) -> RelaxedR1csInstanceAssignment<C> {
-        let r2 = FieldAssignment::mul(cs, &r, &r);
-        // W_fold = u.W + r * U.W
+        let r2 = FieldAssignment::square(cs, &r);
+        println!("R2 = {:?}", r2.value(cs));
+        // W_fold = U.W + r * u.W
         let r_w = u_range.commit_w.scalar_point(cs, &r);
         let w_fold = u_range.commit_w.add(&r_w, cs);
 

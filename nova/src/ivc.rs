@@ -1,5 +1,5 @@
 use crate::function::FunctionCircuit;
-use crate::{Prover, RecursiveProof};
+use crate::{PedersenCommitment, Prover, RecursiveProof};
 use rand_core::OsRng;
 use std::marker::PhantomData;
 
@@ -48,7 +48,6 @@ where
     FC2: FunctionCircuit<E2::Scalar>,
 {
     pub fn init(
-        rng: OsRng,
         pp: &PublicParams<E1, E2, FC1, FC2>,
         z0_primary: DenseVectors<E1::Scalar>,
         z0_secondary: DenseVectors<E2::Scalar>,
@@ -67,14 +66,13 @@ where
         };
         let zi_primary = circuit_primary.generate(&mut cs_primary);
 
-        println!("Primary out");
-        let (x, w) = r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary);
+        let (x, w) = r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary, &pp.ck_primary);
         let (u_single_next_primary, w_single_next_primary) = (
-            RelaxedR1csInstance::new(DenseVectors::new(x)),
-            RelaxedR1csWitness::new(DenseVectors::new(w), pp.r1cs_shape_primary.m()),
+            RelaxedR1csInstance::new(x.x),
+            RelaxedR1csWitness::new(w.w, pp.r1cs_shape_primary.m()),
         );
 
-        let prover_primary = Prover::new(pp.r1cs_shape_primary.clone(), rng);
+        let prover_primary = Prover::new(pp.r1cs_shape_primary.clone(), pp.ck_primary.clone());
 
         let mut cs_secondary = R1cs::<E2>::default();
         let circuit_secondary = AugmentedFCircuit::<E1, FC2> {
@@ -89,14 +87,15 @@ where
         };
         let zi_secondary = circuit_secondary.generate(&mut cs_secondary);
 
-        println!("Secondary out");
-        let (x, w) = r1cs_instance_and_witness(&cs_secondary, &pp.r1cs_shape_secondary);
+        let (x, w) =
+            r1cs_instance_and_witness(&cs_secondary, &pp.r1cs_shape_secondary, &pp.ck_secondary);
         let (u_single_next_secondary, w_single_next_secondary) = (
-            RelaxedR1csInstance::new(DenseVectors::new(x)),
-            RelaxedR1csWitness::new(DenseVectors::new(w), pp.r1cs_shape_secondary.m()),
+            RelaxedR1csInstance::new(x.x),
+            RelaxedR1csWitness::new(w.w, pp.r1cs_shape_secondary.m()),
         );
 
-        let prover_secondary = Prover::new(pp.r1cs_shape_secondary.clone(), rng);
+        let prover_secondary =
+            Prover::new(pp.r1cs_shape_secondary.clone(), pp.ck_secondary.clone());
 
         let u_dummy = RelaxedR1csInstance::<E2>::dummy(pp.r1cs_shape_secondary.l());
         let w_dummy = RelaxedR1csWitness::<E2>::dummy(
@@ -181,18 +180,19 @@ where
 
         let zi_primary = circuit_primary.generate(&mut cs_primary);
 
-        let (x, w) = r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary);
+        let (x, w) = r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary, &pp.ck_primary);
+        println!("Primary out");
         let (u_single_next_primary, w_single_next_primary) = (
-            RelaxedR1csInstance::new(DenseVectors::new(x)),
-            RelaxedR1csWitness::new(DenseVectors::new(w), pp.r1cs_shape_primary.m()),
+            RelaxedR1csInstance::new(x.x),
+            RelaxedR1csWitness::new(w.w, pp.r1cs_shape_primary.m()),
         );
 
         let (u_range_next_primary, w_range_next_primary, commit_t_primary) =
             self.prover_primary.prove(
                 &self.u_range_primary,
                 &self.w_range_primary,
-                &u_single_next_primary, // u_single_next_primary
-                &w_single_next_primary, // w_single_next_primary
+                &u_single_next_primary,
+                &w_single_next_primary,
             );
 
         let mut cs_secondary = R1cs::<E2>::default();
@@ -209,10 +209,12 @@ where
 
         let zi_secondary = circuit_secondary.generate(&mut cs_secondary);
 
-        let (x, w) = r1cs_instance_and_witness(&cs_secondary, &pp.r1cs_shape_secondary);
+        println!("Secondary out");
+        let (x, w) =
+            r1cs_instance_and_witness(&cs_secondary, &pp.r1cs_shape_secondary, &pp.ck_secondary);
         let (u_single_next_secondary, w_single_next_secondary) = (
-            RelaxedR1csInstance::new(DenseVectors::new(x)),
-            RelaxedR1csWitness::new(DenseVectors::new(w), pp.r1cs_shape_secondary.m()),
+            RelaxedR1csInstance::new(x.x),
+            RelaxedR1csWitness::new(w.w, pp.r1cs_shape_secondary.m()),
         );
 
         // update values
@@ -240,8 +242,8 @@ where
             i: self.i,
             z0_primary: self.z0_primary.clone(),
             z0_secondary: self.z0_secondary.clone(),
-            zi_primary: self.z0_primary.clone(),
-            zi_secondary: self.z0_secondary.clone(),
+            zi_primary: self.zi_primary.clone(),
+            zi_secondary: self.zi_secondary.clone(),
             instances: (
                 (
                     self.u_single_secondary.clone(),
@@ -267,6 +269,8 @@ where
 {
     pub r1cs_shape_primary: R1csShape<E1>,
     pub r1cs_shape_secondary: R1csShape<E2>,
+    pub ck_primary: PedersenCommitment<E1::Affine>,
+    pub ck_secondary: PedersenCommitment<E2::Affine>,
     marker: PhantomData<(FC1, FC2)>,
 }
 
@@ -277,7 +281,7 @@ where
     FC1: FunctionCircuit<E1::Scalar>,
     FC2: FunctionCircuit<E2::Scalar>,
 {
-    pub fn setup() -> Self {
+    pub fn setup(rng: OsRng) -> Self {
         // Initialize shape for the primary
         let circuit_primary = AugmentedFCircuit::<E2, FC1> {
             is_primary: true,
@@ -308,9 +312,17 @@ where
         circuit_secondary.generate(&mut cs);
         let r1cs_shape_secondary = R1csShape::from(cs);
 
+        let k = (r1cs_shape_primary.m().next_power_of_two() as u64).trailing_zeros();
+        let ck_primary = PedersenCommitment::<E1::Affine>::new(k.into(), rng);
+
+        let k = (r1cs_shape_secondary.m().next_power_of_two() as u64).trailing_zeros();
+        let ck_secondary = PedersenCommitment::<E2::Affine>::new(k.into(), rng);
+
         PublicParams {
             r1cs_shape_primary,
             r1cs_shape_secondary,
+            ck_primary,
+            ck_secondary,
             marker: Default::default(),
         }
     }
@@ -338,13 +350,12 @@ mod tests {
             GrumpkinDriver,
             ExampleFunction<Fr>,
             ExampleFunction<Fq>,
-        >::setup();
+        >::setup(OsRng);
 
         let z0_primary = DenseVectors::new(vec![Fr::from(0)]);
         let z0_secondary = DenseVectors::new(vec![Fq::from(0)]);
         let mut ivc =
             Ivc::<Bn254Driver, GrumpkinDriver, ExampleFunction<Fr>, ExampleFunction<Fq>>::init(
-                OsRng,
                 &pp,
                 z0_primary,
                 z0_secondary,
