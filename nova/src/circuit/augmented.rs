@@ -1,10 +1,9 @@
 use crate::circuit::nifs::NifsCircuit;
 use crate::circuit::MimcROCircuit;
 use crate::function::FunctionCircuit;
-use crate::gadget::RelaxedR1csInstanceAssignment;
+use crate::gadget::{R1csInstanceAssignment, RelaxedR1csInstanceAssignment};
 use crate::hash::MIMC_ROUNDS;
-use crate::relaxed_r1cs::RelaxedR1csInstance;
-use std::any::type_name;
+use crate::relaxed_r1cs::{R1csInstance, RelaxedR1csInstance};
 use std::marker::PhantomData;
 use zkstd::circuit::prelude::{FieldAssignment, PointAssignment};
 use zkstd::circuit::CircuitDriver;
@@ -18,7 +17,7 @@ pub struct AugmentedFCircuit<C: CircuitDriver, FC: FunctionCircuit<C::Base>> {
     pub i: usize,
     pub z_0: DenseVectors<C::Base>,
     pub z_i: Option<DenseVectors<C::Base>>,
-    pub u_single: Option<RelaxedR1csInstance<C>>,
+    pub u_single: Option<R1csInstance<C>>,
     pub u_range: Option<RelaxedR1csInstance<C>>,
     pub commit_t: Option<C::Affine>,
     pub f: PhantomData<FC>,
@@ -31,7 +30,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> Default for AugmentedFCircu
             i: 0,
             z_0: DenseVectors::zero(1),
             z_i: Some(DenseVectors::zero(1)),
-            u_single: Some(RelaxedR1csInstance::dummy(2)),
+            u_single: Some(R1csInstance::dummy(2)),
             u_range: Some(RelaxedR1csInstance::dummy(2)),
             commit_t: Some(C::Affine::ADDITIVE_IDENTITY),
             f: Default::default(),
@@ -61,12 +60,12 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
 
         let u_dummy_native = RelaxedR1csInstance::<C>::dummy(2);
         let u_dummy = RelaxedR1csInstanceAssignment::witness(cs, &u_dummy_native);
-        let u_single = RelaxedR1csInstanceAssignment::witness(
+        let u_single = R1csInstanceAssignment::witness(
             cs,
             &self
                 .u_single
                 .clone()
-                .unwrap_or_else(|| u_dummy_native.clone()),
+                .unwrap_or_else(|| R1csInstance::<C>::dummy(2)),
         );
         let u_range = RelaxedR1csInstanceAssignment::witness(
             cs,
@@ -93,17 +92,24 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
         let u_range_next_base = if self.is_primary {
             u_dummy
         } else {
-            u_single.clone()
+            RelaxedR1csInstanceAssignment::from_r1cs_instance(cs, u_single.clone())
         };
 
         let u_i_x = u_range.hash(cs, i.clone(), z_0.clone(), z_i.clone());
         FieldAssignment::conditional_enforce_equal(cs, &u_single.x0, &u_i_x, &not_base_case);
 
         let r = Self::get_challenge(cs, &u_range, commit_t.clone());
+        let r = FieldAssignment::constant(&C::Base::one());
         println!("R = {:?}", r.value(cs));
-        dbg!(type_name::<<C as CircuitDriver>::Base>());
+        println!(
+            "R_bits = {:?}",
+            FieldAssignment::to_bits(cs, &r)
+                .iter()
+                .map(|x| FieldAssignment::from(x).value(cs))
+                .collect::<Vec<_>>()
+        );
         let u_range_next_non_base =
-            NifsCircuit::verify(cs, r, u_single.clone(), u_range.clone(), commit_t);
+            NifsCircuit::verify(cs, r, u_range.clone(), u_single.clone(), commit_t);
 
         let u_range_next = RelaxedR1csInstanceAssignment::conditional_select(
             cs,
@@ -114,21 +120,16 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
 
         let z_next = FC::invoke_cs(cs, z_i);
 
-        println!(
-            "Hash_circuit\ni = {:?}\nz0 = {:?}\nznext = {:?}\nu = {:?}\nx0 = {:?}\nx1 = {:?}\ne =\n({:?}, {:?}, {:?})\nw =\n({:?}, {:?}, {:?})",
-            (&i + &FieldAssignment::constant(&C::Base::one())).value(cs),
-            z_0.iter().map(|x| x.value(cs)).collect::<Vec<_>>(),
-            z_next.iter().map(|x| x.value(cs)).collect::<Vec<_>>(),
-            u_range_next.u.value(cs),
-            u_range_next.x0.value(cs),
-            u_range_next.x1.value(cs),
-            u_range_next.commit_e.get_x().value(cs),
-            u_range_next.commit_e.get_y().value(cs),
-            u_range_next.commit_e.get_z().value(cs),
-            u_range_next.commit_w.get_x().value(cs),
-            u_range_next.commit_w.get_y().value(cs),
-            u_range_next.commit_w.get_z().value(cs)
-        );
+        // println!(
+        //     "Hash_circuit\n{:?},\n{:?},\n{:?},\n{:?},\n{:?},\n{:?},",
+        //     (&i + &FieldAssignment::constant(&C::Base::one())).value(cs),
+        //     z_0.iter().map(|x| x.value(cs)).collect::<Vec<_>>(),
+        //     z_next.iter().map(|x| x.value(cs)).collect::<Vec<_>>(),
+        //     u_range_next.u.value(cs),
+        //     u_range_next.x0.value(cs),
+        //     u_range_next.x1.value(cs),
+        // );
+        println!("HASH");
         let u_next_x = u_range_next.hash(
             cs,
             &i + &FieldAssignment::constant(&C::Base::one()),
@@ -158,7 +159,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
 mod tests {
     use super::*;
     use crate::driver::{Bn254Driver, GrumpkinDriver};
-    use crate::ivc::PublicParams;
+
     use crate::relaxed_r1cs::{r1cs_instance_and_witness, R1csShape, RelaxedR1csWitness};
     use crate::test::ExampleFunction;
     use crate::PedersenCommitment;
@@ -188,10 +189,10 @@ mod tests {
 
         let (x, w) = r1cs_instance_and_witness(&cs, &shape, &ck);
         let (instance, witness) = (
-            RelaxedR1csInstance::<Bn254Driver>::new(x.x),
-            RelaxedR1csWitness::<Bn254Driver>::new(w.w, shape.m()),
+            RelaxedR1csInstance::<Bn254Driver>::from_r1cs_instance(&ck, &shape, &x),
+            RelaxedR1csWitness::<Bn254Driver>::from_r1cs_witness(&shape, &w),
         );
-        assert!(shape.is_sat(&u_dummy, &w_dummy));
-        assert!(shape.is_sat(&instance, &witness));
+        assert!(shape.is_sat_relaxed(&u_dummy, &w_dummy));
+        assert!(shape.is_sat_relaxed(&instance, &witness));
     }
 }

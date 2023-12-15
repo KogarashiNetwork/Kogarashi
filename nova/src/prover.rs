@@ -4,9 +4,9 @@ use crate::{
 };
 
 use crate::hash::{MimcRO, MIMC_ROUNDS};
-use crate::relaxed_r1cs::R1csShape;
+use crate::relaxed_r1cs::{R1csInstance, R1csShape, R1csWitness};
 use zkstd::circuit::prelude::CircuitDriver;
-use zkstd::common::{Ring, RngCore};
+use zkstd::common::Ring;
 use zkstd::matrix::DenseVectors;
 
 pub struct Prover<C: CircuitDriver> {
@@ -26,8 +26,8 @@ impl<C: CircuitDriver> Prover<C> {
         &self,
         instance1: &RelaxedR1csInstance<C>,
         witness1: &RelaxedR1csWitness<C>,
-        instance2: &RelaxedR1csInstance<C>,
-        witness2: &RelaxedR1csWitness<C>,
+        instance2: &R1csInstance<C>,
+        witness2: &R1csWitness<C>,
     ) -> (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>, C::Affine) {
         let mut transcript = MimcRO::<MIMC_ROUNDS, C>::default();
         // compute cross term t
@@ -36,17 +36,17 @@ impl<C: CircuitDriver> Prover<C> {
         let commit_t = self.ck.commit(&t);
 
         transcript.append_point(commit_t);
-        instance2.absorb_by_transcript(&mut transcript);
+        instance1.absorb_by_transcript(&mut transcript);
 
         let r = transcript.squeeze();
 
         dbg!(r);
 
         // fold instance
-        let instance = instance2.fold(instance1, r, commit_t);
+        let instance = instance1.fold(instance2, r, commit_t);
 
         // fold witness
-        let witness = witness2.fold(witness1, r, t);
+        let witness = witness1.fold(witness2, r, t);
 
         // return folded relaxed r1cs instance, witness and commit T
         (instance, witness, commit_t)
@@ -57,11 +57,11 @@ impl<C: CircuitDriver> Prover<C> {
         &self,
         instance1: &RelaxedR1csInstance<C>,
         witness1: &RelaxedR1csWitness<C>,
-        instance2: &RelaxedR1csInstance<C>,
-        witness2: &RelaxedR1csWitness<C>,
+        instance2: &R1csInstance<C>,
+        witness2: &R1csWitness<C>,
     ) -> DenseVectors<C::Scalar> {
-        let u1 = C::Scalar::one();
-        let u2 = instance2.u();
+        let u1 = instance1.u;
+        let u2 = C::Scalar::one();
         let m = self.f.m();
         let (a, b, c) = self.f.matrices();
         let (w1, w2) = (witness1.w(), witness2.w());
@@ -96,7 +96,7 @@ impl<C: CircuitDriver> Prover<C> {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::Prover;
-    use bn_254::{Fq, G1Affine};
+    use bn_254::Fq;
     use zkstd::circuit::CircuitDriver;
 
     use crate::driver::GrumpkinDriver;
@@ -106,7 +106,6 @@ pub(crate) mod tests {
     };
     use crate::{PedersenCommitment, Verifier};
     use zkstd::common::OsRng;
-    use zkstd::matrix::DenseVectors;
     use zkstd::r1cs::test::example_r1cs;
 
     pub(crate) fn example_prover<C: CircuitDriver>() -> Prover<C> {
@@ -127,11 +126,10 @@ pub(crate) mod tests {
         let r1cs_2 = example_r1cs::<GrumpkinDriver>(3);
 
         let (x1, w1) = r1cs_instance_and_witness(&r1cs_1, &shape, &prover.ck);
-        let instance1 = RelaxedR1csInstance::new(x1.x);
-        let witness1 = RelaxedR1csWitness::new(w1.w, shape.m());
-        let (x2, w2) = r1cs_instance_and_witness(&r1cs_2, &shape, &prover.ck);
-        let instance2 = RelaxedR1csInstance::new(x2.x);
-        let witness2 = RelaxedR1csWitness::new(w2.w, shape.m());
+        let instance1 = RelaxedR1csInstance::from_r1cs_instance(&prover.ck, &shape, &x1);
+        let witness1 = RelaxedR1csWitness::from_r1cs_witness(&shape, &w1);
+
+        let (instance2, witness2) = r1cs_instance_and_witness(&r1cs_2, &shape, &prover.ck);
 
         let (folded_instance, folded_witness, commit_t) =
             prover.prove(&instance1, &witness1, &instance2, &witness2);
@@ -139,7 +137,7 @@ pub(crate) mod tests {
         assert_eq!(folded_instance, verified_instance);
 
         transcript.append_point(commit_t);
-        instance2.absorb_by_transcript(&mut transcript);
+        instance1.absorb_by_transcript(&mut transcript);
         let t = prover.compute_cross_term(&instance1, &witness1, &instance2, &witness2);
         let r = transcript.squeeze();
 
@@ -151,8 +149,8 @@ pub(crate) mod tests {
         ]
         .concat();
 
-        let z1 = [vec![Fq::one()], instance1.x().get(), witness1.w().get()].concat();
-        let z2 = [vec![instance2.u], instance2.x().get(), witness2.w().get()].concat();
+        let z1 = [vec![instance1.u()], instance1.x().get(), witness1.w().get()].concat();
+        let z2 = [vec![Fq::one()], instance2.x().get(), witness2.w().get()].concat();
 
         let z3_aux: Vec<Fq> = z2
             .iter()
@@ -164,9 +162,9 @@ pub(crate) mod tests {
         assert_eq!(z3, z3_aux);
 
         // check that relations hold for the 2 inputted instances and the folded one
-        assert!(shape.is_sat(&instance1, &witness1));
-        assert!(shape.is_sat(&instance2, &witness2));
-        assert!(shape.is_sat(&folded_instance, &folded_witness));
+        assert!(shape.is_sat_relaxed(&instance1, &witness1));
+        assert!(shape.is_sat(&prover.ck, &instance2, &witness2));
+        assert!(shape.is_sat_relaxed(&folded_instance, &folded_witness));
 
         // next equalities should hold since we started from two cmE of zero-vector E's
         assert_eq!(verified_instance.commit_e, (commit_t * r).into());
@@ -174,9 +172,8 @@ pub(crate) mod tests {
 
         let r2 = r * r;
         assert!(
-            folded_instance.commit_e
-                == (instance1.commit_e + commit_t * r + instance2.commit_e * r2).into()
-                && folded_instance.u == instance1.u + r * instance2.u
+            folded_instance.commit_e == (instance1.commit_e + commit_t * r).into()
+                && folded_instance.u == instance1.u + r
                 && folded_instance.commit_w == (instance1.commit_w + instance2.commit_w * r).into()
                 && folded_instance.x == &instance1.x + &(&instance2.x * r)
         );

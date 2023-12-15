@@ -1,4 +1,4 @@
-use crate::relaxed_r1cs::RelaxedR1csInstance;
+use crate::relaxed_r1cs::{R1csInstance, RelaxedR1csInstance};
 
 use crate::hash::{MimcRO, MIMC_ROUNDS};
 use core::marker::PhantomData;
@@ -12,16 +12,16 @@ impl<C: CircuitDriver> Verifier<C> {
     pub fn verify(
         commit_t: C::Affine,
         instance1: &RelaxedR1csInstance<C>,
-        instance2: &RelaxedR1csInstance<C>,
+        instance2: &R1csInstance<C>,
     ) -> RelaxedR1csInstance<C> {
         let mut transcript = MimcRO::<MIMC_ROUNDS, C>::default();
 
         transcript.append_point(commit_t);
-        instance2.absorb_by_transcript(&mut transcript);
+        instance1.absorb_by_transcript(&mut transcript);
 
         let r = transcript.squeeze();
 
-        instance2.fold(instance1, r, commit_t)
+        instance1.fold(instance2, r, commit_t)
     }
 }
 
@@ -29,7 +29,6 @@ impl<C: CircuitDriver> Verifier<C> {
 mod tests {
     use super::Verifier;
     use crate::prover::tests::example_prover;
-    use zkstd::matrix::DenseVectors;
 
     use crate::driver::GrumpkinDriver;
     use crate::relaxed_r1cs::{
@@ -43,25 +42,24 @@ mod tests {
         let r1cs = example_r1cs::<GrumpkinDriver>(1);
         let shape = R1csShape::from(r1cs.clone());
         let (x, w) = r1cs_instance_and_witness(&r1cs, &shape, &prover.ck);
-        let running_instance = RelaxedR1csInstance::new(x.x);
-        let running_witness = RelaxedR1csWitness::new(w.w, shape.m());
+        let running_instance = RelaxedR1csInstance::from_r1cs_instance(&prover.ck, &shape, &x);
+        let running_witness = RelaxedR1csWitness::from_r1cs_witness(&shape, &w);
 
         for i in 1..10 {
             let r1cs_i = example_r1cs::<GrumpkinDriver>(i);
-            let (x, w) = r1cs_instance_and_witness(&r1cs_i, &shape, &prover.ck);
-            let instance_to_fold = RelaxedR1csInstance::new(x.x);
-            let witness_to_fold = RelaxedR1csWitness::new(w.w, shape.m());
+            let (instance_to_fold, witness_to_fold) =
+                r1cs_instance_and_witness(&r1cs_i, &shape, &prover.ck);
 
             let (instance, witness, commit_t) = prover.prove(
-                &instance_to_fold,
-                &witness_to_fold,
                 &running_instance,
                 &running_witness,
+                &instance_to_fold,
+                &witness_to_fold,
             );
             let verified_instance =
-                Verifier::verify(commit_t, &instance_to_fold, &running_instance);
+                Verifier::verify(commit_t, &running_instance, &instance_to_fold);
             assert_eq!(instance, verified_instance);
-            assert!(shape.is_sat(&instance, &witness));
+            assert!(shape.is_sat_relaxed(&instance, &witness));
         }
     }
 }

@@ -31,6 +31,20 @@ impl<F: PrimeField> PointAssignment<F> {
         Self { x, y, z }
     }
 
+    pub fn to_one_scale<C: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<C>) -> Self {
+        let z = self.z.value(cs).invert();
+        if let Some(inv) = z {
+            let inv = FieldAssignment::constant(&inv);
+            Self {
+                x: FieldAssignment::mul(cs, &self.x, &inv),
+                y: FieldAssignment::mul(cs, &self.y, &inv),
+                z: FieldAssignment::constant(&F::one()),
+            }
+        } else {
+            self.clone()
+        }
+    }
+
     pub fn identity() -> Self {
         let x = FieldAssignment::constant(&F::zero());
         let y = FieldAssignment::constant(&F::one());

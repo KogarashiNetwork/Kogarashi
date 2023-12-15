@@ -1,4 +1,4 @@
-use crate::relaxed_r1cs::{RelaxedR1csInstance, RelaxedR1csWitness};
+use crate::relaxed_r1cs::{R1csInstance, R1csWitness, RelaxedR1csInstance, RelaxedR1csWitness};
 use std::marker::PhantomData;
 
 use crate::driver::scalar_as_base;
@@ -22,7 +22,7 @@ where
     pub(crate) zi_secondary: DenseVectors<E2::Scalar>,
     pub(crate) instances: (
         // u_single/w_single secondary
-        (RelaxedR1csInstance<E2>, RelaxedR1csWitness<E2>),
+        (R1csInstance<E2>, R1csWitness<E2>),
         // u_range/w_range primary
         (RelaxedR1csInstance<E1>, RelaxedR1csWitness<E1>),
         // u_range/w_range secondary
@@ -53,14 +53,6 @@ where
             return false;
         }
         let (hash_primary, hash_secondary) = {
-            dbg!(self.i);
-            dbg!(&self.z0_primary);
-            dbg!(&self.zi_primary);
-            dbg!(&u_range_secondary);
-            dbg!(self.i);
-            dbg!(&self.z0_secondary);
-            dbg!(&self.zi_secondary);
-            dbg!(&u_range_primary);
             (
                 u_range_secondary.hash::<E1>(self.i, &self.z0_primary, &self.zi_primary),
                 u_range_primary.hash::<E2>(self.i, &self.z0_secondary, &self.zi_secondary),
@@ -79,21 +71,25 @@ where
 
         dbg!(pp
             .r1cs_shape_primary
-            .is_sat(&u_range_primary, &w_range_primary));
+            .is_sat_relaxed(&u_range_primary, &w_range_primary));
         dbg!(pp
             .r1cs_shape_secondary
-            .is_sat(&u_range_secondary, &w_range_secondary));
-        dbg!(pp
-            .r1cs_shape_secondary
-            .is_sat(&u_single_secondary, &w_single_secondary));
+            .is_sat_relaxed(&u_range_secondary, &w_range_secondary));
+        dbg!(pp.r1cs_shape_secondary.is_sat(
+            &pp.ck_secondary,
+            &u_single_secondary,
+            &w_single_secondary
+        ));
 
         pp.r1cs_shape_primary
-            .is_sat(&u_range_primary, &w_range_primary)
+            .is_sat_relaxed(&u_range_primary, &w_range_primary)
             && pp
                 .r1cs_shape_secondary
-                .is_sat(&u_range_secondary, &w_range_secondary)
-            && pp
-                .r1cs_shape_secondary
-                .is_sat(&u_single_secondary, &w_single_secondary)
+                .is_sat_relaxed(&u_range_secondary, &w_range_secondary)
+            && pp.r1cs_shape_secondary.is_sat(
+                &pp.ck_secondary,
+                &u_single_secondary,
+                &w_single_secondary,
+            )
     }
 }

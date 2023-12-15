@@ -1,5 +1,6 @@
 use bn_254::{params::PARAM_B3 as BN254_PARAM_B3, Fq, Fr, G1Affine};
 use grumpkin::{params::PARAM_B3 as GRUMPKIN_PARAM_B3, Affine};
+use num_bigint::{BigInt, Sign};
 use zkstd::circuit::CircuitDriver;
 use zkstd::common::{IntGroup, PrimeField, Ring};
 
@@ -33,6 +34,51 @@ impl CircuitDriver for Bn254Driver {
     fn b3() -> Self::Scalar {
         GRUMPKIN_PARAM_B3
     }
+}
+
+/// Convert a field element to a natural number
+pub fn f_to_nat<F: PrimeField>(f: &F) -> BigInt {
+    dbg!(f.to_raw_bytes());
+    BigInt::from_bytes_le(Sign::Plus, &f.to_raw_bytes())
+}
+
+/// Convert a natural number to a field element.
+/// Returns `None` if the number is too big for the field.
+pub fn nat_to_f<F: PrimeField>(n: &BigInt) -> F {
+    let bytes = n.to_signed_bytes_le();
+    if bytes.len() > 64 {
+        panic!("Length exceed the field size");
+    };
+
+    let mut res = [0; 64];
+    res[0..64].copy_from_slice(&bytes);
+
+    F::from_bytes_wide(&res)
+}
+
+/// Compute the limbs encoding a natural number.
+/// The limbs are assumed to be based the `limb_width` power of 2.
+pub fn nat_to_limbs<F: PrimeField>(nat: &BigInt, limb_width: usize, n_limbs: usize) -> Vec<F> {
+    let mask = int_with_n_ones(limb_width);
+    let mut nat = nat.clone();
+    if nat.bits() as usize <= n_limbs * limb_width {
+        (0..n_limbs)
+            .map(|_| {
+                let r = &nat & &mask;
+                nat >>= limb_width as u32;
+                nat_to_f(&r)
+            })
+            .collect()
+    } else {
+        panic!("Wrong amount of bits");
+    }
+}
+
+fn int_with_n_ones(n: usize) -> BigInt {
+    let mut m = BigInt::from(1);
+    m <<= n as u32;
+    m -= 1;
+    m
 }
 
 /// interpret scalar as base

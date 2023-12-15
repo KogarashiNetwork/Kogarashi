@@ -1,12 +1,11 @@
 mod instance;
 mod witness;
 
-use crate::relaxed_r1cs::instance::R1csInstance;
-use crate::relaxed_r1cs::witness::R1csWitness;
 use crate::PedersenCommitment;
-pub(crate) use instance::RelaxedR1csInstance;
-pub(crate) use witness::RelaxedR1csWitness;
+pub(crate) use instance::{R1csInstance, RelaxedR1csInstance};
+pub(crate) use witness::{R1csWitness, RelaxedR1csWitness};
 use zkstd::circuit::prelude::{CircuitDriver, R1cs};
+use zkstd::common::Ring;
 use zkstd::matrix::{DenseVectors, SparseMatrix};
 
 #[derive(Clone, Debug)]
@@ -78,7 +77,7 @@ impl<C: CircuitDriver> R1csShape<C> {
     }
 
     ///  check (A · Z) ◦ (B · Z) = u · (C · Z) + E
-    pub fn is_sat(
+    pub fn is_sat_relaxed(
         &self,
         instance: &RelaxedR1csInstance<C>,
         witness: &RelaxedR1csWitness<C>,
@@ -112,6 +111,41 @@ impl<C: CircuitDriver> R1csShape<C> {
             .zip(ucze.iter())
             .all(|(left, right)| left == right)
     }
+
+    ///  check (A · Z) ◦ (B · Z) = (C · Z)
+    pub fn is_sat(
+        &self,
+        ck: &PedersenCommitment<C::Affine>,
+        instance: &R1csInstance<C>,
+        witness: &R1csWitness<C>,
+    ) -> bool {
+        let Self { m, a, b, c, .. } = self;
+
+        let R1csInstance { commit_w, x } = instance;
+        dbg!(x);
+        let R1csWitness { w } = witness;
+
+        let l = x.len() + 1;
+        let z = DenseVectors::new(vec![vec![C::Scalar::one()], x.get(), w.get()].concat());
+        // A · Z
+        let az = a.prod(m, l, &z);
+        // B · Z
+        let bz = b.prod(m, l, &z);
+        // C · Z
+        let cz = c.prod(m, l, &z);
+        // (A · Z) ◦ (B · Z)
+        let azbz = az * bz;
+
+        let constraints_check = azbz
+            .iter()
+            .zip(cz.iter())
+            .all(|(left, right)| left == right);
+        dbg!(constraints_check);
+        let commit_check = *commit_w == witness.commit(ck);
+        dbg!(commit_check);
+
+        constraints_check && commit_check
+    }
 }
 
 #[cfg(test)]
@@ -124,7 +158,6 @@ mod tests {
     use crate::driver::GrumpkinDriver;
     use crate::PedersenCommitment;
     use zkstd::circuit::prelude::R1cs;
-    use zkstd::matrix::DenseVectors;
     use zkstd::r1cs::test::example_r1cs;
 
     #[test]
@@ -135,9 +168,9 @@ mod tests {
             let k = (shape.m().next_power_of_two() as u64).trailing_zeros();
             let ck = PedersenCommitment::<Affine>::new(k.into(), OsRng);
             let (x, w) = r1cs_instance_and_witness(&r1cs, &shape, &ck);
-            let instance = RelaxedR1csInstance::new(x.x);
-            let witness = RelaxedR1csWitness::new(w.w, shape.m());
-            assert!(shape.is_sat(&instance, &witness))
+            let instance = RelaxedR1csInstance::from_r1cs_instance(&ck, &shape, &x);
+            let witness = RelaxedR1csWitness::from_r1cs_witness(&shape, &w);
+            assert!(shape.is_sat_relaxed(&instance, &witness))
         }
     }
 }

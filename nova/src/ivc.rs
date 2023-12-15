@@ -5,7 +5,8 @@ use std::marker::PhantomData;
 
 use crate::circuit::AugmentedFCircuit;
 use crate::relaxed_r1cs::{
-    r1cs_instance_and_witness, R1csShape, RelaxedR1csInstance, RelaxedR1csWitness,
+    r1cs_instance_and_witness, R1csInstance, R1csShape, R1csWitness, RelaxedR1csInstance,
+    RelaxedR1csWitness,
 };
 use zkstd::circuit::prelude::{CircuitDriver, R1cs};
 use zkstd::common::IntGroup;
@@ -28,8 +29,8 @@ where
     // r1cs instance to be folded
     // u_i
     // represents the correct execution of invocation i of F′
-    u_single_secondary: RelaxedR1csInstance<E2>,
-    w_single_secondary: RelaxedR1csWitness<E2>,
+    u_single_secondary: R1csInstance<E2>,
+    w_single_secondary: R1csWitness<E2>,
     // running r1cs instance
     // U_i
     // represents the correct execution of invocations 1, . . . , i - 1 of F′
@@ -66,12 +67,13 @@ where
         };
         let zi_primary = circuit_primary.generate(&mut cs_primary);
 
-        let (x, w) = r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary, &pp.ck_primary);
-        let (u_single_next_primary, w_single_next_primary) = (
-            RelaxedR1csInstance::new(x.x),
-            RelaxedR1csWitness::new(w.w, pp.r1cs_shape_primary.m()),
-        );
-
+        let (u_single_next_primary, w_single_next_primary) =
+            r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary, &pp.ck_primary);
+        assert!(pp.r1cs_shape_primary.is_sat(
+            &pp.ck_primary,
+            &u_single_next_primary,
+            &w_single_next_primary,
+        ));
         let prover_primary = Prover::new(pp.r1cs_shape_primary.clone(), pp.ck_primary.clone());
 
         let mut cs_secondary = R1cs::<E2>::default();
@@ -87,12 +89,13 @@ where
         };
         let zi_secondary = circuit_secondary.generate(&mut cs_secondary);
 
-        let (x, w) =
+        let (u_single_next_secondary, w_single_next_secondary) =
             r1cs_instance_and_witness(&cs_secondary, &pp.r1cs_shape_secondary, &pp.ck_secondary);
-        let (u_single_next_secondary, w_single_next_secondary) = (
-            RelaxedR1csInstance::new(x.x),
-            RelaxedR1csWitness::new(w.w, pp.r1cs_shape_secondary.m()),
-        );
+        assert!(pp.r1cs_shape_secondary.is_sat(
+            &pp.ck_secondary,
+            &u_single_next_secondary,
+            &w_single_next_secondary,
+        ));
 
         let prover_secondary =
             Prover::new(pp.r1cs_shape_secondary.clone(), pp.ck_secondary.clone());
@@ -110,21 +113,28 @@ where
             zi_primary: DenseVectors::new(
                 zi_primary
                     .into_iter()
-                    .map(|x| x.value(&mut cs_primary))
+                    .map(|x| x.value(&cs_primary))
                     .collect(),
             ),
             zi_secondary: DenseVectors::new(
                 zi_secondary
                     .into_iter()
-                    .map(|x| x.value(&mut cs_secondary))
+                    .map(|x| x.value(&cs_secondary))
                     .collect(),
             ),
             prover_primary,
             prover_secondary,
             u_single_secondary: u_single_next_secondary,
             w_single_secondary: w_single_next_secondary,
-            u_range_primary: u_single_next_primary,
-            w_range_primary: w_single_next_primary,
+            u_range_primary: RelaxedR1csInstance::from_r1cs_instance(
+                &pp.ck_primary,
+                &pp.r1cs_shape_primary,
+                &u_single_next_primary,
+            ),
+            w_range_primary: RelaxedR1csWitness::from_r1cs_witness(
+                &pp.r1cs_shape_primary,
+                &w_single_next_primary,
+            ),
             u_range_secondary: u_dummy,
             w_range_secondary: w_dummy,
             f: PhantomData::default(),
@@ -135,6 +145,7 @@ where
         &mut self,
         pp: &PublicParams<E1, E2, FC1, FC2>,
     ) -> RecursiveProof<E1, E2, FC1, FC2> {
+        println!("STEP");
         if self.i == 0 {
             self.i = 1;
             return RecursiveProof {
@@ -180,12 +191,9 @@ where
 
         let zi_primary = circuit_primary.generate(&mut cs_primary);
 
-        let (x, w) = r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary, &pp.ck_primary);
         println!("Primary out");
-        let (u_single_next_primary, w_single_next_primary) = (
-            RelaxedR1csInstance::new(x.x),
-            RelaxedR1csWitness::new(w.w, pp.r1cs_shape_primary.m()),
-        );
+        let (u_single_next_primary, w_single_next_primary) =
+            r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary, &pp.ck_primary);
 
         let (u_range_next_primary, w_range_next_primary, commit_t_primary) =
             self.prover_primary.prove(
@@ -210,12 +218,14 @@ where
         let zi_secondary = circuit_secondary.generate(&mut cs_secondary);
 
         println!("Secondary out");
-        let (x, w) =
+        let (u_single_next_secondary, w_single_next_secondary) =
             r1cs_instance_and_witness(&cs_secondary, &pp.r1cs_shape_secondary, &pp.ck_secondary);
-        let (u_single_next_secondary, w_single_next_secondary) = (
-            RelaxedR1csInstance::new(x.x),
-            RelaxedR1csWitness::new(w.w, pp.r1cs_shape_secondary.m()),
-        );
+
+        // assert!(pp.r1cs_shape_secondary.is_sat(
+        //     &pp.ck_secondary,
+        //     &u_single_next_secondary,
+        //     &w_single_next_secondary,
+        // ));
 
         // update values
         self.i += 1;
@@ -228,13 +238,13 @@ where
         self.zi_primary = DenseVectors::new(
             zi_primary
                 .into_iter()
-                .map(|x| x.value(&mut cs_primary))
+                .map(|x| x.value(&cs_primary))
                 .collect(),
         );
         self.zi_secondary = DenseVectors::new(
             zi_secondary
                 .into_iter()
-                .map(|x| x.value(&mut cs_secondary))
+                .map(|x| x.value(&cs_secondary))
                 .collect(),
         );
 

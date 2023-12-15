@@ -2,11 +2,12 @@ use crate::relaxed_r1cs::RelaxedR1csInstance;
 
 use crate::circuit::MimcROCircuit;
 use crate::driver::scalar_as_base;
+use crate::gadget::R1csInstanceAssignment;
 use crate::hash::MIMC_ROUNDS;
 use zkstd::circuit::prelude::{
     BinaryAssignment, CircuitDriver, FieldAssignment, PointAssignment, R1cs,
 };
-use zkstd::common::CurveGroup;
+use zkstd::common::{CurveGroup, Ring};
 
 #[derive(Clone)]
 pub(crate) struct RelaxedR1csInstanceAssignment<C: CircuitDriver> {
@@ -54,6 +55,22 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         }
     }
 
+    /// Allocates the R1CS Instance as a `RelaxedR1CSInstance` in the circuit.
+    /// E = 0, u = 1
+    pub fn from_r1cs_instance<CS: CircuitDriver<Scalar = C::Base>>(
+        cs: &mut R1cs<CS>,
+        instance: R1csInstanceAssignment<C>,
+    ) -> Self {
+        let commit_e = PointAssignment::identity();
+        Self {
+            commit_w: instance.commit_w,
+            commit_e,
+            u: FieldAssignment::constant(&C::Base::one()),
+            x0: instance.x0,
+            x1: instance.x1,
+        }
+    }
+
     pub fn conditional_select<CS: CircuitDriver<Scalar = C::Base>>(
         cs: &mut R1cs<CS>,
         a: &Self,
@@ -92,6 +109,31 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         z_0: Vec<FieldAssignment<C::Base>>,
         z_i: Vec<FieldAssignment<C::Base>>,
     ) -> FieldAssignment<C::Base> {
+        let commit_e = self.commit_e.to_one_scale(cs);
+        let commit_w = self.commit_w.to_one_scale(cs);
+        // println!(
+        //     "{:?},\n{:?},\n{:?},\n{:?},\n{:?},\n{:?},",
+        //     commit_e.get_x().value(cs),
+        //     commit_e.get_y().value(cs),
+        //     commit_e.get_z().value(cs),
+        //     commit_w.get_x().value(cs),
+        //     commit_w.get_y().value(cs),
+        //     commit_w.get_z().value(cs)
+        // );
+        dbg!(vec![
+            vec![i.clone()],
+            z_0.clone(),
+            z_i.clone(),
+            vec![self.u.clone()],
+            vec![self.x0.clone()],
+            vec![self.x1.clone()],
+            vec![commit_e.get_x(), commit_e.get_y(), commit_e.get_z()],
+            vec![commit_w.get_x(), commit_w.get_y(), commit_w.get_z()],
+        ]
+        .concat()
+        .iter()
+        .map(|x| x.value(cs))
+        .collect::<Vec<_>>());
         MimcROCircuit::<MIMC_ROUNDS, C>::default().hash_vec(
             cs,
             vec![
@@ -101,16 +143,8 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
                 vec![self.u.clone()],
                 vec![self.x0.clone()],
                 vec![self.x1.clone()],
-                vec![
-                    self.commit_e.get_x(),
-                    self.commit_e.get_y(),
-                    self.commit_e.get_z(),
-                ],
-                vec![
-                    self.commit_w.get_x(),
-                    self.commit_w.get_y(),
-                    self.commit_w.get_z(),
-                ],
+                vec![commit_e.get_x(), commit_e.get_y(), commit_e.get_z()],
+                vec![commit_w.get_x(), commit_w.get_y(), commit_w.get_z()],
             ]
             .concat(),
         )

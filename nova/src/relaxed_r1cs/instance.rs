@@ -1,9 +1,8 @@
 use crate::driver::scalar_as_base;
 use crate::hash::{MimcRO, MIMC_ROUNDS};
 use crate::{PedersenCommitment, R1csShape};
-use std::any::type_name;
 use zkstd::circuit::prelude::CircuitDriver;
-use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, IntGroup, PrimeField, Ring};
+use zkstd::common::{CurveGroup, Group, IntGroup, Ring};
 use zkstd::matrix::DenseVectors;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -22,6 +21,17 @@ impl<C: CircuitDriver> R1csInstance<C> {
             x: DenseVectors::new(x),
         }
     }
+
+    pub(crate) fn dummy(x_len: usize) -> Self {
+        Self {
+            commit_w: C::Affine::ADDITIVE_IDENTITY,
+            x: DenseVectors::zero(x_len),
+        }
+    }
+
+    pub(crate) fn x(&self) -> DenseVectors<C::Scalar> {
+        self.x.clone()
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -37,15 +47,6 @@ pub struct RelaxedR1csInstance<C: CircuitDriver> {
 }
 
 impl<C: CircuitDriver> RelaxedR1csInstance<C> {
-    pub(crate) fn new(x: DenseVectors<C::Scalar>) -> Self {
-        Self {
-            commit_w: C::Affine::ADDITIVE_IDENTITY,
-            commit_e: C::Affine::ADDITIVE_IDENTITY,
-            u: C::Scalar::one(),
-            x,
-        }
-    }
-
     /// Initializes a new `RelaxedR1CSInstance` from an `R1CSInstance`
     pub fn from_r1cs_instance(
         ck: &PedersenCommitment<C::Affine>,
@@ -78,25 +79,22 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
 
     pub(crate) fn fold(
         &self,
-        instance: &RelaxedR1csInstance<C>,
+        instance: &R1csInstance<C>,
         r: C::Scalar,
         commit_t: C::Affine,
     ) -> Self {
-        let r2 = r.square();
-        dbg!(type_name::<<C as CircuitDriver>::Scalar>());
-        dbg!(r2);
-        let (e1, u1, w1, x1) = (
-            C::Affine::ADDITIVE_IDENTITY,
-            C::Scalar::one(),
-            C::Affine::ADDITIVE_IDENTITY,
-            instance.x(),
-        );
-        let (e2, u2, w2, x2) = (self.commit_e, self.u, self.commit_w, self.x());
+        let (e1, u1, w1, x1) = (self.commit_e, self.u, self.commit_w, self.x());
+        let (w2, x2) = (instance.commit_w, instance.x());
 
-        let commit_e = (e1 + commit_t * r + e2 * r2).into();
-        let u = u1 + r * u2;
+        let commit_e = (e1 + commit_t * r).into();
+        let u = u1 + r;
         let commit_w = (w1 + w2 * r).into();
+        // dbg!(commit_w);
+        dbg!(&x1);
+        dbg!(&x2);
+        dbg!(x2.clone() * r);
         let x = x1 + x2 * r;
+        dbg!(&x);
 
         Self {
             commit_w,
@@ -124,8 +122,34 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
         z_0: &DenseVectors<E::Scalar>,
         z_i: &DenseVectors<E::Scalar>,
     ) -> C::Scalar {
-        let commit_e = self.commit_e.to_extended();
-        let commit_w = self.commit_w.to_extended();
+        // let commit_e = self.commit_e.to_extended();
+        // let commit_w = self.commit_w.to_extended();
+        dbg!(vec![
+            vec![E::Scalar::from(i as u64)],
+            z_0.get(),
+            z_i.get(),
+            vec![scalar_as_base::<C>(self.u)],
+            self.x.iter().map(|x| scalar_as_base::<C>(x)).collect(),
+            vec![
+                self.commit_e.get_x(),
+                self.commit_e.get_y(),
+                if self.commit_e.is_identity() {
+                    C::Base::zero()
+                } else {
+                    C::Base::one()
+                },
+            ],
+            vec![
+                self.commit_w.get_x(),
+                self.commit_w.get_y(),
+                if self.commit_w.is_identity() {
+                    C::Base::zero()
+                } else {
+                    C::Base::one()
+                },
+            ],
+        ]
+        .concat());
         MimcRO::<MIMC_ROUNDS, C>::default().hash_vec(
             vec![
                 vec![E::Scalar::from(i as u64)],
@@ -134,14 +158,22 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
                 vec![scalar_as_base::<C>(self.u)],
                 self.x.iter().map(|x| scalar_as_base::<C>(x)).collect(),
                 vec![
-                    commit_e.get_x().into(),
-                    commit_e.get_y().into(),
-                    commit_e.get_z().into(),
+                    self.commit_e.get_x(),
+                    self.commit_e.get_y(),
+                    if self.commit_e.is_identity() {
+                        C::Base::zero()
+                    } else {
+                        C::Base::one()
+                    },
                 ],
                 vec![
-                    commit_w.get_x().into(),
-                    commit_w.get_y().into(),
-                    commit_w.get_z().into(),
+                    self.commit_w.get_x(),
+                    self.commit_w.get_y(),
+                    if self.commit_w.is_identity() {
+                        C::Base::zero()
+                    } else {
+                        C::Base::one()
+                    },
                 ],
             ]
             .concat(),
