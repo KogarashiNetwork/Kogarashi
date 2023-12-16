@@ -1,6 +1,10 @@
 use core::marker::PhantomData;
+use num_bigint::BigInt;
+use num_traits::Num;
+use std::ops::Mul;
 
-use crate::gadget::{R1csInstanceAssignment, RelaxedR1csInstanceAssignment};
+use crate::driver::{f_to_nat, nat_to_f};
+use crate::gadget::{BigNatAssignment, R1csInstanceAssignment, RelaxedR1csInstanceAssignment};
 use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
 use zkstd::common::{Group, IntGroup};
 
@@ -16,18 +20,18 @@ impl<C: CircuitDriver> NifsCircuit<C> {
         u_single: R1csInstanceAssignment<C>,
         commit_t: PointAssignment<C::Base>,
     ) -> RelaxedR1csInstanceAssignment<C> {
-        println!(
-            "W1 = {:?}, {:?}, {:?}",
-            u_range.commit_w.get_x().value(cs),
-            u_range.commit_w.get_y().value(cs),
-            u_range.commit_w.get_z().value(cs)
-        );
-        println!(
-            "W2 = {:?}, {:?}, {:?}",
-            u_single.commit_w.get_x().value(cs),
-            u_single.commit_w.get_y().value(cs),
-            u_single.commit_w.get_z().value(cs)
-        );
+        // println!(
+        //     "W1 = {:?}, {:?}, {:?}",
+        //     u_range.commit_w.get_x().value(cs),
+        //     u_range.commit_w.get_y().value(cs),
+        //     u_range.commit_w.get_z().value(cs)
+        // );
+        // println!(
+        //     "W2 = {:?}, {:?}, {:?}",
+        //     u_single.commit_w.get_x().value(cs),
+        //     u_single.commit_w.get_y().value(cs),
+        //     u_single.commit_w.get_z().value(cs)
+        // );
         // W_fold = U.W + r * u.W
         let r_w = u_single.commit_w.scalar_point(cs, &r);
         let w_fold = u_range.commit_w.add(&r_w, cs);
@@ -45,23 +49,42 @@ impl<C: CircuitDriver> NifsCircuit<C> {
         let u_fold = &u_range.u + &r;
         FieldAssignment::enforce_eq_constant(cs, &(&(&u_fold - &u_range.u) - &r), &C::Base::zero());
 
-        // Fold U.x0 + r * x0
-        let r_x0 = FieldAssignment::mul(cs, &r, &u_single.x0);
-        let x0_fold = &u_range.x0 + &r_x0;
+        let r_bn = f_to_nat(&r.value(cs));
+        let m_bn = BigInt::from_str_radix(C::ORDER_STR, 16).unwrap();
+        let x0_range_bn = f_to_nat(&u_range.x0.value(cs));
+        let x1_range_bn = f_to_nat(&u_range.x1.value(cs));
+        let x0_single_bn = f_to_nat(&u_single.x0.value(cs));
+        let x1_single_bn = f_to_nat(&u_single.x1.value(cs));
 
-        println!("x1 = {:?}", u_range.x1.value(cs));
-        println!("x2 = {:?}", u_single.x1.value(cs));
+        // println!("x1 = {:?}", u_range.x1.value(cs));
+        // println!("x2 = {:?}", u_single.x1.value(cs));
+
+        let r_x0 = x0_single_bn.mul(r_bn.clone()) % m_bn.clone();
+
+        // println!("R_x0 = {:?}", nat_to_f::<C::Base>(&r_x0));
+
+        // Fold U.x0 + r * x0
+        // let r_x0 = FieldAssignment::mul(cs, &r, &u_single.x0);
+        let x0_fold = (x0_range_bn + r_x0) % m_bn.clone();
+        // println!("x0_fold = {:?}", nat_to_f::<C::Base>(&x0_fold));
+
+        let r_x1 = x1_single_bn.mul(r_bn) % m_bn.clone();
+
+        // Fold U.x0 + r * x0
+        // let r_x0 = FieldAssignment::mul(cs, &r, &u_single.x0);
+        let x1_fold = (x1_range_bn + r_x1.clone()) % m_bn;
+
         // Fold U.x1 + r * x1
-        let r_x1 = FieldAssignment::mul(cs, &r, &u_single.x1);
-        println!("R_x1 = {:?}", r_x1.value(cs));
-        let x1_fold = &u_range.x1 + &r_x1;
-        println!("x1_fold = {:?}", x1_fold.value(cs));
+        // let r_x1 = FieldAssignment::mul(cs, &r, &u_single.x1);
+        // println!("R_x1 = {:?}", nat_to_f::<C::Base>(&r_x1));
+        // let x1_fold = &u_range.x1 + &r_x1;
+        // println!("x1_fold = {:?}", nat_to_f::<C::Base>(&x1_fold));
         RelaxedR1csInstanceAssignment {
             commit_w: w_fold,
             commit_e: e_fold,
             u: u_fold,
-            x0: x0_fold,
-            x1: x1_fold,
+            x0: FieldAssignment::witness(cs, nat_to_f(&x0_fold)),
+            x1: FieldAssignment::witness(cs, nat_to_f(&x1_fold)),
         }
     }
 }

@@ -1,13 +1,15 @@
 use crate::relaxed_r1cs::RelaxedR1csInstance;
+use rand_core::OsRng;
 
 use crate::circuit::MimcROCircuit;
-use crate::driver::scalar_as_base;
+use crate::driver::{f_to_nat, scalar_as_base};
+use crate::gadget::big_nat::BigNatAssignment;
 use crate::gadget::R1csInstanceAssignment;
 use crate::hash::MIMC_ROUNDS;
 use zkstd::circuit::prelude::{
     BinaryAssignment, CircuitDriver, FieldAssignment, PointAssignment, R1cs,
 };
-use zkstd::common::{CurveGroup, Ring};
+use zkstd::common::{CurveGroup, Group, Ring};
 
 #[derive(Clone)]
 pub(crate) struct RelaxedR1csInstanceAssignment<C: CircuitDriver> {
@@ -16,6 +18,8 @@ pub(crate) struct RelaxedR1csInstanceAssignment<C: CircuitDriver> {
     pub(crate) u: FieldAssignment<C::Base>,
     pub(crate) x0: FieldAssignment<C::Base>,
     pub(crate) x1: FieldAssignment<C::Base>,
+    // pub(crate) x0: BigInt,
+    // pub(crate) x1: BigInt,
 }
 
 impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
@@ -44,6 +48,8 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         );
         let u = FieldAssignment::witness(cs, scalar_as_base::<C>(*u));
         let x0 = FieldAssignment::witness(cs, scalar_as_base::<C>(x[0]));
+        // let x0 = BigNatAssignment::witness(cs, f_to_nat(&x[0]));
+        // let x1 = BigNatAssignment::witness(cs, f_to_nat(&x[1]));
         let x1 = FieldAssignment::witness(cs, scalar_as_base::<C>(x[1]));
 
         Self {
@@ -120,20 +126,20 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         //     commit_w.get_y().value(cs),
         //     commit_w.get_z().value(cs)
         // );
-        dbg!(vec![
-            vec![i.clone()],
-            z_0.clone(),
-            z_i.clone(),
-            vec![self.u.clone()],
-            vec![self.x0.clone()],
-            vec![self.x1.clone()],
-            vec![commit_e.get_x(), commit_e.get_y(), commit_e.get_z()],
-            vec![commit_w.get_x(), commit_w.get_y(), commit_w.get_z()],
-        ]
-        .concat()
-        .iter()
-        .map(|x| x.value(cs))
-        .collect::<Vec<_>>());
+        // dbg!(vec![
+        //     vec![i.clone()],
+        //     z_0.clone(),
+        //     z_i.clone(),
+        //     vec![self.u.clone()],
+        //     vec![self.x0.clone()],
+        //     vec![self.x1.clone()],
+        //     vec![commit_e.get_x(), commit_e.get_y(), commit_e.get_z()],
+        //     vec![commit_w.get_x(), commit_w.get_y(), commit_w.get_z()],
+        // ]
+        // .concat()
+        // .iter()
+        // .map(|x| x.value(cs))
+        // .collect::<Vec<_>>());
         MimcROCircuit::<MIMC_ROUNDS, C>::default().hash_vec(
             cs,
             vec![

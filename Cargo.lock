@@ -1179,6 +1179,7 @@ dependencies = [
  "bn-254",
  "grumpkin",
  "num-bigint 0.4.4",
+ "num-traits",
  "rand_core",
  "serde",
  "zkgroth16",

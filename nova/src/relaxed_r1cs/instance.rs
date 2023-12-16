@@ -124,32 +124,32 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
     ) -> C::Scalar {
         // let commit_e = self.commit_e.to_extended();
         // let commit_w = self.commit_w.to_extended();
-        dbg!(vec![
-            vec![E::Scalar::from(i as u64)],
-            z_0.get(),
-            z_i.get(),
-            vec![scalar_as_base::<C>(self.u)],
-            self.x.iter().map(|x| scalar_as_base::<C>(x)).collect(),
-            vec![
-                self.commit_e.get_x(),
-                self.commit_e.get_y(),
-                if self.commit_e.is_identity() {
-                    C::Base::zero()
-                } else {
-                    C::Base::one()
-                },
-            ],
-            vec![
-                self.commit_w.get_x(),
-                self.commit_w.get_y(),
-                if self.commit_w.is_identity() {
-                    C::Base::zero()
-                } else {
-                    C::Base::one()
-                },
-            ],
-        ]
-        .concat());
+        // dbg!(vec![
+        //     vec![E::Scalar::from(i as u64)],
+        //     z_0.get(),
+        //     z_i.get(),
+        //     vec![scalar_as_base::<C>(self.u)],
+        //     self.x.iter().map(|x| scalar_as_base::<C>(x)).collect(),
+        //     vec![
+        //         self.commit_e.get_x(),
+        //         self.commit_e.get_y(),
+        //         if self.commit_e.is_identity() {
+        //             C::Base::zero()
+        //         } else {
+        //             C::Base::one()
+        //         },
+        //     ],
+        //     vec![
+        //         self.commit_w.get_x(),
+        //         self.commit_w.get_y(),
+        //         if self.commit_w.is_identity() {
+        //             C::Base::zero()
+        //         } else {
+        //             C::Base::one()
+        //         },
+        //     ],
+        // ]
+        // .concat());
         MimcRO::<MIMC_ROUNDS, C>::default().hash_vec(
             vec![
                 vec![E::Scalar::from(i as u64)],

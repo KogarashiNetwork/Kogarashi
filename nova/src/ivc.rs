@@ -194,6 +194,11 @@ where
         println!("Primary out");
         let (u_single_next_primary, w_single_next_primary) =
             r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary, &pp.ck_primary);
+        assert!(pp.r1cs_shape_primary.is_sat(
+            &pp.ck_primary,
+            &u_single_next_primary,
+            &w_single_next_primary
+        ));
 
         let (u_range_next_primary, w_range_next_primary, commit_t_primary) =
             self.prover_primary.prove(

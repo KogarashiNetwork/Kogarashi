@@ -8,6 +8,10 @@ use zkstd::common::{IntGroup, PrimeField, Ring};
 pub struct GrumpkinDriver;
 
 impl CircuitDriver for GrumpkinDriver {
+    const ORDER_STR: &'static str =
+        "30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47";
+    const BASE_STR: &'static str =
+        "30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001";
     const NUM_BITS: u16 = 254;
     type Affine = Affine;
 
@@ -24,6 +28,11 @@ impl CircuitDriver for GrumpkinDriver {
 pub struct Bn254Driver;
 
 impl CircuitDriver for Bn254Driver {
+    const ORDER_STR: &'static str =
+        "30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001";
+    const BASE_STR: &'static str =
+        "30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47";
+
     const NUM_BITS: u16 = 254;
     type Affine = G1Affine;
 
@@ -38,17 +47,18 @@ impl CircuitDriver for Bn254Driver {
 
 /// Convert a field element to a natural number
 pub fn f_to_nat<F: PrimeField>(f: &F) -> BigInt {
-    dbg!(f.to_raw_bytes());
+    // dbg!(f);
     BigInt::from_bytes_le(Sign::Plus, &f.to_raw_bytes())
 }
 
 /// Convert a natural number to a field element.
 /// Returns `None` if the number is too big for the field.
 pub fn nat_to_f<F: PrimeField>(n: &BigInt) -> F {
-    let bytes = n.to_signed_bytes_le();
+    let mut bytes = n.to_signed_bytes_le();
     if bytes.len() > 64 {
         panic!("Length exceed the field size");
     };
+    bytes.resize(64, 0);
 
     let mut res = [0; 64];
     res[0..64].copy_from_slice(&bytes);

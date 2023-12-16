@@ -17,6 +17,7 @@ grumpkin = { path = "../grumpkin", default-features = false }
 zkgroth16 = { path = "../groth16", default-features = false }
 serde = { version = "1.0.102", default-features = false, features = ["derive"] }
 num-bigint = { version = "0.4", features = ["serde", "rand"] }
+num-traits = "0.2"
 blake2b_simd = { version = "1", default-features = false }
 rand_core = { version="0.6.4", default-features = false, features = ["getrandom"] }
 
