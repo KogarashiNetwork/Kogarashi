@@ -165,6 +165,27 @@ impl<F: PrimeField> FieldAssignment<F> {
         cs.mul_gate(&x.0, &SparseRow::one(), &y.0)
     }
 
+    pub fn enforce_eq_bits<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
+        x: &Self,
+        bits: &[BinaryAssignment],
+    ) {
+        let mut f = F::one();
+        let sum = bits
+            .iter()
+            .fold(FieldAssignment::constant(&F::zero()), |acc, bit| {
+                let l = &acc
+                    + &FieldAssignment::mul(
+                        cs,
+                        &FieldAssignment::constant(&f),
+                        &FieldAssignment::from(bit),
+                    );
+                f = f.double();
+                l
+            });
+        FieldAssignment::enforce_eq(cs, x, &sum);
+    }
+
     pub fn conditional_enforce_equal<C: CircuitDriver<Scalar = F>>(
         cs: &mut R1cs<C>,
         x: &Self,
