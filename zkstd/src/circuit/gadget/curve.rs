@@ -43,6 +43,21 @@ impl<F: PrimeField> PointAssignment<F> {
         } else {
             self.clone()
         }
+
+        // let take_value =
+        //     FieldAssignment::is_neq(cs, &self.z, &FieldAssignment::constant(&F::zero()));
+        // let z = FieldAssignment::constant(&self.z.value(cs).invert().unwrap_or(F::zero()));
+        //
+        // // let inv = FieldAssignment::constant(&z);
+        // let p = Self {
+        //     x: FieldAssignment::mul(cs, &self.x, &z),
+        //     y: FieldAssignment::mul(cs, &self.y, &z),
+        //     z: FieldAssignment::constant(&F::one()),
+        // };
+        //
+        // PointAssignment::conditional_select(cs, &p, &PointAssignment::identity(), &take_value)
+
+        // p.select_identity(cs, &take_value)
     }
 
     pub fn identity() -> Self {

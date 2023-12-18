@@ -177,20 +177,29 @@ impl<F: PrimeField> FieldAssignment<F> {
 
     pub fn conditional_select<C: CircuitDriver<Scalar = F>>(
         cs: &mut R1cs<C>,
-        x: &Self,
-        y: &Self,
+        a: &Self,
+        b: &Self,
         condition: &BinaryAssignment,
     ) -> FieldAssignment<F> {
-        let c = if cs[*condition.inner()] == F::one() {
-            x
-        } else {
-            y
-        };
+        // let c = if cs[*condition.inner()] == F::one() {
+        //     a
+        // } else {
+        //     b
+        // };
 
-        let left = FieldAssignment::mul(cs, &(x - y), &FieldAssignment::from(condition));
+        let select_a = FieldAssignment::mul(cs, a, &FieldAssignment::from(condition));
+        let select_b = FieldAssignment::mul(
+            cs,
+            b,
+            &(&FieldAssignment::constant(&F::one()) - &FieldAssignment::from(condition)),
+        );
 
-        FieldAssignment::enforce_eq(cs, &left, &(c - y));
-        c.clone()
+        // let left = FieldAssignment::mul(cs, &(a - b), &FieldAssignment::from(condition));
+        //
+        // FieldAssignment::enforce_eq(cs, &left, &(c - b));
+        // c.clone()
+
+        &select_a + &select_b
     }
 
     pub fn is_eq<C: CircuitDriver<Scalar = F>>(

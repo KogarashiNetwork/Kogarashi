@@ -177,6 +177,10 @@ where
                 &self.w_single_secondary,
             );
 
+        assert!(pp
+            .r1cs_shape_secondary
+            .is_sat_relaxed(&u_range_next_secondary, &w_range_next_secondary));
+
         let mut cs_primary = R1cs::<E1>::default();
         let circuit_primary = AugmentedFCircuit::<E2, FC1> {
             is_primary: true,

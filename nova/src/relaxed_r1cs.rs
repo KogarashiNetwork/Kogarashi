@@ -27,6 +27,7 @@ pub(crate) fn r1cs_instance_and_witness<C: CircuitDriver>(
 ) -> (R1csInstance<C>, R1csWitness<C>) {
     println!("Cs.x = {:?}", cs.x());
     assert_eq!(cs.m_l_1(), shape.m_l_1());
+    assert_eq!(cs.m(), shape.m());
     let w = cs.w();
     let x = cs.x()[1..].to_vec();
     assert_eq!(x.len(), shape.l());
