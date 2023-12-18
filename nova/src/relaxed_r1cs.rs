@@ -10,8 +10,6 @@ use zkstd::matrix::{DenseVectors, SparseMatrix};
 
 #[derive(Clone, Debug)]
 pub struct R1csShape<C: CircuitDriver> {
-    // 1. Structure S
-    // a, b and c matrices and matrix size
     m: usize,
     instance_length: usize,
     witness_length: usize,
@@ -25,7 +23,6 @@ pub(crate) fn r1cs_instance_and_witness<C: CircuitDriver>(
     shape: &R1csShape<C>,
     ck: &PedersenCommitment<C::Affine>,
 ) -> (R1csInstance<C>, R1csWitness<C>) {
-    println!("Cs.x = {:?}", cs.x());
     assert_eq!(cs.m_l_1(), shape.m_l_1());
     assert_eq!(cs.m(), shape.m());
     let w = cs.w();
@@ -123,7 +120,6 @@ impl<C: CircuitDriver> R1csShape<C> {
         let Self { m, a, b, c, .. } = self;
 
         let R1csInstance { commit_w, x } = instance;
-        dbg!(x);
         let R1csWitness { w } = witness;
 
         let l = x.len() + 1;
@@ -141,9 +137,7 @@ impl<C: CircuitDriver> R1csShape<C> {
             .iter()
             .zip(cz.iter())
             .all(|(left, right)| left == right);
-        dbg!(constraints_check);
         let commit_check = *commit_w == witness.commit(ck);
-        dbg!(commit_check);
 
         constraints_check && commit_check
     }

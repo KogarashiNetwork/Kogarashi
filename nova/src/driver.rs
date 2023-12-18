@@ -47,12 +47,10 @@ impl CircuitDriver for Bn254Driver {
 
 /// Convert a field element to a natural number
 pub fn f_to_nat<F: PrimeField>(f: &F) -> BigInt {
-    // dbg!(f);
     BigInt::from_bytes_le(Sign::Plus, &f.to_raw_bytes())
 }
 
 /// Convert a natural number to a field element.
-/// Returns `None` if the number is too big for the field.
 pub fn nat_to_f<F: PrimeField>(n: &BigInt) -> F {
     let mut bytes = n.to_signed_bytes_le();
     if bytes.len() > 64 {

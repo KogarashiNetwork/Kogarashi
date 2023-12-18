@@ -47,46 +47,6 @@ impl<C: CircuitDriver> R1csInstanceAssignment<C> {
         let x1 = FieldAssignment::conditional_select(cs, &a.x1, &b.x1, condition);
         Self { commit_w, x0, x1 }
     }
-
-    pub(crate) fn absorb_by_transcript<const ROUNDS: usize>(
-        &self,
-        transcript: &mut MimcROCircuit<ROUNDS, C>,
-    ) {
-        transcript.append_point(self.commit_w.clone());
-        transcript.append(self.x0.clone());
-        transcript.append(self.x1.clone());
-    }
-
-    // pub(crate) fn hash<CS: CircuitDriver<Scalar = C::Base>>(
-    //     &self,
-    //     cs: &mut R1cs<CS>,
-    //     i: FieldAssignment<C::Base>,
-    //     z_0: Vec<FieldAssignment<C::Base>>,
-    //     z_i: Vec<FieldAssignment<C::Base>>,
-    // ) -> FieldAssignment<C::Base> {
-    //     MimcROCircuit::<MIMC_ROUNDS, C>::default().hash_vec(
-    //         cs,
-    //         vec![
-    //             vec![i],
-    //             z_0,
-    //             z_i,
-    //             vec![self.u.clone()],
-    //             vec![self.x0.clone()],
-    //             vec![self.x1.clone()],
-    //             vec![
-    //                 self.commit_e.get_x(),
-    //                 self.commit_e.get_y(),
-    //                 self.commit_e.get_z(),
-    //             ],
-    //             vec![
-    //                 self.commit_w.get_x(),
-    //                 self.commit_w.get_y(),
-    //                 self.commit_w.get_z(),
-    //             ],
-    //         ]
-    //         .concat(),
-    //     )
-    // }
 }
 
 #[cfg(test)]

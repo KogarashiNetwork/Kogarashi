@@ -7,7 +7,7 @@ use zkstd::common::{BNAffine, IntGroup, PrimeField, Ring};
 
 /// Amount of rounds calculated for the 254 bit field.
 /// Doubled due to the usage of Feistel mode with zero key.
-pub(crate) const MIMC_ROUNDS: usize = 0;
+pub(crate) const MIMC_ROUNDS: usize = 322;
 
 pub(crate) struct Mimc<const ROUND: usize, F: PrimeField> {
     pub(crate) constants: [F; ROUND],

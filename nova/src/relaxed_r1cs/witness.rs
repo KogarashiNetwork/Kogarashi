@@ -17,7 +17,6 @@ impl<C: CircuitDriver> R1csWitness<C> {
         }
     }
 
-    /// Commits to the witness using the supplied generators
     pub fn commit(&self, ck: &PedersenCommitment<C::Affine>) -> C::Affine {
         ck.commit(&self.w)
     }

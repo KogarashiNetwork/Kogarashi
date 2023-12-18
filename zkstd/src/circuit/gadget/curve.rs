@@ -31,33 +31,18 @@ impl<F: PrimeField> PointAssignment<F> {
         Self { x, y, z }
     }
 
-    pub fn to_one_scale<C: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<C>) -> Self {
-        let z = self.z.value(cs).invert();
-        if let Some(inv) = z {
-            let inv = FieldAssignment::constant(&inv);
-            Self {
-                x: FieldAssignment::mul(cs, &self.x, &inv),
-                y: FieldAssignment::mul(cs, &self.y, &inv),
-                z: FieldAssignment::constant(&F::one()),
-            }
-        } else {
-            self.clone()
-        }
+    pub fn descale<C: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<C>) -> Self {
+        let take_value =
+            FieldAssignment::is_neq(cs, &self.z, &FieldAssignment::constant(&F::zero()));
+        let inv = FieldAssignment::witness(cs, self.z.value(cs).invert().unwrap_or(F::zero()));
 
-        // let take_value =
-        //     FieldAssignment::is_neq(cs, &self.z, &FieldAssignment::constant(&F::zero()));
-        // let z = FieldAssignment::constant(&self.z.value(cs).invert().unwrap_or(F::zero()));
-        //
-        // // let inv = FieldAssignment::constant(&z);
-        // let p = Self {
-        //     x: FieldAssignment::mul(cs, &self.x, &z),
-        //     y: FieldAssignment::mul(cs, &self.y, &z),
-        //     z: FieldAssignment::constant(&F::one()),
-        // };
-        //
-        // PointAssignment::conditional_select(cs, &p, &PointAssignment::identity(), &take_value)
+        let p = Self {
+            x: FieldAssignment::mul(cs, &self.x, &inv),
+            y: FieldAssignment::mul(cs, &self.y, &inv),
+            z: FieldAssignment::constant(&F::one()),
+        };
 
-        // p.select_identity(cs, &take_value)
+        p.select_identity(cs, &take_value)
     }
 
     pub fn identity() -> Self {

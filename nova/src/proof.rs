@@ -49,7 +49,6 @@ where
             || u_range_primary.x.len() != 2
             || u_range_secondary.x.len() != 2
         {
-            println!("Length doesn't match");
             return false;
         }
         let (hash_primary, hash_secondary) = {
@@ -59,27 +58,11 @@ where
             )
         };
 
-        dbg!(hash_primary);
-        dbg!(hash_secondary);
-
         if hash_primary != u_single_secondary.x[0]
             || hash_secondary != scalar_as_base::<E2>(u_single_secondary.x[1])
         {
-            println!("Hash doesn't match");
             return false;
         }
-
-        dbg!(pp
-            .r1cs_shape_primary
-            .is_sat_relaxed(&u_range_primary, &w_range_primary));
-        dbg!(pp
-            .r1cs_shape_secondary
-            .is_sat_relaxed(&u_range_secondary, &w_range_secondary));
-        dbg!(pp.r1cs_shape_secondary.is_sat(
-            &pp.ck_secondary,
-            &u_single_secondary,
-            &w_single_secondary
-        ));
 
         pp.r1cs_shape_primary
             .is_sat_relaxed(&u_range_primary, &w_range_primary)

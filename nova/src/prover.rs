@@ -12,14 +12,13 @@ use zkstd::matrix::DenseVectors;
 pub struct Prover<C: CircuitDriver> {
     // public parameters
     pub(crate) ck: PedersenCommitment<C::Affine>,
-
     // r1cs structure
-    f: R1csShape<C>,
+    shape: R1csShape<C>,
 }
 
 impl<C: CircuitDriver> Prover<C> {
     pub fn new(shape: R1csShape<C>, ck: PedersenCommitment<C::Affine>) -> Self {
-        Self { ck, f: shape }
+        Self { ck, shape }
     }
 
     pub fn prove(
@@ -39,8 +38,6 @@ impl<C: CircuitDriver> Prover<C> {
         instance1.absorb_by_transcript(&mut transcript);
 
         let r = transcript.squeeze();
-
-        dbg!(r);
 
         // fold instance
         let instance = instance1.fold(instance2, r, commit_t);
@@ -62,8 +59,8 @@ impl<C: CircuitDriver> Prover<C> {
     ) -> DenseVectors<C::Scalar> {
         let u1 = instance1.u;
         let u2 = C::Scalar::one();
-        let m = self.f.m();
-        let (a, b, c) = self.f.matrices();
+        let m = self.shape.m();
+        let (a, b, c) = self.shape.matrices();
         let (w1, w2) = (witness1.w(), witness2.w());
         let (x1, x2) = (instance1.x(), instance2.x());
 

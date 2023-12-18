@@ -99,14 +99,6 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
         FieldAssignment::conditional_enforce_equal(cs, &u_single.x0, &u_i_x, &not_base_case);
 
         let r = Self::get_challenge(cs, &u_range, commit_t.clone());
-        // println!("R = {:?}", r.value(cs));
-        // println!(
-        //     "R_bits = {:?}",
-        //     FieldAssignment::to_bits(cs, &r)
-        //         .iter()
-        //         .map(|x| FieldAssignment::from(x).value(cs))
-        //         .collect::<Vec<_>>()
-        // );
         let u_range_next_non_base =
             NifsCircuit::verify(cs, r, u_range.clone(), u_single.clone(), commit_t);
 
@@ -119,16 +111,6 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
 
         let z_next = FC::invoke_cs(cs, z_i);
 
-        // println!(
-        //     "Hash_circuit\n{:?},\n{:?},\n{:?},\n{:?},\n{:?},\n{:?},",
-        //     (&i + &FieldAssignment::constant(&C::Base::one())).value(cs),
-        //     z_0.iter().map(|x| x.value(cs)).collect::<Vec<_>>(),
-        //     z_next.iter().map(|x| x.value(cs)).collect::<Vec<_>>(),
-        //     u_range_next.u.value(cs),
-        //     u_range_next.x0.value(cs),
-        //     u_range_next.x1.value(cs),
-        // );
-        println!("HASH");
         let u_next_x = u_range_next.hash(
             cs,
             &i + &FieldAssignment::constant(&C::Base::one()),

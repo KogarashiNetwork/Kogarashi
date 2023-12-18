@@ -21,7 +21,6 @@ impl<F: PrimeField> BigNatAssignment<F> {
         for (i, limb) in limb_values.iter().enumerate() {
             limbs[i] = FieldAssignment::witness(cs, *limb);
         }
-        dbg!(limb_values);
 
         Self {
             limbs,

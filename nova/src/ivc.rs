@@ -26,16 +26,16 @@ where
     zi_secondary: DenseVectors<E2::Scalar>,
     prover_primary: Prover<E1>,
     prover_secondary: Prover<E2>,
-    // r1cs instance to be folded
-    // u_i
+    // u_i for primary circuit
     // represents the correct execution of invocation i of F′
     u_single_secondary: R1csInstance<E2>,
     w_single_secondary: R1csWitness<E2>,
-    // running r1cs instance
-    // U_i
+    // U_i for primary circuit
     // represents the correct execution of invocations 1, . . . , i - 1 of F′
     u_range_primary: RelaxedR1csInstance<E1>,
     w_range_primary: RelaxedR1csWitness<E1>,
+    // U_i for secondary circuit
+    // represents the correct execution of invocations 1, . . . , i - 1 of F′
     u_range_secondary: RelaxedR1csInstance<E2>,
     w_range_secondary: RelaxedR1csWitness<E2>,
     f: PhantomData<(FC1, FC2)>,
@@ -53,7 +53,6 @@ where
         z0_primary: DenseVectors<E1::Scalar>,
         z0_secondary: DenseVectors<E2::Scalar>,
     ) -> Self {
-        println!("START");
         let mut cs_primary = R1cs::<E1>::default();
         let circuit_primary = AugmentedFCircuit::<E2, FC1> {
             is_primary: true,
@@ -69,11 +68,6 @@ where
 
         let (u_single_next_primary, w_single_next_primary) =
             r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary, &pp.ck_primary);
-        assert!(pp.r1cs_shape_primary.is_sat(
-            &pp.ck_primary,
-            &u_single_next_primary,
-            &w_single_next_primary,
-        ));
         let prover_primary = Prover::new(pp.r1cs_shape_primary.clone(), pp.ck_primary.clone());
 
         let mut cs_secondary = R1cs::<E2>::default();
@@ -91,12 +85,6 @@ where
 
         let (u_single_next_secondary, w_single_next_secondary) =
             r1cs_instance_and_witness(&cs_secondary, &pp.r1cs_shape_secondary, &pp.ck_secondary);
-        assert!(pp.r1cs_shape_secondary.is_sat(
-            &pp.ck_secondary,
-            &u_single_next_secondary,
-            &w_single_next_secondary,
-        ));
-
         let prover_secondary =
             Prover::new(pp.r1cs_shape_secondary.clone(), pp.ck_secondary.clone());
 
@@ -145,7 +133,6 @@ where
         &mut self,
         pp: &PublicParams<E1, E2, FC1, FC2>,
     ) -> RecursiveProof<E1, E2, FC1, FC2> {
-        println!("STEP");
         if self.i == 0 {
             self.i = 1;
             return RecursiveProof {
@@ -177,10 +164,6 @@ where
                 &self.w_single_secondary,
             );
 
-        assert!(pp
-            .r1cs_shape_secondary
-            .is_sat_relaxed(&u_range_next_secondary, &w_range_next_secondary));
-
         let mut cs_primary = R1cs::<E1>::default();
         let circuit_primary = AugmentedFCircuit::<E2, FC1> {
             is_primary: true,
@@ -194,15 +177,8 @@ where
         };
 
         let zi_primary = circuit_primary.generate(&mut cs_primary);
-
-        println!("Primary out");
         let (u_single_next_primary, w_single_next_primary) =
             r1cs_instance_and_witness(&cs_primary, &pp.r1cs_shape_primary, &pp.ck_primary);
-        assert!(pp.r1cs_shape_primary.is_sat(
-            &pp.ck_primary,
-            &u_single_next_primary,
-            &w_single_next_primary
-        ));
 
         let (u_range_next_primary, w_range_next_primary, commit_t_primary) =
             self.prover_primary.prove(
@@ -225,16 +201,8 @@ where
         };
 
         let zi_secondary = circuit_secondary.generate(&mut cs_secondary);
-
-        println!("Secondary out");
         let (u_single_next_secondary, w_single_next_secondary) =
             r1cs_instance_and_witness(&cs_secondary, &pp.r1cs_shape_secondary, &pp.ck_secondary);
-
-        // assert!(pp.r1cs_shape_secondary.is_sat(
-        //     &pp.ck_secondary,
-        //     &u_single_next_secondary,
-        //     &w_single_next_secondary,
-        // ));
 
         // update values
         self.i += 1;
@@ -380,7 +348,7 @@ mod tests {
                 z0_secondary,
             );
 
-        for i in 0..2 {
+        for i in 0..4 {
             let proof = ivc.prove_step(&pp);
             assert!(proof.verify(&pp));
         }

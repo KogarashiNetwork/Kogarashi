@@ -66,9 +66,9 @@ mod tests {
     #[test]
     fn mimc_circuit() {
         let mut mimc = MimcRO::<MIMC_ROUNDS, GrumpkinDriver>::default();
-        let mut mimc_circuit = MimcROCircuit::<MIMC_ROUNDS, GrumpkinDriver>::default(); // Base = Fr, Scalar = Fq
-        let mut cs: R1cs<Bn254Driver> = R1cs::default(); // Base = Fq, Scalar = Fr
-        let point = Affine::random(OsRng); // Base = Fr, Scalar = Fq
+        let mut mimc_circuit = MimcROCircuit::<MIMC_ROUNDS, GrumpkinDriver>::default();
+        let mut cs: R1cs<Bn254Driver> = R1cs::default();
+        let point = Affine::random(OsRng);
         let scalar = Fr::random(OsRng);
 
         let point_assignment = PointAssignment::instance(&mut cs, point);
