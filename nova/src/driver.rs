@@ -10,8 +10,7 @@ pub struct GrumpkinDriver;
 impl CircuitDriver for GrumpkinDriver {
     const ORDER_STR: &'static str =
         "30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47";
-    const BASE_STR: &'static str =
-        "30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001";
+
     const NUM_BITS: u16 = 254;
     type Affine = Affine;
 
@@ -30,8 +29,6 @@ pub struct Bn254Driver;
 impl CircuitDriver for Bn254Driver {
     const ORDER_STR: &'static str =
         "30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001";
-    const BASE_STR: &'static str =
-        "30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47";
 
     const NUM_BITS: u16 = 254;
     type Affine = G1Affine;

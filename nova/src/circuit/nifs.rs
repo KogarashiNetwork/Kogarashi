@@ -36,11 +36,13 @@ impl<C: CircuitDriver> NifsCircuit<C> {
         let r_bn = f_to_nat(&r.value(cs));
         let m_bn = BigInt::from_str_radix(C::ORDER_STR, 16).unwrap();
 
+        // TODO: Should be done without using BigInt
         // u_fold = U.u + r
         let u = f_to_nat(&u_range.u.value(cs));
         let u_fold = FieldAssignment::witness(cs, nat_to_f(&(u.add(r_bn.clone()) % m_bn.clone())));
         // FieldAssignment::enforce_eq_constant(cs, &(&(&u_fold - &u_range.u) - &r), &C::Base::zero());
 
+        // TODO: BigNatAssignment should be use for module arithmetics
         // Fold U.x0 + r * x0
         let x0_range_bn = f_to_nat(&u_range.x0.value(cs));
         let x0_single_bn = f_to_nat(&u_single.x0.value(cs));
@@ -50,7 +52,7 @@ impl<C: CircuitDriver> NifsCircuit<C> {
         let x1_range_bn = f_to_nat(&u_range.x1.value(cs));
         let x1_single_bn = f_to_nat(&u_single.x1.value(cs));
         let r_x1 = x1_single_bn.mul(r_bn) % m_bn.clone();
-        let x1_fold = (x1_range_bn + r_x1.clone()) % m_bn;
+        let x1_fold = (x1_range_bn + r_x1) % m_bn;
 
         RelaxedR1csInstanceAssignment {
             commit_w: w_fold,

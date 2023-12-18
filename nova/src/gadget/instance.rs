@@ -1,6 +1,5 @@
 use crate::relaxed_r1cs::R1csInstance;
 
-use crate::circuit::MimcROCircuit;
 use crate::driver::scalar_as_base;
 
 use zkstd::circuit::prelude::{

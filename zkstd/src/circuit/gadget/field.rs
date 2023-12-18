@@ -181,23 +181,12 @@ impl<F: PrimeField> FieldAssignment<F> {
         b: &Self,
         condition: &BinaryAssignment,
     ) -> FieldAssignment<F> {
-        // let c = if cs[*condition.inner()] == F::one() {
-        //     a
-        // } else {
-        //     b
-        // };
-
         let select_a = FieldAssignment::mul(cs, a, &FieldAssignment::from(condition));
         let select_b = FieldAssignment::mul(
             cs,
             b,
             &(&FieldAssignment::constant(&F::one()) - &FieldAssignment::from(condition)),
         );
-
-        // let left = FieldAssignment::mul(cs, &(a - b), &FieldAssignment::from(condition));
-        //
-        // FieldAssignment::enforce_eq(cs, &left, &(c - b));
-        // c.clone()
 
         &select_a + &select_b
     }

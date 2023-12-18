@@ -34,7 +34,7 @@ impl<F: PrimeField> PointAssignment<F> {
     pub fn descale<C: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<C>) -> Self {
         let take_value =
             FieldAssignment::is_neq(cs, &self.z, &FieldAssignment::constant(&F::zero()));
-        let inv = FieldAssignment::witness(cs, self.z.value(cs).invert().unwrap_or(F::zero()));
+        let inv = FieldAssignment::witness(cs, self.z.value(cs).invert().unwrap_or_else(F::zero));
 
         let p = Self {
             x: FieldAssignment::mul(cs, &self.x, &inv),

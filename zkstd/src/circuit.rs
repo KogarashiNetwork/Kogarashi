@@ -6,7 +6,6 @@ use core::fmt::Debug;
 
 pub trait CircuitDriver: Clone + Debug + Default {
     const ORDER_STR: &'static str;
-    const BASE_STR: &'static str;
     const NUM_BITS: u16;
     // curve affine
     type Affine: BNAffine<Scalar = Self::Scalar, Base = Self::Base>;

@@ -35,8 +35,8 @@ impl<F: PrimeField> BigNatAssignment<F> {
         condition: &BinaryAssignment,
     ) -> BigNatAssignment<F> {
         let mut limbs = vec![FieldAssignment::constant(&F::zero()); BN_N_LIMBS];
-        for i in 0..BN_N_LIMBS {
-            limbs[i] = FieldAssignment::conditional_select(cs, &a.limbs[i], &b.limbs[i], condition);
+        for (i, limb) in limbs.iter_mut().enumerate().take(BN_N_LIMBS) {
+            *limb = FieldAssignment::conditional_select(cs, &a.limbs[i], &b.limbs[i], condition);
         }
 
         let max_word = if cs[*condition.inner()] == F::one() {
