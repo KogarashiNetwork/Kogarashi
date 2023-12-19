@@ -75,6 +75,15 @@ impl<F: PrimeField> FieldAssignment<F> {
         z
     }
 
+    // TODO: How to test it properly
+    pub fn range_check_bits<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
+        a_bits: &[BinaryAssignment],
+        num_bits: u64,
+    ) {
+        Self::range_check(cs, a_bits, F::pow_of_2(num_bits) - F::one());
+    }
+
     pub fn range_check<C: CircuitDriver<Scalar = F>>(
         cs: &mut R1cs<C>,
         a_bits: &[BinaryAssignment],
@@ -147,7 +156,9 @@ impl<F: PrimeField> FieldAssignment<F> {
     pub fn to_bits<C: CircuitDriver<Scalar = F>>(
         cs: &mut R1cs<C>,
         x: &Self,
+        num_bits: usize,
     ) -> Vec<BinaryAssignment> {
+        assert!(num_bits <= 256);
         let bound = F::MODULUS - F::one();
 
         let bit_repr: Vec<BinaryAssignment> = x
@@ -156,8 +167,14 @@ impl<F: PrimeField> FieldAssignment<F> {
             .to_bits()
             .iter()
             .map(|b| BinaryAssignment::witness(cs, *b))
+            .skip(256 - num_bits) // TODO: Decide on how to store bits. LE or BE
             .collect();
-        FieldAssignment::range_check(cs, &bit_repr, bound);
+        if num_bits < C::NUM_BITS as usize {
+            FieldAssignment::range_check_bits(cs, &bit_repr, num_bits as u64);
+        } else {
+            FieldAssignment::range_check(cs, &bit_repr, bound);
+        }
+
         bit_repr
     }
 
@@ -168,11 +185,12 @@ impl<F: PrimeField> FieldAssignment<F> {
     pub fn enforce_eq_bits<C: CircuitDriver<Scalar = F>>(
         cs: &mut R1cs<C>,
         x: &Self,
-        bits: &[BinaryAssignment],
+        bits: &[BinaryAssignment], // BE
     ) {
         let mut f = F::one();
         let sum = bits
             .iter()
+            .rev()
             .fold(FieldAssignment::constant(&F::zero()), |acc, bit| {
                 let l = &acc
                     + &FieldAssignment::mul(

@@ -1,5 +1,4 @@
-use crate::driver::{f_to_nat, nat_to_limbs};
-use num_bigint::BigInt;
+use num_bigint::{BigInt, Sign};
 use zkstd::circuit::prelude::{BinaryAssignment, FieldAssignment};
 use zkstd::circuit::CircuitDriver;
 use zkstd::common::PrimeField;
@@ -8,10 +7,87 @@ use zkstd::r1cs::R1cs;
 pub(crate) const BN_LIMB_WIDTH: usize = 64;
 pub(crate) const BN_N_LIMBS: usize = 4;
 
+/// Convert a field element to a natural number
+pub fn f_to_nat<F: PrimeField>(f: &F) -> BigInt {
+    BigInt::from_bytes_le(Sign::Plus, &f.to_raw_bytes())
+}
+
+/// Convert a natural number to a field element.
+pub fn nat_to_f<F: PrimeField>(n: &BigInt) -> F {
+    let mut bytes = n.to_signed_bytes_le();
+    if bytes.len() > 64 {
+        panic!("Length exceed the field size");
+    };
+    bytes.resize(64, 0);
+
+    let mut res = [0; 64];
+    res[0..64].copy_from_slice(&bytes);
+
+    F::from_bytes_wide(&res)
+}
+
+/// Compute the limbs encoding a natural number.
+/// The limbs are assumed to be based the `limb_width` power of 2.
+pub fn nat_to_limbs<F: PrimeField>(nat: &BigInt, limb_width: usize, n_limbs: usize) -> Vec<F> {
+    let mask = int_with_n_ones(limb_width);
+    let mut nat = nat.clone();
+    if nat.bits() as usize <= n_limbs * limb_width {
+        (0..n_limbs)
+            .map(|_| {
+                let r = &nat & &mask;
+                nat >>= limb_width as u32;
+                nat_to_f(&r)
+            })
+            .collect()
+    } else {
+        panic!("Wrong amount of bits");
+    }
+}
+
+fn int_with_n_ones(n: usize) -> BigInt {
+    let mut m = BigInt::from(1);
+    m <<= n as u32;
+    m -= 1;
+    m
+}
+
+/// Compute the natural number represented by an array of limbs.
+/// The limbs are assumed to be based the `limb_width` power of 2.
+pub fn limbs_to_nat<F: PrimeField, I: DoubleEndedIterator<Item = F>>(
+    limbs: I,
+    limb_width: usize,
+) -> BigInt {
+    limbs.rev().fold(BigInt::from(0), |mut acc, limb| {
+        acc <<= limb_width as u32;
+        acc += f_to_nat(&limb);
+        acc
+    })
+}
+
 #[derive(Clone)]
 pub struct BigNatAssignment<F: PrimeField> {
+    // LE
     limbs: Vec<FieldAssignment<F>>,
-    max_word: BigInt,
+    params: BigNatParams,
+}
+
+#[derive(Clone, PartialEq, Eq)]
+pub struct BigNatParams {
+    pub min_bits: usize,
+    pub max_word: BigInt,
+    pub limb_width: usize,
+    pub n_limbs: usize,
+}
+
+impl BigNatParams {
+    pub fn new(limb_width: usize, n_limbs: usize) -> Self {
+        BigNatParams {
+            min_bits: 0,
+            max_word: (BigInt::from(1) << limb_width as u32) - 1,
+            n_limbs,
+            limb_width,
+        }
+    }
 }
 
 impl<F: PrimeField> BigNatAssignment<F> {
@@ -29,7 +105,7 @@ impl<F: PrimeField> BigNatAssignment<F> {
 
         Self {
             limbs,
-            max_word: num,
+            params: BigNatParams::new(limb_width, n_limbs),
         }
     }
 
@@ -53,6 +129,13 @@ impl<F: PrimeField> BigNatAssignment<F> {
         big_nat
     }
 
+    pub fn value<CS: CircuitDriver<Scalar = F>>(&self, cs: &R1cs<CS>) -> BigInt {
+        limbs_to_nat(
+            self.limbs.iter().map(|x| x.value(cs)),
+            self.params.limb_width,
+        )
+    }
+
     pub fn as_limbs(&self) -> Vec<FieldAssignment<F>> {
         self.limbs.clone()
     }
@@ -66,7 +149,8 @@ impl<F: PrimeField> BigNatAssignment<F> {
         let bitvectors: Vec<Vec<BinaryAssignment>> = self
             .limbs
             .iter()
-            .map(|limb| FieldAssignment::to_bits(cs, limb))
+            .rev()
+            .map(|limb| FieldAssignment::to_bits::<CS>(cs, limb, self.params.limb_width))
             .collect();
         let mut bits = Vec::new();
 
@@ -87,13 +171,10 @@ impl<F: PrimeField> BigNatAssignment<F> {
             *limb = FieldAssignment::conditional_select(cs, &a.limbs[i], &b.limbs[i], condition);
         }
 
-        let max_word = if cs[*condition.inner()] == F::one() {
-            a.max_word.clone()
-        } else {
-            b.max_word.clone()
-        };
-
-        Self { limbs, max_word }
+        Self {
+            limbs,
+            params: a.params.clone(),
+        }
     }
 
     // pub fn assert_well_formed() {}
@@ -103,6 +184,43 @@ impl<F: PrimeField> BigNatAssignment<F> {
     // pub fn mult_mod(&self, other: &Self, modulus: &Self) -> Self {}
 
     pub fn n_bits(&self) -> usize {
-        BN_LIMB_WIDTH * (BN_N_LIMBS - 1) + self.max_word.bits() as usize
+        BN_LIMB_WIDTH * (BN_N_LIMBS - 1) + self.params.max_word.bits() as usize
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::driver::Bn254Driver;
+    use bn_254::Fr;
+    use rand_core::OsRng;
+    use zkstd::common::Group;
+
+    #[test]
+    fn bignat_allocation_from_bigint() {
+        let mut cs = R1cs::<Bn254Driver>::default();
+        let f = Fr::random(OsRng);
+        let num = f_to_nat(&f);
+        let num_assignment =
+            BigNatAssignment::witness_from_big_int(&mut cs, num.clone(), BN_LIMB_WIDTH, BN_N_LIMBS);
+        assert_eq!(num, num_assignment.value(&cs));
+        assert!(cs.is_sat());
+    }
+
+    #[test]
+    fn bignat_allocation_from_field_assignment() {
+        let mut cs = R1cs::<Bn254Driver>::default();
+        let f = Fr::from(1 << 63) * Fr::from(1 << 3) - Fr::one();
+        let num = f_to_nat(&f);
+        let f_assignment = FieldAssignment::witness(&mut cs, f);
+        let num_assignment = BigNatAssignment::witness_from_field_assignment(
+            &mut cs,
+            &f_assignment,
+            BN_LIMB_WIDTH,
+            BN_N_LIMBS,
+        );
+
+        assert_eq!(num, num_assignment.value(&cs));
+        assert!(cs.is_sat());
     }
 }

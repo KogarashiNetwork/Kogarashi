@@ -3,7 +3,7 @@ use num_bigint::BigInt;
 use num_traits::Num;
 use std::ops::{Add, Mul};
 
-use crate::driver::{f_to_nat, nat_to_f};
+use crate::gadget::{f_to_nat, nat_to_f};
 use crate::gadget::{R1csInstanceAssignment, RelaxedR1csInstanceAssignment};
 use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
 use zkstd::common::{Group, IntGroup};
