@@ -1,26 +1,27 @@
 use crate::hash::Mimc;
 
 use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, R1cs};
+use zkstd::common::PrimeField;
 
-pub(crate) struct MimcAssignment<const ROUND: usize, C: CircuitDriver> {
-    constants: [C::Scalar; ROUND],
+pub(crate) struct MimcAssignment<const ROUND: usize, F: PrimeField> {
+    constants: [F; ROUND],
 }
 
-impl<const ROUND: usize, C: CircuitDriver> Default for MimcAssignment<ROUND, C> {
+impl<const ROUND: usize, F: PrimeField> Default for MimcAssignment<ROUND, F> {
     fn default() -> Self {
         Self {
-            constants: Mimc::<ROUND, C::Scalar>::default().constants,
+            constants: Mimc::<ROUND, F>::default().constants,
         }
     }
 }
 
-impl<const ROUND: usize, C: CircuitDriver> MimcAssignment<ROUND, C> {
-    pub(crate) fn hash(
+impl<const ROUND: usize, F: PrimeField> MimcAssignment<ROUND, F> {
+    pub(crate) fn hash<C: CircuitDriver<Scalar = F>>(
         &self,
         cs: &mut R1cs<C>,
-        mut xl: FieldAssignment<C>,
-        mut xr: FieldAssignment<C>,
-    ) -> FieldAssignment<C> {
+        mut xl: FieldAssignment<F>,
+        mut xr: FieldAssignment<F>,
+    ) -> FieldAssignment<F> {
         for c in self.constants.iter().map(|c| FieldAssignment::constant(c)) {
             let cxl = &xl + &c;
             let mut ccxl = FieldAssignment::square(cs, &cxl);

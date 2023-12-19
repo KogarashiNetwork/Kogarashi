@@ -1,53 +1,50 @@
 use crate::circuit::nifs::NifsCircuit;
 use crate::circuit::MimcROCircuit;
 use crate::function::FunctionCircuit;
-use crate::gadget::RelaxedR1csInstanceAssignment;
+use crate::gadget::{R1csInstanceAssignment, RelaxedR1csInstanceAssignment};
 use crate::hash::MIMC_ROUNDS;
-use crate::relaxed_r1cs::RelaxedR1csInstance;
+use crate::relaxed_r1cs::{R1csInstance, RelaxedR1csInstance};
 use std::marker::PhantomData;
-use zkstd::circuit::prelude::{BinaryAssignment, FieldAssignment, PointAssignment};
+use zkstd::circuit::prelude::{FieldAssignment, PointAssignment};
 use zkstd::circuit::CircuitDriver;
 use zkstd::common::{CurveGroup, Group, IntGroup, Ring};
 use zkstd::matrix::DenseVectors;
 use zkstd::r1cs::R1cs;
 
 #[derive(Debug, Clone)]
-pub struct AugmentedFCircuit<C: CircuitDriver, FC: FunctionCircuit<C>> {
+pub struct AugmentedFCircuit<C: CircuitDriver, FC: FunctionCircuit<C::Base>> {
+    pub is_primary: bool,
     pub i: usize,
-    pub z_0: DenseVectors<C::Scalar>,
-    pub z_i: DenseVectors<C::Scalar>,
-    pub u_single: RelaxedR1csInstance<C>,
-    pub u_range: RelaxedR1csInstance<C>,
-    pub u_range_next: RelaxedR1csInstance<C>,
-    pub commit_t: C::Affine,
+    pub z_0: DenseVectors<C::Base>,
+    pub z_i: Option<DenseVectors<C::Base>>,
+    pub u_single: Option<R1csInstance<C>>,
+    pub u_range: Option<RelaxedR1csInstance<C>>,
+    pub commit_t: Option<C::Affine>,
     pub f: PhantomData<FC>,
-    pub x: C::Scalar,
 }
 
-impl<C: CircuitDriver, FC: FunctionCircuit<C>> Default for AugmentedFCircuit<C, FC> {
+impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> Default for AugmentedFCircuit<C, FC> {
     fn default() -> Self {
         Self {
+            is_primary: true,
             i: 0,
             z_0: DenseVectors::zero(1),
-            z_i: DenseVectors::zero(1),
-            u_single: RelaxedR1csInstance::dummy(1),
-            u_range: RelaxedR1csInstance::dummy(1),
-            u_range_next: RelaxedR1csInstance::dummy(1),
-            commit_t: C::Affine::ADDITIVE_IDENTITY,
+            z_i: Some(DenseVectors::zero(1)),
+            u_single: Some(R1csInstance::dummy(2)),
+            u_range: Some(RelaxedR1csInstance::dummy(2)),
+            commit_t: Some(C::Affine::ADDITIVE_IDENTITY),
             f: Default::default(),
-            x: RelaxedR1csInstance::<C>::dummy(1).hash(
-                1,
-                &DenseVectors::zero(1),
-                &FC::invoke(&DenseVectors::zero(1)),
-            ),
         }
     }
 }
 
-impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
-    pub(crate) fn generate(&self, cs: &mut R1cs<C>) {
+impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
+    pub(crate) fn generate<CS: CircuitDriver<Scalar = C::Base>>(
+        &self,
+        cs: &mut R1cs<CS>,
+    ) -> Vec<FieldAssignment<C::Base>> {
         // allocate inputs
-        let i = FieldAssignment::witness(cs, C::Scalar::from(self.i as u64));
+        let i = FieldAssignment::witness(cs, C::Base::from(self.i as u64));
         let z_0 = self
             .z_0
             .iter()
@@ -55,92 +52,83 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
             .collect::<Vec<_>>();
         let z_i = self
             .z_i
+            .clone()
+            .unwrap_or_else(|| self.z_0.clone())
             .iter()
             .map(|x| FieldAssignment::witness(cs, x))
             .collect::<Vec<_>>();
 
-        let u_dummy_native = RelaxedR1csInstance::dummy(1);
+        let u_dummy_native = RelaxedR1csInstance::<C>::dummy(2);
         let u_dummy = RelaxedR1csInstanceAssignment::witness(cs, &u_dummy_native);
-        let u_i = RelaxedR1csInstanceAssignment::witness(cs, &self.u_single);
-        let u_range = RelaxedR1csInstanceAssignment::witness(cs, &self.u_range);
-        let u_range_next = RelaxedR1csInstanceAssignment::witness(cs, &self.u_range_next);
+        let u_single = R1csInstanceAssignment::witness(
+            cs,
+            &self
+                .u_single
+                .clone()
+                .unwrap_or_else(|| R1csInstance::<C>::dummy(2)),
+        );
+        let u_range = RelaxedR1csInstanceAssignment::witness(
+            cs,
+            &self
+                .u_range
+                .clone()
+                .unwrap_or_else(|| u_dummy_native.clone()),
+        );
+
+        let commit_t = self.commit_t.unwrap_or(C::Affine::ADDITIVE_IDENTITY);
         let commit_t = PointAssignment::witness(
             cs,
-            self.commit_t.get_x().into(),
-            self.commit_t.get_y().into(),
-            self.commit_t.is_identity(),
+            commit_t.get_x(),
+            commit_t.get_y(),
+            commit_t.is_identity(),
         );
-        let x = FieldAssignment::instance(cs, self.x);
 
-        let z_next = FC::invoke_cs(cs, z_i.clone());
-        let zero = FieldAssignment::constant(&C::Scalar::zero());
-        let bin_true = BinaryAssignment::witness(cs, 1);
+        let zero = FieldAssignment::constant(&C::Base::zero());
 
         let base_case = FieldAssignment::is_eq(cs, &i, &zero);
         let not_base_case = FieldAssignment::is_neq(cs, &i, &zero);
 
-        // (1) check that ui.x = hash(vk, i, z0, zi, Ui), where ui.x is the public IO of ui
-        let u_i_x = u_range.hash(cs, i.clone(), z_0.clone(), z_i);
-        FieldAssignment::conditional_enforce_equal(cs, &u_i.x[0], &u_i_x, &not_base_case);
+        // base case
+        let u_range_next_base = if self.is_primary {
+            u_dummy
+        } else {
+            RelaxedR1csInstanceAssignment::from_r1cs_instance(cs, u_single.clone())
+        };
 
-        // (2) check that (ui.E, ui.u) = (u⊥.E, 1),
-        FieldAssignment::conditional_enforce_equal(
+        let u_i_x = u_range.hash(cs, i.clone(), z_0.clone(), z_i.clone());
+        FieldAssignment::conditional_enforce_equal(cs, &u_single.x0, &u_i_x, &not_base_case);
+
+        let r = Self::get_challenge(cs, &u_range, commit_t.clone());
+        let u_range_next_non_base =
+            NifsCircuit::verify(cs, r, u_range.clone(), u_single.clone(), commit_t);
+
+        let u_range_next = RelaxedR1csInstanceAssignment::conditional_select(
             cs,
-            &u_i.commit_e.get_x(),
-            &u_dummy.commit_e.get_x(),
-            &not_base_case,
-        );
-        FieldAssignment::conditional_enforce_equal(
-            cs,
-            &u_i.commit_e.get_y(),
-            &u_dummy.commit_e.get_y(),
-            &not_base_case,
-        );
-        FieldAssignment::conditional_enforce_equal(
-            cs,
-            &u_i.commit_e.get_z(),
-            &u_dummy.commit_e.get_z(),
-            &not_base_case,
-        );
-        FieldAssignment::conditional_enforce_equal(
-            cs,
-            &u_i.u,
-            &FieldAssignment::constant(&C::Scalar::one()),
-            &not_base_case,
+            &u_range_next_base,
+            &u_range_next_non_base,
+            &base_case,
         );
 
-        // (3) Verify Ui+1 ← NIFS.V(vk, U, u, T )
-        let r = Self::get_challenge(cs, &u_range, commit_t);
-        let nifs_check = NifsCircuit::verify(cs, r, u_i, u_range.clone(), u_range_next.clone());
-        BinaryAssignment::conditional_enforce_equal(cs, &nifs_check, &bin_true, &not_base_case);
+        let z_next = FC::invoke_cs(cs, z_i);
 
-        // 4. (base case) u_{i+1}.X == H(1, z_0, F(z_0)=F(z_i)=z_i1, U_i) (with U_i being dummy)
-        let u_next_x_basecase = u_range.hash(
+        let u_next_x = u_range_next.hash(
             cs,
-            FieldAssignment::constant(&C::Scalar::one()),
-            z_0.clone(),
+            &i + &FieldAssignment::constant(&C::Base::one()),
+            z_0,
             z_next.clone(),
         );
 
-        // 4. (non-base case). u_{i+1}.x = H(i+1, z_0, z_i+1, U_{i+1})
-        let u_next_x = u_range_next.hash(
-            cs,
-            &i + &FieldAssignment::constant(&C::Scalar::one()),
-            z_0,
-            z_next,
-        );
+        let x0 = FieldAssignment::inputize(cs, u_single.x1);
+        let x1 = FieldAssignment::inputize(cs, u_next_x);
 
-        // constrain u_{i+1}.x for base case
-        FieldAssignment::conditional_enforce_equal(cs, &u_next_x_basecase, &x, &base_case);
-        // constrain u_{i+1}.x for non base case
-        FieldAssignment::conditional_enforce_equal(cs, &u_next_x, &x, &not_base_case);
+        z_next
     }
 
-    pub(crate) fn get_challenge(
-        cs: &mut R1cs<C>,
+    pub(crate) fn get_challenge<CS: CircuitDriver<Scalar = C::Base>>(
+        cs: &mut R1cs<CS>,
         u_range: &RelaxedR1csInstanceAssignment<C>,
-        commit_t: PointAssignment<C>,
-    ) -> FieldAssignment<C> {
+        commit_t: PointAssignment<C::Base>,
+    ) -> FieldAssignment<C::Base> {
         let mut transcript = MimcROCircuit::<MIMC_ROUNDS, C>::default();
         transcript.append_point(commit_t);
         u_range.absorb_by_transcript(&mut transcript);
@@ -151,27 +139,41 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C>> AugmentedFCircuit<C, FC> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::relaxed_r1cs::RelaxedR1csWitness;
+    use crate::driver::{Bn254Driver, GrumpkinDriver};
+
+    use crate::relaxed_r1cs::{r1cs_instance_and_witness, R1csShape, RelaxedR1csWitness};
     use crate::test::ExampleFunction;
-    use crate::RelaxedR1cs;
-    use grumpkin::driver::GrumpkinDriver;
+    use crate::PedersenCommitment;
+    use bn_254::{Fr, G1Affine};
+    use rand_core::OsRng;
 
     #[test]
     fn augmented_circuit_dummies() {
-        let mut cs = R1cs::<GrumpkinDriver>::default();
-        let augmented_circuit =
-            AugmentedFCircuit::<GrumpkinDriver, ExampleFunction<GrumpkinDriver>>::default();
+        let mut cs = R1cs::<Bn254Driver>::default();
+        let augmented_circuit = AugmentedFCircuit::<GrumpkinDriver, ExampleFunction<Fr>> {
+            is_primary: true,
+            i: 0,
+            z_0: DenseVectors::new(vec![Fr::zero(); 1]),
+            z_i: None,
+            u_single: None,
+            u_range: None,
+            commit_t: None,
+            f: Default::default(),
+        };
+
         augmented_circuit.generate(&mut cs);
+        let shape = R1csShape::from(cs.clone());
+        let k = (shape.m().next_power_of_two() as u64).trailing_zeros();
+        let ck = PedersenCommitment::<G1Affine>::new(k.into(), OsRng);
+        let u_dummy = RelaxedR1csInstance::dummy(shape.l());
+        let w_dummy = RelaxedR1csWitness::dummy(shape.m_l_1(), shape.m());
 
-        assert!(cs.is_sat());
-
-        assert_eq!(cs.l(), 2);
-
-        let u_dummy = RelaxedR1csInstance::dummy(cs.l() - 1);
-        let w_dummy = RelaxedR1csWitness::dummy(cs.m_l_1(), cs.m());
-
-        let mut running_r1cs = RelaxedR1cs::new(cs.clone());
-        running_r1cs = running_r1cs.update(&u_dummy, &w_dummy);
-        assert!(running_r1cs.is_sat());
+        let (x, w) = r1cs_instance_and_witness(&cs, &shape, &ck);
+        let (instance, witness) = (
+            RelaxedR1csInstance::<Bn254Driver>::from_r1cs_instance(&ck, &shape, &x),
+            RelaxedR1csWitness::<Bn254Driver>::from_r1cs_witness(&shape, &w),
+        );
+        assert!(shape.is_sat_relaxed(&u_dummy, &w_dummy));
+        assert!(shape.is_sat_relaxed(&instance, &witness));
     }
 }

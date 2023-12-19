@@ -1,56 +1,78 @@
-use crate::{
-    relaxed_r1cs::{RelaxedR1csInstance, RelaxedR1csWitness},
-    RelaxedR1cs,
-};
+use crate::relaxed_r1cs::{R1csInstance, R1csWitness, RelaxedR1csInstance, RelaxedR1csWitness};
+use std::marker::PhantomData;
 
-use zkstd::circuit::prelude::{CircuitDriver, R1cs};
-use zkstd::common::{Group, Ring};
+use crate::driver::scalar_as_base;
+use crate::function::FunctionCircuit;
+use crate::ivc::PublicParams;
+use zkstd::circuit::prelude::CircuitDriver;
 use zkstd::matrix::DenseVectors;
 
 #[allow(clippy::type_complexity)]
-pub struct RecursiveProof<C: CircuitDriver> {
+pub struct RecursiveProof<E1, E2, FC1, FC2>
+where
+    E1: CircuitDriver<Base = <E2 as CircuitDriver>::Scalar>,
+    E2: CircuitDriver<Base = <E1 as CircuitDriver>::Scalar>,
+    FC1: FunctionCircuit<E1::Scalar>,
+    FC2: FunctionCircuit<E2::Scalar>,
+{
     pub(crate) i: usize,
-    pub(crate) z0: DenseVectors<C::Scalar>,
-    pub(crate) zi: DenseVectors<C::Scalar>,
-    pub(crate) r1cs: R1cs<C>,
-    pub(crate) pair: (
-        // instance-witness pair of instance to be folded
-        (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>),
-        // instance-witness pair of running instance
-        (RelaxedR1csInstance<C>, RelaxedR1csWitness<C>),
+    pub(crate) z0_primary: DenseVectors<E1::Scalar>,
+    pub(crate) z0_secondary: DenseVectors<E2::Scalar>,
+    pub(crate) zi_primary: DenseVectors<E1::Scalar>,
+    pub(crate) zi_secondary: DenseVectors<E2::Scalar>,
+    pub(crate) instances: (
+        // u_single/w_single secondary
+        (R1csInstance<E2>, R1csWitness<E2>),
+        // u_range/w_range primary
+        (RelaxedR1csInstance<E1>, RelaxedR1csWitness<E1>),
+        // u_range/w_range secondary
+        (RelaxedR1csInstance<E2>, RelaxedR1csWitness<E2>),
     ),
+    pub(crate) marker: PhantomData<(FC1, FC2)>,
 }
 
-impl<C: CircuitDriver> RecursiveProof<C> {
-    pub fn verify(&self) -> bool {
-        let Self {
-            i,
-            z0,
-            zi,
-            r1cs,
-            pair,
-        } = self;
-        let ((l_ui, l_wi), (s_ui, s_wi)) = pair;
+impl<E1, E2, FC1, FC2> RecursiveProof<E1, E2, FC1, FC2>
+where
+    E1: CircuitDriver<Base = <E2 as CircuitDriver>::Scalar>,
+    E2: CircuitDriver<Base = <E1 as CircuitDriver>::Scalar>,
+    FC1: FunctionCircuit<E1::Scalar>,
+    FC2: FunctionCircuit<E2::Scalar>,
+{
+    pub fn verify(&self, pp: &PublicParams<E1, E2, FC1, FC2>) -> bool {
+        let (
+            (u_single_secondary, w_single_secondary),
+            (u_range_primary, w_range_primary),
+            (u_range_secondary, w_range_secondary),
+        ) = self.instances.clone();
 
-        if *i == 0 {
-            // check if z vector is the same
-            z0 == zi
-        } else {
-            // check that ui.x = hash(vk, i, z0, zi, Ui)
-            let expected_x = l_ui.hash(*i, z0, zi);
-            let check_hash = expected_x == s_ui.x[0];
-
-            // check if folded instance has default error vectors and scalar
-            let check_defaults =
-                s_ui.commit_e == C::Affine::ADDITIVE_IDENTITY && s_ui.u == C::Scalar::one();
-
-            // check if instance-witness pair satisfy
-            let relaxed_r1cs = RelaxedR1cs::new(r1cs.clone());
-            let l_relaxed_r1cs = relaxed_r1cs.update(l_ui, l_wi);
-            let s_relaxed_r1cs = relaxed_r1cs.update(s_ui, s_wi);
-            let is_instance_witness_sat = l_relaxed_r1cs.is_sat() && s_relaxed_r1cs.is_sat();
-
-            check_hash && check_defaults && is_instance_witness_sat
+        if u_single_secondary.x.len() != 2
+            || u_range_primary.x.len() != 2
+            || u_range_secondary.x.len() != 2
+        {
+            return false;
         }
+        let (hash_primary, hash_secondary) = {
+            (
+                u_range_secondary.hash::<E1>(self.i, &self.z0_primary, &self.zi_primary),
+                u_range_primary.hash::<E2>(self.i, &self.z0_secondary, &self.zi_secondary),
+            )
+        };
+
+        if hash_primary != u_single_secondary.x[0]
+            || hash_secondary != scalar_as_base::<E2>(u_single_secondary.x[1])
+        {
+            return false;
+        }
+
+        pp.r1cs_shape_primary
+            .is_sat_relaxed(&u_range_primary, &w_range_primary)
+            && pp
+                .r1cs_shape_secondary
+                .is_sat_relaxed(&u_range_secondary, &w_range_secondary)
+            && pp.r1cs_shape_secondary.is_sat(
+                &pp.ck_secondary,
+                &u_single_secondary,
+                &w_single_secondary,
+            )
     }
 }

@@ -20,12 +20,11 @@ pub use zksnark::ZkSnark;
 
 #[cfg(test)]
 mod tests {
-    use crate::circuit::Circuit;
+    use crate::circuit::{Bn254Driver, Circuit};
     use crate::error::Error;
     use crate::zksnark::ZkSnark;
 
     use bn_254::Fr as BnScalar;
-    use grumpkin::driver::GrumpkinDriver;
     use zkstd::circuit::prelude::{FieldAssignment, R1cs};
     use zkstd::common::OsRng;
 
@@ -50,7 +49,7 @@ mod tests {
         }
 
         impl Circuit for DummyCircuit {
-            fn synthesize(&self, composer: &mut R1cs<GrumpkinDriver>) -> Result<(), Error> {
+            fn synthesize(&self, composer: &mut R1cs<Bn254Driver>) -> Result<(), Error> {
                 let x = FieldAssignment::instance(composer, self.x);
                 let o = FieldAssignment::instance(composer, self.o);
                 let c = FieldAssignment::constant(&BnScalar::from(5));

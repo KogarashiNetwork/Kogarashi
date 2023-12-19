@@ -1,39 +1,51 @@
 use super::binary::BinaryAssignment;
 use crate::circuit::CircuitDriver;
-use crate::common::{vec, Add, Group, IntGroup, Neg, PrimeField, Ring, Sub, Vec};
+use crate::common::{vec, Add, Neg, PrimeField, Sub, Vec};
 use crate::matrix::SparseRow;
 use crate::r1cs::{R1cs, Wire};
 
 #[derive(Clone)]
-pub struct FieldAssignment<C: CircuitDriver>(SparseRow<C::Scalar>);
+pub struct FieldAssignment<F: PrimeField>(SparseRow<F>);
 
-impl<C: CircuitDriver> FieldAssignment<C> {
-    pub fn inner(&self) -> &SparseRow<C::Scalar> {
+impl<F: PrimeField> FieldAssignment<F> {
+    pub fn inner(&self) -> &SparseRow<F> {
         &self.0
     }
-    pub fn instance(cs: &mut R1cs<C>, instance: C::Scalar) -> Self {
+    pub fn instance<C: CircuitDriver<Scalar = F>>(cs: &mut R1cs<C>, instance: F) -> Self {
         let wire = cs.public_wire();
         cs.x.push(instance);
 
         Self(SparseRow::from(wire))
     }
 
-    pub fn witness(cs: &mut R1cs<C>, witness: C::Scalar) -> Self {
+    pub fn witness<C: CircuitDriver<Scalar = F>>(cs: &mut R1cs<C>, witness: F) -> Self {
         let wire = cs.private_wire();
         cs.w.push(witness);
 
         Self(SparseRow::from(wire))
     }
 
-    pub fn constant(constant: &C::Scalar) -> Self {
+    pub fn inputize<C: CircuitDriver<Scalar = F>>(cs: &mut R1cs<C>, witness: Self) -> Self {
+        let wire = cs.public_wire();
+        let value = witness.inner().evaluate(&cs.x, &cs.w);
+        cs.x.push(value);
+
+        Self(SparseRow::from(wire))
+    }
+
+    pub fn value<C: CircuitDriver<Scalar = F>>(&self, cs: &R1cs<C>) -> F {
+        self.inner().evaluate(&cs.x, &cs.w)
+    }
+
+    pub fn constant(constant: &F) -> Self {
         Self(SparseRow(vec![(Wire::ONE, *constant)]))
     }
 
-    pub fn square(cs: &mut R1cs<C>, x: &Self) -> Self {
+    pub fn square<C: CircuitDriver<Scalar = F>>(cs: &mut R1cs<C>, x: &Self) -> Self {
         Self::mul(cs, x, x)
     }
 
-    pub fn mul(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
+    pub fn mul<C: CircuitDriver<Scalar = F>>(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
         if let Some(c) = x.0.as_constant() {
             return Self(y.0.clone() * c);
         }
@@ -48,7 +60,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         z
     }
 
-    pub fn add(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
+    pub fn add<C: CircuitDriver<Scalar = F>>(cs: &mut R1cs<C>, x: &Self, y: &Self) -> Self {
         if let Some(c) = x.0.as_constant() {
             return Self(y.0.clone() + SparseRow::from(c));
         }
@@ -63,7 +75,11 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         z
     }
 
-    pub fn range_check(cs: &mut R1cs<C>, a_bits: &[BinaryAssignment<C>], c: C::Scalar) {
+    pub fn range_check<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
+        a_bits: &[BinaryAssignment],
+        c: F,
+    ) {
         let c_bits = c
             .to_bits()
             .into_iter()
@@ -74,7 +90,7 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         assert!(a_bits
             .iter()
             .take(a_bits.len() - c_bits.len())
-            .all(|b| cs[*b.inner()] == C::Scalar::zero()));
+            .all(|b| cs[*b.inner()] == F::zero()));
 
         let a_bits = a_bits
             .iter()
@@ -104,34 +120,37 @@ impl<C: CircuitDriver> FieldAssignment<C> {
             if c == 1 {
                 let bool_constr = FieldAssignment::mul(
                     cs,
-                    &(&bit_field - &FieldAssignment::constant(&C::Scalar::one())),
+                    &(&bit_field - &FieldAssignment::constant(&F::one())),
                     &bit_field,
                 );
                 FieldAssignment::enforce_eq(
                     cs,
                     &bool_constr,
-                    &FieldAssignment::constant(&C::Scalar::zero()),
+                    &FieldAssignment::constant(&F::zero()),
                 );
             } else if c == 0 {
                 let bool_constr = FieldAssignment::mul(
                     cs,
-                    &(&(&FieldAssignment::constant(&C::Scalar::one()) - &bit_field) - &p[i - 1]),
+                    &(&(&FieldAssignment::constant(&F::one()) - &bit_field) - &p[i - 1]),
                     &bit_field,
                 );
                 FieldAssignment::enforce_eq(
                     cs,
                     &bool_constr,
-                    &FieldAssignment::constant(&C::Scalar::zero()),
+                    &FieldAssignment::constant(&F::zero()),
                 );
             }
         }
     }
 
     /// To bit representation in Big-endian
-    pub fn to_bits(cs: &mut R1cs<C>, x: &Self) -> Vec<BinaryAssignment<C>> {
-        let bound = C::Scalar::MODULUS - C::Scalar::one();
+    pub fn to_bits<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
+        x: &Self,
+    ) -> Vec<BinaryAssignment> {
+        let bound = F::MODULUS - F::one();
 
-        let bit_repr: Vec<BinaryAssignment<C>> = x
+        let bit_repr: Vec<BinaryAssignment> = x
             .inner()
             .evaluate(&cs.x, &cs.w)
             .to_bits()
@@ -142,33 +161,57 @@ impl<C: CircuitDriver> FieldAssignment<C> {
         bit_repr
     }
 
-    pub fn enforce_eq(cs: &mut R1cs<C>, x: &Self, y: &Self) {
+    pub fn enforce_eq<C: CircuitDriver<Scalar = F>>(cs: &mut R1cs<C>, x: &Self, y: &Self) {
         cs.mul_gate(&x.0, &SparseRow::one(), &y.0)
     }
 
-    pub fn conditional_enforce_equal(
+    pub fn conditional_enforce_equal<C: CircuitDriver<Scalar = F>>(
         cs: &mut R1cs<C>,
         x: &Self,
         y: &Self,
-        should_enforce: &BinaryAssignment<C>,
+        should_enforce: &BinaryAssignment,
     ) {
         let mul = FieldAssignment::mul(cs, &(x - y), &FieldAssignment::from(should_enforce));
-        FieldAssignment::enforce_eq_constant(cs, &mul, &C::Scalar::zero());
+        FieldAssignment::enforce_eq_constant(cs, &mul, &F::zero());
     }
 
-    pub fn is_eq(cs: &mut R1cs<C>, x: &Self, y: &Self) -> BinaryAssignment<C> {
+    pub fn conditional_select<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
+        a: &Self,
+        b: &Self,
+        condition: &BinaryAssignment,
+    ) -> FieldAssignment<F> {
+        let select_a = FieldAssignment::mul(cs, a, &FieldAssignment::from(condition));
+        let select_b = FieldAssignment::mul(
+            cs,
+            b,
+            &(&FieldAssignment::constant(&F::one()) - &FieldAssignment::from(condition)),
+        );
+
+        &select_a + &select_b
+    }
+
+    pub fn is_eq<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
+        x: &Self,
+        y: &Self,
+    ) -> BinaryAssignment {
         let is_neq = Self::is_neq(cs, x, y);
         BinaryAssignment::not(cs, &is_neq)
     }
 
-    pub fn is_neq(cs: &mut R1cs<C>, x: &Self, y: &Self) -> BinaryAssignment<C> {
+    pub fn is_neq<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
+        x: &Self,
+        y: &Self,
+    ) -> BinaryAssignment {
         let x_val = x.inner().evaluate(&cs.x, &cs.w);
         let y_val = y.inner().evaluate(&cs.x, &cs.w);
         let is_not_equal = BinaryAssignment::witness(cs, u8::from(x_val != y_val));
         let multiplier = if x_val != y_val {
             FieldAssignment::witness(cs, (x_val - y_val).invert().unwrap())
         } else {
-            FieldAssignment::witness(cs, C::Scalar::one())
+            FieldAssignment::witness(cs, F::one())
         };
 
         let diff = x - y;
@@ -177,44 +220,40 @@ impl<C: CircuitDriver> FieldAssignment<C> {
 
         let not_is_not_equal = BinaryAssignment::not(cs, &is_not_equal);
         let mul = FieldAssignment::mul(cs, &diff, &FieldAssignment::from(&not_is_not_equal));
-        FieldAssignment::enforce_eq(cs, &mul, &FieldAssignment::constant(&C::Scalar::zero()));
+        FieldAssignment::enforce_eq(cs, &mul, &FieldAssignment::constant(&F::zero()));
 
         is_not_equal
     }
 
-    pub fn enforce_eq_constant(cs: &mut R1cs<C>, x: &Self, c: &C::Scalar) {
-        cs.mul_gate(
-            &x.0,
-            &SparseRow::one(),
-            &FieldAssignment::<C>::constant(c).0,
-        )
+    pub fn enforce_eq_constant<C: CircuitDriver<Scalar = F>>(cs: &mut R1cs<C>, x: &Self, c: &F) {
+        cs.mul_gate(&x.0, &SparseRow::one(), &FieldAssignment::constant(c).0)
     }
 }
 
-impl<C: CircuitDriver> From<&BinaryAssignment<C>> for FieldAssignment<C> {
-    fn from(value: &BinaryAssignment<C>) -> Self {
+impl<F: PrimeField> From<&BinaryAssignment> for FieldAssignment<F> {
+    fn from(value: &BinaryAssignment) -> Self {
         Self(SparseRow::from(value.inner()))
     }
 }
 
-impl<C: CircuitDriver> Add<&FieldAssignment<C>> for &FieldAssignment<C> {
-    type Output = FieldAssignment<C>;
+impl<F: PrimeField> Add<&FieldAssignment<F>> for &FieldAssignment<F> {
+    type Output = FieldAssignment<F>;
 
-    fn add(self, rhs: &FieldAssignment<C>) -> Self::Output {
+    fn add(self, rhs: &FieldAssignment<F>) -> Self::Output {
         FieldAssignment(&self.0 + &rhs.0)
     }
 }
 
-impl<C: CircuitDriver> Sub<&FieldAssignment<C>> for &FieldAssignment<C> {
-    type Output = FieldAssignment<C>;
+impl<F: PrimeField> Sub<&FieldAssignment<F>> for &FieldAssignment<F> {
+    type Output = FieldAssignment<F>;
 
-    fn sub(self, rhs: &FieldAssignment<C>) -> Self::Output {
+    fn sub(self, rhs: &FieldAssignment<F>) -> Self::Output {
         FieldAssignment(&self.0 - &rhs.0)
     }
 }
 
-impl<C: CircuitDriver> Neg for &FieldAssignment<C> {
-    type Output = FieldAssignment<C>;
+impl<F: PrimeField> Neg for &FieldAssignment<F> {
+    type Output = FieldAssignment<F>;
 
     fn neg(self) -> Self::Output {
         FieldAssignment(-&self.0)

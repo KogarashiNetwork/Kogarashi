@@ -1,12 +1,127 @@
-mod grumpkin;
+use bn_254::{params::PARAM_B3 as BN254_PARAM_B3, Fq, Fr, G1Affine};
+use grumpkin::{params::PARAM_B3 as GRUMPKIN_PARAM_B3, Affine};
+use num_bigint::{BigInt, Sign};
+use zkstd::circuit::CircuitDriver;
+use zkstd::common::{IntGroup, PrimeField, Ring};
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct GrumpkinDriver;
+
+impl CircuitDriver for GrumpkinDriver {
+    const ORDER_STR: &'static str =
+        "30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47";
+
+    const NUM_BITS: u16 = 254;
+    type Affine = Affine;
+
+    type Base = Fr;
+
+    type Scalar = Fq;
+
+    fn b3() -> Self::Scalar {
+        BN254_PARAM_B3
+    }
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Bn254Driver;
+
+impl CircuitDriver for Bn254Driver {
+    const ORDER_STR: &'static str =
+        "30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001";
+
+    const NUM_BITS: u16 = 254;
+    type Affine = G1Affine;
+
+    type Base = Fq;
+
+    type Scalar = Fr;
+
+    fn b3() -> Self::Scalar {
+        GRUMPKIN_PARAM_B3
+    }
+}
+
+/// Convert a field element to a natural number
+pub fn f_to_nat<F: PrimeField>(f: &F) -> BigInt {
+    BigInt::from_bytes_le(Sign::Plus, &f.to_raw_bytes())
+}
+
+/// Convert a natural number to a field element.
+pub fn nat_to_f<F: PrimeField>(n: &BigInt) -> F {
+    let mut bytes = n.to_signed_bytes_le();
+    if bytes.len() > 64 {
+        panic!("Length exceed the field size");
+    };
+    bytes.resize(64, 0);
+
+    let mut res = [0; 64];
+    res[0..64].copy_from_slice(&bytes);
+
+    F::from_bytes_wide(&res)
+}
+
+/// Compute the limbs encoding a natural number.
+/// The limbs are assumed to be based the `limb_width` power of 2.
+pub fn nat_to_limbs<F: PrimeField>(nat: &BigInt, limb_width: usize, n_limbs: usize) -> Vec<F> {
+    let mask = int_with_n_ones(limb_width);
+    let mut nat = nat.clone();
+    if nat.bits() as usize <= n_limbs * limb_width {
+        (0..n_limbs)
+            .map(|_| {
+                let r = &nat & &mask;
+                nat >>= limb_width as u32;
+                nat_to_f(&r)
+            })
+            .collect()
+    } else {
+        panic!("Wrong amount of bits");
+    }
+}
+
+fn int_with_n_ones(n: usize) -> BigInt {
+    let mut m = BigInt::from(1);
+    m <<= n as u32;
+    m -= 1;
+    m
+}
+
+/// interpret scalar as base
+pub fn scalar_as_base<C: CircuitDriver>(input: C::Scalar) -> C::Base {
+    let input_bits = input.to_bits();
+    let mut mult = C::Base::one();
+    let mut val = C::Base::zero();
+    for bit in input_bits.iter().rev() {
+        if *bit == 1 {
+            val += mult;
+        }
+        mult = mult + mult;
+    }
+    val
+}
+
+/// interpret base as scalar
+pub fn base_as_scalar<C: CircuitDriver>(input: C::Base) -> C::Scalar {
+    let input_bits = input.to_bits();
+    let mut mult = C::Scalar::one();
+    let mut val = C::Scalar::zero();
+    for bit in input_bits.iter().rev() {
+        if *bit == 1 {
+            val += mult;
+        }
+        mult = mult + mult;
+    }
+    val
+}
 
 #[cfg(test)]
 mod grumpkin_gadget_tests {
-    use crate::grumpkin::{Affine, Fq as Base, Fr as Scalar, GrumpkinDriver};
+    use super::{Fq as Scalar, Fr as Base, GrumpkinDriver};
 
+    use bn_254::G1Affine;
     use rand_core::OsRng;
     use zkstd::circuit::prelude::{FieldAssignment, PointAssignment, R1cs};
-    use zkstd::common::{BNAffine, BNProjective, CurveGroup, Group, PrimeField};
+    use zkstd::common::{BNAffine, BNProjective, Group};
 
     #[test]
     fn range_proof_test() {
@@ -118,17 +233,12 @@ mod grumpkin_gadget_tests {
 
     #[test]
     fn curve_double_test() {
+        // Affine
         for _ in 0..100 {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let point = Affine::random(OsRng);
+            let point = G1Affine::random(OsRng);
 
-            let circuit_double = PointAssignment::instance(
-                &mut cs,
-                point.get_x(),
-                point.get_y(),
-                point.is_identity(),
-            )
-            .double(&mut cs);
+            let circuit_double = PointAssignment::instance(&mut cs, point).double(&mut cs);
 
             let expected = point.to_extended().double();
 
@@ -143,13 +253,11 @@ mod grumpkin_gadget_tests {
         // Identity addition test
         {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let a = Affine::random(OsRng);
-            let b = Affine::ADDITIVE_IDENTITY;
+            let a = G1Affine::random(OsRng);
+            let b = G1Affine::ADDITIVE_IDENTITY;
 
-            let a_assignment =
-                PointAssignment::instance(&mut cs, a.get_x(), a.get_y(), a.is_identity());
-            let b_assignment =
-                PointAssignment::instance(&mut cs, b.get_x(), b.get_y(), b.is_identity());
+            let a_assignment = PointAssignment::instance(&mut cs, a);
+            let b_assignment = PointAssignment::instance(&mut cs, b);
 
             let expected = a + b;
 
@@ -162,13 +270,11 @@ mod grumpkin_gadget_tests {
 
         for _ in 0..100 {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let a = Affine::random(OsRng);
-            let b = Affine::random(OsRng);
+            let a = G1Affine::random(OsRng);
+            let b = G1Affine::random(OsRng);
 
-            let a_assignment =
-                PointAssignment::instance(&mut cs, a.get_x(), a.get_y(), a.is_identity());
-            let b_assignment =
-                PointAssignment::instance(&mut cs, b.get_x(), b.get_y(), b.is_identity());
+            let a_assignment = PointAssignment::instance(&mut cs, a);
+            let b_assignment = PointAssignment::instance(&mut cs, b);
 
             let expected = a.to_extended() + b.to_extended();
 
@@ -185,14 +291,11 @@ mod grumpkin_gadget_tests {
         for _ in 0..100 {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
             let x = Scalar::random(OsRng);
-            let p = Affine::random(OsRng);
+            let p = G1Affine::random(OsRng);
 
-            let x_assignment = FieldAssignment::instance(&mut cs, x); // Fr
-            let p_assignment =
-                PointAssignment::instance(&mut cs, p.get_x(), p.get_y(), p.is_identity());
+            let x_assignment = FieldAssignment::instance(&mut cs, x);
+            let p_assignment = PointAssignment::instance(&mut cs, p);
             let expected = p * Base::from(x);
-
-            assert_eq!(x.to_bits(), Base::from(x).to_bits());
 
             let mul_circuit = p_assignment.scalar_point(&mut cs, &x_assignment);
 
