@@ -180,8 +180,28 @@ impl<F: PrimeField> BigNatAssignment<F> {
     // pub fn assert_well_formed() {}
     // pub fn enforce_limb_width_agreement(&self, other: &Self, location: &str) {}
     // pub fn red_mod(&self, modulus: &Self) -> Self {}
-    // pub fn add(&self, other: &Self) -> Self {}    Maybe can merge with red_mod to create add_mod
-    // pub fn mult_mod(&self, other: &Self, modulus: &Self) -> Self {}
+    pub fn add(&self, other: &Self) -> Self {
+        assert_eq!(self.params.limb_width, other.params.limb_width);
+        let n_limbs = std::cmp::max(self.params.n_limbs, other.params.n_limbs);
+        let max_word = &self.params.max_word + &other.params.max_word;
+        let limbs: Vec<FieldAssignment<F>> = (0..n_limbs)
+            .map(|i| match (self.limbs.get(i), other.limbs.get(i)) {
+                (Some(a), Some(b)) => a + b,
+                (Some(a), None) => a.clone(),
+                (None, Some(b)) => b.clone(),
+                (None, None) => unreachable!(),
+            })
+            .collect();
+        Self {
+            limbs,
+            params: BigNatParams {
+                min_bits: std::cmp::max(self.params.min_bits, other.params.min_bits),
+                n_limbs,
+                max_word,
+                limb_width: self.params.limb_width,
+            },
+        }
+    }
 
     pub fn n_bits(&self) -> usize {
         BN_LIMB_WIDTH * (BN_N_LIMBS - 1) + self.params.max_word.bits() as usize
@@ -221,6 +241,31 @@ mod tests {
         );
 
         assert_eq!(num, num_assignment.value(&cs));
+        assert!(cs.is_sat());
+    }
+
+    #[test]
+    fn bignat_add() {
+        let mut cs = R1cs::<Bn254Driver>::default();
+        let modulus = Fr::MODULUS - Fr::one();
+        let num1 = f_to_nat(&modulus);
+        let num2 = f_to_nat(&modulus);
+        let num1_assignment = BigNatAssignment::witness_from_big_int(
+            &mut cs,
+            num1.clone(),
+            BN_LIMB_WIDTH,
+            BN_N_LIMBS,
+        );
+        let num2_assignment = BigNatAssignment::witness_from_big_int(
+            &mut cs,
+            num2.clone(),
+            BN_LIMB_WIDTH,
+            BN_N_LIMBS,
+        );
+
+        let sum = num1_assignment.add(&num2_assignment);
+        let sum_native = num1 + num2;
+        assert_eq!(sum_native, sum.value(&cs));
         assert!(cs.is_sat());
     }
 }
