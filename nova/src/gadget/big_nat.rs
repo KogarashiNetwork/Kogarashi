@@ -1,4 +1,5 @@
 use num_bigint::{BigInt, Sign};
+use num_traits::ToPrimitive;
 use zkstd::circuit::prelude::{BinaryAssignment, FieldAssignment};
 use zkstd::circuit::CircuitDriver;
 use zkstd::common::PrimeField;
@@ -196,6 +197,82 @@ impl<F: PrimeField> BigNatAssignment<F> {
         }
     }
 
+    pub fn enforce_equal_when_carried_regroup<C: CircuitDriver<Scalar = F>>(
+        &self,
+        cs: &mut R1cs<C>,
+        other: &Self,
+    ) {
+        assert_eq!(self.params.limb_width, other.params.limb_width);
+        let max_word = std::cmp::max(&self.params.max_word, &other.params.max_word);
+        let carry_bits =
+            (((max_word.to_f64().unwrap() * 2.0).log2() - self.params.limb_width as f64).ceil()
+                + 0.1) as usize;
+        let limbs_per_group = ((C::NUM_BITS - 1) as usize - carry_bits) / self.params.limb_width;
+        let self_grouped = self.group_limbs(cs, limbs_per_group);
+        let other_grouped = other.group_limbs(cs, limbs_per_group);
+        self_grouped.enforce_equal_when_carried(cs, &other_grouped)
+    }
+
+    pub fn enforce_equal_when_carried<C: CircuitDriver<Scalar = F>>(
+        &self,
+        cs: &mut R1cs<C>,
+        other: &Self,
+    ) {
+        assert_eq!(self.params.limb_width, other.params.limb_width);
+
+        let n = std::cmp::min(self.limbs.len(), other.limbs.len());
+        let target_base = BigInt::from(1u8) << self.params.limb_width as u32;
+        let mut accumulated_extra = BigInt::from(0usize);
+        let max_word = std::cmp::max(&self.params.max_word, &other.params.max_word);
+        let carry_bits =
+            (((max_word.to_f64().unwrap() * 2.0).log2() - self.params.limb_width as f64).ceil()
+                + 0.1) as usize;
+        let mut carry_in = FieldAssignment::constant(&F::zero());
+
+        for i in 0..n {
+            let carry = FieldAssignment::witness(
+                cs,
+                nat_to_f(
+                    &((f_to_nat(&self.limbs[i].value(cs))
+                        + f_to_nat(&carry_in.value(cs))
+                        + max_word
+                        - f_to_nat(&other.limbs[i].value(cs)))
+                        / &target_base),
+                ),
+            );
+            accumulated_extra += max_word;
+
+            let target = FieldAssignment::mul(
+                cs,
+                &FieldAssignment::constant(&nat_to_f::<F>(max_word)),
+                &carry,
+            );
+            let carry_sum = &(&carry_in + &self.limbs[i]) - &other.limbs[i];
+            let accumulated =
+                FieldAssignment::constant(&nat_to_f(&(&accumulated_extra % &target_base)));
+            let max_word = FieldAssignment::constant(&nat_to_f(max_word));
+
+            FieldAssignment::enforce_eq_constant(
+                cs,
+                &(&(&(&carry_sum + &max_word) - &target) - &accumulated),
+                &F::zero(),
+            );
+
+            accumulated_extra /= &target_base;
+            if i < n - 1 {
+                let carry_decomposition = FieldAssignment::to_bits(cs, &carry, 256);
+                FieldAssignment::range_check_bits(cs, &carry_decomposition, carry_bits as u64);
+            } else {
+                FieldAssignment::enforce_eq_constant(
+                    cs,
+                    &(&carry - &FieldAssignment::constant(&nat_to_f(&accumulated_extra))),
+                    &F::zero(),
+                );
+            }
+            carry_in = carry;
+        }
+    }
+
     pub fn add(&self, other: &Self) -> Self {
         assert_eq!(self.params.limb_width, other.params.limb_width);
         let n_limbs = std::cmp::max(self.params.n_limbs, other.params.n_limbs);
@@ -256,8 +333,42 @@ impl<F: PrimeField> BigNatAssignment<F> {
         };
 
         let right_int = BigNatAssignment::from_poly(right, limb_width, right_max_word);
-        // self.equal_when_carried_regroup(cs.namespace(|| "carry"), &right_int)?;
+        self.enforce_equal_when_carried_regroup(cs, &right_int);
         remainder
+    }
+
+    pub fn group_limbs<C: CircuitDriver<Scalar = F>>(
+        &self,
+        cs: &mut R1cs<C>,
+        limbs_per_group: usize,
+    ) -> Self {
+        let n_groups = (self.limbs.len() - 1) / limbs_per_group + 1;
+        let mut limbs = vec![FieldAssignment::constant(&F::zero()); n_groups];
+        let mut shift = FieldAssignment::constant(&F::one());
+        let limb_block = FieldAssignment::constant(&F::pow_of_2(self.params.limb_width as u64));
+        for (i, limb) in self.limbs.iter().enumerate() {
+            if i % limbs_per_group == 0 {
+                shift = FieldAssignment::constant(&F::one());
+            }
+
+            limbs[i / limbs_per_group] =
+                &limbs[i / limbs_per_group] + &FieldAssignment::mul(cs, &shift, limb);
+            shift = FieldAssignment::mul(cs, &shift, &limb_block);
+        }
+
+        let max_word = (0..limbs_per_group).fold(BigInt::from(0u8), |mut acc, i| {
+            acc.set_bit((i * self.params.limb_width) as u64, true);
+            acc
+        }) * &self.params.max_word;
+        Self {
+            params: BigNatParams {
+                min_bits: self.params.min_bits,
+                limb_width: self.params.limb_width * limbs_per_group,
+                n_limbs: limbs.len(),
+                max_word,
+            },
+            limbs,
+        }
     }
 
     pub fn n_bits(&self) -> usize {
