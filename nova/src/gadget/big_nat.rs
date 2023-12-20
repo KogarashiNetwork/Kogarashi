@@ -180,6 +180,13 @@ impl<F: PrimeField> BigNatAssignment<F> {
         bits
     }
 
+    pub fn enforce_eq<C: CircuitDriver<Scalar = F>>(cs: &mut R1cs<C>, x: &Self, y: &Self) {
+        assert_eq!(x.limbs.len(), y.limbs.len());
+        for (x, y) in x.limbs.iter().zip(y.limbs.iter()) {
+            FieldAssignment::enforce_eq(cs, x, y);
+        }
+    }
+
     pub fn conditional_select<C: CircuitDriver<Scalar = F>>(
         cs: &mut R1cs<C>,
         a: &Self,
@@ -243,15 +250,12 @@ impl<F: PrimeField> BigNatAssignment<F> {
             );
             accumulated_extra += max_word;
 
-            let target = FieldAssignment::mul(
-                cs,
-                &FieldAssignment::constant(&nat_to_f::<F>(&target_base)),
-                &carry,
-            );
+            let target_base_ass = FieldAssignment::witness(cs, nat_to_f::<F>(&target_base));
+            let target = FieldAssignment::mul(cs, &target_base_ass, &carry);
             let carry_sum = &(&carry_in + &self.limbs[i]) - &other.limbs[i];
             let accumulated =
-                FieldAssignment::constant(&nat_to_f::<F>(&(&accumulated_extra % &target_base)));
-            let max_word = FieldAssignment::constant(&nat_to_f::<F>(max_word));
+                FieldAssignment::witness(cs, nat_to_f::<F>(&(&accumulated_extra % &target_base)));
+            let max_word = FieldAssignment::witness(cs, nat_to_f::<F>(max_word));
 
             FieldAssignment::enforce_eq_constant(
                 cs,
@@ -264,9 +268,11 @@ impl<F: PrimeField> BigNatAssignment<F> {
                 let carry_decomposition = FieldAssignment::to_bits(cs, &carry, 256);
                 FieldAssignment::range_check_bits(cs, &carry_decomposition, carry_bits as u64);
             } else {
+                let accumulated_extra_ass =
+                    FieldAssignment::witness(cs, nat_to_f(&accumulated_extra));
                 FieldAssignment::enforce_eq_constant(
                     cs,
-                    &(&carry - &FieldAssignment::constant(&nat_to_f(&accumulated_extra))),
+                    &(&carry - &accumulated_extra_ass),
                     &F::zero(),
                 );
             }
@@ -411,7 +417,7 @@ impl<F: PrimeField> BigNatAssignment<F> {
         let n_groups = (self.limbs.len() - 1) / limbs_per_group + 1;
         let mut limbs = vec![FieldAssignment::constant(&F::zero()); n_groups];
         let mut shift = FieldAssignment::constant(&F::one());
-        let limb_block = FieldAssignment::constant(&F::pow_of_2(self.params.limb_width as u64));
+        let limb_block = FieldAssignment::witness(cs, F::pow_of_2(self.params.limb_width as u64));
         for (i, limb) in self.limbs.iter().enumerate() {
             if i % limbs_per_group == 0 {
                 shift = FieldAssignment::constant(&F::one());

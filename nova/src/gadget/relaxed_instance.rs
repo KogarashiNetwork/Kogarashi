@@ -202,17 +202,20 @@ mod tests {
             &scalar_as_base::<GrumpkinDriver>(instance.u),
         );
 
-        // TODO: How should we implement enforce_eq for BigNat
-        // FieldAssignment::enforce_eq_constant(
-        //     &mut cs,
-        //     &instance_assignment.x0,
-        //     &scalar_as_base::<GrumpkinDriver>(instance.x[0]),
-        // );
-        // FieldAssignment::enforce_eq_constant(
-        //     &mut cs,
-        //     &instance_assignment.x1,
-        //     &scalar_as_base::<GrumpkinDriver>(instance.x[1]),
-        // );
+        let x0_ass = BigNatAssignment::witness_from_big_int(
+            &mut cs,
+            f_to_nat(&instance.x[0]),
+            BN_LIMB_WIDTH,
+            BN_N_LIMBS,
+        );
+        let x1_ass = BigNatAssignment::witness_from_big_int(
+            &mut cs,
+            f_to_nat(&instance.x[0]),
+            BN_LIMB_WIDTH,
+            BN_N_LIMBS,
+        );
+        BigNatAssignment::enforce_eq(&mut cs, &instance_assignment.x0, &x0_ass);
+        BigNatAssignment::enforce_eq(&mut cs, &instance_assignment.x1, &x1_ass);
 
         instance_assignment
             .commit_e

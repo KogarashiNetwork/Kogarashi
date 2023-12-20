@@ -75,7 +75,6 @@ impl<F: PrimeField> FieldAssignment<F> {
         z
     }
 
-    // TODO: How to test it properly
     pub fn range_check_bits<C: CircuitDriver<Scalar = F>>(
         cs: &mut R1cs<C>,
         a_bits: &[BinaryAssignment],
