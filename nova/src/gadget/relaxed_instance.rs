@@ -20,8 +20,8 @@ pub(crate) struct RelaxedR1csInstanceAssignment<C: CircuitDriver> {
 }
 
 impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
-    pub(crate) fn witness<CS: CircuitDriver<Scalar = C::Base>>(
-        cs: &mut R1cs<CS>,
+    pub(crate) fn witness<C: CircuitDriver<Scalar = C::Base>>(
+        cs: &mut R1cs<C>,
         relaxed_r1cs_instance: &RelaxedR1csInstance<C>,
     ) -> Self {
         let RelaxedR1csInstance {
@@ -57,8 +57,8 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
     }
 
     /// E = 0, u = 1
-    pub fn from_r1cs_instance<CS: CircuitDriver<Scalar = C::Base>>(
-        cs: &mut R1cs<CS>,
+    pub fn from_r1cs_instance<C: CircuitDriver<Scalar = C::Base>>(
+        cs: &mut R1cs<C>,
         instance: R1csInstanceAssignment<C>,
     ) -> Self {
         let commit_e = PointAssignment::identity();
@@ -71,8 +71,8 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         }
     }
 
-    pub fn conditional_select<CS: CircuitDriver<Scalar = C::Base>>(
-        cs: &mut R1cs<CS>,
+    pub fn conditional_select<C: CircuitDriver<Scalar = C::Base>>(
+        cs: &mut R1cs<C>,
         a: &Self,
         b: &Self,
         condition: &BinaryAssignment,
@@ -102,9 +102,9 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         transcript.append(self.x1.clone());
     }
 
-    pub(crate) fn hash<CS: CircuitDriver<Scalar = C::Base>>(
+    pub(crate) fn hash<C: CircuitDriver<Scalar = C::Base>>(
         &self,
-        cs: &mut R1cs<CS>,
+        cs: &mut R1cs<C>,
         i: FieldAssignment<C::Base>,
         z_0: Vec<FieldAssignment<C::Base>>,
         z_i: Vec<FieldAssignment<C::Base>>,

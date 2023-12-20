@@ -23,9 +23,9 @@ impl<const ROUND: usize, C: CircuitDriver> MimcROCircuit<ROUND, C> {
     pub(crate) fn append(&mut self, absorb: FieldAssignment<C::Base>) {
         self.state.push(absorb)
     }
-    pub(crate) fn hash_vec<CS: CircuitDriver<Scalar = C::Base>>(
+    pub(crate) fn hash_vec<C: CircuitDriver<Scalar = C::Base>>(
         &mut self,
-        cs: &mut R1cs<CS>,
+        cs: &mut R1cs<C>,
         values: Vec<FieldAssignment<C::Base>>,
     ) -> FieldAssignment<C::Base> {
         for x in values {
@@ -40,9 +40,9 @@ impl<const ROUND: usize, C: CircuitDriver> MimcROCircuit<ROUND, C> {
         self.append(point.get_z());
     }
 
-    pub(crate) fn squeeze<CS: CircuitDriver<Scalar = C::Base>>(
+    pub(crate) fn squeeze<C: CircuitDriver<Scalar = C::Base>>(
         &self,
-        cs: &mut R1cs<CS>,
+        cs: &mut R1cs<C>,
     ) -> FieldAssignment<C::Base> {
         self.state.iter().fold(self.key.clone(), |acc, scalar| {
             let h = self.hasher.hash(cs, scalar.clone(), acc.clone());

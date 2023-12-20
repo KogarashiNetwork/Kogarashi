@@ -113,8 +113,8 @@ impl<F: PrimeField> BigNatAssignment<F> {
     /// Allocates a `BigNat` in the circuit with `n_limbs` limbs of width `limb_width` each.
     /// The `max_word` is guaranteed to be `(2 << limb_width) - 1`.
     /// The value is provided by an allocated number
-    pub fn witness_from_field_assignment<CS: CircuitDriver<Scalar = F>>(
-        cs: &mut R1cs<CS>,
+    pub fn witness_from_field_assignment<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
         f: &FieldAssignment<F>,
         limb_width: usize,
         n_limbs: usize,
@@ -142,14 +142,14 @@ impl<F: PrimeField> BigNatAssignment<F> {
         }
     }
 
-    pub fn enforce_well_formed<CS: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<CS>) {
+    pub fn enforce_well_formed<C: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<C>) {
         for limb in &self.limbs {
             let limb_bits = FieldAssignment::to_bits(cs, limb, 256);
             FieldAssignment::range_check_bits(cs, &limb_bits, self.params.limb_width as u64);
         }
     }
 
-    pub fn value<CS: CircuitDriver<Scalar = F>>(&self, cs: &R1cs<CS>) -> BigInt {
+    pub fn value<C: CircuitDriver<Scalar = F>>(&self, cs: &R1cs<C>) -> BigInt {
         limbs_to_nat(
             self.limbs.iter().map(|x| x.value(cs)),
             self.params.limb_width,
@@ -161,16 +161,16 @@ impl<F: PrimeField> BigNatAssignment<F> {
     }
 
     /// Break `self` up into a bit-vector.
-    pub fn decompose<CS: CircuitDriver<Scalar = F>>(
+    pub fn decompose<C: CircuitDriver<Scalar = F>>(
         &self,
-        cs: &mut R1cs<CS>,
+        cs: &mut R1cs<C>,
     ) -> Vec<BinaryAssignment> {
         let limb_values_split = self.limbs.iter().map(|limb| limb.value(cs));
         let bitvectors: Vec<Vec<BinaryAssignment>> = self
             .limbs
             .iter()
             .rev()
-            .map(|limb| FieldAssignment::to_bits::<CS>(cs, limb, self.params.limb_width))
+            .map(|limb| FieldAssignment::to_bits::<C>(cs, limb, self.params.limb_width))
             .collect();
         let mut bits = Vec::new();
 
@@ -244,13 +244,13 @@ impl<F: PrimeField> BigNatAssignment<F> {
 
             let target = FieldAssignment::mul(
                 cs,
-                &FieldAssignment::constant(&nat_to_f::<F>(max_word)),
+                &FieldAssignment::constant(&nat_to_f::<F>(&target_base)),
                 &carry,
             );
             let carry_sum = &(&carry_in + &self.limbs[i]) - &other.limbs[i];
             let accumulated =
-                FieldAssignment::constant(&nat_to_f(&(&accumulated_extra % &target_base)));
-            let max_word = FieldAssignment::constant(&nat_to_f(max_word));
+                FieldAssignment::constant(&nat_to_f::<F>(&(&accumulated_extra % &target_base)));
+            let max_word = FieldAssignment::constant(&nat_to_f::<F>(max_word));
 
             FieldAssignment::enforce_eq_constant(
                 cs,
@@ -271,6 +271,71 @@ impl<F: PrimeField> BigNatAssignment<F> {
             }
             carry_in = carry;
         }
+
+        for limb in self.limbs.iter().skip(n) {
+            FieldAssignment::enforce_eq_constant(cs, limb, &F::zero());
+        }
+
+        for limb in other.limbs.iter().skip(n) {
+            FieldAssignment::enforce_eq_constant(cs, limb, &F::zero());
+        }
+    }
+
+    pub fn mult_mod<C: CircuitDriver<Scalar = F>>(
+        &self,
+        cs: &mut R1cs<C>,
+        other: &Self,
+        modulus: &Self,
+    ) -> Self {
+        assert_eq!(self.params.limb_width, other.params.limb_width);
+        let limb_width = self.params.limb_width;
+        let quotient_bits =
+            (self.n_bits() + other.n_bits()).saturating_sub(modulus.params.min_bits);
+        let quotient_limbs = quotient_bits.saturating_sub(1) / limb_width + 1;
+        let quotient = BigNatAssignment::witness_from_big_int(
+            cs,
+            (self.value(cs) * other.value(cs)) / modulus.value(cs),
+            self.params.limb_width,
+            quotient_limbs,
+        );
+        quotient.enforce_well_formed(cs);
+        let remainder = BigNatAssignment::witness_from_big_int(
+            cs,
+            (self.value(cs) * other.value(cs)) % modulus.value(cs),
+            self.params.limb_width,
+            modulus.limbs.len(),
+        );
+        remainder.enforce_well_formed(cs);
+        let a_poly = Polynomial::from(self.clone());
+        let b_poly = Polynomial::from(other.clone());
+        let mod_poly = Polynomial::from(modulus.clone());
+        let q_poly = Polynomial::from(quotient.clone());
+        let r_poly = Polynomial::from(remainder.clone());
+
+        // a * b
+        let left = a_poly.mul(cs, &b_poly);
+        let right_product = q_poly.mul(cs, &mod_poly);
+        // q * m + r
+        let right = right_product.add(cs, &r_poly);
+
+        let left_max_word = {
+            let mut x = BigInt::from(std::cmp::min(self.limbs.len(), other.limbs.len()));
+            x *= &self.params.max_word;
+            x *= &other.params.max_word;
+            x
+        };
+        let right_max_word = {
+            let mut x = BigInt::from(std::cmp::min(quotient.limbs.len(), modulus.limbs.len()));
+            x *= &quotient.params.max_word;
+            x *= &modulus.params.max_word;
+            x += &remainder.params.max_word;
+            x
+        };
+
+        let left_int = BigNatAssignment::from_poly(left, limb_width, left_max_word);
+        let right_int = BigNatAssignment::from_poly(right, limb_width, right_max_word);
+        left_int.enforce_equal_when_carried_regroup(cs, &right_int);
+        remainder
     }
 
     pub fn add(&self, other: &Self) -> Self {
@@ -381,7 +446,7 @@ pub struct Polynomial<F: PrimeField> {
 }
 
 impl<F: PrimeField> Polynomial<F> {
-    pub fn mul<CS: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<CS>, other: &Self) -> Self {
+    pub fn mul<C: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<C>, other: &Self) -> Self {
         let n_product_coeffs = self.coefficients.len() + other.coefficients.len() - 1;
 
         let mut product: Vec<FieldAssignment<F>> =
@@ -434,7 +499,7 @@ impl<F: PrimeField> Polynomial<F> {
             coefficients: product,
         }
     }
-    pub fn add<CS: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<CS>, other: &Self) -> Self {
+    pub fn add<C: CircuitDriver<Scalar = F>>(&self, cs: &mut R1cs<C>, other: &Self) -> Self {
         let n_coeffs = std::cmp::max(self.coefficients.len(), other.coefficients.len());
         let sum = (0..n_coeffs)
             .map(|i| {
@@ -541,6 +606,37 @@ mod tests {
         let remainder = value_assignment.red_mod(&mut cs, &modulus_assignment);
         let remainder_native = value % modulus;
         assert_eq!(remainder_native, remainder.value(&cs));
+        assert!(cs.is_sat());
+    }
+
+    #[test]
+    fn bignat_mult_mod() {
+        let mut cs = R1cs::<Bn254Driver>::default();
+        let num1 = BigInt::from(42);
+        let num2 = BigInt::from(1337);
+        let modulus = BigInt::from(322);
+        let num1_assignment = BigNatAssignment::witness_from_big_int(
+            &mut cs,
+            num1.clone(),
+            BN_LIMB_WIDTH,
+            BN_N_LIMBS,
+        );
+        let num2_assignment = BigNatAssignment::witness_from_big_int(
+            &mut cs,
+            num2.clone(),
+            BN_LIMB_WIDTH,
+            BN_N_LIMBS,
+        );
+        let modulus_assignment = BigNatAssignment::witness_from_big_int(
+            &mut cs,
+            modulus.clone(),
+            BN_LIMB_WIDTH,
+            BN_N_LIMBS,
+        );
+
+        let mult_mod = num1_assignment.mult_mod(&mut cs, &num2_assignment, &modulus_assignment);
+        let mult_mod_native = (num1 * num2) % modulus;
+        assert_eq!(mult_mod_native, mult_mod.value(&cs));
         assert!(cs.is_sat());
     }
 }

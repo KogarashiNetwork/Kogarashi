@@ -17,8 +17,8 @@ impl<F: PrimeField> FunctionCircuit<F> for ExampleFunction<F> {
         DenseVectors::new(vec![next_z])
     }
 
-    fn invoke_cs<CS: CircuitDriver<Scalar = F>>(
-        cs: &mut R1cs<CS>,
+    fn invoke_cs<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
         z_i: Vec<FieldAssignment<F>>,
     ) -> Vec<FieldAssignment<F>> {
         let five = FieldAssignment::constant(&F::from(5));
