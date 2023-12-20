@@ -1,6 +1,5 @@
 mod helper;
 
-use crate::driver::base_as_scalar;
 use helper::BlakeHelper;
 use zkstd::circuit::CircuitDriver;
 use zkstd::common::{BNAffine, IntGroup, PrimeField, Ring};
@@ -8,6 +7,10 @@ use zkstd::common::{BNAffine, IntGroup, PrimeField, Ring};
 /// Amount of rounds calculated for the 254 bit field.
 /// Doubled due to the usage of Feistel mode with zero key.
 pub(crate) const MIMC_ROUNDS: usize = 322;
+/// Because we start with u equals 0 or 1, we have (1 << 125) steps.
+/// Until the value of u will reach the MODULUS of the field.
+pub(crate) const CHALLENGE_BITS: usize = 128;
+pub(crate) const HASH_BITS: usize = 252;
 
 pub(crate) struct Mimc<const ROUND: usize, F: PrimeField> {
     pub(crate) constants: [F; ROUND],
@@ -77,13 +80,23 @@ impl<const ROUND: usize, C: CircuitDriver> MimcRO<ROUND, C> {
         for x in values {
             self.state.push(x);
         }
-        self.squeeze()
+        self.squeeze(HASH_BITS)
     }
 
-    pub(crate) fn squeeze(&self) -> C::Scalar {
-        base_as_scalar::<C>(self.state.iter().fold(self.key, |acc, scalar| {
+    pub(crate) fn squeeze(&self, num_bits: usize) -> C::Scalar {
+        let hash = self.state.iter().fold(self.key, |acc, scalar| {
             let h = self.hasher.hash(*scalar, acc);
             acc + scalar + h
-        }))
+        });
+        let input_bits = hash.to_bits();
+        let mut mult = C::Scalar::one();
+        let mut val = C::Scalar::zero();
+        for bit in input_bits.iter().rev().take(num_bits) {
+            if *bit == 1 {
+                val += mult;
+            }
+            mult = mult + mult;
+        }
+        val
     }
 }

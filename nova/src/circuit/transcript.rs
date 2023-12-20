@@ -1,7 +1,8 @@
 use crate::gadget::MimcAssignment;
 
+use crate::hash::HASH_BITS;
 use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
-use zkstd::common::IntGroup;
+use zkstd::common::{IntGroup, Ring};
 
 pub(crate) struct MimcROCircuit<const ROUND: usize, C: CircuitDriver> {
     hasher: MimcAssignment<ROUND, C::Base>,
@@ -31,7 +32,7 @@ impl<const ROUND: usize, C: CircuitDriver> MimcROCircuit<ROUND, C> {
         for x in values {
             self.state.push(x);
         }
-        self.squeeze(cs)
+        self.squeeze(cs, HASH_BITS)
     }
 
     pub(crate) fn append_point(&mut self, point: PointAssignment<C::Base>) {
@@ -43,18 +44,30 @@ impl<const ROUND: usize, C: CircuitDriver> MimcROCircuit<ROUND, C> {
     pub(crate) fn squeeze<CS: CircuitDriver<Scalar = C::Base>>(
         &self,
         cs: &mut R1cs<CS>,
+        num_bits: usize,
     ) -> FieldAssignment<C::Base> {
-        self.state.iter().fold(self.key.clone(), |acc, scalar| {
+        let hash = self.state.iter().fold(self.key.clone(), |acc, scalar| {
             let h = self.hasher.hash(cs, scalar.clone(), acc.clone());
             &(&acc + scalar) + &h
-        })
+        });
+
+        let bits = FieldAssignment::to_bits(cs, &hash, num_bits);
+
+        // TODO: Do faster
+        let mut mult = FieldAssignment::constant(&C::Base::one());
+        let mut val = FieldAssignment::constant(&C::Base::zero());
+        for bit in bits.iter().rev().take(num_bits) {
+            val = FieldAssignment::conditional_select(cs, &(&val + &mult), &val, bit);
+            mult = &mult + &mult;
+        }
+        val
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::MimcROCircuit;
-    use crate::hash::{MimcRO, MIMC_ROUNDS};
+    use crate::hash::{MimcRO, HASH_BITS, MIMC_ROUNDS};
 
     use crate::driver::{Bn254Driver, GrumpkinDriver};
     use bn_254::Fr;
@@ -78,8 +91,8 @@ mod tests {
         mimc_circuit.append(scalar_assignment);
         mimc_circuit.append_point(point_assignment);
 
-        let expected = mimc.squeeze().into();
-        let circuit_result = mimc_circuit.squeeze(&mut cs);
+        let expected = mimc.squeeze(HASH_BITS).into();
+        let circuit_result = mimc_circuit.squeeze(&mut cs, HASH_BITS);
         FieldAssignment::enforce_eq_constant(&mut cs, &circuit_result, &expected);
         assert!(cs.is_sat());
     }

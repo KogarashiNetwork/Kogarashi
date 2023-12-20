@@ -1,6 +1,6 @@
 use crate::relaxed_r1cs::{R1csInstance, RelaxedR1csInstance};
 
-use crate::hash::{MimcRO, MIMC_ROUNDS};
+use crate::hash::{MimcRO, CHALLENGE_BITS, MIMC_ROUNDS};
 use core::marker::PhantomData;
 use zkstd::circuit::prelude::CircuitDriver;
 
@@ -19,7 +19,7 @@ impl<C: CircuitDriver> Verifier<C> {
         transcript.append_point(commit_t);
         instance1.absorb_by_transcript(&mut transcript);
 
-        let r = transcript.squeeze();
+        let r = transcript.squeeze(CHALLENGE_BITS);
 
         instance1.fold(instance2, r, commit_t)
     }

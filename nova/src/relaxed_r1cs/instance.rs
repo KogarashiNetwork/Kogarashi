@@ -129,8 +129,7 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
                 vec![scalar_as_base::<C>(self.u)],
                 self.x
                     .iter()
-                    .map(|x| nat_to_limbs(&f_to_nat(&x), BN_LIMB_WIDTH, BN_N_LIMBS))
-                    .flatten()
+                    .flat_map(|x| nat_to_limbs(&f_to_nat(&x), BN_LIMB_WIDTH, BN_N_LIMBS))
                     .map(|x| scalar_as_base::<C>(x))
                     .collect(),
                 vec![

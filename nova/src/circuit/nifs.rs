@@ -1,9 +1,8 @@
 use core::marker::PhantomData;
 use num_bigint::BigInt;
 use num_traits::Num;
-use std::ops::Add;
 
-use crate::gadget::{f_to_nat, nat_to_f, BigNatAssignment, BN_LIMB_WIDTH, BN_N_LIMBS};
+use crate::gadget::{f_to_nat, BigNatAssignment, BN_LIMB_WIDTH, BN_N_LIMBS};
 use crate::gadget::{R1csInstanceAssignment, RelaxedR1csInstanceAssignment};
 use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
 use zkstd::common::{Group, IntGroup};
@@ -37,14 +36,11 @@ impl<C: CircuitDriver> NifsCircuit<C> {
         let m_bn = BigInt::from_str_radix(C::ORDER_STR, 16).unwrap();
         let r_bn_ass =
             BigNatAssignment::witness_from_field_assignment(cs, &r, BN_LIMB_WIDTH, BN_N_LIMBS);
-        let m_bn_ass =
-            BigNatAssignment::witness_from_big_int(cs, m_bn.clone(), BN_LIMB_WIDTH, BN_N_LIMBS);
+        let m_bn_ass = BigNatAssignment::witness_from_big_int(cs, m_bn, BN_LIMB_WIDTH, BN_N_LIMBS);
 
-        // TODO: Should be done without using BigInt
         // u_fold = U.u + r
-        let u = f_to_nat(&u_range.u.value(cs));
-        let u_fold = FieldAssignment::witness(cs, nat_to_f(&(u.add(r_bn.clone()) % m_bn.clone())));
-        // FieldAssignment::enforce_eq_constant(cs, &(&(&u_fold - &u_range.u) - &r), &C::Base::zero());
+        let u_fold = FieldAssignment::witness(cs, u_range.u.value(cs) + r.value(cs));
+        FieldAssignment::enforce_eq_constant(cs, &(&(&u_fold - &u_range.u) - &r), &C::Base::zero());
 
         // Fold U.x0 + r * x0
         let x0_single_bn = BigNatAssignment::witness_from_big_int(
