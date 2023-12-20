@@ -131,7 +131,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
     ) -> FieldAssignment<C::Base> {
         let mut transcript = MimcROCircuit::<MIMC_ROUNDS, C>::default();
         transcript.append_point(commit_t);
-        u_range.absorb_by_transcript(&mut transcript);
+        u_range.absorb_by_transcript(cs, &mut transcript);
         transcript.squeeze(cs, CHALLENGE_BITS)
     }
 }

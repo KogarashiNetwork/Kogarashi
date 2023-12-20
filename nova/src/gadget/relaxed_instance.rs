@@ -4,7 +4,7 @@ use crate::circuit::MimcROCircuit;
 use crate::driver::scalar_as_base;
 use crate::gadget::big_nat::{BigNatAssignment, BN_LIMB_WIDTH, BN_N_LIMBS};
 use crate::gadget::{f_to_nat, R1csInstanceAssignment};
-use crate::hash::MIMC_ROUNDS;
+use crate::hash::{HASH_BITS, MIMC_ROUNDS};
 use zkstd::circuit::prelude::{
     BinaryAssignment, CircuitDriver, FieldAssignment, PointAssignment, R1cs,
 };
@@ -103,12 +103,15 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         }
     }
 
-    pub(crate) fn absorb_by_transcript<const ROUNDS: usize>(
+    pub(crate) fn absorb_by_transcript<CS: CircuitDriver<Scalar = C::Base>, const ROUNDS: usize>(
         &self,
+        cs: &mut R1cs<CS>,
         transcript: &mut MimcROCircuit<ROUNDS, C>,
     ) {
-        transcript.append_point(self.commit_w.clone());
-        transcript.append_point(self.commit_e.clone());
+        let commit_e = self.commit_e.descale(cs);
+        let commit_w = self.commit_w.descale(cs);
+        transcript.append_point(commit_w);
+        transcript.append_point(commit_e);
         transcript.append(self.u.clone());
         for limb in self.x0.as_limbs() {
             transcript.append(limb);
@@ -125,22 +128,12 @@ impl<C: CircuitDriver> RelaxedR1csInstanceAssignment<C> {
         z_0: Vec<FieldAssignment<C::Base>>,
         z_i: Vec<FieldAssignment<C::Base>>,
     ) -> FieldAssignment<C::Base> {
-        let commit_e = self.commit_e.descale(cs);
-        let commit_w = self.commit_w.descale(cs);
-        MimcROCircuit::<MIMC_ROUNDS, C>::default().hash_vec(
-            cs,
-            vec![
-                vec![i],
-                z_0,
-                z_i,
-                vec![self.u.clone()],
-                self.x0.as_limbs(),
-                self.x1.as_limbs(),
-                vec![commit_e.get_x(), commit_e.get_y(), commit_e.get_z()],
-                vec![commit_w.get_x(), commit_w.get_y(), commit_w.get_z()],
-            ]
-            .concat(),
-        )
+        let mut mimc_circuit = MimcROCircuit::<MIMC_ROUNDS, C>::default();
+        mimc_circuit.append(i);
+        mimc_circuit.append_vec(z_0);
+        mimc_circuit.append_vec(z_i);
+        self.absorb_by_transcript(cs, &mut mimc_circuit);
+        mimc_circuit.squeeze(cs, HASH_BITS)
     }
 }
 

@@ -6,7 +6,7 @@ use zkstd::common::{BNAffine, IntGroup, PrimeField, Ring};
 
 /// Amount of rounds calculated for the 254 bit field.
 /// Doubled due to the usage of Feistel mode with zero key.
-pub(crate) const MIMC_ROUNDS: usize = 322;
+pub(crate) const MIMC_ROUNDS: usize = 0;
 /// Because we start with u equals 0 or 1, we have (1 << 125) steps.
 /// Until the value of u will reach the MODULUS of the field.
 pub(crate) const CHALLENGE_BITS: usize = 128;
@@ -76,11 +76,10 @@ impl<const ROUND: usize, C: CircuitDriver> MimcRO<ROUND, C> {
         });
     }
 
-    pub(crate) fn hash_vec(&mut self, values: Vec<C::Base>) -> C::Scalar {
+    pub(crate) fn append_vec(&mut self, values: Vec<C::Base>) {
         for x in values {
-            self.state.push(x);
+            self.append(x);
         }
-        self.squeeze(HASH_BITS)
     }
 
     pub(crate) fn squeeze(&self, num_bits: usize) -> C::Scalar {

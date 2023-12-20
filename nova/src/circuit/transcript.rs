@@ -1,6 +1,5 @@
 use crate::gadget::MimcAssignment;
 
-use crate::hash::HASH_BITS;
 use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
 use zkstd::common::{IntGroup, Ring};
 
@@ -24,15 +23,10 @@ impl<const ROUND: usize, C: CircuitDriver> MimcROCircuit<ROUND, C> {
     pub(crate) fn append(&mut self, absorb: FieldAssignment<C::Base>) {
         self.state.push(absorb)
     }
-    pub(crate) fn hash_vec<CS: CircuitDriver<Scalar = C::Base>>(
-        &mut self,
-        cs: &mut R1cs<CS>,
-        values: Vec<FieldAssignment<C::Base>>,
-    ) -> FieldAssignment<C::Base> {
+    pub(crate) fn append_vec(&mut self, values: Vec<FieldAssignment<C::Base>>) {
         for x in values {
-            self.state.push(x);
+            self.append(x);
         }
-        self.squeeze(cs, HASH_BITS)
     }
 
     pub(crate) fn append_point(&mut self, point: PointAssignment<C::Base>) {
