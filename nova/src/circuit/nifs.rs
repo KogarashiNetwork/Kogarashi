@@ -1,9 +1,9 @@
 use core::marker::PhantomData;
 use num_bigint::BigInt;
 use num_traits::Num;
-use std::ops::{Add, Mul};
+use std::ops::Add;
 
-use crate::gadget::{f_to_nat, nat_to_f};
+use crate::gadget::{f_to_nat, nat_to_f, BigNatAssignment, BN_LIMB_WIDTH, BN_N_LIMBS};
 use crate::gadget::{R1csInstanceAssignment, RelaxedR1csInstanceAssignment};
 use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment, PointAssignment, R1cs};
 use zkstd::common::{Group, IntGroup};
@@ -35,6 +35,10 @@ impl<C: CircuitDriver> NifsCircuit<C> {
 
         let r_bn = f_to_nat(&r.value(cs));
         let m_bn = BigInt::from_str_radix(C::ORDER_STR, 16).unwrap();
+        let r_bn_ass =
+            BigNatAssignment::witness_from_field_assignment(cs, &r, BN_LIMB_WIDTH, BN_N_LIMBS);
+        let m_bn_ass =
+            BigNatAssignment::witness_from_big_int(cs, m_bn.clone(), BN_LIMB_WIDTH, BN_N_LIMBS);
 
         // TODO: Should be done without using BigInt
         // u_fold = U.u + r
@@ -42,24 +46,32 @@ impl<C: CircuitDriver> NifsCircuit<C> {
         let u_fold = FieldAssignment::witness(cs, nat_to_f(&(u.add(r_bn.clone()) % m_bn.clone())));
         // FieldAssignment::enforce_eq_constant(cs, &(&(&u_fold - &u_range.u) - &r), &C::Base::zero());
 
-        // TODO: BigNatAssignment should be use for module arithmetics
         // Fold U.x0 + r * x0
-        let x0_range_bn = f_to_nat(&u_range.x0.value(cs));
-        let x0_single_bn = f_to_nat(&u_single.x0.value(cs));
-        let r_x0 = x0_single_bn.mul(r_bn.clone()) % m_bn.clone();
-        let x0_fold = (x0_range_bn + r_x0) % m_bn.clone();
+        let x0_single_bn = BigNatAssignment::witness_from_big_int(
+            cs,
+            f_to_nat(&u_single.x0.value(cs)),
+            BN_LIMB_WIDTH,
+            BN_N_LIMBS,
+        );
+        let r_x0 = x0_single_bn.mult_mod(cs, &r_bn_ass, &m_bn_ass);
+        let x0_fold = u_range.x0.add(&r_x0).red_mod(cs, &m_bn_ass);
+
         // Fold U.x1 + r * x1
-        let x1_range_bn = f_to_nat(&u_range.x1.value(cs));
-        let x1_single_bn = f_to_nat(&u_single.x1.value(cs));
-        let r_x1 = x1_single_bn.mul(r_bn) % m_bn.clone();
-        let x1_fold = (x1_range_bn + r_x1) % m_bn;
+        let x1_single_bn = BigNatAssignment::witness_from_big_int(
+            cs,
+            f_to_nat(&u_single.x1.value(cs)),
+            BN_LIMB_WIDTH,
+            BN_N_LIMBS,
+        );
+        let r_x1 = x1_single_bn.mult_mod(cs, &r_bn_ass, &m_bn_ass);
+        let x1_fold = u_range.x1.add(&r_x1).red_mod(cs, &m_bn_ass);
 
         RelaxedR1csInstanceAssignment {
             commit_w: w_fold,
             commit_e: e_fold,
             u: u_fold,
-            x0: FieldAssignment::witness(cs, nat_to_f(&x0_fold)),
-            x1: FieldAssignment::witness(cs, nat_to_f(&x1_fold)),
+            x0: x0_fold,
+            x1: x1_fold,
         }
     }
 }

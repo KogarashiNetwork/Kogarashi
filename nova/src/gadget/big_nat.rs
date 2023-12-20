@@ -186,9 +186,10 @@ impl<F: PrimeField> BigNatAssignment<F> {
         b: &Self,
         condition: &BinaryAssignment,
     ) -> BigNatAssignment<F> {
-        let mut limbs = vec![FieldAssignment::constant(&F::zero()); BN_N_LIMBS];
-        for (i, limb) in limbs.iter_mut().enumerate().take(BN_N_LIMBS) {
-            *limb = FieldAssignment::conditional_select(cs, &a.limbs[i], &b.limbs[i], condition);
+        assert_eq!(a.limbs.len(), b.limbs.len());
+        let mut limbs = vec![];
+        for (a, b) in a.limbs.iter().zip(b.limbs.iter()) {
+            limbs.push(FieldAssignment::conditional_select(cs, a, b, condition));
         }
 
         Self {

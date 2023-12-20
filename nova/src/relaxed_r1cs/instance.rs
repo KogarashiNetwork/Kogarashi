@@ -1,4 +1,5 @@
 use crate::driver::scalar_as_base;
+use crate::gadget::{f_to_nat, nat_to_limbs, BN_LIMB_WIDTH, BN_N_LIMBS};
 use crate::hash::{MimcRO, MIMC_ROUNDS};
 use crate::{PedersenCommitment, R1csShape};
 use zkstd::circuit::prelude::CircuitDriver;
@@ -107,7 +108,10 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
         transcript.append_point(self.commit_e);
         transcript.append(scalar_as_base::<C>(self.u));
         for x in &self.x.get() {
-            transcript.append(scalar_as_base::<C>(*x));
+            let limbs = nat_to_limbs(&f_to_nat(x), BN_LIMB_WIDTH, BN_N_LIMBS);
+            for limb in limbs {
+                transcript.append(scalar_as_base::<C>(limb));
+            }
         }
     }
 
@@ -123,7 +127,12 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
                 z_0.get(),
                 z_i.get(),
                 vec![scalar_as_base::<C>(self.u)],
-                self.x.iter().map(|x| scalar_as_base::<C>(x)).collect(),
+                self.x
+                    .iter()
+                    .map(|x| nat_to_limbs(&f_to_nat(&x), BN_LIMB_WIDTH, BN_N_LIMBS))
+                    .flatten()
+                    .map(|x| scalar_as_base::<C>(x))
+                    .collect(),
                 vec![
                     self.commit_e.get_x(),
                     self.commit_e.get_y(),
