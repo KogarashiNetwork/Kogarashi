@@ -13,8 +13,8 @@ pub(crate) struct NifsCircuit<C: CircuitDriver> {
 }
 
 impl<C: CircuitDriver> NifsCircuit<C> {
-    pub(crate) fn verify<C: CircuitDriver<Scalar = C::Base>>(
-        cs: &mut R1cs<C>,
+    pub(crate) fn verify<CS: CircuitDriver<Scalar = C::Base>>(
+        cs: &mut R1cs<CS>,
         r: FieldAssignment<C::Base>,
         u_range: RelaxedR1csInstanceAssignment<C>,
         u_single: R1csInstanceAssignment<C>,

@@ -39,9 +39,9 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> Default for AugmentedFCircu
 }
 
 impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
-    pub(crate) fn generate<C: CircuitDriver<Scalar = C::Base>>(
+    pub(crate) fn generate<CS: CircuitDriver<Scalar = C::Base>>(
         &self,
-        cs: &mut R1cs<C>,
+        cs: &mut R1cs<CS>,
     ) -> Vec<FieldAssignment<C::Base>> {
         // allocate inputs
         let i = FieldAssignment::witness(cs, C::Base::from(self.i as u64));
@@ -124,8 +124,8 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
         z_next
     }
 
-    pub(crate) fn get_challenge<C: CircuitDriver<Scalar = C::Base>>(
-        cs: &mut R1cs<C>,
+    pub(crate) fn get_challenge<CS: CircuitDriver<Scalar = C::Base>>(
+        cs: &mut R1cs<CS>,
         u_range: &RelaxedR1csInstanceAssignment<C>,
         commit_t: PointAssignment<C::Base>,
     ) -> FieldAssignment<C::Base> {

@@ -95,11 +95,14 @@ impl<F: PrimeField> FieldAssignment<F> {
             .skip_while(|&b| b == 0)
             .collect::<Vec<_>>();
 
-        // Check that there are no zeroes before the first one in the C
-        assert!(a_bits
-            .iter()
-            .take(a_bits.len() - c_bits.len())
-            .all(|b| cs[*b.inner()] == F::zero()));
+        if a_bits.len() < c_bits.len() {
+            return;
+        }
+
+        // Check that there are no ones before the first one in the C
+        for bit in a_bits.iter().take(a_bits.len() - c_bits.len()) {
+            FieldAssignment::enforce_eq_constant(cs, &FieldAssignment::from(bit), &F::zero());
+        }
 
         let a_bits = a_bits
             .iter()

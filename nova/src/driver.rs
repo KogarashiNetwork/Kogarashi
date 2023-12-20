@@ -98,6 +98,21 @@ mod grumpkin_gadget_tests {
     }
 
     #[test]
+    fn range_proof_bits_test() {
+        let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
+        let x = Scalar::from(13);
+
+        let x_ass = FieldAssignment::instance(&mut cs, x);
+        let x_bits_256 = FieldAssignment::to_bits(&mut cs, &x_ass, 256);
+        let x_bits_4 = FieldAssignment::to_bits(&mut cs, &x_ass, 4);
+        FieldAssignment::range_check_bits(&mut cs, &x_bits_256, 4);
+        FieldAssignment::range_check_bits(&mut cs, &x_bits_4, 4);
+        assert!(cs.is_sat());
+        FieldAssignment::range_check_bits(&mut cs, &x_bits_256, 3);
+        assert!(!cs.is_sat());
+    }
+
+    #[test]
     fn field_add_test() {
         let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let mut ncs = cs.clone();

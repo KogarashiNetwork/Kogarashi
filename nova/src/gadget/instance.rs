@@ -15,8 +15,8 @@ pub(crate) struct R1csInstanceAssignment<C: CircuitDriver> {
 }
 
 impl<C: CircuitDriver> R1csInstanceAssignment<C> {
-    pub(crate) fn witness<C: CircuitDriver<Scalar = C::Base>>(
-        cs: &mut R1cs<C>,
+    pub(crate) fn witness<CS: CircuitDriver<Scalar = C::Base>>(
+        cs: &mut R1cs<CS>,
         r1cs_instance: &R1csInstance<C>,
     ) -> Self {
         let R1csInstance { commit_w, x } = r1cs_instance;
@@ -34,8 +34,8 @@ impl<C: CircuitDriver> R1csInstanceAssignment<C> {
         Self { commit_w, x0, x1 }
     }
 
-    pub fn conditional_select<C: CircuitDriver<Scalar = C::Base>>(
-        cs: &mut R1cs<C>,
+    pub fn conditional_select<CS: CircuitDriver<Scalar = C::Base>>(
+        cs: &mut R1cs<CS>,
         a: &Self,
         b: &Self,
         condition: &BinaryAssignment,
