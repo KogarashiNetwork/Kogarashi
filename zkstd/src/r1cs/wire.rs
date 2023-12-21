@@ -1,11 +1,14 @@
+use crate::common::{Decode, Encode};
 use core::{
     cmp::Ordering,
     fmt::{self, Formatter},
 };
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Encode, Decode)]
 pub enum Wire {
+    #[codec(skip)]
     Instance(usize),
+    #[codec(skip)]
     Witness(usize),
 }
 

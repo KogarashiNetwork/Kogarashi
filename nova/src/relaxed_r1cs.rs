@@ -5,13 +5,16 @@ use crate::PedersenCommitment;
 pub(crate) use instance::{R1csInstance, RelaxedR1csInstance};
 pub(crate) use witness::{R1csWitness, RelaxedR1csWitness};
 use zkstd::circuit::prelude::{CircuitDriver, R1cs};
-use zkstd::common::Ring;
+use zkstd::common::{Decode, Encode, Ring};
 use zkstd::matrix::{DenseVectors, SparseMatrix};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
 pub struct R1csShape<C: CircuitDriver> {
+    #[codec(skip)]
     m: usize,
+    #[codec(skip)]
     instance_length: usize,
+    #[codec(skip)]
     witness_length: usize,
     a: SparseMatrix<C::Scalar>,
     b: SparseMatrix<C::Scalar>,
@@ -157,11 +160,12 @@ mod tests {
 
     #[test]
     fn relaxed_r1cs_test() {
+        let mut rng = OsRng;
         for i in 1..10 {
             let r1cs: R1cs<GrumpkinDriver> = example_r1cs(i);
             let shape = R1csShape::from(r1cs.clone());
             let k = (shape.m().next_power_of_two() as u64).trailing_zeros();
-            let ck = PedersenCommitment::<Affine>::new(k.into(), OsRng);
+            let ck = PedersenCommitment::<Affine>::new(k.into(), &mut rng);
             let (x, w) = r1cs_instance_and_witness(&r1cs, &shape, &ck);
             let instance = RelaxedR1csInstance::from_r1cs_instance(&ck, &shape, &x);
             let witness = RelaxedR1csWitness::from_r1cs_witness(&shape, &w);

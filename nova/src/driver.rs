@@ -1,9 +1,9 @@
 use bn_254::{params::PARAM_B3 as BN254_PARAM_B3, Fq, Fr, G1Affine};
 use grumpkin::{params::PARAM_B3 as GRUMPKIN_PARAM_B3, Affine};
 use zkstd::circuit::CircuitDriver;
-use zkstd::common::{IntGroup, PrimeField, Ring};
+use zkstd::common::{Decode, Encode, IntGroup, PrimeField, Ring};
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Decode, Encode)]
 pub struct GrumpkinDriver;
 
 impl CircuitDriver for GrumpkinDriver {
@@ -22,7 +22,7 @@ impl CircuitDriver for GrumpkinDriver {
     }
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Decode, Encode)]
 pub struct Bn254Driver;
 
 impl CircuitDriver for Bn254Driver {
@@ -80,10 +80,11 @@ mod grumpkin_gadget_tests {
 
     #[test]
     fn range_proof_test() {
+        let mut rng = OsRng;
         for _ in 0..100 {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
             let mut ncs = cs.clone();
-            let bound = Scalar::random(OsRng);
+            let bound = Scalar::random(&mut rng);
 
             let x_ass = FieldAssignment::instance(&mut cs, bound);
             let x_bits = FieldAssignment::to_bits(&mut cs, &x_ass, 256);
@@ -114,10 +115,11 @@ mod grumpkin_gadget_tests {
 
     #[test]
     fn field_add_test() {
+        let mut rng = OsRng;
         let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let mut ncs = cs.clone();
-        let a = Scalar::random(OsRng);
-        let b = Scalar::random(OsRng);
+        let a = Scalar::random(&mut rng);
+        let b = Scalar::random(&mut rng);
         let mut c = a + b;
 
         // a + b == c
@@ -142,10 +144,11 @@ mod grumpkin_gadget_tests {
 
     #[test]
     fn field_mul_test() {
+        let mut rng = OsRng;
         let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
         let mut ncs = cs.clone();
-        let a = Scalar::random(OsRng);
-        let b = Scalar::random(OsRng);
+        let a = Scalar::random(&mut rng);
+        let b = Scalar::random(&mut rng);
         let mut c = a * b;
 
         // a * b == c
@@ -203,10 +206,11 @@ mod grumpkin_gadget_tests {
 
     #[test]
     fn curve_double_test() {
+        let mut rng = OsRng;
         // Affine
         for _ in 0..100 {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let point = G1Affine::random(OsRng);
+            let point = G1Affine::random(&mut rng);
 
             let circuit_double = PointAssignment::instance(&mut cs, point).double(&mut cs);
 
@@ -220,10 +224,11 @@ mod grumpkin_gadget_tests {
 
     #[test]
     fn curve_add_test() {
+        let mut rng = OsRng;
         // Identity addition test
         {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let a = G1Affine::random(OsRng);
+            let a = G1Affine::random(&mut rng);
             let b = G1Affine::ADDITIVE_IDENTITY;
 
             let a_assignment = PointAssignment::instance(&mut cs, a);
@@ -240,8 +245,8 @@ mod grumpkin_gadget_tests {
 
         for _ in 0..100 {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let a = G1Affine::random(OsRng);
-            let b = G1Affine::random(OsRng);
+            let a = G1Affine::random(&mut rng);
+            let b = G1Affine::random(&mut rng);
 
             let a_assignment = PointAssignment::instance(&mut cs, a);
             let b_assignment = PointAssignment::instance(&mut cs, b);
@@ -258,10 +263,11 @@ mod grumpkin_gadget_tests {
 
     #[test]
     fn curve_scalar_mul_test() {
+        let mut rng = OsRng;
         for _ in 0..100 {
             let mut cs: R1cs<GrumpkinDriver> = R1cs::default();
-            let x = Scalar::random(OsRng);
-            let p = G1Affine::random(OsRng);
+            let x = Scalar::random(&mut rng);
+            let p = G1Affine::random(&mut rng);
 
             let x_assignment = FieldAssignment::instance(&mut cs, x);
             let p_assignment = PointAssignment::instance(&mut cs, p);

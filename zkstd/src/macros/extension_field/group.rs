@@ -10,10 +10,10 @@ macro_rules! ext_field_group_operation {
                 self.get_invert()
             }
 
-            fn random(mut rand: impl RngCore) -> Self {
+            fn random<R: RngCore>(rand: &mut R) -> Self {
                 let mut limbs: [$sub_field; $limbs_length] = [$sub_field::zero(); $limbs_length];
                 for i in 0..$limbs_length {
-                    limbs[i] = $sub_field::random(&mut rand);
+                    limbs[i] = $sub_field::random(rand);
                 }
                 $extension_field(limbs)
             }

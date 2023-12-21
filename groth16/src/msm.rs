@@ -117,9 +117,12 @@ mod tests {
 
     #[test]
     fn multi_scalar_multiplication_test() {
+        let mut rng = OsRng;
         let n = 1 << 5;
-        let points = (0..n).map(|_| G1Affine::random(OsRng)).collect::<Vec<_>>();
-        let scalars = (0..n).map(|_| Fr::random(OsRng)).collect::<Vec<_>>();
+        let points = (0..n)
+            .map(|_| G1Affine::random(&mut rng))
+            .collect::<Vec<_>>();
+        let scalars = (0..n).map(|_| Fr::random(&mut rng)).collect::<Vec<_>>();
         let msm = msm_curve_addition(&points[..], &scalars[..]);
         let naive = points
             .iter()

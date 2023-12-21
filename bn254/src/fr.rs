@@ -321,8 +321,9 @@ mod tests {
 
     #[test]
     fn test_sqrt() {
+        let mut rng = OsRng;
         for _ in 0..100 {
-            let a = Fr::random(OsRng);
+            let a = Fr::random(&mut rng);
             let mut b = a;
             b = b.square();
 
@@ -336,8 +337,9 @@ mod tests {
 
     #[test]
     fn test_serde() {
+        let mut rng = OsRng;
         for _ in 0..100000 {
-            let s = Fr::random(OsRng);
+            let s = Fr::random(&mut rng);
             let bytes = s.to_bytes();
             let s_prime = Fr::from_bytes(bytes).unwrap();
             assert_eq!(s, s_prime);
@@ -346,7 +348,8 @@ mod tests {
 
     #[test]
     fn to_fq_and_back() {
-        let x = Fr::random(OsRng);
+        let mut rng = OsRng;
+        let x = Fr::random(&mut rng);
         let y = Fq::from(x);
         assert_eq!(x, Fr::from(y));
     }

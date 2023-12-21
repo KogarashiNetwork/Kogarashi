@@ -2,13 +2,13 @@ use crate::function::FunctionCircuit;
 
 use core::marker::PhantomData;
 use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment};
-use zkstd::common::PrimeField;
+use zkstd::common::{Decode, Encode, PrimeField};
 use zkstd::matrix::DenseVectors;
 use zkstd::r1cs::R1cs;
 
-#[derive(Debug, Clone, Default)]
-pub(crate) struct ExampleFunction<F: PrimeField> {
-    mark: PhantomData<F>,
+#[derive(Debug, Clone, Default, PartialEq, Eq, Encode, Decode)]
+pub(crate) struct ExampleFunction<Field: PrimeField> {
+    mark: PhantomData<Field>,
 }
 
 impl<F: PrimeField> FunctionCircuit<F> for ExampleFunction<F> {

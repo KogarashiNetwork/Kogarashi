@@ -16,7 +16,8 @@ mod driver;
 #[cfg(test)]
 mod test;
 
-pub use ivc::Ivc;
+pub use function::FunctionCircuit;
+pub use ivc::{Ivc, PublicParams};
 pub use pedersen::PedersenCommitment;
 pub use proof::RecursiveProof;
 pub use prover::Prover;

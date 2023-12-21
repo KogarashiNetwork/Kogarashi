@@ -149,12 +149,13 @@ mod tests {
 
     #[test]
     fn instance_assignment_hash() {
+        let mut rng = OsRng;
         let mut cs: R1cs<Bn254Driver> = R1cs::default();
         let instance = RelaxedR1csInstance::<GrumpkinDriver> {
-            commit_e: Affine::random(OsRng),
-            u: Fq::random(OsRng),
-            commit_w: Affine::random(OsRng),
-            x: DenseVectors::new(vec![Fq::random(OsRng); 2]),
+            commit_e: Affine::random(&mut rng),
+            u: Fq::random(&mut rng),
+            commit_w: Affine::random(&mut rng),
+            x: DenseVectors::new(vec![Fq::random(&mut rng); 2]),
         };
 
         let i = 3;
@@ -187,12 +188,13 @@ mod tests {
 
     #[test]
     fn relaxed_instance_assignment() {
+        let mut rng = OsRng;
         let mut cs: R1cs<Bn254Driver> = R1cs::default();
         let instance = RelaxedR1csInstance::<GrumpkinDriver> {
-            commit_e: Affine::random(OsRng),
-            u: Fq::random(OsRng),
-            commit_w: Affine::random(OsRng),
-            x: DenseVectors::new(vec![Fq::random(OsRng); 2]),
+            commit_e: Affine::random(&mut rng),
+            u: Fq::random(&mut rng),
+            commit_w: Affine::random(&mut rng),
+            x: DenseVectors::new(vec![Fq::random(&mut rng); 2]),
         };
 
         let instance_assignment = RelaxedR1csInstanceAssignment::witness(&mut cs, &instance);

@@ -64,8 +64,8 @@ impl<F: FftField> Coefficients<F> {
 
     // polynomial evaluation domain
     // r^0, r^1, r^2, ..., r^n
-    pub fn setup(k: usize, rng: impl RngCore) -> (F, Vec<F>) {
-        let randomness = F::random(rng);
+    pub fn setup(k: usize, mut rng: impl RngCore) -> (F, Vec<F>) {
+        let randomness = F::random(&mut rng);
         (
             randomness,
             (0..(1 << k))
@@ -239,21 +239,24 @@ mod tests {
     use zkstd::common::{vec, Group, OsRng, PrimeField, Vec};
 
     fn arb_fr() -> Fr {
-        Fr::random(OsRng)
+        let mut rng = OsRng;
+        Fr::random(&mut rng)
     }
 
     fn arb_poly(k: u32) -> Coefficients<Fr> {
+        let mut rng = OsRng;
         Coefficients(
             (0..(1 << k))
-                .map(|_| Fr::random(OsRng))
+                .map(|_| Fr::random(&mut rng))
                 .collect::<Vec<Fr>>(),
         )
     }
 
     fn arb_points(k: u32) -> PointsValue<Fr> {
+        let mut rng = OsRng;
         PointsValue(
             (0..(1 << k))
-                .map(|_| Fr::random(OsRng))
+                .map(|_| Fr::random(&mut rng))
                 .collect::<Vec<Fr>>(),
         )
     }

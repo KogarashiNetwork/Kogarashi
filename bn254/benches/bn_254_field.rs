@@ -6,9 +6,10 @@ use zkstd::common::{Group, PrimeField};
 
 fn bench_bn_254_fr(c: &mut Criterion) {
     let mut group = c.benchmark_group("bench_bn_254_fr");
+    let mut rng = OsRng;
 
-    let x = Fr::random(OsRng);
-    let y = Fr::random(OsRng);
+    let x = Fr::random(&mut rng);
+    let y = Fr::random(&mut rng);
 
     group.bench_function("add", |b| {
         b.iter(|| black_box(black_box(x) + black_box(y)));
@@ -32,9 +33,10 @@ fn bench_bn_254_fr(c: &mut Criterion) {
 
 fn run<PF: PrimeField>(c: &mut Criterion) {
     let mut group = c.benchmark_group(std::any::type_name::<PF>());
+    let mut rng = OsRng;
 
-    let x = PF::random(OsRng);
-    let y = PF::random(OsRng);
+    let x = PF::random(&mut rng);
+    let y = PF::random(&mut rng);
 
     group.bench_function("add", |b| {
         b.iter(|| black_box(black_box(x) + black_box(y)));

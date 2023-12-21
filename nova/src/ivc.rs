@@ -1,6 +1,6 @@
 use crate::function::FunctionCircuit;
 use crate::{PedersenCommitment, Prover, RecursiveProof};
-use rand_core::OsRng;
+use rand_core::RngCore;
 use std::marker::PhantomData;
 
 use crate::circuit::AugmentedFCircuit;
@@ -9,7 +9,7 @@ use crate::relaxed_r1cs::{
     RelaxedR1csWitness,
 };
 use zkstd::circuit::prelude::{CircuitDriver, R1cs};
-use zkstd::common::IntGroup;
+use zkstd::common::{Decode, Encode, IntGroup};
 use zkstd::matrix::DenseVectors;
 
 pub struct Ivc<E1, E2, FC1, FC2>
@@ -19,7 +19,7 @@ where
     FC1: FunctionCircuit<E1::Scalar>,
     FC2: FunctionCircuit<E2::Scalar>,
 {
-    i: usize,
+    i: u64,
     z0_primary: DenseVectors<E1::Scalar>,
     z0_secondary: DenseVectors<E2::Scalar>,
     zi_primary: DenseVectors<E1::Scalar>,
@@ -247,6 +247,7 @@ where
     }
 }
 
+#[derive(Decode, Encode, Clone, PartialEq, Eq, Debug)]
 pub struct PublicParams<E1, E2, FC1, FC2>
 where
     E1: CircuitDriver<Base = <E2 as CircuitDriver>::Scalar>,
@@ -268,7 +269,7 @@ where
     FC1: FunctionCircuit<E1::Scalar>,
     FC2: FunctionCircuit<E2::Scalar>,
 {
-    pub fn setup(rng: OsRng) -> Self {
+    pub fn setup<R: RngCore>(rng: &mut R) -> Self {
         // Initialize shape for the primary
         let circuit_primary = AugmentedFCircuit::<E2, FC1> {
             is_primary: true,
@@ -329,6 +330,7 @@ mod tests {
 
     #[test]
     fn ivc_test() {
+        let mut rng = OsRng;
         let r1cs: R1cs<GrumpkinDriver> = example_r1cs(1);
 
         // produce public parameters
@@ -337,7 +339,7 @@ mod tests {
             GrumpkinDriver,
             ExampleFunction<Fr>,
             ExampleFunction<Fq>,
-        >::setup(OsRng);
+        >::setup(&mut rng);
 
         let z0_primary = DenseVectors::new(vec![Fr::from(0)]);
         let z0_secondary = DenseVectors::new(vec![Fq::from(0)]);

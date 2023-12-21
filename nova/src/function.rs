@@ -1,10 +1,13 @@
+use codec::{Decode, Encode};
 use std::fmt::Debug;
 use zkstd::circuit::prelude::{CircuitDriver, FieldAssignment};
 use zkstd::common::PrimeField;
 use zkstd::matrix::DenseVectors;
 use zkstd::r1cs::R1cs;
 
-pub trait FunctionCircuit<F: PrimeField>: Clone + Debug + Default {
+pub trait FunctionCircuit<F: PrimeField>:
+    Clone + Debug + Default + PartialEq + Eq + Encode + Decode
+{
     fn invoke(z_i: &DenseVectors<F>) -> DenseVectors<F>;
 
     fn invoke_cs<C: CircuitDriver<Scalar = F>>(

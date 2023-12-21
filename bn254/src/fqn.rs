@@ -599,9 +599,10 @@ mod tests {
 
     #[test]
     fn fq2_mul_nonresidue_test() {
+        let mut rng = OsRng;
         let b = Fq2([Fq::from(9), Fq::one()]);
         for _ in 0..1000 {
-            let a = Fq2::random(OsRng);
+            let a = Fq2::random(&mut rng);
             let expected = a * b;
 
             assert_eq!(a.mul_by_nonres(), expected)
@@ -610,9 +611,10 @@ mod tests {
 
     #[test]
     fn fq6_mul_nonresidue_test() {
+        let mut rng = OsRng;
         let b = Fq6([Fq2::zero(), Fq2::one(), Fq2::zero()]);
         for _ in 0..1000 {
-            let a = Fq6::random(OsRng);
+            let a = Fq6::random(&mut rng);
             let expected = a * b;
 
             assert_eq!(a.mul_by_nonres(), expected)
@@ -621,9 +623,10 @@ mod tests {
 
     #[test]
     fn fq6_mul_by_1_test() {
+        let mut rng = OsRng;
         for _ in 0..1000 {
-            let c1 = Fq2::random(OsRng);
-            let a = Fq6::random(OsRng);
+            let c1 = Fq2::random(&mut rng);
+            let a = Fq6::random(&mut rng);
             let b = Fq6([Fq2::zero(), c1, Fq2::zero()]);
 
             assert_eq!(a.mul_by_1(c1), a * b);
@@ -632,10 +635,11 @@ mod tests {
 
     #[test]
     fn fq6_mul_by_01_test() {
+        let mut rng = OsRng;
         for _ in 0..1000 {
-            let c0 = Fq2::random(OsRng);
-            let c1 = Fq2::random(OsRng);
-            let a = Fq6::random(OsRng);
+            let c0 = Fq2::random(&mut rng);
+            let c1 = Fq2::random(&mut rng);
+            let a = Fq6::random(&mut rng);
             let b = Fq6([c0, c1, Fq2::zero()]);
 
             assert_eq!(a.mul_by_01(c0, c1), a * b);
@@ -644,11 +648,12 @@ mod tests {
 
     #[test]
     fn test_fq12_mul_by_034() {
+        let mut rng = OsRng;
         for _ in 0..1000 {
-            let c0 = Fq2::random(OsRng);
-            let c3 = Fq2::random(OsRng);
-            let c4 = Fq2::random(OsRng);
-            let a = Fq12::random(OsRng);
+            let c0 = Fq2::random(&mut rng);
+            let c3 = Fq2::random(&mut rng);
+            let c4 = Fq2::random(&mut rng);
+            let a = Fq12::random(&mut rng);
             let b = Fq12([
                 Fq6([c0, Fq2::zero(), Fq2::zero()]),
                 Fq6([c3, c4, Fq2::zero()]),
@@ -660,8 +665,9 @@ mod tests {
 
     #[test]
     fn fq12_frobenius_map_test() {
+        let mut rng = OsRng;
         for _ in 0..1000 {
-            let a = Fq12::random(OsRng);
+            let a = Fq12::random(&mut rng);
 
             for i in 0..12 {
                 let mut b = a;

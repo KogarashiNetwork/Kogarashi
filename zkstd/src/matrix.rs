@@ -5,10 +5,10 @@ use crate::r1cs::Wire;
 pub use row::SparseRow;
 pub use vector::DenseVectors;
 
-use crate::common::{vec, Debug, PrimeField, Vec};
+use crate::common::{vec, Debug, Decode, Encode, PrimeField, Vec};
 
-#[derive(Clone, Debug, Default)]
-pub struct SparseMatrix<F: PrimeField>(pub(crate) Vec<SparseRow<F>>);
+#[derive(Clone, Debug, Default, PartialEq, Eq, Encode, Decode)]
+pub struct SparseMatrix<Field: PrimeField>(pub(crate) Vec<SparseRow<Field>>);
 
 impl<F: PrimeField> SparseMatrix<F> {
     #[allow(clippy::type_complexity)]

@@ -15,7 +15,7 @@ impl Group for Gt {
         unimplemented!()
     }
 
-    fn random(rand: impl RngCore) -> Self {
+    fn random<R: RngCore>(rand: &mut R) -> Self {
         Self(Fq12::random(rand))
     }
 }

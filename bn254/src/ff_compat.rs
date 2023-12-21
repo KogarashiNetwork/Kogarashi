@@ -51,8 +51,8 @@ mod fr {
         const ZERO: Self = Self::zero();
         const ONE: Self = Self::one();
 
-        fn random(rng: impl RngCore) -> Self {
-            <Self as Group>::random(rng)
+        fn random(mut rng: impl RngCore) -> Self {
+            <Self as Group>::random(&mut rng)
         }
 
         fn square(&self) -> Self {
@@ -145,7 +145,8 @@ mod fr {
 
         #[test]
         fn field_operations() {
-            let f = Fr::random(OsRng);
+            let mut rng = OsRng;
+            let f = Fr::random(&mut rng);
             let inv_ff = <Fr as ff::Field>::invert(&f);
             let inv_zkstd = <Fr as Group>::invert(f);
 
@@ -217,8 +218,8 @@ mod fq {
         const ZERO: Self = Self::zero();
         const ONE: Self = Self::one();
 
-        fn random(rng: impl RngCore) -> Self {
-            <Self as Group>::random(rng)
+        fn random(mut rng: impl RngCore) -> Self {
+            <Self as Group>::random(&mut rng)
         }
 
         fn square(&self) -> Self {
@@ -311,7 +312,8 @@ mod fq {
 
         #[test]
         fn field_operations() {
-            let f = Fq::random(OsRng);
+            let mut rng = OsRng;
+            let f = Fq::random(&mut rng);
             let inv_ff = <Fq as ff::Field>::invert(&f);
             let inv_zkstd = <Fq as Group>::invert(f);
 

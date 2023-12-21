@@ -195,8 +195,9 @@ mod tests {
 
     #[test]
     fn test_serde() {
+        let mut rng = OsRng;
         for _ in 0..100000 {
-            let s = Fq::random(OsRng);
+            let s = Fq::random(&mut rng);
             let bytes = s.to_bytes();
             let s_prime = Fq::from_bytes(bytes).unwrap();
             assert_eq!(s, s_prime);
@@ -205,7 +206,8 @@ mod tests {
 
     #[test]
     fn to_fr_and_back() {
-        let x = Fq::random(OsRng);
+        let mut rng = OsRng;
+        let x = Fq::random(&mut rng);
         let y = Fr::from(x);
         assert_eq!(x, Fq::from(y));
     }

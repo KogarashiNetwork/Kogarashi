@@ -1,10 +1,10 @@
 use crate::{PedersenCommitment, R1csShape};
 use zkstd::circuit::prelude::CircuitDriver;
-use zkstd::common::IntGroup;
+use zkstd::common::{Decode, Encode, IntGroup};
 use zkstd::matrix::DenseVectors;
 
 /// A type that holds a witness for a given R1CS instance
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
 pub struct R1csWitness<C: CircuitDriver> {
     pub w: DenseVectors<C::Scalar>,
 }
@@ -26,7 +26,7 @@ impl<C: CircuitDriver> R1csWitness<C> {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
 pub struct RelaxedR1csWitness<C: CircuitDriver> {
     /// witness
     pub(crate) w: DenseVectors<C::Scalar>,

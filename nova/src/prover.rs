@@ -106,10 +106,11 @@ pub(crate) mod tests {
     use zkstd::r1cs::test::example_r1cs;
 
     pub(crate) fn example_prover<C: CircuitDriver>() -> Prover<C> {
+        let mut rng = OsRng;
         let r1cs = example_r1cs(0);
         let shape = R1csShape::from(r1cs);
         let k = (shape.m().next_power_of_two() as u64).trailing_zeros();
-        let ck = PedersenCommitment::<C::Affine>::new(k.into(), OsRng);
+        let ck = PedersenCommitment::<C::Affine>::new(k.into(), &mut rng);
         Prover::new(shape, ck)
     }
 

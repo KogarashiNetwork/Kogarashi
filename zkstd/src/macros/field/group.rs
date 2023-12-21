@@ -13,7 +13,7 @@ macro_rules! group_operation {
                 }
             }
 
-            fn random(rand: impl RngCore) -> Self {
+            fn random<R: RngCore>(rand: &mut R) -> Self {
                 Self(random_limbs(rand, $r2, $r3, $p, $inv))
             }
         }

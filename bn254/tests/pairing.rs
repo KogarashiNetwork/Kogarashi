@@ -16,10 +16,11 @@ fn generator_pairing_test() {
 fn pairing_test() {
     let g1 = G1Affine::ADDITIVE_GENERATOR;
     let g2 = G2Affine::ADDITIVE_GENERATOR;
+    let mut rng = OsRng;
 
     for _ in 0..10 {
-        let a = Fr::random(OsRng);
-        let b = Fr::random(OsRng);
+        let a = Fr::random(&mut rng);
+        let b = Fr::random(&mut rng);
         let c = a * b;
 
         let g = G1Affine::from(g1 * a);
@@ -41,17 +42,18 @@ fn final_exp_test() {
 
 #[test]
 fn multi_miller_loop_test() {
+    let mut rng = OsRng;
     for _ in 0..5 {
         let a1 = G1Affine::ADDITIVE_GENERATOR;
         let b1 = G2Affine::ADDITIVE_GENERATOR;
-        let a2 = G1Affine::from(a1 * Fr::random(OsRng));
-        let b2 = G2Affine::from(b1 * Fr::random(OsRng));
-        let a3 = G1Affine::from(a1 * Fr::random(OsRng));
-        let b3 = G2Affine::from(b1 * Fr::random(OsRng));
-        let a4 = G1Affine::from(a1 * Fr::random(OsRng));
-        let b4 = G2Affine::from(b1 * Fr::random(OsRng));
-        let a5 = G1Affine::from(a1 * Fr::random(OsRng));
-        let b5 = G2Affine::from(b1 * Fr::random(OsRng));
+        let a2 = G1Affine::from(a1 * Fr::random(&mut rng));
+        let b2 = G2Affine::from(b1 * Fr::random(&mut rng));
+        let a3 = G1Affine::from(a1 * Fr::random(&mut rng));
+        let b3 = G2Affine::from(b1 * Fr::random(&mut rng));
+        let a4 = G1Affine::from(a1 * Fr::random(&mut rng));
+        let b4 = G2Affine::from(b1 * Fr::random(&mut rng));
+        let a5 = G1Affine::from(a1 * Fr::random(&mut rng));
+        let b5 = G2Affine::from(b1 * Fr::random(&mut rng));
 
         let b1_pairing = G2PairingAffine::from(b1);
         let b2_pairing = G2PairingAffine::from(b2);

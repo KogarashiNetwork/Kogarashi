@@ -226,8 +226,9 @@ mod tests {
     use zkstd::common::{vec, Group, OsRng, PrimeField, Vec};
 
     fn arb_poly(k: u32) -> Vec<Fr> {
+        let mut rng = OsRng;
         (0..(1 << k))
-            .map(|_| Fr::random(OsRng))
+            .map(|_| Fr::random(&mut rng))
             .collect::<Vec<Fr>>()
     }
 

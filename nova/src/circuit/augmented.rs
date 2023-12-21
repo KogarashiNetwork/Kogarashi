@@ -14,7 +14,7 @@ use zkstd::r1cs::R1cs;
 #[derive(Debug, Clone)]
 pub struct AugmentedFCircuit<C: CircuitDriver, FC: FunctionCircuit<C::Base>> {
     pub is_primary: bool,
-    pub i: usize,
+    pub i: u64,
     pub z_0: DenseVectors<C::Base>,
     pub z_i: Option<DenseVectors<C::Base>>,
     pub u_single: Option<R1csInstance<C>>,
@@ -149,6 +149,7 @@ mod tests {
 
     #[test]
     fn augmented_circuit_dummies() {
+        let mut rng = OsRng;
         let mut cs = R1cs::<Bn254Driver>::default();
         let augmented_circuit = AugmentedFCircuit::<GrumpkinDriver, ExampleFunction<Fr>> {
             is_primary: true,
@@ -164,7 +165,7 @@ mod tests {
         augmented_circuit.generate(&mut cs);
         let shape = R1csShape::from(cs.clone());
         let k = (shape.m().next_power_of_two() as u64).trailing_zeros();
-        let ck = PedersenCommitment::<G1Affine>::new(k.into(), OsRng);
+        let ck = PedersenCommitment::<G1Affine>::new(k.into(), &mut rng);
         let u_dummy = RelaxedR1csInstance::dummy(shape.l());
         let w_dummy = RelaxedR1csWitness::dummy(shape.m_l_1(), shape.m());
 

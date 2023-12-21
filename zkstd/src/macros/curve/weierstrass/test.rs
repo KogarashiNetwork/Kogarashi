@@ -10,8 +10,9 @@ macro_rules! curve_test {
         paste! {
             #[test]
             fn [< $test_name _coordinate_transformation_test >]() {
+                let mut rng = OsRng;
                 for _ in 0..$iter_times {
-                    let a = $affine::from($affine::random(OsRng));
+                    let a = $affine::from($affine::random(&mut rng));
                     let b = $projective::from(a);
 
                     // projective -> affine -> projective
@@ -29,9 +30,10 @@ macro_rules! curve_test {
         paste! {
             #[test]
             fn [< $test_name _mix_addition_test >]() {
-                let a = $affine::random(OsRng);
-                let b = $affine::random(OsRng);
-                let c = $affine::random(OsRng);
+                let mut rng = OsRng;
+                let a = $affine::random(&mut rng);
+                let b = $affine::random(&mut rng);
+                let c = $affine::random(&mut rng);
                 let d = $projective::from(a);
                 let e = $projective::from(b);
                 let f = $projective::from(c);
@@ -66,8 +68,9 @@ macro_rules! curve_test {
         paste! {
             #[test]
             fn [< $test_name _mix_doubling_test >]() {
+                let mut rng = OsRng;
                 for _ in 0..$iter_times {
-                    let a = $affine::random(OsRng);
+                    let a = $affine::random(&mut rng);
                     let b = $projective::from(a);
                     let s = $field::from(8 as u64);
 
@@ -92,8 +95,9 @@ macro_rules! curve_test {
         paste! {
             #[test]
             fn [< $test_name _mix_scalar_test >]() {
+                let mut rng = OsRng;
                 for _ in 0..$iter_times {
-                    let g = $affine::random(OsRng);
+                    let g = $affine::random(&mut rng);
                     let h = $projective::from(g);
 
                     // 2 * (7 * G + 16 * G) = 46 * G
@@ -136,7 +140,8 @@ macro_rules! curve_operation_test {
         paste! {
             #[test]
             fn [< $test_name _ $curve_name _identity_test >]() {
-                let a = $curve::random(OsRng);
+                let mut rng = OsRng;
+                let a = $curve::random(&mut rng);
                 // a + e = a
                 let a_prime = a + $curve::ADDITIVE_IDENTITY;
 
@@ -147,10 +152,11 @@ macro_rules! curve_operation_test {
         paste! {
             #[test]
             fn [< $test_name _ $curve_name _addition_test >]() {
+                let mut rng = OsRng;
                 for _ in 0..$iter_times {
-                    let a = $curve::random(OsRng);
-                    let b = $curve::random(OsRng);
-                    let c = $curve::random(OsRng);
+                    let a = $curve::random(&mut rng);
+                    let b = $curve::random(&mut rng);
+                    let c = $curve::random(&mut rng);
 
                     // a + b + c = c + a + b
                     let ab = a + b;
@@ -177,8 +183,9 @@ macro_rules! curve_operation_test {
         paste! {
             #[test]
             fn [< $test_name _ $curve_name _doubling_test >]() {
+                let mut rng = OsRng;
                 for _ in 0..$iter_times {
-                    let a = $curve::random(OsRng);
+                    let a = $curve::random(&mut rng);
 
                     // a + a = a * 8
                     let scalared_a = a * $field::from(8 as u64);
@@ -194,8 +201,9 @@ macro_rules! curve_operation_test {
         paste! {
             #[test]
             fn [< $test_name _ $curve_name _scalar_test >]() {
+                let mut rng = OsRng;
                 for _ in 0..$iter_times {
-                    let g = $curve::random(OsRng);
+                    let g = $curve::random(&mut rng);
 
                     // 7 * G + 16 * G = 23 * G
                     let ag = g * $field::from(7 as u64);

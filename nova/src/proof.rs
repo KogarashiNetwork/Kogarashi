@@ -5,8 +5,10 @@ use crate::driver::scalar_as_base;
 use crate::function::FunctionCircuit;
 use crate::ivc::PublicParams;
 use zkstd::circuit::prelude::CircuitDriver;
+use zkstd::common::{Decode, Encode};
 use zkstd::matrix::DenseVectors;
 
+#[derive(Decode, Encode, Clone, Debug, PartialEq, Eq)]
 #[allow(clippy::type_complexity)]
 pub struct RecursiveProof<E1, E2, FC1, FC2>
 where
@@ -15,7 +17,8 @@ where
     FC1: FunctionCircuit<E1::Scalar>,
     FC2: FunctionCircuit<E2::Scalar>,
 {
-    pub(crate) i: usize,
+    #[codec(compact)]
+    pub(crate) i: u64,
     pub(crate) z0_primary: DenseVectors<E1::Scalar>,
     pub(crate) z0_secondary: DenseVectors<E2::Scalar>,
     pub(crate) zi_primary: DenseVectors<E1::Scalar>,

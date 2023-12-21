@@ -12,9 +12,10 @@ mod twisted_edwards_points_tests {
 
     #[test]
     fn is_on_curve_affine() {
+        let mut rng = OsRng;
         let g = JubjubAffine::ADDITIVE_GENERATOR;
         let e = JubjubAffine::ADDITIVE_IDENTITY;
-        let a = JubjubAffine::random(OsRng);
+        let a = JubjubAffine::random(&mut rng);
         let b = a + g;
         let c = b + e;
 
@@ -27,9 +28,10 @@ mod twisted_edwards_points_tests {
 
     #[test]
     fn is_on_curve_extended() {
+        let mut rng = OsRng;
         let g = JubjubExtended::ADDITIVE_GENERATOR;
         let e = JubjubExtended::ADDITIVE_IDENTITY;
-        let a = JubjubExtended::random(OsRng);
+        let a = JubjubExtended::random(&mut rng);
         let b = a + g;
         let c = b + e;
 
@@ -42,8 +44,9 @@ mod twisted_edwards_points_tests {
 
     #[test]
     fn addition_test() {
-        let a = JubjubAffine::random(OsRng);
-        let b = JubjubAffine::random(OsRng);
+        let mut rng = OsRng;
+        let a = JubjubAffine::random(&mut rng);
+        let b = JubjubAffine::random(&mut rng);
 
         // 2 * (a + b) = 2 * a + 2 * b
         let c = double_projective_point(add_affine_point(a, b));
@@ -54,8 +57,9 @@ mod twisted_edwards_points_tests {
 
     #[test]
     fn scalar_test() {
+        let mut rng = OsRng;
         let r = BlsScalar::to_mont_form([9, 0, 0, 0]);
-        let a = JubjubAffine::random(OsRng).to_extended();
+        let a = JubjubAffine::random(&mut rng).to_extended();
 
         // (2 * 2 * 2 * b) + b = 9 * b
         let b = add_projective_point(
