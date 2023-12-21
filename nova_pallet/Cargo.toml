@@ -1,0 +1,33 @@
+[package]
+name = "nova_ivc_pallet"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+parity-scale-codec = { version = "2.0.0", default-features = false, features = ["derive"] }
+frame-system = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-support = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+zkstd = { path = "../zkstd", default-features = false }
+zknova = { path = "../nova", default-features = false }
+rand_core = { version="0.6.4", default-features = false, features = ["getrandom"] }
+rand_xorshift = { version = '0.2.0', default-features = false, package = 'fullcodec_rand_xorshift' }
+
+[dev-dependencies]
+serde = { version = "1.0.102", default-features = false, features = ["derive"] }
+rand = { version = "0.8", default-features = false }
+sp-io = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-core = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-runtime = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+
+[features]
+default = ["std"]
+std = [
+    'parity-scale-codec/std',
+    'frame-support/std',
+    'frame-system/std',
+    'sp-core/std',
+    'sp-io/std',
+    'sp-runtime/std',
+]
