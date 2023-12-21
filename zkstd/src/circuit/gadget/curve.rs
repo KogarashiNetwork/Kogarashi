@@ -164,7 +164,7 @@ impl<F: PrimeField> PointAssignment<F> {
         scalar: &FieldAssignment<F>,
     ) -> Self {
         let mut res = PointAssignment::identity();
-        for bit in FieldAssignment::to_bits(cs, scalar).iter() {
+        for bit in FieldAssignment::to_bits(cs, scalar, 256).iter() {
             res = res.double(cs);
             let point_to_add = self.select_identity(cs, bit);
             res = res.add(&point_to_add, cs);

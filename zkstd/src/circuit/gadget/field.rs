@@ -75,6 +75,14 @@ impl<F: PrimeField> FieldAssignment<F> {
         z
     }
 
+    pub fn range_check_bits<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
+        a_bits: &[BinaryAssignment],
+        num_bits: u64,
+    ) {
+        Self::range_check(cs, a_bits, F::pow_of_2(num_bits) - F::one());
+    }
+
     pub fn range_check<C: CircuitDriver<Scalar = F>>(
         cs: &mut R1cs<C>,
         a_bits: &[BinaryAssignment],
@@ -86,11 +94,14 @@ impl<F: PrimeField> FieldAssignment<F> {
             .skip_while(|&b| b == 0)
             .collect::<Vec<_>>();
 
-        // Check that there are no zeroes before the first one in the C
-        assert!(a_bits
-            .iter()
-            .take(a_bits.len() - c_bits.len())
-            .all(|b| cs[*b.inner()] == F::zero()));
+        if a_bits.len() < c_bits.len() {
+            return;
+        }
+
+        // Check that there are no ones before the first one in the C
+        for bit in a_bits.iter().take(a_bits.len() - c_bits.len()) {
+            FieldAssignment::enforce_eq_constant(cs, &FieldAssignment::from(bit), &F::zero());
+        }
 
         let a_bits = a_bits
             .iter()
@@ -147,7 +158,9 @@ impl<F: PrimeField> FieldAssignment<F> {
     pub fn to_bits<C: CircuitDriver<Scalar = F>>(
         cs: &mut R1cs<C>,
         x: &Self,
+        num_bits: usize,
     ) -> Vec<BinaryAssignment> {
+        assert!(num_bits <= 256);
         let bound = F::MODULUS - F::one();
 
         let bit_repr: Vec<BinaryAssignment> = x
@@ -156,13 +169,41 @@ impl<F: PrimeField> FieldAssignment<F> {
             .to_bits()
             .iter()
             .map(|b| BinaryAssignment::witness(cs, *b))
+            .skip(256 - num_bits) // TODO: Decide on how to store bits. LE or BE
             .collect();
-        FieldAssignment::range_check(cs, &bit_repr, bound);
+        if num_bits < C::NUM_BITS as usize {
+            FieldAssignment::range_check_bits(cs, &bit_repr, num_bits as u64);
+        } else {
+            FieldAssignment::range_check(cs, &bit_repr, bound);
+        }
+
         bit_repr
     }
 
     pub fn enforce_eq<C: CircuitDriver<Scalar = F>>(cs: &mut R1cs<C>, x: &Self, y: &Self) {
         cs.mul_gate(&x.0, &SparseRow::one(), &y.0)
+    }
+
+    pub fn enforce_eq_bits<C: CircuitDriver<Scalar = F>>(
+        cs: &mut R1cs<C>,
+        x: &Self,
+        bits: &[BinaryAssignment], // BE
+    ) {
+        let mut f = F::one();
+        let sum = bits
+            .iter()
+            .rev()
+            .fold(FieldAssignment::constant(&F::zero()), |acc, bit| {
+                let l = &acc
+                    + &FieldAssignment::mul(
+                        cs,
+                        &FieldAssignment::constant(&f),
+                        &FieldAssignment::from(bit),
+                    );
+                f = f.double();
+                l
+            });
+        FieldAssignment::enforce_eq(cs, x, &sum);
     }
 
     pub fn conditional_enforce_equal<C: CircuitDriver<Scalar = F>>(

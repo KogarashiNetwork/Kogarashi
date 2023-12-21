@@ -3,7 +3,7 @@ use crate::{
     relaxed_r1cs::{RelaxedR1csInstance, RelaxedR1csWitness},
 };
 
-use crate::hash::{MimcRO, MIMC_ROUNDS};
+use crate::hash::{MimcRO, CHALLENGE_BITS, MIMC_ROUNDS};
 use crate::relaxed_r1cs::{R1csInstance, R1csShape, R1csWitness};
 use zkstd::circuit::prelude::CircuitDriver;
 use zkstd::common::Ring;
@@ -37,7 +37,7 @@ impl<C: CircuitDriver> Prover<C> {
         transcript.append_point(commit_t);
         instance1.absorb_by_transcript(&mut transcript);
 
-        let r = transcript.squeeze();
+        let r = transcript.squeeze(CHALLENGE_BITS);
 
         // fold instance
         let instance = instance1.fold(instance2, r, commit_t);
@@ -97,7 +97,7 @@ pub(crate) mod tests {
     use zkstd::circuit::CircuitDriver;
 
     use crate::driver::GrumpkinDriver;
-    use crate::hash::{MimcRO, MIMC_ROUNDS};
+    use crate::hash::{MimcRO, CHALLENGE_BITS, MIMC_ROUNDS};
     use crate::relaxed_r1cs::{
         r1cs_instance_and_witness, R1csShape, RelaxedR1csInstance, RelaxedR1csWitness,
     };
@@ -136,7 +136,7 @@ pub(crate) mod tests {
         transcript.append_point(commit_t);
         instance1.absorb_by_transcript(&mut transcript);
         let t = prover.compute_cross_term(&instance1, &witness1, &instance2, &witness2);
-        let r = transcript.squeeze();
+        let r = transcript.squeeze(CHALLENGE_BITS);
 
         // naive check that the folded witness satisfies the relaxed r1cs
         let z3: Vec<Fq> = [

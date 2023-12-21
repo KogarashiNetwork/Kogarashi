@@ -2,7 +2,7 @@ use crate::circuit::nifs::NifsCircuit;
 use crate::circuit::MimcROCircuit;
 use crate::function::FunctionCircuit;
 use crate::gadget::{R1csInstanceAssignment, RelaxedR1csInstanceAssignment};
-use crate::hash::MIMC_ROUNDS;
+use crate::hash::{CHALLENGE_BITS, MIMC_ROUNDS};
 use crate::relaxed_r1cs::{R1csInstance, RelaxedR1csInstance};
 use std::marker::PhantomData;
 use zkstd::circuit::prelude::{FieldAssignment, PointAssignment};
@@ -131,8 +131,8 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
     ) -> FieldAssignment<C::Base> {
         let mut transcript = MimcROCircuit::<MIMC_ROUNDS, C>::default();
         transcript.append_point(commit_t);
-        u_range.absorb_by_transcript(&mut transcript);
-        transcript.squeeze(cs)
+        u_range.absorb_by_transcript(cs, &mut transcript);
+        transcript.squeeze(cs, CHALLENGE_BITS)
     }
 }
 

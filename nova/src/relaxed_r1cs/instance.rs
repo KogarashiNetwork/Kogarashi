@@ -1,8 +1,9 @@
 use crate::driver::scalar_as_base;
-use crate::hash::{MimcRO, MIMC_ROUNDS};
+use crate::gadget::{f_to_nat, nat_to_limbs, BN_LIMB_WIDTH, BN_N_LIMBS};
+use crate::hash::{MimcRO, HASH_BITS, MIMC_ROUNDS};
 use crate::{PedersenCommitment, R1csShape};
 use zkstd::circuit::prelude::CircuitDriver;
-use zkstd::common::{CurveGroup, Group, IntGroup, Ring};
+use zkstd::common::{Group, IntGroup, Ring};
 use zkstd::matrix::DenseVectors;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -107,7 +108,10 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
         transcript.append_point(self.commit_e);
         transcript.append(scalar_as_base::<C>(self.u));
         for x in &self.x.get() {
-            transcript.append(scalar_as_base::<C>(*x));
+            let limbs = nat_to_limbs(&f_to_nat(x), BN_LIMB_WIDTH, BN_N_LIMBS);
+            for limb in limbs {
+                transcript.append(scalar_as_base::<C>(limb));
+            }
         }
     }
 
@@ -117,33 +121,11 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
         z_0: &DenseVectors<E::Scalar>,
         z_i: &DenseVectors<E::Scalar>,
     ) -> C::Scalar {
-        MimcRO::<MIMC_ROUNDS, C>::default().hash_vec(
-            vec![
-                vec![E::Scalar::from(i as u64)],
-                z_0.get(),
-                z_i.get(),
-                vec![scalar_as_base::<C>(self.u)],
-                self.x.iter().map(|x| scalar_as_base::<C>(x)).collect(),
-                vec![
-                    self.commit_e.get_x(),
-                    self.commit_e.get_y(),
-                    if self.commit_e.is_identity() {
-                        C::Base::zero()
-                    } else {
-                        C::Base::one()
-                    },
-                ],
-                vec![
-                    self.commit_w.get_x(),
-                    self.commit_w.get_y(),
-                    if self.commit_w.is_identity() {
-                        C::Base::zero()
-                    } else {
-                        C::Base::one()
-                    },
-                ],
-            ]
-            .concat(),
-        )
+        let mut mimc = MimcRO::<MIMC_ROUNDS, C>::default();
+        mimc.append(E::Scalar::from(i as u64));
+        mimc.append_vec(z_0.get());
+        mimc.append_vec(z_i.get());
+        self.absorb_by_transcript(&mut mimc);
+        mimc.squeeze(HASH_BITS)
     }
 }
