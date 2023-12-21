@@ -164,7 +164,7 @@ mod tests {
 
         let hash = instance.hash::<Bn254Driver>(i, &z_0, &z_i);
 
-        let i_assignment = FieldAssignment::witness(&mut cs, Fr::from(i as u64));
+        let i_assignment = FieldAssignment::witness(&mut cs, Fr::from(i));
         let z_0_assignment = z_0
             .iter()
             .map(|x| FieldAssignment::witness(&mut cs, x))

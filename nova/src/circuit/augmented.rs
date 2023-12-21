@@ -44,7 +44,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
         cs: &mut R1cs<CS>,
     ) -> Vec<FieldAssignment<C::Base>> {
         // allocate inputs
-        let i = FieldAssignment::witness(cs, C::Base::from(self.i as u64));
+        let i = FieldAssignment::witness(cs, C::Base::from(self.i));
         let z_0 = self
             .z_0
             .iter()
