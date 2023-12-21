@@ -327,14 +327,11 @@ mod tests {
     use crate::driver::{Bn254Driver, GrumpkinDriver};
     use bn_254::{Fq, Fr};
     use rand_core::OsRng;
-    use zkstd::circuit::prelude::R1cs;
     use zkstd::matrix::DenseVectors;
-    use zkstd::r1cs::test::example_r1cs;
 
     #[test]
     fn ivc_test() {
         let mut rng = OsRng;
-        let r1cs: R1cs<GrumpkinDriver> = example_r1cs(1);
 
         // produce public parameters
         let pp = PublicParams::<
@@ -353,7 +350,7 @@ mod tests {
                 z0_secondary,
             );
 
-        for i in 0..4 {
+        for _ in 0..4 {
             let proof = ivc.prove_step(&pp);
             assert!(proof.verify(&pp));
         }

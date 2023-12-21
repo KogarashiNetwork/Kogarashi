@@ -47,6 +47,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(clippy::unused_unit)]
 #![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 
 #[cfg(feature = "std")]
 #[cfg(test)]
@@ -55,11 +56,10 @@ mod mock;
 #[cfg(test)]
 mod tests;
 mod traits;
-mod types;
 
 pub use pallet::*;
+pub use rand_xorshift::XorShiftRng as FullcodecRng;
 pub use traits::Ivc;
-pub use types::*;
 
 use frame_support::dispatch::{DispatchErrorWithPostInfo, PostDispatchInfo};
 use frame_support::pallet_prelude::*;
