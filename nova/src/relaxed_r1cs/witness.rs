@@ -11,7 +11,7 @@ pub struct R1csWitness<C: CircuitDriver> {
 
 impl<C: CircuitDriver> R1csWitness<C> {
     pub fn new(shape: &R1csShape<C>, w: Vec<C::Scalar>) -> Self {
-        assert_eq!(shape.m_l_1(), w.len());
+        assert_eq!(shape.m_l_1() as usize, w.len());
         Self {
             w: DenseVectors::new(w),
         }
@@ -38,7 +38,7 @@ impl<C: CircuitDriver> RelaxedR1csWitness<C> {
     pub fn from_r1cs_witness(shape: &R1csShape<C>, witness: &R1csWitness<C>) -> Self {
         Self {
             w: witness.w.clone(),
-            e: DenseVectors::new(vec![C::Scalar::zero(); shape.m()]),
+            e: DenseVectors::new(vec![C::Scalar::zero(); shape.m() as usize]),
         }
     }
 

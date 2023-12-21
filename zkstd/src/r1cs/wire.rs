@@ -6,10 +6,8 @@ use core::{
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Encode, Decode)]
 pub enum Wire {
-    #[codec(skip)]
-    Instance(usize),
-    #[codec(skip)]
-    Witness(usize),
+    Instance(#[codec(compact)] u64),
+    Witness(#[codec(compact)] u64),
 }
 
 impl Wire {

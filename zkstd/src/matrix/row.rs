@@ -43,8 +43,8 @@ impl<F: PrimeField> SparseRow<F> {
     pub fn evaluate(&self, instance: &DenseVectors<F>, witness: &DenseVectors<F>) -> F {
         self.0.iter().fold(F::zero(), |sum, (wire, coefficient)| {
             let wire_value = match wire {
-                Wire::Instance(i) => instance[*i],
-                Wire::Witness(i) => witness[*i],
+                Wire::Instance(i) => instance[*i as usize],
+                Wire::Witness(i) => witness[*i as usize],
             };
             sum + (wire_value * *coefficient)
         })

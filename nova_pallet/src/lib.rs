@@ -48,6 +48,12 @@
 #![allow(clippy::unused_unit)]
 #![allow(clippy::large_enum_variant)]
 
+#[cfg(feature = "std")]
+#[cfg(test)]
+mod mock;
+#[cfg(feature = "std")]
+#[cfg(test)]
+mod tests;
 mod traits;
 mod types;
 

@@ -16,7 +16,7 @@ pub struct R1csInstance<C: CircuitDriver> {
 
 impl<C: CircuitDriver> R1csInstance<C> {
     pub fn new(shape: &R1csShape<C>, commit_w: C::Affine, x: Vec<C::Scalar>) -> Self {
-        assert_eq!(shape.l(), x.len());
+        assert_eq!(shape.l() as usize, x.len());
         Self {
             commit_w,
             x: DenseVectors::new(x),
@@ -54,7 +54,7 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
         shape: &R1csShape<C>,
         instance: &R1csInstance<C>,
     ) -> Self {
-        let mut r_instance = RelaxedR1csInstance::dummy(shape.l());
+        let mut r_instance = RelaxedR1csInstance::dummy(shape.l() as usize);
         r_instance.commit_w = instance.commit_w;
         r_instance.u = C::Scalar::one();
         r_instance.x = instance.x.clone();

@@ -88,10 +88,10 @@ where
         let prover_secondary =
             Prover::new(pp.r1cs_shape_secondary.clone(), pp.ck_secondary.clone());
 
-        let u_dummy = RelaxedR1csInstance::<E2>::dummy(pp.r1cs_shape_secondary.l());
+        let u_dummy = RelaxedR1csInstance::<E2>::dummy(pp.r1cs_shape_secondary.l() as usize);
         let w_dummy = RelaxedR1csWitness::<E2>::dummy(
-            pp.r1cs_shape_secondary.m_l_1(),
-            pp.r1cs_shape_secondary.m(),
+            pp.r1cs_shape_secondary.m_l_1() as usize,
+            pp.r1cs_shape_secondary.m() as usize,
         );
 
         Self {
@@ -300,10 +300,13 @@ where
         circuit_secondary.generate(&mut cs);
         let r1cs_shape_secondary = R1csShape::from(cs);
 
-        let k = (r1cs_shape_primary.m().next_power_of_two() as u64).trailing_zeros();
+        let k = r1cs_shape_primary.m().next_power_of_two().trailing_zeros();
         let ck_primary = PedersenCommitment::<E1::Affine>::new(k.into(), rng);
 
-        let k = (r1cs_shape_secondary.m().next_power_of_two() as u64).trailing_zeros();
+        let k = r1cs_shape_secondary
+            .m()
+            .next_power_of_two()
+            .trailing_zeros();
         let ck_secondary = PedersenCommitment::<E2::Affine>::new(k.into(), rng);
 
         PublicParams {

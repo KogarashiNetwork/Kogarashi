@@ -20,10 +20,10 @@ fn dense_to_sparse<F: PrimeField>(value: Vec<Vec<u64>>, l: usize) -> SparseMatri
                 .enumerate()
                 .map(|(index, element)| {
                     if index <= l {
-                        (Wire::Instance(index), F::from(*element))
+                        (Wire::Instance(index as u64), F::from(*element))
                     } else {
                         let index = index - l - 1;
-                        (Wire::Witness(index), F::from(*element))
+                        (Wire::Witness(index as u64), F::from(*element))
                     }
                 })
                 .filter(|(_, value)| *value != F::zero())

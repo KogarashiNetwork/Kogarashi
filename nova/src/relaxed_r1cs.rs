@@ -10,12 +10,12 @@ use zkstd::matrix::{DenseVectors, SparseMatrix};
 
 #[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
 pub struct R1csShape<C: CircuitDriver> {
-    #[codec(skip)]
-    m: usize,
-    #[codec(skip)]
-    instance_length: usize,
-    #[codec(skip)]
-    witness_length: usize,
+    #[codec(compact)]
+    m: u64,
+    #[codec(compact)]
+    instance_length: u64,
+    #[codec(compact)]
+    witness_length: u64,
     a: SparseMatrix<C::Scalar>,
     b: SparseMatrix<C::Scalar>,
     c: SparseMatrix<C::Scalar>,
@@ -26,11 +26,11 @@ pub(crate) fn r1cs_instance_and_witness<C: CircuitDriver>(
     shape: &R1csShape<C>,
     ck: &PedersenCommitment<C::Affine>,
 ) -> (R1csInstance<C>, R1csWitness<C>) {
-    assert_eq!(cs.m_l_1(), shape.m_l_1());
+    assert_eq!(cs.m_l_1(), shape.m_l_1() as usize);
     assert_eq!(cs.m(), shape.m());
     let w = cs.w();
     let x = cs.x()[1..].to_vec();
-    assert_eq!(x.len(), shape.l());
+    assert_eq!(x.len(), shape.l() as usize);
 
     let witness = R1csWitness::new(shape, w);
     let commit_w = witness.commit(ck);
@@ -44,8 +44,8 @@ impl<C: CircuitDriver> From<R1cs<C>> for R1csShape<C> {
         let (a, b, c) = value.matrices();
         Self {
             m: value.m(),
-            instance_length: value.l() - 1,
-            witness_length: value.m_l_1(),
+            instance_length: (value.l() - 1) as u64,
+            witness_length: value.m_l_1() as u64,
             a,
             b,
             c,
@@ -65,15 +65,15 @@ impl<C: CircuitDriver> R1csShape<C> {
         (self.a.clone(), self.b.clone(), self.c.clone())
     }
 
-    pub fn m(&self) -> usize {
+    pub fn m(&self) -> u64 {
         self.m
     }
 
-    pub fn l(&self) -> usize {
+    pub fn l(&self) -> u64 {
         self.instance_length
     }
 
-    pub fn m_l_1(&self) -> usize {
+    pub fn m_l_1(&self) -> u64 {
         self.witness_length
     }
 
@@ -96,11 +96,11 @@ impl<C: CircuitDriver> R1csShape<C> {
         let l = x.len() + 1;
         let z = DenseVectors::new(vec![vec![*u], x.get(), w.get()].concat());
         // A · Z
-        let az = a.prod(m, l, &z);
+        let az = a.prod(*m, l, &z);
         // B · Z
-        let bz = b.prod(m, l, &z);
+        let bz = b.prod(*m, l, &z);
         // C · Z
-        let cz = c.prod(m, l, &z);
+        let cz = c.prod(*m, l, &z);
         // (A · Z) ◦ (B · Z)
         let azbz = az * bz;
 
@@ -128,11 +128,11 @@ impl<C: CircuitDriver> R1csShape<C> {
         let l = x.len() + 1;
         let z = DenseVectors::new(vec![vec![C::Scalar::one()], x.get(), w.get()].concat());
         // A · Z
-        let az = a.prod(m, l, &z);
+        let az = a.prod(*m, l, &z);
         // B · Z
-        let bz = b.prod(m, l, &z);
+        let bz = b.prod(*m, l, &z);
         // C · Z
-        let cz = c.prod(m, l, &z);
+        let cz = c.prod(*m, l, &z);
         // (A · Z) ◦ (B · Z)
         let azbz = az * bz;
 
@@ -164,7 +164,7 @@ mod tests {
         for i in 1..10 {
             let r1cs: R1cs<GrumpkinDriver> = example_r1cs(i);
             let shape = R1csShape::from(r1cs.clone());
-            let k = (shape.m().next_power_of_two() as u64).trailing_zeros();
+            let k = shape.m().next_power_of_two().trailing_zeros();
             let ck = PedersenCommitment::<Affine>::new(k.into(), &mut rng);
             let (x, w) = r1cs_instance_and_witness(&r1cs, &shape, &ck);
             let instance = RelaxedR1csInstance::from_r1cs_instance(&ck, &shape, &x);

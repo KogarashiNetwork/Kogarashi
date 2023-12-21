@@ -37,10 +37,10 @@ impl ZkSnark {
         let gamma_inverse = gamma.invert().ok_or(Error::ProverInversionFailed)?;
         let delta_inverse = delta.invert().ok_or(Error::ProverInversionFailed)?;
 
-        let mut h = vec![G1Affine::ADDITIVE_IDENTITY; cs.m() - 1];
+        let mut h = vec![G1Affine::ADDITIVE_IDENTITY; (cs.m() - 1) as usize];
 
         // Compute (1, tau, tau^2, ...)
-        let mut powers_of_tau = PointsValue(vec![Fr::zero(); cs.m()]);
+        let mut powers_of_tau = PointsValue(vec![Fr::zero(); cs.m() as usize]);
         let mut current_pow_of_tau = Fr::one();
         for x in powers_of_tau.0.iter_mut() {
             *x = current_pow_of_tau;

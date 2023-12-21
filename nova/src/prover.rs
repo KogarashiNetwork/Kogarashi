@@ -70,12 +70,12 @@ impl<C: CircuitDriver> Prover<C> {
         let l2 = x2.len() + 1;
 
         // matrices and z vector matrix multiplication
-        let az2 = a.prod(&m, l2, &z2);
-        let bz1 = b.prod(&m, l1, &z1);
-        let az1 = a.prod(&m, l1, &z1);
-        let bz2 = b.prod(&m, l2, &z2);
-        let cz2 = c.prod(&m, l2, &z2);
-        let cz1 = c.prod(&m, l1, &z1);
+        let az2 = a.prod(m, l2, &z2);
+        let bz1 = b.prod(m, l1, &z1);
+        let az1 = a.prod(m, l1, &z1);
+        let bz2 = b.prod(m, l2, &z2);
+        let cz2 = c.prod(m, l2, &z2);
+        let cz1 = c.prod(m, l1, &z1);
 
         // matrices Hadamard product
         let az2bz1 = az2 * bz1;
@@ -109,7 +109,7 @@ pub(crate) mod tests {
         let mut rng = OsRng;
         let r1cs = example_r1cs(0);
         let shape = R1csShape::from(r1cs);
-        let k = (shape.m().next_power_of_two() as u64).trailing_zeros();
+        let k = shape.m().next_power_of_two().trailing_zeros();
         let ck = PedersenCommitment::<C::Affine>::new(k.into(), &mut rng);
         Prover::new(shape, ck)
     }
