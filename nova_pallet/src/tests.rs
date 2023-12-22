@@ -79,7 +79,7 @@ mod ivc_pallet_tests {
     }
 
     #[test]
-    fn default_test() {
+    fn three_steps_ivc() {
         let mut rng = get_rng();
 
         let pp = PublicParams::<
@@ -99,7 +99,7 @@ mod ivc_pallet_tests {
             );
 
         new_test_ext().execute_with(|| {
-            for _ in 0..2 {
+            for _ in 0..3 {
                 let proof = ivc.prove_step(&pp);
                 assert!(IvcPallet::verify(Origin::signed(1), proof, pp.clone()).is_ok());
             }
