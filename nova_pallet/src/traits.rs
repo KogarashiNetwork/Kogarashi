@@ -1,6 +1,5 @@
-use crate::FullcodecRng;
 use frame_support::pallet_prelude::DispatchResultWithPostInfo;
-use zknova::{FunctionCircuit, RecursiveProof};
+use zknova::{FunctionCircuit, PublicParams, RecursiveProof};
 use zkstd::circuit::CircuitDriver;
 
 /// Abstraction over an ivc system
@@ -11,11 +10,10 @@ where
     FC1: FunctionCircuit<E1::Scalar>,
     FC2: FunctionCircuit<E2::Scalar>,
 {
-    /// The public parameters generation function
-    /// This is the dispatchable function and assumed to be called by other pallet as API
-    fn trusted_setup(rng: FullcodecRng) -> DispatchResultWithPostInfo;
-
     /// The proof verify function
     /// This is the dispatchable function and assumed to be called by other pallet as API
-    fn verify(proof: RecursiveProof<E1, E2, FC1, FC2>) -> DispatchResultWithPostInfo;
+    fn verify(
+        proof: RecursiveProof<E1, E2, FC1, FC2>,
+        pp: PublicParams<E1, E2, FC1, FC2>,
+    ) -> DispatchResultWithPostInfo;
 }

@@ -23,7 +23,7 @@ frame_support::construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        TemplateModule: nova_ivc_pallet::{Module, Call, Storage, Event<T>},
+        TemplateModule: nova_ivc_pallet::{Module, Call, Storage},
     }
 );
 
@@ -89,7 +89,6 @@ impl nova_ivc_pallet::Config for Test {
     type E2 = GrumpkinDriver;
     type FC1 = ExampleFunction<Fr>;
     type FC2 = ExampleFunction<Fq>;
-    type Event = Event;
 }
 
 // Build genesis storage according to the mock runtime.
