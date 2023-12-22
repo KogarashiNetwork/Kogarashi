@@ -236,10 +236,11 @@ mod tests {
     #[test]
     #[allow(clippy::op_ref)]
     fn grumpkin_operations() {
-        let aff1 = Affine::random(OsRng);
-        let aff2 = Affine::random(OsRng);
-        let mut ext1 = Projective::random(OsRng);
-        let ext2 = Projective::random(OsRng);
+        let mut rng = OsRng;
+        let aff1 = Affine::random(&mut rng);
+        let aff2 = Affine::random(&mut rng);
+        let mut ext1 = Projective::random(&mut rng);
+        let ext2 = Projective::random(&mut rng);
         let scalar = Fq::from(42);
 
         let _ = aff1 + aff2;

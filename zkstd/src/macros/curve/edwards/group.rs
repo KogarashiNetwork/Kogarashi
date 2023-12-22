@@ -26,7 +26,7 @@ macro_rules! twisted_edwards_affine_group_operation {
                 }
             }
 
-            fn random(rand: impl RngCore) -> $affine {
+            fn random<R: RngCore>(rand: &mut R) -> $affine {
                 (Self::ADDITIVE_GENERATOR * $scalar::random(rand)).into()
             }
         }
@@ -106,7 +106,7 @@ macro_rules! twisted_edwards_extend_group_operation {
                 }
             }
 
-            fn random(rand: impl RngCore) -> Self {
+            fn random<R: RngCore>(rand: &mut R) -> Self {
                 Self::ADDITIVE_GENERATOR * $scalar::random(rand)
             }
         }

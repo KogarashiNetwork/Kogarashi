@@ -17,7 +17,7 @@ pub trait Group: Basic + Eq + PartialEq + Send + Sync {
     fn invert(self) -> Option<Self>;
 
     // return random element
-    fn random(rand: impl RngCore) -> Self;
+    fn random<R: RngCore>(rand: &mut R) -> Self;
 }
 
 /// integer group trait which supports additive arithmetic

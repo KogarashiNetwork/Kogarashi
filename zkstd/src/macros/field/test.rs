@@ -4,8 +4,9 @@ macro_rules! field_test {
         paste! {
             #[test]
             fn [< $test_name _equivalence_test >]() {
+                let mut rng = OsRng;
                 for _ in 0..$iter_times {
-                    let a = $field::random(OsRng);
+                    let a = $field::random(&mut rng);
                     let b = a.square();
 
                     assert!(a == a);
@@ -21,8 +22,9 @@ macro_rules! field_test {
         paste! {
             #[test]
             fn [< $test_name _addition_test >]() {
+                let mut rng = OsRng;
                 for _ in 0..$iter_times {
-                    let a = $field::random(OsRng);
+                    let a = $field::random(&mut rng);
 
                     // a + a = a * 2
                     let b = a + a;
@@ -36,8 +38,9 @@ macro_rules! field_test {
         paste! {
             #[test]
             fn [< $test_name _subtraction_test >]() {
+                let mut rng = OsRng;
                 for _ in 0..$iter_times {
-                    let a = $field::random(OsRng);
+                    let a = $field::random(&mut rng);
 
                     // a - a = a * 2 - a * 2
                     let b = a - a;
@@ -53,10 +56,11 @@ macro_rules! field_test {
         paste! {
             #[test]
             fn [< $test_name _multiplication_test >]() {
+                let mut rng = OsRng;
                 for _ in 0..$iter_times {
-                    let a = $field::random(OsRng);
-                    let b = $field::random(OsRng);
-                    let c = $field::random(OsRng);
+                    let a = $field::random(&mut rng);
+                    let b = $field::random(&mut rng);
+                    let c = $field::random(&mut rng);
 
                     // a * b + a * c
                     let ab = a * b;
@@ -75,9 +79,10 @@ macro_rules! field_test {
         paste! {
             #[test]
             fn [< $test_name _squaring_test >]() {
+                let mut rng = OsRng;
                 for _ in 0..$iter_times {
-                    let a = $field::random(OsRng);
-                    let b = $field::random(OsRng);
+                    let a = $field::random(&mut rng);
+                    let b = $field::random(&mut rng);
 
                     // (a * a) * (b * b)
                     let aa = a * a;
@@ -97,8 +102,9 @@ macro_rules! field_test {
         paste! {
             #[test]
             fn [< $test_name _inversion_test >]() {
+                let mut rng = OsRng;
                 for _ in 0..$iter_times {
-                    let a = $field::random(OsRng);
+                    let a = $field::random(&mut rng);
 
                     // a * a^-1 = e
                     let inv = a.invert();

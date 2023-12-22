@@ -1,12 +1,12 @@
 #![allow(clippy::op_ref)]
 use super::vector::DenseVectors;
-use crate::common::{Add, Debug, Mul, Neg, PrimeField, Sub, Vec};
+use crate::common::{Add, Debug, Decode, Encode, Mul, Neg, PrimeField, Sub, Vec};
 use crate::r1cs::Wire;
 
 use core::slice::Iter;
 
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct SparseRow<F: PrimeField>(pub(crate) Vec<(Wire, F)>);
+#[derive(Clone, Debug, Eq, PartialEq, Encode, Decode)]
+pub struct SparseRow<Field: PrimeField>(pub(crate) Vec<(Wire, Field)>);
 
 impl<F: PrimeField> SparseRow<F> {
     /// Creates a new expression with the given wire coefficients.
@@ -43,8 +43,8 @@ impl<F: PrimeField> SparseRow<F> {
     pub fn evaluate(&self, instance: &DenseVectors<F>, witness: &DenseVectors<F>) -> F {
         self.0.iter().fold(F::zero(), |sum, (wire, coefficient)| {
             let wire_value = match wire {
-                Wire::Instance(i) => instance[*i],
-                Wire::Witness(i) => witness[*i],
+                Wire::Instance(i) => instance[*i as usize],
+                Wire::Witness(i) => witness[*i as usize],
             };
             sum + (wire_value * *coefficient)
         })

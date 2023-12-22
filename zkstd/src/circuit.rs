@@ -3,8 +3,9 @@ pub mod prelude;
 
 use crate::common::{BNAffine, Deserialize, PrimeField, Serialize};
 use core::fmt::Debug;
+use parity_scale_codec::{Decode, Encode};
 
-pub trait CircuitDriver: Clone + Debug + Default {
+pub trait CircuitDriver: Clone + Debug + Default + Decode + Encode + PartialEq + Eq {
     const ORDER_STR: &'static str;
     const NUM_BITS: u16;
     // curve affine

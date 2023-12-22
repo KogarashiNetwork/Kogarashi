@@ -60,10 +60,11 @@ mod tests {
 
     #[test]
     fn instance_assignment() {
+        let mut rng = OsRng;
         let mut cs: R1cs<Bn254Driver> = R1cs::default();
         let instance = R1csInstance::<GrumpkinDriver> {
-            commit_w: Affine::random(OsRng),
-            x: DenseVectors::new(vec![Fq::random(OsRng); 2]),
+            commit_w: Affine::random(&mut rng),
+            x: DenseVectors::new(vec![Fq::random(&mut rng); 2]),
         };
 
         let instance_assignment = R1csInstanceAssignment::witness(&mut cs, &instance);

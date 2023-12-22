@@ -5,10 +5,10 @@ use crate::r1cs::Wire;
 pub use row::SparseRow;
 pub use vector::DenseVectors;
 
-use crate::common::{vec, Debug, PrimeField, Vec};
+use crate::common::{vec, Debug, Decode, Encode, PrimeField, Vec};
 
-#[derive(Clone, Debug, Default)]
-pub struct SparseMatrix<F: PrimeField>(pub(crate) Vec<SparseRow<F>>);
+#[derive(Clone, Debug, Default, PartialEq, Eq, Encode, Decode)]
+pub struct SparseMatrix<Field: PrimeField>(pub(crate) Vec<SparseRow<Field>>);
 
 impl<F: PrimeField> SparseMatrix<F> {
     #[allow(clippy::type_complexity)]
@@ -21,8 +21,8 @@ impl<F: PrimeField> SparseMatrix<F> {
         let mut w = vec![vec![]; m_l_1];
         for (i, a) in self.0.iter().enumerate() {
             a.iter().for_each(|(wire, coeff)| match wire {
-                Wire::Instance(k) => x[*k].push((*coeff, i)),
-                Wire::Witness(k) => w[*k].push((*coeff, i)),
+                Wire::Instance(k) => x[*k as usize].push((*coeff, i)),
+                Wire::Witness(k) => w[*k as usize].push((*coeff, i)),
             });
         }
         (x, w)
@@ -33,13 +33,13 @@ impl<F: PrimeField> SparseMatrix<F> {
     }
 
     // matrix-vector multiplication
-    pub fn prod(&self, m: &usize, l: usize, z: &DenseVectors<F>) -> DenseVectors<F> {
-        let mut vectors = DenseVectors::zero(*m);
+    pub fn prod(&self, m: u64, l: usize, z: &DenseVectors<F>) -> DenseVectors<F> {
+        let mut vectors = DenseVectors::zero(m as usize);
         for (index, elements) in self.0.iter().enumerate() {
             vectors[index] = elements.iter().fold(F::zero(), |sum, (wire, coeff)| {
                 let value = match wire {
-                    Wire::Instance(i) => z[*i],
-                    Wire::Witness(i) => z[*i + l],
+                    Wire::Instance(i) => z[*i as usize],
+                    Wire::Witness(i) => z[*i as usize + l],
                 };
                 sum + *coeff * value
             })

@@ -7,10 +7,11 @@ use zkstd::common::{BNAffine, BNProjective, Group};
 
 fn bench_g1_affine(c: &mut Criterion) {
     let mut group = c.benchmark_group("g1_affine");
+    let mut rng = OsRng;
 
-    let p1 = Affine::random(OsRng);
-    let p2 = Affine::random(OsRng);
-    let k = Fq::random(OsRng);
+    let p1 = Affine::random(&mut rng);
+    let p2 = Affine::random(&mut rng);
+    let k = Fq::random(&mut rng);
 
     group.bench_function("add", |b| {
         b.iter(|| black_box(black_box(p1) + black_box(p2)));
@@ -28,10 +29,11 @@ fn bench_g1_affine(c: &mut Criterion) {
 
 fn bench_g1_projective(c: &mut Criterion) {
     let mut group = c.benchmark_group("g1_projective");
+    let mut rng = OsRng;
 
-    let p1 = Projective::random(OsRng);
-    let p2 = Projective::random(OsRng);
-    let k = Fq::random(OsRng);
+    let p1 = Projective::random(&mut rng);
+    let p2 = Projective::random(&mut rng);
+    let k = Fq::random(&mut rng);
 
     group.bench_function("add", |b| {
         b.iter(|| black_box(black_box(p1) + black_box(p2)));

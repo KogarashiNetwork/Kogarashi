@@ -543,8 +543,9 @@ mod tests {
 
     #[test]
     fn bignat_allocation_from_bigint() {
+        let mut rng = OsRng;
         let mut cs = R1cs::<Bn254Driver>::default();
-        let f = Fr::random(OsRng);
+        let f = Fr::random(&mut rng);
         let num = f_to_nat(&f);
         let num_assignment =
             BigNatAssignment::witness_from_big_int(&mut cs, num.clone(), BN_LIMB_WIDTH, BN_N_LIMBS);

@@ -1,9 +1,10 @@
+use crate::common::ParityCmp;
 use crate::traits::{CurveGroup, PrimeField};
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 /// elliptic curve rational points group
 /// rational points group behaves as abelian group
-pub trait BNCurve: CurveGroup {
+pub trait BNCurve: CurveGroup + ParityCmp {
     // b param
     const PARAM_B: Self::Base;
     // 3b param

@@ -1,6 +1,6 @@
 use crate::function::FunctionCircuit;
 use crate::{PedersenCommitment, Prover, RecursiveProof};
-use rand_core::OsRng;
+use rand_core::RngCore;
 use std::marker::PhantomData;
 
 use crate::circuit::AugmentedFCircuit;
@@ -9,7 +9,7 @@ use crate::relaxed_r1cs::{
     RelaxedR1csWitness,
 };
 use zkstd::circuit::prelude::{CircuitDriver, R1cs};
-use zkstd::common::IntGroup;
+use zkstd::common::{Decode, Encode, IntGroup};
 use zkstd::matrix::DenseVectors;
 
 pub struct Ivc<E1, E2, FC1, FC2>
@@ -19,7 +19,7 @@ where
     FC1: FunctionCircuit<E1::Scalar>,
     FC2: FunctionCircuit<E2::Scalar>,
 {
-    i: usize,
+    i: u64,
     z0_primary: DenseVectors<E1::Scalar>,
     z0_secondary: DenseVectors<E2::Scalar>,
     zi_primary: DenseVectors<E1::Scalar>,
@@ -88,10 +88,10 @@ where
         let prover_secondary =
             Prover::new(pp.r1cs_shape_secondary.clone(), pp.ck_secondary.clone());
 
-        let u_dummy = RelaxedR1csInstance::<E2>::dummy(pp.r1cs_shape_secondary.l());
+        let u_dummy = RelaxedR1csInstance::<E2>::dummy(pp.r1cs_shape_secondary.l() as usize);
         let w_dummy = RelaxedR1csWitness::<E2>::dummy(
-            pp.r1cs_shape_secondary.m_l_1(),
-            pp.r1cs_shape_secondary.m(),
+            pp.r1cs_shape_secondary.m_l_1() as usize,
+            pp.r1cs_shape_secondary.m() as usize,
         );
 
         Self {
@@ -247,6 +247,7 @@ where
     }
 }
 
+#[derive(Decode, Encode, Clone, PartialEq, Eq, Debug)]
 pub struct PublicParams<E1, E2, FC1, FC2>
 where
     E1: CircuitDriver<Base = <E2 as CircuitDriver>::Scalar>,
@@ -268,7 +269,7 @@ where
     FC1: FunctionCircuit<E1::Scalar>,
     FC2: FunctionCircuit<E2::Scalar>,
 {
-    pub fn setup(rng: OsRng) -> Self {
+    pub fn setup<R: RngCore>(rng: &mut R) -> Self {
         // Initialize shape for the primary
         let circuit_primary = AugmentedFCircuit::<E2, FC1> {
             is_primary: true,
@@ -299,10 +300,13 @@ where
         circuit_secondary.generate(&mut cs);
         let r1cs_shape_secondary = R1csShape::from(cs);
 
-        let k = (r1cs_shape_primary.m().next_power_of_two() as u64).trailing_zeros();
+        let k = r1cs_shape_primary.m().next_power_of_two().trailing_zeros();
         let ck_primary = PedersenCommitment::<E1::Affine>::new(k.into(), rng);
 
-        let k = (r1cs_shape_secondary.m().next_power_of_two() as u64).trailing_zeros();
+        let k = r1cs_shape_secondary
+            .m()
+            .next_power_of_two()
+            .trailing_zeros();
         let ck_secondary = PedersenCommitment::<E2::Affine>::new(k.into(), rng);
 
         PublicParams {
@@ -311,46 +315,6 @@ where
             ck_primary,
             ck_secondary,
             marker: Default::default(),
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{Ivc, PublicParams};
-    use crate::test::ExampleFunction;
-
-    use crate::driver::{Bn254Driver, GrumpkinDriver};
-    use bn_254::{Fq, Fr};
-    use rand_core::OsRng;
-    use zkstd::circuit::prelude::R1cs;
-    use zkstd::matrix::DenseVectors;
-    use zkstd::r1cs::test::example_r1cs;
-
-    #[test]
-    fn ivc_test() {
-        let r1cs: R1cs<GrumpkinDriver> = example_r1cs(1);
-
-        // produce public parameters
-        let pp = PublicParams::<
-            Bn254Driver,
-            GrumpkinDriver,
-            ExampleFunction<Fr>,
-            ExampleFunction<Fq>,
-        >::setup(OsRng);
-
-        let z0_primary = DenseVectors::new(vec![Fr::from(0)]);
-        let z0_secondary = DenseVectors::new(vec![Fq::from(0)]);
-        let mut ivc =
-            Ivc::<Bn254Driver, GrumpkinDriver, ExampleFunction<Fr>, ExampleFunction<Fq>>::init(
-                &pp,
-                z0_primary,
-                z0_secondary,
-            );
-
-        for i in 0..4 {
-            let proof = ivc.prove_step(&pp);
-            assert!(proof.verify(&pp));
         }
     }
 }

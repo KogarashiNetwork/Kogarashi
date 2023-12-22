@@ -14,7 +14,7 @@ use zkstd::r1cs::R1cs;
 #[derive(Debug, Clone)]
 pub struct AugmentedFCircuit<C: CircuitDriver, FC: FunctionCircuit<C::Base>> {
     pub is_primary: bool,
-    pub i: usize,
+    pub i: u64,
     pub z_0: DenseVectors<C::Base>,
     pub z_i: Option<DenseVectors<C::Base>>,
     pub u_single: Option<R1csInstance<C>>,
@@ -44,7 +44,7 @@ impl<C: CircuitDriver, FC: FunctionCircuit<C::Base>> AugmentedFCircuit<C, FC> {
         cs: &mut R1cs<CS>,
     ) -> Vec<FieldAssignment<C::Base>> {
         // allocate inputs
-        let i = FieldAssignment::witness(cs, C::Base::from(self.i as u64));
+        let i = FieldAssignment::witness(cs, C::Base::from(self.i));
         let z_0 = self
             .z_0
             .iter()
@@ -149,6 +149,7 @@ mod tests {
 
     #[test]
     fn augmented_circuit_dummies() {
+        let mut rng = OsRng;
         let mut cs = R1cs::<Bn254Driver>::default();
         let augmented_circuit = AugmentedFCircuit::<GrumpkinDriver, ExampleFunction<Fr>> {
             is_primary: true,
@@ -163,10 +164,10 @@ mod tests {
 
         augmented_circuit.generate(&mut cs);
         let shape = R1csShape::from(cs.clone());
-        let k = (shape.m().next_power_of_two() as u64).trailing_zeros();
-        let ck = PedersenCommitment::<G1Affine>::new(k.into(), OsRng);
-        let u_dummy = RelaxedR1csInstance::dummy(shape.l());
-        let w_dummy = RelaxedR1csWitness::dummy(shape.m_l_1(), shape.m());
+        let k = shape.m().next_power_of_two().trailing_zeros();
+        let ck = PedersenCommitment::<G1Affine>::new(k.into(), &mut rng);
+        let u_dummy = RelaxedR1csInstance::dummy(shape.l() as usize);
+        let w_dummy = RelaxedR1csWitness::dummy(shape.m_l_1() as usize, shape.m() as usize);
 
         let (x, w) = r1cs_instance_and_witness(&cs, &shape, &ck);
         let (instance, witness) = (

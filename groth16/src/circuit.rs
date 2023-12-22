@@ -4,14 +4,14 @@ use grumpkin::params::PARAM_B3 as GRUMPKIN_PARAM_B3;
 use zkstd::circuit::CircuitDriver;
 
 use zkstd::circuit::prelude::R1cs;
-use zkstd::common::Debug;
+use zkstd::common::{Debug, Decode, Encode};
 
 /// circuit trait
 pub trait Circuit: Default + Debug {
     fn synthesize(&self, constraint_system: &mut R1cs<Bn254Driver>) -> Result<(), Error>;
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Decode, Encode)]
 pub struct Bn254Driver;
 
 impl CircuitDriver for Bn254Driver {

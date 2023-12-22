@@ -272,10 +272,11 @@ mod tests {
     #[test]
     #[allow(clippy::op_ref)]
     fn bn254_operations() {
-        let aff1 = G1Affine::random(OsRng);
-        let aff2 = G1Affine::random(OsRng);
-        let mut ext1 = G1Projective::random(OsRng);
-        let ext2 = G1Projective::random(OsRng);
+        let mut rng = OsRng;
+        let aff1 = G1Affine::random(&mut rng);
+        let aff2 = G1Affine::random(&mut rng);
+        let mut ext1 = G1Projective::random(&mut rng);
+        let ext2 = G1Projective::random(&mut rng);
         let scalar = Fr::from(42);
 
         let _ = aff1 + aff2;

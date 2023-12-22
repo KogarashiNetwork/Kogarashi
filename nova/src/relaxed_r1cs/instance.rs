@@ -3,10 +3,10 @@ use crate::gadget::{f_to_nat, nat_to_limbs, BN_LIMB_WIDTH, BN_N_LIMBS};
 use crate::hash::{MimcRO, HASH_BITS, MIMC_ROUNDS};
 use crate::{PedersenCommitment, R1csShape};
 use zkstd::circuit::prelude::CircuitDriver;
-use zkstd::common::{Group, IntGroup, Ring};
+use zkstd::common::{Decode, Encode, Group, IntGroup, Ring};
 use zkstd::matrix::DenseVectors;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Encode, Decode, PartialEq, Eq)]
 pub struct R1csInstance<C: CircuitDriver> {
     /// commitment for witness vectors
     pub(crate) commit_w: C::Affine,
@@ -16,7 +16,7 @@ pub struct R1csInstance<C: CircuitDriver> {
 
 impl<C: CircuitDriver> R1csInstance<C> {
     pub fn new(shape: &R1csShape<C>, commit_w: C::Affine, x: Vec<C::Scalar>) -> Self {
-        assert_eq!(shape.l(), x.len());
+        assert_eq!(shape.l() as usize, x.len());
         Self {
             commit_w,
             x: DenseVectors::new(x),
@@ -35,7 +35,7 @@ impl<C: CircuitDriver> R1csInstance<C> {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
 pub struct RelaxedR1csInstance<C: CircuitDriver> {
     /// commitment for witness vectors
     pub(crate) commit_w: C::Affine,
@@ -54,7 +54,7 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
         shape: &R1csShape<C>,
         instance: &R1csInstance<C>,
     ) -> Self {
-        let mut r_instance = RelaxedR1csInstance::dummy(shape.l());
+        let mut r_instance = RelaxedR1csInstance::dummy(shape.l() as usize);
         r_instance.commit_w = instance.commit_w;
         r_instance.u = C::Scalar::one();
         r_instance.x = instance.x.clone();
@@ -117,12 +117,12 @@ impl<C: CircuitDriver> RelaxedR1csInstance<C> {
 
     pub fn hash<E: CircuitDriver<Base = C::Scalar, Scalar = C::Base>>(
         &self,
-        i: usize,
+        i: u64,
         z_0: &DenseVectors<E::Scalar>,
         z_i: &DenseVectors<E::Scalar>,
     ) -> C::Scalar {
         let mut mimc = MimcRO::<MIMC_ROUNDS, C>::default();
-        mimc.append(E::Scalar::from(i as u64));
+        mimc.append(E::Scalar::from(i));
         mimc.append_vec(z_0.get());
         mimc.append_vec(z_i.get());
         self.absorb_by_transcript(&mut mimc);

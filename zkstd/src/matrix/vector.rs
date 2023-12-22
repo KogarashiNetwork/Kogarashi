@@ -1,8 +1,8 @@
-use crate::common::{vec, Add, Mul, PrimeField, Sub, Vec};
+use crate::common::{vec, Add, Decode, Encode, Mul, PrimeField, Sub, Vec};
 use core::ops::{Index, IndexMut};
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct DenseVectors<F: PrimeField>(Vec<F>);
+#[derive(Clone, Debug, Default, PartialEq, Eq, Encode, Decode)]
+pub struct DenseVectors<Field: PrimeField>(Vec<Field>);
 
 impl<F: PrimeField> DenseVectors<F> {
     pub fn new(vectors: Vec<F>) -> Self {

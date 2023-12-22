@@ -12,7 +12,7 @@ pub(crate) use wire::Wire;
 pub struct R1cs<C: CircuitDriver> {
     // 1. Structure S
     // a, b and c matrices and matrix size
-    m: usize,
+    m: u64,
     a: SparseMatrix<C::Scalar>,
     b: SparseMatrix<C::Scalar>,
     c: SparseMatrix<C::Scalar>,
@@ -27,7 +27,7 @@ pub struct R1cs<C: CircuitDriver> {
 }
 
 impl<C: CircuitDriver> R1cs<C> {
-    pub fn m(&self) -> usize {
+    pub fn m(&self) -> u64 {
         self.m
     }
 
@@ -63,11 +63,11 @@ impl<C: CircuitDriver> R1cs<C> {
         let R1cs { m, a, b, c, x, w } = self;
         let z = DenseVectors::new(vec![x.get(), w.get()].concat());
         // A · Z
-        let az = a.prod(m, self.l(), &z);
+        let az = a.prod(*m, self.l(), &z);
         // B · Z
-        let bz = b.prod(m, self.l(), &z);
+        let bz = b.prod(*m, self.l(), &z);
         // C · Z
-        let cz = c.prod(m, self.l(), &z);
+        let cz = c.prod(*m, self.l(), &z);
         // (A · Z) ◦ (B · Z)
         let azbz = az * bz;
 
@@ -90,12 +90,12 @@ impl<C: CircuitDriver> R1cs<C> {
 
     pub(crate) fn public_wire(&mut self) -> Wire {
         let index = self.x.len();
-        Wire::Instance(index)
+        Wire::Instance(index as u64)
     }
 
     pub(crate) fn private_wire(&mut self) -> Wire {
         let index = self.w.len();
-        Wire::Witness(index)
+        Wire::Witness(index as u64)
     }
 
     /// constrain x * y = z
@@ -184,8 +184,8 @@ impl<C: CircuitDriver> Index<Wire> for R1cs<C> {
 
     fn index(&self, w: Wire) -> &Self::Output {
         match w {
-            Wire::Instance(i) => &self.x[i],
-            Wire::Witness(i) => &self.w[i],
+            Wire::Instance(i) => &self.x[i as usize],
+            Wire::Witness(i) => &self.w[i as usize],
         }
     }
 }
