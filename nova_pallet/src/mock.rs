@@ -1,6 +1,5 @@
 use crate as nova_ivc_pallet;
 use crate::*;
-use bn_254::{Fq, Fr};
 use frame_support::parameter_types;
 use frame_system as system;
 use sp_core::H256;
@@ -8,9 +7,6 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zknova::{Bn254Driver, FunctionCircuit, GrumpkinDriver};
-use zkstd::circuit::prelude::FieldAssignment;
-use zkstd::circuit::CircuitDriver;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -56,10 +52,6 @@ impl system::Config for Test {
     type SystemWeightInfo = ();
     type SS58Prefix = SS58Prefix;
 }
-
-use zkstd::common::PrimeField;
-use zkstd::matrix::DenseVectors;
-use zkstd::r1cs::R1cs;
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Encode, Decode)]
 pub struct ExampleFunction<Field: PrimeField> {

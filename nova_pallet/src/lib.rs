@@ -18,7 +18,7 @@
 //! - [`Config`]
 //! - [`Call`]
 //! - [`Pallet`]
-//! - [`Ivc`]
+//! - [`IvcVerifier`]
 //!
 //! ## Overview
 //!
@@ -56,21 +56,19 @@ mod mock;
 #[cfg(test)]
 mod tests;
 mod traits;
+mod types;
 
 pub use pallet::*;
-pub use rand_xorshift::XorShiftRng as FullcodecRng;
-pub use traits::Ivc;
+pub use traits::IvcVerifier;
+pub use types::*;
 
 use frame_support::dispatch::{DispatchErrorWithPostInfo, PostDispatchInfo};
 use frame_support::pallet_prelude::*;
 use frame_system::pallet_prelude::*;
-use zknova::{PublicParams, RecursiveProof};
 
 #[frame_support::pallet]
 pub mod pallet {
     use super::*;
-    use zknova::{FunctionCircuit, PublicParams, RecursiveProof};
-    use zkstd::circuit::CircuitDriver;
 
     #[pallet::config]
     pub trait Config: frame_system::Config {
@@ -78,12 +76,6 @@ pub mod pallet {
         type E2: CircuitDriver<Base = <Self::E1 as CircuitDriver>::Scalar>;
         type FC1: FunctionCircuit<<Self::E1 as CircuitDriver>::Scalar>;
         type FC2: FunctionCircuit<<Self::E2 as CircuitDriver>::Scalar>;
-    }
-
-    #[pallet::error]
-    pub enum Error<T> {
-        NoneValue,
-        StorageOverflow,
     }
 
     #[pallet::pallet]
@@ -101,13 +93,13 @@ pub mod pallet {
             pp: PublicParams<T::E1, T::E2, T::FC1, T::FC2>,
         ) -> DispatchResultWithPostInfo {
             ensure_signed(origin)?;
-            <Self as Ivc<T::E1, T::E2, T::FC1, T::FC2>>::verify(proof, pp)?;
+            <Self as IvcVerifier<T::E1, T::E2, T::FC1, T::FC2>>::verify(proof, pp)?;
             Ok(().into())
         }
     }
 }
 
-impl<T: Config> Ivc<T::E1, T::E2, T::FC1, T::FC2> for Pallet<T> {
+impl<T: Config> IvcVerifier<T::E1, T::E2, T::FC1, T::FC2> for Pallet<T> {
     /// The API method to verify the proof validity
     fn verify(
         proof: RecursiveProof<T::E1, T::E2, T::FC1, T::FC2>,

@@ -1,9 +1,8 @@
+use crate::types::*;
 use frame_support::pallet_prelude::DispatchResultWithPostInfo;
-use zknova::{FunctionCircuit, PublicParams, RecursiveProof};
-use zkstd::circuit::CircuitDriver;
 
 /// Abstraction over an ivc system
-pub trait Ivc<E1, E2, FC1, FC2>
+pub trait IvcVerifier<E1, E2, FC1, FC2>
 where
     E1: CircuitDriver<Base = <E2 as CircuitDriver>::Scalar>,
     E2: CircuitDriver<Base = <E1 as CircuitDriver>::Scalar>,

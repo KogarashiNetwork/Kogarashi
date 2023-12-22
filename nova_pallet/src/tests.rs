@@ -1,15 +1,13 @@
 use crate::mock::{new_test_ext, ExampleFunction};
-use crate::pallet::Config;
+use crate::*;
 use crate::{self as nova_ivc};
 
-use bn_254::{Fq, Fr};
 use frame_support::{construct_runtime, parameter_types};
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use zknova::{Bn254Driver, GrumpkinDriver};
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<TestRuntime>;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;
@@ -66,10 +64,7 @@ impl Config for TestRuntime {
 #[cfg(test)]
 mod ivc_pallet_tests {
     use super::*;
-    use crate::FullcodecRng;
     use rand::SeedableRng;
-    use zknova::{Ivc, PublicParams};
-    use zkstd::matrix::DenseVectors;
 
     fn get_rng() -> FullcodecRng {
         FullcodecRng::from_seed([
