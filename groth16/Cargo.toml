@@ -27,3 +27,6 @@ std = [
     "zkstd/std",
     "rayon"
 ]
+
+[[example]]
+name = "simple"

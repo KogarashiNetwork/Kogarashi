@@ -11,7 +11,7 @@ mod prover;
 mod verifier;
 mod zksnark;
 
-pub use circuit::Circuit;
+pub use circuit::{Bn254Driver, Circuit};
 pub use error::Error;
 pub use proof::Proof;
 pub use prover::Prover;
@@ -20,9 +20,7 @@ pub use zksnark::ZkSnark;
 
 #[cfg(test)]
 mod tests {
-    use crate::circuit::{Bn254Driver, Circuit};
-    use crate::error::Error;
-    use crate::zksnark::ZkSnark;
+    use super::*;
 
     use bn_254::Fr as BnScalar;
     use zkstd::circuit::prelude::{FieldAssignment, R1cs};
@@ -56,7 +54,6 @@ mod tests {
 
                 let sym1 = FieldAssignment::mul(composer, &x, &x);
                 let y = FieldAssignment::mul(composer, &sym1, &x);
-                // TODO: check why using the `Add` trait crashes this test
                 let sym2 = FieldAssignment::add(composer, &y, &x);
 
                 FieldAssignment::enforce_eq(composer, &(&sym2 + &c), &o);
