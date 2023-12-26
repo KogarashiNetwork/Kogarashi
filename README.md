@@ -15,7 +15,7 @@ We provide the composable layer 2 technologies by **Recursive Snarks** on top of
 - [x] R1cs
 - [x] Groth16
 - [x] Nova nifs
-- [ ] Nova IVC
+- [x] Nova IVC
 - [ ] Spartan
 - [ ] Hyper Nova
 - [ ] Lookup

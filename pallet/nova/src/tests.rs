@@ -1,6 +1,6 @@
 use crate::mock::{new_test_ext, ExampleFunction};
 use crate::*;
-use crate::{self as nova_ivc};
+use crate::{self as pallet_nova};
 
 use frame_support::{construct_runtime, parameter_types};
 use sp_core::H256;
@@ -19,7 +19,7 @@ construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        IvcPallet: nova_ivc::{Module, Call, Storage},
+        Nova: pallet_nova::{Module, Call, Storage},
     }
 );
 
@@ -92,12 +92,13 @@ mod ivc_pallet_tests {
                 z0_primary,
                 z0_secondary,
             );
+        (0..2).for_each(|_| {
+            ivc.prove_step(&pp);
+        });
+        let proof = ivc.prove_step(&pp);
 
         new_test_ext().execute_with(|| {
-            for _ in 0..3 {
-                let proof = ivc.prove_step(&pp);
-                assert!(IvcPallet::verify(Origin::signed(1), proof, pp.clone()).is_ok());
-            }
+            assert!(Nova::verify(Origin::signed(1), proof, pp.clone()).is_ok());
         });
     }
 }
