@@ -1,10 +1,3 @@
-# zkSNARKs
-
-Implementation of [`On the Size of Pairing-based Non-interactive Arguments`](https://eprint.iacr.org/2016/260.pdf)
-
-## Usage
-
-```rs
 use bn_254::Fr as BnScalar;
 use zkgroth16::{Bn254Driver, Circuit, Error, ZkSnark};
 use zkstd::{
@@ -80,4 +73,3 @@ fn main() {
         .verify(&proof, &[x, o])
         .expect("Failed to verify the proof");
 }
-```

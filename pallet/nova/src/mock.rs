@@ -1,4 +1,4 @@
-use crate as nova_ivc_pallet;
+use crate as pallet_nova;
 use crate::*;
 use frame_support::parameter_types;
 use frame_system as system;
@@ -19,7 +19,7 @@ frame_support::construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        TemplateModule: nova_ivc_pallet::{Module, Call, Storage},
+        TemplateModule: pallet_nova::{Module, Call, Storage},
     }
 );
 
@@ -76,7 +76,7 @@ impl<F: PrimeField> FunctionCircuit<F> for ExampleFunction<F> {
     }
 }
 
-impl nova_ivc_pallet::Config for Test {
+impl pallet_nova::Config for Test {
     type E1 = Bn254Driver;
     type E2 = GrumpkinDriver;
     type FC1 = ExampleFunction<Fr>;
