@@ -1376,24 +1376,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72ef4a56884ca558e5ddb05a1d1e7e1bfd9a68d9ed024c21704cc98872dae1bb"
 
 [[package]]
-name = "nova-ivc-pallet"
-version = "0.1.0"
-dependencies = [
- "bn-254",
- "frame-support",
- "frame-system",
- "fullcodec_rand_xorshift",
- "parity-scale-codec",
- "rand 0.8.5",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "zknova",
- "zkstd 0.0.22",
-]
-
-[[package]]
 name = "num-bigint"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1508,6 +1490,24 @@ name = "os_str_bytes"
 version = "6.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2355d85b9a3786f481747ced0e0ff2ba35213a1f9bd406ed906554d7af805a1"
+
+[[package]]
+name = "pallet-nova"
+version = "0.1.0"
+dependencies = [
+ "bn-254",
+ "frame-support",
+ "frame-system",
+ "fullcodec_rand_xorshift",
+ "parity-scale-codec",
+ "rand 0.8.5",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "zknova",
+ "zkstd 0.0.22",
+]
 
 [[package]]
 name = "parity-scale-codec"

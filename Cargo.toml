@@ -5,7 +5,7 @@ members = [
     "grumpkin",
     "nova",
     "zkstd",
-    "nova_pallet"
+    "pallet/nova"
 ]
 
 [profile.release]

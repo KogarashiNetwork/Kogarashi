@@ -35,10 +35,10 @@
 //! through RPC client.
 //!
 //! ### Introduction
-//! There four steps to use `nova-pallet`.
+//! There four steps to use `pallet-nova`.
 //!
-//! 1. Import `nova-ivc-pallet` to your substrate runtime and node
-//! 2. Use `nova-ivc-pallet` in your pallet
+//! 1. Import `pallet-nova` to your substrate runtime and node
+//! 2. Use `pallet-nova` in your pallet
 //! 3. Open `get_public_parameters` RPC
 //!
 //! `get_public_parameters` is an RPC method and, `trusted_setup` and `verify` are
