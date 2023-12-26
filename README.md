@@ -30,6 +30,12 @@ We provide the composable layer 2 technologies by **Recursive Snarks** on top of
 $ cargo test --all --release
 ```
 
+or
+
+```shell
+$ docker-compose up
+```
+
 ## Status
 
 **We are in research and development phase and this is alpha quality software. Please use at your own risk**.

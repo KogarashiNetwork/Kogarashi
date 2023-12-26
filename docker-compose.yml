@@ -1,0 +1,7 @@
+version: '3'
+services:
+  nova:
+    build: .
+    container_name: nova
+    tty: true
+    stdin_open: true
