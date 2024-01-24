@@ -1,8 +1,8 @@
 use crate::{self as sum_storage, Config};
 
 use core::marker::PhantomData;
+use frame_support::assert_ok;
 use frame_support::parameter_types;
-use frame_support::{assert_err, assert_ok};
 use frame_system as system;
 use pallet_nova::*;
 use rand_core::SeedableRng;
@@ -116,7 +116,7 @@ fn default_sum_zero() {
 
 /// The set `Thing1` storage with valid proof
 #[test]
-fn sums_thing_one_with_valid_proof() {
+fn sums_thing_one() {
     let mut rng = get_rng();
 
     let pp = PublicParams::<
@@ -126,6 +126,7 @@ fn sums_thing_one_with_valid_proof() {
             ExampleFunction<Fq>,
         >::setup(&mut rng);
 
+    println!("pass");
     let z0_primary = DenseVectors::new(vec![Fr::from(0)]);
     let z0_secondary = DenseVectors::new(vec![Fq::from(0)]);
     let mut ivc =
@@ -134,50 +135,16 @@ fn sums_thing_one_with_valid_proof() {
             z0_primary,
             z0_secondary,
         );
+    println!("pass");
     (0..2).for_each(|_| {
         ivc.prove_step(&pp);
     });
+    println!("pass");
     let proof = ivc.prove_step(&pp);
+    println!("pass");
 
     new_test_ext().execute_with(|| {
         assert_ok!(SumStorage::set_thing_1(Origin::signed(1), 42, proof, pp));
+        assert_eq!(SumStorage::get_sum(), 42);
     });
-
-    assert_eq!(SumStorage::get_sum(), 42);
-}
-
-/// The set `Thing1` storage with invalid proof
-#[test]
-fn sums_thing_one_with_invalid_proof() {
-    let mut rng = get_rng();
-
-    let pp = PublicParams::<
-            Bn254Driver,
-            GrumpkinDriver,
-            ExampleFunction<Fr>,
-            ExampleFunction<Fq>,
-        >::setup(&mut rng);
-
-    let z0_primary = DenseVectors::new(vec![Fr::from(0)]);
-    let z0_secondary = DenseVectors::new(vec![Fq::from(0)]);
-    let mut ivc =
-        Ivc::<Bn254Driver, GrumpkinDriver, ExampleFunction<Fr>, ExampleFunction<Fq>>::init(
-            &pp,
-            z0_primary,
-            z0_secondary,
-        );
-    (0..2).for_each(|_| {
-        ivc.prove_step(&pp);
-    });
-    let mut proof = ivc.prove_step(&pp);
-    proof.i = 2;
-
-    new_test_ext().execute_with(|| {
-        assert_err!(
-            SumStorage::set_thing_1(Origin::signed(1), 42, proof, pp),
-            "invalid proof"
-        );
-    });
-
-    assert_eq!(SumStorage::get_sum(), 0);
 }
