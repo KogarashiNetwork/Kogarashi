@@ -17,4 +17,4 @@ COPY . .
 
 WORKDIR /app/pallet/nova
 
-RUN cargo test --release
+CMD cargo test --release
