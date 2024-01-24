@@ -304,6 +304,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "bn-254"
+version = "0.0.1"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#6cfe4cdc1d2cc232b18e04899e78d81840c65e09"
+dependencies = [
+ "ff",
+ "parity-scale-codec",
+ "serde",
+ "zkstd 0.0.22 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -993,13 +1004,24 @@ checksum = "4271d37baee1b8c7e4b708028c57d816cf9d2434acb33a549475f78c181f6253"
 name = "grumpkin"
 version = "0.0.1"
 dependencies = [
- "bn-254",
+ "bn-254 0.0.1",
  "criterion",
  "parity-scale-codec",
  "proptest",
  "rand_core 0.6.4",
  "serde",
  "zkstd 0.0.22",
+]
+
+[[package]]
+name = "grumpkin"
+version = "0.0.1"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#6cfe4cdc1d2cc232b18e04899e78d81840c65e09"
+dependencies = [
+ "bn-254 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
+ "parity-scale-codec",
+ "serde",
+ "zkstd 0.0.22 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
 ]
 
 [[package]]
@@ -1495,7 +1517,7 @@ checksum = "e2355d85b9a3786f481747ced0e0ff2ba35213a1f9bd406ed906554d7af805a1"
 name = "pallet-nova"
 version = "0.1.0"
 dependencies = [
- "bn-254",
+ "bn-254 0.0.1",
  "frame-support",
  "frame-system",
  "fullcodec_rand_xorshift",
@@ -1505,8 +1527,22 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "zknova",
+ "zknova 0.0.1",
  "zkstd 0.0.22",
+]
+
+[[package]]
+name = "pallet-nova"
+version = "0.1.0"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#6cfe4cdc1d2cc232b18e04899e78d81840c65e09"
+dependencies = [
+ "bn-254 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
+ "frame-support",
+ "frame-system",
+ "fullcodec_rand_xorshift",
+ "parity-scale-codec",
+ "zknova 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
+ "zkstd 0.0.22 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
 ]
 
 [[package]]
@@ -3084,14 +3120,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "zk-storage"
+version = "3.0.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "pallet-nova 0.1.0 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0 (git+https://github.com/KogarashiNetwork/zksubstrate?branch=v3.0.0)",
+]
+
+[[package]]
 name = "zkgroth16"
 version = "0.0.1"
 dependencies = [
- "bn-254",
- "grumpkin",
+ "bn-254 0.0.1",
+ "grumpkin 0.0.1",
  "parity-scale-codec",
  "rayon",
  "zkstd 0.0.22",
+]
+
+[[package]]
+name = "zkgroth16"
+version = "0.0.1"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#6cfe4cdc1d2cc232b18e04899e78d81840c65e09"
+dependencies = [
+ "bn-254 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
+ "grumpkin 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
+ "parity-scale-codec",
+ "zkstd 0.0.22 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
 ]
 
 [[package]]
@@ -3099,15 +3162,32 @@ name = "zknova"
 version = "0.0.1"
 dependencies = [
  "blake2b_simd",
- "bn-254",
- "grumpkin",
+ "bn-254 0.0.1",
+ "grumpkin 0.0.1",
  "num-bigint 0.4.4",
  "num-traits",
  "parity-scale-codec",
  "rand_core 0.6.4",
  "serde",
- "zkgroth16",
+ "zkgroth16 0.0.1",
  "zkstd 0.0.22",
+]
+
+[[package]]
+name = "zknova"
+version = "0.0.1"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#6cfe4cdc1d2cc232b18e04899e78d81840c65e09"
+dependencies = [
+ "blake2b_simd",
+ "bn-254 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
+ "grumpkin 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
+ "num-bigint 0.4.4",
+ "num-traits",
+ "parity-scale-codec",
+ "rand_core 0.6.4",
+ "serde",
+ "zkgroth16 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
+ "zkstd 0.0.22 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
 ]
 
 [[package]]
@@ -3125,6 +3205,18 @@ dependencies = [
 [[package]]
 name = "zkstd"
 version = "0.0.22"
+dependencies = [
+ "parity-scale-codec",
+ "paste",
+ "rand_core 0.6.4",
+ "serde",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "zkstd"
+version = "0.0.22"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#6cfe4cdc1d2cc232b18e04899e78d81840c65e09"
 dependencies = [
  "parity-scale-codec",
  "paste",

@@ -36,6 +36,13 @@ or
 $ docker-compose up
 ```
 
+If you want to run `pallet-nova` container without docker-compose, the command would be as follow.
+
+```shell
+$ docker build . -t nova
+$ docker run nova
+```
+
 ## Status
 
 **We are in research and development phase and this is alpha quality software. Please use at your own risk**.

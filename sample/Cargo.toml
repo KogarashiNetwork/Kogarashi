@@ -1,0 +1,37 @@
+[package]
+name = "zk-storage"
+version = "3.0.0"
+edition = "2018"
+authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
+repository = "https://github.com/substrate-developer-hub/recipes"
+description = "A pallet with two storage items whose sum is exposed via a custom runtime API"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+parity-scale-codec = { version = "2.0", default-features = false, features = ["derive"] }
+
+# Substrate packages
+frame-support = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+frame-system = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-runtime = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-std = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+
+# nova pallet
+pallet-nova = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
+rand_core = {version="0.6", default-features = false }
+
+[dev-dependencies]
+serde = { version = "1.0.102", default-features = false, features = ["derive"] }
+sp-io = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+sp-core = { branch = 'v3.0.0', default-features = false, git = "https://github.com/KogarashiNetwork/zksubstrate" }
+
+[features]
+default = ["std"]
+std = [
+	"parity-scale-codec/std",
+	"sp-std/std",
+	"sp-runtime/std",
+	"frame-support/std",
+	"frame-system/std",
+    "pallet-nova/std"
+]
