@@ -13,8 +13,8 @@ RUN apk add --no-cache --update-cache \
 
 WORKDIR /app
 
-COPY . .
+COPY sample .
 
-WORKDIR /app/pallet/nova
+WORKDIR /app
 
 CMD cargo test --release

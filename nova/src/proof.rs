@@ -18,7 +18,7 @@ where
     FC2: FunctionCircuit<E2::Scalar>,
 {
     #[codec(compact)]
-    pub(crate) i: u64,
+    pub i: u64,
     pub(crate) z0_primary: DenseVectors<E1::Scalar>,
     pub(crate) z0_secondary: DenseVectors<E2::Scalar>,
     pub(crate) zi_primary: DenseVectors<E1::Scalar>,
