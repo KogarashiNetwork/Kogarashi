@@ -306,7 +306,7 @@ dependencies = [
 [[package]]
 name = "bn-254"
 version = "0.0.1"
-source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#6cfe4cdc1d2cc232b18e04899e78d81840c65e09"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#670d3a505ab5fd44a8ef6146d4b671e00129c0a8"
 dependencies = [
  "ff",
  "parity-scale-codec",
@@ -1016,7 +1016,7 @@ dependencies = [
 [[package]]
 name = "grumpkin"
 version = "0.0.1"
-source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#6cfe4cdc1d2cc232b18e04899e78d81840c65e09"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#670d3a505ab5fd44a8ef6146d4b671e00129c0a8"
 dependencies = [
  "bn-254 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
  "parity-scale-codec",
@@ -1534,7 +1534,7 @@ dependencies = [
 [[package]]
 name = "pallet-nova"
 version = "0.1.0"
-source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#6cfe4cdc1d2cc232b18e04899e78d81840c65e09"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#670d3a505ab5fd44a8ef6146d4b671e00129c0a8"
 dependencies = [
  "bn-254 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
  "frame-support",
@@ -3149,7 +3149,7 @@ dependencies = [
 [[package]]
 name = "zkgroth16"
 version = "0.0.1"
-source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#6cfe4cdc1d2cc232b18e04899e78d81840c65e09"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#670d3a505ab5fd44a8ef6146d4b671e00129c0a8"
 dependencies = [
  "bn-254 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
  "grumpkin 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
@@ -3176,7 +3176,7 @@ dependencies = [
 [[package]]
 name = "zknova"
 version = "0.0.1"
-source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#6cfe4cdc1d2cc232b18e04899e78d81840c65e09"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#670d3a505ab5fd44a8ef6146d4b671e00129c0a8"
 dependencies = [
  "blake2b_simd",
  "bn-254 0.0.1 (git+https://github.com/KogarashiNetwork/Kogarashi?branch=master)",
@@ -3216,7 +3216,7 @@ dependencies = [
 [[package]]
 name = "zkstd"
 version = "0.0.22"
-source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#6cfe4cdc1d2cc232b18e04899e78d81840c65e09"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#670d3a505ab5fd44a8ef6146d4b671e00129c0a8"
 dependencies = [
  "parity-scale-codec",
  "paste",

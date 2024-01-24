@@ -13,8 +13,8 @@ RUN apk add --no-cache --update-cache \
 
 WORKDIR /app
 
-COPY sample .
+COPY . .
 
-WORKDIR /app
+WORKDIR /app/sample
 
 CMD cargo test --release
