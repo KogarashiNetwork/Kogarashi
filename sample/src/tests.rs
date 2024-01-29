@@ -30,17 +30,17 @@ frame_support::construct_runtime!(
 
 parameter_types! {
     pub const BlockHashCount: u64 = 250;
-    pub const SS58Prefix: u8 = 42;
+    pub BlockWeights: frame_system::limits::BlockWeights =
+        frame_system::limits::BlockWeights::simple_max(1024);
 }
 
 impl system::Config for TestRuntime {
     type BaseCallFilter = ();
     type BlockWeights = ();
     type BlockLength = ();
-    type DbWeight = ();
     type Origin = Origin;
-    type Call = Call;
     type Index = u64;
+    type Call = Call;
     type BlockNumber = u64;
     type Hash = H256;
     type Hashing = BlakeTwo256;
@@ -49,13 +49,14 @@ impl system::Config for TestRuntime {
     type Header = Header;
     type Event = Event;
     type BlockHashCount = BlockHashCount;
+    type DbWeight = ();
     type Version = ();
     type PalletInfo = PalletInfo;
     type AccountData = ();
     type OnNewAccount = ();
     type OnKilledAccount = ();
     type SystemWeightInfo = ();
-    type SS58Prefix = SS58Prefix;
+    type SS58Prefix = ();
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Encode, Decode)]
@@ -105,6 +106,13 @@ fn get_rng() -> FullcodecRng {
         0x59, 0x62, 0xbe, 0x5d, 0x76, 0x3d, 0x31, 0x8d, 0x17, 0xdb, 0x37, 0x32, 0x54, 0x06, 0xbc,
         0xe5,
     ])
+}
+
+#[test]
+fn default_sum_zero() {
+    new_test_ext().execute_with(|| {
+        assert_eq!(SumStorage::get_sum(), 0);
+    });
 }
 
 /// The set `Thing1` storage with valid proof
