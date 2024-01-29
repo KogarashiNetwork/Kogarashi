@@ -32,23 +32,6 @@ impl<C, M> SumStorage<C, M> {
 	}
 }
 
-/// Error type of this RPC api.
-// pub enum Error {
-// 	/// The transaction was not decodable.
-// 	DecodeError,
-// 	/// The call to runtime failed.
-// 	RuntimeError,
-// }
-//
-// impl From<Error> for i64 {
-// 	fn from(e: Error) -> i64 {
-// 		match e {
-// 			Error::RuntimeError => 1,
-// 			Error::DecodeError => 2,
-// 		}
-// 	}
-// }
-
 impl<C, Block> SumStorageApi<<Block as BlockT>::Hash> for SumStorage<C, Block>
 where
 	Block: BlockT,

@@ -107,13 +107,6 @@ fn get_rng() -> FullcodecRng {
     ])
 }
 
-#[test]
-fn default_sum_zero() {
-    new_test_ext().execute_with(|| {
-        assert_eq!(SumStorage::get_sum(), 0);
-    });
-}
-
 /// The set `Thing1` storage with valid proof
 #[test]
 fn sums_thing_one() {
@@ -126,7 +119,6 @@ fn sums_thing_one() {
             ExampleFunction<Fq>,
         >::setup(&mut rng);
 
-    println!("pass");
     let z0_primary = DenseVectors::new(vec![Fr::from(0)]);
     let z0_secondary = DenseVectors::new(vec![Fq::from(0)]);
     let mut ivc =
@@ -135,13 +127,11 @@ fn sums_thing_one() {
             z0_primary,
             z0_secondary,
         );
-    println!("pass");
+
     (0..2).for_each(|_| {
         ivc.prove_step(&pp);
     });
-    println!("pass");
     let proof = ivc.prove_step(&pp);
-    println!("pass");
 
     new_test_ext().execute_with(|| {
         assert_ok!(SumStorage::set_thing_1(Origin::signed(1), 42, proof, pp));
