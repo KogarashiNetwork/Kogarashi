@@ -8,6 +8,8 @@
 
 pub use crate::pallet::*;
 
+mod client;
+
 #[cfg(test)]
 mod tests;
 

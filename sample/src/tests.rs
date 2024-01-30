@@ -1,6 +1,5 @@
-use crate::{self as sum_storage, Config};
+use crate::{self as sum_storage, client::ExampleFunction, Config};
 
-use core::marker::PhantomData;
 use frame_support::assert_ok;
 use frame_support::parameter_types;
 use frame_system as system;
@@ -57,29 +56,6 @@ impl system::Config for TestRuntime {
     type OnKilledAccount = ();
     type SystemWeightInfo = ();
     type SS58Prefix = ();
-}
-
-#[derive(Debug, Clone, Default, PartialEq, Eq, Encode, Decode)]
-pub struct ExampleFunction<Field: PrimeField> {
-    mark: PhantomData<Field>,
-}
-
-impl<F: PrimeField> FunctionCircuit<F> for ExampleFunction<F> {
-    fn invoke(z: &DenseVectors<F>) -> DenseVectors<F> {
-        let next_z = z[0] * z[0] * z[0] + z[0] + F::from(5);
-        DenseVectors::new(vec![next_z])
-    }
-
-    fn invoke_cs<C: CircuitDriver<Scalar = F>>(
-        cs: &mut R1cs<C>,
-        z_i: Vec<FieldAssignment<F>>,
-    ) -> Vec<FieldAssignment<F>> {
-        let five = FieldAssignment::constant(&F::from(5));
-        let z_i_square = FieldAssignment::mul(cs, &z_i[0], &z_i[0]);
-        let z_i_cube = FieldAssignment::mul(cs, &z_i_square, &z_i[0]);
-
-        vec![&(&z_i_cube + &z_i[0]) + &five]
-    }
 }
 
 impl pallet_nova::Config for TestRuntime {
