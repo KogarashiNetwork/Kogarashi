@@ -15,4 +15,4 @@ WORKDIR /app
 
 COPY ./sample .
 
-# CMD cargo test --release
+CMD cargo test --release

@@ -255,7 +255,7 @@ dependencies = [
 [[package]]
 name = "bn-254"
 version = "0.0.1"
-source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#0d37f1901c0e8810c66a2a999fca464304fe622e"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#32aec18550832f76c9876b0f1688122d628eda92"
 dependencies = [
  "ff",
  "parity-scale-codec",
@@ -807,7 +807,7 @@ checksum = "4271d37baee1b8c7e4b708028c57d816cf9d2434acb33a549475f78c181f6253"
 [[package]]
 name = "grumpkin"
 version = "0.0.1"
-source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#0d37f1901c0e8810c66a2a999fca464304fe622e"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#32aec18550832f76c9876b0f1688122d628eda92"
 dependencies = [
  "bn-254",
  "parity-scale-codec",
@@ -1233,7 +1233,7 @@ checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
 [[package]]
 name = "pallet-nova"
 version = "0.1.0"
-source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#0d37f1901c0e8810c66a2a999fca464304fe622e"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#32aec18550832f76c9876b0f1688122d628eda92"
 dependencies = [
  "bn-254",
  "frame-support",
@@ -2632,7 +2632,7 @@ dependencies = [
 [[package]]
 name = "zkgroth16"
 version = "0.0.1"
-source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#0d37f1901c0e8810c66a2a999fca464304fe622e"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#32aec18550832f76c9876b0f1688122d628eda92"
 dependencies = [
  "bn-254",
  "grumpkin",
@@ -2643,7 +2643,7 @@ dependencies = [
 [[package]]
 name = "zknova"
 version = "0.0.1"
-source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#0d37f1901c0e8810c66a2a999fca464304fe622e"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#32aec18550832f76c9876b0f1688122d628eda92"
 dependencies = [
  "blake2b_simd",
  "bn-254",
@@ -2672,7 +2672,7 @@ dependencies = [
 [[package]]
 name = "zkstd"
 version = "0.0.22"
-source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#0d37f1901c0e8810c66a2a999fca464304fe622e"
+source = "git+https://github.com/KogarashiNetwork/Kogarashi?branch=master#32aec18550832f76c9876b0f1688122d628eda92"
 dependencies = [
  "parity-scale-codec",
  "paste",
