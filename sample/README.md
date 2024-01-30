@@ -1,17 +1,17 @@
 # Nova Pallet Sample
 Sample implementation to test Nova pallet functionality by importing on your pallet. You can find full version of tutorial [here](https://kogarashinetwork.github.io/tutorial/nova_pallet/).
 
-## Test
-
-```shell
-$ cargo test --release
-```
-
 ## Dependency
 
 ```yml
 pallet-nova = { git = "https://github.com/KogarashiNetwork/Kogarashi", branch = "master", default-features = false }
 rand_core = {version="0.6", default-features = false }
+```
+
+## Test
+
+```shell
+$ cargo test --release
 ```
 
 ## Usage
