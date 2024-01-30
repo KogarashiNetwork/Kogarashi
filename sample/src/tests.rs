@@ -30,17 +30,17 @@ frame_support::construct_runtime!(
 
 parameter_types! {
     pub const BlockHashCount: u64 = 250;
-    pub const SS58Prefix: u8 = 42;
+    pub BlockWeights: frame_system::limits::BlockWeights =
+        frame_system::limits::BlockWeights::simple_max(1024);
 }
 
 impl system::Config for TestRuntime {
     type BaseCallFilter = ();
     type BlockWeights = ();
     type BlockLength = ();
-    type DbWeight = ();
     type Origin = Origin;
-    type Call = Call;
     type Index = u64;
+    type Call = Call;
     type BlockNumber = u64;
     type Hash = H256;
     type Hashing = BlakeTwo256;
@@ -49,13 +49,14 @@ impl system::Config for TestRuntime {
     type Header = Header;
     type Event = Event;
     type BlockHashCount = BlockHashCount;
+    type DbWeight = ();
     type Version = ();
     type PalletInfo = PalletInfo;
     type AccountData = ();
     type OnNewAccount = ();
     type OnKilledAccount = ();
     type SystemWeightInfo = ();
-    type SS58Prefix = SS58Prefix;
+    type SS58Prefix = ();
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Encode, Decode)]
@@ -126,7 +127,6 @@ fn sums_thing_one() {
             ExampleFunction<Fq>,
         >::setup(&mut rng);
 
-    println!("pass");
     let z0_primary = DenseVectors::new(vec![Fr::from(0)]);
     let z0_secondary = DenseVectors::new(vec![Fq::from(0)]);
     let mut ivc =
@@ -135,13 +135,11 @@ fn sums_thing_one() {
             z0_primary,
             z0_secondary,
         );
-    println!("pass");
+
     (0..2).for_each(|_| {
         ivc.prove_step(&pp);
     });
-    println!("pass");
     let proof = ivc.prove_step(&pp);
-    println!("pass");
 
     new_test_ext().execute_with(|| {
         assert_ok!(SumStorage::set_thing_1(Origin::signed(1), 42, proof, pp));

@@ -5,7 +5,9 @@ members = [
     "grumpkin",
     "nova",
     "zkstd",
-    "pallet/nova",
+    "pallet/nova"
+]
+exclude = [
     "sample"
 ]
 
