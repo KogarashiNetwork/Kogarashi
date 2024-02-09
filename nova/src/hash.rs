@@ -6,7 +6,7 @@ use zkstd::common::{BNAffine, IntGroup, PrimeField, Ring};
 
 /// Amount of rounds calculated for the 254 bit field.
 /// Doubled due to the usage of Feistel mode with zero key.
-pub(crate) const MIMC_ROUNDS: usize = 161;
+pub(crate) const MIMC_ROUNDS: usize = 46;
 /// Because we start with u equals 0 or 1, we have (1 << 125) steps.
 /// Until the value of u will reach the MODULUS of the field.
 pub(crate) const CHALLENGE_BITS: usize = 128;
@@ -35,11 +35,13 @@ impl<const ROUND: usize, F: PrimeField> Mimc<ROUND, F> {
         for c in self.constants {
             let mut cxl = xl;
             cxl += c;
-            let mut ccxl = cxl.square();
-            ccxl *= cxl;
-            ccxl += xr;
+            let ccxl = cxl.square();
+            let cccxl = ccxl.square();
+            let mut ccccxl = ccxl * cccxl;
+            ccccxl *= cxl;
+            ccccxl += xr;
             xr = xl;
-            xl = ccxl;
+            xl = ccccxl;
         }
         xl
     }

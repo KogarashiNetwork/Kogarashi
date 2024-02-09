@@ -24,10 +24,12 @@ impl<const ROUND: usize, F: PrimeField> MimcAssignment<ROUND, F> {
     ) -> FieldAssignment<F> {
         for c in self.constants.iter().map(|c| FieldAssignment::constant(c)) {
             let cxl = &xl + &c;
-            let mut ccxl = FieldAssignment::square(cs, &cxl);
-            ccxl = &FieldAssignment::mul(cs, &ccxl, &cxl) + &xr;
+            let ccxl = FieldAssignment::square(cs, &cxl);
+            let cccxl = FieldAssignment::square(cs, &ccxl);
+            let mut ccccxl = FieldAssignment::mul(cs, &cccxl, &ccxl);
+            ccccxl = &FieldAssignment::mul(cs, &ccccxl, &cxl) + &xr;
             xr = xl;
-            xl = ccxl;
+            xl = ccccxl;
         }
         xl
     }
